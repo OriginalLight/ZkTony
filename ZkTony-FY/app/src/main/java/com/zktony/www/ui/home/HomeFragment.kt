@@ -54,7 +54,7 @@ class HomeFragment :
     }
 
     /**
-     * 初始化TextView
+     * 初始化文本框
      */
     private fun initTextView() {
         binding.a.tvActions.setOnClickListener {
