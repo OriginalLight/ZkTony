@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="@layout/fragment_home">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.zktony.www.ui.home.HomeViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
+
+        <TextView
+            android:id="@+id/tv_icon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:background="@color/dark_onPrimaryContainer"
+            android:gravity="center"
+            android:text="@string/c"
+            android:textAlignment="center"
+            android:textColor="@color/light_primary"
+            android:textSize="48sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_program"
+            android:layout_width="144dp"
+            android:layout_height="62dp"
+            android:backgroundTint="@color/light_onPrimary"
+            android:dropDownWidth="match_parent"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:singleLine="true"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:cornerRadius="0dp"
+            app:elevation="0dp"
+            app:icon="@drawable/ic_drop"
+            app:iconGravity="end"
+            app:iconPadding="0dp"
+            app:iconTint="@color/black"
+            app:layout_constraintEnd_toStartOf="@+id/v_1"
+            app:layout_constraintStart_toEndOf="@+id/tv_icon"
+            app:layout_constraintTop_toTopOf="parent"
+            app:rippleColor="@color/light_primary" />
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toTopOf="@+id/tv_actions"
+            app:layout_constraintEnd_toStartOf="@+id/v_1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_icon" />
+
+
+        <com.zktony.www.views.MarqueTextView
+            android:id="@+id/tv_actions"
+            android:layout_width="180dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:textAlignment="center"
+            android:textColor="@color/light_primary"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/v_1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_time" />
+
+        <View
+            android:id="@+id/v_1"
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="144dp"
+            android:background="@color/dark_onPrimaryContainer"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_icon"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/v_2"
+            app:layout_constraintStart_toEndOf="@+id/v_1"
+            app:layout_constraintTop_toTopOf="parent">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/v_2"
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="160dp"
+            android:background="@color/dark_onPrimaryContainer"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_start"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/start"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="40dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/v_2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:rippleColor="@color/light_error"
+            app:strokeColor="@color/dark_onBackground"
+            app:strokeWidth="5dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_stop"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:backgroundTint="@color/light_error"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/stop"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:cornerRadius="40dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/v_2"
+            app:layout_constraintTop_toTopOf="parent"
+            app:rippleColor="@color/light_primary"
+            app:strokeColor="@color/dark_onBackground"
+            app:strokeWidth="5dp" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
