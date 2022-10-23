@@ -52,7 +52,7 @@ class CommandGroup {
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
         val commandBlock = listOf(
-            CommandBlock.Text(SERIAL_FOUR, "${module.value}吸取一抗"),
+            CommandBlock.Text(SERIAL_FOUR, "${module.value}移动到一抗"),
             CommandBlock.Delay(1000L),
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
