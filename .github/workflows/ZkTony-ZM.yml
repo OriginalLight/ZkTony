@@ -42,6 +42,10 @@ jobs:
             ~/.gradle/caches/build-cache-*
           key: gradle-${{ hashFiles('checksum.txt') }}
 
+      - name: Change wrapper permissions
+        working-directory: ${{ env.SAMPLE_PATH }}
+        run: chmod +x ./gradlew
+        
       - name: Build project
         working-directory: ${{ env.SAMPLE_PATH }}
         run: ./gradlew assembleRelease
