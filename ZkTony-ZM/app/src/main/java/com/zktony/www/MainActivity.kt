@@ -149,6 +149,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
     /**
      * 初始化串口
+     * 当前项目使用TTYS4
      */
     private fun initSerialPort() {
         COMSerial.instance.addCOM(TTYS4.device, 115200)
