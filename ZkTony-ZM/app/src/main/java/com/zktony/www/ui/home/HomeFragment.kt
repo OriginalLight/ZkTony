@@ -229,7 +229,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     }
 
     /**
-     * 根据Tab选择模式
+     * 选择模式
      */
     private fun tab1Event() {
         binding.moduleX.tab1.addOnTabSelectedListener(object : OnTabSelectedListener {
