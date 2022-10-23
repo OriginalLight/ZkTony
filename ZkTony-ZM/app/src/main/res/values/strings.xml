@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">转膜仪</string>
+    <string name="title_home">转膜/染色</string>
+    <string name="title_program">实验程序</string>
+    <string name="title_log">日志</string>
+    <string name="title_admin">管理员</string>
+    <string name="about">关于我们</string>
+    <string name="close">关闭</string>
+</resources>

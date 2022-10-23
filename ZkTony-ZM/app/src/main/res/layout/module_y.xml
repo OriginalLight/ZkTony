@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="@layout/fragment_home">
+
+    <data>
+
+        <variable
+            name="cmd"
+            type="com.zktony.www.ui.home.model.Cmd" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="6dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tabBackground="@drawable/tab_background"
+            app:tabIndicatorColor="@color/purple_700"
+            app:tabSelectedTextColor="@color/black"
+            app:tabTextAppearance="@style/TextAppearance.AppCompat.Large"
+            app:tabTextColor="@color/light_outline">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="转膜"
+                android:textSize="16sp" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="染色"
+                android:textSize="16sp" />
+
+        </com.google.android.material.tabs.TabLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/con_input"
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tab_1">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/con_1"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="-1dp"
+                android:layout_marginBottom="-1dp"
+                android:background="@drawable/bg_line"
+                app:layout_constraintBottom_toTopOf="@+id/con_3"
+                app:layout_constraintEnd_toStartOf="@+id/con_2"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+
+                <Spinner
+                    android:id="@+id/sp_1"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_weight="2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/con_2"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="-1dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="-1dp"
+                android:background="@drawable/bg_line"
+                app:layout_constraintBottom_toTopOf="@+id/con_4"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@+id/con_1"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <EditText
+                    android:id="@+id/et_1"
+                    style="@style/Widget.AppCompat.EditText"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:hint="转速 RPM"
+                    android:imeOptions="actionNext"
+                    android:inputType="numberDecimal"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/con_3"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="-1dp"
+                android:layout_marginEnd="-1dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/bg_line"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/con_4"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/con_1">
+
+                <EditText
+                    android:id="@+id/et_2"
+                    style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:hint="电压 V"
+                    android:imeOptions="actionNext"
+                    android:inputType="numberDecimal"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/con_4"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="-1dp"
+                android:layout_marginTop="-1dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/bg_line"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@+id/con_3"
+                app:layout_constraintTop_toBottomOf="@+id/con_2">
+
+                <EditText
+                    android:id="@+id/et_3"
+                    style="@style/Widget.AppCompat.Light.AutoCompleteTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:hint="时长 MIN"
+                    android:imeOptions="actionDone"
+                    android:inputType="numberDecimal"
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/con_dash"
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/con_input">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/con_5"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="-1dp"
+                android:layout_marginBottom="-1dp"
+                android:background="@drawable/tv_error"
+                app:layout_constraintBottom_toTopOf="@+id/con_7"
+                app:layout_constraintEnd_toStartOf="@+id/con_6"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/tv_1"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:text='@{cmd.inputSensorY == 0 ? "模块B未插入" : "模块B已就绪"}'
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/con_6"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="-1dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="-1dp"
+                android:background="@drawable/tv_health"
+                app:layout_constraintBottom_toTopOf="@+id/con_8"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@+id/con_5"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <TextView
+                    android:id="@+id/tv_2"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:text='@{cmd.stepMotorY == 0 ? "OFF" : "转速：" + cmd.stepMotorY + " RPM"}'
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/con_7"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="-1dp"
+                android:layout_marginEnd="-1dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/tv_health"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/con_8"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/con_5">
+
+
+                <TextView
+                    android:id="@+id/tv_3"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:text='@{cmd.getVoltageY == 0f ? "OFF" : "电压：" + Float.toString(cmd.getVoltageY).substring(0, 5) + " V"}'
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/con_8"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="-1dp"
+                android:layout_marginTop="-1dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/tv_health"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@+id/con_7"
+                app:layout_constraintTop_toBottomOf="@+id/con_6">
+
+                <TextView
+                    android:id="@+id/tv_4"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:text='@{cmd.getCurrentY == 0f ? "OFF" : "电流：" + (cmd.getCurrentY &lt; 1f ? Float.toString(cmd.getCurrentY).substring(2, 5).replaceAll("^(0+)", "") + " mA" : Float.toString(cmd.getCurrentY).substring(0, 4) + " A")}'
+                    android:textSize="20sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/con_operate"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/con_dash">
+
+            <Button
+                android:id="@+id/btn_1"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/btn_press_selector"
+                android:text="停止"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btn_2"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/btn_2"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/btn_ban"
+                android:enabled="false"
+                android:text="开始"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btn_1"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/con_pump"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/con_operate">
+
+            <Button
+                android:id="@+id/btn_3"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/btn_press_selector"
+                android:text="填充"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btn_4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/btn_4"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/btn_press_selector"
+                android:text="回吸"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/btn_3"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/con_time"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_line"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/con_pump">
+
+            <TextView
+                android:id="@+id/tv_5"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:gravity="center"
+                android:text="00:00"
+                android:textSize="100sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
+

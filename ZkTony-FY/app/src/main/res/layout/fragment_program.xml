@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/con_1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        tools:context=".ui.data.DataFragment">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/con_2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/light_onPrimary"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/con_3_1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@color/dark_onBackground"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/con_3_1_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginEnd="2dp"
+                    app:layout_constraintBottom_toTopOf="@+id/rc_1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/tv_title_1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="1dp"
+                        android:background="@color/light_onPrimary"
+                        android:gravity="center"
+                        android:text="@string/order"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/tv_title_2"
+                        app:layout_constraintHorizontal_weight="1"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tv_title_2"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"
+                        android:background="@color/light_onPrimary"
+                        android:gravity="center"
+                        android:text="@string/program_name"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/tv_title_3"
+                        app:layout_constraintHorizontal_weight="2"
+                        app:layout_constraintStart_toEndOf="@+id/tv_title_1"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/tv_title_3"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="1dp"
+                        android:layout_marginEnd="1dp"
+                        android:background="@color/light_onPrimary"
+                        android:gravity="center"
+                        android:text="@string/actions"
+                        android:textColor="@color/black"
+                        android:textSize="16sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_add"
+                        app:layout_constraintHorizontal_weight="5"
+                        app:layout_constraintStart_toEndOf="@+id/tv_title_2"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_add"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="1dp"
+                        android:background="@color/dark_secondary"
+                        android:gravity="center"
+                        android:text="@string/add"
+                        android:textColor="@color/light_onPrimary"
+                        android:textSize="16sp"
+                        app:icon="@drawable/ic_add"
+                        app:iconGravity="textStart"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_weight="2"
+                        app:layout_constraintStart_toEndOf="@+id/tv_title_3"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rc_1"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:isScrollContainer="true"
+                    app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintHorizontal_weight="4"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/con_3_1_1"
+                    tools:listitem="@layout/item_program">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>
+
+
+

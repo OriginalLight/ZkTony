@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.zktony.www.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_program"
+        android:name="com.zktony.www.ui.program.ProgramFragment"
+        android:label="@string/title_program"
+        tools:layout="@layout/fragment_program" />
+
+    <fragment
+        android:id="@+id/navigation_log"
+        android:name="com.zktony.www.ui.log.LogFragment"
+        android:label="@string/title_log"
+        tools:layout="@layout/fragment_log" />
+
+    <fragment
+        android:id="@+id/navigation_admin"
+        android:name="com.zktony.www.ui.admin.AdminFragment"
+        android:label="@string/title_admin"
+        tools:layout="@layout/fragment_admin" />
+
+</navigation>
