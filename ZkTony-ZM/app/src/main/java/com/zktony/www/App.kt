@@ -9,7 +9,6 @@ import com.zktony.www.common.app.ApplicationProxy
 import com.zktony.www.common.app.CommonApplicationProxy
 import com.zktony.www.common.datastore.DataStoreFactory
 import com.zktony.www.common.dialog.DialogXManager
-import com.zktony.www.common.http.RetrofitManager
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -33,7 +32,6 @@ class App : Application(), Configuration.Provider {
         super.onCreate()
         DataStoreFactory.init(this)
         proxies.forEach { it.onCreate(this) }
-        RetrofitManager.init()
         DialogXManager(this).init()
     }
 

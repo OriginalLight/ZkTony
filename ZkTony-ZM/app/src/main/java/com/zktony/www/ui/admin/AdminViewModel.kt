@@ -23,8 +23,8 @@ import com.zktony.www.common.http.adapter.isSuccess
 import com.zktony.www.common.http.download.DownloadManager
 import com.zktony.www.common.http.download.model.DownloadState
 import com.zktony.www.common.model.Event
-import com.zktony.www.services.SystemService
-import com.zktony.www.services.model.Version
+import com.zktony.www.data.repository.SystemRepository
+import com.zktony.www.data.services.model.Version
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -37,8 +37,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AdminViewModel @Inject constructor(
-    private val service: SystemService,
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val systemRepository: SystemRepository,
 ) : BaseViewModel() {
 
     @Inject
@@ -239,7 +239,7 @@ class AdminViewModel @Inject constructor(
     private fun checkRemoteUpdate(context: Context) {
         viewModelScope.launch {
             if (context.isNetworkAvailable()) {
-                val res = service.getVersionInfo(1)
+                val res = systemRepository.getVersionInfo(1)
                 if (res.isSuccess) {
                     val ver = res.getOrThrow()
                     if (ver.versionCode > context.versionCode()) {

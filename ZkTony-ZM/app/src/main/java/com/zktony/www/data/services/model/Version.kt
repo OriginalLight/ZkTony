@@ -1,4 +1,4 @@
-package com.zktony.www.services.model
+package com.zktony.www.data.services.model
 
 /**
  * @author 刘贺贺

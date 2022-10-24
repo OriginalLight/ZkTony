@@ -22,7 +22,7 @@ import com.zktony.www.common.http.download.DownloadManager
 import com.zktony.www.common.http.download.model.DownloadState
 import com.zktony.www.data.entity.Motor
 import com.zktony.www.data.repository.MotorRepository
-import com.zktony.www.data.services.SystemService
+import com.zktony.www.data.repository.SystemRepository
 import com.zktony.www.data.services.model.Version
 import com.zktony.www.model.enum.SerialPortEnum
 import com.zktony.www.model.enum.getSerialPortEnum
@@ -39,9 +39,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AdminViewModel @Inject constructor(
-    private val service: SystemService,
     private val dataStore: DataStore<Preferences>,
     private val motorRepository: MotorRepository,
+    private val systemRepository: SystemRepository,
 ) : BaseViewModel() {
 
     @Inject
@@ -214,7 +214,7 @@ class AdminViewModel @Inject constructor(
     private fun checkRemoteUpdate(context: Context) {
         viewModelScope.launch {
             if (context.isNetworkAvailable()) {
-                val res = service.getVersionInfo(2)
+                val res = systemRepository.getVersionInfo(2)
                 if (res.isSuccess) {
                     res.getOrNull()?.let {
                         if (it.versionCode > context.versionCode()) {
