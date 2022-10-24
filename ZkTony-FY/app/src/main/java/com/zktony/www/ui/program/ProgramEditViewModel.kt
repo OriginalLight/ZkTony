@@ -6,9 +6,6 @@ import com.zktony.www.data.entity.Action
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
 import com.zktony.www.model.enum.ActionEnum
-import com.zktony.www.ui.program.model.ProgramEditIntent
-import com.zktony.www.ui.program.model.ProgramEditState
-import com.zktony.www.ui.program.model.ProgramEditUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -131,3 +128,22 @@ class ProgramEditViewModel @Inject constructor(
     }
 
 }
+
+sealed class ProgramEditIntent {
+    data class OnSwitchAction(val action: ActionEnum) : ProgramEditIntent()
+    data class OnDeleteAction(val action: Action) : ProgramEditIntent()
+    data class OnLoadActions(val programId: String) : ProgramEditIntent()
+    data class OnEditAction(val action: Action) : ProgramEditIntent()
+    object OnAddAction : ProgramEditIntent()
+}
+
+sealed class ProgramEditState {
+    data class OnSwitchAction(val action: ActionEnum) : ProgramEditState()
+    data class OnActionChange(val actionList: List<Action>) : ProgramEditState()
+    data class OnButtonChange(val enable: Boolean) : ProgramEditState()
+}
+
+data class ProgramEditUiState(
+    var programId: String = "",
+    var action: Action = Action()
+)

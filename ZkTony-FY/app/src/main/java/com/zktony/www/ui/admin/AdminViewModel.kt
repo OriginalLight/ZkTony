@@ -27,8 +27,6 @@ import com.zktony.www.data.services.model.Version
 import com.zktony.www.model.enum.SerialPortEnum
 import com.zktony.www.model.enum.getSerialPortEnum
 import com.zktony.www.serialport.protocol.Command
-import com.zktony.www.ui.admin.model.AdminIntent
-import com.zktony.www.ui.admin.model.AdminState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -369,4 +367,34 @@ class AdminViewModel @Inject constructor(
             }
         }
     }
+}
+
+sealed class AdminIntent {
+    // 下位机复位
+    object Reset : AdminIntent()
+
+    // 跳转到wifi设置界面
+    data class WifiSetting(val context: Context) : AdminIntent()
+
+    // 检查更新
+    data class CheckUpdate(val context: Context) : AdminIntent()
+
+    // 执行更新
+    data class DoUpdate(val context: Context, val file: File?, val version: Version?) :
+        AdminIntent()
+
+    // 切换底部导航栏
+    data class ChangeBar(val bar: Boolean, val context: Context) : AdminIntent()
+
+    // 变更抗体保温温度
+    data class ChangeTemp(val temp: Float) : AdminIntent()
+
+}
+
+sealed class AdminState {
+    data class CheckUpdate(val file: File?, val version: Version?) : AdminState()
+    data class DownloadProgress(val progress: Int) : AdminState()
+    data class DownloadSuccess(val file: File) : AdminState()
+    object DownloadError : AdminState()
+    object ChangeBar : AdminState()
 }

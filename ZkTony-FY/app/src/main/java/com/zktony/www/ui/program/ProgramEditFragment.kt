@@ -17,8 +17,6 @@ import com.zktony.www.data.entity.Action
 import com.zktony.www.databinding.FragmentProgramEditBinding
 import com.zktony.www.model.enum.ActionEnum
 import com.zktony.www.model.enum.getActionEnum
-import com.zktony.www.ui.program.model.ProgramEditIntent
-import com.zktony.www.ui.program.model.ProgramEditState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch

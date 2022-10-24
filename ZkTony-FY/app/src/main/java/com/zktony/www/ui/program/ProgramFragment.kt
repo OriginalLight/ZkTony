@@ -16,8 +16,6 @@ import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.showShortToast
 import com.zktony.www.data.entity.Program
 import com.zktony.www.databinding.FragmentProgramBinding
-import com.zktony.www.ui.program.model.ProgramIntent
-import com.zktony.www.ui.program.model.ProgramState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch

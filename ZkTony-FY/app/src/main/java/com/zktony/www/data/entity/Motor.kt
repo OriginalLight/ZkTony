@@ -39,9 +39,16 @@ data class Motor(
     var motorType: Int = 0,
     // 创建时间
     var createTime: Date = Date(System.currentTimeMillis()),
-    // 转一圈移动的长度
+    // y轴转一圈移动的长度
     @Ignore
-    var length: Float = 40.5f
+    val yLength: Float = 58f,
+    // z轴转一圈移动的长度
+    @Ignore
+    val zLength: Float = 3.8f,
+    // 转一圈的出液量
+    @Ignore
+    val volume: Float = 0.5f,
+
 ) {
     constructor(hex: String) : this() {
         address = hex.substring(0, 2).hexToInt8()
@@ -72,19 +79,30 @@ data class Motor(
     }
 
     /**
-     * 移动一毫米所用的脉冲数
+     * Y轴移动任意距离所需要的脉冲数
+     *
+     * @param distance [Float] 移动的距离
      */
-    private fun pulseCountPerMm(): Float {
-        return pulseCount() / length
+    fun yPulseCount(distance: Float): String {
+        return (distance * pulseCount() / yLength).toInt().toString()
     }
 
     /**
-     * 移动任意距离所需要的脉冲数
+     * Z轴移动任意距离所需要的脉冲数
      *
-     * @param distance 移动的距离
+     * @param distance [Float] 移动的距离
      */
-    fun pulseCount(distance: Float): String {
-        return (distance * pulseCountPerMm()).toInt().toString()
+    fun zPulseCount(distance: Float): String {
+        return (distance * pulseCount() / zLength).toInt().toString()
+    }
+
+    /**
+     * 出任意量液所需要的脉冲数
+     * @param volume [Float] 出液量
+     * @return [String] 脉冲数
+     */
+    fun volumePulseCount(volume: Float): String {
+        return (volume * pulseCount() / this.volume).toInt().toString()
     }
 
 }

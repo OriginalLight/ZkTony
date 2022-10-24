@@ -17,15 +17,12 @@ data class MotionMotor(
      * @param y [Float] y轴运动距离
      * @param z [Float] z轴运动距离
      */
-    fun toMultiPointHex(x: Float, y: Float, z: Float): String {
+    fun toMultiPointHex(y: Float, z: Float): String {
         val str = StringBuilder()
-        str.append(xAxis.pulseCount(x))
+        str.append("0,")
+        str.append(yAxis.yPulseCount(y))
         str.append(",")
-        str.append(yAxis.pulseCount(y))
-        str.append(",")
-        str.append(zAxis.pulseCount(z))
-        str.append(",")
-        str.append("0")
+        str.append(zAxis.zPulseCount(z))
         str.append(",")
         return str.toString()
     }
@@ -36,13 +33,12 @@ data class MotionMotor(
      * @param y [Float] y轴运动距离
      * @param z [Float] z轴运动距离
      */
-    fun toSinglePointHex(x: Float, y: Float, z: Float): String {
+    fun toSinglePointHex(y: Float, z: Float): String {
         val str = StringBuilder()
-        str.append(xAxis.pulseCount(x))
+        str.append("0,")
+        str.append(yAxis.yPulseCount(y))
         str.append(",")
-        str.append(yAxis.pulseCount(y))
-        str.append(",")
-        str.append(zAxis.pulseCount(z))
+        str.append(zAxis.zPulseCount(z))
         str.append(",")
         return str.toString()
     }
