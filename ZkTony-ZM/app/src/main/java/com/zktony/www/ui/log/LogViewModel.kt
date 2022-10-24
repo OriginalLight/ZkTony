@@ -4,16 +4,15 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.extension.getDayEnd
 import com.zktony.www.common.extension.getDayStart
+import com.zktony.www.data.entity.LogData
+import com.zktony.www.data.entity.LogRecord
 import com.zktony.www.data.repository.LogDataRepository
 import com.zktony.www.data.repository.LogRecordRespository
-import com.zktony.www.ui.log.model.LogIntent
-import com.zktony.www.ui.log.model.LogState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.Date
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -74,4 +73,15 @@ class LogViewModel @Inject constructor(
             }
         }
     }
+}
+
+sealed class LogIntent {
+    object InitLogRecord : LogIntent()
+    data class ChangeLogRecord(val start: Date, val end: Date) : LogIntent()
+    data class ChangeLogData(val id: String) : LogIntent()
+}
+
+sealed class LogState {
+    data class ChangeLogRecord(val logRecordList: List<LogRecord>) : LogState()
+    data class ChangeLogData(val logDataList: List<LogData>) : LogState()
 }

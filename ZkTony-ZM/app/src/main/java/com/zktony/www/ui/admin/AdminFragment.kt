@@ -21,8 +21,6 @@ import com.zktony.www.common.constant.Constants
 import com.zktony.www.common.extension.*
 import com.zktony.www.databinding.FragmentAdminBinding
 import com.zktony.www.services.model.Version
-import com.zktony.www.ui.admin.model.AdminIntent
-import com.zktony.www.ui.admin.model.AdminState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
@@ -224,7 +222,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                         title.text = "发现本地新版本"
                         message.text = "是否更新？"
                         btnOk.setOnClickListener {
-                            viewModel.dispatch(AdminIntent.DoUpdate(requireContext(), this@run, null))
+                            viewModel.dispatch(
+                                AdminIntent.DoUpdate(
+                                    requireContext(),
+                                    this@run,
+                                    null
+                                )
+                            )
                             dialog.dismiss()
                         }
                         btnCancel.setOnClickListener { dialog.dismiss() }
@@ -244,7 +248,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                         title.text = "发现在线新版本"
                         message.text = this@run.description + "\n是否升级？"
                         btnOk.setOnClickListener {
-                            viewModel.dispatch(AdminIntent.DoUpdate(requireContext(), null, this@run))
+                            viewModel.dispatch(
+                                AdminIntent.DoUpdate(
+                                    requireContext(),
+                                    null,
+                                    this@run
+                                )
+                            )
                             dialog.dismiss()
                         }
                         btnCancel.setOnClickListener { dialog.dismiss() }

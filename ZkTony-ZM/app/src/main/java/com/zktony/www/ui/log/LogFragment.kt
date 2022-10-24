@@ -26,17 +26,13 @@ import com.zktony.www.common.model.Event
 import com.zktony.www.data.entity.LogData
 import com.zktony.www.data.entity.LogRecord
 import com.zktony.www.databinding.FragmentLogBinding
-import com.zktony.www.ui.log.model.LogIntent
-import com.zktony.www.ui.log.model.LogState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
+import java.util.*
 
 
 @AndroidEntryPoint

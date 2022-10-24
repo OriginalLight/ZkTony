@@ -3,7 +3,6 @@ package com.zktony.www.ui.program
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
-import android.widget.LinearLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.kongzue.dialogx.dialogs.MessageDialog
@@ -17,8 +16,6 @@ import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.model.Event
 import com.zktony.www.data.entity.Program
 import com.zktony.www.databinding.FragmentProgramBinding
-import com.zktony.www.ui.program.model.ProgramIntent
-import com.zktony.www.ui.program.model.ProgramState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
