@@ -1,7 +1,9 @@
 package com.zktony.www.data.repository
 
+import com.zktony.www.common.http.adapter.NetworkResponse
 import com.zktony.www.data.dao.ProgramDao
 import com.zktony.www.data.entity.Program
+import com.zktony.www.data.services.ProgramService
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -10,7 +12,8 @@ import javax.inject.Inject
  * @date: 2022-09-21 8:49
  */
 class ProgramRepository @Inject constructor(
-    private val programDao: ProgramDao
+    private val programDao: ProgramDao,
+    private val service: ProgramService
 ) {
     suspend fun insert(program: Program) {
         programDao.insert(program)
@@ -38,6 +41,10 @@ class ProgramRepository @Inject constructor(
 
     fun withoutUpload(): Flow<List<Program>> {
         return programDao.withoutUpload()
+    }
+
+    suspend fun uploadProgram(programs: List<Program>): NetworkResponse<Any> {
+        return service.uploadProgram(programs)
     }
 
 }

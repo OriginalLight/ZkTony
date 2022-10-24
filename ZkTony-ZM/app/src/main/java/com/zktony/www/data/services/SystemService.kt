@@ -1,7 +1,7 @@
-package com.zktony.www.services
+package com.zktony.www.data.services
 
 import com.zktony.www.common.http.adapter.NetworkResponse
-import com.zktony.www.services.model.Version
+import com.zktony.www.data.services.model.Version
 import retrofit2.http.GET
 import retrofit2.http.Query
 

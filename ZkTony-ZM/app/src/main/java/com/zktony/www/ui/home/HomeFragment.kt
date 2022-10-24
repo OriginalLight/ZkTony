@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.widget.AdapterView
-import android.widget.LinearLayout
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayout
@@ -14,7 +13,7 @@ import com.zktony.serialport.COMSerial
 import com.zktony.www.R
 import com.zktony.www.adapter.SpinnerAdapter
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.AppLog
+import com.zktony.www.common.Logger
 import com.zktony.www.common.app.AppIntent
 import com.zktony.www.common.app.AppState
 import com.zktony.www.common.app.AppViewModel
@@ -561,7 +560,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 if (state.modelX === A) R.raw.zm else R.raw.rs
                             )
                         )
-                        AppLog.d(msg = "模块A计时停止：")
+                        Logger.d(msg = "模块A计时停止：")
                         if (!state.isRunY) {
                             zDisposable?.run {
                                 if (this.isDisposed.not()) {
@@ -578,7 +577,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 if (state.modelY === A) R.raw.zm else R.raw.rs
                             )
                         )
-                        AppLog.d(msg = "模块B计时停止：")
+                        Logger.d(msg = "模块B计时停止：")
                         if (!state.isRunX) {
                             zDisposable?.run {
                                 if (this.isDisposed.not()) {
@@ -613,7 +612,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }
                 }
             }
-            AppLog.d(msg = "模块A停止：")
+            Logger.d(msg = "模块A停止：")
         }
         if (module == Y) {
             yDisposable?.run {
@@ -629,7 +628,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }
                 }
             }
-            AppLog.d(msg = "模块B停止：")
+            Logger.d(msg = "模块B停止：")
         }
     }
 
@@ -659,14 +658,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     sendCmd.zmotorX = 1
                     sendCmd.zmotorY = 1
                     appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
-                    AppLog.d(msg = "开始定时自动清理废液")
+                    Logger.d(msg = "开始定时自动清理废液")
                     lifecycleScope.launch {
                         delay(viewModel.duration.toLong() * 1000)
                         val cmd = appViewModel.latestSendCmd
                         cmd.zmotorX = 0
                         cmd.zmotorY = 0
                         appViewModel.dispatch(AppIntent.SendCmd(cmd))
-                        AppLog.d(msg = "结束定时自动清理废液")
+                        Logger.d(msg = "结束定时自动清理废液")
                     }
                 }
 

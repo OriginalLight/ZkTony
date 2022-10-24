@@ -8,7 +8,7 @@ import com.zktony.www.BuildConfig
 /**
  * App 日志类
  */
-object AppLog {
+object Logger {
 
     private const val DEFAULT_TAG = "ZkTony"
 

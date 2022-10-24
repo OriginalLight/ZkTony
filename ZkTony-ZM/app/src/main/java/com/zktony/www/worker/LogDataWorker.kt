@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.www.common.AppLog
+import com.zktony.www.common.Logger
 import com.zktony.www.common.http.adapter.isSuccess
 import com.zktony.www.data.repository.LogDataRepository
-import com.zktony.www.services.LogService
+import com.zktony.www.data.repository.LogRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -27,23 +27,23 @@ class LogDataWorker @AssistedInject constructor(
     lateinit var logDataRepository: LogDataRepository
 
     @Inject
-    lateinit var service: LogService
+    lateinit var logRepository: LogRepository
 
     override suspend fun doWork(): Result {
         try {
             logDataRepository.withoutUpload().first().let {
                 if (it.isEmpty()) {
-                    AppLog.d("LogDataWorker", "上传日志数据为空")
+                    Logger.d("LogDataWorker", "上传日志数据为空")
                     return Result.success()
                 }
-                val res = service.uploadLogData(it)
+                val res = logRepository.uploadLogData(it)
                 if (res.isSuccess) {
                     it.forEach { logData ->
                         logData.upload = 1
                     }
                     logDataRepository.updateBatch(it)
                 } else {
-                    AppLog.e("LogDataWorker", "上传日志数据失败")
+                    Logger.e("LogDataWorker", "上传日志数据失败")
                     return Result.failure()
                 }
             }

@@ -1,4 +1,4 @@
-package com.zktony.www.services
+package com.zktony.www.data.services
 
 interface BaseService {
 

@@ -20,7 +20,7 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.constant.Constants
 import com.zktony.www.common.extension.*
 import com.zktony.www.databinding.FragmentAdminBinding
-import com.zktony.www.services.model.Version
+import com.zktony.www.data.services.model.Version
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
