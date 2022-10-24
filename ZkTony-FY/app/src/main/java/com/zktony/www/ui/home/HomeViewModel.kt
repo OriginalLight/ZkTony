@@ -4,6 +4,7 @@ import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.zktony.www.R
 import com.zktony.www.base.BaseViewModel
+import com.zktony.www.common.Logger
 import com.zktony.www.common.app.AppIntent
 import com.zktony.www.common.app.AppState
 import com.zktony.www.common.app.AppViewModel
@@ -13,15 +14,14 @@ import com.zktony.www.data.entity.Program
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
 import com.zktony.www.model.ActionActuator
+import com.zktony.www.model.ActionState
 import com.zktony.www.model.Queue
 import com.zktony.www.model.enum.ModuleEnum
 import com.zktony.www.model.enum.SerialPortEnum
-import com.zktony.www.model.state.ActionState
+import com.zktony.www.model.state.ButtonState
+import com.zktony.www.model.state.ModuleState
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
-import com.zktony.www.ui.home.model.HomeIntent
-import com.zktony.www.ui.home.model.HomeState
-import com.zktony.www.ui.home.model.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -208,7 +208,7 @@ class HomeViewModel @Inject constructor(
                     }
                 }
                 stopProgram(module)
-                _uiState.update { this }
+                _uiState.value = this
                 _state.emit(HomeState.OnButtonChange(module))
             }
         }
@@ -419,13 +419,8 @@ class HomeViewModel @Inject constructor(
             }
             val runner = ActionActuator.Builder().setModule(module).setActionQueue(actionQueue)
                 .setSettingState(appViewModel.settingState.value).build()
+            programStateCollector(runner)
             runner.run()
-            runner.state.collect {
-                when (it) {
-                    is ActionState.Finish -> clearJobWhenProgramStop(module)
-                    else -> {}
-                }
-            }
         }
         setJobWhenProgramStart(module, job)
     }
@@ -489,4 +484,56 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 程序运行状态收集器
+     */
+    private fun programStateCollector(job: ActionActuator) {
+        viewModelScope.launch {
+            job.state.collect {
+                when (it) {
+                    is ActionState.CurrentAction -> {
+                        Logger.e(msg = "当前程序：${it.module.value} ${it.action}")
+                    }
+                    is ActionState.CurrentActionTime -> {
+                        Logger.e(msg = "当前程序剩余时间：${it.module.value} ${it.time}")
+                    }
+                    is ActionState.Finish -> onStop(it.module)
+                }
+            }
+        }
+    }
+
 }
+
+sealed class HomeIntent {
+    data class OnSwitchProgram(val index: Int, val module: ModuleEnum) : HomeIntent()
+    data class OnStart(val module: ModuleEnum) : HomeIntent()
+    data class OnStop(val module: ModuleEnum) : HomeIntent()
+    object OnReset : HomeIntent()
+    object OnPause : HomeIntent()
+    object OnInsulating : HomeIntent()
+}
+
+sealed class HomeState {
+    data class OnSwitchProgram(val index: Int, val module: ModuleEnum) : HomeState()
+    data class OnLoadProgram(val uiState: HomeUiState) : HomeState()
+    data class OnButtonChange(val module: ModuleEnum) : HomeState()
+    data class OnRestCallBack(val success: Boolean) : HomeState()
+    object OnPause : HomeState()
+    object OnInsulating : HomeState()
+}
+
+data class HomeUiState(
+    var programList: List<Program> = emptyList(),
+    var moduleA: ModuleState = ModuleState(),
+    var moduleB: ModuleState = ModuleState(),
+    var moduleC: ModuleState = ModuleState(),
+    var moduleD: ModuleState = ModuleState(),
+    var btnReset: ButtonState = ButtonState(),
+    var btnPause: ButtonState = ButtonState(
+        text = "暂停摇床",
+        background = R.mipmap.btn_pause,
+        textColor = R.color.dark_outline
+    ),
+    var btnInsulating: ButtonState = ButtonState(text = "抗体保温", textColor = R.color.dark_outline),
+)

@@ -27,8 +27,6 @@ import com.zktony.www.common.constant.Constants
 import com.zktony.www.common.extension.*
 import com.zktony.www.data.services.model.Version
 import com.zktony.www.databinding.FragmentAdminBinding
-import com.zktony.www.ui.admin.model.AdminIntent
-import com.zktony.www.ui.admin.model.AdminState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

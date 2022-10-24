@@ -5,7 +5,6 @@ import com.zktony.www.common.extension.getTimeFormat
 import com.zktony.www.data.entity.Action
 import com.zktony.www.model.enum.ActionEnum
 import com.zktony.www.model.enum.ModuleEnum
-import com.zktony.www.model.state.ActionState
 import com.zktony.www.model.state.SettingState
 import com.zktony.www.serialport.protocol.CommandGroup
 import kotlinx.coroutines.delay
@@ -56,10 +55,6 @@ class ActionActuator private constructor(
             addBlockingLiquid {
                 countDown((action.time * 60 * 60).toLong(), {
                     _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
-                    Logger.d(
-                        module.value,
-                        "封闭液等待时间: ${it.getTimeFormat()}"
-                    )
                 },
                     {
                         wasteLiquid { executeNext() }
@@ -80,10 +75,6 @@ class ActionActuator private constructor(
             addAntibodyOne {
                 countDown((action.time * 60 * 60).toLong(), {
                     _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
-                    Logger.d(
-                        module.value,
-                        "一抗等待时间: ${it.getTimeFormat()}"
-                    )
                 },
                     {
                         recycleAntibodyOne { executeNext() }
@@ -103,10 +94,6 @@ class ActionActuator private constructor(
             addAntibodyTwo {
                 countDown((action.time * 60 * 60).toLong(), {
                     _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
-                    Logger.d(
-                        module.value,
-                        "二抗等待时间: ${it.getTimeFormat()}"
-                    )
                 },
                     {
                         wasteLiquid { executeNext() }
@@ -126,10 +113,6 @@ class ActionActuator private constructor(
             addWashingLiquid {
                 countDown((action.time * 60).toLong(), {
                     _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
-                    Logger.d(
-                        module.value,
-                        "洗涤等待时间: ${it.getTimeFormat()}"
-                    )
                 },
                     {
                         action.count--
@@ -152,8 +135,8 @@ class ActionActuator private constructor(
             dequeue()
             if (isEmpty()) {
                 // 任务队列执行完成
-                _state.emit(ActionState.Finish(module))
                 Logger.e(msg = "${module.value}任务队列执行完成")
+                _state.emit(ActionState.Finish(module))
             } else {
                 // 继续执行任务队列
                 Logger.e(msg = "${module.value}执行下一个任务")
@@ -199,4 +182,10 @@ class ActionActuator private constructor(
         fun build() = ActionActuator(actionQueue, module, settingState)
     }
 
+}
+
+sealed class ActionState {
+    data class CurrentAction(val module: ModuleEnum, val action: Action) : ActionState()
+    data class CurrentActionTime(val module: ModuleEnum, val time: String) : ActionState()
+    data class Finish(val module: ModuleEnum) : ActionState()
 }

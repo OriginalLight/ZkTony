@@ -1,6 +1,7 @@
 package com.zktony.www.serialport.protocol
 
 import com.zktony.www.model.enum.ModuleEnum
+import com.zktony.www.model.enum.SerialPortEnum
 import com.zktony.www.model.enum.SerialPortEnum.*
 import com.zktony.www.model.state.SettingState
 import com.zktony.www.serialport.SerialPortManager
@@ -25,24 +26,27 @@ class CommandGroup {
 
     }
 
+
     /**
      * 添加封闭液
      * @param block
      */
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
+        val motionMotor = settingState.motionMotor
         val commandBlock = listOf(
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint("0,6400,0,0,0,6400,9600,0,0,0,0,0,")
+                SERIAL_ONE, Command.multiPoint(
+                    motionMotor.toMultiPointHex(90f, 0f) +
+                            motionMotor.toMultiPointHex(90f, 98f) +
+                            motionMotor.toMultiPointHex(90f, 0f) +
+                            motionMotor.toMultiPointHex(0f, 0f)
+                )
             ),
-            CommandBlock.Hex(
-                SERIAL_TWO, Command.multiPoint("3200,0,0,3200,0,0,0,0,0,")
-            ),
-            CommandBlock.Hex(
-                SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,")
-            ),
+            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,6400,0,0,0,0,0,32000,0,0,")),
+            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock)
+        waitUntilComplete(commandBlock, 45 * 1000L)
         block.invoke()
     }
 
@@ -51,12 +55,21 @@ class CommandGroup {
      * @param block
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
+        val motionMotor = settingState.motionMotor
         val commandBlock = listOf(
-            CommandBlock.Text(SERIAL_FOUR, "${module.value}一抗"),
-            CommandBlock.Delay(1000L),
+            CommandBlock.Hex(
+                SERIAL_ONE, Command.multiPoint(
+                    motionMotor.toMultiPointHex(176f, 0f) +
+                            motionMotor.toMultiPointHex(176f, 103f) +
+                            motionMotor.toMultiPointHex(176f, 0f) +
+                            motionMotor.toMultiPointHex(0f, 0f)
+                )
+            ),
+            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,6400,0,0,0,0,0,32000,0,0,")),
+            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock)
+        waitUntilComplete(commandBlock, 45 * 1000L)
         block.invoke()
     }
 
@@ -65,14 +78,21 @@ class CommandGroup {
      * @param block
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
+        val motionMotor = settingState.motionMotor
         val commandBlock = listOf(
-            CommandBlock.Text(SERIAL_FOUR, "${module.value}回收一抗"),
-            CommandBlock.Delay(3000L),
-            CommandBlock.Text(SERIAL_FOUR, "${module.value}放回一抗"),
-            CommandBlock.Delay(5000L),
+            CommandBlock.Hex(
+                SERIAL_ONE, Command.multiPoint(
+                    motionMotor.toMultiPointHex(176f, 0f) +
+                            motionMotor.toMultiPointHex(176f, 98f) +
+                            motionMotor.toMultiPointHex(176f, 0f) +
+                            motionMotor.toMultiPointHex(0f, 0f)
+                )
+            ),
+            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,-32000,0,0,0,0,0,0,0,0,")),
+            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock)
+        waitUntilComplete(commandBlock, 45 * 1000L)
         block.invoke()
     }
 
@@ -81,14 +101,21 @@ class CommandGroup {
      * @param block
      */
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
+        val motionMotor = settingState.motionMotor
         val commandBlock = listOf(
-            CommandBlock.Text(SERIAL_FOUR, "${module.value}吸取二抗"),
-            CommandBlock.Delay(3000L),
-            CommandBlock.Text(SERIAL_FOUR, "${module.value}添加二抗"),
-            CommandBlock.Delay(5000L),
+            CommandBlock.Hex(
+                SERIAL_ONE, Command.multiPoint(
+                    motionMotor.toMultiPointHex(138f, 0f) +
+                            motionMotor.toMultiPointHex(138f, 103f) +
+                            motionMotor.toMultiPointHex(138f, 0f) +
+                            motionMotor.toMultiPointHex(0f, 0f)
+                )
+            ),
+            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,6400,0,0,0,0,0,32000,0,0,")),
+            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock)
+        waitUntilComplete(commandBlock, 45 * 1000L)
         block.invoke()
     }
 
@@ -97,14 +124,21 @@ class CommandGroup {
      * @param block
      */
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
+        val motionMotor = settingState.motionMotor
         val commandBlock = listOf(
-            CommandBlock.Text(SERIAL_FOUR, "${module.value}吸取洗涤液"),
-            CommandBlock.Delay(3000L),
-            CommandBlock.Text(SERIAL_FOUR, "${module.value}添加洗涤液"),
-            CommandBlock.Delay(5000L),
+            CommandBlock.Hex(
+                SERIAL_ONE, Command.multiPoint(
+                    motionMotor.toMultiPointHex(51f, 0f) +
+                            motionMotor.toMultiPointHex(51f, 98f) +
+                            motionMotor.toMultiPointHex(51f, 0f) +
+                            motionMotor.toMultiPointHex(0f, 0f)
+                )
+            ),
+            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,6400,0,0,0,0,0,32000,0,0,")),
+            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock)
+        waitUntilComplete(commandBlock, 45 * 1000L)
         block.invoke()
     }
 
@@ -114,14 +148,21 @@ class CommandGroup {
      * @param block
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
+        val motionMotor = settingState.motionMotor
         val commandBlock = listOf(
-            CommandBlock.Text(SERIAL_FOUR, "${module.value}移动到废液槽"),
-            CommandBlock.Delay(3000L),
-            CommandBlock.Text(SERIAL_FOUR, "${module.value}排入废液槽"),
-            CommandBlock.Delay(5000L),
+            CommandBlock.Hex(
+                SERIAL_ONE, Command.multiPoint(
+                    motionMotor.toMultiPointHex(8f, 0f) +
+                            motionMotor.toMultiPointHex(8f, 20f) +
+                            motionMotor.toMultiPointHex(8f, 0f) +
+                            motionMotor.toMultiPointHex(0f, 0f)
+                )
+            ),
+            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,-96000,0,0,0,0,0,0,0,0,")),
+            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock)
+        waitUntilComplete(commandBlock, 25 * 1000L)
         block.invoke()
     }
 
@@ -145,4 +186,10 @@ class CommandGroup {
         }
     }
 
+}
+
+sealed class CommandBlock {
+    data class Hex(val serialPort: SerialPortEnum, val hex: String) : CommandBlock()
+    data class Text(val serialPort: SerialPortEnum, val text: String) : CommandBlock()
+    data class Delay(val delay: Long) : CommandBlock()
 }

@@ -8,11 +8,7 @@ import com.zktony.www.data.entity.Motor
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.model.enum.getSerialPortEnum
 import com.zktony.www.serialport.protocol.Command
-import com.zktony.www.ui.admin.model.MotorSettingIntent
-import com.zktony.www.ui.admin.model.MotorSettingState
-import com.zktony.www.ui.admin.model.MotorSettingUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,31 +30,16 @@ class MotorSettingViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            launch {
-                intent.collect {
-                    when (it) {
-                        is MotorSettingIntent.OnMotorValueChange -> onMotorValueChange(it.motor)
-                        is MotorSettingIntent.OnEditMotor -> onEditMotor(it.motor)
-                        is MotorSettingIntent.OnUpdateMotor -> onUpdateMotor()
-                    }
+            intent.collect {
+                when (it) {
+                    is MotorSettingIntent.OnMotorValueChange -> onMotorValueChange(it.motor)
+                    is MotorSettingIntent.OnEditMotor -> onEditMotor(it.motor)
+                    is MotorSettingIntent.OnUpdateMotor -> onUpdateMotor()
+                    is MotorSettingIntent.InitMotors -> initMotors()
                 }
             }
-            launch {
-                delay(200L)
-                motorRepository.getAll().collect { motors ->
-                    _uiState.update {
-                        if (it.motor.name.isEmpty()) {
-                            it.copy(motor = motors.first())
-                        } else {
-                            it
-                        }
-                    }
-                    _state.emit(MotorSettingState.OnMotorValueChange(uiState.value.motor))
-                    _state.emit(MotorSettingState.OnDataBaseChange(motors))
-                }
-            }
-
         }
+        initMotors()
     }
 
     /**
@@ -71,6 +52,25 @@ class MotorSettingViewModel @Inject constructor(
                 this@MotorSettingViewModel.intent.emit(intent)
             }
         } catch (_: Exception) {
+        }
+    }
+
+    /**
+     * 初始化电机
+     */
+    private fun initMotors() {
+        viewModelScope.launch {
+            motorRepository.getAll().collect { motors ->
+                _uiState.update {
+                    if (it.motor.name.isEmpty()) {
+                        it.copy(motor = motors.first())
+                    } else {
+                        it
+                    }
+                }
+                _state.emit(MotorSettingState.OnMotorValueChange(uiState.value.motor))
+                _state.emit(MotorSettingState.OnDataBaseChange(motors))
+            }
         }
     }
 
@@ -148,3 +148,20 @@ class MotorSettingViewModel @Inject constructor(
     }
 
 }
+
+sealed class MotorSettingIntent {
+    data class OnMotorValueChange(val motor: Motor) : MotorSettingIntent()
+    data class OnEditMotor(val motor: Motor) : MotorSettingIntent()
+    object OnUpdateMotor : MotorSettingIntent()
+    object InitMotors : MotorSettingIntent()
+}
+
+sealed class MotorSettingState {
+    data class OnDataBaseChange(val motorList: List<Motor>) : MotorSettingState()
+    data class OnUpdateMessage(val message: String) : MotorSettingState()
+    data class OnMotorValueChange(val motor: Motor) : MotorSettingState()
+}
+
+data class MotorSettingUiState(
+    var motor: Motor = Motor(),
+)

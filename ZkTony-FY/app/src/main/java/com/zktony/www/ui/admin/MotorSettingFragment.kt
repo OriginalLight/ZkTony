@@ -15,8 +15,6 @@ import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.data.entity.Motor
 import com.zktony.www.databinding.FragmentMotorSettingBinding
-import com.zktony.www.ui.admin.model.MotorSettingIntent
-import com.zktony.www.ui.admin.model.MotorSettingState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -62,6 +60,7 @@ class MotorSettingFragment :
         motorAdapter.setOnEditButtonClick { motor ->
             viewModel.dispatch(MotorSettingIntent.OnEditMotor(motor))
         }
+        viewModel.dispatch(MotorSettingIntent.InitMotors)
     }
 
     /**

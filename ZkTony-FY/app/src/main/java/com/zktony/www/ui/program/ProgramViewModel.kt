@@ -6,8 +6,6 @@ import com.zktony.www.common.extension.showShortToast
 import com.zktony.www.data.entity.Program
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.ui.program.model.ProgramIntent
-import com.zktony.www.ui.program.model.ProgramState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -83,4 +81,13 @@ class ProgramViewModel @Inject constructor(
         }
     }
 
+}
+
+sealed class ProgramIntent {
+    data class OnDeleteProgram(val program: Program) : ProgramIntent()
+    data class OnAddProgram(val programName: String) : ProgramIntent()
+}
+
+sealed class ProgramState {
+    data class OnProgramChange(val programList: List<Program>) : ProgramState()
 }

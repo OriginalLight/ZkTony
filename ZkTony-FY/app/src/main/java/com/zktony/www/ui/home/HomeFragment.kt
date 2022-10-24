@@ -13,9 +13,6 @@ import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.databinding.FragmentHomeBinding
 import com.zktony.www.model.enum.ModuleEnum
-import com.zktony.www.ui.home.model.HomeIntent
-import com.zktony.www.ui.home.model.HomeState
-import com.zktony.www.ui.home.model.HomeUiState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -439,4 +436,5 @@ class HomeFragment :
                 }
         }
     }
+
 }
