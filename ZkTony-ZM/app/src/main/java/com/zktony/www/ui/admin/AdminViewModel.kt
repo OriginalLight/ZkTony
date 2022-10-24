@@ -25,8 +25,6 @@ import com.zktony.www.common.http.download.model.DownloadState
 import com.zktony.www.common.model.Event
 import com.zktony.www.services.SystemService
 import com.zktony.www.services.model.Version
-import com.zktony.www.ui.admin.model.AdminIntent
-import com.zktony.www.ui.admin.model.AdminState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -271,4 +269,31 @@ class AdminViewModel @Inject constructor(
         }
         return null
     }
+}
+
+sealed class AdminIntent {
+    data class ChangeInterval(val interval: Int) : AdminIntent()
+    data class ChangeDuration(val duration: Int) : AdminIntent()
+    data class ChangeBar(val bar: Boolean, val context: Context) : AdminIntent()
+    data class ChangeAudio(val audio: Boolean) : AdminIntent()
+    data class ChangeDetect(val detect: Boolean) : AdminIntent()
+    data class ChangePump(val pump: Boolean) : AdminIntent()
+    data class CheckUpdate(val context: Context) : AdminIntent()
+    data class DoUpdate(val context: Context, val file: File?, val version: Version?) :
+        AdminIntent()
+
+    data class WifiSetting(val context: Context) : AdminIntent()
+    object Rest : AdminIntent()
+}
+
+sealed class AdminState {
+    data class ChangeInterval(val interval: Int) : AdminState()
+    data class ChangeDuration(val duration: Int) : AdminState()
+    data class ChangeBar(val bar: Boolean) : AdminState()
+    data class ChangeAudio(val audio: Boolean) : AdminState()
+    data class ChangeDetect(val detect: Boolean) : AdminState()
+    data class CheckUpdate(val file: File?, val version: Version?) : AdminState()
+    data class DownloadProgress(val progress: Int) : AdminState()
+    data class DownloadSuccess(val file: File) : AdminState()
+    object DownloadError : AdminState()
 }

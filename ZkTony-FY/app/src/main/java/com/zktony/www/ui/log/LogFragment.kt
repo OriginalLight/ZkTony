@@ -26,8 +26,6 @@ import com.zktony.www.data.entity.LogData
 import com.zktony.www.data.entity.LogRecord
 import com.zktony.www.databinding.FragmentLogBinding
 import com.zktony.www.model.Event
-import com.zktony.www.ui.log.model.LogIntent
-import com.zktony.www.ui.log.model.LogState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch

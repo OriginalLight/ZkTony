@@ -4,8 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.data.entity.Program
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.ui.program.model.ProgramIntent
-import com.zktony.www.ui.program.model.ProgramState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -112,4 +110,16 @@ class ProgramViewModel @Inject constructor(
         }
     }
 
+}
+
+sealed class ProgramIntent {
+    data class InsertProgram(val program: Program) : ProgramIntent()
+    data class UpdateProgram(val program: Program) : ProgramIntent()
+    data class DeleteProgram(val program: Program) : ProgramIntent()
+    data class VerifyProgram(val program: Program) : ProgramIntent()
+}
+
+sealed class ProgramState {
+    data class VerifyProgram(val verify: Boolean) : ProgramState()
+    data class ChangeProgramList(val programList: List<Program>) : ProgramState()
 }

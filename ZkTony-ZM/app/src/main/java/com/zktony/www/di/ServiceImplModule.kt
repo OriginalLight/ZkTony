@@ -25,7 +25,7 @@ abstract class ServiceImplModule {
 
     @Binds
     @Singleton
-    abstract fun getLoginServiceImpl(impl: LogServiceImpl): LogService
+    abstract fun getLogServiceImpl(impl: LogServiceImpl): LogService
 
     @Binds
     @Singleton
