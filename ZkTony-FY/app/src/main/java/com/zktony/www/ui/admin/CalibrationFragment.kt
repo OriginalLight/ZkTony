@@ -107,6 +107,15 @@ class CalibrationFragment :
             btnTestAntibodyTwoTankUp.setOnClickListener {
                 viewModel.dispatch(CalibrationIntent.AntibodyTwoTankNeedleUp)
             }
+            btnTestZeroMove.setOnClickListener {
+                viewModel.dispatch(CalibrationIntent.ToZeroPosition)
+            }
+            btnTestAspirate.setOnClickListener {
+                viewModel.dispatch(CalibrationIntent.Aspirate)
+            }
+            btnTestDrainage.setOnClickListener {
+                viewModel.dispatch(CalibrationIntent.Drainage)
+            }
         }
     }
 
