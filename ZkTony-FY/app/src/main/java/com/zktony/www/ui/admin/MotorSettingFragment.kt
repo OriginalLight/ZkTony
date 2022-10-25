@@ -70,7 +70,7 @@ class MotorSettingFragment :
         binding.btnBack.run {
             this.clickScale()
             this.setOnClickListener {
-                findNavController().navigate(R.id.action_navigation_motor_setting_to_navigation_admin)
+                findNavController().navigateUp()
             }
         }
         binding.btnMode.setOnClickListener {

@@ -18,8 +18,6 @@ import com.zktony.www.model.ActionState
 import com.zktony.www.model.Queue
 import com.zktony.www.model.enum.ModuleEnum
 import com.zktony.www.model.enum.SerialPortEnum
-import com.zktony.www.model.state.ButtonState
-import com.zktony.www.model.state.ModuleState
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -536,4 +534,24 @@ data class HomeUiState(
         textColor = R.color.dark_outline
     ),
     var btnInsulating: ButtonState = ButtonState(text = "抗体保温", textColor = R.color.dark_outline),
+)
+
+data class ModuleState(
+    var index: Int = -1,
+    var isRunning: Boolean = false,
+    var btnStart: ButtonState = ButtonState(enable = false),
+    var btnStop: ButtonState = ButtonState(visibility = View.GONE),
+    var btnProgram: ButtonState = ButtonState(),
+    var job: Job? = null,
+)
+
+data class ButtonState(
+    var visibility: Int = View.VISIBLE,
+    var isClickable: Boolean = true,
+    var text: String = "",
+    var enable: Boolean = true,
+    var background: Int = 0,
+    var isRunning: Boolean = false,
+    var icon: Int = 0,
+    var textColor: Int = 0,
 )

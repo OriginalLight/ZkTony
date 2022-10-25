@@ -1,11 +1,11 @@
 package com.zktony.www.model
 
 import com.zktony.www.common.Logger
+import com.zktony.www.common.app.SettingState
 import com.zktony.www.common.extension.getTimeFormat
 import com.zktony.www.data.entity.Action
 import com.zktony.www.model.enum.ActionEnum
 import com.zktony.www.model.enum.ModuleEnum
-import com.zktony.www.model.state.SettingState
 import com.zktony.www.serialport.protocol.CommandGroup
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow

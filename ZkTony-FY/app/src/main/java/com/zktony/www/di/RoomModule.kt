@@ -29,7 +29,7 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object DataBaseModule {
+object RoomModule {
 
     @Provides
     @Singleton
@@ -64,5 +64,10 @@ object DataBaseModule {
     @Provides
     fun provideMotorDao(database: AppDatabase): MotorDao {
         return database.motorDao()
+    }
+
+    @Provides
+    fun provideCailbrationDao(database: AppDatabase): CalibrationDao {
+        return database.cailbrationDao()
     }
 }

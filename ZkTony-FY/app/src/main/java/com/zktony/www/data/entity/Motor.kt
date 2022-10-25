@@ -1,7 +1,6 @@
 package com.zktony.www.data.entity
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.zktony.www.common.extension.hex2ToInt16
 import com.zktony.www.common.extension.hexToInt8
@@ -39,17 +38,8 @@ data class Motor(
     var motorType: Int = 0,
     // 创建时间
     var createTime: Date = Date(System.currentTimeMillis()),
-    // y轴转一圈移动的长度
-    @Ignore
-    val yLength: Float = 58f,
-    // z轴转一圈移动的长度
-    @Ignore
-    val zLength: Float = 3.8f,
-    // 转一圈的出液量
-    @Ignore
-    val volume: Float = 0.5f,
 
-) {
+    ) {
     constructor(hex: String) : this() {
         address = hex.substring(0, 2).hexToInt8()
         subdivision = hex.substring(2, 4).hexToInt8()
@@ -70,39 +60,4 @@ data class Motor(
                 waitTime.int16ToHex2()
 
     }
-
-    /**
-     *  电机转一圈需要的脉冲数
-     */
-    private fun pulseCount(): Int {
-        return 200 * subdivision
-    }
-
-    /**
-     * Y轴移动任意距离所需要的脉冲数
-     *
-     * @param distance [Float] 移动的距离
-     */
-    fun yPulseCount(distance: Float): String {
-        return (distance * pulseCount() / yLength).toInt().toString()
-    }
-
-    /**
-     * Z轴移动任意距离所需要的脉冲数
-     *
-     * @param distance [Float] 移动的距离
-     */
-    fun zPulseCount(distance: Float): String {
-        return (distance * pulseCount() / zLength).toInt().toString()
-    }
-
-    /**
-     * 出任意量液所需要的脉冲数
-     * @param volume [Float] 出液量
-     * @return [String] 脉冲数
-     */
-    fun volumePulseCount(volume: Float): String {
-        return (volume * pulseCount() / this.volume).toInt().toString()
-    }
-
 }

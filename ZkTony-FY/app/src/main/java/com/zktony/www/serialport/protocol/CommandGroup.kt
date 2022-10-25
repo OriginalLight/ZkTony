@@ -1,9 +1,9 @@
 package com.zktony.www.serialport.protocol
 
+import com.zktony.www.common.app.SettingState
 import com.zktony.www.model.enum.ModuleEnum
 import com.zktony.www.model.enum.SerialPortEnum
 import com.zktony.www.model.enum.SerialPortEnum.*
-import com.zktony.www.model.state.SettingState
 import com.zktony.www.serialport.SerialPortManager
 import kotlinx.coroutines.delay
 
@@ -105,9 +105,9 @@ class CommandGroup {
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(138f, 0f) +
-                            motionMotor.toMultiPointHex(138f, 103f) +
-                            motionMotor.toMultiPointHex(138f, 0f) +
+                    motionMotor.toMultiPointHex(137.5f, 0f) +
+                            motionMotor.toMultiPointHex(137.5f, 103f) +
+                            motionMotor.toMultiPointHex(137.5f, 0f) +
                             motionMotor.toMultiPointHex(0f, 0f)
                 )
             ),
@@ -128,9 +128,9 @@ class CommandGroup {
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(51f, 0f) +
-                            motionMotor.toMultiPointHex(51f, 98f) +
-                            motionMotor.toMultiPointHex(51f, 0f) +
+                    motionMotor.toMultiPointHex(50.5f, 0f) +
+                            motionMotor.toMultiPointHex(50.5f, 98f) +
+                            motionMotor.toMultiPointHex(50.5f, 0f) +
                             motionMotor.toMultiPointHex(0f, 0f)
                 )
             ),
@@ -152,10 +152,10 @@ class CommandGroup {
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(8f, 0f) +
-                            motionMotor.toMultiPointHex(8f, 20f) +
-                            motionMotor.toMultiPointHex(8f, 0f) +
-                            motionMotor.toMultiPointHex(0f, 0f)
+                    motionMotor.toMultiPointHex(6.5f, 0f) +
+                            motionMotor.toMultiPointHex(6.5f, 20f) +
+                            motionMotor.toMultiPointHex(6.5f, 0f) +
+                            motionMotor.toMultiPointHex(6.5f, 0f)
                 )
             ),
             CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,-96000,0,0,0,0,0,0,0,0,")),
