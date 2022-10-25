@@ -14,6 +14,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
+import com.kongzue.dialogx.dialogs.BottomMenu
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.dialogs.FullScreenDialog
 import com.kongzue.dialogx.dialogs.InputDialog
@@ -84,7 +85,16 @@ class AdminFragment :
                     .setInputInfo(InputInfo().setInputType(TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_PASSWORD))
                     .setOkButton { _, _, inputStr ->
                         if (inputStr.isBlank().not() && inputStr == "123456") {
-                            findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor_setting)
+                            BottomMenu.show(listOf("校准设置","电机设置"))
+                                .setMessage("请选择设置，请不要重复点击！！！")
+                                .setOnMenuItemClickListener { _, _, index ->
+                                    when (index) {
+                                        0 -> findNavController().navigate(R.id.action_navigation_admin_to_navigation_calibration)
+                                        1 -> findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor_setting)
+                                        else -> { }
+                                    }
+                                    false
+                                }
                         } else {
                             PopTip.show("密码错误")
                         }

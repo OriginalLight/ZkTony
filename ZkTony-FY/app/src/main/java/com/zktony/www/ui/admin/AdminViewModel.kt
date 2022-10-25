@@ -20,7 +20,9 @@ import com.zktony.www.common.http.adapter.getOrNull
 import com.zktony.www.common.http.adapter.isSuccess
 import com.zktony.www.common.http.download.DownloadManager
 import com.zktony.www.common.http.download.model.DownloadState
+import com.zktony.www.data.entity.Calibration
 import com.zktony.www.data.entity.Motor
+import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
 import com.zktony.www.data.services.model.Version
@@ -41,6 +43,7 @@ import javax.inject.Inject
 class AdminViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val motorRepository: MotorRepository,
+    private val calibrationRepository: CalibrationRepository,
     private val systemRepository: SystemRepository,
 ) : BaseViewModel() {
 
@@ -53,28 +56,35 @@ class AdminViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            intent.collect {
-                when (it) {
-                    is AdminIntent.Reset -> reset()
-                    is AdminIntent.WifiSetting -> wifiSetting(it.context)
-                    is AdminIntent.DoUpdate -> doUpdate(it.context, it.file, it.version)
-                    is AdminIntent.ChangeBar -> changeBar(it.bar, it.context)
-                    is AdminIntent.ChangeTemp -> changeTemp(it.temp)
-                    is AdminIntent.CheckUpdate -> checkUpdate(it.context)
+            launch {
+                intent.collect {
+                    when (it) {
+                        is AdminIntent.Reset -> reset()
+                        is AdminIntent.WifiSetting -> wifiSetting(it.context)
+                        is AdminIntent.DoUpdate -> doUpdate(it.context, it.file, it.version)
+                        is AdminIntent.ChangeBar -> changeBar(it.bar, it.context)
+                        is AdminIntent.ChangeTemp -> changeTemp(it.temp)
+                        is AdminIntent.CheckUpdate -> checkUpdate(it.context)
+                    }
                 }
             }
-        }
-        viewModelScope.launch {
-            appViewModel.state.collect {
-                when (it) {
-                    is AppState.ReceiverSerialOne -> onReceiverSerialOne(it.command)
-                    is AppState.ReceiverSerialTwo -> onReceiverSerialTwo(it.command)
-                    is AppState.ReceiverSerialThree -> onReceiverSerialThree(it.command)
-                    else -> {}
+            launch {
+                appViewModel.state.collect {
+                    when (it) {
+                        is AppState.ReceiverSerialOne -> onReceiverSerialOne(it.command)
+                        is AppState.ReceiverSerialTwo -> onReceiverSerialTwo(it.command)
+                        is AppState.ReceiverSerialThree -> onReceiverSerialThree(it.command)
+                        else -> {}
+                    }
                 }
             }
+            launch {
+                initAndSyncMotor()
+            }
+            launch {
+                initCalibration()
+            }
         }
-        initAndSyncMotor()
     }
 
     /**
@@ -364,6 +374,20 @@ class AdminViewModel @Inject constructor(
                         mode = motor.mode,
                     )
                 )
+            }
+        }
+    }
+
+    /**
+     * 初始化校准参数
+     */
+    private fun initCalibration() {
+        viewModelScope.launch {
+            // 获取不到校准参数则初始化
+            calibrationRepository.getCailbration().firstOrNull().let {
+                if (it == null) {
+                    calibrationRepository.insert(Calibration())
+                }
             }
         }
     }
