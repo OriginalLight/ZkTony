@@ -1,7 +1,7 @@
 package com.zktony.www.common.http.adapter
 
 import com.zktony.www.common.http.exception.ApiException
-import com.zktony.www.common.result.Result
+import com.zktony.www.common.http.result.Result
 
 /**
  * 接口的返回类型包装类

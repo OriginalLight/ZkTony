@@ -29,7 +29,7 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object DataBaseModule {
+object RoomModule {
 
     @Provides
     @Singleton
@@ -39,26 +39,6 @@ object DataBaseModule {
             AppDatabase::class.java,
             "zktony.db"
         ).build()
-    }
-
-    @Provides
-    fun provideLogRecordDao(database: AppDatabase): LogRecordDao {
-        return database.logRecordDao()
-    }
-
-    @Provides
-    fun provideProgramDao(database: AppDatabase): ProgramDao {
-        return database.programDao()
-    }
-
-    @Provides
-    fun provideLogDataDao(database: AppDatabase): LogDataDao {
-        return database.logDataDao()
-    }
-
-    @Provides
-    fun provideActionDao(database: AppDatabase): ActionDao {
-        return database.actionDao()
     }
 
     @Provides
