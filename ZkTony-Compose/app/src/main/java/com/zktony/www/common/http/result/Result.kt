@@ -1,6 +1,6 @@
-package com.zktony.www.common.result
+package com.zktony.www.common.http.result
 
-import com.zktony.www.common.result.Result.Success
+import com.zktony.www.common.http.result.Result.Success
 import kotlinx.coroutines.flow.MutableStateFlow
 
 sealed class Result<out R> {
