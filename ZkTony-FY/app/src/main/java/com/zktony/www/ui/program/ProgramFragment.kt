@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.text.InputType.TYPE_CLASS_TEXT
 import android.text.InputType.TYPE_TEXT_VARIATION_NORMAL
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.InputDialog
 import com.kongzue.dialogx.dialogs.MessageDialog
@@ -71,6 +73,7 @@ class ProgramFragment :
                 false
             }
         }
+        viewModel.dispatch(ProgramIntent.OnLoadProgramList)
     }
 
     /**

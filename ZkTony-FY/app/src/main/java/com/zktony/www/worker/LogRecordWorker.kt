@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.zktony.www.common.Logger
 import com.zktony.www.common.http.adapter.isSuccess
-import com.zktony.www.data.repository.LogRecordRespository
+import com.zktony.www.data.repository.LogRecordRepository
 import com.zktony.www.data.services.LogService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -24,7 +24,7 @@ class LogRecordWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     @Inject
-    lateinit var logRecordRepository: LogRecordRespository
+    lateinit var logRecordRepository: LogRecordRepository
 
     @Inject
     lateinit var service: LogService

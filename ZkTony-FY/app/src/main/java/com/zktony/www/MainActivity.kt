@@ -10,7 +10,7 @@ import com.zktony.www.common.app.AppState
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.verifyHex
 import com.zktony.www.databinding.ActivityMainBinding
-import com.zktony.www.model.enum.SerialPortEnum
+import com.zktony.www.serialport.SerialPortEnum
 import com.zktony.www.serialport.SerialPortManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -34,41 +34,43 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     private fun initView() {
         // WorkerManager.instance.createWorker()
         lifecycleScope.launch {
-            SerialPortManager.instance.addDataListener { com, hexData ->
-                when (com) {
-                    SerialPortEnum.SERIAL_ONE.device -> {
-                        hexData.verifyHex().forEach {
-                            appViewModel.dispatch(AppIntent.ReceiverSerialOne(it))
+            launch {
+                SerialPortManager.instance.addDataListener { com, hexData ->
+                    when (com) {
+                        SerialPortEnum.SERIAL_ONE.device -> {
+                            hexData.verifyHex().forEach {
+                                appViewModel.dispatch(AppIntent.ReceiverSerialOne(it))
+                            }
                         }
-                    }
-                    SerialPortEnum.SERIAL_TWO.device -> {
-                        hexData.verifyHex().forEach {
-                            appViewModel.dispatch(AppIntent.ReceiverSerialTwo(it))
+                        SerialPortEnum.SERIAL_TWO.device -> {
+                            hexData.verifyHex().forEach {
+                                appViewModel.dispatch(AppIntent.ReceiverSerialTwo(it))
+                            }
                         }
-                    }
-                    SerialPortEnum.SERIAL_THREE.device -> {
-                        hexData.verifyHex().forEach {
-                            appViewModel.dispatch(AppIntent.ReceiverSerialThree(it))
+                        SerialPortEnum.SERIAL_THREE.device -> {
+                            hexData.verifyHex().forEach {
+                                appViewModel.dispatch(AppIntent.ReceiverSerialThree(it))
+                            }
                         }
-                    }
-                    SerialPortEnum.SERIAL_FOUR.device -> {
-                        hexData.verifyHex().forEach {
-                            appViewModel.dispatch(AppIntent.ReceiverSerialFour(it))
+                        SerialPortEnum.SERIAL_FOUR.device -> {
+                            hexData.verifyHex().forEach {
+                                appViewModel.dispatch(AppIntent.ReceiverSerialFour(it))
+                            }
                         }
                     }
                 }
             }
-        }
-        lifecycleScope.launch {
-            appViewModel.state.collect {
-                when (it) {
-                    is AppState.Sender -> {
-                        SerialPortManager.instance.sendHex(it.serialPort, it.command)
+            launch {
+                appViewModel.state.collect {
+                    when (it) {
+                        is AppState.Sender -> {
+                            SerialPortManager.instance.sendHex(it.serialPort, it.command)
+                        }
+                        is AppState.SenderText -> {
+                            SerialPortManager.instance.sendText(it.serialPort, it.command)
+                        }
+                        else -> {}
                     }
-                    is AppState.SenderText -> {
-                        SerialPortManager.instance.sendText(it.serialPort, it.command)
-                    }
-                    else -> {}
                 }
             }
         }

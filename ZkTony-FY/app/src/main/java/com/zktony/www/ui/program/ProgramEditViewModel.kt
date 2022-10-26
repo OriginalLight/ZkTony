@@ -3,9 +3,9 @@ package com.zktony.www.ui.program
 import androidx.lifecycle.viewModelScope
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.data.entity.Action
+import com.zktony.www.data.entity.ActionEnum
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.model.enum.ActionEnum
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -32,8 +32,9 @@ class ProgramEditViewModel @Inject constructor(
                     is ProgramEditIntent.OnSwitchAction -> onSwitchAction(it.action)
                     is ProgramEditIntent.OnDeleteAction -> onDeleteAction(it.action)
                     is ProgramEditIntent.OnAddAction -> onAddAction()
-                    is ProgramEditIntent.OnLoadActions -> onLoadActions(it.programId)
+                    is ProgramEditIntent.OnSetProgramId -> onSetProgramId(it.programId)
                     is ProgramEditIntent.OnEditAction -> onEditAction(it.action)
+                    is ProgramEditIntent.OnLoadActionList -> onLoadActionList()
                 }
             }
         }
@@ -56,13 +57,10 @@ class ProgramEditViewModel @Inject constructor(
      * 加载程序列表
      * @param programId [String] 程序ID
      */
-    private fun onLoadActions(programId: String) {
+    private fun onSetProgramId(programId: String) {
         viewModelScope.launch {
             if (programId != "None") {
                 _uiState.update { it.copy(programId = programId) }
-            }
-            actionRepository.getByProgramId(programId).collect {
-                _state.emit(ProgramEditState.OnActionChange(it))
             }
         }
     }
@@ -127,13 +125,25 @@ class ProgramEditViewModel @Inject constructor(
                 && (action.mode != ActionEnum.WASHING.index || action.count > 0)
     }
 
+    /**
+     * 加载步骤列表
+     */
+    private fun onLoadActionList() {
+        viewModelScope.launch {
+            actionRepository.getByProgramId(uiState.value.programId).collect {
+                _state.emit(ProgramEditState.OnActionChange(it))
+            }
+        }
+    }
+
 }
 
 sealed class ProgramEditIntent {
     data class OnSwitchAction(val action: ActionEnum) : ProgramEditIntent()
     data class OnDeleteAction(val action: Action) : ProgramEditIntent()
-    data class OnLoadActions(val programId: String) : ProgramEditIntent()
+    data class OnSetProgramId(val programId: String) : ProgramEditIntent()
     data class OnEditAction(val action: Action) : ProgramEditIntent()
+    object OnLoadActionList : ProgramEditIntent()
     object OnAddAction : ProgramEditIntent()
 }
 

@@ -10,15 +10,12 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
-import com.kongzue.dialogx.dialogs.BottomMenu
-import com.kongzue.dialogx.dialogs.CustomDialog
-import com.kongzue.dialogx.dialogs.FullScreenDialog
-import com.kongzue.dialogx.dialogs.InputDialog
-import com.kongzue.dialogx.dialogs.PopTip
+import com.kongzue.dialogx.dialogs.*
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.kongzue.dialogx.util.InputInfo
 import com.zktony.www.R
@@ -85,13 +82,13 @@ class AdminFragment :
                     .setInputInfo(InputInfo().setInputType(TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_PASSWORD))
                     .setOkButton { _, _, inputStr ->
                         if (inputStr.isBlank().not() && inputStr == "123456") {
-                            BottomMenu.show(listOf("校准设置","电机设置"))
+                            BottomMenu.show(listOf("校准设置", "电机设置"))
                                 .setMessage("请选择设置，请不要重复点击！！！")
                                 .setOnMenuItemClickListener { _, _, index ->
                                     when (index) {
                                         0 -> findNavController().navigate(R.id.action_navigation_admin_to_navigation_calibration)
                                         1 -> findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor_setting)
-                                        else -> { }
+                                        else -> {}
                                     }
                                     false
                                 }
@@ -112,7 +109,13 @@ class AdminFragment :
         }
         binding.btnUpdate.run {
             this.clickScale()
-            this.setOnClickListener { viewModel.dispatch(AdminIntent.CheckUpdate(requireContext())) }
+            this.setOnClickListener {
+                if (viewModel.uiState.value.isUpdating) {
+                    PopTip.show("正在更新中")
+                } else {
+                    viewModel.dispatch(AdminIntent.CheckUpdate(requireContext()))
+                }
+            }
         }
         binding.conVersion.run {
             this.clickScale()
@@ -274,6 +277,10 @@ class AdminFragment :
      */
     private fun downloadSuccess(file: File) {
         binding.progress.visibility = View.INVISIBLE
+        binding.tvUpdate.run {
+            text = "检查更新"
+            setTextColor(ContextCompat.getColor(context, R.color.dark_outline))
+        }
         requireContext().installApk(file)
     }
 
@@ -289,6 +296,7 @@ class AdminFragment :
      * 更新进度
      * @param progress [Int]
      */
+    @SuppressLint("SetTextI18n")
     private fun downloadProgress(progress: Int) {
         binding.progress.run {
             if (this.visibility != View.VISIBLE) {
@@ -297,6 +305,10 @@ class AdminFragment :
             if (this.progress != progress) {
                 this.progress = progress
             }
+        }
+        binding.tvUpdate.run {
+            setTextColor(ContextCompat.getColor(context, R.color.green))
+            text = "$progress%"
         }
     }
 

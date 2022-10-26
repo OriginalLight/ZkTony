@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.BottomMenu
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.R
@@ -12,7 +14,6 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.databinding.FragmentHomeBinding
-import com.zktony.www.model.enum.ModuleEnum
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -232,11 +233,9 @@ class HomeFragment :
                 binding.a.run {
                     if (index != -1) {
                         btnProgram.text = uiState.programList[index].name
-                        tvTime.text = uiState.programList[index].time
                         tvActions.text = uiState.programList[index].actions
                     } else {
                         btnProgram.text = ""
-                        tvTime.text = ""
                         tvActions.text = ""
                     }
                 }
@@ -245,11 +244,9 @@ class HomeFragment :
                 binding.b.run {
                     if (index != -1) {
                         btnProgram.text = uiState.programList[index].name
-                        tvTime.text = uiState.programList[index].time
                         tvActions.text = uiState.programList[index].actions
                     } else {
                         btnProgram.text = ""
-                        tvTime.text = ""
                         tvActions.text = ""
                     }
                 }
@@ -258,11 +255,9 @@ class HomeFragment :
                 binding.c.run {
                     if (index != -1) {
                         btnProgram.text = uiState.programList[index].name
-                        tvTime.text = uiState.programList[index].time
                         tvActions.text = uiState.programList[index].actions
                     } else {
                         btnProgram.text = ""
-                        tvTime.text = ""
                         tvActions.text = ""
                     }
                 }
@@ -271,11 +266,9 @@ class HomeFragment :
                 binding.d.run {
                     if (index != -1) {
                         btnProgram.text = uiState.programList[index].name
-                        tvTime.text = uiState.programList[index].time
                         tvActions.text = uiState.programList[index].actions
                     } else {
                         btnProgram.text = ""
-                        tvTime.text = ""
                         tvActions.text = ""
                     }
                 }

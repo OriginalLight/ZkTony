@@ -21,15 +21,12 @@ import com.zktony.www.common.extension.versionCode
 import com.zktony.www.common.http.adapter.getOrThrow
 import com.zktony.www.common.http.adapter.isSuccess
 import com.zktony.www.common.http.download.DownloadManager
-import com.zktony.www.common.http.download.model.DownloadState
+import com.zktony.www.common.http.download.DownloadState
 import com.zktony.www.common.model.Event
 import com.zktony.www.data.repository.SystemRepository
 import com.zktony.www.data.services.model.Version
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import java.io.File
@@ -47,6 +44,9 @@ class AdminViewModel @Inject constructor(
     private val _state = MutableSharedFlow<AdminState>()
     val state: SharedFlow<AdminState> get() = _state
     private val intent = MutableSharedFlow<AdminIntent>()
+
+    private val _uiState = MutableStateFlow(AdminUiState())
+    val uiState: StateFlow<AdminUiState> get() = _uiState
 
     init {
         viewModelScope.launch {
@@ -202,6 +202,9 @@ class AdminViewModel @Inject constructor(
         file?.run {
             context.installApk(this)
         } ?: version?.run {
+            _uiState.update {
+                uiState.value.copy(isUpdating = true)
+            }
             downloadApk(context, this)
         }
     }
@@ -216,6 +219,9 @@ class AdminViewModel @Inject constructor(
                 when (it) {
                     is DownloadState.Success -> {
                         _state.emit(AdminState.DownloadSuccess(it.file))
+                        _uiState.update {
+                            uiState.value.copy(isUpdating = false)
+                        }
                         context.installApk(it.file)
                     }
 
@@ -297,3 +303,7 @@ sealed class AdminState {
     data class DownloadSuccess(val file: File) : AdminState()
     object DownloadError : AdminState()
 }
+
+data class AdminUiState(
+    var isUpdating: Boolean = false,
+)

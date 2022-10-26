@@ -14,9 +14,9 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.data.entity.Action
+import com.zktony.www.data.entity.ActionEnum
+import com.zktony.www.data.entity.getActionEnum
 import com.zktony.www.databinding.FragmentProgramEditBinding
-import com.zktony.www.model.enum.ActionEnum
-import com.zktony.www.model.enum.getActionEnum
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -62,8 +62,9 @@ class ProgramEditFragment :
         }
         arguments?.run {
             val programId = ProgramEditFragmentArgs.fromBundle(this).programId
-            viewModel.dispatch(ProgramEditIntent.OnLoadActions(programId))
+            viewModel.dispatch(ProgramEditIntent.OnSetProgramId(programId))
         }
+        viewModel.dispatch(ProgramEditIntent.OnLoadActionList)
     }
 
     /**

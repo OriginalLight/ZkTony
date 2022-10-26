@@ -8,6 +8,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
@@ -41,6 +42,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     /**
      * init观察者
      */
+    @SuppressLint("SetTextI18n")
     private fun initObserver() {
         lifecycleScope.launch {
             viewModel.state.collect {
@@ -75,6 +77,10 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
 
                     is AdminState.DownloadSuccess -> {
                         binding.progress.visibility = View.INVISIBLE
+                        binding.tvUpdate.run {
+                            text = "检查更新"
+                            setTextColor(ContextCompat.getColor(context, R.color.dark_outline))
+                        }
                         requireContext().installApk(it.file)
                     }
 
@@ -85,8 +91,18 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     }
 
                     is AdminState.DownloadProgress -> {
-                        binding.progress.visibility = View.VISIBLE
-                        binding.progress.progress = it.progress
+                        binding.progress.run {
+                            if (visibility != View.VISIBLE) {
+                                visibility = View.VISIBLE
+                            }
+                            if (progress != it.progress) {
+                                progress = it.progress
+                            }
+                        }
+                        binding.tvUpdate.run {
+                            setTextColor(ContextCompat.getColor(context, R.color.green))
+                            text = "${it.progress}%"
+                        }
                     }
                 }
             }
@@ -99,8 +115,8 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     @SuppressLint("ClickableViewAccessibility")
     private fun imageButtonEvent() {
         binding.ib1.run {
-            this.clickScale()
-            this.setOnClickListener { viewModel.dispatch(AdminIntent.Rest) }
+            clickScale()
+            setOnClickListener { viewModel.dispatch(AdminIntent.Rest) }
         }
         binding.ib2.addTouchEvent({
             it.scaleX = 0.8f
@@ -112,12 +128,18 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             viewModel.dispatch(AdminIntent.ChangePump(false))
         })
         binding.ib3.run {
-            this.clickScale()
-            this.setOnClickListener { viewModel.dispatch(AdminIntent.WifiSetting(requireContext())) }
+            clickScale()
+            setOnClickListener { viewModel.dispatch(AdminIntent.WifiSetting(requireContext())) }
         }
         binding.ib4.run {
-            this.clickScale()
-            this.setOnClickListener { viewModel.dispatch(AdminIntent.CheckUpdate(requireContext())) }
+            clickScale()
+            setOnClickListener {
+                if (viewModel.uiState.value.isUpdating) {
+                    PopTip.show("正在更新中")
+                } else {
+                    viewModel.dispatch(AdminIntent.CheckUpdate(requireContext()))
+                }
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 <resources>
     <string name="a">A</string>
     <string name="about">关于我们</string>
-    <string name="actions">流程</string>
+    <string name="actions">程序流程</string>
     <string name="add">添加</string>
     <string name="add_action">添加程序步骤</string>
     <string name="add_ban">请补充完整</string>

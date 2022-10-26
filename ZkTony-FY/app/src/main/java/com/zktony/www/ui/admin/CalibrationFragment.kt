@@ -6,6 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
@@ -30,15 +31,11 @@ class CalibrationFragment :
 
     private fun initObserver() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.state.collect {
-                        when (it) {
-                            is CalibrationState.OnCalibrationValueChange -> onCalibrationValueChange(
-                                it.calibration
-                            )
-                        }
-                    }
+            viewModel.state.collect {
+                when (it) {
+                    is CalibrationState.OnCalibrationValueChange -> onCalibrationValueChange(
+                        it.calibration
+                    )
                 }
             }
         }
@@ -60,9 +57,14 @@ class CalibrationFragment :
             btnTestWasteTankMove.setOnClickListener {
                 viewModel.dispatch(CalibrationIntent.ToWasteTank)
             }
-            btnTestWasteTankDown.setOnLongClickListener {
-                viewModel.dispatch(CalibrationIntent.WasteTankNeedleDown)
-                true
+            btnTestWasteTankDown.run {
+                setOnClickListener {
+                    PopTip.show("请确认针头位置，避免撞针，长按开始下降！！！")
+                }
+                setOnLongClickListener {
+                    viewModel.dispatch(CalibrationIntent.WasteTankNeedleDown)
+                    true
+                }
             }
             btnTestWasteTankUp.setOnClickListener {
                 viewModel.dispatch(CalibrationIntent.WasteTankNeedleUp)
@@ -70,9 +72,14 @@ class CalibrationFragment :
             btnTestWashTankMove.setOnClickListener {
                 viewModel.dispatch(CalibrationIntent.ToWashTank)
             }
-            btnTestWashTankDown.setOnLongClickListener {
-                viewModel.dispatch(CalibrationIntent.WashTankNeedleDown)
-                true
+            btnTestWashTankDown.run {
+                setOnClickListener {
+                    PopTip.show("请确认针头位置，避免撞针，长按开始下降！！！")
+                }
+                setOnLongClickListener {
+                    viewModel.dispatch(CalibrationIntent.WashTankNeedleDown)
+                    true
+                }
             }
             btnTestWashTankUp.setOnClickListener {
                 viewModel.dispatch(CalibrationIntent.WashTankNeedleUp)
@@ -80,9 +87,14 @@ class CalibrationFragment :
             btnTestBlockingLiquidTankMove.setOnClickListener {
                 viewModel.dispatch(CalibrationIntent.ToBlockingLiquidTank)
             }
-            btnTestBlockingLiquidTankDown.setOnLongClickListener {
-                viewModel.dispatch(CalibrationIntent.BlockingLiquidTankNeedleDown)
-                true
+            btnTestBlockingLiquidTankDown.run {
+                setOnClickListener {
+                    PopTip.show("请确认针头位置，避免撞针，长按开始下降！！！")
+                }
+                setOnLongClickListener {
+                    viewModel.dispatch(CalibrationIntent.BlockingLiquidTankNeedleDown)
+                    true
+                }
             }
             btnTestBlockingLiquidTankUp.setOnClickListener {
                 viewModel.dispatch(CalibrationIntent.BlockingLiquidTankNeedleUp)
@@ -90,9 +102,14 @@ class CalibrationFragment :
             btnTestAntibodyOneTankMove.setOnClickListener {
                 viewModel.dispatch(CalibrationIntent.ToAntibodyOneTank)
             }
-            btnTestAntibodyOneTankDown.setOnLongClickListener {
-                viewModel.dispatch(CalibrationIntent.AntibodyOneTankNeedleDown)
-                true
+            btnTestAntibodyOneTankDown.run {
+                setOnClickListener {
+                    PopTip.show("请确认针头位置，避免撞针，长按开始下降！！！")
+                }
+                setOnLongClickListener {
+                    viewModel.dispatch(CalibrationIntent.AntibodyOneTankNeedleDown)
+                    true
+                }
             }
             btnTestAntibodyOneTankUp.setOnClickListener {
                 viewModel.dispatch(CalibrationIntent.AntibodyOneTankNeedleUp)
@@ -100,9 +117,14 @@ class CalibrationFragment :
             btnTestAntibodyTwoTankMove.setOnClickListener {
                 viewModel.dispatch(CalibrationIntent.ToAntibodyTwoTank)
             }
-            btnTestAntibodyTwoTankDown.setOnLongClickListener {
-                viewModel.dispatch(CalibrationIntent.AntibodyTwoTankNeedleDown)
-                true
+            btnTestAntibodyTwoTankDown.run {
+                setOnClickListener {
+                    PopTip.show("请确认针头位置，避免撞针，长按开始下降！！！")
+                }
+                setOnLongClickListener {
+                    viewModel.dispatch(CalibrationIntent.AntibodyTwoTankNeedleDown)
+                    true
+                }
             }
             btnTestAntibodyTwoTankUp.setOnClickListener {
                 viewModel.dispatch(CalibrationIntent.AntibodyTwoTankNeedleUp)
@@ -123,10 +145,10 @@ class CalibrationFragment :
      * 初始化编辑框
      */
     private fun initEditText() {
-        val cailbration = viewModel.uiState.value.calibration
+        val calibration = viewModel.uiState.value.calibration
         binding.run {
             wasteTankPosition.run {
-                setText(cailbration.wasteTankPosition.toString().removeZero())
+                setText(calibration.wasteTankPosition.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -138,7 +160,7 @@ class CalibrationFragment :
                 }
             }
             wasteTankHeight.run {
-                setText(cailbration.wasteTankHeight.toString().removeZero())
+                setText(calibration.wasteTankHeight.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -150,7 +172,7 @@ class CalibrationFragment :
                 }
             }
             washTankPosition.run {
-                setText(cailbration.washTankPosition.toString().removeZero())
+                setText(calibration.washTankPosition.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -162,7 +184,7 @@ class CalibrationFragment :
                 }
             }
             washTankHeight.run {
-                setText(cailbration.washTankHeight.toString().removeZero())
+                setText(calibration.washTankHeight.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -174,7 +196,7 @@ class CalibrationFragment :
                 }
             }
             blockingLiquidTankPosition.run {
-                setText(cailbration.blockingLiquidTankPosition.toString().removeZero())
+                setText(calibration.blockingLiquidTankPosition.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -186,7 +208,7 @@ class CalibrationFragment :
                 }
             }
             blockingLiquidTankHeight.run {
-                setText(cailbration.blockingLiquidTankHeight.toString().removeZero())
+                setText(calibration.blockingLiquidTankHeight.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -198,7 +220,7 @@ class CalibrationFragment :
                 }
             }
             antibodyOneTankPosition.run {
-                setText(cailbration.antibodyOneTankPosition.toString().removeZero())
+                setText(calibration.antibodyOneTankPosition.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -210,7 +232,7 @@ class CalibrationFragment :
                 }
             }
             antibodyOneTankHeight.run {
-                setText(cailbration.antibodyOneTankHeight.toString().removeZero())
+                setText(calibration.antibodyOneTankHeight.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -222,7 +244,7 @@ class CalibrationFragment :
                 }
             }
             antibodyTwoTankPosition.run {
-                setText(cailbration.antibodyTwoTankPosition.toString().removeZero())
+                setText(calibration.antibodyTwoTankPosition.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -234,7 +256,7 @@ class CalibrationFragment :
                 }
             }
             antibodyTwoTankHeight.run {
-                setText(cailbration.antibodyTwoTankHeight.toString().removeZero())
+                setText(calibration.antibodyTwoTankHeight.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -246,7 +268,7 @@ class CalibrationFragment :
                 }
             }
             yMotorDistance.run {
-                setText(cailbration.yMotorDistance.toString().removeZero())
+                setText(calibration.yMotorDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -258,7 +280,7 @@ class CalibrationFragment :
                 }
             }
             zMotorDistance.run {
-                setText(cailbration.zMotorDistance.toString().removeZero())
+                setText(calibration.zMotorDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -270,7 +292,7 @@ class CalibrationFragment :
                 }
             }
             pumpOneDistance.run {
-                setText(cailbration.pumpOneDistance.toString().removeZero())
+                setText(calibration.pumpOneDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -282,7 +304,7 @@ class CalibrationFragment :
                 }
             }
             pumpTwoDistance.run {
-                setText(cailbration.pumpTwoDistance.toString().removeZero())
+                setText(calibration.pumpTwoDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -294,7 +316,7 @@ class CalibrationFragment :
                 }
             }
             pumpThreeDistance.run {
-                setText(cailbration.pumpThreeDistance.toString().removeZero())
+                setText(calibration.pumpThreeDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -306,7 +328,7 @@ class CalibrationFragment :
                 }
             }
             pumpFourDistance.run {
-                setText(cailbration.pumpFourDistance.toString().removeZero())
+                setText(calibration.pumpFourDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(
@@ -318,7 +340,7 @@ class CalibrationFragment :
                 }
             }
             pumpFiveDistance.run {
-                setText(cailbration.pumpFiveDistance.toString().removeZero())
+                setText(calibration.pumpFiveDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.dispatch(
                         CalibrationIntent.OnCalibrationValueChange(

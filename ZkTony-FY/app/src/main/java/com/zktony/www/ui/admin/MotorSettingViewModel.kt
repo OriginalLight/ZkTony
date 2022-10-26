@@ -6,7 +6,7 @@ import com.zktony.www.common.app.AppIntent
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.data.entity.Motor
 import com.zktony.www.data.repository.MotorRepository
-import com.zktony.www.model.enum.getSerialPortEnum
+import com.zktony.www.serialport.getSerialPortEnum
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*

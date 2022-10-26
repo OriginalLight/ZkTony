@@ -9,15 +9,13 @@ import com.zktony.www.common.app.AppIntent
 import com.zktony.www.common.app.AppState
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.removeZero
+import com.zktony.www.common.model.Queue
 import com.zktony.www.data.entity.Action
+import com.zktony.www.data.entity.ActionEnum
 import com.zktony.www.data.entity.Program
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.model.ActionActuator
-import com.zktony.www.model.ActionState
-import com.zktony.www.model.Queue
-import com.zktony.www.model.enum.ModuleEnum
-import com.zktony.www.model.enum.SerialPortEnum
+import com.zktony.www.serialport.SerialPortEnum
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -555,3 +553,10 @@ data class ButtonState(
     var icon: Int = 0,
     var textColor: Int = 0,
 )
+
+enum class ModuleEnum(val value: String) {
+    A("模块A"),
+    B("模块B"),
+    C("模块C"),
+    D("模块D"),
+}

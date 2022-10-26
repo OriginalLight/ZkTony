@@ -10,8 +10,8 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.R
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.data.entity.Action
+import com.zktony.www.data.entity.getActionEnum
 import com.zktony.www.databinding.ItemActionBinding
-import com.zktony.www.model.enum.getActionEnum
 
 /**
  * @author: 刘贺贺

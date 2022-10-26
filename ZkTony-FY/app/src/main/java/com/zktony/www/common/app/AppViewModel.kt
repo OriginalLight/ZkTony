@@ -10,11 +10,11 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.www.common.Logger
 import com.zktony.www.common.constant.Constants
 import com.zktony.www.data.entity.Calibration
+import com.zktony.www.data.entity.MotionMotor
 import com.zktony.www.data.entity.Motor
+import com.zktony.www.data.entity.PumpMotor
 import com.zktony.www.data.repository.RoomRepository
-import com.zktony.www.model.MotionMotor
-import com.zktony.www.model.PumpMotor
-import com.zktony.www.model.enum.SerialPortEnum
+import com.zktony.www.serialport.SerialPortEnum
 import com.zktony.www.serialport.SerialPortManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -73,8 +73,8 @@ class AppViewModel @Inject constructor(
             }
             launch {
                 delay(1000L)
-                roomRepository.getCailbrationRepository().getCailbration().collect {
-                    loadCailbration(it)
+                roomRepository.getCalibrationRepository().getCalibration().collect {
+                    loadCalibration(it)
                 }
             }
             launch {
@@ -211,7 +211,7 @@ class AppViewModel @Inject constructor(
     /**
      * 加载校准数据
      */
-    private fun loadCailbration(calibrations: List<Calibration>) {
+    private fun loadCalibration(calibrations: List<Calibration>) {
         var calibration = Calibration()
         if (calibrations.isNotEmpty()) {
             calibration = calibrations[0]

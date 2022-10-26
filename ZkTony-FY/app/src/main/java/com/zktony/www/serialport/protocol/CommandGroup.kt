@@ -1,10 +1,10 @@
 package com.zktony.www.serialport.protocol
 
 import com.zktony.www.common.app.SettingState
-import com.zktony.www.model.enum.ModuleEnum
-import com.zktony.www.model.enum.SerialPortEnum
-import com.zktony.www.model.enum.SerialPortEnum.*
+import com.zktony.www.serialport.SerialPortEnum
+import com.zktony.www.serialport.SerialPortEnum.*
 import com.zktony.www.serialport.SerialPortManager
+import com.zktony.www.ui.home.ModuleEnum
 import kotlinx.coroutines.delay
 
 /**
@@ -33,12 +33,13 @@ class CommandGroup {
      */
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
         val motionMotor = settingState.motionMotor
+        val calibration = settingState.calibration
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(90f, 0f) +
-                            motionMotor.toMultiPointHex(90f, 98f) +
-                            motionMotor.toMultiPointHex(90f, 0f) +
+                    motionMotor.toMultiPointHex(calibration.blockingLiquidTankPosition, 0f) +
+                            motionMotor.toMultiPointHex(calibration.blockingLiquidTankPosition, calibration.blockingLiquidTankHeight) +
+                            motionMotor.toMultiPointHex(calibration.blockingLiquidTankPosition, 0f) +
                             motionMotor.toMultiPointHex(0f, 0f)
                 )
             ),
@@ -56,12 +57,13 @@ class CommandGroup {
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
         val motionMotor = settingState.motionMotor
+        val calibration = settingState.calibration
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(176f, 0f) +
-                            motionMotor.toMultiPointHex(176f, 103f) +
-                            motionMotor.toMultiPointHex(176f, 0f) +
+                    motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, 0f) +
+                            motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, calibration.antibodyOneTankHeight) +
+                            motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, 0f) +
                             motionMotor.toMultiPointHex(0f, 0f)
                 )
             ),
@@ -79,12 +81,13 @@ class CommandGroup {
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
         val motionMotor = settingState.motionMotor
+        val calibration = settingState.calibration
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(176f, 0f) +
-                            motionMotor.toMultiPointHex(176f, 98f) +
-                            motionMotor.toMultiPointHex(176f, 0f) +
+                    motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, 0f) +
+                            motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, calibration.wasteTankHeight) +
+                            motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, 0f) +
                             motionMotor.toMultiPointHex(0f, 0f)
                 )
             ),
@@ -102,12 +105,13 @@ class CommandGroup {
      */
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
         val motionMotor = settingState.motionMotor
+        val calibration = settingState.calibration
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(137.5f, 0f) +
-                            motionMotor.toMultiPointHex(137.5f, 103f) +
-                            motionMotor.toMultiPointHex(137.5f, 0f) +
+                    motionMotor.toMultiPointHex(calibration.antibodyTwoTankPosition, 0f) +
+                            motionMotor.toMultiPointHex(calibration.antibodyTwoTankPosition, calibration.antibodyTwoTankHeight) +
+                            motionMotor.toMultiPointHex(calibration.antibodyTwoTankPosition, 0f) +
                             motionMotor.toMultiPointHex(0f, 0f)
                 )
             ),
@@ -125,13 +129,14 @@ class CommandGroup {
      */
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
         val motionMotor = settingState.motionMotor
+        val calibration = settingState.calibration
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(50.5f, 0f) +
-                            motionMotor.toMultiPointHex(50.5f, 98f) +
-                            motionMotor.toMultiPointHex(50.5f, 0f) +
-                            motionMotor.toMultiPointHex(0f, 0f)
+                    motionMotor.toMultiPointHex(calibration.washTankPosition, 0f) +
+                            motionMotor.toMultiPointHex(calibration.washTankPosition, calibration.washTankHeight) +
+                            motionMotor.toMultiPointHex(calibration.washTankPosition, 0f) +
+                            motionMotor.toMultiPointHex(calibration.washTankPosition, 0f)
                 )
             ),
             CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,6400,0,0,0,0,0,32000,0,0,")),
@@ -149,13 +154,14 @@ class CommandGroup {
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
         val motionMotor = settingState.motionMotor
+        val calibration = settingState.calibration
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(6.5f, 0f) +
-                            motionMotor.toMultiPointHex(6.5f, 20f) +
-                            motionMotor.toMultiPointHex(6.5f, 0f) +
-                            motionMotor.toMultiPointHex(6.5f, 0f)
+                    motionMotor.toMultiPointHex(calibration.wasteTankPosition, 0f) +
+                            motionMotor.toMultiPointHex(calibration.wasteTankPosition, calibration.wasteTankHeight) +
+                            motionMotor.toMultiPointHex(calibration.wasteTankPosition, 0f) +
+                            motionMotor.toMultiPointHex(calibration.wasteTankPosition, 0f)
                 )
             ),
             CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,-96000,0,0,0,0,0,0,0,0,")),

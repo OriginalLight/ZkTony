@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
  * @author: 刘贺贺
  * @date: 2022-09-27 15:00
  */
-class WorkerManager {
+class  WorkerManager {
 
     private val programRequest by lazy {
         PeriodicWorkRequestBuilder<ProgramWorker>(60, TimeUnit.MINUTES)

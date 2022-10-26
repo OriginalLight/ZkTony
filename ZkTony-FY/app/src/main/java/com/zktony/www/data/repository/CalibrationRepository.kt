@@ -20,7 +20,7 @@ class CalibrationRepository @Inject constructor(
         calibrationDao.update(calibration)
     }
 
-    fun getCailbration(): Flow<List<Calibration>> {
+    fun getCalibration(): Flow<List<Calibration>> {
         return calibrationDao.getCailbration()
     }
 }

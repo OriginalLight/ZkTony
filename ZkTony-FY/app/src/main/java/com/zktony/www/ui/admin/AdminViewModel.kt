@@ -19,22 +19,19 @@ import com.zktony.www.common.extension.*
 import com.zktony.www.common.http.adapter.getOrNull
 import com.zktony.www.common.http.adapter.isSuccess
 import com.zktony.www.common.http.download.DownloadManager
-import com.zktony.www.common.http.download.model.DownloadState
+import com.zktony.www.common.http.download.DownloadState
 import com.zktony.www.data.entity.Calibration
 import com.zktony.www.data.entity.Motor
 import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
 import com.zktony.www.data.services.model.Version
-import com.zktony.www.model.enum.SerialPortEnum
-import com.zktony.www.model.enum.getSerialPortEnum
+import com.zktony.www.serialport.SerialPortEnum
+import com.zktony.www.serialport.getSerialPortEnum
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -53,6 +50,9 @@ class AdminViewModel @Inject constructor(
     private val _state = MutableSharedFlow<AdminState>()
     val state: SharedFlow<AdminState> get() = _state
     private val intent = MutableSharedFlow<AdminIntent>()
+
+    private val _uiState = MutableStateFlow(AdminUiState())
+    val uiState: StateFlow<AdminUiState> get() = _uiState
 
     init {
         viewModelScope.launch {
@@ -182,6 +182,9 @@ class AdminViewModel @Inject constructor(
         file?.run {
             context.installApk(this)
         } ?: version?.run {
+            _uiState.update {
+                uiState.value.copy(isUpdating = true)
+            }
             downloadApk(context, this)
         }
     }
@@ -201,6 +204,9 @@ class AdminViewModel @Inject constructor(
                 when (it) {
                     is DownloadState.Success -> {
                         _state.emit(AdminState.DownloadSuccess(it.file))
+                        _uiState.update {
+                            uiState.value.copy(isUpdating = false)
+                        }
                         context.installApk(it.file)
                     }
 
@@ -384,8 +390,8 @@ class AdminViewModel @Inject constructor(
     private fun initCalibration() {
         viewModelScope.launch {
             // 获取不到校准参数则初始化
-            calibrationRepository.getCailbration().firstOrNull().let {
-                if (it == null) {
+            calibrationRepository.getCalibration().first().let {
+                if (it.isEmpty()) {
                     calibrationRepository.insert(Calibration())
                 }
             }
@@ -422,3 +428,7 @@ sealed class AdminState {
     object DownloadError : AdminState()
     object ChangeBar : AdminState()
 }
+
+data class AdminUiState(
+    var isUpdating: Boolean = false,
+)

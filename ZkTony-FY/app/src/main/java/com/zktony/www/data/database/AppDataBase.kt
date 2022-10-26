@@ -22,5 +22,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun logDataDao(): LogDataDao
     abstract fun actionDao(): ActionDao
     abstract fun motorDao(): MotorDao
-    abstract fun cailbrationDao(): CalibrationDao
+    abstract fun calibrationDao(): CalibrationDao
 }
