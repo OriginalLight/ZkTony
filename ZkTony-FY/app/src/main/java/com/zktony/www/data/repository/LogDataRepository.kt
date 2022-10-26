@@ -21,8 +21,8 @@ class LogDataRepository @Inject constructor(
         logDataDao.deleteByDate()
     }
 
-    suspend fun updateBatch(logDatas: List<LogData>) {
-        logDataDao.updateBatch(logDatas)
+    suspend fun updateBatch(logDataList: List<LogData>) {
+        logDataDao.updateBatch(logDataList)
     }
 
     fun getByLogId(id: String): Flow<List<LogData>> {

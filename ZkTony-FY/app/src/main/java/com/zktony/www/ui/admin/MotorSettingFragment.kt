@@ -38,15 +38,11 @@ class MotorSettingFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.state.collect {
-                        when (it) {
-                            is MotorSettingState.OnDataBaseChange -> onDataBaseChange(it.motorList)
-                            is MotorSettingState.OnUpdateMessage -> onUpdateMessage(it.message)
-                            is MotorSettingState.OnMotorValueChange -> onMotorValueChange(it.motor)
-                        }
-                    }
+            viewModel.state.collect {
+                when (it) {
+                    is MotorSettingState.OnDataBaseChange -> onDataBaseChange(it.motorList)
+                    is MotorSettingState.OnUpdateMessage -> onUpdateMessage(it.message)
+                    is MotorSettingState.OnMotorValueChange -> onMotorValueChange(it.motor)
                 }
             }
         }

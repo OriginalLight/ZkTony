@@ -10,7 +10,7 @@ import javax.inject.Inject
  * @author: 刘贺贺
  * @date: 2022-09-21 8:52
  */
-class LogRecordRespository @Inject constructor(
+class LogRecordRepository @Inject constructor(
     private val logRecordDao: LogRecordDao
 ) {
     suspend fun insert(logRecord: LogRecord) {
@@ -29,8 +29,8 @@ class LogRecordRespository @Inject constructor(
         logRecordDao.deleteByDate()
     }
 
-    suspend fun deleteInvaliedLog() {
-        logRecordDao.deleteInvaliedLog()
+    suspend fun deleteInvalidedLog() {
+        logRecordDao.deleteInvalidedLog()
     }
 
     fun withoutUpload(): Flow<List<LogRecord>> {

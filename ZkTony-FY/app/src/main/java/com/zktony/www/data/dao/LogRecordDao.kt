@@ -40,7 +40,7 @@ interface LogRecordDao {
     suspend fun deleteByDate()
 
     @Query("DELETE FROM log_record WHERE  julianday('now') - julianday(createTime) <= '1' AND id NOT IN (SELECT da.logId FROM log_data AS da WHERE  julianday('now') - julianday(da.createTime) <= '1')")
-    suspend fun deleteInvaliedLog()
+    suspend fun deleteInvalidedLog()
 
     @Query("SELECT * FROM log_record WHERE createTime BETWEEN :start AND :end ORDER BY createTime DESC")
     fun getByDate(start: Date, end: Date): Flow<List<LogRecord>>

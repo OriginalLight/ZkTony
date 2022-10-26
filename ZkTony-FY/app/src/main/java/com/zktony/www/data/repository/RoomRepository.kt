@@ -11,5 +11,5 @@ class RoomRepository @Inject constructor(
     private val calibrationRepository: CalibrationRepository
 ) {
     fun getMotorRepository() = motorRepository
-    fun getCailbrationRepository() = calibrationRepository
+    fun getCalibrationRepository() = calibrationRepository
 }

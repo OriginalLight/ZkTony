@@ -30,13 +30,8 @@ class ProgramViewModel @Inject constructor(
                 when (it) {
                     is ProgramIntent.OnAddProgram -> onAddProgram(it.programName)
                     is ProgramIntent.OnDeleteProgram -> onDeleteProgram(it.program)
+                    is ProgramIntent.OnLoadProgramList -> onLoadProgramList()
                 }
-            }
-        }
-        viewModelScope.launch {
-            delay(200L)
-            programRepository.getAll().collect {
-                _state.emit(ProgramState.OnProgramChange(it))
             }
         }
     }
@@ -81,11 +76,23 @@ class ProgramViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 加载程序列表
+     */
+    private fun onLoadProgramList() {
+        viewModelScope.launch {
+            programRepository.getAll().collect {
+                _state.emit(ProgramState.OnProgramChange(it))
+            }
+        }
+    }
+
 }
 
 sealed class ProgramIntent {
     data class OnDeleteProgram(val program: Program) : ProgramIntent()
     data class OnAddProgram(val programName: String) : ProgramIntent()
+    object OnLoadProgramList : ProgramIntent()
 }
 
 sealed class ProgramState {

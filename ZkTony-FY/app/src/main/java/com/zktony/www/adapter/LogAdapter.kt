@@ -7,13 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.R
-import com.zktony.www.common.constant.Constants
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.simpleDateFormat
 import com.zktony.www.data.entity.LogRecord
 import com.zktony.www.databinding.ItemLogBinding
-import com.zktony.www.model.Event
-import org.greenrobot.eventbus.EventBus
 
 /**
  * @author: 刘贺贺
@@ -39,8 +36,7 @@ class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback
                     holder.bindingAdapterPosition
                 )
             }
-            EventBus.getDefault().post(Event(Constants.BLANK, Constants.LOG_CLICK))
-            notifyDataSetChanged()
+               notifyDataSetChanged()
         }
     }
 

@@ -96,9 +96,8 @@
 -keep class android.view.** { *; }
 
 # Model
--keep class com.zktony.www.services.model.** {*;}
+-keep class com.zktony.www.data.services.model.** {*;}
 -keep class com.zktony.www.common.model.** {*;}
--keep class com.zktony.www.common.http.download.model.** {*;}
 -keepclasseswithmembers class com.zktony.www.common.http.adapter.NetworkResponse {*;}
 -keepclasseswithmembers class * extends com.zktony.www.common.http.adapter.NetworkResponse {*;}
 -keepclasseswithmembers class com.zktony.www.data.entity.** {*;}

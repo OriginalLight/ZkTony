@@ -4,9 +4,7 @@ import com.zktony.serialport.COMSerial
 import com.zktony.serialport.listener.OnComDataListener
 import com.zktony.www.common.Logger
 import com.zktony.www.common.extension.hexFormat
-import com.zktony.www.model.Queue
-import com.zktony.www.model.enum.SerialPortEnum
-import com.zktony.www.model.enum.SerialPortEnum.*
+import com.zktony.www.common.model.Queue
 import com.zktony.www.serialport.protocol.CommandBlock
 import kotlinx.coroutines.delay
 
@@ -15,10 +13,10 @@ class SerialPortManager {
     val commandQueue = Queue<List<CommandBlock>>()
 
     init {
-        COMSerial.instance.addCOM(SERIAL_ONE.device, 115200)
-        COMSerial.instance.addCOM(SERIAL_TWO.device, 115200)
-        COMSerial.instance.addCOM(SERIAL_THREE.device, 115200)
-        COMSerial.instance.addCOM(SERIAL_FOUR.device, 115200)
+        COMSerial.instance.addCOM(SerialPortEnum.SERIAL_ONE.device, 115200)
+        COMSerial.instance.addCOM(SerialPortEnum.SERIAL_TWO.device, 115200)
+        COMSerial.instance.addCOM(SerialPortEnum.SERIAL_THREE.device, 115200)
+        COMSerial.instance.addCOM(SerialPortEnum.SERIAL_FOUR.device, 115200)
     }
 
     /**
@@ -93,5 +91,26 @@ class SerialPortManager {
         val instance: SerialPortManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             SerialPortManager()
         }
+    }
+}
+
+enum class SerialPortEnum(val device: String, val value: String, val index: Int) {
+    SERIAL_ONE("/dev/ttyS0", "串口一", 0),
+    SERIAL_TWO("/dev/ttyS1", "串口二", 1),
+    SERIAL_THREE("/dev/ttyS2", "串口三", 2),
+    SERIAL_FOUR("/dev/ttyS3", "串口四", 3),
+    SERIAL_FIVE("/dev/ttyS4", "串口五", 4),
+    SERIAL_SIX("/dev/ttyS5", "串口六", 5),
+}
+
+fun getSerialPortEnum(index: Int): SerialPortEnum {
+    return when (index) {
+        0 -> SerialPortEnum.SERIAL_ONE
+        1 -> SerialPortEnum.SERIAL_TWO
+        2 -> SerialPortEnum.SERIAL_THREE
+        3 -> SerialPortEnum.SERIAL_FOUR
+        4 -> SerialPortEnum.SERIAL_FIVE
+        5 -> SerialPortEnum.SERIAL_SIX
+        else -> SerialPortEnum.SERIAL_ONE
     }
 }

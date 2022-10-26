@@ -68,6 +68,6 @@ object RoomModule {
 
     @Provides
     fun provideCailbrationDao(database: AppDatabase): CalibrationDao {
-        return database.cailbrationDao()
+        return database.calibrationDao()
     }
 }

@@ -7,7 +7,7 @@ import com.zktony.www.common.extension.getDayStart
 import com.zktony.www.data.entity.LogData
 import com.zktony.www.data.entity.LogRecord
 import com.zktony.www.data.repository.LogDataRepository
-import com.zktony.www.data.repository.LogRecordRespository
+import com.zktony.www.data.repository.LogRecordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LogViewModel @Inject constructor(
-    private val logRecordRepository: LogRecordRespository,
+    private val logRecordRepository: LogRecordRepository,
     private val logDataRepository: LogDataRepository
 ) : BaseViewModel() {
 

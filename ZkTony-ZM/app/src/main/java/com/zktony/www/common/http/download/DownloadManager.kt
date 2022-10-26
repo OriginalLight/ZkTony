@@ -1,7 +1,6 @@
 package com.zktony.www.common.http.download
 
 import com.zktony.www.common.extension.copyTo
-import com.zktony.www.common.http.download.model.DownloadState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -45,4 +44,10 @@ object DownloadManager {
             emit(DownloadState.Err(it))
         }.flowOn(Dispatchers.IO)
     }
+}
+
+sealed class DownloadState {
+    data class Progress(val progress: Int) : DownloadState()
+    data class Err(val t: Throwable) : DownloadState()
+    data class Success(val file: File) : DownloadState()
 }

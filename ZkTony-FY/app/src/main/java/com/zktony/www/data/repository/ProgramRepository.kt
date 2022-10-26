@@ -3,9 +3,9 @@ package com.zktony.www.data.repository
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.data.dao.ActionDao
 import com.zktony.www.data.dao.ProgramDao
+import com.zktony.www.data.entity.ActionEnum
 import com.zktony.www.data.entity.Program
-import com.zktony.www.model.enum.ActionEnum
-import com.zktony.www.model.enum.getActionEnum
+import com.zktony.www.data.entity.getActionEnum
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
@@ -50,16 +50,20 @@ class ProgramRepository @Inject constructor(
         actionDao.getByProgramId(programId).firstOrNull()?.let {
             var actions = ""
             var time = 0f
-            it.forEachIndexed { index, action ->
-                actions += getActionEnum(action.mode).str
-                if (index != it.size - 1) {
-                    actions += " -> "
+            if (it.isNotEmpty()) {
+                it.forEachIndexed { index, action ->
+                    actions += getActionEnum(action.mode).str
+                    if (index != it.size - 1) {
+                        actions += " -> "
+                    }
+                    time += if (action.mode == ActionEnum.WASHING.index) {
+                        action.time * action.count
+                    } else {
+                        action.time * 60
+                    }
                 }
-                time += if (action.mode == ActionEnum.WASHING.index) {
-                    action.time * action.count
-                } else {
-                    action.time * 60
-                }
+            } else {
+                actions = "没有任何操作，去添加吧"
             }
             // 将分钟转换为小时加分钟
             val hour = (time / 60).toInt()
