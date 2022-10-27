@@ -26,8 +26,8 @@ data class Action(
 
 enum class ActionEnum(val index: Int, val str: String) {
     BLOCKING_LIQUID(0, "封闭液"),
-    ANTIBODY_ONE(1, "抗体1"),
-    ANTIBODY_TWO(2, "抗体2"),
+    ANTIBODY_ONE(1, "一抗"),
+    ANTIBODY_TWO(2, "二抗"),
     WASHING(3, "洗涤");
 
 }

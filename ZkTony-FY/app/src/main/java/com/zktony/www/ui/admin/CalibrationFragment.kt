@@ -243,6 +243,18 @@ class CalibrationFragment :
                     )
                 }
             }
+            recycleAntibodyOneTankHeight.run {
+                setText(calibration.recycleAntibodyOneTankHeight.toString().removeZero())
+                afterTextChange {
+                    viewModel.dispatch(
+                        CalibrationIntent.OnCalibrationValueChange(
+                            viewModel.uiState.value.calibration.copy(
+                                recycleAntibodyOneTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
+                            )
+                        )
+                    )
+                }
+            }
             antibodyTwoTankPosition.run {
                 setText(calibration.antibodyTwoTankPosition.toString().removeZero())
                 afterTextChange {
@@ -351,6 +363,18 @@ class CalibrationFragment :
                     )
                 }
             }
+            drainDistance.run {
+                setText(calibration.drainDistance.toString().removeZero())
+                afterTextChange {
+                    viewModel.dispatch(
+                        CalibrationIntent.OnCalibrationValueChange(
+                            viewModel.uiState.value.calibration.copy(
+                                drainDistance = if (it.isNotEmpty()) it.toFloat() else 0f
+                            )
+                        )
+                    )
+                }
+            }
         }
     }
 
@@ -408,6 +432,12 @@ class CalibrationFragment :
                     setText(str)
                 }
             }
+            recycleAntibodyOneTankHeight.run {
+                val str = calibration.recycleAntibodyOneTankHeight.toString().removeZero()
+                if (text.toString() != str) {
+                    setText(str)
+                }
+            }
             antibodyTwoTankPosition.run {
                 val str = calibration.antibodyTwoTankPosition.toString().removeZero()
                 if (text.toString() != str) {
@@ -458,6 +488,12 @@ class CalibrationFragment :
             }
             pumpFiveDistance.run {
                 val str = calibration.pumpFiveDistance.toString().removeZero()
+                if (text.toString() != str) {
+                    setText(str)
+                }
+            }
+            drainDistance.run {
+                val str = calibration.drainDistance.toString().removeZero()
                 if (text.toString() != str) {
                     setText(str)
                 }

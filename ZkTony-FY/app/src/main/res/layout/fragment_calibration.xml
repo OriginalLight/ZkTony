@@ -288,6 +288,31 @@
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/input_recycle_antibody_one_tank_height"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="32dp"
+                        android:elevation="2dp"
+                        android:hint="@string/recycle_antibody_one_tank_height"
+                        app:boxBackgroundColor="@color/light_onPrimary"
+                        app:startIconDrawable="@mipmap/ic_height">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/recycle_antibody_one_tank_height"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:cursorVisible="true"
+                            android:inputType="numberDecimal"
+                            android:maxLength="50"
+                            android:singleLine="true"
+                            android:textSize="16sp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/input_antibody_two_tank_position"
                         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                         android:layout_width="match_parent"
@@ -502,6 +527,31 @@
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/pump_five_distance"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:cursorVisible="true"
+                            android:inputType="numberDecimal"
+                            android:maxLength="50"
+                            android:singleLine="true"
+                            android:textSize="16sp" />
+
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/input_drain_distance"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="32dp"
+                        android:elevation="2dp"
+                        android:hint="@string/drain_distance"
+                        app:boxBackgroundColor="@color/light_onPrimary"
+                        app:startIconDrawable="@mipmap/ic_water">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/drain_distance"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:cursorVisible="true"

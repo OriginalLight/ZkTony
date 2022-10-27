@@ -2,6 +2,7 @@ package com.zktony.www.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.zktony.www.common.Logger
 import com.zktony.www.common.extension.hex2ToInt16
 import com.zktony.www.common.extension.hexToInt8
 import com.zktony.www.common.extension.int16ToHex2
@@ -112,18 +113,15 @@ data class MotionMotor(
     }
 
     /**
-     * 单点运动
+     * 运动延时
      * @param y [Float] y轴运动距离
      * @param z [Float] z轴运动距离
+     * @return [Long] 延时时间
      */
-    fun toSinglePointHex(y: Float, z: Float): String {
-        val str = StringBuilder()
-        str.append("0,")
-        str.append(yPulseCount(y))
-        str.append(",")
-        str.append(zPulseCount(z))
-        str.append(",")
-        return str.toString()
+    fun delayTime(y: Float, z: Float): Long {
+        val yTime = (y / yLength * 60 / yAxis.speed * 1000).toLong()
+        val zTime = (z / zLength * 60 / zAxis.speed * 1000).toLong()
+        return yTime + zTime
     }
 }
 
@@ -157,7 +155,7 @@ data class PumpMotor(
      * @param volume [Float] 出液量
      * @return [String] 脉冲数
      */
-    fun pumpOneVolumePulseCount(volume: Float): String {
+    private fun pumpOneVolumePulseCount(volume: Float): String {
         return (volume * pulseCount(pumpOne) / this.volumeOne).toInt().toString()
     }
 
@@ -166,7 +164,7 @@ data class PumpMotor(
      * @param volume [Float] 出液量
      * @return [String] 脉冲数
      */
-    fun pumpTwoVolumePulseCount(volume: Float): String {
+    private fun pumpTwoVolumePulseCount(volume: Float): String {
         return (volume * pulseCount(pumpTwo) / this.volumeTwo).toInt().toString()
     }
 
@@ -175,7 +173,7 @@ data class PumpMotor(
      * @param volume [Float] 出液量
      * @return [String] 脉冲数
      */
-    fun pumpThreeVolumePulseCount(volume: Float): String {
+    private fun pumpThreeVolumePulseCount(volume: Float): String {
         return (volume * pulseCount(pumpThree) / this.volumeThree).toInt().toString()
     }
 
@@ -184,7 +182,7 @@ data class PumpMotor(
      * @param volume [Float] 出液量
      * @return [String] 脉冲数
      */
-    fun pumpFourVolumePulseCount(volume: Float): String {
+    private fun pumpFourVolumePulseCount(volume: Float): String {
         return (volume * pulseCount(pumpFour) / this.volumeFour).toInt().toString()
     }
 
@@ -193,7 +191,74 @@ data class PumpMotor(
      * @param volume [Float] 出液量
      * @return [String] 脉冲数
      */
-    fun pumpFiveVolumePulseCount(volume: Float): String {
+    private fun pumpFiveVolumePulseCount(volume: Float): String {
         return (volume * pulseCount(pumpFive) / this.volumeFive).toInt().toString()
+    }
+
+    /**
+     * B板子多点运动
+     * @param pumpOneVolume [Float] 泵一出液量
+     * @param pumpTwoVolume [Float] 泵二出液量
+     * @param pumpThreeVolume [Float] 泵三出液量
+     * @return [String] 十六进制字符串
+     */
+    fun toMultiPointHexB(
+        pumpOneVolume: Float,
+        pumpTwoVolume: Float,
+        pumpThreeVolume: Float,
+    ): String {
+        val str = StringBuilder()
+        str.append(pumpOneVolumePulseCount(pumpOneVolume))
+        str.append(",")
+        str.append(pumpTwoVolumePulseCount(pumpTwoVolume))
+        str.append(",")
+        str.append(pumpThreeVolumePulseCount(pumpThreeVolume))
+        str.append(",")
+        return str.toString()
+    }
+
+    /**
+     * C板子多点运动
+     * @param pumpFourVolume [Float] 泵一出液量
+     * @param pumpFiveVolume [Float] 泵二出液量
+     * @return [String] 十六进制字符串
+     */
+    fun toMultiPointHexC(
+        pumpFourVolume: Float,
+        pumpFiveVolume: Float,
+    ): String {
+        val str = StringBuilder()
+        str.append(pumpFourVolumePulseCount(pumpFourVolume))
+        str.append(",")
+        str.append(pumpFiveVolumePulseCount(pumpFiveVolume))
+        str.append(",")
+        str.append("0,")
+        return str.toString()
+    }
+
+    /**
+     * 运动延时
+     * @param x [Float] x轴运动距离
+     * @param y [Float] y轴运动距离
+     * @param z [Float] z轴运动距离
+     * @return [Long] 延时时间
+     */
+    fun delayTimeB(x: Float, y: Float, z: Float): Long {
+        val xTime = (x / volumeOne * 60 / pumpOne.speed * 1000).toLong()
+        val yTime = (y / volumeTwo * 60 / pumpTwo.speed * 1000).toLong()
+        val zTime = (z / volumeThree * 60 / pumpThree.speed * 1000).toLong()
+        return xTime + yTime + zTime
+    }
+
+    /**
+     * 运动延时
+     * @param x [Float] x轴运动距离
+     * @param y [Float] y轴运动距离
+     * @return [Long] 延时时间
+     */
+    fun delayTimeC(x: Float, y: Float): Long {
+        val xTime = (x / volumeFour * 60 / pumpFour.speed * 1000).toLong()
+        val yTime = (y / volumeFive * 60 / pumpFive.speed * 1000).toLong()
+        return xTime + yTime
     }
 }
