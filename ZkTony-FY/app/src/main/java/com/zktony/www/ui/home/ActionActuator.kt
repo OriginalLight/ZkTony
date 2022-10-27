@@ -52,6 +52,7 @@ class ActionActuator private constructor(
         commandGroup.run {
             initModule(this@ActionActuator.module)
             initSettingState(this@ActionActuator.settingState)
+            initAction(action)
             addBlockingLiquid {
                 countDown((action.time * 60 * 60).toLong(), {
                     _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
@@ -72,6 +73,7 @@ class ActionActuator private constructor(
         commandGroup.run {
             initModule(this@ActionActuator.module)
             initSettingState(this@ActionActuator.settingState)
+            initAction(action)
             addAntibodyOne {
                 countDown((action.time * 60 * 60).toLong(), {
                     _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
@@ -91,6 +93,7 @@ class ActionActuator private constructor(
         commandGroup.run {
             initModule(this@ActionActuator.module)
             initSettingState(this@ActionActuator.settingState)
+            initAction(action)
             addAntibodyTwo {
                 countDown((action.time * 60 * 60).toLong(), {
                     _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
@@ -110,6 +113,7 @@ class ActionActuator private constructor(
         commandGroup.run {
             initModule(module)
             initSettingState(settingState)
+            initAction(action)
             addWashingLiquid {
                 countDown((action.time * 60).toLong(), {
                     _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))

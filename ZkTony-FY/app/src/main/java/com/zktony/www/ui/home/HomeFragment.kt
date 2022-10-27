@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.BottomMenu
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.R
@@ -46,6 +44,7 @@ class HomeFragment :
                     is HomeState.OnRestCallBack -> onRestCallBack(it.success)
                     is HomeState.OnPause -> onBtnPause()
                     is HomeState.OnInsulating -> onInsulating()
+                    is HomeState.OnDashBoardChange -> onDashBoardChange(it.module)
                 }
             }
         }
@@ -385,6 +384,22 @@ class HomeFragment :
         binding.e.tvInsulating.run {
             text = uiState.btnInsulating.text
             setTextColor(ContextCompat.getColor(context, uiState.btnInsulating.textColor))
+        }
+    }
+
+    /**
+     * Dashboard变化
+     * @param module [ModuleEnum] 模块
+     */
+    private fun onDashBoardChange(module: ModuleEnum) {
+        val uiState = viewModel.uiState.value
+        when (module) {
+            ModuleEnum.A -> {
+                binding.a.run {
+                    dashTime.text = uiState.dashBoardA.time
+                }
+            }
+            else -> {}
         }
     }
 

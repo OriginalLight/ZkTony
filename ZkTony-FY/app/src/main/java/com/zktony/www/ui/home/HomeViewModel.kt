@@ -4,14 +4,12 @@ import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.zktony.www.R
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.Logger
 import com.zktony.www.common.app.AppIntent
 import com.zktony.www.common.app.AppState
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.model.Queue
 import com.zktony.www.data.entity.Action
-import com.zktony.www.data.entity.ActionEnum
 import com.zktony.www.data.entity.Program
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
@@ -224,6 +222,10 @@ class HomeViewModel @Inject constructor(
         appViewModel.dispatch(
             AppIntent.Sender(SerialPortEnum.SERIAL_ONE, Command().toHex())
         )
+        stopProgram(ModuleEnum.A)
+        stopProgram(ModuleEnum.B)
+        stopProgram(ModuleEnum.C)
+        stopProgram(ModuleEnum.D)
     }
 
     /**
@@ -482,16 +484,95 @@ class HomeViewModel @Inject constructor(
 
     /**
      * 程序运行状态收集器
+     * @param job [ActionActuator] 运行器
      */
     private fun programStateCollector(job: ActionActuator) {
         viewModelScope.launch {
             job.state.collect {
                 when (it) {
                     is ActionState.CurrentAction -> {
-                        Logger.e(msg = "当前程序：${it.module.value} ${it.action}")
+                        val action = it.action
+                        when (it.module) {
+                            ModuleEnum.A -> {
+                                _uiState.update {
+                                    uiState.value.copy(
+                                        dashBoardA = uiState.value.dashBoardA.copy(
+                                            currentAction = action
+                                        )
+                                    )
+                                }
+                            }
+                            ModuleEnum.B -> {
+                                _uiState.update {
+                                    uiState.value.copy(
+                                        dashBoardB = uiState.value.dashBoardB.copy(
+                                            currentAction = action
+                                        )
+                                    )
+                                }
+                            }
+                            ModuleEnum.C -> {
+                                _uiState.update {
+                                    uiState.value.copy(
+                                        dashBoardC = uiState.value.dashBoardC.copy(
+                                            currentAction = action
+                                        )
+                                    )
+                                }
+                            }
+                            ModuleEnum.D -> {
+                                _uiState.update {
+                                    uiState.value.copy(
+                                        dashBoardD = uiState.value.dashBoardD.copy(
+                                            currentAction = action
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                        _state.emit(HomeState.OnDashBoardChange(it.module))
                     }
                     is ActionState.CurrentActionTime -> {
-                        Logger.e(msg = "当前程序剩余时间：${it.module.value} ${it.time}")
+                        val time = it.time
+                        when (it.module) {
+                            ModuleEnum.A -> {
+                                _uiState.update {
+                                    uiState.value.copy(
+                                        dashBoardA = uiState.value.dashBoardA.copy(
+                                            time = time
+                                        )
+                                    )
+                                }
+                            }
+                            ModuleEnum.B -> {
+                                _uiState.update {
+                                    uiState.value.copy(
+                                        dashBoardB = uiState.value.dashBoardB.copy(
+                                            time = time
+                                        )
+                                    )
+                                }
+                            }
+                            ModuleEnum.C -> {
+                                _uiState.update {
+                                    uiState.value.copy(
+                                        dashBoardC = uiState.value.dashBoardC.copy(
+                                            time = time
+                                        )
+                                    )
+                                }
+                            }
+                            ModuleEnum.D -> {
+                                _uiState.update {
+                                    uiState.value.copy(
+                                        dashBoardD = uiState.value.dashBoardD.copy(
+                                            time = time
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                        _state.emit(HomeState.OnDashBoardChange(it.module))
                     }
                     is ActionState.Finish -> onStop(it.module)
                 }
@@ -515,6 +596,7 @@ sealed class HomeState {
     data class OnLoadProgram(val uiState: HomeUiState) : HomeState()
     data class OnButtonChange(val module: ModuleEnum) : HomeState()
     data class OnRestCallBack(val success: Boolean) : HomeState()
+    data class OnDashBoardChange(val module: ModuleEnum) : HomeState()
     object OnPause : HomeState()
     object OnInsulating : HomeState()
 }
@@ -532,6 +614,10 @@ data class HomeUiState(
         textColor = R.color.dark_outline
     ),
     var btnInsulating: ButtonState = ButtonState(text = "抗体保温", textColor = R.color.dark_outline),
+    var dashBoardA: DashBoardState = DashBoardState(),
+    var dashBoardB: DashBoardState = DashBoardState(),
+    var dashBoardC: DashBoardState = DashBoardState(),
+    var dashBoardD: DashBoardState = DashBoardState()
 )
 
 data class ModuleState(
@@ -552,6 +638,11 @@ data class ButtonState(
     var isRunning: Boolean = false,
     var icon: Int = 0,
     var textColor: Int = 0,
+)
+
+data class DashBoardState(
+    var currentAction: Action = Action(),
+    var time: String = "00:00:00",
 )
 
 enum class ModuleEnum(val value: String) {

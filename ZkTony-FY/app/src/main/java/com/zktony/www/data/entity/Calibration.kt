@@ -24,6 +24,7 @@ data class Calibration(
     // 一抗槽位置
     var antibodyOneTankPosition: Float = 176f,
     var antibodyOneTankHeight: Float = 103f,
+    var recycleAntibodyOneTankHeight: Float = 30f,
     // 二抗槽位置
     var antibodyTwoTankPosition: Float = 137.5f,
     var antibodyTwoTankHeight: Float = 103f,
@@ -42,4 +43,6 @@ data class Calibration(
     var pumpFourDistance: Float = 0.5f,
     // 蠕动泵五转的圈数
     var pumpFiveDistance: Float = 0.5f,
+    // 排液转的圈数
+    var drainDistance: Float = 30f,
 )

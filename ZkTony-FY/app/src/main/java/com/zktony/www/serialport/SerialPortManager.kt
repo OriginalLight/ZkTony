@@ -64,6 +64,7 @@ class SerialPortManager {
                     sendText(it.serialPort, it.text)
                 }
                 is CommandBlock.Delay -> {
+                    Logger.e( msg = "delay: ${it.delay} ms")
                     delay(it.delay)
                 }
             }

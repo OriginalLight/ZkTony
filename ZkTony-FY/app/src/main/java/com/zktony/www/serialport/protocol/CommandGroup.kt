@@ -1,10 +1,16 @@
 package com.zktony.www.serialport.protocol
 
+import com.zktony.www.common.Logger
 import com.zktony.www.common.app.SettingState
+import com.zktony.www.data.entity.Action
+import com.zktony.www.data.entity.Calibration
+import com.zktony.www.data.entity.MotionMotor
+import com.zktony.www.data.entity.PumpMotor
 import com.zktony.www.serialport.SerialPortEnum
 import com.zktony.www.serialport.SerialPortEnum.*
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.ui.home.ModuleEnum
+import com.zktony.www.ui.home.ModuleEnum.*
 import kotlinx.coroutines.delay
 
 /**
@@ -16,6 +22,10 @@ class CommandGroup {
     private val serialPortManager = SerialPortManager.instance
     private lateinit var module: ModuleEnum
     private lateinit var settingState: SettingState
+    private lateinit var action: Action
+    private lateinit var motionMotor: MotionMotor
+    private lateinit var pumpMotor: PumpMotor
+    private lateinit var calibration: Calibration
 
     fun initModule(module: ModuleEnum) {
         this.module = module
@@ -23,7 +33,14 @@ class CommandGroup {
 
     fun initSettingState(settingState: SettingState) {
         this.settingState = settingState
+        this.motionMotor = settingState.motionMotor
+        this.pumpMotor = settingState.pumpMotor
+        this.calibration = settingState.calibration
 
+    }
+
+    fun initAction(action: Action) {
+        this.action = action
     }
 
 
@@ -32,22 +49,32 @@ class CommandGroup {
      * @param block
      */
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
-        val motionMotor = settingState.motionMotor
-        val calibration = settingState.calibration
-        val commandBlock = listOf(
+        Logger.d(msg = "添加封闭液")
+        val commandBlock = mutableListOf<CommandBlock>()
+        commandBlock.add(
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.blockingLiquidTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(calibration.blockingLiquidTankPosition, calibration.blockingLiquidTankHeight) +
-                            motionMotor.toMultiPointHex(calibration.blockingLiquidTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(0f, 0f)
+                SERIAL_ONE,
+                Command.multiPoint(
+                    move(
+                        calibration.blockingLiquidTankPosition,
+                        calibration.blockingLiquidTankHeight
+                    )
                 )
-            ),
-            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,6400,0,0,0,0,0,32000,0,0,")),
-            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
+            )
+        )
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquidC())))
+        commandBlock.add(
+            CommandBlock.Delay(
+                motionMotor.delayTime(
+                    calibration.blockingLiquidTankPosition * 2,
+                    calibration.blockingLiquidTankHeight * 2
+                ) + addLiquidDelay() + 5000
+            )
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock, 45 * 1000L)
+        waitUntilComplete(commandBlock)
+        Logger.d(msg = "添加封闭液完成")
         block.invoke()
     }
 
@@ -56,22 +83,32 @@ class CommandGroup {
      * @param block
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
-        val motionMotor = settingState.motionMotor
-        val calibration = settingState.calibration
-        val commandBlock = listOf(
+        Logger.d(msg = "添加一抗")
+        val commandBlock = mutableListOf<CommandBlock>()
+        commandBlock.add(
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, calibration.antibodyOneTankHeight) +
-                            motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(0f, 0f)
+                SERIAL_ONE,
+                Command.multiPoint(
+                    move(
+                        calibration.antibodyOneTankPosition,
+                        calibration.antibodyOneTankHeight
+                    )
                 )
-            ),
-            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,6400,0,0,0,0,0,32000,0,0,")),
-            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
+            )
+        )
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquidC())))
+        commandBlock.add(
+            CommandBlock.Delay(
+                motionMotor.delayTime(
+                    calibration.antibodyOneTankPosition * 2,
+                    calibration.antibodyOneTankHeight * 2
+                ) + addLiquidDelay() + 5000
+            )
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock, 45 * 1000L)
+        waitUntilComplete(commandBlock)
+        Logger.d(msg = "添加一抗完成")
         block.invoke()
     }
 
@@ -80,22 +117,32 @@ class CommandGroup {
      * @param block
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
-        val motionMotor = settingState.motionMotor
-        val calibration = settingState.calibration
-        val commandBlock = listOf(
+        Logger.d(msg = "回收一抗")
+        val commandBlock = mutableListOf<CommandBlock>()
+        commandBlock.add(
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, calibration.wasteTankHeight) +
-                            motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(0f, 0f)
+                SERIAL_ONE,
+                Command.multiPoint(
+                    move(
+                        calibration.antibodyOneTankPosition,
+                        calibration.recycleAntibodyOneTankHeight
+                    )
                 )
-            ),
-            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,-32000,0,0,0,0,0,0,0,0,")),
-            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
+            )
+        )
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(recycleLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(recycleLiquidC())))
+        commandBlock.add(
+            CommandBlock.Delay(
+                motionMotor.delayTime(
+                    calibration.antibodyOneTankPosition * 2,
+                    calibration.recycleAntibodyOneTankHeight * 2
+                ) + addLiquidDelay() + 5000
+            )
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock, 45 * 1000L)
+        waitUntilComplete(commandBlock)
+        Logger.d(msg = "回收一抗完成")
         block.invoke()
     }
 
@@ -104,22 +151,32 @@ class CommandGroup {
      * @param block
      */
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
-        val motionMotor = settingState.motionMotor
-        val calibration = settingState.calibration
-        val commandBlock = listOf(
+        Logger.d(msg = "添加二抗")
+        val commandBlock = mutableListOf<CommandBlock>()
+        commandBlock.add(
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.antibodyTwoTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(calibration.antibodyTwoTankPosition, calibration.antibodyTwoTankHeight) +
-                            motionMotor.toMultiPointHex(calibration.antibodyTwoTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(0f, 0f)
+                SERIAL_ONE,
+                Command.multiPoint(
+                    move(
+                        calibration.antibodyTwoTankPosition,
+                        calibration.antibodyTwoTankHeight
+                    )
                 )
-            ),
-            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,6400,0,0,0,0,0,32000,0,0,")),
-            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
+            )
+        )
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquidC())))
+        commandBlock.add(
+            CommandBlock.Delay(
+                motionMotor.delayTime(
+                    calibration.antibodyTwoTankPosition * 2,
+                    calibration.antibodyTwoTankHeight * 2
+                ) + addLiquidDelay() + 5000
+            )
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock, 45 * 1000L)
+        waitUntilComplete(commandBlock)
+        Logger.d(msg = "添加二抗完成")
         block.invoke()
     }
 
@@ -128,22 +185,32 @@ class CommandGroup {
      * @param block
      */
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
-        val motionMotor = settingState.motionMotor
-        val calibration = settingState.calibration
-        val commandBlock = listOf(
+        Logger.d(msg = "添加洗涤液")
+        val commandBlock = mutableListOf<CommandBlock>()
+        commandBlock.add(
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.washTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(calibration.washTankPosition, calibration.washTankHeight) +
-                            motionMotor.toMultiPointHex(calibration.washTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(calibration.washTankPosition, 0f)
+                SERIAL_ONE,
+                Command.multiPoint(
+                    move(
+                        calibration.washTankPosition,
+                        calibration.washTankHeight
+                    )
                 )
-            ),
-            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,6400,0,0,0,0,0,32000,0,0,")),
-            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
+            )
+        )
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquidC())))
+        commandBlock.add(
+            CommandBlock.Delay(
+                motionMotor.delayTime(
+                    calibration.washTankPosition * 2,
+                    calibration.washTankHeight * 2
+                ) + addLiquidDelay() + 5000
+            )
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock, 45 * 1000L)
+        waitUntilComplete(commandBlock)
+        Logger.d(msg = "添加洗涤液完成")
         block.invoke()
     }
 
@@ -153,22 +220,32 @@ class CommandGroup {
      * @param block
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
-        val motionMotor = settingState.motionMotor
-        val calibration = settingState.calibration
-        val commandBlock = listOf(
+        Logger.d(msg = "回收到废液槽")
+        val commandBlock = mutableListOf<CommandBlock>()
+        commandBlock.add(
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.wasteTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(calibration.wasteTankPosition, calibration.wasteTankHeight) +
-                            motionMotor.toMultiPointHex(calibration.wasteTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(calibration.wasteTankPosition, 0f)
+                SERIAL_ONE,
+                Command.multiPoint(
+                    move(
+                        calibration.wasteTankPosition,
+                        calibration.wasteTankHeight
+                    )
                 )
-            ),
-            CommandBlock.Hex(SERIAL_TWO, Command.multiPoint("0,0,0,-96000,0,0,0,0,0,0,0,0,")),
-            CommandBlock.Hex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,0,0,0,0,0,0,")),
+            )
+        )
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(recycleLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(recycleLiquidC())))
+        commandBlock.add(
+            CommandBlock.Delay(
+                motionMotor.delayTime(
+                    calibration.wasteTankPosition * 2,
+                    calibration.wasteTankHeight * 2
+                ) + addLiquidDelay() + 5000
+            )
         )
         serialPortManager.commandQueue.enqueue(commandBlock)
-        waitUntilComplete(commandBlock, 25 * 1000L)
+        waitUntilComplete(commandBlock)
+        Logger.d(msg = "回收到废液槽完成")
         block.invoke()
     }
 
@@ -184,6 +261,191 @@ class CommandGroup {
             delay(delay)
         }
     }
+
+    /**
+     * 主机命令生成器
+     */
+    private fun move(distance: Float, height: Float): String {
+        return motionMotor.toMultiPointHex(distance, 0f) +
+                motionMotor.toMultiPointHex(distance, height) +
+                motionMotor.toMultiPointHex(distance, 0f) +
+                motionMotor.toMultiPointHex(0f, 0f)
+    }
+
+    /**
+     * 从机B命令生成器
+     * @return [String] 命令字符串
+     */
+    private fun addLiquidB(): String {
+        when (module) {
+            A -> {
+                return pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(action.liquidVolume, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(
+                            action.liquidVolume + (200 * pumpMotor.pumpOne.subdivision * calibration.drainDistance),
+                            0f,
+                            0f
+                        )
+            }
+            B -> {
+                return pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(0f, action.liquidVolume, 0f) +
+                        pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(
+                            0f,
+                            action.liquidVolume + (200 * pumpMotor.pumpOne.subdivision * calibration.drainDistance),
+                            0f
+                        )
+            }
+            C -> {
+                return pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(0f, 0f, action.liquidVolume) +
+                        pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(
+                            0f,
+                            0f,
+                            action.liquidVolume + (200 * pumpMotor.pumpOne.subdivision * calibration.drainDistance)
+                        )
+            }
+            D -> {
+                return "0,0,0,0,0,0,0,0,0,0,0,0,"
+            }
+        }
+    }
+
+    /**
+     * 从机C命令生成器
+     * @return [String] 命令字符串
+     */
+    private fun addLiquidC(): String {
+        when (module) {
+            A -> {
+                return "0,0,0,0,0,0,0,0,0,0,0,0,"
+            }
+            B -> {
+                return "0,0,0,0,0,0,0,0,0,0,0,0,"
+            }
+            C -> {
+                return "0,0,0,0,0,0,0,0,0,0,0,0,"
+            }
+            D -> {
+                return pumpMotor.toMultiPointHexC(0f, 0f) +
+                        pumpMotor.toMultiPointHexC(action.liquidVolume, 0f) +
+                        pumpMotor.toMultiPointHexC(0f, 0f) +
+                        pumpMotor.toMultiPointHexC(
+                            action.liquidVolume + (200 * pumpMotor.pumpOne.subdivision * calibration.drainDistance),
+                            0f
+                        )
+            }
+        }
+    }
+
+    /**
+     * 从机B命令生成器
+     * @return [String] 命令字符串
+     */
+    private fun recycleLiquidB(): String {
+        when (module) {
+            A -> {
+                return pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(
+                            -(action.liquidVolume + (calibration.pumpOneDistance * calibration.drainDistance)),
+                            0f,
+                            0f
+                        ) +
+                        pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(0f, 0f, 0f)
+            }
+            B -> {
+                return pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(
+                            0f,
+                            -(action.liquidVolume + (calibration.pumpTwoDistance * calibration.drainDistance)),
+                            0f
+                        ) +
+                        pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(0f, 0f, 0f)
+            }
+            C -> {
+                return pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(
+                            0f,
+                            0f,
+                            -(action.liquidVolume + (calibration.pumpThreeDistance * calibration.drainDistance))
+                        ) +
+                        pumpMotor.toMultiPointHexB(0f, 0f, 0f) +
+                        pumpMotor.toMultiPointHexB(0f, 0f, 0f)
+            }
+            D -> {
+                return "0,0,0,0,0,0,0,0,0,0,0,0,"
+            }
+        }
+    }
+
+    /**
+     * 从机C命令生成器
+     * @return [String] 命令字符串
+     */
+    private fun recycleLiquidC(): String {
+        when (module) {
+            A -> {
+                return "0,0,0,0,0,0,0,0,0,0,0,0,"
+            }
+            B -> {
+                return "0,0,0,0,0,0,0,0,0,0,0,0,"
+            }
+            C -> {
+                return "0,0,0,0,0,0,0,0,0,0,0,0,"
+            }
+            D -> {
+                return pumpMotor.toMultiPointHexC(0f, 0f) +
+                        pumpMotor.toMultiPointHexC(
+                            -(action.liquidVolume + (calibration.pumpFourDistance * calibration.drainDistance)),
+                            0f
+                        ) +
+                        pumpMotor.toMultiPointHexC(0f, 0f) +
+                        pumpMotor.toMultiPointHexC(0f, 0f)
+            }
+        }
+    }
+
+    /**
+     * 加液等待时间
+     * @return [Long]
+     */
+    private fun addLiquidDelay(): Long {
+        return when (module) {
+            A -> {
+                pumpMotor.delayTimeB(
+                    action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpOneDistance,
+                    0f,
+                    0f
+                )
+            }
+            B -> {
+                pumpMotor.delayTimeB(
+                    0f,
+                    action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpTwoDistance,
+                    0f
+                )
+            }
+            C -> {
+                pumpMotor.delayTimeB(
+                    0f,
+                    0f,
+                    action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpThreeDistance
+                )
+            }
+            D -> {
+                pumpMotor.delayTimeC(
+                    action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpFourDistance,
+                    0f
+                )
+            }
+        }
+    }
+
 
     companion object {
         @JvmStatic
