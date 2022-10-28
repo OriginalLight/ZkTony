@@ -29,8 +29,23 @@ fun String.removeZero(): String {
 }
 
 
+/**
+ * 字符转日期
+ * @param format [String] 日期格式
+ * @return [Date]
+ */
 @SuppressLint("SimpleDateFormat")
 fun String.simpleDateFormat(format: String): Date? {
     val sdf = SimpleDateFormat(format)
     return sdf.parse(this)
+}
+
+/**
+ * 提取下位机返回字符串中的温度
+ * @return [String]
+ */
+fun String.extractTemp(): String {
+    val regEx = "[^0-9.]"
+    val p = regEx.toRegex()
+    return p.replace(this.substring(4, this.length - 1), "")
 }

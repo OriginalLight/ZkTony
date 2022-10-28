@@ -82,9 +82,9 @@ class ProgramEditFragment :
         }
         val action = viewModel.uiState.value.action
         binding.btnAction.run {
-            text = getActionEnum(action.mode).str
+            text = getActionEnum(action.mode).value
             setOnClickListener {
-                val menuList = ActionEnum.values().map { it.str }
+                val menuList = ActionEnum.values().map { it.value }
                 BottomMenu.show(menuList)
                     .setOnIconChangeCallBack(object : OnIconChangeCallBack<BottomMenu>() {
                         override fun getIcon(
@@ -93,10 +93,10 @@ class ProgramEditFragment :
                             menuText: String?
                         ): Int {
                             when (menuText) {
-                                ActionEnum.BLOCKING_LIQUID.str -> return R.mipmap.ic_blocking_liquid
-                                ActionEnum.ANTIBODY_ONE.str -> return R.mipmap.ic_antibody
-                                ActionEnum.ANTIBODY_TWO.str -> return R.mipmap.ic_antibody
-                                ActionEnum.WASHING.str -> return R.mipmap.ic_washing
+                                ActionEnum.BLOCKING_LIQUID.value -> return R.mipmap.ic_blocking_liquid
+                                ActionEnum.ANTIBODY_ONE.value -> return R.mipmap.ic_antibody
+                                ActionEnum.ANTIBODY_TWO.value -> return R.mipmap.ic_antibody
+                                ActionEnum.WASHING.value -> return R.mipmap.ic_washing
                             }
                             return 0
                         }

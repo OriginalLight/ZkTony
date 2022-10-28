@@ -2,7 +2,6 @@ package com.zktony.www.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.zktony.www.common.Logger
 import com.zktony.www.common.extension.hex2ToInt16
 import com.zktony.www.common.extension.hexToInt8
 import com.zktony.www.common.extension.int16ToHex2

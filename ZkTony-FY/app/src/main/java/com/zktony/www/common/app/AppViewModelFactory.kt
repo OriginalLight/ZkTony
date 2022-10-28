@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.RoomRepository
 import javax.inject.Inject
 

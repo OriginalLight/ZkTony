@@ -36,7 +36,7 @@ class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback
                     holder.bindingAdapterPosition
                 )
             }
-               notifyDataSetChanged()
+            notifyDataSetChanged()
         }
     }
 
