@@ -1,5 +1,6 @@
 package com.zktony.www.ui.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -11,14 +12,14 @@ import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
+import com.zktony.www.data.entity.getActionEnum
 import com.zktony.www.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class HomeFragment :
-    BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
+class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
 
     override val viewModel: HomeViewModel by viewModels()
 
@@ -53,18 +54,57 @@ class HomeFragment :
     /**
      * 初始化文本框
      */
+    @SuppressLint("SetTextI18n")
     private fun initTextView() {
-        binding.a.tvActions.setOnClickListener {
-            PopTip.show((it as TextView).text)
+        val uiState = viewModel.uiState.value
+        binding.a.run {
+            tvActions.setOnClickListener {
+                PopTip.show((it as TextView).text)
+            }
+            dashState.text = if (uiState.moduleA.isRunning) "运行中" else "已就绪"
+            dashAction.text =
+                if (uiState.dashBoardA.currentAction.order == 0) "/" else uiState.dashBoardA.currentAction.order.toString() + " " + getModuleEnum(
+                    uiState.dashBoardA.currentAction.mode
+                ).value
+            dashTemp.text = uiState.dashBoardA.temperature
+            dashTime.text = uiState.dashBoardA.time
+
         }
-        binding.b.tvActions.setOnClickListener {
-            PopTip.show((it as TextView).text)
+        binding.b.run {
+            tvActions.setOnClickListener {
+                PopTip.show((it as TextView).text)
+            }
+            dashState.text = if (uiState.moduleB.isRunning) "运行中" else "已就绪"
+            dashAction.text =
+                if (uiState.dashBoardB.currentAction.order == 0) "/" else uiState.dashBoardB.currentAction.order.toString() + " " + getActionEnum(
+                    uiState.dashBoardB.currentAction.mode
+                ).value
+            dashTemp.text = uiState.dashBoardB.temperature
+            dashTime.text = uiState.dashBoardB.time
         }
-        binding.c.tvActions.setOnClickListener {
-            PopTip.show((it as TextView).text)
+        binding.c.run {
+            tvActions.setOnClickListener {
+                PopTip.show((it as TextView).text)
+            }
+            dashState.text = if (uiState.moduleC.isRunning) "运行中" else "已就绪"
+            dashAction.text =
+                if (uiState.dashBoardA.currentAction.order == 0) "/" else uiState.dashBoardC.currentAction.order.toString() + " " + getActionEnum(
+                    uiState.dashBoardC.currentAction.mode
+                ).value
+            dashTemp.text = uiState.dashBoardC.temperature
+            dashTime.text = uiState.dashBoardC.time
         }
-        binding.d.tvActions.setOnClickListener {
-            PopTip.show((it as TextView).text)
+        binding.d.run {
+            tvActions.setOnClickListener {
+                PopTip.show((it as TextView).text)
+            }
+            dashState.text = if (uiState.moduleD.isRunning) "运行中" else "已就绪"
+            dashAction.text =
+                if (uiState.dashBoardD.currentAction.order == 0) "/" else uiState.dashBoardD.currentAction.order.toString() + " " + getActionEnum(
+                    uiState.dashBoardD.currentAction.mode
+                ).value
+            dashTemp.text = uiState.dashBoardD.temperature
+            dashTime.text = uiState.dashBoardD.time
         }
     }
 
@@ -396,10 +436,48 @@ class HomeFragment :
         when (module) {
             ModuleEnum.A -> {
                 binding.a.run {
+                    dashState.text = if (uiState.moduleA.isRunning) "运行中" else "已就绪"
+                    dashAction.text =
+                        if (uiState.dashBoardA.currentAction.order == 0) "/" else uiState.dashBoardA.currentAction.order.toString() + " " + getActionEnum(
+                            uiState.dashBoardA.currentAction.mode
+                        ).value
+                    dashTemp.text = uiState.dashBoardA.temperature
                     dashTime.text = uiState.dashBoardA.time
                 }
             }
-            else -> {}
+            ModuleEnum.B -> {
+                binding.b.run {
+                    dashState.text = if (uiState.moduleB.isRunning) "运行中" else "已就绪"
+                    dashAction.text =
+                        if (uiState.dashBoardB.currentAction.order == 0) "/" else uiState.dashBoardB.currentAction.order.toString() + " " + getActionEnum(
+                            uiState.dashBoardB.currentAction.mode
+                        ).value
+                    dashTemp.text = uiState.dashBoardB.temperature
+                    dashTime.text = uiState.dashBoardB.time
+                }
+            }
+            ModuleEnum.C -> {
+                binding.c.run {
+                    dashState.text = if (uiState.moduleC.isRunning) "运行中" else "已就绪"
+                    dashAction.text =
+                        if (uiState.dashBoardC.currentAction.order == 0) "/" else uiState.dashBoardC.currentAction.order.toString() + " " + getActionEnum(
+                            uiState.dashBoardC.currentAction.mode
+                        ).value
+                    dashTemp.text = uiState.dashBoardC.temperature
+                    dashTime.text = uiState.dashBoardC.time
+                }
+            }
+            ModuleEnum.D -> {
+                binding.d.run {
+                    dashState.text = if (uiState.moduleD.isRunning) "运行中" else "已就绪"
+                    dashAction.text =
+                        if (uiState.dashBoardD.currentAction.order == 0) "/" else uiState.dashBoardD.currentAction.order.toString() + " " + getActionEnum(
+                            uiState.dashBoardD.currentAction.mode
+                        ).value
+                    dashTemp.text = uiState.dashBoardD.temperature
+                    dashTime.text = uiState.dashBoardD.time
+                }
+            }
         }
     }
 
@@ -423,8 +501,7 @@ class HomeFragment :
         val uiState = viewModel.uiState.value
         val menuList = uiState.programList.map { it.name }
         if (menuList.isNotEmpty()) {
-            BottomMenu.show(menuList)
-                .setMessage("请选择程序")
+            BottomMenu.show(menuList).setMessage("请选择程序")
                 .setOnMenuItemClickListener { _, _, index ->
                     when (module) {
                         ModuleEnum.A -> {

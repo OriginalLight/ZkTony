@@ -334,10 +334,10 @@ class CalibrationViewModel @Inject constructor(
             CommandBlock.Delay(3000),
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                            motionMotor.toMultiPointHex(
-                                calibration.antibodyOneTankPosition,
-                                calibration.recycleAntibodyOneTankHeight
-                            )
+                    motionMotor.toMultiPointHex(
+                        calibration.antibodyOneTankPosition,
+                        calibration.recycleAntibodyOneTankHeight
+                    )
                 )
             ),
             CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),

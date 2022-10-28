@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -44,10 +44,10 @@
             android:background="@color/light_onPrimary"
             android:ellipsize="end"
             android:gravity="center"
+            android:singleLine="true"
             android:text="@{program.name}"
             android:textColor="@color/black"
             android:textSize="16sp"
-            android:singleLine="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/tv_3"
             app:layout_constraintHorizontal_weight="2"

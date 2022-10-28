@@ -24,7 +24,7 @@ data class Action(
     var createTime: Date = Date(System.currentTimeMillis())
 )
 
-enum class ActionEnum(val index: Int, val str: String) {
+enum class ActionEnum(val index: Int, val value: String) {
     BLOCKING_LIQUID(0, "封闭液"),
     ANTIBODY_ONE(1, "一抗"),
     ANTIBODY_TWO(2, "二抗"),

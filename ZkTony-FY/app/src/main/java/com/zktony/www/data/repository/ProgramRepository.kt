@@ -52,7 +52,7 @@ class ProgramRepository @Inject constructor(
             var time = 0f
             if (it.isNotEmpty()) {
                 it.forEachIndexed { index, action ->
-                    actions += getActionEnum(action.mode).str
+                    actions += getActionEnum(action.mode).value
                     if (index != it.size - 1) {
                         actions += " -> "
                     }

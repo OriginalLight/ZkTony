@@ -65,7 +65,7 @@ class ActionAdapter : ListAdapter<Action, ActionAdapter.ViewHolder>(ActionDiffCa
                         con4.visibility = View.VISIBLE
                     }
                 }
-                model.text = getActionEnum(item.mode).str
+                model.text = getActionEnum(item.mode).value
                 cardView.setOnClickListener {
                     PopTip.show(R.mipmap.item_delete, "点击右侧图标删除")
                 }

@@ -55,6 +55,34 @@ data class Command(
         }
 
         /**
+         * 查询温度
+         * @param address 地址
+         * @return [String] 指令
+         */
+        @JvmStatic
+        fun queryTemperature(address: String): String {
+            return "TC1:TCACTUALTEMP?@$address\r"
+        }
+
+        /**
+         * 暂停摇床
+         * @return [String] 指令
+         */
+        @JvmStatic
+        fun pauseShakeBed(): String {
+            return Command(parameter = "0B", data = "0100").toHex()
+        }
+
+        /**
+         * 恢复摇床
+         * @return [String] 指令
+         */
+        @JvmStatic
+        fun resumeShakeBed(): String {
+            return Command(parameter = "0B", data = "0101").toHex()
+        }
+
+        /**
          * 单点走位
          * @param data [String] 字符串
          * @return [String] 指令

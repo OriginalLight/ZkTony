@@ -7,6 +7,7 @@ import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppIntent
 import com.zktony.www.common.app.AppState
 import com.zktony.www.common.app.AppViewModel
+import com.zktony.www.common.extension.extractTemp
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.model.Queue
 import com.zktony.www.data.entity.Action
@@ -45,35 +46,66 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            intent.collect {
-                when (it) {
-                    is HomeIntent.OnSwitchProgram -> onSwitchProgram(it.index, it.module)
-                    is HomeIntent.OnStart -> onStart(it.module)
-                    is HomeIntent.OnStop -> onStop(it.module)
-                    is HomeIntent.OnReset -> onReset()
-                    is HomeIntent.OnPause -> onPause()
-                    is HomeIntent.OnInsulating -> onInsulating()
+            launch {
+                intent.collect {
+                    when (it) {
+                        is HomeIntent.OnSwitchProgram -> onSwitchProgram(it.index, it.module)
+                        is HomeIntent.OnStart -> onStart(it.module)
+                        is HomeIntent.OnStop -> onStop(it.module)
+                        is HomeIntent.OnReset -> onReset()
+                        is HomeIntent.OnPause -> onPause()
+                        is HomeIntent.OnInsulating -> onInsulating()
+                    }
+                }
+            }
+            launch {
+                programRepository.getAll().collect {
+                    val uiState = uiState.value
+                    uiState.run {
+                        onProgramChange(it)
+                        _state.emit(HomeState.OnLoadProgram(this))
+                    }
+                }
+            }
+            launch {
+                appViewModel.state.collect {
+                    when (it) {
+                        is AppState.ReceiverSerialOne -> receiverSerialOne(it.command)
+                        is AppState.ReceiverSerialFour -> receiverSerialFour(it.command)
+                        else -> {}
+                    }
+                }
+            }
+            launch {
+                // 设置和定时查询温控
+                for (i in 0..4) {
+                    delay(200L)
+                    appViewModel.dispatch(
+                        AppIntent.SenderText(
+                            SerialPortEnum.SERIAL_FOUR, Command.saveTemperature(i.toString(), "26")
+                        )
+                    )
+                    delay(200L)
+                    appViewModel.dispatch(
+                        AppIntent.SenderText(
+                            SerialPortEnum.SERIAL_FOUR, Command.setTemperature(i.toString(), "26")
+                        )
+                    )
+                }
+                // 每一分钟查询一次温度
+                while (true) {
+                    for (i in 0..3) {
+                        delay(200L)
+                        appViewModel.dispatch(
+                            AppIntent.SenderText(
+                                SerialPortEnum.SERIAL_FOUR, Command.queryTemperature(i.toString())
+                            )
+                        )
+                    }
+                    delay(60 * 1000L)
                 }
             }
         }
-        viewModelScope.launch {
-            programRepository.getAll().collect {
-                val uiState = uiState.value
-                uiState.run {
-                    onProgramChange(it)
-                    _state.emit(HomeState.OnLoadProgram(this))
-                }
-            }
-        }
-        viewModelScope.launch {
-            appViewModel.state.collect {
-                when (it) {
-                    is AppState.ReceiverSerialOne -> receiverSerialOne(it.command)
-                    else -> {}
-                }
-            }
-        }
-        initTempControl()
     }
 
     /**
@@ -280,10 +312,8 @@ class HomeViewModel @Inject constructor(
                         textColor = R.color.dark_outline
                         appViewModel.dispatch(
                             AppIntent.SenderText(
-                                SerialPortEnum.SERIAL_FOUR,
-                                Command.setTemperature(
-                                    address = "4",
-                                    temperature = "26"
+                                SerialPortEnum.SERIAL_FOUR, Command.setTemperature(
+                                    address = "4", temperature = "26"
                                 )
                             )
                         )
@@ -294,10 +324,8 @@ class HomeViewModel @Inject constructor(
                         textColor = R.color.red
                         appViewModel.dispatch(
                             AppIntent.SenderText(
-                                SerialPortEnum.SERIAL_FOUR,
-                                Command.setTemperature(
-                                    address = "4",
-                                    temperature = temp
+                                SerialPortEnum.SERIAL_FOUR, Command.setTemperature(
+                                    address = "4", temperature = temp
                                 )
                             )
                         )
@@ -319,6 +347,58 @@ class HomeViewModel @Inject constructor(
             "86" -> resetCallBack(command)
         }
     }
+
+    /**
+     * 串口四数据接收
+     * @param hex [String] 数据
+     */
+    private fun receiverSerialFour(hex: String) {
+        viewModelScope.launch {
+            // 读取温度
+            val address = hex.last().toString().toInt()
+            val temp = hex.extractTemp()
+            when (address) {
+                0 -> {
+                    _uiState.update {
+                        uiState.value.copy(
+                            dashBoardA = uiState.value.dashBoardA.copy(
+                                temperature = "$temp℃"
+                            )
+                        )
+                    }
+                }
+                1 -> {
+                    _uiState.update {
+                        uiState.value.copy(
+                            dashBoardB = uiState.value.dashBoardB.copy(
+                                temperature = "$temp℃"
+                            )
+                        )
+                    }
+                }
+                2 -> {
+                    _uiState.update {
+                        uiState.value.copy(
+                            dashBoardC = uiState.value.dashBoardC.copy(
+                                temperature = "$temp℃"
+                            )
+                        )
+                    }
+                }
+                3 -> {
+                    _uiState.update {
+                        uiState.value.copy(
+                            dashBoardD = uiState.value.dashBoardD.copy(
+                                temperature = "$temp℃"
+                            )
+                        )
+                    }
+                }
+            }
+            _state.emit(HomeState.OnDashBoardChange(getModuleEnum(address)))
+        }
+    }
+
 
     /**
      * 复位反馈
@@ -380,31 +460,6 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
-     * 初始化温控
-     */
-    private fun initTempControl() {
-        viewModelScope.launch {
-            // 0到4循环
-            for (i in 0..4) {
-                delay(200L)
-                appViewModel.dispatch(
-                    AppIntent.SenderText(
-                        SerialPortEnum.SERIAL_FOUR,
-                        Command.saveTemperature(i.toString(), "26")
-                    )
-                )
-                delay(200L)
-                appViewModel.dispatch(
-                    AppIntent.SenderText(
-                        SerialPortEnum.SERIAL_FOUR,
-                        Command.setTemperature(i.toString(), "26")
-                    )
-                )
-            }
-        }
-    }
-
-    /**
      * 运行程序
      * @param module [ModuleEnum] 模块
      * @param program [Program] 程序
@@ -437,23 +492,42 @@ class HomeViewModel @Inject constructor(
      * @param job [Job] Job
      */
     private fun setJobWhenProgramStart(module: ModuleEnum, job: Job) {
-        when (module) {
-            ModuleEnum.A -> {
-                uiState.value.moduleA.job?.let { if (it.isActive) it.cancel() }
-                _uiState.update { it.apply { moduleA = moduleA.copy(job = job) } }
+        viewModelScope.launch {
+            when (module) {
+                ModuleEnum.A -> {
+                    uiState.value.moduleA.job?.let { if (it.isActive) it.cancel() }
+                    _uiState.update {
+                        it.apply {
+                            moduleA = moduleA.copy(job = job, isRunning = true)
+                        }
+                    }
+                }
+                ModuleEnum.B -> {
+                    uiState.value.moduleB.job?.let { if (it.isActive) it.cancel() }
+                    _uiState.update {
+                        it.apply {
+                            moduleB = moduleB.copy(job = job, isRunning = true)
+                        }
+                    }
+                }
+                ModuleEnum.C -> {
+                    uiState.value.moduleC.job?.let { if (it.isActive) it.cancel() }
+                    _uiState.update {
+                        it.apply {
+                            moduleC = moduleC.copy(job = job, isRunning = true)
+                        }
+                    }
+                }
+                ModuleEnum.D -> {
+                    uiState.value.moduleD.job?.let { if (it.isActive) it.cancel() }
+                    _uiState.update {
+                        it.apply {
+                            moduleD = moduleD.copy(job = job, isRunning = true)
+                        }
+                    }
+                }
             }
-            ModuleEnum.B -> {
-                uiState.value.moduleB.job?.let { if (it.isActive) it.cancel() }
-                _uiState.update { it.apply { moduleB = moduleB.copy(job = job) } }
-            }
-            ModuleEnum.C -> {
-                uiState.value.moduleC.job?.let { if (it.isActive) it.cancel() }
-                _uiState.update { it.apply { moduleC = moduleC.copy(job = job) } }
-            }
-            ModuleEnum.D -> {
-                uiState.value.moduleD.job?.let { if (it.isActive) it.cancel() }
-                _uiState.update { it.apply { moduleD = moduleD.copy(job = job) } }
-            }
+            _state.emit(HomeState.OnDashBoardChange(module))
         }
     }
 
@@ -462,23 +536,52 @@ class HomeViewModel @Inject constructor(
      * @param module [ModuleEnum] 模块
      */
     private fun clearJobWhenProgramStop(module: ModuleEnum) {
-        when (module) {
-            ModuleEnum.A -> {
-                uiState.value.moduleA.job?.let { if (it.isActive) it.cancel() }
-                _uiState.update { it.apply { moduleA = it.moduleA.copy(job = null) } }
+        viewModelScope.launch {
+            when (module) {
+                ModuleEnum.A -> {
+                    uiState.value.moduleA.job?.let { if (it.isActive) it.cancel() }
+                    _uiState.update {
+                        it.apply {
+                            moduleA = it.moduleA.copy(job = null, isRunning = false)
+                        }
+                    }
+                    _uiState.update { it.apply { dashBoardA = DashBoardState() } }
+                }
+                ModuleEnum.B -> {
+                    uiState.value.moduleB.job?.let { if (it.isActive) it.cancel() }
+                    _uiState.update {
+                        it.apply {
+                            moduleB = it.moduleB.copy(job = null, isRunning = false)
+                        }
+                    }
+                    _uiState.update { it.apply { dashBoardB = DashBoardState() } }
+                }
+                ModuleEnum.C -> {
+                    uiState.value.moduleC.job?.let { if (it.isActive) it.cancel() }
+                    _uiState.update {
+                        it.apply {
+                            moduleC = it.moduleC.copy(job = null, isRunning = false)
+                        }
+                    }
+                    _uiState.update { it.apply { dashBoardC = DashBoardState() } }
+                }
+                ModuleEnum.D -> {
+                    uiState.value.moduleD.job?.let { if (it.isActive) it.cancel() }
+                    _uiState.update {
+                        it.apply {
+                            moduleD = it.moduleD.copy(job = null, isRunning = false)
+                        }
+                    }
+                    _uiState.update { it.apply { dashBoardD = DashBoardState() } }
+                }
             }
-            ModuleEnum.B -> {
-                uiState.value.moduleB.job?.let { if (it.isActive) it.cancel() }
-                _uiState.update { it.apply { moduleB = it.moduleB.copy(job = null) } }
+            // 如果四个模块的job都是null的话暂停摇床
+            if (uiState.value.moduleA.job == null && uiState.value.moduleB.job == null && uiState.value.moduleC.job == null && uiState.value.moduleD.job == null) {
+                AppIntent.Sender(
+                    SerialPortEnum.SERIAL_ONE, Command(parameter = "0B", data = "0101").toHex()
+                )
             }
-            ModuleEnum.C -> {
-                uiState.value.moduleC.job?.let { if (it.isActive) it.cancel() }
-                _uiState.update { it.apply { moduleC = it.moduleC.copy(job = null) } }
-            }
-            ModuleEnum.D -> {
-                uiState.value.moduleD.job?.let { if (it.isActive) it.cancel() }
-                _uiState.update { it.apply { moduleD = it.moduleD.copy(job = null) } }
-            }
+            _state.emit(HomeState.OnDashBoardChange(module))
         }
     }
 
@@ -609,9 +712,7 @@ data class HomeUiState(
     var moduleD: ModuleState = ModuleState(),
     var btnReset: ButtonState = ButtonState(),
     var btnPause: ButtonState = ButtonState(
-        text = "暂停摇床",
-        background = R.mipmap.btn_pause,
-        textColor = R.color.dark_outline
+        text = "暂停摇床", background = R.mipmap.btn_pause, textColor = R.color.dark_outline
     ),
     var btnInsulating: ButtonState = ButtonState(text = "抗体保温", textColor = R.color.dark_outline),
     var dashBoardA: DashBoardState = DashBoardState(),
@@ -643,11 +744,19 @@ data class ButtonState(
 data class DashBoardState(
     var currentAction: Action = Action(),
     var time: String = "00:00:00",
+    var temperature: String = "0.0℃",
 )
 
-enum class ModuleEnum(val value: String) {
-    A("模块A"),
-    B("模块B"),
-    C("模块C"),
-    D("模块D"),
+enum class ModuleEnum(val value: String, val index: Int) {
+    A("模块A", 0), B("模块B", 1), C("模块C", 2), D("模块D", 3),
+}
+
+fun getModuleEnum(index: Int): ModuleEnum {
+    return when (index) {
+        0 -> ModuleEnum.A
+        1 -> ModuleEnum.B
+        2 -> ModuleEnum.C
+        3 -> ModuleEnum.D
+        else -> ModuleEnum.A
+    }
 }
