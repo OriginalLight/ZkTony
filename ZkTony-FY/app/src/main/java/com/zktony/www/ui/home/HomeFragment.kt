@@ -12,7 +12,7 @@ import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.data.entity.getActionEnum
+import com.zktony.www.common.room.entity.getActionEnum
 import com.zktony.www.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

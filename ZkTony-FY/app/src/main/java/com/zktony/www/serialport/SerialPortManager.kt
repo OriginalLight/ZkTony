@@ -2,7 +2,7 @@ package com.zktony.www.serialport
 
 import com.zktony.serialport.COMSerial
 import com.zktony.serialport.listener.OnComDataListener
-import com.zktony.www.common.Logger
+import com.zktony.www.common.utils.Logger
 import com.zktony.www.common.extension.hexFormat
 import com.zktony.www.common.model.Queue
 import com.zktony.www.serialport.protocol.CommandBlock

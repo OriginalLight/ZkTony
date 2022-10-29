@@ -10,7 +10,7 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.data.entity.Calibration
+import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.databinding.FragmentCalibrationBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

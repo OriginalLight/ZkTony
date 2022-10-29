@@ -1,14 +1,12 @@
 package com.zktony.www.di
 
-import com.zktony.www.common.Logger
-import com.zktony.www.common.constant.Constants
-import com.zktony.www.common.http.adapter.ErrorHandler
-import com.zktony.www.common.http.adapter.NetworkResponseAdapterFactory
-import com.zktony.www.common.http.converter.GsonConverterFactory
-import com.zktony.www.common.http.interceptor.logInterceptor
-import com.zktony.www.data.services.LogService
-import com.zktony.www.data.services.ProgramService
-import com.zktony.www.data.services.SystemService
+import com.zktony.www.common.utils.Logger
+import com.zktony.www.common.utils.Constants
+import com.zktony.www.common.network.adapter.ErrorHandler
+import com.zktony.www.common.network.adapter.NetworkResponseAdapterFactory
+import com.zktony.www.common.network.converter.GsonConverterFactory
+import com.zktony.www.common.network.interceptor.logInterceptor
+import com.zktony.www.common.network.service.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

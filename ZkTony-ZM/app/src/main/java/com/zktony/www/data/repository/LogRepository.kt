@@ -1,9 +1,9 @@
 package com.zktony.www.data.repository
 
-import com.zktony.www.common.http.adapter.NetworkResponse
-import com.zktony.www.data.entity.LogData
-import com.zktony.www.data.entity.LogRecord
-import com.zktony.www.data.services.LogService
+import com.zktony.www.common.network.adapter.NetworkResponse
+import com.zktony.www.common.room.entity.LogData
+import com.zktony.www.common.room.entity.LogRecord
+import com.zktony.www.common.network.service.LogService
 import javax.inject.Inject
 
 class LogRepository @Inject constructor(

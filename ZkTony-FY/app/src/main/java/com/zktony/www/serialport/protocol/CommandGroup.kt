@@ -1,11 +1,11 @@
 package com.zktony.www.serialport.protocol
 
-import com.zktony.www.common.Logger
+import com.zktony.www.common.utils.Logger
 import com.zktony.www.common.app.SettingState
-import com.zktony.www.data.entity.Action
-import com.zktony.www.data.entity.Calibration
-import com.zktony.www.data.entity.MotionMotor
-import com.zktony.www.data.entity.PumpMotor
+import com.zktony.www.common.room.entity.Action
+import com.zktony.www.common.room.entity.Calibration
+import com.zktony.www.common.room.entity.MotionMotor
+import com.zktony.www.common.room.entity.PumpMotor
 import com.zktony.www.serialport.SerialPortEnum
 import com.zktony.www.serialport.SerialPortEnum.*
 import com.zktony.www.serialport.SerialPortManager

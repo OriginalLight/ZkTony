@@ -18,8 +18,8 @@ package com.zktony.www.di
 
 import android.content.Context
 import androidx.room.Room
-import com.zktony.www.data.dao.*
-import com.zktony.www.data.database.AppDatabase
+import com.zktony.www.common.room.dao.*
+import com.zktony.www.common.room.database.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -67,7 +67,7 @@ object RoomModule {
     }
 
     @Provides
-    fun provideCailbrationDao(database: AppDatabase): CalibrationDao {
+    fun provideCalibrationDao(database: AppDatabase): CalibrationDao {
         return database.calibrationDao()
     }
 }

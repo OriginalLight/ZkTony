@@ -9,12 +9,12 @@ import com.kongzue.dialogx.dialogs.MessageDialog
 import com.zktony.www.R
 import com.zktony.www.adapter.ProgramAdapter
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.constant.Constants
+import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.extension.addSuffix
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.common.model.Event
-import com.zktony.www.data.entity.Program
+import com.zktony.www.data.model.Event
+import com.zktony.www.common.room.entity.Program
 import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged

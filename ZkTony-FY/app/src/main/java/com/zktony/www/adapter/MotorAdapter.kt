@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.R
-import com.zktony.www.data.entity.Motor
+import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.databinding.ItemMotorBinding
 
 /**

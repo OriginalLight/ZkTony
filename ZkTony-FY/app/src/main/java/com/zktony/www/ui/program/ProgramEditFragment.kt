@@ -13,9 +13,9 @@ import com.zktony.www.adapter.ActionAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.data.entity.Action
-import com.zktony.www.data.entity.ActionEnum
-import com.zktony.www.data.entity.getActionEnum
+import com.zktony.www.common.room.entity.Action
+import com.zktony.www.common.room.entity.ActionEnum
+import com.zktony.www.common.room.entity.getActionEnum
 import com.zktony.www.databinding.FragmentProgramEditBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged

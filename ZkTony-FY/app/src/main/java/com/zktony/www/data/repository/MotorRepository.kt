@@ -1,7 +1,7 @@
 package com.zktony.www.data.repository
 
-import com.zktony.www.data.dao.MotorDao
-import com.zktony.www.data.entity.Motor
+import com.zktony.www.common.room.dao.MotorDao
+import com.zktony.www.common.room.entity.Motor
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

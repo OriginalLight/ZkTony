@@ -1,9 +1,9 @@
 package com.zktony.www.data.repository
 
-import com.zktony.www.common.http.adapter.NetworkResponse
-import com.zktony.www.data.dao.ProgramDao
-import com.zktony.www.data.entity.Program
-import com.zktony.www.data.services.ProgramService
+import com.zktony.www.common.network.adapter.NetworkResponse
+import com.zktony.www.common.room.dao.ProgramDao
+import com.zktony.www.common.room.entity.Program
+import com.zktony.www.common.network.service.ProgramService
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
