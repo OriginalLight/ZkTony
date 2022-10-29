@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppIntent
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.data.entity.Motor
+import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.serialport.getSerialPortEnum
 import com.zktony.www.serialport.protocol.Command

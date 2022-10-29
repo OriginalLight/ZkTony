@@ -14,7 +14,7 @@ import com.zktony.www.adapter.ProgramAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.showShortToast
-import com.zktony.www.data.entity.Program
+import com.zktony.www.common.room.entity.Program
 import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged

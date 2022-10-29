@@ -10,8 +10,8 @@ import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.extractTemp
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.model.Queue
-import com.zktony.www.data.entity.Action
-import com.zktony.www.data.entity.Program
+import com.zktony.www.common.room.entity.Action
+import com.zktony.www.common.room.entity.Program
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
 import com.zktony.www.serialport.SerialPortEnum

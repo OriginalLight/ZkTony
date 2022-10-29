@@ -21,9 +21,9 @@ import com.kongzue.dialogx.util.InputInfo
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.constant.Constants
+import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.extension.*
-import com.zktony.www.data.services.model.Version
+import com.zktony.www.data.model.Version
 import com.zktony.www.databinding.FragmentAdminBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay

@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.R
-import com.zktony.www.common.constant.Constants
+import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.common.model.Event
-import com.zktony.www.data.entity.Program
+import com.zktony.www.data.model.Event
+import com.zktony.www.common.room.entity.Program
 import com.zktony.www.databinding.ItemProgramBinding
 import org.greenrobot.eventbus.EventBus
 
