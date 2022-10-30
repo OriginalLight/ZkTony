@@ -105,4 +105,17 @@ public class UserController {
             return Result.fail();
         }
     }
+
+    /**
+     * 登陆
+     */
+    @PostMapping("/login")
+    public Result<User> login(@RequestBody User user) {
+        User loginUser = iUserService.login(user);
+        if(loginUser != null) {
+            return Result.ok(loginUser);
+        } else {
+            return Result.fail();
+        }
+    }
 }
