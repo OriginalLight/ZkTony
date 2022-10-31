@@ -21,46 +21,19 @@ class ProgramViewModel @Inject constructor(
 
     private val _state = MutableSharedFlow<ProgramState>()
     val state: SharedFlow<ProgramState> get() = _state
-    private val intent = MutableSharedFlow<ProgramIntent>()
 
-    init {
-        viewModelScope.launch {
-            intent.collect {
-                when (it) {
-                    is ProgramIntent.OnAddProgram -> onAddProgram(it.programName)
-                    is ProgramIntent.OnDeleteProgram -> onDeleteProgram(it.program)
-                    is ProgramIntent.OnLoadProgramList -> onLoadProgramList()
-                }
-            }
-        }
-    }
-
-    /**
-     * Intent处理器
-     * @param intent [ProgramIntent]
-     */
-    fun dispatch(intent: ProgramIntent) {
-        try {
-            viewModelScope.launch {
-                this@ProgramViewModel.intent.emit(intent)
-            }
-        } catch (_: Exception) {
-        }
-    }
 
     /**
      * 添加程序
      * @param programName [String] 程序名
      */
-    private fun onAddProgram(programName: String) {
+    fun addProgram(programName: String) {
         viewModelScope.launch {
             programRepository.getByName(programName).firstOrNull()?.let {
                 "已存在相同名称的程序".showShortToast()
                 return@launch
             }
-            val program = Program()
-            program.name = programName
-            programRepository.insert(program)
+            programRepository.insert(Program(name = programName))
         }
     }
 
@@ -68,7 +41,7 @@ class ProgramViewModel @Inject constructor(
      * 删除程序
      * @param program [Program] 程序
      */
-    private fun onDeleteProgram(program: Program) {
+    fun deleteProgram(program: Program) {
         viewModelScope.launch {
             programRepository.delete(program)
             actionRepository.deleteByProgramId(program.id)
@@ -78,7 +51,7 @@ class ProgramViewModel @Inject constructor(
     /**
      * 加载程序列表
      */
-    private fun onLoadProgramList() {
+    fun loadProgramList() {
         viewModelScope.launch {
             programRepository.getAll().collect {
                 _state.emit(ProgramState.OnProgramChange(it))
@@ -86,12 +59,6 @@ class ProgramViewModel @Inject constructor(
         }
     }
 
-}
-
-sealed class ProgramIntent {
-    data class OnDeleteProgram(val program: Program) : ProgramIntent()
-    data class OnAddProgram(val programName: String) : ProgramIntent()
-    object OnLoadProgramList : ProgramIntent()
 }
 
 sealed class ProgramState {

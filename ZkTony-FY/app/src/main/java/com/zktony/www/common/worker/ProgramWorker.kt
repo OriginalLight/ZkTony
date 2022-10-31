@@ -38,10 +38,9 @@ class ProgramWorker @AssistedInject constructor(
                 }
                 val res = service.uploadProgram(it)
                 if (res.isSuccess) {
-                    it.forEach { program ->
-                        program.upload = 1
-                    }
-                    programRepository.updateBatch(it)
+                    programRepository.updateBatch(it.map { program ->
+                        program.copy(upload = 1)
+                    })
                     Logger.d("ProgramWorker", "上传程序成功")
                 } else {
                     Logger.d("ProgramWorker", "上传程序失败")

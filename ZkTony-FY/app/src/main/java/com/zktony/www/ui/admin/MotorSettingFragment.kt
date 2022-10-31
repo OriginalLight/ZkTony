@@ -52,9 +52,9 @@ class MotorSettingFragment :
     private fun initRecyclerView() {
         binding.rcMotor.adapter = motorAdapter
         motorAdapter.setOnEditButtonClick { motor ->
-            viewModel.dispatch(MotorSettingIntent.OnEditMotor(motor))
+            viewModel.editMotor(motor)
         }
-        viewModel.dispatch(MotorSettingIntent.InitMotors)
+        viewModel.initMotors()
     }
 
     /**
@@ -72,11 +72,9 @@ class MotorSettingFragment :
             BottomMenu.show(mode)
                 .setOnMenuItemClickListener { _, text, index ->
                     binding.btnMode.text = text
-                    viewModel.dispatch(
-                        MotorSettingIntent.OnMotorValueChange(
-                            viewModel.uiState.value.motor.copy(
-                                mode = index
-                            )
+                    viewModel.motorValueChange(
+                        viewModel.uiState.value.motor.copy(
+                            mode = index
                         )
                     )
                     false
@@ -87,18 +85,16 @@ class MotorSettingFragment :
             BottomMenu.show(subdivision)
                 .setOnMenuItemClickListener { _, text, _ ->
                     binding.btnSubdivision.text = text
-                    viewModel.dispatch(
-                        MotorSettingIntent.OnMotorValueChange(
-                            viewModel.uiState.value.motor.copy(
-                                subdivision = text.toString().toInt()
-                            )
+                    viewModel.motorValueChange(
+                        viewModel.uiState.value.motor.copy(
+                            subdivision = text.toString().toInt()
                         )
                     )
                     false
                 }
         }
         binding.btnUpdate.setOnClickListener {
-            viewModel.dispatch(MotorSettingIntent.OnUpdateMotor)
+            viewModel.updateMotor()
         }
     }
 
@@ -107,54 +103,46 @@ class MotorSettingFragment :
      */
     private fun initEditText() {
         binding.speed.afterTextChange {
-            viewModel.dispatch(
-                MotorSettingIntent.OnMotorValueChange(
-                    viewModel.uiState.value.motor.copy(
-                        speed = if (it.isNotEmpty()) {
-                            it.toInt()
-                        } else {
-                            0
-                        }
-                    )
+            viewModel.motorValueChange(
+                viewModel.uiState.value.motor.copy(
+                    speed = if (it.isNotEmpty()) {
+                        it.toInt()
+                    } else {
+                        0
+                    }
                 )
             )
         }
         binding.acceleration.afterTextChange {
-            viewModel.dispatch(
-                MotorSettingIntent.OnMotorValueChange(
-                    viewModel.uiState.value.motor.copy(
-                        acceleration = if (it.isNotEmpty()) {
-                            it.toInt()
-                        } else {
-                            0
-                        }
-                    )
+            viewModel.motorValueChange(
+                viewModel.uiState.value.motor.copy(
+                    acceleration = if (it.isNotEmpty()) {
+                        it.toInt()
+                    } else {
+                        0
+                    }
                 )
             )
         }
         binding.deceleration.afterTextChange {
-            viewModel.dispatch(
-                MotorSettingIntent.OnMotorValueChange(
-                    viewModel.uiState.value.motor.copy(
-                        deceleration = if (it.isNotEmpty()) {
-                            it.toInt()
-                        } else {
-                            0
-                        }
-                    )
+            viewModel.motorValueChange(
+                viewModel.uiState.value.motor.copy(
+                    deceleration = if (it.isNotEmpty()) {
+                        it.toInt()
+                    } else {
+                        0
+                    }
                 )
             )
         }
         binding.waitTime.afterTextChange {
-            viewModel.dispatch(
-                MotorSettingIntent.OnMotorValueChange(
-                    viewModel.uiState.value.motor.copy(
-                        waitTime = if (it.isNotEmpty()) {
-                            it.toInt()
-                        } else {
-                            0
-                        }
-                    )
+            viewModel.motorValueChange(
+                viewModel.uiState.value.motor.copy(
+                    waitTime = if (it.isNotEmpty()) {
+                        it.toInt()
+                    } else {
+                        0
+                    }
                 )
             )
         }

@@ -65,27 +65,8 @@ class ProgramRepository @Inject constructor(
             } else {
                 actions = "没有任何操作，去添加吧"
             }
-            // 将分钟转换为小时加分钟
-            val hour = (time / 60).toInt()
-            val minute = (time % 60)
-            val timeStr = if (hour > 0) {
-                if (minute > 0) {
-                    "$hour 小时 ${minute.toString().removeZero()} 分钟"
-                } else {
-                    "$hour 小时"
-                }
-            } else {
-                if (minute > 0) {
-                    "${minute.toString().removeZero()} 分钟"
-                } else {
-                    ""
-                }
-            }
             programDao.getById(programId).firstOrNull()?.let { program ->
-                program.actions = actions
-                program.actionCount = it.size
-                program.time = timeStr
-                programDao.update(program)
+                programDao.update(program.copy(actions = actions, actionCount = it.size))
             }
         }
     }

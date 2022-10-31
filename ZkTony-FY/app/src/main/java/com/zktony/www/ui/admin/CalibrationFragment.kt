@@ -50,91 +50,91 @@ class CalibrationFragment :
                 setOnClickListener { findNavController().navigateUp() }
             }
             btnUpdate.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.OnUpdateCalibration)
+                viewModel.updateCalibration()
             }
             btnTestWasteTankMove.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.ToWasteTank)
+                viewModel.toWasteTank()
             }
             btnTestWasteTankDown.run {
                 setOnClickListener {
                     PopTip.show("请确认针头位置，避免撞针，长按开始下降！！！")
                 }
                 setOnLongClickListener {
-                    viewModel.dispatch(CalibrationIntent.WasteTankNeedleDown)
+                    viewModel.wasteTankNeedleDown()
                     true
                 }
             }
             btnTestWasteTankUp.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.WasteTankNeedleUp)
+                viewModel.wasteTankNeedleUp()
             }
             btnTestWashTankMove.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.ToWashTank)
+                viewModel.toWashTank()
             }
             btnTestWashTankDown.run {
                 setOnClickListener {
                     PopTip.show("请确认针头位置，避免撞针，长按开始下降！！！")
                 }
                 setOnLongClickListener {
-                    viewModel.dispatch(CalibrationIntent.WashTankNeedleDown)
+                    viewModel.washTankNeedleDown()
                     true
                 }
             }
             btnTestWashTankUp.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.WashTankNeedleUp)
+                viewModel.washTankNeedleUp()
             }
             btnTestBlockingLiquidTankMove.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.ToBlockingLiquidTank)
+                viewModel.toBlockingLiquidTank()
             }
             btnTestBlockingLiquidTankDown.run {
                 setOnClickListener {
                     PopTip.show("请确认针头位置，避免撞针，长按开始下降！！！")
                 }
                 setOnLongClickListener {
-                    viewModel.dispatch(CalibrationIntent.BlockingLiquidTankNeedleDown)
+                    viewModel.blockingLiquidTankNeedleDown()
                     true
                 }
             }
             btnTestBlockingLiquidTankUp.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.BlockingLiquidTankNeedleUp)
+                viewModel.blockingLiquidTankNeedleUp()
             }
             btnTestAntibodyOneTankMove.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.ToAntibodyOneTank)
+                viewModel.toAntibodyOneTank()
             }
             btnTestAntibodyOneTankDown.run {
                 setOnClickListener {
                     PopTip.show("请确认针头位置，避免撞针，长按开始下降！！！")
                 }
                 setOnLongClickListener {
-                    viewModel.dispatch(CalibrationIntent.AntibodyOneTankNeedleDown)
+                    viewModel.antibodyOneTankNeedleDown()
                     true
                 }
             }
             btnTestAntibodyOneTankUp.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.AntibodyOneTankNeedleUp)
+                viewModel.antibodyOneTankNeedleUp()
             }
             btnTestAntibodyTwoTankMove.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.ToAntibodyTwoTank)
+                viewModel.toAntibodyTwoTank()
             }
             btnTestAntibodyTwoTankDown.run {
                 setOnClickListener {
                     PopTip.show("请确认针头位置，避免撞针，长按开始下降！！！")
                 }
                 setOnLongClickListener {
-                    viewModel.dispatch(CalibrationIntent.AntibodyTwoTankNeedleDown)
+                    viewModel.antibodyTwoTankNeedleDown()
                     true
                 }
             }
             btnTestAntibodyTwoTankUp.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.AntibodyTwoTankNeedleUp)
+                viewModel.antibodyTwoTankNeedleUp()
             }
             btnTestZeroMove.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.ToZeroPosition)
+                viewModel.toZeroPosition()
             }
             btnTestAspirate.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.Aspirate)
+                viewModel.aspirate()
             }
             btnTestDrainage.setOnClickListener {
-                viewModel.dispatch(CalibrationIntent.Drainage)
+                viewModel.drainage()
             }
         }
     }
@@ -148,11 +148,9 @@ class CalibrationFragment :
             wasteTankPosition.run {
                 setText(calibration.wasteTankPosition.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                wasteTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            wasteTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -160,11 +158,9 @@ class CalibrationFragment :
             wasteTankHeight.run {
                 setText(calibration.wasteTankHeight.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                wasteTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            wasteTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -172,11 +168,9 @@ class CalibrationFragment :
             washTankPosition.run {
                 setText(calibration.washTankPosition.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                washTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            washTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -184,11 +178,9 @@ class CalibrationFragment :
             washTankHeight.run {
                 setText(calibration.washTankHeight.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                washTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            washTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -196,11 +188,9 @@ class CalibrationFragment :
             blockingLiquidTankPosition.run {
                 setText(calibration.blockingLiquidTankPosition.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                blockingLiquidTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            blockingLiquidTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -208,11 +198,9 @@ class CalibrationFragment :
             blockingLiquidTankHeight.run {
                 setText(calibration.blockingLiquidTankHeight.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                blockingLiquidTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            blockingLiquidTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -220,11 +208,9 @@ class CalibrationFragment :
             antibodyOneTankPosition.run {
                 setText(calibration.antibodyOneTankPosition.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                antibodyOneTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            antibodyOneTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -232,11 +218,9 @@ class CalibrationFragment :
             antibodyOneTankHeight.run {
                 setText(calibration.antibodyOneTankHeight.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                antibodyOneTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            antibodyOneTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -244,11 +228,9 @@ class CalibrationFragment :
             recycleAntibodyOneTankHeight.run {
                 setText(calibration.recycleAntibodyOneTankHeight.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                recycleAntibodyOneTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            recycleAntibodyOneTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -256,11 +238,9 @@ class CalibrationFragment :
             antibodyTwoTankPosition.run {
                 setText(calibration.antibodyTwoTankPosition.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                antibodyTwoTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            antibodyTwoTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -268,11 +248,9 @@ class CalibrationFragment :
             antibodyTwoTankHeight.run {
                 setText(calibration.antibodyTwoTankHeight.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                antibodyTwoTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            antibodyTwoTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -280,11 +258,9 @@ class CalibrationFragment :
             yMotorDistance.run {
                 setText(calibration.yMotorDistance.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                yMotorDistance = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            yMotorDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -292,11 +268,9 @@ class CalibrationFragment :
             zMotorDistance.run {
                 setText(calibration.zMotorDistance.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                zMotorDistance = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            zMotorDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -304,11 +278,9 @@ class CalibrationFragment :
             pumpOneDistance.run {
                 setText(calibration.pumpOneDistance.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                pumpOneDistance = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            pumpOneDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -316,11 +288,9 @@ class CalibrationFragment :
             pumpTwoDistance.run {
                 setText(calibration.pumpTwoDistance.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                pumpTwoDistance = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            pumpTwoDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -328,11 +298,9 @@ class CalibrationFragment :
             pumpThreeDistance.run {
                 setText(calibration.pumpThreeDistance.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                pumpThreeDistance = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            pumpThreeDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -340,11 +308,9 @@ class CalibrationFragment :
             pumpFourDistance.run {
                 setText(calibration.pumpFourDistance.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                pumpFourDistance = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            pumpFourDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -352,11 +318,9 @@ class CalibrationFragment :
             pumpFiveDistance.run {
                 setText(calibration.pumpFiveDistance.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                pumpFiveDistance = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            pumpFiveDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }
@@ -364,11 +328,9 @@ class CalibrationFragment :
             drainDistance.run {
                 setText(calibration.drainDistance.toString().removeZero())
                 afterTextChange {
-                    viewModel.dispatch(
-                        CalibrationIntent.OnCalibrationValueChange(
-                            viewModel.uiState.value.calibration.copy(
-                                drainDistance = if (it.isNotEmpty()) it.toFloat() else 0f
-                            )
+                    viewModel.calibrationValueChange(
+                        viewModel.uiState.value.calibration.copy(
+                            drainDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
                 }

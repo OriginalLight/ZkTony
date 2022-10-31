@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = libs.versions.gpioNameSpace.get()
+    namespace = "com.zktony.gpio"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
@@ -30,6 +30,7 @@ android {
 
 dependencies {
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.ext.junit)
+
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
 }

@@ -12,16 +12,16 @@ import java.util.*
 @Entity
 data class Action(
     @PrimaryKey
-    var id: String = UUID.randomUUID().toString(),
-    var programId: String = "",
-    var mode: Int = 0,
-    var order: Int = 0,
-    var temperature: Float = 0f,
-    var liquidVolume: Float = 0f,
-    var count: Int = 0,
-    var time: Float = 0f,
-    var upload: Int = 0,
-    var createTime: Date = Date(System.currentTimeMillis())
+    val id: String = UUID.randomUUID().toString(),
+    val programId: String = "",
+    val mode: Int = 0,
+    val order: Int = 0,
+    val temperature: Float = 0f,
+    val liquidVolume: Float = 0f,
+    val count: Int = 0,
+    val time: Float = 0f,
+    val upload: Int = 0,
+    val createTime: Date = Date(System.currentTimeMillis())
 )
 
 enum class ActionEnum(val index: Int, val value: String) {

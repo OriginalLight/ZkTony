@@ -5,7 +5,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.zktony.www.base.BaseActivity
-import com.zktony.www.common.app.AppIntent
 import com.zktony.www.common.app.AppState
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.verifyHex
@@ -39,22 +38,22 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                     when (com) {
                         SerialPortEnum.SERIAL_ONE.device -> {
                             hexData.verifyHex().forEach {
-                                appViewModel.dispatch(AppIntent.ReceiverSerialOne(it))
+                                appViewModel.receiverSerialOne(it)
                             }
                         }
                         SerialPortEnum.SERIAL_TWO.device -> {
                             hexData.verifyHex().forEach {
-                                appViewModel.dispatch(AppIntent.ReceiverSerialTwo(it))
+                                appViewModel.receiverSerialTwo(it)
                             }
                         }
                         SerialPortEnum.SERIAL_THREE.device -> {
                             hexData.verifyHex().forEach {
-                                appViewModel.dispatch(AppIntent.ReceiverSerialThree(it))
+                                appViewModel.receiverSerialThree(it)
                             }
                         }
                         SerialPortEnum.SERIAL_FOUR.device -> {
                             hexData.verifyHex().forEach {
-                                appViewModel.dispatch(AppIntent.ReceiverSerialFour(it))
+                                appViewModel.receiverSerialFour(it)
                             }
                         }
                     }

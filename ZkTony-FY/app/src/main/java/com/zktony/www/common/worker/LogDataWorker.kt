@@ -38,10 +38,10 @@ class LogDataWorker @AssistedInject constructor(
                 }
                 val res = service.uploadLogData(it)
                 if (res.isSuccess) {
-                    it.forEach { logData ->
-                        logData.upload = 1
-                    }
-                    logDataRepository.updateBatch(it)
+                    // 所有的upload设置为1
+                    logDataRepository.updateBatch(it.map { logData ->
+                        logData.copy(upload = 1)
+                    })
                 } else {
                     Logger.e("LogDataWorker", "上传日志数据失败")
                     return Result.failure()

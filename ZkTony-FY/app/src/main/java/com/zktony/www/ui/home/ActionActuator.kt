@@ -114,14 +114,15 @@ class ActionActuator private constructor(
             initModule(module)
             initSettingState(settingState)
             initAction(action)
+            var count = action.count
             addWashingLiquid {
                 countDown((action.time * 60).toLong(), {
                     _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
                 },
                     {
-                        action.count--
+                        count--
                         wasteLiquid { }
-                        if (action.count > 0) {
+                        if (count > 0) {
                             executeWashing(action)
                         } else {
                             executeNext()

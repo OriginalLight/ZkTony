@@ -3,10 +3,10 @@ package com.zktony.www.data.model
 /**
  * @author 刘贺贺
  */
-class Version {
-    var id: Long = 0
-    var url: String = ""
-    var versionName: String = ""
-    var versionCode = 0
-    var description: String = ""
-}
+data class Version (
+    val id: Long,
+    val url: String,
+    val versionName: String,
+    val versionCode: Int,
+    val description: String
+)

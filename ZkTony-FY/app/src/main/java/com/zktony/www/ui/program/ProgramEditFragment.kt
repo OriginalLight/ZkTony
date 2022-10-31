@@ -58,13 +58,13 @@ class ProgramEditFragment :
         binding.rc1.adapter = actionAdapter
         actionAdapter.setOnDeleteButtonClick {
             PopTip.show("已删除")
-            viewModel.dispatch(ProgramEditIntent.OnDeleteAction(it))
+            viewModel.deleteAction(it)
         }
         arguments?.run {
             val programId = ProgramEditFragmentArgs.fromBundle(this).programId
-            viewModel.dispatch(ProgramEditIntent.OnSetProgramId(programId))
+            viewModel.setProgramId(programId)
         }
-        viewModel.dispatch(ProgramEditIntent.OnLoadActionList)
+        viewModel.loadActionList()
     }
 
     /**
@@ -78,7 +78,7 @@ class ProgramEditFragment :
             }
         }
         binding.btnAdd.setOnClickListener {
-            viewModel.dispatch(ProgramEditIntent.OnAddAction)
+            viewModel.addAction()
         }
         val action = viewModel.uiState.value.action
         binding.btnAction.run {
@@ -104,7 +104,7 @@ class ProgramEditFragment :
                     })
                     .setOnMenuItemClickListener { _, text, index ->
                         binding.btnAction.text = text
-                        viewModel.dispatch(ProgramEditIntent.OnSwitchAction(getActionEnum(index)))
+                        viewModel.switchAction(getActionEnum(index))
                         false
                     }
             }
@@ -116,49 +116,29 @@ class ProgramEditFragment :
      */
     private fun initEditText() {
         binding.order.afterTextChange {
-            val action = viewModel.uiState.value.action
-            if (it.isNotEmpty()) {
-                action.order = it.toInt()
-            } else {
-                action.order = 0
-            }
-            viewModel.dispatch(ProgramEditIntent.OnEditAction(action))
+            viewModel.editAction(viewModel.uiState.value.action.copy(
+                order = if (it.isNotEmpty()) it.toInt() else 0
+            ))
         }
         binding.time.afterTextChange {
-            val action = viewModel.uiState.value.action
-            if (it.isNotEmpty()) {
-                action.time = it.toFloat()
-            } else {
-                action.time = 0f
-            }
-            viewModel.dispatch(ProgramEditIntent.OnEditAction(action))
+            viewModel.editAction(viewModel.uiState.value.action.copy(
+                time = if (it.isNotEmpty()) it.toFloat() else 0f
+            ))
         }
         binding.temperature.afterTextChange {
-            val action = viewModel.uiState.value.action
-            if (it.isNotEmpty()) {
-                action.temperature = it.toFloat()
-            } else {
-                action.temperature = 0f
-            }
-            viewModel.dispatch(ProgramEditIntent.OnEditAction(action))
+            viewModel.editAction(viewModel.uiState.value.action.copy(
+                temperature = if (it.isNotEmpty()) it.toFloat() else 0f
+            ))
         }
         binding.liquidVolume.afterTextChange {
-            val action = viewModel.uiState.value.action
-            if (it.isNotEmpty()) {
-                action.liquidVolume = it.toFloat()
-            } else {
-                action.liquidVolume = 0f
-            }
-            viewModel.dispatch(ProgramEditIntent.OnEditAction(action))
+            viewModel.editAction(viewModel.uiState.value.action.copy(
+                liquidVolume = if (it.isNotEmpty()) it.toFloat() else 0f
+            ))
         }
         binding.count.afterTextChange {
-            val action = viewModel.uiState.value.action
-            if (it.isNotEmpty()) {
-                action.count = it.toInt()
-            } else {
-                action.count = 0
-            }
-            viewModel.dispatch(ProgramEditIntent.OnEditAction(action))
+            viewModel.editAction(viewModel.uiState.value.action.copy(
+                count = if (it.isNotEmpty()) it.toInt() else 0
+            ))
 
         }
         onSwitchAction(getActionEnum(viewModel.uiState.value.action.mode))

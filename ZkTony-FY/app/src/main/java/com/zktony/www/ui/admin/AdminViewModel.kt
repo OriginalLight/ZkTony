@@ -11,10 +11,8 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.viewModelScope
 import com.zktony.gpio.Gpio
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.app.AppIntent
 import com.zktony.www.common.app.AppState
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.extension.*
 import com.zktony.www.common.network.adapter.getOrNull
 import com.zktony.www.common.network.adapter.isSuccess
@@ -22,10 +20,11 @@ import com.zktony.www.common.network.download.DownloadManager
 import com.zktony.www.common.network.download.DownloadState
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.Motor
+import com.zktony.www.common.utils.Constants
+import com.zktony.www.data.model.Version
 import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
-import com.zktony.www.data.model.Version
 import com.zktony.www.serialport.SerialPortEnum
 import com.zktony.www.serialport.getSerialPortEnum
 import com.zktony.www.serialport.protocol.Command
@@ -49,25 +48,12 @@ class AdminViewModel @Inject constructor(
 
     private val _state = MutableSharedFlow<AdminState>()
     val state: SharedFlow<AdminState> get() = _state
-    private val intent = MutableSharedFlow<AdminIntent>()
 
     private val _uiState = MutableStateFlow(AdminUiState())
     val uiState: StateFlow<AdminUiState> get() = _uiState
 
     init {
         viewModelScope.launch {
-            launch {
-                intent.collect {
-                    when (it) {
-                        is AdminIntent.Reset -> reset()
-                        is AdminIntent.WifiSetting -> wifiSetting(it.context)
-                        is AdminIntent.DoUpdate -> doUpdate(it.context, it.file, it.version)
-                        is AdminIntent.ChangeBar -> changeBar(it.bar, it.context)
-                        is AdminIntent.ChangeTemp -> changeTemp(it.temp)
-                        is AdminIntent.CheckUpdate -> checkUpdate(it.context)
-                    }
-                }
-            }
             launch {
                 appViewModel.state.collect {
                     when (it) {
@@ -87,23 +73,11 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Intent处理
-     * @param intent [AdminIntent]
-     */
-    fun dispatch(intent: AdminIntent) {
-        try {
-            viewModelScope.launch {
-                this@AdminViewModel.intent.emit(intent)
-            }
-        } catch (_: Exception) {
-        }
-    }
 
     /**
      * 下位机复位
      */
-    private fun reset() {
+    fun reset() {
         Gpio.instance.setDirection("gpio156", 1)
         Gpio.instance.writeGpio("gpio156", 0)
         Gpio.instance.writeGpio("gpio156", 1)
@@ -113,7 +87,7 @@ class AdminViewModel @Inject constructor(
      * wifi设置
      * @param context [Context]
      */
-    private fun wifiSetting(context: Context) {
+    fun wifiSetting(context: Context) {
         viewModelScope.launch {
             val intent = Intent(Settings.ACTION_WIFI_SETTINGS).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -132,7 +106,7 @@ class AdminViewModel @Inject constructor(
      * @param bar [Boolean]
      * @param context [Context]
      */
-    private fun changeBar(bar: Boolean, context: Context) {
+    fun changeBar(bar: Boolean, context: Context) {
         viewModelScope.launch {
             dataStore.edit { preferences ->
                 preferences[booleanPreferencesKey(Constants.BAR)] = bar
@@ -149,7 +123,7 @@ class AdminViewModel @Inject constructor(
      * 抗体保温温度切换
      * @param temp [Float]
      */
-    private fun changeTemp(temp: Float) {
+    fun changeTemp(temp: Float) {
         viewModelScope.launch {
             dataStore.edit { preferences ->
                 preferences[floatPreferencesKey(Constants.TEMP)] = temp
@@ -161,7 +135,7 @@ class AdminViewModel @Inject constructor(
      * 检查更新
      * @param context [Context]
      */
-    private fun checkUpdate(context: Context) {
+    fun checkUpdate(context: Context) {
         viewModelScope.launch {
             val apk = checkLocalUpdate()
             if (apk != null) {
@@ -178,13 +152,11 @@ class AdminViewModel @Inject constructor(
      * @param file [File]
      * @param version [Version]
      */
-    private fun doUpdate(context: Context, file: File?, version: Version?) {
+    fun doUpdate(context: Context, file: File?, version: Version?) {
         file?.run {
             context.installApk(this)
         } ?: version?.run {
-            _uiState.update {
-                uiState.value.copy(isUpdating = true)
-            }
+            _uiState.value = _uiState.value.copy(isUpdating = true)
             downloadApk(context, this)
         }
     }
@@ -204,13 +176,12 @@ class AdminViewModel @Inject constructor(
                 when (it) {
                     is DownloadState.Success -> {
                         _state.emit(AdminState.DownloadSuccess(it.file))
-                        _uiState.update {
-                            uiState.value.copy(isUpdating = false)
-                        }
+                        _uiState.value = _uiState.value.copy(isUpdating = false)
                         context.installApk(it.file)
                     }
 
                     is DownloadState.Err -> {
+                        _uiState.value = _uiState.value.copy(isUpdating = false)
                         _state.emit(AdminState.DownloadError)
                     }
 
@@ -268,9 +239,9 @@ class AdminViewModel @Inject constructor(
      * @param hex [String]
      */
     private fun onReceiverSerialOne(hex: String) {
-        Command(hex).run {
+        hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotorByCallBack(Motor(data).copy(board = SerialPortEnum.SERIAL_ONE.index))
+                updateMotorByCallBack(data.toMotor().copy(board = SerialPortEnum.SERIAL_ONE.index))
             }
         }
     }
@@ -280,9 +251,9 @@ class AdminViewModel @Inject constructor(
      * @param hex [String]
      */
     private fun onReceiverSerialTwo(hex: String) {
-        Command(hex).run {
+        hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotorByCallBack(Motor(data).copy(board = SerialPortEnum.SERIAL_TWO.index))
+                updateMotorByCallBack(data.toMotor().copy(board = SerialPortEnum.SERIAL_TWO.index))
             }
         }
     }
@@ -292,9 +263,11 @@ class AdminViewModel @Inject constructor(
      * @param hex [String]
      */
     private fun onReceiverSerialThree(hex: String) {
-        Command(hex).run {
+        hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotorByCallBack(Motor(data).copy(board = SerialPortEnum.SERIAL_THREE.index))
+                updateMotorByCallBack(
+                    data.toMotor().copy(board = SerialPortEnum.SERIAL_THREE.index)
+                )
             }
         }
     }
@@ -347,15 +320,13 @@ class AdminViewModel @Inject constructor(
                     if (i == 2 && j == 3) {
                         break
                     }
-                    appViewModel.dispatch(
-                        AppIntent.Sender(
-                            getSerialPortEnum(i),
-                            Command(
-                                function = "03",
-                                parameter = "04",
-                                data = j.int8ToHex()
-                            ).toHex()
-                        )
+                    appViewModel.sender(
+                        getSerialPortEnum(i),
+                        Command(
+                            function = "03",
+                            parameter = "04",
+                            data = j.int8ToHex()
+                        ).toHex()
                     )
                     delay(100L)
                 }
@@ -399,28 +370,6 @@ class AdminViewModel @Inject constructor(
     }
 }
 
-sealed class AdminIntent {
-    // 下位机复位
-    object Reset : AdminIntent()
-
-    // 跳转到wifi设置界面
-    data class WifiSetting(val context: Context) : AdminIntent()
-
-    // 检查更新
-    data class CheckUpdate(val context: Context) : AdminIntent()
-
-    // 执行更新
-    data class DoUpdate(val context: Context, val file: File?, val version: Version?) :
-        AdminIntent()
-
-    // 切换底部导航栏
-    data class ChangeBar(val bar: Boolean, val context: Context) : AdminIntent()
-
-    // 变更抗体保温温度
-    data class ChangeTemp(val temp: Float) : AdminIntent()
-
-}
-
 sealed class AdminState {
     data class CheckUpdate(val file: File?, val version: Version?) : AdminState()
     data class DownloadProgress(val progress: Int) : AdminState()
@@ -430,5 +379,5 @@ sealed class AdminState {
 }
 
 data class AdminUiState(
-    var isUpdating: Boolean = false,
+    val isUpdating: Boolean = false,
 )

@@ -21,8 +21,8 @@ import com.kongzue.dialogx.util.InputInfo
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.extension.*
+import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.model.Version
 import com.zktony.www.databinding.FragmentAdminBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -72,7 +72,7 @@ class AdminFragment :
     private fun initButton() {
         binding.btnReset.run {
             this.clickScale()
-            this.setOnClickListener { viewModel.dispatch(AdminIntent.Reset) }
+            this.setOnClickListener { viewModel.reset() }
         }
         binding.btnSetting.run {
             this.clickScale()
@@ -103,8 +103,8 @@ class AdminFragment :
         binding.btnWifi.run {
             this.clickScale()
             this.setOnClickListener {
-                viewModel.dispatch(AdminIntent.ChangeBar(true, requireContext()))
-                viewModel.dispatch(AdminIntent.WifiSetting(requireContext()))
+                viewModel.changeBar(true, requireContext())
+                viewModel.wifiSetting(requireContext())
             }
         }
         binding.btnUpdate.run {
@@ -113,7 +113,7 @@ class AdminFragment :
                 if (viewModel.uiState.value.isUpdating) {
                     PopTip.show("正在更新中")
                 } else {
-                    viewModel.dispatch(AdminIntent.CheckUpdate(requireContext()))
+                    viewModel.checkUpdate(requireContext())
                 }
             }
         }
@@ -170,7 +170,7 @@ class AdminFragment :
         binding.swBar.run {
             this.isChecked = appViewModel.settingState.value.bar
             setOnCheckedChangeListener { _, isChecked ->
-                viewModel.dispatch(AdminIntent.ChangeBar(isChecked, requireContext()))
+                viewModel.changeBar(isChecked, requireContext())
             }
         }
     }
@@ -190,7 +190,7 @@ class AdminFragment :
             setText(appViewModel.settingState.value.temp.toString().removeZero())
             afterTextChange {
                 if (it.isNotEmpty()) {
-                    viewModel.dispatch(AdminIntent.ChangeTemp(it.toFloat()))
+                    viewModel.changeTemp(it.toFloat())
                 }
             }
             onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
@@ -228,12 +228,10 @@ class AdminFragment :
                         title.text = "发现本地新版本"
                         message.text = "是否更新？"
                         btnOk.setOnClickListener {
-                            viewModel.dispatch(
-                                AdminIntent.DoUpdate(
-                                    requireContext(),
-                                    this@run,
-                                    null
-                                )
+                            viewModel.doUpdate(
+                                requireContext(),
+                                this@run,
+                                null
                             )
                             dialog.dismiss()
                         }
@@ -254,13 +252,7 @@ class AdminFragment :
                         title.text = "发现在线新版本"
                         message.text = this@run.description + "\n是否升级？"
                         btnOk.setOnClickListener {
-                            viewModel.dispatch(
-                                AdminIntent.DoUpdate(
-                                    requireContext(),
-                                    null,
-                                    this@run
-                                )
-                            )
+                            viewModel.doUpdate(requireContext(), null, this@run)
                             dialog.dismiss()
                         }
                         btnCancel.setOnClickListener { dialog.dismiss() }

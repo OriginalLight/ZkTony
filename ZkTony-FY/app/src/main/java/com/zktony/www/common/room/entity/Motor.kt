@@ -15,41 +15,31 @@ import java.util.*
 @Entity(tableName = "motor")
 data class Motor(
     @PrimaryKey
-    var id: String = UUID.randomUUID().toString(),
+    val id: String = UUID.randomUUID().toString(),
     // 地址
-    var address: Int = 0,
+    val address: Int = 0,
     // 所在板子
-    var board: Int = 0,
+    val board: Int = 0,
     // 电机编号
-    var name: String = "",
+    val name: String = "",
     // 转速
-    var speed: Int = 100,
+    val speed: Int = 100,
     // 加速
-    var acceleration: Int = 60,
+    val acceleration: Int = 60,
     // 减速
-    var deceleration: Int = 60,
+    val deceleration: Int = 60,
     // 等待时间
-    var waitTime: Int = 0,
+    val waitTime: Int = 0,
     // 模式
-    var mode: Int = 1,
+    val mode: Int = 1,
     // 细分
-    var subdivision: Int = 16,
+    val subdivision: Int = 16,
     // 电机类型
-    var motorType: Int = 0,
+    val motorType: Int = 0,
     // 创建时间
-    var createTime: Date = Date(System.currentTimeMillis()),
+    val createTime: Date = Date(System.currentTimeMillis()),
 
     ) {
-    constructor(hex: String) : this() {
-        address = hex.substring(0, 2).hexToInt8()
-        subdivision = hex.substring(2, 4).hexToInt8()
-        speed = hex.substring(4, 8).hex2ToInt16()
-        acceleration = hex.substring(8, 10).hexToInt8()
-        deceleration = hex.substring(10, 12).hexToInt8()
-        mode = hex.substring(12, 14).hexToInt8()
-        waitTime = hex.substring(14, 18).hex2ToInt16()
-    }
-
     fun toHex(): String {
         return address.int8ToHex() +
                 subdivision.int8ToHex() +
@@ -63,13 +53,13 @@ data class Motor(
 }
 
 data class MotionMotor(
-    var xAxis: Motor = Motor(),
-    var yAxis: Motor = Motor(),
-    var zAxis: Motor = Motor(),
+    val xAxis: Motor = Motor(),
+    val yAxis: Motor = Motor(),
+    val zAxis: Motor = Motor(),
     // y轴转一圈移动的长度
-    var yLength: Float = 58f,
+    val yLength: Float = 58f,
     // z轴转一圈移动的长度
-    var zLength: Float = 3.8f,
+    val zLength: Float = 3.8f,
 ) {
     /**
      *  电机转一圈需要的脉冲数
@@ -125,21 +115,21 @@ data class MotionMotor(
 }
 
 data class PumpMotor(
-    var pumpOne: Motor = Motor(),
-    var pumpTwo: Motor = Motor(),
-    var pumpThree: Motor = Motor(),
-    var pumpFour: Motor = Motor(),
-    var pumpFive: Motor = Motor(),
+    val pumpOne: Motor = Motor(),
+    val pumpTwo: Motor = Motor(),
+    val pumpThree: Motor = Motor(),
+    val pumpFour: Motor = Motor(),
+    val pumpFive: Motor = Motor(),
     // 泵一转一圈的出液量
-    var volumeOne: Float = 0.5f,
+    val volumeOne: Float = 0.5f,
     // 泵二转一圈的出液量
-    var volumeTwo: Float = 0.5f,
+    val volumeTwo: Float = 0.5f,
     // 泵三转一圈的出液量
-    var volumeThree: Float = 0.5f,
+    val volumeThree: Float = 0.5f,
     // 泵四转一圈的出液量
-    var volumeFour: Float = 0.5f,
+    val volumeFour: Float = 0.5f,
     // 泵五转一圈的出液量
-    var volumeFive: Float = 0.5f,
+    val volumeFive: Float = 0.5f,
 ) {
 
     /**

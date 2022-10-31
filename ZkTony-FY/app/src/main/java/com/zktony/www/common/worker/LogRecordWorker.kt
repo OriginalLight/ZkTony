@@ -38,10 +38,9 @@ class LogRecordWorker @AssistedInject constructor(
                 }
                 val res = service.uploadLogRecords(it)
                 if (res.isSuccess) {
-                    it.forEach { logRecord ->
-                        logRecord.upload = 1
-                    }
-                    logRecordRepository.updateBatch(it)
+                    logRecordRepository.updateBatch(it.map { logRecord ->
+                        logRecord.copy(upload = 1)
+                    })
                 } else {
                     Logger.e("LogRecordWorker", "上传日志失败")
                     return Result.failure()
