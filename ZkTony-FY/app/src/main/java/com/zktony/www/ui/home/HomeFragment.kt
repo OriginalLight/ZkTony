@@ -118,7 +118,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 isEnabled = uiState.moduleA.btnStart.enable
                 visibility = uiState.moduleA.btnStart.visibility
                 setOnClickListener {
-                    this@HomeFragment.viewModel.dispatch(HomeIntent.OnStart(ModuleEnum.A))
+                    this@HomeFragment.viewModel.start(ModuleEnum.A)
                 }
             }
             btnStop.run {
@@ -128,7 +128,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     PopTip.show(R.mipmap.ic_stop, "长按停止")
                 }
                 setOnLongClickListener {
-                    this@HomeFragment.viewModel.dispatch(HomeIntent.OnStop(ModuleEnum.A))
+                    this@HomeFragment.viewModel.stop(ModuleEnum.A)
                     true
                 }
             }
@@ -145,7 +145,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 isEnabled = uiState.moduleB.btnStart.enable
                 visibility = uiState.moduleB.btnStart.visibility
                 setOnClickListener {
-                    this@HomeFragment.viewModel.dispatch(HomeIntent.OnStart(ModuleEnum.B))
+                    this@HomeFragment.viewModel.start(ModuleEnum.B)
                 }
             }
             btnStop.run {
@@ -155,7 +155,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     PopTip.show(R.mipmap.ic_stop, "长按停止")
                 }
                 setOnLongClickListener {
-                    this@HomeFragment.viewModel.dispatch(HomeIntent.OnStop(ModuleEnum.B))
+                    this@HomeFragment.viewModel.stop(ModuleEnum.B)
                     true
                 }
             }
@@ -172,7 +172,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 isEnabled = uiState.moduleC.btnStart.enable
                 visibility = uiState.moduleC.btnStart.visibility
                 setOnClickListener {
-                    this@HomeFragment.viewModel.dispatch(HomeIntent.OnStart(ModuleEnum.C))
+                    this@HomeFragment.viewModel.start(ModuleEnum.C)
                 }
             }
             btnStop.run {
@@ -182,7 +182,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     PopTip.show(R.mipmap.ic_stop, "长按停止")
                 }
                 setOnLongClickListener {
-                    this@HomeFragment.viewModel.dispatch(HomeIntent.OnStop(ModuleEnum.C))
+                    this@HomeFragment.viewModel.stop(ModuleEnum.C)
                     true
                 }
             }
@@ -199,7 +199,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 isEnabled = uiState.moduleD.btnStart.enable
                 visibility = uiState.moduleD.btnStart.visibility
                 setOnClickListener {
-                    this@HomeFragment.viewModel.dispatch(HomeIntent.OnStart(ModuleEnum.D))
+                    this@HomeFragment.viewModel.start(ModuleEnum.D)
                 }
             }
             btnStop.run {
@@ -209,7 +209,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     PopTip.show(R.mipmap.ic_stop, "长按停止")
                 }
                 setOnLongClickListener {
-                    this@HomeFragment.viewModel.dispatch(HomeIntent.OnStop(ModuleEnum.D))
+                    this@HomeFragment.viewModel.stop(ModuleEnum.D)
                     true
                 }
             }
@@ -229,7 +229,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
                 setOnLongClickListener {
                     PopTip.show(R.mipmap.ic_reset, "复位-已下发")
-                    this@HomeFragment.viewModel.dispatch(HomeIntent.OnReset)
+                    this@HomeFragment.viewModel.reset()
                     true
                 }
             }
@@ -241,7 +241,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     } else {
                         PopTip.show(R.mipmap.ic_stop, "已暂停摇床，再次点击继续")
                     }
-                    this@HomeFragment.viewModel.dispatch(HomeIntent.OnPause)
+                    this@HomeFragment.viewModel.pause()
                 }
             }
             btnInsulating.run {
@@ -252,7 +252,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     } else {
                         PopTip.show(R.mipmap.ic_insulating, "抗体保温中，再次点击取消")
                     }
-                    this@HomeFragment.viewModel.dispatch(HomeIntent.OnInsulating)
+                    this@HomeFragment.viewModel.insulating()
                 }
             }
             onBtnPause()
@@ -266,13 +266,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param module [ModuleEnum] 模块
      */
     private fun onSwitchProgram(index: Int, module: ModuleEnum) {
-        val uiState = viewModel.uiState.value
+        val programList = viewModel.uiState.value.programList
         when (module) {
             ModuleEnum.A -> {
                 binding.a.run {
                     if (index != -1) {
-                        btnProgram.text = uiState.programList[index].name
-                        tvActions.text = uiState.programList[index].actions
+                        btnProgram.text = programList[index].name
+                        tvActions.text = programList[index].actions
                     } else {
                         btnProgram.text = ""
                         tvActions.text = ""
@@ -282,8 +282,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             ModuleEnum.B -> {
                 binding.b.run {
                     if (index != -1) {
-                        btnProgram.text = uiState.programList[index].name
-                        tvActions.text = uiState.programList[index].actions
+                        btnProgram.text = programList[index].name
+                        tvActions.text = programList[index].actions
                     } else {
                         btnProgram.text = ""
                         tvActions.text = ""
@@ -293,8 +293,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             ModuleEnum.C -> {
                 binding.c.run {
                     if (index != -1) {
-                        btnProgram.text = uiState.programList[index].name
-                        tvActions.text = uiState.programList[index].actions
+                        btnProgram.text = programList[index].name
+                        tvActions.text = programList[index].actions
                     } else {
                         btnProgram.text = ""
                         tvActions.text = ""
@@ -304,8 +304,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             ModuleEnum.D -> {
                 binding.d.run {
                     if (index != -1) {
-                        btnProgram.text = uiState.programList[index].name
-                        tvActions.text = uiState.programList[index].actions
+                        btnProgram.text = programList[index].name
+                        tvActions.text = programList[index].actions
                     } else {
                         btnProgram.text = ""
                         tvActions.text = ""
@@ -503,20 +503,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         if (menuList.isNotEmpty()) {
             BottomMenu.show(menuList).setMessage("请选择程序")
                 .setOnMenuItemClickListener { _, _, index ->
-                    when (module) {
-                        ModuleEnum.A -> {
-                            viewModel.dispatch(HomeIntent.OnSwitchProgram(index, module))
-                        }
-                        ModuleEnum.B -> {
-                            viewModel.dispatch(HomeIntent.OnSwitchProgram(index, module))
-                        }
-                        ModuleEnum.C -> {
-                            viewModel.dispatch(HomeIntent.OnSwitchProgram(index, module))
-                        }
-                        ModuleEnum.D -> {
-                            viewModel.dispatch(HomeIntent.OnSwitchProgram(index, module))
-                        }
-                    }
+                    viewModel.onSwitchProgram(index, module)
                     false
                 }
         }

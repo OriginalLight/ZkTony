@@ -26,15 +26,12 @@ import java.util.*
 @Entity(tableName = "log_record")
 data class LogRecord(
     @PrimaryKey
-    var id: String = UUID.randomUUID().toString()
-) {
-    constructor() : this(UUID.randomUUID().toString())
-
-    var programId = ""
-    var model = 0
-    var motor = 0
-    var voltage = 0f
-    var time = 0f
-    var upload = 0
-    var createTime: Date = Date(System.currentTimeMillis())
-}
+    val id: String = UUID.randomUUID().toString(),
+    val programId: String = "",
+    val model: Int = 0,
+    val motor: Int = 0,
+    val voltage: Float = 0f,
+    val time: Float = 0f,
+    val upload: Int = 0,
+    val createTime: Date = Date(System.currentTimeMillis())
+)

@@ -7,21 +7,7 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        getByName("debug") {
-            storeFile = file(libs.versions.storeFile.get())
-            storePassword = libs.versions.storePassword.get()
-            keyAlias = libs.versions.keyAlias.get()
-            keyPassword = libs.versions.keyPassword.get()
-        }
-        create("release") {
-            storeFile = file(libs.versions.storeFile.get())
-            storePassword = libs.versions.storePassword.get()
-            keyAlias = libs.versions.keyAlias.get()
-            keyPassword = libs.versions.keyPassword.get()
-        }
-    }
-    namespace = libs.versions.nameSpace.get()
+    namespace = "com.zktony.www"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     buildFeatures {
@@ -29,14 +15,23 @@ android {
     }
 
     defaultConfig {
-        applicationId = libs.versions.applicationId.get()
+        applicationId = "com.zktony.www"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = libs.versions.versionCode.get().toInt()
-        versionName = libs.versions.versionName.get()
+        versionCode = 1
+        versionName = "1.0.0"
         multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        named("debug") {
+            storeFile = rootProject.file("zktony.keystore")
+            storePassword = "zktony"
+            keyAlias = "zktony"
+            keyPassword = "zktony"
+        }
     }
 
     buildTypes {
@@ -47,7 +42,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName("debug")
         }
         debug {
             isDebuggable = true
@@ -75,40 +70,42 @@ dependencies {
     implementation(fileTree("dir" to "libs", "include" to listOf("*.jar", "*.aar")))
     implementation(project(mapOf("path" to ":gpio")))
     implementation(project(mapOf("path" to ":serialport")))
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.ktx)
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.material)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.recyclerview)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.legacy.support.v4)
-    implementation(libs.eventbus)
-    implementation(libs.rxjava)
-    implementation(libs.rxandroid)
-    implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.chart)
+    implementation(libs.datastore.preferences)
+    implementation(libs.dialogx)
+    implementation(libs.eventbus)
     implementation(libs.gson)
+    implementation(libs.hilt.android)
+    implementation(libs.hilt.work)
+    implementation(libs.legacy.support.v4)
+    implementation(libs.material)
     implementation(libs.okhttp3)
     implementation(libs.okhttp3.logging.interceptor)
-    implementation(libs.datastore.preferences)
-    implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.hilt.work)
-    implementation(libs.hilt.android)
-    implementation(libs.dialogx)
+    implementation(libs.recyclerview)
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.converter.gson)
-    kapt(libs.hilt.compiler)
-    kapt(libs.hilt.android.compiler)
+    implementation(libs.rxandroid)
+    implementation(libs.rxjava)
+    implementation(libs.androidx.core.ktx)
+
     kapt(libs.androidx.room.compiler)
+    kapt(libs.hilt.android.compiler)
+    kapt(libs.hilt.compiler)
 
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.ext.junit)
+
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
 }

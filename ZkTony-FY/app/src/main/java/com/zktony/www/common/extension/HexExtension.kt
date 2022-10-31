@@ -1,5 +1,7 @@
 package com.zktony.www.common.extension
 
+import com.zktony.www.common.room.entity.Motor
+import com.zktony.www.serialport.protocol.Command
 import java.math.BigInteger
 
 /**
@@ -163,6 +165,37 @@ fun String.hexFormat(): String {
         result.append(str.substring(2 * i, 2 * i + 2)).append(" ")
     }
     return result.toString()
+}
+
+/**
+ * 解析电机数据
+ * @return [Motor] 电机
+ */
+fun String.toMotor(): Motor {
+    return Motor(
+        address = this.substring(0, 2).hexToInt8(),
+        subdivision = this.substring(2, 4).hexToInt8(),
+        speed = this.substring(4, 8).hex2ToInt16(),
+        acceleration = this.substring(8, 10).hexToInt8(),
+        deceleration = this.substring(10, 12).hexToInt8(),
+        mode = this.substring(12, 14).hexToInt8(),
+        waitTime = this.substring(14, 18).hex2ToInt16()
+    )
+}
+
+/**
+ * 解析十六进制字符串为Command
+ * @return [Command]
+ */
+fun String.toCommand(): Command {
+    return Command(
+        header = this.substring(0, 2),
+        address = this.substring(2, 4),
+        function = this.substring(4, 6),
+        parameter = this.substring(6, 8),
+        data = this.substring(8, this.length - 8),
+        end = this.substring(this.length - 8, this.length)
+    )
 }
 
 

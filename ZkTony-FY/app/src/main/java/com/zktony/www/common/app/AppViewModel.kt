@@ -34,24 +34,12 @@ class AppViewModel @Inject constructor(
 
     private val _state = MutableSharedFlow<AppState>()
     val state: SharedFlow<AppState> get() = _state
-    private val intent = MutableSharedFlow<AppIntent>()
+
     private val _settingState = MutableStateFlow(SettingState())
     val settingState: StateFlow<SettingState> get() = _settingState
 
     init {
         viewModelScope.launch {
-            launch {
-                intent.collect {
-                    when (it) {
-                        is AppIntent.Sender -> sender(it.serialPort, it.command)
-                        is AppIntent.SenderText -> senderText(it.serialPort, it.command)
-                        is AppIntent.ReceiverSerialOne -> receiverSerialOne(it.command)
-                        is AppIntent.ReceiverSerialTwo -> receiverSerialTwo(it.command)
-                        is AppIntent.ReceiverSerialThree -> receiverSerialThree(it.command)
-                        is AppIntent.ReceiverSerialFour -> receiverSerialFour(it.command)
-                    }
-                }
-            }
             launch {
                 dataStore.data.map {
                     it[floatPreferencesKey(Constants.TEMP)] ?: 3.0f
@@ -83,25 +71,13 @@ class AppViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Intent处理器
-     * @param intent [AppIntent]
-     */
-    fun dispatch(intent: AppIntent) {
-        try {
-            viewModelScope.launch {
-                this@AppViewModel.intent.emit(intent)
-            }
-        } catch (_: Exception) {
-        }
-    }
 
     /**
      * 发送指令
      * @param serialPort [SerialPortEnum]
      * @param command  [String] 指令
      */
-    private fun sender(serialPort: SerialPortEnum, command: String) {
+    fun sender(serialPort: SerialPortEnum, command: String) {
         viewModelScope.launch {
             _state.emit(AppState.Sender(serialPort, command))
         }
@@ -112,7 +88,7 @@ class AppViewModel @Inject constructor(
      * @param serialPort [SerialPortEnum]
      * @param command  [String] 指令
      */
-    private fun senderText(serialPort: SerialPortEnum, command: String) {
+    fun senderText(serialPort: SerialPortEnum, command: String) {
         viewModelScope.launch {
             _state.emit(AppState.SenderText(serialPort, command))
         }
@@ -122,7 +98,7 @@ class AppViewModel @Inject constructor(
      * 接收指令串口一
      * @param command [String] 指令
      */
-    private fun receiverSerialOne(command: String) {
+    fun receiverSerialOne(command: String) {
         viewModelScope.launch {
             _state.emit(AppState.ReceiverSerialOne(command))
             Logger.d(msg = "receiverSerialOne: $command")
@@ -133,7 +109,7 @@ class AppViewModel @Inject constructor(
      * 接收指令串口二
      * @param command [String] 指令
      */
-    private fun receiverSerialTwo(command: String) {
+    fun receiverSerialTwo(command: String) {
         viewModelScope.launch {
             _state.emit(AppState.ReceiverSerialTwo(command))
             Logger.d(msg = "receiverSerialTwo: $command")
@@ -144,7 +120,7 @@ class AppViewModel @Inject constructor(
      * 接收指令串口三
      * @param command [String] 指令
      */
-    private fun receiverSerialThree(command: String) {
+    fun receiverSerialThree(command: String) {
         viewModelScope.launch {
             _state.emit(AppState.ReceiverSerialThree(command))
             Logger.d(msg = "receiverSerialThree: $command")
@@ -155,7 +131,7 @@ class AppViewModel @Inject constructor(
      * 接收指令串口四
      * @param command [String] 指令
      */
-    private fun receiverSerialFour(command: String) {
+    fun receiverSerialFour(command: String) {
         viewModelScope.launch {
             _state.emit(AppState.ReceiverSerialFour(command))
             Logger.d(msg = "receiverSerialFour: $command")
@@ -163,6 +139,10 @@ class AppViewModel @Inject constructor(
     }
 
 
+    /**
+     * 加载电机参数
+     * @param motors [List]<[Motor]>
+     */
     private fun loadMotors(motors: List<Motor>) {
         viewModelScope.launch {
             motors.forEach { motor ->
@@ -240,15 +220,6 @@ sealed class AppState {
     data class ReceiverSerialTwo(val command: String) : AppState()
     data class ReceiverSerialThree(val command: String) : AppState()
     data class ReceiverSerialFour(val command: String) : AppState()
-}
-
-sealed class AppIntent {
-    data class Sender(val serialPort: SerialPortEnum, val command: String) : AppIntent()
-    data class SenderText(val serialPort: SerialPortEnum, val command: String) : AppIntent()
-    data class ReceiverSerialOne(val command: String) : AppIntent()
-    data class ReceiverSerialTwo(val command: String) : AppIntent()
-    data class ReceiverSerialThree(val command: String) : AppIntent()
-    data class ReceiverSerialFour(val command: String) : AppIntent()
 }
 
 data class SettingState(

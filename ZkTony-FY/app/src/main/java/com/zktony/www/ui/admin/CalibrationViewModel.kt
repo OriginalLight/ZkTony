@@ -25,65 +25,21 @@ class CalibrationViewModel @Inject constructor(
     private val _state = MutableSharedFlow<CalibrationState>()
     val state: SharedFlow<CalibrationState> get() = _state
 
-    private val intent = MutableSharedFlow<CalibrationIntent>()
-
     private val _uiState = MutableStateFlow(CalibrationUiState())
     val uiState: StateFlow<CalibrationUiState> get() = _uiState
 
     init {
         viewModelScope.launch {
-            launch {
-                intent.collect {
-                    when (it) {
-                        is CalibrationIntent.OnCalibrationValueChange -> onCalibrationValueChange(it.calibration)
-                        is CalibrationIntent.OnUpdateCalibration -> onUpdateCalibration()
-                        is CalibrationIntent.ToWasteTank -> toWasteTank()
-                        is CalibrationIntent.WasteTankNeedleDown -> wasteTankNeedleDown()
-                        is CalibrationIntent.WasteTankNeedleUp -> wasteTankNeedleUp()
-                        is CalibrationIntent.ToWashTank -> toWashTank()
-                        is CalibrationIntent.WashTankNeedleDown -> washTankNeedleDown()
-                        is CalibrationIntent.WashTankNeedleUp -> washTankNeedleUp()
-                        is CalibrationIntent.ToBlockingLiquidTank -> toBlockingLiquidTank()
-                        is CalibrationIntent.BlockingLiquidTankNeedleDown -> blockingLiquidTankNeedleDown()
-                        is CalibrationIntent.BlockingLiquidTankNeedleUp -> blockingLiquidTankNeedleUp()
-                        is CalibrationIntent.ToAntibodyOneTank -> toAntibodyOneTank()
-                        is CalibrationIntent.AntibodyOneTankNeedleDown -> antibodyOneTankNeedleDown()
-                        is CalibrationIntent.AntibodyOneTankNeedleUp -> antibodyOneTankNeedleUp()
-                        is CalibrationIntent.ToAntibodyTwoTank -> toAntibodyTwoTank()
-                        is CalibrationIntent.AntibodyTwoTankNeedleDown -> antibodyTwoTankNeedleDown()
-                        is CalibrationIntent.AntibodyTwoTankNeedleUp -> antibodyTwoTankNeedleUp()
-                        is CalibrationIntent.ToZeroPosition -> toZeroPosition()
-                        is CalibrationIntent.Aspirate -> aspirate()
-                        is CalibrationIntent.Drainage -> drainage()
+            calibrationRepository.getCalibration().collect { calibrationList ->
+                if (calibrationList.isNotEmpty()) {
+                    _uiState.update {
+                        uiState.value.copy(
+                            calibration = calibrationList[0]
+                        )
                     }
+                    _state.emit(CalibrationState.OnCalibrationValueChange(calibrationList[0]))
                 }
             }
-            launch {
-                calibrationRepository.getCalibration().collect { calibrationList ->
-                    if (calibrationList.isNotEmpty()) {
-                        _uiState.update {
-                            uiState.value.copy(
-                                calibration = calibrationList[0]
-                            )
-                        }
-                        _state.emit(CalibrationState.OnCalibrationValueChange(calibrationList[0]))
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Intent处理器
-     * @param intent [CalibrationIntent]
-     */
-    fun dispatch(intent: CalibrationIntent) {
-        try {
-            viewModelScope.launch {
-                this@CalibrationViewModel.intent.emit(intent)
-            }
-        } catch (_: Exception) {
-
         }
     }
 
@@ -91,20 +47,16 @@ class CalibrationViewModel @Inject constructor(
      * 校准值改变
      * @param calibration [Calibration]
      */
-    private fun onCalibrationValueChange(calibration: Calibration) {
+    fun calibrationValueChange(calibration: Calibration) {
         viewModelScope.launch {
-            _uiState.update {
-                uiState.value.copy(
-                    calibration = calibration
-                )
-            }
+            _uiState.value = _uiState.value.copy(calibration = calibration)
         }
     }
 
     /**
      * 更新校准值
      */
-    private fun onUpdateCalibration() {
+    fun updateCalibration() {
         viewModelScope.launch {
             calibrationRepository.update(uiState.value.calibration)
         }
@@ -113,7 +65,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 移动到废液槽
      */
-    private fun toWasteTank() {
+    fun toWasteTank() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val calibration = uiState.value.calibration
@@ -133,7 +85,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 废液槽针头下降
      */
-    private fun wasteTankNeedleDown() {
+    fun wasteTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = uiState.value.calibration
         val commandBlock = listOf(
@@ -155,7 +107,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 废液槽针头上升
      */
-    private fun wasteTankNeedleUp() {
+    fun wasteTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = uiState.value.calibration
         val commandBlock = listOf(
@@ -174,7 +126,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 移动到洗液槽
      */
-    private fun toWashTank() {
+    fun toWashTank() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val calibration = uiState.value.calibration
@@ -194,7 +146,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 洗液槽针头下降
      */
-    private fun washTankNeedleDown() {
+    fun washTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = uiState.value.calibration
         val commandBlock = listOf(
@@ -216,7 +168,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 洗液槽针头上升
      */
-    private fun washTankNeedleUp() {
+    fun washTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = uiState.value.calibration
         val commandBlock = listOf(
@@ -235,7 +187,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 移动到阻断液槽
      */
-    private fun toBlockingLiquidTank() {
+    fun toBlockingLiquidTank() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val calibration = uiState.value.calibration
@@ -255,7 +207,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 阻断液槽针头下降
      */
-    private fun blockingLiquidTankNeedleDown() {
+    fun blockingLiquidTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = uiState.value.calibration
         val commandBlock = listOf(
@@ -277,7 +229,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 阻断液槽针头上升
      */
-    private fun blockingLiquidTankNeedleUp() {
+    fun blockingLiquidTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = uiState.value.calibration
         val commandBlock = listOf(
@@ -296,7 +248,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 移动到抗体一槽
      */
-    private fun toAntibodyOneTank() {
+    fun toAntibodyOneTank() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val calibration = uiState.value.calibration
@@ -316,7 +268,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 抗体一槽针头下降
      */
-    private fun antibodyOneTankNeedleDown() {
+    fun antibodyOneTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = uiState.value.calibration
         val commandBlock = listOf(
@@ -349,7 +301,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 抗体一槽针头上升
      */
-    private fun antibodyOneTankNeedleUp() {
+    fun antibodyOneTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = uiState.value.calibration
         val commandBlock = listOf(
@@ -368,7 +320,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 移动到抗体二槽
      */
-    private fun toAntibodyTwoTank() {
+    fun toAntibodyTwoTank() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val calibration = uiState.value.calibration
@@ -388,7 +340,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 抗体二槽针头下降
      */
-    private fun antibodyTwoTankNeedleDown() {
+    fun antibodyTwoTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = uiState.value.calibration
         val commandBlock = listOf(
@@ -410,7 +362,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 抗体二槽针头上升
      */
-    private fun antibodyTwoTankNeedleUp() {
+    fun antibodyTwoTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = uiState.value.calibration
         val commandBlock = listOf(
@@ -429,7 +381,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 回到原点
      */
-    private fun toZeroPosition() {
+    fun toZeroPosition() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val commandBlock = listOf(
@@ -448,7 +400,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 吸液
      */
-    private fun aspirate() {
+    fun aspirate() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val commandBlock = listOf(
@@ -467,7 +419,7 @@ class CalibrationViewModel @Inject constructor(
     /**
      * 测试 排液
      */
-    private fun drainage() {
+    fun drainage() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val commandBlock = listOf(
@@ -490,34 +442,11 @@ class CalibrationViewModel @Inject constructor(
     }
 }
 
-sealed class CalibrationIntent {
-    data class OnCalibrationValueChange(val calibration: Calibration) : CalibrationIntent()
-    object OnUpdateCalibration : CalibrationIntent()
-    object ToWasteTank : CalibrationIntent()
-    object WasteTankNeedleDown : CalibrationIntent()
-    object WasteTankNeedleUp : CalibrationIntent()
-    object ToWashTank : CalibrationIntent()
-    object WashTankNeedleDown : CalibrationIntent()
-    object WashTankNeedleUp : CalibrationIntent()
-    object ToBlockingLiquidTank : CalibrationIntent()
-    object BlockingLiquidTankNeedleDown : CalibrationIntent()
-    object BlockingLiquidTankNeedleUp : CalibrationIntent()
-    object ToAntibodyOneTank : CalibrationIntent()
-    object AntibodyOneTankNeedleDown : CalibrationIntent()
-    object AntibodyOneTankNeedleUp : CalibrationIntent()
-    object ToAntibodyTwoTank : CalibrationIntent()
-    object AntibodyTwoTankNeedleDown : CalibrationIntent()
-    object AntibodyTwoTankNeedleUp : CalibrationIntent()
-    object ToZeroPosition : CalibrationIntent()
-    object Aspirate : CalibrationIntent()
-    object Drainage : CalibrationIntent()
-}
-
 sealed class CalibrationState {
     data class OnCalibrationValueChange(val calibration: Calibration) : CalibrationState()
 }
 
 data class CalibrationUiState(
-    var calibration: Calibration = Calibration()
+    val calibration: Calibration = Calibration()
 )
 

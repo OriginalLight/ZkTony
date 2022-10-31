@@ -67,11 +67,11 @@ class ProgramFragment :
                 "确定",
                 "取消"
             ).setOkButton { _, _ ->
-                viewModel.dispatch(ProgramIntent.OnDeleteProgram(it))
+                viewModel.deleteProgram(it)
                 false
             }
         }
-        viewModel.dispatch(ProgramIntent.OnLoadProgramList)
+        viewModel.loadProgramList()
     }
 
     /**
@@ -89,7 +89,7 @@ class ProgramFragment :
                             "程序名称不能为空".showShortToast()
                             return@setOkButton false
                         }
-                        viewModel.dispatch(ProgramIntent.OnAddProgram(inputStr.trim()))
+                        viewModel.addProgram(inputStr.trim())
                         false
                     }
                     .show()

@@ -7,22 +7,13 @@ import com.zktony.www.common.extension.toHex
  * @date: 2022-10-17 13:09
  */
 data class Command(
-    var header: String = "EE",
-    var address: String = "01",
-    var function: String = "06",
-    var parameter: String = "0A",
-    var data: String = "",
-    var end: String = "FFFCFFFF"
+    val header: String = "EE",
+    val address: String = "01",
+    val function: String = "06",
+    val parameter: String = "0A",
+    val data: String = "",
+    val end: String = "FFFCFFFF"
 ) {
-    constructor(hex: String) : this() {
-        header = hex.substring(0, 2)
-        address = hex.substring(2, 4)
-        function = hex.substring(4, 6)
-        parameter = hex.substring(6, 8)
-        data = hex.substring(8, hex.length - 8)
-        end = hex.substring(hex.length - 8, hex.length)
-    }
-
     /**
      * 获取十六进制字符串
      * @return 16进制字符串

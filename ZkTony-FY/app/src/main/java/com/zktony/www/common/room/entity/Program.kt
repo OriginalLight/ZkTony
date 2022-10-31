@@ -7,12 +7,12 @@ import java.util.*
 @Entity(tableName = "program")
 data class Program(
     @PrimaryKey
-    var id: String = UUID.randomUUID().toString(),
-    var name: String = "",
-    var actions: String = "没有任何操作，去添加吧",
-    var runCount: Int = 0,
-    var actionCount: Int = 0,
-    var time: String = "",
-    var upload: Int = 0,
-    var createTime: Date = Date(System.currentTimeMillis())
+    val id: String = UUID.randomUUID().toString(),
+    val name: String = "",
+    val actions: String = "没有任何操作，去添加吧",
+    val runCount: Int = 0,
+    val actionCount: Int = 0,
+    val time: String = "",
+    val upload: Int = 0,
+    val createTime: Date = Date(System.currentTimeMillis())
 )
