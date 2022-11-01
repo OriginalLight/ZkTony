@@ -40,7 +40,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             viewModel.state.collect {
                 when (it) {
                     is HomeState.OnSwitchProgram -> onSwitchProgram(it.index, it.module)
-                    is HomeState.OnLoadProgram -> onLoadProgram(it.uiState)
+                    is HomeState.OnLoadProgram -> onLoadProgram()
                     is HomeState.OnButtonChange -> onButtonChange(it.module)
                     is HomeState.OnRestCallBack -> onRestCallBack(it.success)
                     is HomeState.OnPause -> onBtnPause()
@@ -214,11 +214,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
             }
             btnProgram.run {
+                isClickable = uiState.moduleD.btnProgram.isClickable
                 setOnClickListener {
                     showSelectProgramDialog(ModuleEnum.D)
                 }
                 onSwitchProgram(uiState.moduleD.index, ModuleEnum.D)
-                run { isClickable = uiState.moduleD.btnProgram.isClickable }
             }
         }
         binding.e.run {
@@ -317,9 +317,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     /**
      * 加载程序列表
-     * @param uiState [HomeUiState]
      */
-    private fun onLoadProgram(uiState: HomeUiState) {
+    private fun onLoadProgram() {
+        val uiState = viewModel.uiState.value
         onSwitchProgram(uiState.moduleA.index, ModuleEnum.A)
         onSwitchProgram(uiState.moduleB.index, ModuleEnum.B)
         onSwitchProgram(uiState.moduleC.index, ModuleEnum.C)
