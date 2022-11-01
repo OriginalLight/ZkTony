@@ -45,11 +45,9 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             launch {
                 programRepository.getAll().collect {
-                    val uiState = uiState.value
-                    uiState.run {
-                        onProgramChange(it)
-                        _state.emit(HomeState.OnLoadProgram(this))
-                    }
+                    onProgramChange(it)
+                    delay(100L)
+                    _state.emit(HomeState.OnLoadProgram)
                 }
             }
             launch {
@@ -437,35 +435,41 @@ class HomeViewModel @Inject constructor(
      * @param programList [List]<[Program]> 程序列表
      */
     private fun onProgramChange(programList: List<Program>) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                programList = programList,
-                moduleA = _uiState.value.moduleA.copy(
-                    index = if (programList.isEmpty()) -1 else if (_uiState.value.moduleA.index >= programList.size) 0 else _uiState.value.moduleA.index,
-                    btnStart = _uiState.value.moduleA.btnStart.copy(
-                        enable = if (programList.isEmpty()) false else programList[_uiState.value.moduleA.index].actionCount > 0
-                    )
-                ),
-                moduleB = _uiState.value.moduleB.copy(
-                    index = if (programList.isEmpty()) -1 else if (_uiState.value.moduleB.index >= programList.size) 0 else _uiState.value.moduleB.index,
-                    btnStart = _uiState.value.moduleB.btnStart.copy(
-                        enable = if (programList.isEmpty()) false else programList[_uiState.value.moduleB.index].actionCount > 0
-                    )
-                ),
-                moduleC = _uiState.value.moduleC.copy(
-                    index = if (programList.isEmpty()) -1 else if (_uiState.value.moduleC.index >= programList.size) 0 else _uiState.value.moduleC.index,
-                    btnStart = _uiState.value.moduleC.btnStart.copy(
-                        enable = if (programList.isEmpty()) false else programList[_uiState.value.moduleC.index].actionCount > 0
-                    )
-                ),
-                moduleD = _uiState.value.moduleD.copy(
-                    index = if (programList.isEmpty()) -1 else if (_uiState.value.moduleD.index >= programList.size) 0 else _uiState.value.moduleD.index,
-                    btnStart = _uiState.value.moduleD.btnStart.copy(
-                        enable = if (programList.isEmpty()) false else programList[_uiState.value.moduleD.index].actionCount > 0
-                    )
-                ),
-            )
-        }
+        val indexA =
+            if (programList.isEmpty()) -1 else (if (_uiState.value.moduleA.index >= programList.size || _uiState.value.moduleA.index == -1) 0 else _uiState.value.moduleA.index)
+        val indexB =
+            if (programList.isEmpty()) -1 else (if (_uiState.value.moduleB.index >= programList.size || _uiState.value.moduleB.index == -1) 0 else _uiState.value.moduleB.index)
+        val indexC =
+            if (programList.isEmpty()) -1 else (if (_uiState.value.moduleC.index >= programList.size || _uiState.value.moduleC.index == -1) 0 else _uiState.value.moduleC.index)
+        val indexD =
+            if (programList.isEmpty()) -1 else (if (_uiState.value.moduleD.index >= programList.size || _uiState.value.moduleD.index == -1) 0 else _uiState.value.moduleD.index)
+        _uiState.value = _uiState.value.copy(
+            programList = programList,
+            moduleA = _uiState.value.moduleA.copy(
+                index = indexA,
+                btnStart = _uiState.value.moduleA.btnStart.copy(
+                    enable = if (programList.isEmpty()) false else programList[indexA].actionCount > 0
+                )
+            ),
+            moduleB = _uiState.value.moduleB.copy(
+                index = indexB,
+                btnStart = _uiState.value.moduleB.btnStart.copy(
+                    enable = if (programList.isEmpty()) false else programList[indexB].actionCount > 0
+                )
+            ),
+            moduleC = _uiState.value.moduleC.copy(
+                index = indexC,
+                btnStart = _uiState.value.moduleC.btnStart.copy(
+                    enable = if (programList.isEmpty()) false else programList[indexC].actionCount > 0
+                )
+            ),
+            moduleD = _uiState.value.moduleD.copy(
+                index = indexD,
+                btnStart = _uiState.value.moduleD.btnStart.copy(
+                    enable = if (programList.isEmpty()) false else programList[indexD].actionCount > 0
+                )
+            ),
+        )
     }
 
     /**
@@ -685,12 +689,12 @@ class HomeViewModel @Inject constructor(
 
 sealed class HomeState {
     data class OnSwitchProgram(val index: Int, val module: ModuleEnum) : HomeState()
-    data class OnLoadProgram(val uiState: HomeUiState) : HomeState()
     data class OnButtonChange(val module: ModuleEnum) : HomeState()
     data class OnRestCallBack(val success: Boolean) : HomeState()
     data class OnDashBoardChange(val module: ModuleEnum) : HomeState()
     object OnPause : HomeState()
     object OnInsulating : HomeState()
+    object OnLoadProgram : HomeState()
 }
 
 data class HomeUiState(

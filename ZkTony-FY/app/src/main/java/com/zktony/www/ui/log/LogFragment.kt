@@ -1,11 +1,9 @@
 package com.zktony.www.ui.log
 
 import android.annotation.SuppressLint
-import android.app.DatePickerDialog
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.github.mikephil.charting.charts.LineChart
@@ -20,14 +18,12 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.getDayEnd
 import com.zktony.www.common.extension.getDayStart
-import com.zktony.www.common.extension.simpleDateFormat
 import com.zktony.www.common.room.entity.LogData
 import com.zktony.www.common.room.entity.LogRecord
 import com.zktony.www.databinding.FragmentLogBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -42,7 +38,6 @@ class LogFragment :
     private var logDataList = emptyList<LogData>()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initTextView()
         initObserver()
         initRecyclerView()
         buttonEvent()
@@ -58,7 +53,6 @@ class LogFragment :
                         logRecordList = it.logRecordList
                         logAdapter.currentPosition = -1
                         logAdapter.isClick = false
-                        refreshButton()
                     }
 
                     is LogState.ChangeLogData -> {
@@ -82,56 +76,6 @@ class LogFragment :
         )
     }
 
-    @SuppressLint("SimpleDateFormat")
-    private fun initTextView() {
-        val formatter = SimpleDateFormat("yyyy-MM-dd")
-        binding.tv1.text = formatter.format(Date(System.currentTimeMillis()))
-        binding.tv3.text = formatter.format(Date(System.currentTimeMillis()))
-        binding.tv1.setOnClickListener {
-            showDatePickerDialog(0, binding.tv1, Calendar.getInstance())
-        }
-        binding.tv3.setOnClickListener {
-            showDatePickerDialog(0, binding.tv3, Calendar.getInstance())
-        }
-    }
-
-    /**
-     * 日期选择
-     * @param themeResId
-     * @param tv
-     * @param calendar
-     */
-    @SuppressLint("SetTextI18n", "SimpleDateFormat")
-    fun showDatePickerDialog(
-        themeResId: Int,
-        tv: TextView,
-        calendar: Calendar
-    ) {
-        DatePickerDialog(
-            requireActivity(),
-            themeResId,
-            { _, year, monthOfYear, dayOfMonth ->
-                val dateStr = year.toString() + "-" + (monthOfYear + 1) + "-" + dayOfMonth
-                val date = dateStr.simpleDateFormat("yyyy-MM-dd")
-                tv.text = date?.simpleDateFormat("yyyy-MM-dd")
-                val start = binding.tv1.text.toString().simpleDateFormat("yyyy-MM-dd")
-                val end = binding.tv3.text.toString().simpleDateFormat("yyyy-MM-dd")
-                start?.run {
-                    end?.run {
-                        viewModel.dispatch(
-                            LogIntent.ChangeLogRecord(
-                                start.getDayStart(),
-                                end.getDayEnd()
-                            )
-                        )
-                    }
-                }
-            },
-            calendar[Calendar.YEAR],
-            calendar[Calendar.MONTH],
-            calendar[Calendar.DAY_OF_MONTH]
-        ).show()
-    }
 
     /**
      * 按钮事件
@@ -145,22 +89,6 @@ class LogFragment :
                 binding.con2.visibility = View.GONE
                 binding.con1.visibility = View.VISIBLE
             }
-        }
-        binding.btn1.setOnClickListener {
-            binding.con1.visibility = View.GONE
-            binding.con2.visibility = View.VISIBLE
-            binding.lc1.visibility = View.VISIBLE
-            binding.lc2.visibility = View.GONE
-            binding.tvChart.text = "电压图"
-            initVoltageChart()
-        }
-        binding.btn2.setOnClickListener {
-            binding.con1.visibility = View.GONE
-            binding.con2.visibility = View.VISIBLE
-            binding.lc1.visibility = View.GONE
-            binding.lc2.visibility = View.VISIBLE
-            binding.tvChart.text = "电流图"
-            initCurrentChart()
         }
     }
 
@@ -256,14 +184,4 @@ class LogFragment :
         xAxis.position = XAxis.XAxisPosition.BOTTOM
     }
 
-    private fun refreshButton() {
-        if (logRecordList.isEmpty() || logAdapter.currentPosition == -1 || !logAdapter.isClick) {
-            binding.btn1.visibility = View.GONE
-            binding.btn2.visibility = View.GONE
-        } else {
-            binding.btn1.visibility = View.VISIBLE
-            binding.btn2.visibility = View.VISIBLE
-            viewModel.dispatch(LogIntent.ChangeLogData(logAdapter.getItem().id))
-        }
-    }
 }
