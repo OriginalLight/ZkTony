@@ -16,16 +16,16 @@ import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.ActionEnum
 import com.zktony.www.common.room.entity.getActionEnum
-import com.zktony.www.databinding.FragmentProgramEditBinding
+import com.zktony.www.databinding.FragmentActionBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class ProgramEditFragment :
-    BaseFragment<ProgramEditViewModel, FragmentProgramEditBinding>(R.layout.fragment_program_edit) {
+class ActionFragment :
+    BaseFragment<ActionViewModel, FragmentActionBinding>(R.layout.fragment_action) {
 
-    override val viewModel: ProgramEditViewModel by viewModels()
+    override val viewModel: ActionViewModel by viewModels()
 
     private val actionAdapter by lazy { ActionAdapter() }
 
@@ -41,11 +41,11 @@ class ProgramEditFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.state.distinctUntilChanged().collect {
+            viewModel.event.distinctUntilChanged().collect {
                 when (it) {
-                    is ProgramEditState.OnSwitchAction -> onSwitchAction(it.action)
-                    is ProgramEditState.OnActionChange -> onActionChange(it.actionList)
-                    is ProgramEditState.OnButtonChange -> onButtonChange(it.enable)
+                    is ActionEvent.OnSwitchAction -> onSwitchAction(it.action)
+                    is ActionEvent.OnActionChange -> onActionChange(it.actionList)
+                    is ActionEvent.OnButtonChange -> onButtonChange(it.enable)
                 }
             }
         }
@@ -61,7 +61,7 @@ class ProgramEditFragment :
             viewModel.deleteAction(it)
         }
         arguments?.run {
-            val programId = ProgramEditFragmentArgs.fromBundle(this).programId
+            val programId = ActionFragmentArgs.fromBundle(this).programId
             viewModel.setProgramId(programId)
         }
         viewModel.loadActionList()
@@ -116,29 +116,39 @@ class ProgramEditFragment :
      */
     private fun initEditText() {
         binding.order.afterTextChange {
-            viewModel.editAction(viewModel.uiState.value.action.copy(
-                order = if (it.isNotEmpty()) it.toInt() else 0
-            ))
+            viewModel.editAction(
+                viewModel.uiState.value.action.copy(
+                    order = if (it.isNotEmpty()) it.toInt() else 0
+                )
+            )
         }
         binding.time.afterTextChange {
-            viewModel.editAction(viewModel.uiState.value.action.copy(
-                time = if (it.isNotEmpty()) it.toFloat() else 0f
-            ))
+            viewModel.editAction(
+                viewModel.uiState.value.action.copy(
+                    time = if (it.isNotEmpty()) it.toFloat() else 0f
+                )
+            )
         }
         binding.temperature.afterTextChange {
-            viewModel.editAction(viewModel.uiState.value.action.copy(
-                temperature = if (it.isNotEmpty()) it.toFloat() else 0f
-            ))
+            viewModel.editAction(
+                viewModel.uiState.value.action.copy(
+                    temperature = if (it.isNotEmpty()) it.toFloat() else 0f
+                )
+            )
         }
         binding.liquidVolume.afterTextChange {
-            viewModel.editAction(viewModel.uiState.value.action.copy(
-                liquidVolume = if (it.isNotEmpty()) it.toFloat() else 0f
-            ))
+            viewModel.editAction(
+                viewModel.uiState.value.action.copy(
+                    liquidVolume = if (it.isNotEmpty()) it.toFloat() else 0f
+                )
+            )
         }
         binding.count.afterTextChange {
-            viewModel.editAction(viewModel.uiState.value.action.copy(
-                count = if (it.isNotEmpty()) it.toInt() else 0
-            ))
+            viewModel.editAction(
+                viewModel.uiState.value.action.copy(
+                    count = if (it.isNotEmpty()) it.toInt() else 0
+                )
+            )
 
         }
         onSwitchAction(getActionEnum(viewModel.uiState.value.action.mode))

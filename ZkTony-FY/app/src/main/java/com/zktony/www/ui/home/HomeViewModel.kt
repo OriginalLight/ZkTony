@@ -4,7 +4,7 @@ import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.zktony.www.R
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.app.AppState
+import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.extractTemp
 import com.zktony.www.common.extension.removeZero
@@ -34,8 +34,8 @@ class HomeViewModel @Inject constructor(
     lateinit var appViewModel: AppViewModel
 
     // 返回的状态
-    private val _state = MutableSharedFlow<HomeState>()
-    val state: SharedFlow<HomeState> get() = _state
+    private val _event = MutableSharedFlow<HomeEvent>()
+    val event: SharedFlow<HomeEvent> get() = _event
 
     // 保存的UI状态
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -47,14 +47,14 @@ class HomeViewModel @Inject constructor(
                 programRepository.getAll().collect {
                     onProgramChange(it)
                     delay(100L)
-                    _state.emit(HomeState.OnLoadProgram)
+                    _event.emit(HomeEvent.OnLoadProgram)
                 }
             }
             launch {
-                appViewModel.state.collect {
+                appViewModel.event.collect {
                     when (it) {
-                        is AppState.ReceiverSerialOne -> receiverSerialOne(it.command)
-                        is AppState.ReceiverSerialFour -> receiverSerialFour(it.command)
+                        is AppEvent.ReceiverSerialOne -> receiverSerialOne(it.command)
+                        is AppEvent.ReceiverSerialFour -> receiverSerialFour(it.command)
                         else -> {}
                     }
                 }
@@ -137,8 +137,8 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
-            _state.emit(HomeState.OnSwitchProgram(index, module))
-            _state.emit(HomeState.OnButtonChange(module))
+            _event.emit(HomeEvent.OnSwitchProgram(index, module))
+            _event.emit(HomeEvent.OnButtonChange(module))
         }
     }
 
@@ -218,7 +218,7 @@ class HomeViewModel @Inject constructor(
                     runProgram(module, _uiState.value.programList[_uiState.value.moduleD.index])
                 }
             }
-            _state.emit(HomeState.OnButtonChange(module))
+            _event.emit(HomeEvent.OnButtonChange(module))
         }
     }
 
@@ -295,7 +295,7 @@ class HomeViewModel @Inject constructor(
                 }
             }
             stopProgram(module)
-            _state.emit(HomeState.OnButtonChange(module))
+            _event.emit(HomeEvent.OnButtonChange(module))
         }
     }
 
@@ -335,7 +335,7 @@ class HomeViewModel @Inject constructor(
                     isRunning = !_uiState.value.btnPause.isRunning,
                 )
             )
-            _state.emit(HomeState.OnPause)
+            _event.emit(HomeEvent.OnPause)
         }
     }
 
@@ -359,7 +359,7 @@ class HomeViewModel @Inject constructor(
                     isRunning = !_uiState.value.btnInsulating.isRunning,
                 )
             )
-            _state.emit(HomeState.OnInsulating)
+            _event.emit(HomeEvent.OnInsulating)
         }
     }
 
@@ -413,7 +413,7 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
-            _state.emit(HomeState.OnDashBoardChange(getModuleEnum(address)))
+            _event.emit(HomeEvent.OnDashBoardChange(getModuleEnum(address)))
         }
     }
 
@@ -425,7 +425,7 @@ class HomeViewModel @Inject constructor(
     private fun resetCallBack(command: Command) {
         viewModelScope.launch {
             command.run {
-                _state.emit(HomeState.OnRestCallBack(parameter == "0A" && data == "00"))
+                _event.emit(HomeEvent.OnRestCallBack(parameter == "0A" && data == "00"))
             }
         }
     }
@@ -540,7 +540,7 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
-            _state.emit(HomeState.OnDashBoardChange(module))
+            _event.emit(HomeEvent.OnDashBoardChange(module))
         }
     }
 
@@ -599,7 +599,7 @@ class HomeViewModel @Inject constructor(
                     Command(parameter = "0B", data = "0101").toHex()
                 )
             }
-            _state.emit(HomeState.OnDashBoardChange(module))
+            _event.emit(HomeEvent.OnDashBoardChange(module))
         }
     }
 
@@ -643,7 +643,7 @@ class HomeViewModel @Inject constructor(
                                 )
                             }
                         }
-                        _state.emit(HomeState.OnDashBoardChange(it.module))
+                        _event.emit(HomeEvent.OnDashBoardChange(it.module))
                     }
                     is ActionState.CurrentActionTime -> {
                         val time = it.time
@@ -677,7 +677,7 @@ class HomeViewModel @Inject constructor(
                                 )
                             }
                         }
-                        _state.emit(HomeState.OnDashBoardChange(it.module))
+                        _event.emit(HomeEvent.OnDashBoardChange(it.module))
                     }
                     is ActionState.Finish -> stop(it.module)
                 }
@@ -687,14 +687,14 @@ class HomeViewModel @Inject constructor(
 
 }
 
-sealed class HomeState {
-    data class OnSwitchProgram(val index: Int, val module: ModuleEnum) : HomeState()
-    data class OnButtonChange(val module: ModuleEnum) : HomeState()
-    data class OnRestCallBack(val success: Boolean) : HomeState()
-    data class OnDashBoardChange(val module: ModuleEnum) : HomeState()
-    object OnPause : HomeState()
-    object OnInsulating : HomeState()
-    object OnLoadProgram : HomeState()
+sealed class HomeEvent {
+    data class OnSwitchProgram(val index: Int, val module: ModuleEnum) : HomeEvent()
+    data class OnButtonChange(val module: ModuleEnum) : HomeEvent()
+    data class OnRestCallBack(val success: Boolean) : HomeEvent()
+    data class OnDashBoardChange(val module: ModuleEnum) : HomeEvent()
+    object OnPause : HomeEvent()
+    object OnInsulating : HomeEvent()
+    object OnLoadProgram : HomeEvent()
 }
 
 data class HomeUiState(

@@ -19,8 +19,8 @@ class ProgramViewModel @Inject constructor(
     private val actionRepository: ActionRepository
 ) : BaseViewModel() {
 
-    private val _state = MutableSharedFlow<ProgramState>()
-    val state: SharedFlow<ProgramState> get() = _state
+    private val _event = MutableSharedFlow<ProgramEvent>()
+    val event: SharedFlow<ProgramEvent> get() = _event
 
 
     /**
@@ -54,13 +54,13 @@ class ProgramViewModel @Inject constructor(
     fun loadProgramList() {
         viewModelScope.launch {
             programRepository.getAll().collect {
-                _state.emit(ProgramState.OnProgramChange(it))
+                _event.emit(ProgramEvent.OnProgramChange(it))
             }
         }
     }
 
 }
 
-sealed class ProgramState {
-    data class OnProgramChange(val programList: List<Program>) : ProgramState()
+sealed class ProgramEvent {
+    data class OnProgramChange(val programList: List<Program>) : ProgramEvent()
 }

@@ -16,16 +16,16 @@ import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class ProgramEditViewModel @Inject constructor(
+class ActionViewModel @Inject constructor(
     private val programRepository: ProgramRepository,
     private val actionRepository: ActionRepository
 ) : BaseViewModel() {
 
-    private val _state = MutableSharedFlow<ProgramEditState>()
-    val state: SharedFlow<ProgramEditState> get() = _state
+    private val _event = MutableSharedFlow<ActionEvent>()
+    val event: SharedFlow<ActionEvent> get() = _event
 
-    private val _uiState = MutableStateFlow(ProgramEditUiState())
-    val uiState: StateFlow<ProgramEditUiState> get() = _uiState
+    private val _uiState = MutableStateFlow(ActionUiState())
+    val uiState: StateFlow<ActionUiState> get() = _uiState
 
     /**
      * 加载程序列表
@@ -72,7 +72,7 @@ class ProgramEditViewModel @Inject constructor(
     fun editAction(action: Action) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(action = action)
-            _state.emit(ProgramEditState.OnButtonChange(validateAction(uiState.value.action)))
+            _event.emit(ActionEvent.OnButtonChange(validateAction(uiState.value.action)))
         }
     }
 
@@ -84,8 +84,8 @@ class ProgramEditViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value =
                 _uiState.value.copy(action = _uiState.value.action.copy(mode = action.index))
-            _state.emit(ProgramEditState.OnSwitchAction(action))
-            _state.emit(ProgramEditState.OnButtonChange(validateAction(uiState.value.action)))
+            _event.emit(ActionEvent.OnSwitchAction(action))
+            _event.emit(ActionEvent.OnButtonChange(validateAction(uiState.value.action)))
         }
     }
 
@@ -96,7 +96,7 @@ class ProgramEditViewModel @Inject constructor(
     fun loadActionList() {
         viewModelScope.launch {
             actionRepository.getByProgramId(uiState.value.programId).collect {
-                _state.emit(ProgramEditState.OnActionChange(it))
+                _event.emit(ActionEvent.OnActionChange(it))
             }
         }
     }
@@ -117,13 +117,13 @@ class ProgramEditViewModel @Inject constructor(
 }
 
 
-sealed class ProgramEditState {
-    data class OnSwitchAction(val action: ActionEnum) : ProgramEditState()
-    data class OnActionChange(val actionList: List<Action>) : ProgramEditState()
-    data class OnButtonChange(val enable: Boolean) : ProgramEditState()
+sealed class ActionEvent {
+    data class OnSwitchAction(val action: ActionEnum) : ActionEvent()
+    data class OnActionChange(val actionList: List<Action>) : ActionEvent()
+    data class OnButtonChange(val enable: Boolean) : ActionEvent()
 }
 
-data class ProgramEditUiState(
+data class ActionUiState(
     val programId: String = "",
     val action: Action = Action()
 )

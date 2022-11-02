@@ -32,8 +32,8 @@ class AppViewModel @Inject constructor(
     private val roomRepository: RoomRepository,
 ) : AndroidViewModel(application) {
 
-    private val _state = MutableSharedFlow<AppState>()
-    val state: SharedFlow<AppState> get() = _state
+    private val _event = MutableSharedFlow<AppEvent>()
+    val event: SharedFlow<AppEvent> get() = _event
 
     private val _settingState = MutableStateFlow(SettingState())
     val settingState: StateFlow<SettingState> get() = _settingState
@@ -79,7 +79,7 @@ class AppViewModel @Inject constructor(
      */
     fun sender(serialPort: SerialPortEnum, command: String) {
         viewModelScope.launch {
-            _state.emit(AppState.Sender(serialPort, command))
+            _event.emit(AppEvent.Sender(serialPort, command))
         }
     }
 
@@ -90,7 +90,7 @@ class AppViewModel @Inject constructor(
      */
     fun senderText(serialPort: SerialPortEnum, command: String) {
         viewModelScope.launch {
-            _state.emit(AppState.SenderText(serialPort, command))
+            _event.emit(AppEvent.SenderText(serialPort, command))
         }
     }
 
@@ -100,7 +100,7 @@ class AppViewModel @Inject constructor(
      */
     fun receiverSerialOne(command: String) {
         viewModelScope.launch {
-            _state.emit(AppState.ReceiverSerialOne(command))
+            _event.emit(AppEvent.ReceiverSerialOne(command))
             Logger.d(msg = "receiverSerialOne: $command")
         }
     }
@@ -111,7 +111,7 @@ class AppViewModel @Inject constructor(
      */
     fun receiverSerialTwo(command: String) {
         viewModelScope.launch {
-            _state.emit(AppState.ReceiverSerialTwo(command))
+            _event.emit(AppEvent.ReceiverSerialTwo(command))
             Logger.d(msg = "receiverSerialTwo: $command")
         }
     }
@@ -122,7 +122,7 @@ class AppViewModel @Inject constructor(
      */
     fun receiverSerialThree(command: String) {
         viewModelScope.launch {
-            _state.emit(AppState.ReceiverSerialThree(command))
+            _event.emit(AppEvent.ReceiverSerialThree(command))
             Logger.d(msg = "receiverSerialThree: $command")
         }
     }
@@ -133,7 +133,7 @@ class AppViewModel @Inject constructor(
      */
     fun receiverSerialFour(command: String) {
         viewModelScope.launch {
-            _state.emit(AppState.ReceiverSerialFour(command))
+            _event.emit(AppEvent.ReceiverSerialFour(command))
             Logger.d(msg = "receiverSerialFour: $command")
         }
     }
@@ -213,13 +213,13 @@ class AppViewModel @Inject constructor(
     }
 }
 
-sealed class AppState {
-    data class Sender(val serialPort: SerialPortEnum, val command: String) : AppState()
-    data class SenderText(val serialPort: SerialPortEnum, val command: String) : AppState()
-    data class ReceiverSerialOne(val command: String) : AppState()
-    data class ReceiverSerialTwo(val command: String) : AppState()
-    data class ReceiverSerialThree(val command: String) : AppState()
-    data class ReceiverSerialFour(val command: String) : AppState()
+sealed class AppEvent {
+    data class Sender(val serialPort: SerialPortEnum, val command: String) : AppEvent()
+    data class SenderText(val serialPort: SerialPortEnum, val command: String) : AppEvent()
+    data class ReceiverSerialOne(val command: String) : AppEvent()
+    data class ReceiverSerialTwo(val command: String) : AppEvent()
+    data class ReceiverSerialThree(val command: String) : AppEvent()
+    data class ReceiverSerialFour(val command: String) : AppEvent()
 }
 
 data class SettingState(

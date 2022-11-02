@@ -13,18 +13,18 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MotorSettingViewModel @Inject constructor(
+class MotorViewModel @Inject constructor(
     private val motorRepository: MotorRepository
 ) : BaseViewModel() {
 
     @Inject
     lateinit var appViewModel: AppViewModel
 
-    private val _state = MutableSharedFlow<MotorSettingState>()
-    val state: SharedFlow<MotorSettingState> get() = _state
+    private val _event = MutableSharedFlow<MotorEvent>()
+    val event: SharedFlow<MotorEvent> get() = _event
 
-    private val _uiState = MutableStateFlow(MotorSettingUiState())
-    val uiState: StateFlow<MotorSettingUiState> get() = _uiState
+    private val _uiState = MutableStateFlow(MotorUiState())
+    val uiState: StateFlow<MotorUiState> get() = _uiState
 
     /**
      * 初始化电机
@@ -34,8 +34,8 @@ class MotorSettingViewModel @Inject constructor(
             motorRepository.getAll().collect { motors ->
                 _uiState.value =
                     _uiState.value.copy(motor = if (_uiState.value.motor.name.isEmpty()) motors.first() else _uiState.value.motor)
-                _state.emit(MotorSettingState.OnMotorValueChange(uiState.value.motor))
-                _state.emit(MotorSettingState.OnDataBaseChange(motors))
+                _event.emit(MotorEvent.OnMotorValueChange(uiState.value.motor))
+                _event.emit(MotorEvent.OnDataBaseChange(motors))
             }
         }
     }
@@ -55,7 +55,7 @@ class MotorSettingViewModel @Inject constructor(
     fun editMotor(motor: Motor) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(motor = motor)
-            _state.emit(MotorSettingState.OnMotorValueChange(motor))
+            _event.emit(MotorEvent.OnMotorValueChange(motor))
         }
     }
 
@@ -74,7 +74,7 @@ class MotorSettingViewModel @Inject constructor(
                         data = motor.toHex()
                     ).toHex()
                 )
-                _state.emit(MotorSettingState.OnUpdateMessage("更新成功"))
+                _event.emit(MotorEvent.OnUpdateMessage("更新成功"))
             }
         }
     }
@@ -87,19 +87,19 @@ class MotorSettingViewModel @Inject constructor(
     private fun validateMotor(motor: Motor): Boolean {
         if (motor.speed <= 0) {
             viewModelScope.launch {
-                _state.emit(MotorSettingState.OnUpdateMessage("速度不能小于0"))
+                _event.emit(MotorEvent.OnUpdateMessage("速度不能小于0"))
             }
             return false
         }
         if (motor.acceleration > 100 || motor.acceleration < 10) {
             viewModelScope.launch {
-                _state.emit(MotorSettingState.OnUpdateMessage("加速度范围10-100"))
+                _event.emit(MotorEvent.OnUpdateMessage("加速度范围10-100"))
             }
             return false
         }
         if (motor.deceleration > 100 || motor.deceleration < 10) {
             viewModelScope.launch {
-                _state.emit(MotorSettingState.OnUpdateMessage("减速度范围10-100"))
+                _event.emit(MotorEvent.OnUpdateMessage("减速度范围10-100"))
             }
             return false
         }
@@ -109,12 +109,12 @@ class MotorSettingViewModel @Inject constructor(
 }
 
 
-sealed class MotorSettingState {
-    data class OnDataBaseChange(val motorList: List<Motor>) : MotorSettingState()
-    data class OnUpdateMessage(val message: String) : MotorSettingState()
-    data class OnMotorValueChange(val motor: Motor) : MotorSettingState()
+sealed class MotorEvent {
+    data class OnDataBaseChange(val motorList: List<Motor>) : MotorEvent()
+    data class OnUpdateMessage(val message: String) : MotorEvent()
+    data class OnMotorValueChange(val motor: Motor) : MotorEvent()
 }
 
-data class MotorSettingUiState(
+data class MotorUiState(
     val motor: Motor = Motor(),
 )

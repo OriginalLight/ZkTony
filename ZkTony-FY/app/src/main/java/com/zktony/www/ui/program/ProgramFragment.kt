@@ -40,9 +40,9 @@ class ProgramFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.state.distinctUntilChanged().collect {
+            viewModel.event.distinctUntilChanged().collect {
                 when (it) {
-                    is ProgramState.OnProgramChange -> onProgramChange(it.programList)
+                    is ProgramEvent.OnProgramChange -> onProgramChange(it.programList)
                 }
             }
         }
@@ -56,7 +56,7 @@ class ProgramFragment :
 
         programAdapter.setOnEditButtonClick {
             val direction =
-                ProgramFragmentDirections.actionNavigationProgramToNavigationProgramEdit(it.id)
+                ProgramFragmentDirections.actionNavigationProgramToNavigationAction(it.id)
             findNavController().navigate(direction)
         }
 

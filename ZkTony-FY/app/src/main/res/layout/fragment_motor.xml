@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:background="@color/dark_onBackground"
-        tools:context=".ui.program.ProgramEditFragment">
+        tools:context=".ui.admin.MotorFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -35,7 +35,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/program_edit"
+                android:text="@string/setting"
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="24sp"
@@ -73,12 +73,12 @@
                 app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rc_1"
+                    android:id="@+id/rc_motor"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:isScrollContainer="true"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
                     app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -87,8 +87,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0"
-                    tools:listitem="@layout/item_action" />
-
+                    tools:listitem="@layout/item_motor" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -123,41 +122,152 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:gravity="center"
-                            android:text="@string/add_action"
                             android:textAlignment="center"
                             android:textColor="@color/black"
                             android:textSize="22sp" />
 
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_action"
+                        <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="96dp"
+                            android:layout_marginStart="32dp"
                             android:layout_marginTop="16dp"
-                            android:layout_marginEnd="96dp"
-                            android:backgroundTint="@color/light_onPrimary"
-                            android:dropDownWidth="match_parent"
-                            android:ellipsize="end"
-                            android:gravity="center"
-                            android:includeFontPadding="false"
-                            android:insetTop="0dp"
-                            android:insetBottom="0dp"
-                            android:singleLine="true"
-                            android:textAlignment="center"
-                            android:textAllCaps="false"
-                            android:textColor="@color/black"
-                            android:textSize="16sp"
-                            android:textStyle="bold"
-                            app:cornerRadius="0dp"
-                            app:elevation="2dp"
-                            app:icon="@drawable/ic_drop"
-                            app:iconGravity="end"
-                            app:iconPadding="0dp"
-                            app:iconTint="@color/black"
-                            app:rippleColor="@color/light_primary" />
+                            android:layout_marginEnd="32dp">
+
+                            <ImageView
+                                android:id="@+id/icon_mode"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_marginTop="8dp"
+                                android:layout_marginBottom="8dp"
+                                android:background="@mipmap/ic_mode"
+                                android:backgroundTint="@color/dark_surfaceVariant"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="ContentDescription" />
+
+                            <TextView
+                                android:id="@+id/tv_mode"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="@string/mode"
+                                android:textSize="16sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/icon_mode"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_mode"
+                                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="96dp"
+                                android:layout_marginBottom="2dp"
+                                android:backgroundTint="@color/light_onPrimary"
+                                android:dropDownWidth="match_parent"
+                                android:ellipsize="end"
+                                android:gravity="center"
+                                android:includeFontPadding="false"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:singleLine="true"
+                                android:textAlignment="center"
+                                android:textAllCaps="false"
+                                android:textColor="@color/black"
+                                android:textSize="16sp"
+                                app:cornerRadius="0dp"
+                                app:elevation="2dp"
+                                app:icon="@drawable/ic_drop"
+                                app:iconGravity="end"
+                                app:iconPadding="0dp"
+                                app:iconTint="@color/black"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/tv_mode"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:rippleColor="@color/light_primary" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/dark_outline"
+                                app:layout_constraintBottom_toBottomOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="32dp"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginEnd="32dp">
+
+                            <ImageView
+                                android:id="@+id/icon_subdivision"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_marginStart="8dp"
+                                android:background="@mipmap/ic_subdivision"
+                                android:backgroundTint="@color/dark_surfaceVariant"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="ContentDescription" />
+
+                            <TextView
+                                android:id="@+id/tv_subdivision"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="@string/subdivision"
+                                android:textSize="16sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/icon_subdivision"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btn_subdivision"
+                                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="96dp"
+                                android:layout_marginBottom="2dp"
+                                android:backgroundTint="@color/light_onPrimary"
+                                android:dropDownWidth="match_parent"
+                                android:ellipsize="end"
+                                android:gravity="center"
+                                android:includeFontPadding="false"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:singleLine="true"
+                                android:textAlignment="center"
+                                android:textAllCaps="false"
+                                android:textColor="@color/black"
+                                android:textSize="16sp"
+                                app:cornerRadius="0dp"
+                                app:elevation="2dp"
+                                app:icon="@drawable/ic_drop"
+                                app:iconGravity="end"
+                                app:iconPadding="0dp"
+                                app:iconTint="@color/black"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/tv_subdivision"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:rippleColor="@color/light_primary" />
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/dark_outline"
+                                app:layout_constraintBottom_toBottomOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/input_order"
+                            android:id="@+id/input_speed"
                             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -165,12 +275,12 @@
                             android:layout_marginTop="16dp"
                             android:layout_marginEnd="32dp"
                             android:elevation="2dp"
-                            android:hint="@string/hint_order"
+                            android:hint="@string/hint_speed"
                             app:boxBackgroundColor="@color/light_onPrimary"
-                            app:startIconDrawable="@mipmap/ic_order">
+                            app:startIconDrawable="@mipmap/ic_speed">
 
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/order"
+                                android:id="@+id/speed"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:cursorVisible="true"
@@ -182,7 +292,7 @@
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/input_time"
+                            android:id="@+id/input_wait_time"
                             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -190,16 +300,16 @@
                             android:layout_marginTop="16dp"
                             android:layout_marginEnd="32dp"
                             android:elevation="2dp"
-                            android:hint="@string/hint_time_min"
+                            android:hint="@string/hint_wait_time"
                             app:boxBackgroundColor="@color/light_onPrimary"
                             app:startIconDrawable="@mipmap/ic_time">
 
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/time"
+                                android:id="@+id/wait_time"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:cursorVisible="true"
-                                android:inputType="numberDecimal"
+                                android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp" />
@@ -207,7 +317,7 @@
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/input_temperature"
+                            android:id="@+id/input_acceleration"
                             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -215,16 +325,16 @@
                             android:layout_marginTop="16dp"
                             android:layout_marginEnd="32dp"
                             android:elevation="2dp"
-                            android:hint="@string/hint_temperature"
+                            android:hint="@string/hint_acceleration"
                             app:boxBackgroundColor="@color/light_onPrimary"
-                            app:startIconDrawable="@mipmap/ic_temp">
+                            app:startIconDrawable="@mipmap/ic_acceleration">
 
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/temperature"
+                                android:id="@+id/acceleration"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:cursorVisible="true"
-                                android:inputType="numberDecimal"
+                                android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp" />
@@ -232,7 +342,7 @@
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/input_liquid_volume"
+                            android:id="@+id/input_deceleration"
                             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -240,38 +350,12 @@
                             android:layout_marginTop="16dp"
                             android:layout_marginEnd="32dp"
                             android:elevation="2dp"
-                            android:hint="@string/hint_liquid_volume"
+                            android:hint="@string/hint_deceleration"
                             app:boxBackgroundColor="@color/light_onPrimary"
-                            app:startIconDrawable="@mipmap/ic_liquid">
+                            app:startIconDrawable="@mipmap/ic_deceleration">
 
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/liquid_volume"
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:cursorVisible="true"
-                                android:inputType="numberDecimal"
-                                android:maxLength="50"
-                                android:singleLine="true"
-                                android:textSize="16sp" />
-
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/input_count"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="32dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginEnd="32dp"
-                            android:elevation="2dp"
-                            android:hint="@string/hint_count"
-                            android:visibility="gone"
-                            app:boxBackgroundColor="@color/light_onPrimary"
-                            app:startIconDrawable="@mipmap/ic_count">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/count"
+                                android:id="@+id/deceleration"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:cursorVisible="true"
@@ -283,7 +367,7 @@
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_add"
+                            android:id="@+id/btn_update"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="32dp"
@@ -291,14 +375,10 @@
                             android:layout_marginEnd="32dp"
                             android:layout_marginBottom="32dp"
                             android:backgroundTint="@color/light_primary"
-                            android:enabled="false"
-                            android:text="@string/add_ban"
+                            android:text="@string/save_config"
                             android:textColor="@color/light_onPrimary"
                             android:textSize="20sp"
                             app:cornerRadius="10dp"
-                            app:icon="@drawable/ic_add"
-                            app:iconGravity="textStart"
-                            app:iconTint="@color/light_onPrimary"
                             app:rippleColor="@color/light_error" />
 
                     </LinearLayout>
@@ -311,4 +391,6 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
 </layout>
+

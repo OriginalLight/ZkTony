@@ -54,13 +54,13 @@ class AdminFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.state.collect {
+            viewModel.event.collect {
                 when (it) {
-                    is AdminState.ChangeBar -> changeBar()
-                    is AdminState.CheckUpdate -> confirmUpdate(it.file, it.version)
-                    is AdminState.DownloadSuccess -> downloadSuccess(it.file)
-                    is AdminState.DownloadError -> downloadError()
-                    is AdminState.DownloadProgress -> downloadProgress(it.progress)
+                    is AdminEvent.ChangeBar -> changeBar()
+                    is AdminEvent.CheckUpdate -> confirmUpdate(it.file, it.version)
+                    is AdminEvent.DownloadSuccess -> downloadSuccess(it.file)
+                    is AdminEvent.DownloadError -> downloadError()
+                    is AdminEvent.DownloadProgress -> downloadProgress(it.progress)
                 }
             }
         }
@@ -87,7 +87,7 @@ class AdminFragment :
                                 .setOnMenuItemClickListener { _, _, index ->
                                     when (index) {
                                         0 -> findNavController().navigate(R.id.action_navigation_admin_to_navigation_calibration)
-                                        1 -> findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor_setting)
+                                        1 -> findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor)
                                         else -> {}
                                     }
                                     false
