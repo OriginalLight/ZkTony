@@ -21,37 +21,15 @@ class LogViewModel @Inject constructor(
     private val logDataRepository: LogDataRepository
 ) : BaseViewModel() {
 
-    private val _state = MutableSharedFlow<LogState>()
-    val state: SharedFlow<LogState> get() = _state
-    private val intent = MutableSharedFlow<LogIntent>()
-
-    init {
-        viewModelScope.launch {
-            intent.collect {
-                when (it) {
-                    is LogIntent.ChangeLogRecord -> changeLogRecord(it.start, it.end)
-                    is LogIntent.ChangeLogData -> changeLogData(it.id)
-                }
-            }
-        }
-    }
-
-    fun dispatch(intent: LogIntent) {
-        try {
-            viewModelScope.launch {
-                this@LogViewModel.intent.emit(intent)
-            }
-        } catch (_: Exception) {
-        }
-
-    }
+    private val _event = MutableSharedFlow<LogEvent>()
+    val event: SharedFlow<LogEvent> get() = _event
 
 
-    private fun changeLogRecord(start: Date, end: Date) {
+    fun changeLogRecord(start: Date, end: Date) {
         viewModelScope.launch {
             logRecordRepository.getByDate(start.getDayStart(), end.getDayEnd())
                 .collect {
-                    _state.emit(LogState.ChangeLogRecord(it))
+                    _event.emit(LogEvent.ChangeLogRecord(it))
                 }
         }
     }
@@ -59,18 +37,13 @@ class LogViewModel @Inject constructor(
     private fun changeLogData(id: String) {
         viewModelScope.launch {
             logDataRepository.getByLogId(id).collect {
-                _state.emit(LogState.ChangeLogData(it))
+                _event.emit(LogEvent.ChangeLogData(it))
             }
         }
     }
 }
 
-sealed class LogIntent {
-    data class ChangeLogRecord(val start: Date, val end: Date) : LogIntent()
-    data class ChangeLogData(val id: String) : LogIntent()
-}
-
-sealed class LogState {
-    data class ChangeLogRecord(val logRecordList: List<LogRecord>) : LogState()
-    data class ChangeLogData(val logDataList: List<LogData>) : LogState()
+sealed class LogEvent {
+    data class ChangeLogRecord(val logRecordList: List<LogRecord>) : LogEvent()
+    data class ChangeLogData(val logDataList: List<LogData>) : LogEvent()
 }

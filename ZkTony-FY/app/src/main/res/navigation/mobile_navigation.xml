@@ -17,8 +17,8 @@
         android:label="@string/title_program"
         tools:layout="@layout/fragment_program">
         <action
-            android:id="@+id/action_navigation_program_to_navigation_program_edit"
-            app:destination="@id/navigation_program_edit"
+            android:id="@+id/action_navigation_program_to_navigation_action"
+            app:destination="@id/navigation_action"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
@@ -28,12 +28,12 @@
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_program_edit"
-        android:name="com.zktony.www.ui.program.ProgramEditFragment"
+        android:id="@+id/navigation_action"
+        android:name="com.zktony.www.ui.program.ActionFragment"
         android:label="@string/title_program_edit"
-        tools:layout="@layout/fragment_program_edit">
+        tools:layout="@layout/fragment_action">
         <action
-            android:id="@+id/action_navigation_program_edit_to_navigation_program"
+            android:id="@+id/action_navigation_action_to_navigation_program"
             app:destination="@id/navigation_program"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
@@ -57,8 +57,8 @@
         android:label="@string/title_admin"
         tools:layout="@layout/fragment_admin">
         <action
-            android:id="@+id/action_navigation_admin_to_navigation_motor_setting"
-            app:destination="@id/navigation_motor_setting"
+            android:id="@+id/action_navigation_admin_to_navigation_motor"
+            app:destination="@id/navigation_motor"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
@@ -73,12 +73,12 @@
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_motor_setting"
-        android:name="com.zktony.www.ui.admin.MotorSettingFragment"
+        android:id="@+id/navigation_motor"
+        android:name="com.zktony.www.ui.admin.MotorFragment"
         android:label="@string/title_adjust"
-        tools:layout="@layout/fragment_motor_setting">
+        tools:layout="@layout/fragment_motor">
         <action
-            android:id="@+id/action_navigation_motor_setting_to_navigation_admin"
+            android:id="@+id/action_navigation_motor_to_navigation_admin"
             app:destination="@id/navigation_admin"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"

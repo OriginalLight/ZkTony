@@ -37,15 +37,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.state.collect {
+            viewModel.event.collect {
                 when (it) {
-                    is HomeState.OnSwitchProgram -> onSwitchProgram(it.index, it.module)
-                    is HomeState.OnLoadProgram -> onLoadProgram()
-                    is HomeState.OnButtonChange -> onButtonChange(it.module)
-                    is HomeState.OnRestCallBack -> onRestCallBack(it.success)
-                    is HomeState.OnPause -> onBtnPause()
-                    is HomeState.OnInsulating -> onInsulating()
-                    is HomeState.OnDashBoardChange -> onDashBoardChange(it.module)
+                    is HomeEvent.OnSwitchProgram -> onSwitchProgram(it.index, it.module)
+                    is HomeEvent.OnLoadProgram -> onLoadProgram()
+                    is HomeEvent.OnButtonChange -> onButtonChange(it.module)
+                    is HomeEvent.OnRestCallBack -> onRestCallBack(it.success)
+                    is HomeEvent.OnPause -> onBtnPause()
+                    is HomeEvent.OnInsulating -> onInsulating()
+                    is HomeEvent.OnDashBoardChange -> onDashBoardChange(it.module)
                 }
             }
         }

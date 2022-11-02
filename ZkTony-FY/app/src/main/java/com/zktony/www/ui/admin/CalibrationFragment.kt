@@ -29,9 +29,9 @@ class CalibrationFragment :
 
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.state.collect {
+            viewModel.event.collect {
                 when (it) {
-                    is CalibrationState.OnCalibrationValueChange -> onCalibrationValueChange(
+                    is CalibrationEvent.OnCalibrationValueChange -> onCalibrationValueChange(
                         it.calibration
                     )
                 }

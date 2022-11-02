@@ -46,16 +46,16 @@ class LogFragment :
     @SuppressLint("NotifyDataSetChanged")
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.state.distinctUntilChanged().collect {
+            viewModel.event.distinctUntilChanged().collect {
                 when (it) {
-                    is LogState.ChangeLogRecord -> {
+                    is LogEvent.ChangeLogRecord -> {
                         logAdapter.submitList(it.logRecordList)
                         logRecordList = it.logRecordList
                         logAdapter.currentPosition = -1
                         logAdapter.isClick = false
                     }
 
-                    is LogState.ChangeLogData -> {
+                    is LogEvent.ChangeLogData -> {
                         logDataList = it.logDataList
                     }
                 }
@@ -68,11 +68,9 @@ class LogFragment :
      */
     private fun initRecyclerView() {
         binding.rc1.adapter = logAdapter
-        viewModel.dispatch(
-            LogIntent.ChangeLogRecord(
-                Date(System.currentTimeMillis()).getDayStart(),
-                Date(System.currentTimeMillis()).getDayEnd()
-            )
+        viewModel.changeLogRecord(
+            Date(System.currentTimeMillis()).getDayStart(),
+            Date(System.currentTimeMillis()).getDayEnd()
         )
     }
 

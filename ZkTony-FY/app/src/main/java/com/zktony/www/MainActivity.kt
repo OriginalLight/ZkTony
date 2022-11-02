@@ -5,7 +5,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.zktony.www.base.BaseActivity
-import com.zktony.www.common.app.AppState
+import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.verifyHex
 import com.zktony.www.databinding.ActivityMainBinding
@@ -60,12 +60,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                 }
             }
             launch {
-                appViewModel.state.collect {
+                appViewModel.event.collect {
                     when (it) {
-                        is AppState.Sender -> {
+                        is AppEvent.Sender -> {
                             SerialPortManager.instance.sendHex(it.serialPort, it.command)
                         }
-                        is AppState.SenderText -> {
+                        is AppEvent.SenderText -> {
                             SerialPortManager.instance.sendText(it.serialPort, it.command)
                         }
                         else -> {}

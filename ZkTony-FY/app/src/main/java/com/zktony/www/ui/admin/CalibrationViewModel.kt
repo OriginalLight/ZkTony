@@ -22,8 +22,8 @@ class CalibrationViewModel @Inject constructor(
     @Inject
     lateinit var appViewModel: AppViewModel
 
-    private val _state = MutableSharedFlow<CalibrationState>()
-    val state: SharedFlow<CalibrationState> get() = _state
+    private val _event = MutableSharedFlow<CalibrationEvent>()
+    val event: SharedFlow<CalibrationEvent> get() = _event
 
     private val _uiState = MutableStateFlow(CalibrationUiState())
     val uiState: StateFlow<CalibrationUiState> get() = _uiState
@@ -37,7 +37,7 @@ class CalibrationViewModel @Inject constructor(
                             calibration = calibrationList[0]
                         )
                     }
-                    _state.emit(CalibrationState.OnCalibrationValueChange(calibrationList[0]))
+                    _event.emit(CalibrationEvent.OnCalibrationValueChange(calibrationList[0]))
                 }
             }
         }
@@ -442,8 +442,8 @@ class CalibrationViewModel @Inject constructor(
     }
 }
 
-sealed class CalibrationState {
-    data class OnCalibrationValueChange(val calibration: Calibration) : CalibrationState()
+sealed class CalibrationEvent {
+    data class OnCalibrationValueChange(val calibration: Calibration) : CalibrationEvent()
 }
 
 data class CalibrationUiState(

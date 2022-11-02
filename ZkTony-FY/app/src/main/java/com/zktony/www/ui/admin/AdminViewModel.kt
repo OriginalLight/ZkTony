@@ -11,7 +11,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.viewModelScope
 import com.zktony.gpio.Gpio
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.app.AppState
+import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.*
 import com.zktony.www.common.network.adapter.getOrNull
@@ -21,6 +21,8 @@ import com.zktony.www.common.network.download.DownloadState
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Constants
+import com.zktony.www.common.utils.Constants.DEVICE_ID
+import com.zktony.www.common.utils.Logger
 import com.zktony.www.data.model.Version
 import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.MotorRepository
@@ -46,8 +48,8 @@ class AdminViewModel @Inject constructor(
     @Inject
     lateinit var appViewModel: AppViewModel
 
-    private val _state = MutableSharedFlow<AdminState>()
-    val state: SharedFlow<AdminState> get() = _state
+    private val _event = MutableSharedFlow<AdminEvent>()
+    val event: SharedFlow<AdminEvent> get() = _event
 
     private val _uiState = MutableStateFlow(AdminUiState())
     val uiState: StateFlow<AdminUiState> get() = _uiState
@@ -55,11 +57,11 @@ class AdminViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                appViewModel.state.collect {
+                appViewModel.event.collect {
                     when (it) {
-                        is AppState.ReceiverSerialOne -> onReceiverSerialOne(it.command)
-                        is AppState.ReceiverSerialTwo -> onReceiverSerialTwo(it.command)
-                        is AppState.ReceiverSerialThree -> onReceiverSerialThree(it.command)
+                        is AppEvent.ReceiverSerialOne -> onReceiverSerialOne(it.command)
+                        is AppEvent.ReceiverSerialTwo -> onReceiverSerialTwo(it.command)
+                        is AppEvent.ReceiverSerialThree -> onReceiverSerialThree(it.command)
                         else -> {}
                     }
                 }
@@ -97,7 +99,7 @@ class AdminViewModel @Inject constructor(
                 putExtra("extra_prefs_set_back_text", "返回")
             }
             context.startActivity(intent)
-            _state.emit(AdminState.ChangeBar)
+            _event.emit(AdminEvent.ChangeBar)
         }
     }
 
@@ -139,7 +141,7 @@ class AdminViewModel @Inject constructor(
         viewModelScope.launch {
             val apk = checkLocalUpdate()
             if (apk != null) {
-                _state.emit(AdminState.CheckUpdate(apk, null))
+                _event.emit(AdminEvent.CheckUpdate(apk, null))
             } else {
                 checkRemoteUpdate(context)
             }
@@ -175,18 +177,18 @@ class AdminViewModel @Inject constructor(
             ).collect {
                 when (it) {
                     is DownloadState.Success -> {
-                        _state.emit(AdminState.DownloadSuccess(it.file))
+                        _event.emit(AdminEvent.DownloadSuccess(it.file))
                         _uiState.value = _uiState.value.copy(isUpdating = false)
                         context.installApk(it.file)
                     }
 
                     is DownloadState.Err -> {
                         _uiState.value = _uiState.value.copy(isUpdating = false)
-                        _state.emit(AdminState.DownloadError)
+                        _event.emit(AdminEvent.DownloadError)
                     }
 
                     is DownloadState.Progress -> {
-                        _state.emit(AdminState.DownloadProgress(it.progress))
+                        _event.emit(AdminEvent.DownloadProgress(it.progress))
                     }
                 }
             }
@@ -201,11 +203,11 @@ class AdminViewModel @Inject constructor(
     private fun checkRemoteUpdate(context: Context) {
         viewModelScope.launch {
             if (context.isNetworkAvailable()) {
-                val res = systemRepository.getVersionInfo(2)
+                val res = systemRepository.getVersionInfo(DEVICE_ID)
                 if (res.isSuccess) {
                     res.getOrNull()?.let {
                         if (it.versionCode > context.versionCode()) {
-                            _state.emit(AdminState.CheckUpdate(null, it))
+                            _event.emit(AdminEvent.CheckUpdate(null, it))
                         } else {
                             "已经是最新版本".showShortToast()
                         }
@@ -370,12 +372,12 @@ class AdminViewModel @Inject constructor(
     }
 }
 
-sealed class AdminState {
-    data class CheckUpdate(val file: File?, val version: Version?) : AdminState()
-    data class DownloadProgress(val progress: Int) : AdminState()
-    data class DownloadSuccess(val file: File) : AdminState()
-    object DownloadError : AdminState()
-    object ChangeBar : AdminState()
+sealed class AdminEvent {
+    data class CheckUpdate(val file: File?, val version: Version?) : AdminEvent()
+    data class DownloadProgress(val progress: Int) : AdminEvent()
+    data class DownloadSuccess(val file: File) : AdminEvent()
+    object DownloadError : AdminEvent()
+    object ChangeBar : AdminEvent()
 }
 
 data class AdminUiState(

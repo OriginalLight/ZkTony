@@ -12,15 +12,15 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.room.entity.Motor
-import com.zktony.www.databinding.FragmentMotorSettingBinding
+import com.zktony.www.databinding.FragmentMotorBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MotorSettingFragment :
-    BaseFragment<MotorSettingViewModel, FragmentMotorSettingBinding>(R.layout.fragment_motor_setting) {
+class MotorFragment :
+    BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layout.fragment_motor) {
 
-    override val viewModel: MotorSettingViewModel by viewModels()
+    override val viewModel: MotorViewModel by viewModels()
 
     private val motorAdapter by lazy { MotorAdapter() }
 
@@ -36,11 +36,11 @@ class MotorSettingFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.state.collect {
+            viewModel.event.collect {
                 when (it) {
-                    is MotorSettingState.OnDataBaseChange -> onDataBaseChange(it.motorList)
-                    is MotorSettingState.OnUpdateMessage -> onUpdateMessage(it.message)
-                    is MotorSettingState.OnMotorValueChange -> onMotorValueChange(it.motor)
+                    is MotorEvent.OnDataBaseChange -> onDataBaseChange(it.motorList)
+                    is MotorEvent.OnUpdateMessage -> onUpdateMessage(it.message)
+                    is MotorEvent.OnMotorValueChange -> onMotorValueChange(it.motor)
                 }
             }
         }
