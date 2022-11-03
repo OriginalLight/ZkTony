@@ -1,7 +1,7 @@
 package com.zktony.www.common.network.adapter
 
 import com.zktony.www.common.network.exception.ApiException
-import com.zktony.www.common.network.result.Result
+import com.zktony.www.common.network.result.NetworkResult
 
 /**
  * 接口的返回类型包装类
@@ -71,10 +71,10 @@ inline fun <T : Any> NetworkResponse<T>.guardSuccess(
     return this.data
 }
 
-fun <T : Any> NetworkResponse<T>.toResult(): Result<T> {
+fun <T : Any> NetworkResponse<T>.toResult(): NetworkResult<T> {
     return if (this is NetworkResponse.Success<T>) {
-        Result.Success(this.data)
+        NetworkResult.Success(this.data)
     } else {
-        Result.Error(exceptionOrNull())
+        NetworkResult.Error(exceptionOrNull())
     }
 }

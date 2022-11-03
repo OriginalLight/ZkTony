@@ -1,13 +1,13 @@
 package com.zktony.www.common.network.result
 
-import com.zktony.www.common.network.result.Result.Success
+import com.zktony.www.common.network.result.NetworkResult.Success
 import kotlinx.coroutines.flow.MutableStateFlow
 
-sealed class Result<out R> {
+sealed class NetworkResult<out R> {
 
-    data class Success<out T>(val data: T) : Result<T>()
-    data class Error(val throwable: Throwable?) : Result<Nothing>()
-    object Loading : Result<Nothing>()
+    data class Success<out T>(val data: T) : NetworkResult<T>()
+    data class Error(val throwable: Throwable?) : NetworkResult<Nothing>()
+    object Loading : NetworkResult<Nothing>()
 
     override fun toString(): String {
         return when (this) {
@@ -18,17 +18,17 @@ sealed class Result<out R> {
     }
 }
 
-val Result<*>.succeeded
+val NetworkResult<*>.succeeded
     get() = this is Success && data != null
 
-fun <T> Result<T>.successOr(fallback: T): T {
+fun <T> NetworkResult<T>.successOr(fallback: T): T {
     return (this as? Success<T>)?.data ?: fallback
 }
 
-val <T> Result<T>.data: T?
+val <T> NetworkResult<T>.data: T?
     get() = (this as? Success)?.data
 
-inline fun <reified T> Result<T>.updateOnSuccess(stateFlow: MutableStateFlow<T>) {
+inline fun <reified T> NetworkResult<T>.updateOnSuccess(stateFlow: MutableStateFlow<T>) {
     if (this is Success) {
         stateFlow.value = data
     }

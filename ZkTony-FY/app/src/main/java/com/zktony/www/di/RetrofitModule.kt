@@ -46,15 +46,7 @@ object RetrofitModule {
         return Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
             .client(okHttpClient)
-            .addCallAdapterFactory(NetworkResponseAdapterFactory(object : ErrorHandler {
-                override fun bizError(code: Int, msg: String) {
-                    Logger.d(msg = "bizError: code:$code - msg: $msg")
-                }
-
-                override fun otherError(throwable: Throwable) {
-                    Logger.e(msg = throwable.message.toString(), throwable = throwable)
-                }
-            }))
+            .addCallAdapterFactory(NetworkResponseAdapterFactory())
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

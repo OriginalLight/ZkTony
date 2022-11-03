@@ -10,19 +10,18 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.viewModelScope
 import com.zktony.gpio.Gpio
+import com.zktony.www.BuildConfig
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.*
-import com.zktony.www.common.network.adapter.getOrNull
-import com.zktony.www.common.network.adapter.isSuccess
 import com.zktony.www.common.network.download.DownloadManager
 import com.zktony.www.common.network.download.DownloadState
+import com.zktony.www.common.network.result.NetworkResult
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.utils.Constants.DEVICE_ID
-import com.zktony.www.common.utils.Logger
 import com.zktony.www.data.model.Version
 import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.MotorRepository
@@ -203,17 +202,22 @@ class AdminViewModel @Inject constructor(
     private fun checkRemoteUpdate(context: Context) {
         viewModelScope.launch {
             if (context.isNetworkAvailable()) {
-                val res = systemRepository.getVersionInfo(DEVICE_ID)
-                if (res.isSuccess) {
-                    res.getOrNull()?.let {
-                        if (it.versionCode > context.versionCode()) {
-                            _event.emit(AdminEvent.CheckUpdate(null, it))
-                        } else {
-                            "已经是最新版本".showShortToast()
+                systemRepository.getVersionInfo(DEVICE_ID).collect {
+                    when (it) {
+                        is NetworkResult.Loading -> {
+                            "正在检查更新".showShortToast()
+                        }
+                        is NetworkResult.Success -> {
+                            if (it.data.versionCode > BuildConfig.VERSION_CODE) {
+                                _event.emit(AdminEvent.CheckUpdate(null, it.data))
+                            } else {
+                                "已经是最新版本".showShortToast()
+                            }
+                        }
+                        is NetworkResult.Error -> {
+                            "升级接口异常请联系管理员".showShortToast()
                         }
                     }
-                } else {
-                    "升级接口异常请联系管理员".showShortToast()
                 }
             } else {
                 "请连接网络或插入升级U盘".showShortToast()
