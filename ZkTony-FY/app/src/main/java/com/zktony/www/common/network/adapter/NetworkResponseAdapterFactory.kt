@@ -1,14 +1,13 @@
 package com.zktony.www.common.network.adapter
 
+import com.zktony.www.common.utils.Logger
 import retrofit2.Call
 import retrofit2.CallAdapter
 import retrofit2.Retrofit
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-class NetworkResponseAdapterFactory(
-    private val errorHandler: ErrorHandler? = null
-) : CallAdapter.Factory() {
+class NetworkResponseAdapterFactory : CallAdapter.Factory() {
 
     override fun get(
         returnType: Type,
@@ -30,6 +29,14 @@ class NetworkResponseAdapterFactory(
         // 如果非NetworkResponse不处理
         if (getRawType(responseType) != NetworkResponse::class.java) return null
 
-        return NetworkResponseAdapter(responseType, errorHandler)
+        return NetworkResponseAdapter(responseType, object : ErrorHandler {
+            override fun bizError(code: Int, msg: String) {
+                Logger.d(msg = "bizError: code:$code - msg: $msg")
+            }
+
+            override fun otherError(throwable: Throwable) {
+                Logger.e(msg = throwable.message.toString(), throwable = throwable)
+            }
+        })
     }
 }
