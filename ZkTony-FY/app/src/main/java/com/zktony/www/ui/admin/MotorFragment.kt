@@ -5,7 +5,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.BottomMenu
-import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.R
 import com.zktony.www.adapter.MotorAdapter
 import com.zktony.www.base.BaseFragment
@@ -36,12 +35,13 @@ class MotorFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.event.collect {
-                when (it) {
-                    is MotorEvent.OnDataBaseChange -> onDataBaseChange(it.motorList)
-                    is MotorEvent.OnUpdateMessage -> onUpdateMessage(it.message)
-                    is MotorEvent.OnMotorValueChange -> onMotorValueChange(it.motor)
+            launch {
+                viewModel.motorList.collect {
+                    motorAdapter.submitList(it)
                 }
+            }
+            launch {
+                viewModel.selectedMotor.collect { onSelectedMotorChange(it) }
             }
         }
     }
@@ -52,9 +52,8 @@ class MotorFragment :
     private fun initRecyclerView() {
         binding.rcMotor.adapter = motorAdapter
         motorAdapter.setOnEditButtonClick { motor ->
-            viewModel.editMotor(motor)
+            viewModel.selectMotor(motor)
         }
-        viewModel.initMotors()
     }
 
     /**
@@ -73,7 +72,7 @@ class MotorFragment :
                 .setOnMenuItemClickListener { _, text, index ->
                     binding.btnMode.text = text
                     viewModel.motorValueChange(
-                        viewModel.uiState.value.motor.copy(
+                        viewModel.editMotor.value.copy(
                             mode = index
                         )
                     )
@@ -86,7 +85,7 @@ class MotorFragment :
                 .setOnMenuItemClickListener { _, text, _ ->
                     binding.btnSubdivision.text = text
                     viewModel.motorValueChange(
-                        viewModel.uiState.value.motor.copy(
+                        viewModel.editMotor.value.copy(
                             subdivision = text.toString().toInt()
                         )
                     )
@@ -104,7 +103,7 @@ class MotorFragment :
     private fun initEditText() {
         binding.speed.afterTextChange {
             viewModel.motorValueChange(
-                viewModel.uiState.value.motor.copy(
+                viewModel.editMotor.value.copy(
                     speed = if (it.isNotEmpty()) {
                         it.toInt()
                     } else {
@@ -115,7 +114,7 @@ class MotorFragment :
         }
         binding.acceleration.afterTextChange {
             viewModel.motorValueChange(
-                viewModel.uiState.value.motor.copy(
+                viewModel.editMotor.value.copy(
                     acceleration = if (it.isNotEmpty()) {
                         it.toInt()
                     } else {
@@ -126,7 +125,7 @@ class MotorFragment :
         }
         binding.deceleration.afterTextChange {
             viewModel.motorValueChange(
-                viewModel.uiState.value.motor.copy(
+                viewModel.editMotor.value.copy(
                     deceleration = if (it.isNotEmpty()) {
                         it.toInt()
                     } else {
@@ -137,7 +136,7 @@ class MotorFragment :
         }
         binding.waitTime.afterTextChange {
             viewModel.motorValueChange(
-                viewModel.uiState.value.motor.copy(
+                viewModel.editMotor.value.copy(
                     waitTime = if (it.isNotEmpty()) {
                         it.toInt()
                     } else {
@@ -149,18 +148,10 @@ class MotorFragment :
     }
 
     /**
-     * 更新电机列表
-     * @param motorList [List]<[Motor]>
-     */
-    private fun onDataBaseChange(motorList: List<Motor>) {
-        motorAdapter.submitList(motorList)
-    }
-
-    /**
-     * 更新电机值
+     * 选中电机
      * @param motor [Motor] 电机
      */
-    private fun onMotorValueChange(motor: Motor) {
+    private fun onSelectedMotorChange(motor: Motor) {
         binding.run {
             tvTitle.text = motor.name
             btnMode.text = if (motor.mode == 0) "增量模式" else "坐标模式"
@@ -172,11 +163,4 @@ class MotorFragment :
         }
     }
 
-    /**
-     * 更新电机回调信息
-     * @param message [String]
-     */
-    private fun onUpdateMessage(message: String) {
-        PopTip.show(message)
-    }
 }

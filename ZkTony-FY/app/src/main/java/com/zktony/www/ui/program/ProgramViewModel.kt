@@ -7,8 +7,8 @@ import com.zktony.www.common.room.entity.Program
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,10 +18,16 @@ class ProgramViewModel @Inject constructor(
     private val programRepository: ProgramRepository,
     private val actionRepository: ActionRepository
 ) : BaseViewModel() {
+    private val _programList = MutableStateFlow(emptyList<Program>())
+    val programList = _programList.asStateFlow()
 
-    private val _event = MutableSharedFlow<ProgramEvent>()
-    val event = _event.asSharedFlow()
-
+    init {
+        viewModelScope.launch {
+            programRepository.getAll().collect {
+                _programList.value = it
+            }
+        }
+    }
 
     /**
      * 添加程序
@@ -48,19 +54,4 @@ class ProgramViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 加载程序列表
-     */
-    fun loadProgramList() {
-        viewModelScope.launch {
-            programRepository.getAll().collect {
-                _event.emit(ProgramEvent.OnProgramChange(it))
-            }
-        }
-    }
-
-}
-
-sealed class ProgramEvent {
-    data class OnProgramChange(val programList: List<Program>) : ProgramEvent()
 }

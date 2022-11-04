@@ -7,10 +7,7 @@ import com.zktony.www.common.room.entity.ActionEnum
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -21,11 +18,26 @@ class ActionViewModel @Inject constructor(
     private val actionRepository: ActionRepository
 ) : BaseViewModel() {
 
-    private val _event = MutableSharedFlow<ActionEvent>()
-    val event = _event.asSharedFlow()
+    private val _actionList = MutableStateFlow(emptyList<Action>())
+    private val _action = MutableStateFlow(Action())
+    private val _buttonEnable = MutableStateFlow(false)
+    private val _programId = MutableStateFlow("None")
+    val actionList = _actionList.asStateFlow()
+    val action = _action.asStateFlow()
+    val buttonEnable = _buttonEnable.asStateFlow()
+    val programId = _programId.asStateFlow()
 
-    private val _uiState = MutableStateFlow(ActionUiState())
-    val uiState = _uiState.asStateFlow()
+    init {
+        viewModelScope.launch {
+            programId.collect {
+                if (it != "None") {
+                    actionRepository.getByProgramId(it).collect { actionList ->
+                        _actionList.value = actionList
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * 加载程序列表
@@ -33,9 +45,7 @@ class ActionViewModel @Inject constructor(
      */
     fun setProgramId(programId: String) {
         viewModelScope.launch {
-            if (programId != "None") {
-                _uiState.value = _uiState.value.copy(programId = programId)
-            }
+            _programId.value = programId
         }
     }
 
@@ -45,12 +55,12 @@ class ActionViewModel @Inject constructor(
     fun addAction() {
         viewModelScope.launch {
             actionRepository.insert(
-                _uiState.value.action.copy(
+                _action.value.copy(
                     id = UUID.randomUUID().toString(),
-                    programId = _uiState.value.programId
+                    programId = programId.value
                 )
             )
-            programRepository.updateActions(uiState.value.programId)
+            programRepository.updateActions(programId.value)
         }
     }
 
@@ -61,7 +71,7 @@ class ActionViewModel @Inject constructor(
     fun deleteAction(action: Action) {
         viewModelScope.launch {
             actionRepository.delete(action)
-            programRepository.updateActions(uiState.value.programId)
+            programRepository.updateActions(programId.value)
         }
     }
 
@@ -71,8 +81,8 @@ class ActionViewModel @Inject constructor(
      */
     fun editAction(action: Action) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(action = action)
-            _event.emit(ActionEvent.OnButtonChange(validateAction(uiState.value.action)))
+            _action.value = action
+            validateAction(action)
         }
     }
 
@@ -82,22 +92,8 @@ class ActionViewModel @Inject constructor(
      */
     fun switchAction(action: ActionEnum) {
         viewModelScope.launch {
-            _uiState.value =
-                _uiState.value.copy(action = _uiState.value.action.copy(mode = action.index))
-            _event.emit(ActionEvent.OnSwitchAction(action))
-            _event.emit(ActionEvent.OnButtonChange(validateAction(uiState.value.action)))
-        }
-    }
-
-
-    /**
-     * 加载步骤列表
-     */
-    fun loadActionList() {
-        viewModelScope.launch {
-            actionRepository.getByProgramId(uiState.value.programId).collect {
-                _event.emit(ActionEvent.OnActionChange(it))
-            }
+            _action.value = _action.value.copy(mode = action.index)
+            validateAction(this@ActionViewModel.action.value)
         }
     }
 
@@ -106,8 +102,8 @@ class ActionViewModel @Inject constructor(
      * @param action [Action] 步骤
      * @return [Boolean] 是否有效
      */
-    private fun validateAction(action: Action): Boolean {
-        return action.order > 0
+    private fun validateAction(action: Action) {
+        _buttonEnable.value = action.order > 0
                 && action.time > 0f
                 && action.temperature > 0
                 && action.liquidVolume > 0
@@ -115,15 +111,3 @@ class ActionViewModel @Inject constructor(
     }
 
 }
-
-
-sealed class ActionEvent {
-    data class OnSwitchAction(val action: ActionEnum) : ActionEvent()
-    data class OnActionChange(val actionList: List<Action>) : ActionEvent()
-    data class OnButtonChange(val enable: Boolean) : ActionEvent()
-}
-
-data class ActionUiState(
-    val programId: String = "",
-    val action: Action = Action()
-)

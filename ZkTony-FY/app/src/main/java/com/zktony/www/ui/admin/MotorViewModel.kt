@@ -1,6 +1,7 @@
 package com.zktony.www.ui.admin
 
 import androidx.lifecycle.viewModelScope
+import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.Motor
@@ -8,10 +9,7 @@ import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.serialport.getSerialPortEnum
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,22 +21,19 @@ class MotorViewModel @Inject constructor(
     @Inject
     lateinit var appViewModel: AppViewModel
 
-    private val _event = MutableSharedFlow<MotorEvent>()
-    val event = _event.asSharedFlow()
+    private val _motorList = MutableStateFlow(emptyList<Motor>())
+    private val _editMotor = MutableStateFlow(Motor())
+    private val _selectedMotor = MutableStateFlow(Motor())
+    val motorList = _motorList.asStateFlow()
+    val editMotor = _editMotor.asStateFlow()
+    val selectedMotor = _selectedMotor.asStateFlow()
 
-    private val _uiState = MutableStateFlow(MotorUiState())
-    val uiState = _uiState.asStateFlow()
-
-    /**
-     * 初始化电机
-     */
-    fun initMotors() {
+    init {
         viewModelScope.launch {
             motorRepository.getAll().collect { motors ->
-                _uiState.value =
-                    _uiState.value.copy(motor = if (_uiState.value.motor.name.isEmpty()) motors.first() else _uiState.value.motor)
-                _event.emit(MotorEvent.OnMotorValueChange(uiState.value.motor))
-                _event.emit(MotorEvent.OnDataBaseChange(motors))
+                _motorList.value = motors
+                _editMotor.value = if (editMotor.value.name.isEmpty()) motors.first() else editMotor.value
+                _selectedMotor.value = if (selectedMotor.value.name.isEmpty()) motors.first() else selectedMotor.value
             }
         }
     }
@@ -48,18 +43,15 @@ class MotorViewModel @Inject constructor(
      * @param motor [Motor]
      */
     fun motorValueChange(motor: Motor) {
-        _uiState.value = _uiState.value.copy(motor = motor)
+        _editMotor.value = motor
     }
 
     /**
      * 编辑电机
      * @param motor [Motor]
      */
-    fun editMotor(motor: Motor) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(motor = motor)
-            _event.emit(MotorEvent.OnMotorValueChange(motor))
-        }
+    fun selectMotor(motor: Motor) {
+        _selectedMotor.value = motor
     }
 
     /**
@@ -67,17 +59,16 @@ class MotorViewModel @Inject constructor(
      */
     fun updateMotor() {
         viewModelScope.launch {
-            val motor = uiState.value.motor
-            if (validateMotor(motor)) {
-                motorRepository.update(motor)
+            if (validateMotor(editMotor.value)) {
+                motorRepository.update(editMotor.value)
                 appViewModel.sender(
-                    getSerialPortEnum(motor.board),
+                    getSerialPortEnum(editMotor.value.board),
                     Command(
                         parameter = "04",
-                        data = motor.toHex()
+                        data = editMotor.value.toHex()
                     ).toHex()
                 )
-                _event.emit(MotorEvent.OnUpdateMessage("更新成功"))
+                PopTip.show("更新成功")
             }
         }
     }
@@ -90,19 +81,19 @@ class MotorViewModel @Inject constructor(
     private fun validateMotor(motor: Motor): Boolean {
         if (motor.speed <= 0) {
             viewModelScope.launch {
-                _event.emit(MotorEvent.OnUpdateMessage("速度不能小于0"))
+                PopTip.show("速度不能小于0")
             }
             return false
         }
         if (motor.acceleration > 100 || motor.acceleration < 10) {
             viewModelScope.launch {
-                _event.emit(MotorEvent.OnUpdateMessage("加速度范围10-100"))
+                PopTip.show("加速度范围为10-100")
             }
             return false
         }
         if (motor.deceleration > 100 || motor.deceleration < 10) {
             viewModelScope.launch {
-                _event.emit(MotorEvent.OnUpdateMessage("减速度范围10-100"))
+                PopTip.show("减速度范围为10-100")
             }
             return false
         }
@@ -110,14 +101,3 @@ class MotorViewModel @Inject constructor(
         return true
     }
 }
-
-
-sealed class MotorEvent {
-    data class OnDataBaseChange(val motorList: List<Motor>) : MotorEvent()
-    data class OnUpdateMessage(val message: String) : MotorEvent()
-    data class OnMotorValueChange(val motor: Motor) : MotorEvent()
-}
-
-data class MotorUiState(
-    val motor: Motor = Motor(),
-)

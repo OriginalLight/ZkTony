@@ -29,12 +29,8 @@ class CalibrationFragment :
 
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.event.collect {
-                when (it) {
-                    is CalibrationEvent.OnCalibrationValueChange -> onCalibrationValueChange(
-                        it.calibration
-                    )
-                }
+            viewModel.calibration.collect {
+                onCalibrationValueChange(it)
             }
         }
     }
@@ -143,13 +139,13 @@ class CalibrationFragment :
      * 初始化编辑框
      */
     private fun initEditText() {
-        val calibration = viewModel.uiState.value.calibration
+        val calibration = viewModel.calibration.value
         binding.run {
             wasteTankPosition.run {
                 setText(calibration.wasteTankPosition.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             wasteTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -159,7 +155,7 @@ class CalibrationFragment :
                 setText(calibration.wasteTankHeight.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             wasteTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -169,7 +165,7 @@ class CalibrationFragment :
                 setText(calibration.washTankPosition.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             washTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -179,7 +175,7 @@ class CalibrationFragment :
                 setText(calibration.washTankHeight.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             washTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -189,7 +185,7 @@ class CalibrationFragment :
                 setText(calibration.blockingLiquidTankPosition.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             blockingLiquidTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -199,7 +195,7 @@ class CalibrationFragment :
                 setText(calibration.blockingLiquidTankHeight.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             blockingLiquidTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -209,7 +205,7 @@ class CalibrationFragment :
                 setText(calibration.antibodyOneTankPosition.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             antibodyOneTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -219,7 +215,7 @@ class CalibrationFragment :
                 setText(calibration.antibodyOneTankHeight.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             antibodyOneTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -229,7 +225,7 @@ class CalibrationFragment :
                 setText(calibration.recycleAntibodyOneTankHeight.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             recycleAntibodyOneTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -239,7 +235,7 @@ class CalibrationFragment :
                 setText(calibration.antibodyTwoTankPosition.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             antibodyTwoTankPosition = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -249,7 +245,7 @@ class CalibrationFragment :
                 setText(calibration.antibodyTwoTankHeight.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             antibodyTwoTankHeight = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -259,7 +255,7 @@ class CalibrationFragment :
                 setText(calibration.yMotorDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             yMotorDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -269,7 +265,7 @@ class CalibrationFragment :
                 setText(calibration.zMotorDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             zMotorDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -279,7 +275,7 @@ class CalibrationFragment :
                 setText(calibration.pumpOneDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             pumpOneDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -289,7 +285,7 @@ class CalibrationFragment :
                 setText(calibration.pumpTwoDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             pumpTwoDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -299,7 +295,7 @@ class CalibrationFragment :
                 setText(calibration.pumpThreeDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             pumpThreeDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -309,7 +305,7 @@ class CalibrationFragment :
                 setText(calibration.pumpFourDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             pumpFourDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -319,7 +315,7 @@ class CalibrationFragment :
                 setText(calibration.pumpFiveDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             pumpFiveDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
@@ -329,7 +325,7 @@ class CalibrationFragment :
                 setText(calibration.drainDistance.toString().removeZero())
                 afterTextChange {
                     viewModel.calibrationValueChange(
-                        viewModel.uiState.value.calibration.copy(
+                        viewModel.calibration.value.copy(
                             drainDistance = if (it.isNotEmpty()) it.toFloat() else 0f
                         )
                     )
