@@ -10,7 +10,8 @@ import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import com.zktony.www.serialport.protocol.CommandBlock
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,22 +23,14 @@ class CalibrationViewModel @Inject constructor(
     @Inject
     lateinit var appViewModel: AppViewModel
 
-    private val _event = MutableSharedFlow<CalibrationEvent>()
-    val event = _event.asSharedFlow()
-
-    private val _uiState = MutableStateFlow(CalibrationUiState())
-    val uiState = _uiState.asStateFlow()
+    private val _calibration = MutableStateFlow(Calibration())
+    val calibration = _calibration.asStateFlow()
 
     init {
         viewModelScope.launch {
             calibrationRepository.getCalibration().collect { calibrationList ->
                 if (calibrationList.isNotEmpty()) {
-                    _uiState.update {
-                        uiState.value.copy(
-                            calibration = calibrationList[0]
-                        )
-                    }
-                    _event.emit(CalibrationEvent.OnCalibrationValueChange(calibrationList[0]))
+                    _calibration.value = calibrationList.first()
                 }
             }
         }
@@ -49,7 +42,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun calibrationValueChange(calibration: Calibration) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(calibration = calibration)
+            _calibration.value = calibration
         }
     }
 
@@ -58,7 +51,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun updateCalibration() {
         viewModelScope.launch {
-            calibrationRepository.update(uiState.value.calibration)
+            calibrationRepository.update(calibration.value)
         }
     }
 
@@ -68,7 +61,7 @@ class CalibrationViewModel @Inject constructor(
     fun toWasteTank() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
-            val calibration = uiState.value.calibration
+            val calibration = calibration.value
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -87,7 +80,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun wasteTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
-        val calibration = uiState.value.calibration
+        val calibration = calibration.value
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -109,7 +102,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun wasteTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
-        val calibration = uiState.value.calibration
+        val calibration = calibration.value
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -129,7 +122,7 @@ class CalibrationViewModel @Inject constructor(
     fun toWashTank() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
-            val calibration = uiState.value.calibration
+            val calibration = calibration.value
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -148,7 +141,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun washTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
-        val calibration = uiState.value.calibration
+        val calibration = calibration.value
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -170,7 +163,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun washTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
-        val calibration = uiState.value.calibration
+        val calibration = calibration.value
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -190,7 +183,7 @@ class CalibrationViewModel @Inject constructor(
     fun toBlockingLiquidTank() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
-            val calibration = uiState.value.calibration
+            val calibration = calibration.value
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -209,7 +202,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun blockingLiquidTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
-        val calibration = uiState.value.calibration
+        val calibration = calibration.value
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -231,7 +224,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun blockingLiquidTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
-        val calibration = uiState.value.calibration
+        val calibration = calibration.value
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -251,7 +244,7 @@ class CalibrationViewModel @Inject constructor(
     fun toAntibodyOneTank() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
-            val calibration = uiState.value.calibration
+            val calibration = calibration.value
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -270,7 +263,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun antibodyOneTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
-        val calibration = uiState.value.calibration
+        val calibration = calibration.value
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -303,7 +296,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun antibodyOneTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
-        val calibration = uiState.value.calibration
+        val calibration = calibration.value
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -323,7 +316,7 @@ class CalibrationViewModel @Inject constructor(
     fun toAntibodyTwoTank() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
-            val calibration = uiState.value.calibration
+            val calibration = calibration.value
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -342,7 +335,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun antibodyTwoTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
-        val calibration = uiState.value.calibration
+        val calibration = calibration.value
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -364,7 +357,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun antibodyTwoTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
-        val calibration = uiState.value.calibration
+        val calibration = calibration.value
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
@@ -441,12 +434,4 @@ class CalibrationViewModel @Inject constructor(
         }
     }
 }
-
-sealed class CalibrationEvent {
-    data class OnCalibrationValueChange(val calibration: Calibration) : CalibrationEvent()
-}
-
-data class CalibrationUiState(
-    val calibration: Calibration = Calibration()
-)
 

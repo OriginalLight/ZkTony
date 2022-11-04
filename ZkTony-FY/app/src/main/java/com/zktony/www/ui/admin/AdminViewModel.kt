@@ -1,6 +1,5 @@
 package com.zktony.www.ui.admin
 
-import android.content.Context
 import android.content.Intent
 import android.provider.Settings
 import androidx.datastore.core.DataStore
@@ -15,6 +14,7 @@ import com.zktony.www.BuildConfig
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
+import com.zktony.www.common.app.CommonApplicationProxy
 import com.zktony.www.common.extension.*
 import com.zktony.www.common.network.download.DownloadManager
 import com.zktony.www.common.network.download.DownloadState
@@ -32,7 +32,10 @@ import com.zktony.www.serialport.getSerialPortEnum
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -48,11 +51,12 @@ class AdminViewModel @Inject constructor(
     @Inject
     lateinit var appViewModel: AppViewModel
 
-    private val _event = MutableSharedFlow<AdminEvent>()
-    val event = _event.asSharedFlow()
-
-    private val _uiState = MutableStateFlow(AdminUiState())
-    val uiState = _uiState.asStateFlow()
+    private val _file = MutableStateFlow<File?>(null)
+    private val _version = MutableStateFlow<Version?>(null)
+    private val _progress = MutableStateFlow(0)
+    val file = _file.asStateFlow()
+    val version = _version.asStateFlow()
+    val progress = _progress.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -87,9 +91,8 @@ class AdminViewModel @Inject constructor(
 
     /**
      * wifi设置
-     * @param context [Context]
      */
-    fun wifiSetting(context: Context) {
+    fun wifiSetting() {
         viewModelScope.launch {
             val intent = Intent(Settings.ACTION_WIFI_SETTINGS).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -98,17 +101,17 @@ class AdminViewModel @Inject constructor(
                 putExtra("extra_prefs_set_next_text", "完成")
                 putExtra("extra_prefs_set_back_text", "返回")
             }
-            context.startActivity(intent)
-            _event.emit(AdminEvent.ChangeBar)
+            CommonApplicationProxy.application.startActivity(intent)
+            delay(200L)
+            changeBar(true)
         }
     }
 
     /**
      * 导航栏切换
      * @param bar [Boolean]
-     * @param context [Context]
      */
-    fun changeBar(bar: Boolean, context: Context) {
+    fun changeBar(bar: Boolean) {
         viewModelScope.launch {
             dataStore.edit { preferences ->
                 preferences[booleanPreferencesKey(Constants.BAR)] = bar
@@ -118,7 +121,7 @@ class AdminViewModel @Inject constructor(
             action = "ACTION_SHOW_NAVBAR"
             putExtra("cmd", if (bar) "show" else "hide")
         }
-        context.sendBroadcast(intent)
+        CommonApplicationProxy.application.sendBroadcast(intent)
     }
 
     /**
@@ -130,65 +133,48 @@ class AdminViewModel @Inject constructor(
             dataStore.edit { preferences ->
                 preferences[floatPreferencesKey(Constants.TEMP)] = temp
             }
+            PopTip.show("设置成功")
         }
     }
 
     /**
      * 检查更新
-     * @param context [Context]
      */
-    fun checkUpdate(context: Context) {
+    fun checkUpdate() {
         viewModelScope.launch {
             val apk = checkLocalUpdate()
             if (apk != null) {
-                _event.emit(AdminEvent.CheckUpdate(apk, null))
+                _file.value = apk
             } else {
-                checkRemoteUpdate(context)
+                checkRemoteUpdate()
             }
         }
     }
 
     /**
-     * 更新 有本地文件就进行本地更新否则下载远程更新
-     * @param context [Context]
-     * @param file [File]
-     * @param version [Version]
-     */
-    fun doUpdate(context: Context, file: File?, version: Version?) {
-        file?.run {
-            context.installApk(this)
-        } ?: version?.run {
-            _uiState.value = _uiState.value.copy(isUpdating = true)
-            downloadApk(context, this)
-        }
-    }
-
-    /**
      *  下载apk
-     *  @param context [Context]
      *  @param version [Version]
      */
-    private fun downloadApk(context: Context, version: Version) {
+    fun doRemoteUpdate(version: Version) {
         viewModelScope.launch {
             PopTip.show("开始下载")
             DownloadManager.download(
                 version.url,
-                File(context.getExternalFilesDir(null), "update.apk")
+                File(CommonApplicationProxy.application.getExternalFilesDir(null), "update.apk")
             ).collect {
                 when (it) {
                     is DownloadState.Success -> {
-                        _event.emit(AdminEvent.DownloadSuccess(it.file))
-                        _uiState.value = _uiState.value.copy(isUpdating = false)
-                        context.installApk(it.file)
+                        _progress.value = 0
+                        CommonApplicationProxy.application.installApk(it.file)
                     }
 
                     is DownloadState.Err -> {
-                        _uiState.value = _uiState.value.copy(isUpdating = false)
-                        _event.emit(AdminEvent.DownloadError)
+                        _progress.value = 0
+                        PopTip.show("下载失败,请重试!").showLong()
                     }
 
                     is DownloadState.Progress -> {
-                        _event.emit(AdminEvent.DownloadProgress(it.progress))
+                        _progress.value = it.progress
                     }
                 }
             }
@@ -198,16 +184,15 @@ class AdminViewModel @Inject constructor(
 
     /**
      * 获取版本信息
-     * @param context [Context]
      */
-    private fun checkRemoteUpdate(context: Context) {
+    private fun checkRemoteUpdate() {
         viewModelScope.launch {
-            if (context.isNetworkAvailable()) {
+            if (CommonApplicationProxy.application.isNetworkAvailable()) {
                 systemRepository.getVersionInfo(DEVICE_ID).collect {
                     when (it) {
                         is NetworkResult.Success -> {
                             if (it.data.versionCode > BuildConfig.VERSION_CODE) {
-                                _event.emit(AdminEvent.CheckUpdate(null, it.data))
+                                _version.value = it.data
                             } else {
                                 PopTip.show("已经是最新版本")
                             }
@@ -374,15 +359,3 @@ class AdminViewModel @Inject constructor(
         }
     }
 }
-
-sealed class AdminEvent {
-    data class CheckUpdate(val file: File?, val version: Version?) : AdminEvent()
-    data class DownloadProgress(val progress: Int) : AdminEvent()
-    data class DownloadSuccess(val file: File) : AdminEvent()
-    object DownloadError : AdminEvent()
-    object ChangeBar : AdminEvent()
-}
-
-data class AdminUiState(
-    val isUpdating: Boolean = false,
-)

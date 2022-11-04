@@ -26,7 +26,6 @@ import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.model.Version
 import com.zktony.www.databinding.FragmentAdminBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -52,15 +51,38 @@ class AdminFragment :
     /**
      * 初始化观察者
      */
+    @SuppressLint("SetTextI18n")
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.event.collect {
-                when (it) {
-                    is AdminEvent.ChangeBar -> changeBar()
-                    is AdminEvent.CheckUpdate -> confirmUpdate(it.file, it.version)
-                    is AdminEvent.DownloadSuccess -> downloadSuccess(it.file)
-                    is AdminEvent.DownloadError -> downloadError()
-                    is AdminEvent.DownloadProgress -> downloadProgress(it.progress)
+            launch {
+                viewModel.file.collect {
+                    it?.let { showLocalUpdate(it) }
+                }
+            }
+            launch {
+                viewModel.version.collect {
+                    it?.let { showRemoteUpdate(it) }
+                }
+            }
+            launch {
+                viewModel.progress.collect { progress ->
+                    binding.progress.run {
+                        if (progress == 0) {
+                            visibility = View.GONE
+                        } else {
+                            visibility = View.VISIBLE
+                            setProgress(progress)
+                        }
+                    }
+                    binding.tvUpdate.run {
+                        if (progress == 0) {
+                            text = "检查更新"
+                            setTextColor(ContextCompat.getColor(context, R.color.dark_outline))
+                        } else {
+                            text = "$progress%"
+                            setTextColor(ContextCompat.getColor(context, R.color.green))
+                        }
+                    }
                 }
             }
         }
@@ -103,17 +125,17 @@ class AdminFragment :
         binding.btnWifi.run {
             this.clickScale()
             this.setOnClickListener {
-                viewModel.changeBar(true, requireContext())
-                viewModel.wifiSetting(requireContext())
+                viewModel.changeBar(true)
+                viewModel.wifiSetting()
             }
         }
         binding.btnUpdate.run {
             this.clickScale()
             this.setOnClickListener {
-                if (viewModel.uiState.value.isUpdating) {
+                if (viewModel.progress.value > 0) {
                     PopTip.show("正在更新中")
                 } else {
-                    viewModel.checkUpdate(requireContext())
+                    viewModel.checkUpdate()
                 }
             }
         }
@@ -170,7 +192,7 @@ class AdminFragment :
         binding.swBar.run {
             this.isChecked = appViewModel.settingState.value.bar
             setOnCheckedChangeListener { _, isChecked ->
-                viewModel.changeBar(isChecked, requireContext())
+                viewModel.changeBar(isChecked)
             }
         }
     }
@@ -202,106 +224,54 @@ class AdminFragment :
     }
 
     /**
-     * 更新导航栏开关
+     * 显示本地更新
+     * @param file [File]
      */
-    private fun changeBar() {
-        lifecycleScope.launch {
-            delay(200L)
-            binding.swBar.isChecked = appViewModel.settingState.value.bar
-        }
+    private fun showLocalUpdate(file: File) {
+        CustomDialog.build()
+            .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_update_dialog) {
+                override fun onBind(dialog: CustomDialog, v: View) {
+                    val title = v.findViewById<TextView>(R.id.title)
+                    val message = v.findViewById<TextView>(R.id.message)
+                    val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
+                    val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
+                    title.text = "发现本地新版本"
+                    message.text = "是否更新？"
+                    btnOk.setOnClickListener {
+                        requireContext().installApk(file)
+                        dialog.dismiss()
+                    }
+                    btnCancel.setOnClickListener { dialog.dismiss() }
+                }
+            })
+            .setMaskColor(Color.parseColor("#4D000000"))
+            .show()
     }
 
     /**
-     * 确认更新
-     * @param file [File]
+     * 显示更新
      * @param version [Version]
      */
-    private fun confirmUpdate(file: File?, version: Version?) {
-        file?.run {
-            CustomDialog.build()
-                .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_update_dialog) {
-                    override fun onBind(dialog: CustomDialog, v: View) {
-                        val title = v.findViewById<TextView>(R.id.title)
-                        val message = v.findViewById<TextView>(R.id.message)
-                        val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
-                        val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
-                        title.text = "发现本地新版本"
-                        message.text = "是否更新？"
-                        btnOk.setOnClickListener {
-                            viewModel.doUpdate(
-                                requireContext(),
-                                this@run,
-                                null
-                            )
-                            dialog.dismiss()
-                        }
-                        btnCancel.setOnClickListener { dialog.dismiss() }
+    private fun showRemoteUpdate(version: Version) {
+        CustomDialog.build()
+            .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_update_dialog) {
+                @SuppressLint("SetTextI18n")
+                override fun onBind(dialog: CustomDialog, v: View) {
+                    val title = v.findViewById<TextView>(R.id.title)
+                    val message = v.findViewById<TextView>(R.id.message)
+                    val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
+                    val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
+                    title.text = "发现在线新版本"
+                    message.text = version.description + "\n是否升级？"
+                    btnOk.setOnClickListener {
+                        viewModel.doRemoteUpdate(version)
+                        dialog.dismiss()
                     }
-                })
-                .setMaskColor(Color.parseColor("#4D000000"))
-                .show()
-        } ?: version?.run {
-            CustomDialog.build()
-                .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_update_dialog) {
-                    @SuppressLint("SetTextI18n")
-                    override fun onBind(dialog: CustomDialog, v: View) {
-                        val title = v.findViewById<TextView>(R.id.title)
-                        val message = v.findViewById<TextView>(R.id.message)
-                        val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
-                        val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
-                        title.text = "发现在线新版本"
-                        message.text = this@run.description + "\n是否升级？"
-                        btnOk.setOnClickListener {
-                            viewModel.doUpdate(requireContext(), null, this@run)
-                            dialog.dismiss()
-                        }
-                        btnCancel.setOnClickListener { dialog.dismiss() }
-                    }
-                })
-                .setMaskColor(Color.parseColor("#4D000000"))
-                .show()
-        }
-    }
-
-    /**
-     * 更新成功
-     * @param file [File]
-     */
-    private fun downloadSuccess(file: File) {
-        binding.progress.visibility = View.INVISIBLE
-        binding.tvUpdate.run {
-            text = "检查更新"
-            setTextColor(ContextCompat.getColor(context, R.color.dark_outline))
-        }
-        requireContext().installApk(file)
-    }
-
-    /**
-     * 更新失败
-     */
-    private fun downloadError() {
-        binding.progress.visibility = View.INVISIBLE
-        PopTip.show("下载失败,请重试!").showLong()
-    }
-
-    /**
-     * 更新进度
-     * @param progress [Int]
-     */
-    @SuppressLint("SetTextI18n")
-    private fun downloadProgress(progress: Int) {
-        binding.progress.run {
-            if (this.visibility != View.VISIBLE) {
-                this.visibility = View.VISIBLE
-            }
-            if (this.progress != progress) {
-                this.progress = progress
-            }
-        }
-        binding.tvUpdate.run {
-            setTextColor(ContextCompat.getColor(context, R.color.green))
-            text = "$progress%"
-        }
+                    btnCancel.setOnClickListener { dialog.dismiss() }
+                }
+            })
+            .setMaskColor(Color.parseColor("#4D000000"))
+            .show()
     }
 
 }

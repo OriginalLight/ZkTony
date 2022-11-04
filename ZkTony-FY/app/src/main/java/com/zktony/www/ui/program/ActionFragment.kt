@@ -13,12 +13,11 @@ import com.zktony.www.adapter.ActionAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.ActionEnum
 import com.zktony.www.common.room.entity.getActionEnum
+import com.zktony.www.common.utils.Logger
 import com.zktony.www.databinding.FragmentActionBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -41,11 +40,34 @@ class ActionFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.event.distinctUntilChanged().collect {
-                when (it) {
-                    is ActionEvent.OnSwitchAction -> onSwitchAction(it.action)
-                    is ActionEvent.OnActionChange -> onActionChange(it.actionList)
-                    is ActionEvent.OnButtonChange -> onButtonChange(it.enable)
+            launch {
+                viewModel.actionList.collect {
+                    actionAdapter.submitList(it)
+                }
+            }
+            launch {
+                viewModel.buttonEnable.collect {
+                    binding.btnAdd.run {
+                        isEnabled = it
+                        text =
+                            if (it) resources.getString(R.string.add)
+                            else resources.getString(R.string.add_ban)
+                    }
+                }
+            }
+            launch {
+                viewModel.action.collect {
+                    if (getActionEnum(it.mode) == ActionEnum.WASHING) {
+                        binding.run {
+                            inputCount.visibility = View.VISIBLE
+                            inputTime.hint = resources.getString(R.string.hint_time_min)
+                        }
+                    } else {
+                        binding.run {
+                            inputCount.visibility = View.GONE
+                            inputTime.hint = resources.getString(R.string.hint_time_hour)
+                        }
+                    }
                 }
             }
         }
@@ -60,11 +82,13 @@ class ActionFragment :
             PopTip.show("已删除")
             viewModel.deleteAction(it)
         }
-        arguments?.run {
-            val programId = ActionFragmentArgs.fromBundle(this).programId
-            viewModel.setProgramId(programId)
+        arguments?.let {
+            ActionFragmentArgs.fromBundle(it).programId.run {
+                if (this != "None") {
+                    viewModel.setProgramId(this)
+                }
+            }
         }
-        viewModel.loadActionList()
     }
 
     /**
@@ -80,9 +104,8 @@ class ActionFragment :
         binding.btnAdd.setOnClickListener {
             viewModel.addAction()
         }
-        val action = viewModel.uiState.value.action
         binding.btnAction.run {
-            text = getActionEnum(action.mode).value
+            text = getActionEnum(viewModel.action.value.mode).value
             setOnClickListener {
                 val menuList = ActionEnum.values().map { it.value }
                 BottomMenu.show(menuList)
@@ -117,81 +140,39 @@ class ActionFragment :
     private fun initEditText() {
         binding.order.afterTextChange {
             viewModel.editAction(
-                viewModel.uiState.value.action.copy(
+                viewModel.action.value.copy(
                     order = if (it.isNotEmpty()) it.toInt() else 0
                 )
             )
         }
         binding.time.afterTextChange {
             viewModel.editAction(
-                viewModel.uiState.value.action.copy(
+                viewModel.action.value.copy(
                     time = if (it.isNotEmpty()) it.toFloat() else 0f
                 )
             )
         }
         binding.temperature.afterTextChange {
             viewModel.editAction(
-                viewModel.uiState.value.action.copy(
+                viewModel.action.value.copy(
                     temperature = if (it.isNotEmpty()) it.toFloat() else 0f
                 )
             )
         }
         binding.liquidVolume.afterTextChange {
             viewModel.editAction(
-                viewModel.uiState.value.action.copy(
+                viewModel.action.value.copy(
                     liquidVolume = if (it.isNotEmpty()) it.toFloat() else 0f
                 )
             )
         }
         binding.count.afterTextChange {
             viewModel.editAction(
-                viewModel.uiState.value.action.copy(
+                viewModel.action.value.copy(
                     count = if (it.isNotEmpty()) it.toInt() else 0
                 )
             )
 
-        }
-        onSwitchAction(getActionEnum(viewModel.uiState.value.action.mode))
-    }
-
-    /**
-     * 切换Action操作
-     * @param action [ActionEnum]
-     */
-    private fun onSwitchAction(action: ActionEnum) {
-        if (action == ActionEnum.WASHING) {
-            binding.run {
-                inputCount.visibility = View.VISIBLE
-                inputTime.hint = resources.getString(R.string.hint_time_min)
-            }
-        } else {
-            binding.run {
-                inputCount.visibility = View.GONE
-                inputTime.hint = resources.getString(R.string.hint_time_hour)
-            }
-        }
-    }
-
-    /**
-     * Action列表变化
-     * @param actionList [List]<[Action]> Action列表
-     */
-    private fun onActionChange(actionList: List<Action>) {
-        actionAdapter.submitList(actionList)
-    }
-
-    /**
-     * 按钮状态变化
-     * @param enable [Boolean] 是否可用
-     */
-    private fun onButtonChange(enable: Boolean) {
-        binding.btnAdd.run {
-            this.isEnabled = enable
-            if (enable) {
-                this.text = resources.getString(R.string.add)
-            } else {
-                this.text = resources.getString(R.string.add_ban)
-            }
         }
     }
 

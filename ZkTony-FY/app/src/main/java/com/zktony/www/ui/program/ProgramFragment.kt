@@ -40,10 +40,8 @@ class ProgramFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.event.distinctUntilChanged().collect {
-                when (it) {
-                    is ProgramEvent.OnProgramChange -> onProgramChange(it.programList)
-                }
+            viewModel.programList.collect {
+                programAdapter.submitList(it)
             }
         }
     }
@@ -71,7 +69,6 @@ class ProgramFragment :
                 false
             }
         }
-        viewModel.loadProgramList()
     }
 
     /**
@@ -95,14 +92,6 @@ class ProgramFragment :
                     .show()
             }
         }
-    }
-
-    /**
-     * 改变程序列表
-     * @param programList [List]<[Program]> 程序列表
-     */
-    private fun onProgramChange(programList: List<Program>) {
-        programAdapter.submitList(programList)
     }
 
 }

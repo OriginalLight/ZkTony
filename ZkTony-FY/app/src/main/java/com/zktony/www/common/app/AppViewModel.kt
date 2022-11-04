@@ -36,7 +36,7 @@ class AppViewModel @Inject constructor(
     val event: SharedFlow<AppEvent> get() = _event
 
     private val _settingState = MutableStateFlow(SettingState())
-    val settingState: StateFlow<SettingState> get() = _settingState
+    val settingState = _settingState.asStateFlow()
 
     init {
         viewModelScope.launch {
