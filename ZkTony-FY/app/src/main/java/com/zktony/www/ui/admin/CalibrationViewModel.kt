@@ -23,10 +23,10 @@ class CalibrationViewModel @Inject constructor(
     lateinit var appViewModel: AppViewModel
 
     private val _event = MutableSharedFlow<CalibrationEvent>()
-    val event: SharedFlow<CalibrationEvent> get() = _event
+    val event = _event.asSharedFlow()
 
     private val _uiState = MutableStateFlow(CalibrationUiState())
-    val uiState: StateFlow<CalibrationUiState> get() = _uiState
+    val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {

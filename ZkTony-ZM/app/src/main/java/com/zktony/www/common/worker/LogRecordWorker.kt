@@ -6,10 +6,12 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.common.network.adapter.isSuccess
-import com.zktony.www.data.repository.LogRecordRespository
+import com.zktony.www.common.result.NetworkResult
+import com.zktony.www.data.repository.LogRecordRepository
 import com.zktony.www.data.repository.LogRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -24,27 +26,28 @@ class LogRecordWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     @Inject
-    lateinit var logRecordRepository: LogRecordRespository
+    lateinit var logRecordRepository: LogRecordRepository
 
     @Inject
     lateinit var logRepository: LogRepository
 
     override suspend fun doWork(): Result {
         try {
-            logRecordRepository.withoutUpload().first().let {
-                if (it.isEmpty()) {
+            logRecordRepository.withoutUpload().first().let { logs ->
+                if (logs.isEmpty()) {
                     Logger.d("LogRecordWorker", "上传日志为空")
                     return Result.success()
                 }
-                val res = logRepository.uploadLogRecords(it)
-                if (res.isSuccess) {
-                    it.forEach { logRecord ->
-                        logRecord.upload = 1
+                logRepository.uploadLogRecords(logs).collect { res ->
+                    when(res) {
+                        is NetworkResult.Success -> {
+                            logRecordRepository.updateBatch(logs.map { it.copy(upload = 1) })
+                        }
+                        is NetworkResult.Error -> {
+                            Logger.d("LogRecordWorker", "上传日志失败")
+                        }
+                        else -> {}
                     }
-                    logRecordRepository.updateBatch(it)
-                } else {
-                    Logger.e("LogRecordWorker", "上传日志失败")
-                    return Result.failure()
                 }
             }
             return Result.success()

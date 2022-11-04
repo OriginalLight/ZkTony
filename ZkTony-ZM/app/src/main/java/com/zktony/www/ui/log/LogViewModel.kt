@@ -7,81 +7,63 @@ import com.zktony.www.common.extension.getDayStart
 import com.zktony.www.common.room.entity.LogData
 import com.zktony.www.common.room.entity.LogRecord
 import com.zktony.www.data.repository.LogDataRepository
-import com.zktony.www.data.repository.LogRecordRespository
+import com.zktony.www.data.repository.LogRecordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class LogViewModel @Inject constructor(
-    private val logRecordRepository: LogRecordRespository,
+    private val logRecordRepository: LogRecordRepository,
     private val logDataRepository: LogDataRepository
 ) : BaseViewModel() {
 
-    private val _state = MutableSharedFlow<LogState>()
-    val state: SharedFlow<LogState> get() = _state
-    private val intent = MutableSharedFlow<LogIntent>()
+    private val _event = MutableSharedFlow<LogEvent>()
+    val event = _event.asSharedFlow()
 
-    init {
-        viewModelScope.launch {
-            intent.collect {
-                when (it) {
-                    is LogIntent.InitLogRecord -> initLogRecord()
-                    is LogIntent.ChangeLogRecord -> changeLogRecord(it.start, it.end)
-                    is LogIntent.ChangeLogData -> changeLogData(it.id)
-                }
-            }
-        }
-    }
-
-    fun dispatch(intent: LogIntent) {
-        try {
-            viewModelScope.launch {
-                this@LogViewModel.intent.emit(intent)
-            }
-        } catch (_: Exception) {
-        }
-
-    }
-
-    private fun initLogRecord() {
+    /**
+     * 获取所有记录
+     */
+    fun initLogRecord() {
         viewModelScope.launch {
             logRecordRepository.getAll()
                 .collect {
-                    _state.emit(LogState.ChangeLogRecord(it))
+                    _event.emit(LogEvent.ChangeLogRecord(it))
                 }
         }
     }
 
-
-    private fun changeLogRecord(start: Date, end: Date) {
+    /**
+     * 获取日志记录
+     * @param start 开始时间
+     * @param end 结束时间
+     */
+    fun changeLogRecord(start: Date, end: Date) {
         viewModelScope.launch {
             logRecordRepository.getByDate(start.getDayStart(), end.getDayEnd())
                 .collect {
-                    _state.emit(LogState.ChangeLogRecord(it))
+                    _event.emit(LogEvent.ChangeLogRecord(it))
                 }
         }
     }
 
-    private fun changeLogData(id: String) {
+    /**
+     * 获取日志数据
+     * @param id 日志记录id
+     */
+    fun changeLogData(id: String) {
         viewModelScope.launch {
             logDataRepository.getByLogId(id).collect {
-                _state.emit(LogState.ChangeLogData(it))
+                _event.emit(LogEvent.ChangeLogData(it))
             }
         }
     }
 }
 
-sealed class LogIntent {
-    object InitLogRecord : LogIntent()
-    data class ChangeLogRecord(val start: Date, val end: Date) : LogIntent()
-    data class ChangeLogData(val id: String) : LogIntent()
-}
-
-sealed class LogState {
-    data class ChangeLogRecord(val logRecordList: List<LogRecord>) : LogState()
-    data class ChangeLogData(val logDataList: List<LogData>) : LogState()
+sealed class LogEvent {
+    data class ChangeLogRecord(val logRecordList: List<LogRecord>) : LogEvent()
+    data class ChangeLogData(val logDataList: List<LogData>) : LogEvent()
 }

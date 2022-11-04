@@ -6,7 +6,7 @@ import com.zktony.www.common.room.entity.Program
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,51 +15,42 @@ class ProgramViewModel @Inject constructor(
     private val programRepository: ProgramRepository
 ) : BaseViewModel() {
 
-    private val _state = MutableSharedFlow<ProgramState>()
-    val state: SharedFlow<ProgramState> get() = _state
-    private val intent = MutableSharedFlow<ProgramIntent>()
+    private val _event = MutableSharedFlow<ProgramEvent>()
+    val event = _event.asSharedFlow()
 
     init {
         viewModelScope.launch {
-            intent.collect {
-                when (it) {
-                    is ProgramIntent.InsertProgram -> insertProgram(it.program)
-                    is ProgramIntent.DeleteProgram -> deleteProgram(it.program)
-                    is ProgramIntent.UpdateProgram -> updateProgram(it.program)
-                    is ProgramIntent.VerifyProgram -> verifyProgram(it.program)
-                }
-            }
-        }
-        viewModelScope.launch {
             programRepository.getAll().collect {
-                _state.emit(ProgramState.ChangeProgramList(it))
+                _event.emit(ProgramEvent.ChangeProgramList(it))
             }
         }
     }
 
-    fun dispatch(intent: ProgramIntent) {
-        try {
-            viewModelScope.launch {
-                this@ProgramViewModel.intent.emit(intent)
-            }
-        } catch (_: Exception) {
-        }
-    }
-
-
-    private fun insertProgram(program: Program) {
+    /**
+     * 添加程序
+     * @param program [Program] 程序
+     */
+    fun insertProgram(program: Program) {
         viewModelScope.launch {
             programRepository.insert(program)
         }
     }
 
-    private fun deleteProgram(program: Program) {
+    /**
+     * 删除程序
+     * @param program [Program] 程序
+     */
+    fun deleteProgram(program: Program) {
         viewModelScope.launch {
             programRepository.delete(program)
         }
     }
 
-    private fun updateProgram(program: Program) {
+    /**
+     * 更新程序
+     * @param program [Program] 程序
+     */
+    fun updateProgram(program: Program) {
         viewModelScope.launch {
             programRepository.update(program)
         }
@@ -67,8 +58,9 @@ class ProgramViewModel @Inject constructor(
 
     /**
      * 判断程序是否可以插入/编辑
+     * @param program [Program] 程序
      */
-    private fun verifyProgram(program: Program) {
+    fun verifyProgram(program: Program) {
         viewModelScope.launch {
             var verify = true
             if (program.name.isEmpty()) {
@@ -106,20 +98,13 @@ class ProgramViewModel @Inject constructor(
             if (program.time == 0f) {
                 verify = false
             }
-            _state.emit(ProgramState.VerifyProgram(verify))
+            _event.emit(ProgramEvent.VerifyProgram(verify))
         }
     }
 
 }
 
-sealed class ProgramIntent {
-    data class InsertProgram(val program: Program) : ProgramIntent()
-    data class UpdateProgram(val program: Program) : ProgramIntent()
-    data class DeleteProgram(val program: Program) : ProgramIntent()
-    data class VerifyProgram(val program: Program) : ProgramIntent()
-}
-
-sealed class ProgramState {
-    data class VerifyProgram(val verify: Boolean) : ProgramState()
-    data class ChangeProgramList(val programList: List<Program>) : ProgramState()
+sealed class ProgramEvent {
+    data class VerifyProgram(val verify: Boolean) : ProgramEvent()
+    data class ChangeProgramList(val programList: List<Program>) : ProgramEvent()
 }

@@ -1,21 +1,10 @@
 [versions]
 ## build
-applicationId = "com.zktony.www"
-nameSpace = "com.zktony.www"
-gpioNameSpace = "com.zktony.gpio"
-serialPortNameSpace = "com.zktony.serialport"
 compileSdk = "33"
 minSdk = "19"
 targetSdk = "33"
-versionCode = "1"
-versionName = "1.0.0"
 ndkVersion = "21.4.7075529"
 cMakeVersion = "3.10.2"
-## security
-storeFile = "../zktony.keystore"
-keyAlias = "zktony"
-keyPassword = "zktony"
-storePassword = "zktony"
 ## dependencies
 activity = "1.6.1"
 androidGradlePlugin = "7.3.1"

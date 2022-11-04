@@ -9,10 +9,11 @@ import com.zktony.serialport.COMSerial
 import com.zktony.serialport.listener.OnComDataListener
 import com.zktony.www.base.BaseActivity
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.app.AppIntent
+import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.audio.AudioPlayer
 import com.zktony.www.common.utils.Constants
+import com.zktony.www.common.worker.WorkerManager
 import com.zktony.www.data.model.Event
 import com.zktony.www.data.model.SerialPort.TTYS4
 import com.zktony.www.databinding.ActivityMainBinding
@@ -21,7 +22,6 @@ import com.zktony.www.ui.home.HomeFragment
 import com.zktony.www.ui.home.model.Cmd
 import com.zktony.www.ui.log.LogFragment
 import com.zktony.www.ui.program.ProgramFragment
-import com.zktony.www.common.worker.WorkerManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -152,15 +152,25 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
      * 当前项目使用TTYS4
      */
     private fun initSerialPort() {
-        COMSerial.instance.addCOM(TTYS4.device, 115200)
-        COMSerial.instance.addDataListener(object : OnComDataListener {
-            override fun comDataBack(com: String, hexData: String) {
-                val cmd = Cmd(hexData)
-                if (cmd.cmd == 2) {
-                    appViewModel.dispatch(AppIntent.ReceiveCmd(cmd))
+        lifecycleScope.launch {
+            COMSerial.instance.addCOM(TTYS4.device, 115200)
+            COMSerial.instance.addDataListener(object : OnComDataListener {
+                override fun comDataBack(com: String, hexData: String) {
+                    val cmd = Cmd(hexData)
+                    if (cmd.cmd == 2) {
+                        appViewModel.receiveCmd(cmd)
+                    }
+                }
+            })
+            appViewModel.event.collect {
+                when (it) {
+                    is AppEvent.SendCmd -> {
+                        COMSerial.instance.sendHex(TTYS4.device, it.cmd.genHex())
+                    }
+                    else -> {}
                 }
             }
-        })
+        }
     }
 
     /**
@@ -168,7 +178,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onGetMessage(event: Event<String, Int>) {
-        if (Constants.AUDIOID == event.type && audio) {
+        if (Constants.AUDIO_ID == event.type && audio) {
             lifecycleScope.launch {
                 AudioPlayer.instance.play(this@MainActivity, event.message)
             }

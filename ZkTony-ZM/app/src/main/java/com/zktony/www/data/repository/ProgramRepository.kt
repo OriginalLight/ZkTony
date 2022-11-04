@@ -1,10 +1,12 @@
 package com.zktony.www.data.repository
 
-import com.zktony.www.common.network.adapter.NetworkResponse
+import com.zktony.www.common.network.adapter.toResult
+import com.zktony.www.common.network.service.ProgramService
+import com.zktony.www.common.result.NetworkResult
 import com.zktony.www.common.room.dao.ProgramDao
 import com.zktony.www.common.room.entity.Program
-import com.zktony.www.common.network.service.ProgramService
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 /**
@@ -12,39 +14,40 @@ import javax.inject.Inject
  * @date: 2022-09-21 8:49
  */
 class ProgramRepository @Inject constructor(
-    private val programDao: ProgramDao,
+    private val dao: ProgramDao,
     private val service: ProgramService
 ) {
     suspend fun insert(program: Program) {
-        programDao.insert(program)
+        dao.insert(program)
     }
 
     fun getAll(): Flow<List<Program>> {
-        return programDao.getAll()
+        return dao.getAll()
     }
 
     suspend fun updateDefaultByKind(kind: Int) {
-        programDao.updateDefaultByKind(kind)
+        dao.updateDefaultByKind(kind)
     }
 
     suspend fun delete(program: Program) {
-        programDao.delete(program)
+        dao.delete(program)
     }
 
     suspend fun update(program: Program) {
-        programDao.update(program)
+        dao.update(program)
     }
 
     suspend fun updateBatch(programs: List<Program>) {
-        programDao.updateBatch(programs)
+        dao.updateBatch(programs)
     }
 
     fun withoutUpload(): Flow<List<Program>> {
-        return programDao.withoutUpload()
+        return dao.withoutUpload()
     }
 
-    suspend fun uploadProgram(programs: List<Program>): NetworkResponse<Any> {
-        return service.uploadProgram(programs)
+    suspend fun uploadProgram(programs: List<Program>) = flow {
+        emit(NetworkResult.Loading)
+        emit(service.uploadProgram(programs).toResult())
     }
 
 }

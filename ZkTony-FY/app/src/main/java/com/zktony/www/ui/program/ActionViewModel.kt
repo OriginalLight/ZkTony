@@ -9,8 +9,8 @@ import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -22,10 +22,10 @@ class ActionViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private val _event = MutableSharedFlow<ActionEvent>()
-    val event: SharedFlow<ActionEvent> get() = _event
+    val event = _event.asSharedFlow()
 
     private val _uiState = MutableStateFlow(ActionUiState())
-    val uiState: StateFlow<ActionUiState> get() = _uiState
+    val uiState = _uiState.asStateFlow()
 
     /**
      * 加载程序列表

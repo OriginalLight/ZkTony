@@ -10,7 +10,7 @@ import com.zktony.www.data.repository.LogDataRepository
 import com.zktony.www.data.repository.LogRecordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -22,7 +22,7 @@ class LogViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private val _event = MutableSharedFlow<LogEvent>()
-    val event: SharedFlow<LogEvent> get() = _event
+    val event = _event.asSharedFlow()
 
 
     fun changeLogRecord(start: Date, end: Date) {

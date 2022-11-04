@@ -17,14 +17,14 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.zktony.www.R
 import com.zktony.www.adapter.LogAdapter
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.getDayEnd
 import com.zktony.www.common.extension.getDayStart
 import com.zktony.www.common.extension.simpleDateFormat
-import com.zktony.www.data.model.Event
 import com.zktony.www.common.room.entity.LogData
 import com.zktony.www.common.room.entity.LogRecord
+import com.zktony.www.common.utils.Constants
+import com.zktony.www.data.model.Event
 import com.zktony.www.databinding.FragmentLogBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -58,12 +58,15 @@ class LogFragment :
         EventBus.getDefault().unregister(this)
     }
 
+    /**
+     * 初始化Observer
+     */
     @SuppressLint("NotifyDataSetChanged")
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.state.distinctUntilChanged().collect {
+            viewModel.event.distinctUntilChanged().collect {
                 when (it) {
-                    is LogState.ChangeLogRecord -> {
+                    is LogEvent.ChangeLogRecord -> {
                         logAdapter.submitList(it.logRecordList)
                         logRecordList = it.logRecordList
                         logAdapter.currentPosition = -1
@@ -71,7 +74,7 @@ class LogFragment :
                         refreshButton()
                     }
 
-                    is LogState.ChangeLogData -> {
+                    is LogEvent.ChangeLogData -> {
                         logDataList = it.logDataList
                     }
                 }
@@ -84,7 +87,7 @@ class LogFragment :
      */
     private fun initRecyclerView() {
         binding.rc1.adapter = logAdapter
-        viewModel.dispatch(LogIntent.InitLogRecord)
+        viewModel.initLogRecord()
     }
 
     @SuppressLint("SimpleDateFormat")
@@ -114,14 +117,7 @@ class LogFragment :
                 val dateStr = year.toString() + "-" + (monthOfYear + 1) + "-" + dayOfMonth
                 val date = dateStr.simpleDateFormat("yyyy-MM-dd")
                 tv.text = date?.simpleDateFormat("MM 月 dd 日")
-                date?.run {
-                    viewModel.dispatch(
-                        LogIntent.ChangeLogRecord(
-                            date.getDayStart(),
-                            date.getDayEnd()
-                        )
-                    )
-                }
+                date?.run { viewModel.changeLogRecord(date.getDayStart(), date.getDayEnd()) }
             },
             calendar[Calendar.YEAR],
             calendar[Calendar.MONTH],
@@ -259,7 +255,7 @@ class LogFragment :
         } else {
             binding.btn1.visibility = View.VISIBLE
             binding.btn2.visibility = View.VISIBLE
-            viewModel.dispatch(LogIntent.ChangeLogData(logAdapter.getItem().id))
+            viewModel.changeLogData(logAdapter.getItem().id)
         }
     }
 

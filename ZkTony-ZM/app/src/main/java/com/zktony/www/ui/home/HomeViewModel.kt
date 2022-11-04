@@ -8,21 +8,19 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.serialport.COMSerial
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.model.Event
-import com.zktony.www.data.model.SerialPort
 import com.zktony.www.common.room.entity.LogData
 import com.zktony.www.common.room.entity.LogRecord
 import com.zktony.www.common.room.entity.Program
+import com.zktony.www.common.utils.Constants
+import com.zktony.www.data.model.Event
+import com.zktony.www.data.model.SerialPort
 import com.zktony.www.data.repository.LogDataRepository
-import com.zktony.www.data.repository.LogRecordRespository
+import com.zktony.www.data.repository.LogRecordRepository
 import com.zktony.www.data.repository.ProgramRepository
 import com.zktony.www.ui.home.model.Cmd
 import com.zktony.www.ui.home.model.ControlState
 import com.zktony.www.ui.home.model.Model
-import com.zktony.www.ui.home.model.Model.A
-import com.zktony.www.ui.home.model.Model.X
-import com.zktony.www.ui.home.model.Model.Y
+import com.zktony.www.ui.home.model.Model.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -32,7 +30,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
@@ -43,7 +41,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val programRepository: ProgramRepository,
-    private val logRecordRepository: LogRecordRespository,
+    private val logRecordRepository: LogRecordRepository,
     private val logDataRepository: LogDataRepository
 ) : BaseViewModel() {
 
@@ -59,42 +57,56 @@ class HomeViewModel @Inject constructor(
 
 
     private val _errorMessage = MutableSharedFlow<String>()
-    val errorMessage: SharedFlow<String> get() = _errorMessage
+    val errorMessage = _errorMessage.asSharedFlow()
 
     init {
         viewModelScope.launch {
-            dataStore.data.map { preferences ->
-                preferences[intPreferencesKey(Constants.INTERVAL)] ?: 1
-            }.collect {
-                interval = it
+            launch {
+                dataStore.data.map { preferences ->
+                    preferences[intPreferencesKey(Constants.INTERVAL)] ?: 1
+                }.collect {
+                    interval = it
+                }
             }
-        }
-        viewModelScope.launch {
-            dataStore.data.map { preferences ->
-                preferences[intPreferencesKey(Constants.DURATION)] ?: 10
-            }.collect {
-                duration = it
+            launch {
+                dataStore.data.map { preferences ->
+                    preferences[intPreferencesKey(Constants.DURATION)] ?: 10
+                }.collect {
+                    duration = it
+                }
             }
-        }
-        viewModelScope.launch {
-            dataStore.data.map { preferences ->
-                preferences[booleanPreferencesKey(Constants.DETECT)] ?: true
-            }.collect {
-                detect = it
+            launch {
+                dataStore.data.map { preferences ->
+                    preferences[booleanPreferencesKey(Constants.DETECT)] ?: true
+                }.collect {
+                    detect = it
+                }
             }
         }
     }
 
+    /**
+     * 获取程序
+     * @return [Flow]<[List]<[Program]>>
+     */
     fun getAllProgram(): Flow<List<Program>> {
         return programRepository.getAll()
     }
 
+    /**
+     * 更新程序为默认
+     * @param kind [Int]
+     */
     fun updateProgramDefaultByKind(kind: Int) {
         viewModelScope.launch {
             programRepository.updateDefaultByKind(kind)
         }
     }
 
+    /**
+     * 更新程序
+     * @param program [Program]
+     */
     fun updateProgram(program: Program) {
         viewModelScope.launch {
             programRepository.update(program)
@@ -103,29 +115,35 @@ class HomeViewModel @Inject constructor(
 
     /**
      * 开始收集log
+     * @param module [Model] 模块
+     * @param programId [String] 程序Id
+     * @param state [ControlState] 控制状态
      */
     fun startRecordLog(module: Model, programId: String, state: ControlState) {
         viewModelScope.launch {
-            val logRecord = LogRecord()
+            var logRecord = LogRecord().copy(programId = programId)
             if (module == X) {
-                logRecord.model = if (state.modelX === A) 0 else 1
-                logRecord.motor = state.motorX
-                logRecord.voltage = state.voltageX
-                logRecord.time = state.timeX.toFloat()
+                logRecord = logRecord.copy(
+                    model = if (state.modelX === A) 0 else 1,
+                    motor = state.motorX,
+                    voltage = state.voltageX,
+                    time = state.timeX.toFloat(),
+                )
                 if (logDisposableX != null && !logDisposableX!!.isDisposed) {
                     logDisposableX!!.dispose()
                 }
             }
             if (module == Y) {
-                logRecord.model = if (state.modelY === A) 0 else 1
-                logRecord.motor = state.motorY
-                logRecord.voltage = state.voltageY
-                logRecord.time = state.timeY.toFloat()
+                logRecord = logRecord.copy(
+                    model = if (state.modelY === A) 0 else 1,
+                    motor = state.motorY,
+                    voltage = state.voltageY,
+                    time = state.timeY.toFloat(),
+                )
                 if (logDisposableY != null && !logDisposableY!!.isDisposed) {
                     logDisposableY!!.dispose()
                 }
             }
-            logRecord.programId = programId
             logRecordRepository.insert(logRecord)
             Observable.interval(5, 5, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
@@ -142,19 +160,21 @@ class HomeViewModel @Inject constructor(
                     }
 
                     override fun onNext(aLong: Long) {
-                        val data = LogData()
-                        data.logId = logRecord.id
+                        var data = LogData().copy(logId = logRecord.id, time = (aLong * 5).toInt())
                         val recCmd = appViewModel.latestReceiveCmd
-                        if (module == X) {
-                            data.motor = recCmd.stepMotorX
-                            data.voltage = recCmd.getVoltageX
-                            data.current = recCmd.getCurrentX
+                        data = if (module == X) {
+                            data.copy(
+                                motor = recCmd.stepMotorX,
+                                voltage = recCmd.getVoltageX,
+                                current = recCmd.getCurrentX
+                            )
                         } else {
-                            data.motor = recCmd.stepMotorY
-                            data.voltage = recCmd.getVoltageY
-                            data.current = recCmd.getCurrentY
+                            data.copy(
+                                motor = recCmd.stepMotorY,
+                                voltage = recCmd.getVoltageY,
+                                current = recCmd.getCurrentY
+                            )
                         }
-                        data.time = (aLong * 5).toInt()
                         viewModelScope.launch {
                             logDataRepository.insert(data)
                         }
@@ -169,6 +189,7 @@ class HomeViewModel @Inject constructor(
 
     /**
      * 停止收集log
+     * @param module [Model] 模块
      */
     fun stopRecordLog(module: Model) {
         viewModelScope.launch {
@@ -181,7 +202,7 @@ class HomeViewModel @Inject constructor(
             logRecordRepository.deleteByDate()
             logDataRepository.deleteByDate()
             logDataRepository.deleteDataLessThanTen()
-            logRecordRepository.deleteInvaliedLog()
+            logRecordRepository.deleteInvalidedLog()
             Observable.timer(2, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.io())
                 .unsubscribeOn(Schedulers.io())

@@ -9,12 +9,12 @@ import com.kongzue.dialogx.dialogs.MessageDialog
 import com.zktony.www.R
 import com.zktony.www.adapter.ProgramAdapter
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.extension.addSuffix
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.data.model.Event
 import com.zktony.www.common.room.entity.Program
+import com.zktony.www.common.utils.Constants
+import com.zktony.www.data.model.Event
 import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -59,9 +59,9 @@ class ProgramFragment :
     @SuppressLint("NotifyDataSetChanged")
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.state.distinctUntilChanged().collect {
+            viewModel.event.distinctUntilChanged().collect {
                 when (it) {
-                    is ProgramState.VerifyProgram -> {
+                    is ProgramEvent.VerifyProgram -> {
                         if (it.verify) {
                             binding.btn1.visibility = View.VISIBLE
                         } else {
@@ -69,7 +69,7 @@ class ProgramFragment :
                         }
                     }
 
-                    is ProgramState.ChangeProgramList -> {
+                    is ProgramEvent.ChangeProgramList -> {
                         programAdapter.submitList(it.programList)
                         programList = it.programList
                         refreshEditButton()
@@ -85,105 +85,100 @@ class ProgramFragment :
     @SuppressLint("SetTextI18n")
     private fun initEditText() {
         binding.et1.afterTextChange {
-            program.name = it
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            program = program.copy(name = it)
+            viewModel.verifyProgram(program)
         }
         binding.et2.afterTextChange {
-            program.proteinName = it
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            program = program.copy(proteinName = it)
+            viewModel.verifyProgram(program)
         }
         binding.et3.afterTextChange {
-            if (it.isNotEmpty()) {
-                program.proteinMinSize = it.replace(" kD", "").removeZero().toFloat()
-            } else {
-                program.proteinMinSize = 0f
-            }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            program = program.copy(
+                proteinMinSize = if (it.isNotEmpty()) it.replace(" kD", "").removeZero()
+                    .toFloat() else 0f
+            )
+            viewModel.verifyProgram(program)
         }
         binding.et3.addSuffix(" kD")
         binding.et4.afterTextChange {
-            if (it.isNotEmpty()) {
-                program.proteinMaxSize = it.replace(" kD", "").removeZero().toFloat()
-            } else {
-                program.proteinMaxSize = 0f
-            }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            program = program.copy(
+                proteinMaxSize = if (it.isNotEmpty()) it.replace(" kD", "")
+                    .removeZero().toFloat() else 0f
+            )
+            viewModel.verifyProgram(program)
         }
         binding.et4.addSuffix(" kD")
         binding.et5.afterTextChange {
-            if (it.isNotEmpty()) {
-                program.glueConcentration = it.replace(" %", "").removeZero().toFloat()
-            } else {
-                program.glueConcentration = 0f
-            }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            program = program.copy(
+                glueConcentration = if (it.isNotEmpty()) it.replace(" %", "")
+                    .removeZero().toFloat() else 0f
+            )
+            viewModel.verifyProgram(program)
         }
         binding.et5.addSuffix(" %")
         binding.et10.afterTextChange {
-            if (it.isNotEmpty()) {
-                program.glueMinConcentration = it.replace(" %", "").removeZero().toFloat()
-            } else {
-                program.glueMinConcentration = 0f
-            }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            program = program.copy(
+                glueMinConcentration = if (it.isNotEmpty()) it.replace(" %", "")
+                    .removeZero().toFloat() else 0f
+            )
+            viewModel.verifyProgram(program)
         }
         binding.et10.addSuffix(" %")
         binding.et11.afterTextChange {
-            if (it.isNotEmpty()) {
-                program.glueMaxConcentration = it.replace(" %", "").removeZero().toFloat()
-            } else {
-                program.glueMaxConcentration = 0f
-            }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            program = program.copy(
+                glueMaxConcentration = if (it.isNotEmpty()) it.replace(" %", "")
+                    .removeZero().toFloat() else 0f
+            )
+            viewModel.verifyProgram(program)
         }
         binding.et11.addSuffix(" %")
         binding.et6.afterTextChange {
-            program.bufferType = it
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            program = program.copy(bufferType = it)
+            viewModel.verifyProgram(program)
         }
         binding.et7.afterTextChange {
             if (it.isNotEmpty()) {
                 val v = it.replace(" v", "").removeZero().toFloat()
                 if (v > 65) {
-                    program.voltage = 65f
+                    program = program.copy(voltage = 65f)
                     binding.et7.setText("65")
                 } else {
-                    program.voltage = v
+                    program = program.copy(voltage = v)
                 }
             } else {
-                program.voltage = 0f
+                program = program.copy(voltage = 0f)
             }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            viewModel.verifyProgram(program)
         }
         binding.et7.addSuffix(" v")
         binding.et8.afterTextChange {
             if (it.isNotEmpty()) {
                 val time = it.replace(" min", "").removeZero().toFloat()
                 if (time > 99) {
-                    program.time = 99f
+                    program = program.copy(time = 99f)
                     binding.et8.setText("99")
                 } else {
-                    program.time = time
+                    program = program.copy(time = time)
                 }
             } else {
-                program.time = 0f
+                program = program.copy(time = 0f)
             }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            viewModel.verifyProgram(program)
         }
         binding.et8.addSuffix(" min")
         binding.et9.afterTextChange {
             if (it.isNotEmpty()) {
                 val motor = it.replace(" rpm", "").removeZero().toInt()
                 if (motor > 250) {
+                    program = program.copy(motor = 250)
                     binding.et9.setText("250")
-                    program.motor = 250
                 } else {
-                    program.motor = motor
+                    program = program.copy(motor = motor)
                 }
             } else {
-                program.motor = 0
+                program = program.copy(motor = 0)
             }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            viewModel.verifyProgram(program)
         }
         binding.et9.addSuffix(" rpm")
     }
@@ -207,10 +202,10 @@ class ProgramFragment :
                 return@setOnClickListener
             } else {
                 if (isInsertProgram(program)) {
-                    viewModel.dispatch(ProgramIntent.InsertProgram(program))
+                    viewModel.insertProgram(program)
                 } else {
-                    program.upload = 0
-                    viewModel.dispatch(ProgramIntent.UpdateProgram(program))
+                    program = program.copy(upload = 0)
+                    viewModel.updateProgram(program)
                 }
             }
             binding.con3.visibility = View.GONE
@@ -238,7 +233,7 @@ class ProgramFragment :
                 .setTitle("删除实验程序")
                 .setMessage("确定删除实验程序：" + selectedProgram.name + "？")
                 .setOkButton("确定") { dialog, _ ->
-                    viewModel.dispatch(ProgramIntent.DeleteProgram(selectedProgram))
+                    viewModel.deleteProgram(selectedProgram)
                     programAdapter.isClick = true
                     programAdapter.currentPosition = 0
                     refreshEditButton()
@@ -269,42 +264,41 @@ class ProgramFragment :
         binding.et6.visibility = View.GONE
         binding.rg1.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.rb_1 -> program.thickness = "0.075"
-                R.id.rb_2 -> program.thickness = "0.1"
-                R.id.rb_3 -> program.thickness = "0.15"
+                R.id.rb_1 -> program = program.copy(thickness = "0.075")
+                R.id.rb_2 -> program = program.copy(thickness = "0.1")
+                R.id.rb_3 -> program = program.copy(thickness = "0.15")
             }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            viewModel.verifyProgram(program)
         }
         binding.rg2.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rb_4 -> {
-                    program.bufferType = "厂家"
+                    program = program.copy(bufferType = "厂家")
                     binding.et6.visibility = View.GONE
                 }
 
                 R.id.rb_5 -> {
                     if (program.bufferType == "厂家") {
-                        program.bufferType = ""
+                        program = program.copy(bufferType = "")
                     }
                     binding.et6.visibility = View.VISIBLE
                 }
             }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            viewModel.verifyProgram(program)
         }
         binding.rg3.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
                 R.id.rb_6 -> {
                     binding.l10.visibility = View.VISIBLE
-                    program.model = 0
+                    program = program.copy(model = 0)
                 }
 
                 R.id.rb_7 -> {
                     binding.l10.visibility = View.GONE
-                    program.model = 1
-                    program.motor = 0
+                    program = program.copy(model = 1, motor = 0)
                 }
             }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            viewModel.verifyProgram(program)
         }
         binding.rg4.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
@@ -313,20 +307,21 @@ class ProgramFragment :
                     binding.et5.visibility = View.VISIBLE
                     binding.et10.setText("")
                     binding.et11.setText("")
-                    program.glueMinConcentration = 0f
-                    program.glueMaxConcentration = 0f
-                    program.glueType = 0
+                    program = program.copy(
+                        glueMinConcentration = 0f,
+                        glueMaxConcentration = 0f,
+                        glueType = 0
+                    )
                 }
 
                 R.id.rb_9 -> {
                     binding.conT.visibility = View.VISIBLE
                     binding.et5.visibility = View.GONE
                     binding.et5.setText("")
-                    program.glueConcentration = 0f
-                    program.glueType = 1
+                    program = program.copy(glueConcentration = 0f, glueType = 1)
                 }
             }
-            viewModel.dispatch(ProgramIntent.VerifyProgram(program))
+            viewModel.verifyProgram(program)
         }
     }
 
@@ -421,6 +416,7 @@ class ProgramFragment :
 
     /**
      * 判断是否是插入
+     * @param program [Program] 程序
      */
     private fun isInsertProgram(program: Program): Boolean {
         programList.filter { it.id == program.id }.forEach { _ ->
@@ -431,6 +427,7 @@ class ProgramFragment :
 
     /**
      * 名字是否重复
+     * @param program [Program] 程序
      */
     private fun isRepeatName(program: Program): Boolean {
         programList.filter { it.name == program.name && it.id != program.id }.forEach { _ ->
@@ -439,6 +436,9 @@ class ProgramFragment :
         return false
     }
 
+    /**
+     * 刷新按钮
+     */
     private fun refreshEditButton() {
         if (programList.isEmpty() || programAdapter.currentPosition == -1 || !programAdapter.isClick) {
             binding.btn4.visibility = View.GONE

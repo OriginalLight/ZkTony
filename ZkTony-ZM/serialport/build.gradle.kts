@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = libs.versions.serialPortNameSpace.get()
+    namespace = "com.zktony.serialport"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

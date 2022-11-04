@@ -10,30 +10,30 @@ import javax.inject.Inject
  * @date: 2022-09-21 8:56
  */
 class LogDataRepository @Inject constructor(
-    private val logDataDao: LogDataDao
+    private val dao: LogDataDao
 ) {
 
     suspend fun insert(logData: LogData) {
-        logDataDao.insert(logData)
+        dao.insert(logData)
     }
 
     suspend fun deleteByDate() {
-        logDataDao.deleteByDate()
+        dao.deleteByDate()
     }
 
     suspend fun updateBatch(logDatas: List<LogData>) {
-        logDataDao.updateBatch(logDatas)
+        dao.updateBatch(logDatas)
     }
 
     fun getByLogId(id: String): Flow<List<LogData>> {
-        return logDataDao.getByLogId(id)
+        return dao.getByLogId(id)
     }
 
     suspend fun deleteDataLessThanTen() {
-        logDataDao.deleteDataLessThanTen()
+        dao.deleteDataLessThanTen()
     }
 
     fun withoutUpload(): Flow<List<LogData>> {
-        return logDataDao.withoutUpload()
+        return dao.withoutUpload()
     }
 }

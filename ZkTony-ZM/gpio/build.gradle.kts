@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = libs.versions.gpioNameSpace.get()
+    namespace = "com.zktony.gpio"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

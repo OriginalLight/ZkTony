@@ -14,8 +14,7 @@ import com.zktony.www.R
 import com.zktony.www.adapter.SpinnerAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.utils.Logger
-import com.zktony.www.common.app.AppIntent
-import com.zktony.www.common.app.AppState
+import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.extension.addSuffix
@@ -95,13 +94,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun initObserver() {
         viewModel.initQueryWork()
         lifecycleScope.launch {
-            appViewModel.state.collect {
+            appViewModel.event.collect {
                 when (it) {
-                    is AppState.SendCmd -> {
-                        COMSerial.instance.sendHex(SerialPort.TTYS4.device, it.cmd.genHex())
-                    }
-
-                    is AppState.ReceiveCmd -> onRecCmdChanged(it.cmd)
+                    is AppEvent.ReceiveCmd -> onRecCmdChanged(it.cmd)
+                    else -> {}
                 }
             }
         }
@@ -423,14 +419,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.scaleY = 0.8f
             state.stepMotorX = sendCmd.stepMotorX
             sendCmd.stepMotorX = 160
-            appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
+            appViewModel.sendCmd(sendCmd)
         }, {
             val sendCmd = appViewModel.latestSendCmd
             it.setBackgroundResource(R.drawable.btn_nopress_shape)
             it.scaleX = 1f
             it.scaleY = 1f
             sendCmd.stepMotorX = state.stepMotorX
-            appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
+            appViewModel.sendCmd(sendCmd)
         })
         binding.moduleX.btn4.addTouchEvent({
             val sendCmd = appViewModel.latestSendCmd
@@ -439,14 +435,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.scaleY = 0.8f
             state.stepMotorX = sendCmd.stepMotorX
             sendCmd.stepMotorX = -160
-            appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
+            appViewModel.sendCmd(sendCmd)
         }, {
             val sendCmd = appViewModel.latestSendCmd
             it.setBackgroundResource(R.drawable.btn_nopress_shape)
             it.scaleX = 1f
             it.scaleY = 1f
             sendCmd.stepMotorX = state.stepMotorX
-            appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
+            appViewModel.sendCmd(sendCmd)
         })
         binding.moduleY.btn3.addTouchEvent({
             val sendCmd = appViewModel.latestSendCmd
@@ -455,14 +451,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.scaleY = 0.8f
             state.stepMotorY = sendCmd.stepMotorY
             sendCmd.stepMotorY = 160
-            appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
+            appViewModel.sendCmd(sendCmd)
         }, {
             val sendCmd = appViewModel.latestSendCmd
             it.setBackgroundResource(R.drawable.btn_nopress_shape)
             it.scaleX = 1f
             it.scaleY = 1f
             sendCmd.stepMotorY = state.stepMotorY
-            appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
+            appViewModel.sendCmd(sendCmd)
         })
         binding.moduleY.btn4.addTouchEvent({
             val sendCmd = appViewModel.latestSendCmd
@@ -471,19 +467,20 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.scaleY = 0.8f
             state.stepMotorY = sendCmd.stepMotorY
             sendCmd.stepMotorY = -160
-            appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
+            appViewModel.sendCmd(sendCmd)
         }, {
             val sendCmd = appViewModel.latestSendCmd
             it.setBackgroundResource(R.drawable.btn_nopress_shape)
             it.scaleX = 1f
             it.scaleY = 1f
             sendCmd.stepMotorY = state.stepMotorY
-            appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
+            appViewModel.sendCmd(sendCmd)
         })
     }
 
     /**
      * 开始按钮按下
+     * @param module 模块
      */
     private fun start(module: Model) {
         var time = 0
@@ -556,7 +553,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         binding.moduleX.tv5.text = "已完成"
                         EventBus.getDefault().post(
                             Event(
-                                Constants.AUDIOID,
+                                Constants.AUDIO_ID,
                                 if (state.modelX === A) R.raw.zm else R.raw.rs
                             )
                         )
@@ -573,7 +570,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         binding.moduleY.tv5.text = "已完成"
                         EventBus.getDefault().post(
                             Event(
-                                Constants.AUDIOID,
+                                Constants.AUDIO_ID,
                                 if (state.modelY === A) R.raw.zm else R.raw.rs
                             )
                         )
@@ -592,6 +589,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     /**
      * 停止按钮按下
+     * @param module 模块
      */
     @SuppressLint("SetTextI18n")
     private fun stop(module: Model) {
@@ -657,14 +655,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     val sendCmd = appViewModel.latestSendCmd
                     sendCmd.zmotorX = 1
                     sendCmd.zmotorY = 1
-                    appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
+                    appViewModel.sendCmd(sendCmd)
                     Logger.d(msg = "开始定时自动清理废液")
                     lifecycleScope.launch {
                         delay(viewModel.duration.toLong() * 1000)
                         val cmd = appViewModel.latestSendCmd
                         cmd.zmotorX = 0
                         cmd.zmotorY = 0
-                        appViewModel.dispatch(AppIntent.SendCmd(cmd))
+                        appViewModel.sendCmd(cmd)
                         Logger.d(msg = "结束定时自动清理废液")
                     }
                 }
@@ -676,6 +674,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     /**
      * 不可编辑，开始按钮按下后
+     * @param module 模块
      */
     private fun disableEtSp(module: Model) {
         if (module === X) {
@@ -699,6 +698,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     /**
      * 可编辑，开始按钮按下后
+     * @param module 模块
      */
     private fun enableEtSp(module: Model) {
         if (module === X) {
@@ -721,6 +721,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     /**
      * 发送开始命令
+     * @param module 模块
      */
     private fun sendStartCmd(module: Model) {
         val sendCmd = appViewModel.latestSendCmd
@@ -746,11 +747,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
             sendCmd.targetVoltageY = state.voltageY
         }
-        appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
+        appViewModel.sendCmd(sendCmd)
     }
 
     /**
      * 发送停止命令
+     * @param module 模块
      */
     private fun sendStopCmd(module: Model) {
         val sendCmd = appViewModel.latestSendCmd
@@ -768,7 +770,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             sendCmd.stepMotorY = 0
             sendCmd.targetVoltageY = 0f
         }
-        appViewModel.dispatch(AppIntent.SendCmd(sendCmd))
+        appViewModel.sendCmd(sendCmd)
     }
 
     /**
@@ -828,6 +830,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     /**
      * 重新加载选项框
+     * @param module 模块
      */
     @SuppressLint("SetTextI18n")
     private fun reloadSpinnerItem(module: Model) {
@@ -904,6 +907,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     /**
      * 把当前选定的配置设为默认
+     * @param module 模块
+     * @param model 模式
      */
     private fun setProgramAndLog(module: Model, model: Model) {
         lifecycleScope.launch {
@@ -916,10 +921,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 program = spinnerAdapterY.getItem(binding.moduleY.sp1.selectedItemPosition)
             }
             if (program != null && program.name.isNotEmpty()) {
-                program.def = 1
-                program.count = program.count + 1
-                program.upload = 0
-                viewModel.updateProgram(program)
+                viewModel.updateProgram(program.copy(def = 1, count = program.count + 1, upload = 0))
                 viewModel.startRecordLog(module, program.id, state)
             } else {
                 viewModel.startRecordLog(module, "no-program", state)
