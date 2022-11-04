@@ -18,8 +18,7 @@ package com.zktony.www.common.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Date
-import java.util.UUID
+import java.util.*
 
 /**
  * Data class that represent the a table in the database.
@@ -27,15 +26,12 @@ import java.util.UUID
 @Entity(tableName = "log_data")
 data class LogData(
     @PrimaryKey
-    var id: String = UUID.randomUUID().toString()
-) {
-    constructor() : this(UUID.randomUUID().toString())
-
-    var logId = ""
-    var motor = 0
-    var voltage = 0f
-    var current = 0f
-    var time = 0
-    var upload = 0
-    var createTime: Date = Date(System.currentTimeMillis())
-}
+    val id: String = UUID.randomUUID().toString(),
+    val logId: String = "",
+    val motor: Int = 0,
+    val voltage: Float = 0f,
+    val current: Float = 0f,
+    val time: Int = 0,
+    val upload: Int = 0,
+    val createTime: Date = Date(System.currentTimeMillis()),
+)

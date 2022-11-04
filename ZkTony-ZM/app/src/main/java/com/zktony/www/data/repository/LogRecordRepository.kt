@@ -10,38 +10,38 @@ import javax.inject.Inject
  * @author: 刘贺贺
  * @date: 2022-09-21 8:52
  */
-class LogRecordRespository @Inject constructor(
-    private val logRecordDao: LogRecordDao
+class LogRecordRepository @Inject constructor(
+    private val dao: LogRecordDao
 ) {
     suspend fun insert(logRecord: LogRecord) {
-        logRecordDao.insert(logRecord)
+        dao.insert(logRecord)
     }
 
     suspend fun update(logRecord: LogRecord) {
-        logRecordDao.update(logRecord)
+        dao.update(logRecord)
     }
 
     suspend fun updateBatch(logRecordList: List<LogRecord>) {
-        logRecordDao.updateBatch(logRecordList)
+        dao.updateBatch(logRecordList)
     }
 
     suspend fun deleteByDate() {
-        logRecordDao.deleteByDate()
+        dao.deleteByDate()
     }
 
-    suspend fun deleteInvaliedLog() {
-        logRecordDao.deleteInvaliedLog()
+    suspend fun deleteInvalidedLog() {
+        dao.deleteInvaliedLog()
     }
 
     fun withoutUpload(): Flow<List<LogRecord>> {
-        return logRecordDao.withoutUpload()
+        return dao.withoutUpload()
     }
 
     fun getByDate(start: Date, end: Date): Flow<List<LogRecord>> {
-        return logRecordDao.getByDate(start, end)
+        return dao.getByDate(start, end)
     }
 
     fun getAll(): Flow<List<LogRecord>> {
-        return logRecordDao.getAll()
+        return dao.getAll()
     }
 }

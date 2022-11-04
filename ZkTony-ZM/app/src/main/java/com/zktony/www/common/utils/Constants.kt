@@ -6,6 +6,7 @@ package com.zktony.www.common.utils
  */
 object Constants {
 
+    const val DEVICE_ID = 1L
     const val DOMAIN = "https://www.zktony.com"
     const val BASE_URL = "http://120.48.67.96:8080"
     const val LOG_CLICK = "LOG_CLICK"
@@ -17,7 +18,7 @@ object Constants {
     const val BLANK = ""
     const val RESET = "RESET"
     const val AUDIO = "AUDIO"
-    const val AUDIOID = "AUDIOID"
+    const val AUDIO_ID = "AUDIO_ID"
     const val BAR = "BAR"
     const val INTERVAL = "INTERVAL"
     const val DURATION = "DURATION"

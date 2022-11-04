@@ -8,7 +8,7 @@ import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +20,7 @@ class ProgramViewModel @Inject constructor(
 ) : BaseViewModel() {
 
     private val _event = MutableSharedFlow<ProgramEvent>()
-    val event: SharedFlow<ProgramEvent> get() = _event
+    val event = _event.asSharedFlow()
 
 
     /**

@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.viewModelScope
+import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.gpio.Gpio
 import com.zktony.www.BuildConfig
 import com.zktony.www.base.BaseViewModel
@@ -48,10 +49,10 @@ class AdminViewModel @Inject constructor(
     lateinit var appViewModel: AppViewModel
 
     private val _event = MutableSharedFlow<AdminEvent>()
-    val event: SharedFlow<AdminEvent> get() = _event
+    val event = _event.asSharedFlow()
 
     private val _uiState = MutableStateFlow(AdminUiState())
-    val uiState: StateFlow<AdminUiState> get() = _uiState
+    val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -169,7 +170,7 @@ class AdminViewModel @Inject constructor(
      */
     private fun downloadApk(context: Context, version: Version) {
         viewModelScope.launch {
-            "开始下载".showShortToast()
+            PopTip.show("开始下载")
             DownloadManager.download(
                 version.url,
                 File(context.getExternalFilesDir(null), "update.apk")
@@ -204,23 +205,21 @@ class AdminViewModel @Inject constructor(
             if (context.isNetworkAvailable()) {
                 systemRepository.getVersionInfo(DEVICE_ID).collect {
                     when (it) {
-                        is NetworkResult.Loading -> {
-                            "正在检查更新".showShortToast()
-                        }
                         is NetworkResult.Success -> {
                             if (it.data.versionCode > BuildConfig.VERSION_CODE) {
                                 _event.emit(AdminEvent.CheckUpdate(null, it.data))
                             } else {
-                                "已经是最新版本".showShortToast()
+                                PopTip.show("已经是最新版本")
                             }
                         }
                         is NetworkResult.Error -> {
-                            "升级接口异常请联系管理员".showShortToast()
+                            PopTip.show("升级接口异常请联系管理员")
                         }
+                        else -> {}
                     }
                 }
             } else {
-                "请连接网络或插入升级U盘".showShortToast()
+                PopTip.show("请连接网络或插入升级U盘")
             }
         }
     }

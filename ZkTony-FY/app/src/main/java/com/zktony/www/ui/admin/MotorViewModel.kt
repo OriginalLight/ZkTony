@@ -8,7 +8,10 @@ import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.serialport.getSerialPortEnum
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,10 +24,10 @@ class MotorViewModel @Inject constructor(
     lateinit var appViewModel: AppViewModel
 
     private val _event = MutableSharedFlow<MotorEvent>()
-    val event: SharedFlow<MotorEvent> get() = _event
+    val event = _event.asSharedFlow()
 
     private val _uiState = MutableStateFlow(MotorUiState())
-    val uiState: StateFlow<MotorUiState> get() = _uiState
+    val uiState = _uiState.asStateFlow()
 
     /**
      * 初始化电机

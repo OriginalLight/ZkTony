@@ -35,11 +35,11 @@ class HomeViewModel @Inject constructor(
 
     // 返回的状态
     private val _event = MutableSharedFlow<HomeEvent>()
-    val event: SharedFlow<HomeEvent> get() = _event
+    val event = _event.asSharedFlow()
 
     // 保存的UI状态
     private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState: StateFlow<HomeUiState> get() = _uiState
+    val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {

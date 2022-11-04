@@ -6,9 +6,11 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.common.network.adapter.isSuccess
+import com.zktony.www.common.result.NetworkResult
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -27,21 +29,21 @@ class ProgramWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         try {
-            programRepository.withoutUpload().first().let {
-                if (it.isEmpty()) {
+            programRepository.withoutUpload().first().let { programs ->
+                if (programs.isEmpty()) {
                     Logger.d("ProgramWorker", "上传程序为空")
                     return Result.success()
                 }
-                val res = programRepository.uploadProgram(it)
-                if (res.isSuccess) {
-                    it.forEach { program ->
-                        program.upload = 1
+                programRepository.uploadProgram(programs).collect { res ->
+                    when(res) {
+                        is NetworkResult.Success -> {
+                            programRepository.updateBatch(programs.map { it.copy(upload = 1) })
+                        }
+                        is NetworkResult.Error -> {
+                            Logger.d("ProgramWorker", "上传程序失败")
+                        }
+                        else -> {}
                     }
-                    programRepository.updateBatch(it)
-                    Logger.d("ProgramWorker", "上传程序成功")
-                } else {
-                    Logger.d("ProgramWorker", "上传程序失败")
-                    return Result.failure()
                 }
             }
             return Result.success()

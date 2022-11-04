@@ -10,10 +10,6 @@ android {
     namespace = "com.zktony.www"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
-    buildFeatures {
-        dataBinding = true
-    }
-
     defaultConfig {
         applicationId = "com.zktony.www"
         minSdk = libs.versions.minSdk.get().toInt()
@@ -58,10 +54,14 @@ android {
         )
     }
 
+    buildFeatures {
+        dataBinding = true
+    }
+
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-fy-${libs.versions.versionName.get()}-${name}.apk"
+                "zktony-fy-${versionName}-${name}.apk"
         }
     }
 }

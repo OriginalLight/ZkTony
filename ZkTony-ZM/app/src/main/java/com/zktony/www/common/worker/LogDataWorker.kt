@@ -6,6 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.common.network.adapter.isSuccess
+import com.zktony.www.common.result.NetworkResult
 import com.zktony.www.data.repository.LogDataRepository
 import com.zktony.www.data.repository.LogRepository
 import dagger.assisted.Assisted
@@ -31,20 +32,21 @@ class LogDataWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         try {
-            logDataRepository.withoutUpload().first().let {
-                if (it.isEmpty()) {
+            logDataRepository.withoutUpload().first().let { logs ->
+                if (logs.isEmpty()) {
                     Logger.d("LogDataWorker", "上传日志数据为空")
                     return Result.success()
                 }
-                val res = logRepository.uploadLogData(it)
-                if (res.isSuccess) {
-                    it.forEach { logData ->
-                        logData.upload = 1
+                logRepository.uploadLogData(logs).collect { res ->
+                    when(res) {
+                        is NetworkResult.Success -> {
+                            logDataRepository.updateBatch(logs.map { it.copy(upload = 1) })
+                        }
+                        is NetworkResult.Error -> {
+                            Logger.d("LogDataWorker", "上传日志数据失败")
+                        }
+                        else -> {}
                     }
-                    logDataRepository.updateBatch(it)
-                } else {
-                    Logger.e("LogDataWorker", "上传日志数据失败")
-                    return Result.failure()
                 }
             }
             return Result.success()

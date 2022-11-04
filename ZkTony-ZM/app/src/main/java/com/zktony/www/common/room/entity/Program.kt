@@ -2,33 +2,29 @@ package com.zktony.www.common.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Date
-import java.util.UUID
+import java.util.*
 
 @Entity(tableName = "program")
-class Program(
+data class Program(
     @PrimaryKey
-    var id: String = UUID.randomUUID().toString()
-) {
-    constructor() : this(UUID.randomUUID().toString())
-
-    var name = ""
-    var motor = 0
-    var voltage = 0f
-    var time = 0f
-    var count = 0
-    var thickness = "0.075"
-    var glueType = 0
-    var glueConcentration = 0f
-    var glueMaxConcentration = 0f
-    var glueMinConcentration = 0f
-    var proteinMaxSize = 0f
-    var proteinMinSize = 0f
-    var proteinName = ""
-    var bufferType = "厂家"
-    var model = 0
-    var status = 0
-    var def = 0
-    var upload = 0
-    var createTime = Date(System.currentTimeMillis())
-}
+    val id: String = UUID.randomUUID().toString(),
+    val name: String = "",
+    val motor: Int = 0,
+    val voltage: Float = 0f,
+    val time: Float = 0f,
+    val count: Int = 0,
+    val thickness: String = "0.075",
+    val glueType: Int = 0,
+    val glueConcentration: Float = 0f,
+    val glueMaxConcentration: Float = 0f,
+    val glueMinConcentration: Float = 0f,
+    val proteinMaxSize: Float = 0f,
+    val proteinMinSize: Float = 0f,
+    val proteinName: String = "",
+    val bufferType: String = "厂家",
+    val model: Int = 0,
+    val status: Int = 0,
+    val def: Int = 0,
+    val upload: Int = 0,
+    val createTime: Date = Date(System.currentTimeMillis())
+)

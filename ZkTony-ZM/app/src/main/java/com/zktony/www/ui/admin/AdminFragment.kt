@@ -18,10 +18,10 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.extension.*
-import com.zktony.www.databinding.FragmentAdminBinding
+import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.model.Version
+import com.zktony.www.databinding.FragmentAdminBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
@@ -45,37 +45,37 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     @SuppressLint("SetTextI18n")
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.state.collect {
+            viewModel.event.collect {
                 when (it) {
-                    is AdminState.ChangeBar -> {
+                    is AdminEvent.ChangeBar -> {
                         binding.sw1.isChecked = it.bar
                     }
 
-                    is AdminState.ChangeAudio -> {
+                    is AdminEvent.ChangeAudio -> {
                         binding.sw2.isChecked = it.audio
                     }
 
-                    is AdminState.ChangeDetect -> {
+                    is AdminEvent.ChangeDetect -> {
                         binding.sw3.isChecked = it.detect
                     }
 
-                    is AdminState.ChangeInterval -> {
+                    is AdminEvent.ChangeInterval -> {
                         if (!binding.et1.isFocused) {
                             binding.et1.setText(it.interval.toString())
                         }
                     }
 
-                    is AdminState.ChangeDuration -> {
+                    is AdminEvent.ChangeDuration -> {
                         if (!binding.et2.isFocused) {
                             binding.et2.setText(it.duration.toString())
                         }
                     }
 
-                    is AdminState.CheckUpdate -> {
+                    is AdminEvent.CheckUpdate -> {
                         confirmUpdate(it.file, it.version)
                     }
 
-                    is AdminState.DownloadSuccess -> {
+                    is AdminEvent.DownloadSuccess -> {
                         binding.progress.visibility = View.INVISIBLE
                         binding.tvUpdate.run {
                             text = "检查更新"
@@ -84,13 +84,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                         requireContext().installApk(it.file)
                     }
 
-                    is AdminState.DownloadError -> {
+                    is AdminEvent.DownloadError -> {
                         binding.progress.progress = 0
                         binding.progress.visibility = View.INVISIBLE
                         "下载失败,  请重试！".showShortToast()
                     }
 
-                    is AdminState.DownloadProgress -> {
+                    is AdminEvent.DownloadProgress -> {
                         binding.progress.run {
                             if (visibility != View.VISIBLE) {
                                 visibility = View.VISIBLE
@@ -116,20 +116,20 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     private fun imageButtonEvent() {
         binding.ib1.run {
             clickScale()
-            setOnClickListener { viewModel.dispatch(AdminIntent.Rest) }
+            setOnClickListener { viewModel.rest() }
         }
         binding.ib2.addTouchEvent({
             it.scaleX = 0.8f
             it.scaleY = 0.8f
-            viewModel.dispatch(AdminIntent.ChangePump(true))
+            viewModel.changePump(true)
         }, {
             it.scaleX = 1f
             it.scaleY = 1f
-            viewModel.dispatch(AdminIntent.ChangePump(false))
+            viewModel.changePump(false)
         })
         binding.ib3.run {
             clickScale()
-            setOnClickListener { viewModel.dispatch(AdminIntent.WifiSetting(requireContext())) }
+            setOnClickListener { viewModel.wifiSetting(requireContext()) }
         }
         binding.ib4.run {
             clickScale()
@@ -137,7 +137,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 if (viewModel.uiState.value.isUpdating) {
                     PopTip.show("正在更新中")
                 } else {
-                    viewModel.dispatch(AdminIntent.CheckUpdate(requireContext()))
+                    viewModel.checkUpdate(requireContext())
                 }
             }
         }
@@ -148,13 +148,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
      */
     private fun initSwitch() {
         binding.sw1.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.dispatch(AdminIntent.ChangeBar(isChecked, requireContext()))
+            viewModel.changeBar(isChecked, requireContext())
         }
         binding.sw2.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.dispatch(AdminIntent.ChangeAudio(isChecked))
+            viewModel.changeAudio(isChecked)
         }
         binding.sw3.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.dispatch(AdminIntent.ChangeDetect(isChecked))
+            viewModel.changeDetect(isChecked)
         }
     }
 
@@ -164,16 +164,16 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     private fun initEditView() {
         binding.et1.afterTextChange {
             if (it.isNotEmpty()) {
-                viewModel.dispatch(AdminIntent.ChangeInterval(it.removeZero().toInt()))
+                viewModel.changeInterval(it.removeZero().toInt())
             } else {
-                viewModel.dispatch(AdminIntent.ChangeInterval(1))
+                viewModel.changeInterval(1)
             }
         }
         binding.et2.afterTextChange {
             if (it.isNotEmpty()) {
-                viewModel.dispatch(AdminIntent.ChangeDuration(it.removeZero().toInt()))
+                viewModel.changeDuration(it.removeZero().toInt())
             } else {
-                viewModel.dispatch(AdminIntent.ChangeDuration(10))
+                viewModel.changeDuration(10)
             }
         }
         binding.conVersion.run {
@@ -231,6 +231,8 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
 
     /**
      * 确认更新
+     * @param file [File] 文件
+     * @param version [Version] 版本信息
      */
     private fun confirmUpdate(file: File?, version: Version?) {
         file?.run {
@@ -244,12 +246,10 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                         title.text = "发现本地新版本"
                         message.text = "是否更新？"
                         btnOk.setOnClickListener {
-                            viewModel.dispatch(
-                                AdminIntent.DoUpdate(
-                                    requireContext(),
-                                    this@run,
-                                    null
-                                )
+                            viewModel.doUpdate(
+                                requireContext(),
+                                this@run,
+                                null
                             )
                             dialog.dismiss()
                         }
@@ -270,12 +270,10 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                         title.text = "发现在线新版本"
                         message.text = this@run.description + "\n是否升级？"
                         btnOk.setOnClickListener {
-                            viewModel.dispatch(
-                                AdminIntent.DoUpdate(
-                                    requireContext(),
-                                    null,
-                                    this@run
-                                )
+                            viewModel.doUpdate(
+                                requireContext(),
+                                null,
+                                this@run
                             )
                             dialog.dismiss()
                         }
