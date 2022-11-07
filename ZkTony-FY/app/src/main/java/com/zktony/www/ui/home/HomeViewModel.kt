@@ -596,7 +596,7 @@ class HomeViewModel @Inject constructor(
             if (uiState.value.moduleA.job == null && uiState.value.moduleB.job == null && uiState.value.moduleC.job == null && uiState.value.moduleD.job == null) {
                 appViewModel.sender(
                     SerialPortEnum.SERIAL_ONE,
-                    Command(parameter = "0B", data = "0101").toHex()
+                    Command(parameter = "0B", data = "0100").toHex()
                 )
             }
             _event.emit(HomeEvent.OnDashBoardChange(module))
@@ -611,7 +611,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             job.state.collect {
                 when (it) {
-                    is ActionState.CurrentAction -> {
+                    is ActionEvent.CurrentAction -> {
                         val action = it.action
                         when (it.module) {
                             ModuleEnum.A -> {
@@ -645,7 +645,7 @@ class HomeViewModel @Inject constructor(
                         }
                         _event.emit(HomeEvent.OnDashBoardChange(it.module))
                     }
-                    is ActionState.CurrentActionTime -> {
+                    is ActionEvent.CurrentActionTime -> {
                         val time = it.time
                         when (it.module) {
                             ModuleEnum.A -> {
@@ -679,7 +679,40 @@ class HomeViewModel @Inject constructor(
                         }
                         _event.emit(HomeEvent.OnDashBoardChange(it.module))
                     }
-                    is ActionState.Finish -> stop(it.module)
+                    is ActionEvent.Finish -> stop(it.module)
+                    is ActionEvent.Count -> {
+                        when (it.module) {
+                            ModuleEnum.A -> {
+                                _uiState.value = _uiState.value.copy(
+                                    dashBoardA = _uiState.value.dashBoardA.copy(
+                                        count = it.count.toString()
+                                    )
+                                )
+                            }
+                            ModuleEnum.B -> {
+                                _uiState.value = _uiState.value.copy(
+                                    dashBoardB = _uiState.value.dashBoardB.copy(
+                                        count = it.count.toString()
+                                    )
+                                )
+                            }
+                            ModuleEnum.C -> {
+                                _uiState.value = _uiState.value.copy(
+                                    dashBoardC = _uiState.value.dashBoardC.copy(
+                                        count = it.count.toString()
+                                    )
+                                )
+                            }
+                            ModuleEnum.D -> {
+                                _uiState.value = _uiState.value.copy(
+                                    dashBoardD = _uiState.value.dashBoardD.copy(
+                                        count = it.count.toString()
+                                    )
+                                )
+                            }
+                        }
+                        _event.emit(HomeEvent.OnDashBoardChange(it.module))
+                    }
                 }
             }
         }
@@ -738,6 +771,7 @@ data class DashBoardState(
     val currentAction: Action = Action(),
     val time: String = "00:00:00",
     val temperature: String = "0.0℃",
+    val count : String = ""
 )
 
 enum class ModuleEnum(val value: String, val index: Int) {

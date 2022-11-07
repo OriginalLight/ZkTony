@@ -215,11 +215,6 @@ class AdminFragment :
                     viewModel.changeTemp(it.toFloat())
                 }
             }
-            onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
-                if (!hasFocus && text.toString().isEmpty()) {
-                    this.setText(appViewModel.settingState.value.temp.toString().removeZero())
-                }
-            }
         }
     }
 

@@ -2,11 +2,10 @@ package com.zktony.www.common.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.zktony.www.common.extension.hex2ToInt16
-import com.zktony.www.common.extension.hexToInt8
 import com.zktony.www.common.extension.int16ToHex2
 import com.zktony.www.common.extension.int8ToHex
 import java.util.*
+import kotlin.math.max
 
 /**
  * @author: 刘贺贺
@@ -91,7 +90,7 @@ data class MotionMotor(
      * @param y [Float] y轴运动距离
      * @param z [Float] z轴运动距离
      */
-    fun toMultiPointHex(y: Float, z: Float): String {
+    fun toMotionHex(y: Float, z: Float): String {
         val str = StringBuilder()
         str.append("0,")
         str.append(yPulseCount(y))
@@ -185,44 +184,90 @@ data class PumpMotor(
     }
 
     /**
+     * 多点运动
+     * @param one [Float] 泵一出液量
+     * @param two [Float] 泵二出液量
+     * @param three [Float] 泵三出液量
+     * @param three [Float] 泵四出液量
+     * @param three [Float] 泵五出液量
+     */
+    fun toPumpHex(
+        one: Float = 0f,
+        two: Float = 0f,
+        three: Float = 0f,
+        four: Float = 0f,
+        five: Float = 0f
+    ): List<String> {
+        val hex = StringBuilder()
+        val hex1 = StringBuilder()
+        hex.append(pumpOneVolumePulseCount(one))
+        hex.append(",")
+        hex.append(pumpTwoVolumePulseCount(two))
+        hex.append(",")
+        hex.append(pumpThreeVolumePulseCount(three))
+        hex.append(",")
+        hex1.append(pumpFourVolumePulseCount(four))
+        hex1.append(",")
+        hex1.append(pumpFiveVolumePulseCount(five))
+        hex1.append(",")
+        hex1.append("0,")
+        return listOf(hex.toString(), hex1.toString())
+    }
+
+    /**
      * B板子多点运动
-     * @param pumpOneVolume [Float] 泵一出液量
-     * @param pumpTwoVolume [Float] 泵二出液量
-     * @param pumpThreeVolume [Float] 泵三出液量
+     * @param oneVolume [Float] 泵一出液量
+     * @param twoVolume [Float] 泵二出液量
+     * @param threeVolume [Float] 泵三出液量
      * @return [String] 十六进制字符串
      */
     fun toMultiPointHexB(
-        pumpOneVolume: Float,
-        pumpTwoVolume: Float,
-        pumpThreeVolume: Float,
+        oneVolume: Float,
+        twoVolume: Float,
+        threeVolume: Float,
     ): String {
         val str = StringBuilder()
-        str.append(pumpOneVolumePulseCount(pumpOneVolume))
+        str.append(pumpOneVolumePulseCount(oneVolume))
         str.append(",")
-        str.append(pumpTwoVolumePulseCount(pumpTwoVolume))
+        str.append(pumpTwoVolumePulseCount(twoVolume))
         str.append(",")
-        str.append(pumpThreeVolumePulseCount(pumpThreeVolume))
+        str.append(pumpThreeVolumePulseCount(threeVolume))
         str.append(",")
         return str.toString()
     }
 
     /**
      * C板子多点运动
-     * @param pumpFourVolume [Float] 泵一出液量
-     * @param pumpFiveVolume [Float] 泵二出液量
+     * @param fourVolume [Float] 泵一出液量
+     * @param fiveVolume [Float] 泵二出液量
      * @return [String] 十六进制字符串
      */
     fun toMultiPointHexC(
-        pumpFourVolume: Float,
-        pumpFiveVolume: Float,
+        fourVolume: Float,
+        fiveVolume: Float,
     ): String {
         val str = StringBuilder()
-        str.append(pumpFourVolumePulseCount(pumpFourVolume))
+        str.append(pumpFourVolumePulseCount(fourVolume))
         str.append(",")
-        str.append(pumpFiveVolumePulseCount(pumpFiveVolume))
+        str.append(pumpFiveVolumePulseCount(fiveVolume))
         str.append(",")
         str.append("0,")
         return str.toString()
+    }
+
+    fun delayTime(
+        one: Float = 0f,
+        two: Float = 0f,
+        three: Float = 0f,
+        four: Float = 0f,
+        five: Float = 0f
+    ): Long {
+        val oneTime = (one / volumeOne * 60 / pumpOne.speed * 1000).toLong()
+        val twoTime = (two / volumeTwo * 60 / pumpTwo.speed * 1000).toLong()
+        val threeTime = (three / volumeThree * 60 / pumpThree.speed * 1000).toLong()
+        val fourTime = (four / volumeFour * 60 / pumpFour.speed * 1000).toLong()
+        val fiveTime = (five / volumeFive * 60 / pumpFive.speed * 1000).toLong()
+        return max(oneTime, max(twoTime, max(threeTime, max(fourTime, fiveTime))))
     }
 
     /**

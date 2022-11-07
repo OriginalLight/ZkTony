@@ -51,6 +51,7 @@ class MotorViewModel @Inject constructor(
      * @param motor [Motor]
      */
     fun selectMotor(motor: Motor) {
+        _editMotor.value = motor
         _selectedMotor.value = motor
     }
 

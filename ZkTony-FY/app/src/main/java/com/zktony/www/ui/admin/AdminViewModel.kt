@@ -133,7 +133,6 @@ class AdminViewModel @Inject constructor(
             dataStore.edit { preferences ->
                 preferences[floatPreferencesKey(Constants.TEMP)] = temp
             }
-            PopTip.show("设置成功")
         }
     }
 
