@@ -1,6 +1,7 @@
 package com.zktony.www.ui.admin
 
 import androidx.lifecycle.viewModelScope
+import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.Calibration
@@ -24,13 +25,16 @@ class CalibrationViewModel @Inject constructor(
     lateinit var appViewModel: AppViewModel
 
     private val _calibration = MutableStateFlow(Calibration())
+    private val _editCalibration = MutableStateFlow(Calibration())
     val calibration = _calibration.asStateFlow()
+    val editCalibration = _editCalibration.asStateFlow()
 
     init {
         viewModelScope.launch {
             calibrationRepository.getCalibration().collect { calibrationList ->
                 if (calibrationList.isNotEmpty()) {
                     _calibration.value = calibrationList.first()
+                    _editCalibration.value = calibrationList.first()
                 }
             }
         }
@@ -42,7 +46,7 @@ class CalibrationViewModel @Inject constructor(
      */
     fun calibrationValueChange(calibration: Calibration) {
         viewModelScope.launch {
-            _calibration.value = calibration
+            _editCalibration.value = calibration
         }
     }
 
@@ -51,7 +55,8 @@ class CalibrationViewModel @Inject constructor(
      */
     fun updateCalibration() {
         viewModelScope.launch {
-            calibrationRepository.update(calibration.value)
+            calibrationRepository.update(editCalibration.value)
+            PopTip.show("更新成功")
         }
     }
 
@@ -65,7 +70,7 @@ class CalibrationViewModel @Inject constructor(
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMultiPointHex(calibration.wasteTankPosition, 0f)
+                        motionMotor.toMotionHex(calibration.wasteTankPosition, 0f)
                     )
                 ),
                 CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
@@ -84,8 +89,8 @@ class CalibrationViewModel @Inject constructor(
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.wasteTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(
+                    motionMotor.toMotionHex(calibration.wasteTankPosition, 0f) +
+                            motionMotor.toMotionHex(
                                 calibration.wasteTankPosition,
                                 calibration.wasteTankHeight
                             )
@@ -106,8 +111,8 @@ class CalibrationViewModel @Inject constructor(
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.wasteTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(0f, 0f)
+                    motionMotor.toMotionHex(calibration.wasteTankPosition, 0f) +
+                            motionMotor.toMotionHex(0f, 0f)
                 )
             ),
             CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
@@ -126,7 +131,7 @@ class CalibrationViewModel @Inject constructor(
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMultiPointHex(calibration.washTankPosition, 0f)
+                        motionMotor.toMotionHex(calibration.washTankPosition, 0f)
                     )
                 ),
                 CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
@@ -145,8 +150,8 @@ class CalibrationViewModel @Inject constructor(
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.washTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(
+                    motionMotor.toMotionHex(calibration.washTankPosition, 0f) +
+                            motionMotor.toMotionHex(
                                 calibration.washTankPosition,
                                 calibration.washTankHeight
                             )
@@ -167,8 +172,8 @@ class CalibrationViewModel @Inject constructor(
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.washTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(0f, 0f)
+                    motionMotor.toMotionHex(calibration.washTankPosition, 0f) +
+                            motionMotor.toMotionHex(0f, 0f)
                 )
             ),
             CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
@@ -187,7 +192,7 @@ class CalibrationViewModel @Inject constructor(
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMultiPointHex(calibration.blockingLiquidTankPosition, 0f)
+                        motionMotor.toMotionHex(calibration.blockingLiquidTankPosition, 0f)
                     )
                 ),
                 CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
@@ -206,8 +211,8 @@ class CalibrationViewModel @Inject constructor(
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.blockingLiquidTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(
+                    motionMotor.toMotionHex(calibration.blockingLiquidTankPosition, 0f) +
+                            motionMotor.toMotionHex(
                                 calibration.blockingLiquidTankPosition,
                                 calibration.blockingLiquidTankHeight
                             )
@@ -228,8 +233,8 @@ class CalibrationViewModel @Inject constructor(
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.blockingLiquidTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(0f, 0f)
+                    motionMotor.toMotionHex(calibration.blockingLiquidTankPosition, 0f) +
+                            motionMotor.toMotionHex(0f, 0f)
                 )
             ),
             CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
@@ -248,7 +253,7 @@ class CalibrationViewModel @Inject constructor(
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, 0f)
+                        motionMotor.toMotionHex(calibration.antibodyOneTankPosition, 0f)
                     )
                 ),
                 CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
@@ -267,8 +272,8 @@ class CalibrationViewModel @Inject constructor(
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(
+                    motionMotor.toMotionHex(calibration.antibodyOneTankPosition, 0f) +
+                            motionMotor.toMotionHex(
                                 calibration.antibodyOneTankPosition,
                                 calibration.antibodyOneTankHeight
                             )
@@ -279,7 +284,7 @@ class CalibrationViewModel @Inject constructor(
             CommandBlock.Delay(3000),
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(
+                    motionMotor.toMotionHex(
                         calibration.antibodyOneTankPosition,
                         calibration.recycleAntibodyOneTankHeight
                     )
@@ -300,8 +305,8 @@ class CalibrationViewModel @Inject constructor(
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.antibodyOneTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(0f, 0f)
+                    motionMotor.toMotionHex(calibration.antibodyOneTankPosition, 0f) +
+                            motionMotor.toMotionHex(0f, 0f)
                 )
             ),
             CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
@@ -320,7 +325,7 @@ class CalibrationViewModel @Inject constructor(
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMultiPointHex(calibration.antibodyTwoTankPosition, 0f)
+                        motionMotor.toMotionHex(calibration.antibodyTwoTankPosition, 0f)
                     )
                 ),
                 CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
@@ -339,8 +344,8 @@ class CalibrationViewModel @Inject constructor(
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.antibodyTwoTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(
+                    motionMotor.toMotionHex(calibration.antibodyTwoTankPosition, 0f) +
+                            motionMotor.toMotionHex(
                                 calibration.antibodyTwoTankPosition,
                                 calibration.antibodyTwoTankHeight
                             )
@@ -361,8 +366,8 @@ class CalibrationViewModel @Inject constructor(
         val commandBlock = listOf(
             CommandBlock.Hex(
                 SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMultiPointHex(calibration.antibodyTwoTankPosition, 0f) +
-                            motionMotor.toMultiPointHex(0f, 0f)
+                    motionMotor.toMotionHex(calibration.antibodyTwoTankPosition, 0f) +
+                            motionMotor.toMotionHex(0f, 0f)
                 )
             ),
             CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
@@ -380,7 +385,7 @@ class CalibrationViewModel @Inject constructor(
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMultiPointHex(0f, 0f)
+                        motionMotor.toMotionHex(0f, 0f)
                     )
                 ),
                 CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
@@ -399,7 +404,7 @@ class CalibrationViewModel @Inject constructor(
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMultiPointHex(0f, 0f)
+                        motionMotor.toMotionHex(0f, 0f)
                     )
                 ),
                 CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("3200,3200,3200,")),
@@ -418,7 +423,7 @@ class CalibrationViewModel @Inject constructor(
             val commandBlock = listOf(
                 CommandBlock.Hex(
                     SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMultiPointHex(0f, 0f)
+                        motionMotor.toMotionHex(0f, 0f)
                     )
                 ),
                 CommandBlock.Hex(

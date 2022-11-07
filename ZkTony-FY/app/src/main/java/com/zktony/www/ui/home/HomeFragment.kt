@@ -438,9 +438,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 binding.a.run {
                     dashState.text = if (uiState.moduleA.isRunning) "运行中" else "已就绪"
                     dashAction.text =
-                        if (uiState.dashBoardA.currentAction.order == 0) "/" else uiState.dashBoardA.currentAction.order.toString() + " " + getActionEnum(
+                        if (uiState.dashBoardA.currentAction.order == 0) "/" else getActionEnum(
                             uiState.dashBoardA.currentAction.mode
-                        ).value
+                        ).value + if (uiState.dashBoardA.count.isNotEmpty()) " X${uiState.dashBoardA.count}" else ""
                     dashTemp.text = uiState.dashBoardA.temperature
                     dashTime.text = uiState.dashBoardA.time
                 }
@@ -449,9 +449,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 binding.b.run {
                     dashState.text = if (uiState.moduleB.isRunning) "运行中" else "已就绪"
                     dashAction.text =
-                        if (uiState.dashBoardB.currentAction.order == 0) "/" else uiState.dashBoardB.currentAction.order.toString() + " " + getActionEnum(
+                        if (uiState.dashBoardB.currentAction.order == 0) "/" else getActionEnum(
                             uiState.dashBoardB.currentAction.mode
-                        ).value
+                        ).value + if (uiState.dashBoardB.count.isNotEmpty()) " X${uiState.dashBoardB.count}" else ""
                     dashTemp.text = uiState.dashBoardB.temperature
                     dashTime.text = uiState.dashBoardB.time
                 }
@@ -460,9 +460,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 binding.c.run {
                     dashState.text = if (uiState.moduleC.isRunning) "运行中" else "已就绪"
                     dashAction.text =
-                        if (uiState.dashBoardC.currentAction.order == 0) "/" else uiState.dashBoardC.currentAction.order.toString() + " " + getActionEnum(
+                        if (uiState.dashBoardC.currentAction.order == 0) "/" else getActionEnum(
                             uiState.dashBoardC.currentAction.mode
-                        ).value
+                        ).value + if (uiState.dashBoardC.count.isNotEmpty()) " X${uiState.dashBoardC.count}" else ""
                     dashTemp.text = uiState.dashBoardC.temperature
                     dashTime.text = uiState.dashBoardC.time
                 }
@@ -471,9 +471,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 binding.d.run {
                     dashState.text = if (uiState.moduleD.isRunning) "运行中" else "已就绪"
                     dashAction.text =
-                        if (uiState.dashBoardD.currentAction.order == 0) "/" else uiState.dashBoardD.currentAction.order.toString() + " " + getActionEnum(
+                        if (uiState.dashBoardD.currentAction.order == 0) "/" else getActionEnum(
                             uiState.dashBoardD.currentAction.mode
-                        ).value
+                        ).value + if (uiState.dashBoardD.count.isNotEmpty()) " X${uiState.dashBoardD.count}" else ""
                     dashTemp.text = uiState.dashBoardD.temperature
                     dashTime.text = uiState.dashBoardD.time
                 }

@@ -64,16 +64,16 @@ class CommandGroup {
         commandBlock.add(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    move(
+                    moveTo(
                         calibration.blockingLiquidTankPosition, calibration.blockingLiquidTankHeight
                     )
                 )
             )
         )
         // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquid()[0])))
         // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquidC())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquid()[1])))
         // 运动加液延时
         commandBlock.add(
             CommandBlock.Delay(
@@ -111,16 +111,16 @@ class CommandGroup {
         commandBlock.add(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    move(
+                    moveTo(
                         calibration.antibodyOneTankPosition, calibration.antibodyOneTankHeight
                     )
                 )
             )
         )
         // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquid()[0])))
         // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquidC())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquid()[1])))
         // 运动加液延时
         commandBlock.add(
             CommandBlock.Delay(
@@ -156,18 +156,14 @@ class CommandGroup {
         // 主板运动命令
         commandBlock.add(
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
-                    move(
-                        calibration.antibodyOneTankPosition,
-                        calibration.recycleAntibodyOneTankHeight
-                    )
-                )
+                SERIAL_ONE,
+                Command.multiPoint(moveTo(calibration.antibodyOneTankPosition, calibration.recycleAntibodyOneTankHeight))
             )
         )
         // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(recycleLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(recycleLiquid()[0])))
         // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(recycleLiquidC())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(recycleLiquid()[1])))
         // 运动加液延时
         commandBlock.add(
             CommandBlock.Delay(
@@ -205,16 +201,16 @@ class CommandGroup {
         commandBlock.add(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    move(
+                    moveTo(
                         calibration.antibodyTwoTankPosition, calibration.antibodyTwoTankHeight
                     )
                 )
             )
         )
         // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquid()[0])))
         // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquidC())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquid()[1])))
         // 运动加液延时
         commandBlock.add(
             CommandBlock.Delay(
@@ -250,16 +246,16 @@ class CommandGroup {
         commandBlock.add(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    move(
+                    moveTo(
                         calibration.washTankPosition, calibration.washTankHeight
                     )
                 )
             )
         )
         // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquid()[0])))
         // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquidC())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquid()[1])))
         // 运动加液延时
         commandBlock.add(
             CommandBlock.Delay(
@@ -297,16 +293,16 @@ class CommandGroup {
         commandBlock.add(
             CommandBlock.Hex(
                 SERIAL_ONE, Command.multiPoint(
-                    move(
+                    moveTo(
                         calibration.wasteTankPosition, calibration.wasteTankHeight
                     )
                 )
             )
         )
         // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(recycleLiquidB())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(recycleLiquid()[0])))
         // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(recycleLiquidC())))
+        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(recycleLiquid()[1])))
         // 运动加液延时
         commandBlock.add(
             CommandBlock.Delay(
@@ -339,147 +335,103 @@ class CommandGroup {
     /**
      * 主机命令生成器
      */
-    private fun move(distance: Float, height: Float): String {
-        return motionMotor.toMultiPointHex(distance, 0f) + motionMotor.toMultiPointHex(
-            distance,
-            height
-        ) + motionMotor.toMultiPointHex(distance, 0f) + motionMotor.toMultiPointHex(0f, 0f)
+    private fun moveTo(distance: Float, height: Float): String {
+        return motionMotor.toMotionHex(distance, 0f) +
+                motionMotor.toMotionHex(distance, height) +
+                motionMotor.toMotionHex(distance, 0f) +
+                motionMotor.toMotionHex(0f, 0f)
     }
 
     /**
-     * 从机B加液命令生成器
-     * @return [String] 命令字符串
+     * 从板子加液命令生成器
+     * @return [List]<[String]>
      */
-    private fun addLiquidB(): String {
-        when (module) {
+    private fun addLiquid(): List<String> {
+        val zero = "0,0,0,"
+        val list = mutableListOf<String>()
+        when(module) {
             A -> {
-                return pumpMotor.toMultiPointHexB(
-                    0f,
-                    0f,
-                    0f
-                ) + pumpMotor.toMultiPointHexB(
-                    action.liquidVolume,
-                    0f,
-                    0f
-                ) + pumpMotor.toMultiPointHexB(0f, 0f, 0f) + pumpMotor.toMultiPointHexB(
-                    action.liquidVolume + (200 * pumpMotor.pumpOne.subdivision * calibration.drainDistance),
-                    0f,
-                    0f
-                )
+                val stepOne = pumpMotor.toPumpHex(
+                    one = action.liquidVolume,
+                    five = if (action.mode == 3) action.liquidVolume else 0f)
+                val stepTwo = pumpMotor.toPumpHex(
+                    one = action.liquidVolume + pumpMotor.volumeOne * calibration.drainDistance)
+
+                list.add(zero + stepOne[0] + zero + stepTwo[0])
+                list.add(zero + stepOne[1] + zero + stepTwo[1])
             }
             B -> {
-                return pumpMotor.toMultiPointHexB(0f, 0f, 0f) + pumpMotor.toMultiPointHexB(
-                    0f,
-                    action.liquidVolume,
-                    0f
-                ) + pumpMotor.toMultiPointHexB(0f, 0f, 0f) + pumpMotor.toMultiPointHexB(
-                    0f,
-                    action.liquidVolume + (200 * pumpMotor.pumpOne.subdivision * calibration.drainDistance),
-                    0f
-                )
+                val stepOne = pumpMotor.toPumpHex(
+                    two = action.liquidVolume,
+                    five = if (action.mode == 3) action.liquidVolume else 0f)
+                val stepTwo = pumpMotor.toPumpHex(
+                    two = action.liquidVolume + pumpMotor.volumeTwo * calibration.drainDistance)
+
+                list.add(zero + stepOne[0] + zero + stepTwo[0])
+                list.add(zero + stepOne[1] + zero + stepTwo[1])
             }
             C -> {
-                return pumpMotor.toMultiPointHexB(0f, 0f, 0f) + pumpMotor.toMultiPointHexB(
-                    0f,
-                    0f,
-                    action.liquidVolume
-                ) + pumpMotor.toMultiPointHexB(0f, 0f, 0f) + pumpMotor.toMultiPointHexB(
-                    0f,
-                    0f,
-                    action.liquidVolume + (200 * pumpMotor.pumpOne.subdivision * calibration.drainDistance)
-                )
+                val stepOne = pumpMotor.toPumpHex(
+                    three = action.liquidVolume,
+                    five = if (action.mode == 3) action.liquidVolume else 0f)
+                val stepTwo = pumpMotor.toPumpHex(
+                    three = action.liquidVolume + pumpMotor.volumeThree * calibration.drainDistance)
+
+                list.add(zero + stepOne[0] + zero + stepTwo[0])
+                list.add(zero + stepOne[1] + zero + stepTwo[1])
             }
             D -> {
-                return "0,0,0,0,0,0,0,0,0,0,0,0,"
+                val stepOne = pumpMotor.toPumpHex(
+                    four = action.liquidVolume,
+                    five = if (action.mode == 3) action.liquidVolume else 0f)
+                val stepTwo = pumpMotor.toPumpHex(
+                    four = action.liquidVolume + pumpMotor.volumeFour * calibration.drainDistance)
+
+                list.add(zero + stepOne[0] + zero + stepTwo[0])
+                list.add(zero + stepOne[1] + zero + stepTwo[1])
             }
         }
+        return list
     }
 
     /**
-     * 从机C加液命令生成器
-     * @return [String] 命令字符串
+     * 从机排液命令生成器
+     * @return [List]<[String]>
      */
-    private fun addLiquidC(): String {
+    private fun recycleLiquid(): List<String> {
+        val zero = "0,0,0,"
+        val list = mutableListOf<String>()
         when (module) {
             A -> {
-                return "0,0,0,0,0,0,0,0,0,0,0,0,"
-            }
-            B -> {
-                return "0,0,0,0,0,0,0,0,0,0,0,0,"
-            }
-            C -> {
-                return "0,0,0,0,0,0,0,0,0,0,0,0,"
-            }
-            D -> {
-                return pumpMotor.toMultiPointHexC(
-                    0f,
-                    0f
-                ) + pumpMotor.toMultiPointHexC(
-                    action.liquidVolume,
-                    0f
-                ) + pumpMotor.toMultiPointHexC(0f, 0f) + pumpMotor.toMultiPointHexC(
-                    action.liquidVolume + (200 * pumpMotor.pumpOne.subdivision * calibration.drainDistance),
-                    0f
+                val recycle = pumpMotor.toPumpHex(
+                    one = -(action.liquidVolume + pumpMotor.volumeOne * calibration.drainDistance),
                 )
-            }
-        }
-    }
-
-    /**
-     * 从机B排液命令生成器
-     * @return [String] 命令字符串
-     */
-    private fun recycleLiquidB(): String {
-        when (module) {
-            A -> {
-                return pumpMotor.toMultiPointHexB(0f, 0f, 0f) + pumpMotor.toMultiPointHexB(
-                    -(action.liquidVolume + (calibration.pumpOneDistance * calibration.drainDistance)),
-                    0f,
-                    0f
-                ) + pumpMotor.toMultiPointHexB(0f, 0f, 0f) + pumpMotor.toMultiPointHexB(0f, 0f, 0f)
+                list.add(zero + recycle[0] + zero + zero)
+                list.add(zero + recycle[1] + zero + zero)
             }
             B -> {
-                return pumpMotor.toMultiPointHexB(0f, 0f, 0f) + pumpMotor.toMultiPointHexB(
-                    0f,
-                    -(action.liquidVolume + (calibration.pumpTwoDistance * calibration.drainDistance)),
-                    0f
-                ) + pumpMotor.toMultiPointHexB(0f, 0f, 0f) + pumpMotor.toMultiPointHexB(0f, 0f, 0f)
+                val recycle = pumpMotor.toPumpHex(
+                    two = -(action.liquidVolume + pumpMotor.volumeTwo * calibration.drainDistance),
+                )
+                list.add(zero + recycle[0] + zero + zero)
+                list.add(zero + recycle[1] + zero + zero)
             }
             C -> {
-                return pumpMotor.toMultiPointHexB(0f, 0f, 0f) + pumpMotor.toMultiPointHexB(
-                    0f,
-                    0f,
-                    -(action.liquidVolume + (calibration.pumpThreeDistance * calibration.drainDistance))
-                ) + pumpMotor.toMultiPointHexB(0f, 0f, 0f) + pumpMotor.toMultiPointHexB(0f, 0f, 0f)
+                val recycle = pumpMotor.toPumpHex(
+                    three = -(action.liquidVolume + pumpMotor.volumeThree * calibration.drainDistance),
+                )
+                list.add(zero + recycle[0] + zero + zero)
+                list.add(zero + recycle[1] + zero + zero)
             }
             D -> {
-                return "0,0,0,0,0,0,0,0,0,0,0,0,"
+                val recycle = pumpMotor.toPumpHex(
+                    four = -(action.liquidVolume + pumpMotor.volumeFour * calibration.drainDistance),
+                )
+                list.add(zero + recycle[0] + zero + zero)
+                list.add(zero + recycle[1] + zero + zero)
             }
         }
-    }
-
-    /**
-     * 从机C排液命令生成器
-     * @return [String] 命令字符串
-     */
-    private fun recycleLiquidC(): String {
-        when (module) {
-            A -> {
-                return "0,0,0,0,0,0,0,0,0,0,0,0,"
-            }
-            B -> {
-                return "0,0,0,0,0,0,0,0,0,0,0,0,"
-            }
-            C -> {
-                return "0,0,0,0,0,0,0,0,0,0,0,0,"
-            }
-            D -> {
-                return pumpMotor.toMultiPointHexC(0f, 0f) + pumpMotor.toMultiPointHexC(
-                    -(action.liquidVolume + (calibration.pumpFourDistance * calibration.drainDistance)),
-                    0f
-                ) + pumpMotor.toMultiPointHexC(0f, 0f) + pumpMotor.toMultiPointHexC(0f, 0f)
-            }
-        }
+        return list
     }
 
     /**
@@ -489,30 +441,27 @@ class CommandGroup {
     private fun addLiquidDelay(): Long {
         return when (module) {
             A -> {
-                pumpMotor.delayTimeB(
-                    action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpOneDistance,
-                    0f,
-                    0f
+                pumpMotor.delayTime(
+                    one = action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpOneDistance,
+                    five = if (action.mode == 3) action.liquidVolume else 0f
                 )
             }
             B -> {
-                pumpMotor.delayTimeB(
-                    0f,
-                    action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpTwoDistance,
-                    0f
+                pumpMotor.delayTime(
+                    two = action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpTwoDistance,
+                    five = if (action.mode == 3) action.liquidVolume else 0f
                 )
             }
             C -> {
-                pumpMotor.delayTimeB(
-                    0f,
-                    0f,
-                    action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpThreeDistance
+                pumpMotor.delayTime(
+                    three = action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpThreeDistance,
+                    five = if (action.mode == 3) action.liquidVolume else 0f
                 )
             }
             D -> {
-                pumpMotor.delayTimeC(
-                    action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpFourDistance,
-                    0f
+                pumpMotor.delayTime(
+                    four = action.liquidVolume * 2 + calibration.drainDistance * calibration.pumpFourDistance,
+                    five = if (action.mode == 3) action.liquidVolume else 0f
                 )
             }
         }

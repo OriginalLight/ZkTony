@@ -24,8 +24,8 @@ class ActionActuator private constructor(
     private val module: ModuleEnum,
     private val settingState: SettingState,
 ) {
-    private val _state = MutableSharedFlow<ActionState>()
-    val state: SharedFlow<ActionState> get() = _state
+    private val _state = MutableSharedFlow<ActionEvent>()
+    val state: SharedFlow<ActionEvent> get() = _state
     private val commandGroup by lazy { CommandGroup() }
 
     /**
@@ -33,12 +33,12 @@ class ActionActuator private constructor(
      */
     suspend fun run() {
         actionQueue.peek()?.let { action ->
-            _state.emit(ActionState.CurrentAction(module, action))
+            _state.emit(ActionEvent.CurrentAction(module, action))
             when (action.mode) {
                 ActionEnum.BLOCKING_LIQUID.index -> executeBlockingLiquid(action)
                 ActionEnum.ANTIBODY_ONE.index -> executeAntibodyOne(action)
                 ActionEnum.ANTIBODY_TWO.index -> executeAntibodyTwo(action)
-                ActionEnum.WASHING.index -> executeWashing(action)
+                ActionEnum.WASHING.index -> executeWashing(action, action.count)
                 else -> {}
             }
         }
@@ -55,7 +55,7 @@ class ActionActuator private constructor(
             initAction(action)
             addBlockingLiquid {
                 countDown((action.time * 60 * 60).toLong(), {
-                    _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
+                    _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
                 },
                     {
                         wasteLiquid { executeNext() }
@@ -76,7 +76,7 @@ class ActionActuator private constructor(
             initAction(action)
             addAntibodyOne {
                 countDown((action.time * 60 * 60).toLong(), {
-                    _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
+                    _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
                 },
                     {
                         recycleAntibodyOne { executeNext() }
@@ -96,7 +96,7 @@ class ActionActuator private constructor(
             initAction(action)
             addAntibodyTwo {
                 countDown((action.time * 60 * 60).toLong(), {
-                    _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
+                    _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
                 },
                     {
                         wasteLiquid { executeNext() }
@@ -109,21 +109,20 @@ class ActionActuator private constructor(
      * 执行洗涤
      * @param action Action
      */
-    private suspend fun executeWashing(action: Action) {
+    private suspend fun executeWashing(action: Action, count: Int) {
         commandGroup.run {
             initModule(module)
             initSettingState(settingState)
             initAction(action)
-            var count = action.count
+            _state.emit(ActionEvent.Count(module, action.count - count + 1))
             addWashingLiquid {
                 countDown((action.time * 60).toLong(), {
-                    _state.emit(ActionState.CurrentActionTime(module, it.getTimeFormat()))
+                    _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
                 },
                     {
-                        count--
                         wasteLiquid { }
-                        if (count > 0) {
-                            executeWashing(action)
+                        if (count - 1 > 0) {
+                            executeWashing(action, count - 1)
                         } else {
                             executeNext()
                         }
@@ -141,7 +140,7 @@ class ActionActuator private constructor(
             if (isEmpty()) {
                 // 任务队列执行完成
                 Logger.e(msg = "${module.value}任务队列执行完成")
-                _state.emit(ActionState.Finish(module))
+                _state.emit(ActionEvent.Finish(module))
             } else {
                 // 继续执行任务队列
                 Logger.e(msg = "${module.value}执行下一个任务")
@@ -189,8 +188,9 @@ class ActionActuator private constructor(
 
 }
 
-sealed class ActionState {
-    data class CurrentAction(val module: ModuleEnum, val action: Action) : ActionState()
-    data class CurrentActionTime(val module: ModuleEnum, val time: String) : ActionState()
-    data class Finish(val module: ModuleEnum) : ActionState()
+sealed class ActionEvent {
+    data class CurrentAction(val module: ModuleEnum, val action: Action) : ActionEvent()
+    data class CurrentActionTime(val module: ModuleEnum, val time: String) : ActionEvent()
+    data class Finish(val module: ModuleEnum) : ActionEvent()
+    data class Count(val module: ModuleEnum, val count: Int) : ActionEvent()
 }

@@ -16,17 +16,17 @@ data class Calibration(
     val wasteTankPosition: Float = 6.5f,
     val wasteTankHeight: Float = 20f,
     // 洗涤槽液位置
-    val washTankPosition: Float = 50.5f,
+    val washTankPosition: Float = 50f,
     val washTankHeight: Float = 98f,
     // 封闭液槽位置
-    val blockingLiquidTankPosition: Float = 90f,
+    val blockingLiquidTankPosition: Float = 88f,
     val blockingLiquidTankHeight: Float = 98f,
     // 一抗槽位置
-    val antibodyOneTankPosition: Float = 176f,
+    val antibodyOneTankPosition: Float = 175f,
     val antibodyOneTankHeight: Float = 103f,
     val recycleAntibodyOneTankHeight: Float = 30f,
     // 二抗槽位置
-    val antibodyTwoTankPosition: Float = 137.5f,
+    val antibodyTwoTankPosition: Float = 137f,
     val antibodyTwoTankHeight: Float = 103f,
 
     // y轴电机一圈走的距离
@@ -34,15 +34,15 @@ data class Calibration(
     // z轴电机一圈走的距离
     val zMotorDistance: Float = 3.8f,
     // 蠕动泵一一圈走的进液量
-    val pumpOneDistance: Float = 0.5f,
+    val pumpOneDistance: Float = 1f,
     // 蠕动泵二一圈走的进液量
-    val pumpTwoDistance: Float = 0.5f,
+    val pumpTwoDistance: Float = 1f,
     // 蠕动泵三一圈走的进液量
-    val pumpThreeDistance: Float = 0.5f,
+    val pumpThreeDistance: Float = 1f,
     // 蠕动泵四一圈走的进液量
-    val pumpFourDistance: Float = 0.5f,
+    val pumpFourDistance: Float = 1f,
     // 蠕动泵五转的圈数
-    val pumpFiveDistance: Float = 0.5f,
+    val pumpFiveDistance: Float = 1f,
     // 排液转的圈数
     val drainDistance: Float = 30f,
 )
