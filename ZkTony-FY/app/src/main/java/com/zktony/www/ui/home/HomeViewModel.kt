@@ -2,7 +2,7 @@ package com.zktony.www.ui.home
 
 import android.view.View
 import androidx.lifecycle.viewModelScope
-import com.zktony.www.R
+import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
@@ -12,15 +12,19 @@ import com.zktony.www.common.extension.toCommand
 import com.zktony.www.common.model.Queue
 import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.Program
+import com.zktony.www.common.room.entity.getActionEnum
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
 import com.zktony.www.serialport.SerialPortEnum
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
+import com.zktony.www.ui.home.ModuleEnum.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -33,21 +37,25 @@ class HomeViewModel @Inject constructor(
     @Inject
     lateinit var appViewModel: AppViewModel
 
-    // 返回的状态
-    private val _event = MutableSharedFlow<HomeEvent>()
-    val event = _event.asSharedFlow()
-
-    // 保存的UI状态
-    private val _uiState = MutableStateFlow(HomeUiState())
-    val uiState = _uiState.asStateFlow()
+    private val _programList = MutableStateFlow<List<Program>>(emptyList())
+    private val _aState = MutableStateFlow(ModuleState())
+    private val _bState = MutableStateFlow(ModuleState())
+    private val _cState = MutableStateFlow(ModuleState())
+    private val _dState = MutableStateFlow(ModuleState())
+    private val _eState = MutableStateFlow(OperationState())
+    val programList = _programList.asStateFlow()
+    val aState = _aState.asStateFlow()
+    val bState = _bState.asStateFlow()
+    val cState = _cState.asStateFlow()
+    val dState = _dState.asStateFlow()
+    val eState = _eState.asStateFlow()
 
     init {
         viewModelScope.launch {
             launch {
                 programRepository.getAll().collect {
+                    _programList.value = it
                     onProgramChange(it)
-                    delay(100L)
-                    _event.emit(HomeEvent.OnLoadProgram)
                 }
             }
             launch {
@@ -96,49 +104,31 @@ class HomeViewModel @Inject constructor(
     fun onSwitchProgram(index: Int, module: ModuleEnum) {
         viewModelScope.launch {
             when (module) {
-                ModuleEnum.A -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleA = _uiState.value.moduleA.copy(
-                            index = index,
-                            btnStart = _uiState.value.moduleA.btnStart.copy(
-                                enable = _uiState.value.programList[index].actionCount > 0,
-                            ),
-                        )
+                A -> {
+                    _aState.value = _aState.value.copy(
+                        program = _programList.value[index],
+                        btnStartEnable = _programList.value[index].actionCount > 0,
                     )
                 }
-                ModuleEnum.B -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleB = _uiState.value.moduleB.copy(
-                            index = index,
-                            btnStart = _uiState.value.moduleB.btnStart.copy(
-                                enable = _uiState.value.programList[index].actionCount > 0,
-                            ),
-                        )
+                B -> {
+                    _bState.value = _bState.value.copy(
+                        program = _programList.value[index],
+                        btnStartEnable = _programList.value[index].actionCount > 0,
                     )
                 }
-                ModuleEnum.C -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleC = _uiState.value.moduleC.copy(
-                            index = index,
-                            btnStart = _uiState.value.moduleC.btnStart.copy(
-                                enable = _uiState.value.programList[index].actionCount > 0,
-                            ),
-                        )
+                C -> {
+                    _cState.value = _cState.value.copy(
+                        program = _programList.value[index],
+                        btnStartEnable = _programList.value[index].actionCount > 0,
                     )
                 }
-                ModuleEnum.D -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleD = _uiState.value.moduleD.copy(
-                            index = index,
-                            btnStart = _uiState.value.moduleD.btnStart.copy(
-                                enable = _uiState.value.programList[index].actionCount > 0,
-                            ),
-                        )
+                D -> {
+                    _dState.value = _dState.value.copy(
+                        program = _programList.value[index],
+                        btnStartEnable = _programList.value[index].actionCount > 0,
                     )
                 }
             }
-            _event.emit(HomeEvent.OnSwitchProgram(index, module))
-            _event.emit(HomeEvent.OnButtonChange(module))
         }
     }
 
@@ -149,76 +139,43 @@ class HomeViewModel @Inject constructor(
     fun start(module: ModuleEnum) {
         viewModelScope.launch {
             when (module) {
-                ModuleEnum.A -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleA = _uiState.value.moduleA.copy(
-                            isRunning = true,
-                            btnStart = _uiState.value.moduleA.btnStart.copy(
-                                visibility = View.GONE,
-                            ),
-                            btnStop = _uiState.value.moduleA.btnStop.copy(
-                                visibility = View.VISIBLE,
-                            ),
-                            btnProgram = _uiState.value.moduleA.btnProgram.copy(
-                                isClickable = false,
-                            ),
-                        )
+                A -> {
+                    _aState.value = _aState.value.copy(
+                        btnStartVisible = View.GONE,
+                        btnStopVisible = View.VISIBLE,
+                        btnSelectorEnable = false,
+                        runtimeText = "运行中",
                     )
-                    runProgram(module, _uiState.value.programList[_uiState.value.moduleA.index])
+                    runProgram(module, _aState.value.program!!)
                 }
-                ModuleEnum.B -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleB = _uiState.value.moduleB.copy(
-                            isRunning = true,
-                            btnStart = _uiState.value.moduleB.btnStart.copy(
-                                visibility = View.GONE,
-                            ),
-                            btnStop = _uiState.value.moduleB.btnStop.copy(
-                                visibility = View.VISIBLE,
-                            ),
-                            btnProgram = _uiState.value.moduleB.btnProgram.copy(
-                                isClickable = false,
-                            ),
-                        )
+                B -> {
+                    _bState.value = _bState.value.copy(
+                        btnStartVisible = View.GONE,
+                        btnStopVisible = View.VISIBLE,
+                        btnSelectorEnable = false,
+                        runtimeText = "运行中",
                     )
-                    runProgram(module, _uiState.value.programList[_uiState.value.moduleB.index])
+                    runProgram(module, _bState.value.program!!)
                 }
-                ModuleEnum.C -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleC = _uiState.value.moduleC.copy(
-                            isRunning = true,
-                            btnStart = _uiState.value.moduleC.btnStart.copy(
-                                visibility = View.GONE,
-                            ),
-                            btnStop = _uiState.value.moduleC.btnStop.copy(
-                                visibility = View.VISIBLE,
-                            ),
-                            btnProgram = _uiState.value.moduleC.btnProgram.copy(
-                                isClickable = false,
-                            ),
-                        )
+                C -> {
+                    _cState.value = _cState.value.copy(
+                        btnStartVisible = View.GONE,
+                        btnStopVisible = View.VISIBLE,
+                        btnSelectorEnable = false,
+                        runtimeText = "运行中",
                     )
-                    runProgram(module, _uiState.value.programList[_uiState.value.moduleC.index])
+                    runProgram(module, _cState.value.program!!)
                 }
-                ModuleEnum.D -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleD = _uiState.value.moduleD.copy(
-                            isRunning = true,
-                            btnStart = _uiState.value.moduleD.btnStart.copy(
-                                visibility = View.GONE,
-                            ),
-                            btnStop = _uiState.value.moduleD.btnStop.copy(
-                                visibility = View.VISIBLE,
-                            ),
-                            btnProgram = _uiState.value.moduleD.btnProgram.copy(
-                                isClickable = false,
-                            ),
-                        )
+                D -> {
+                    _dState.value = _dState.value.copy(
+                        btnStartVisible = View.GONE,
+                        btnStopVisible = View.VISIBLE,
+                        btnSelectorEnable = false,
+                        runtimeText = "运行中",
                     )
-                    runProgram(module, _uiState.value.programList[_uiState.value.moduleD.index])
+                    runProgram(module, _dState.value.program!!)
                 }
             }
-            _event.emit(HomeEvent.OnButtonChange(module))
         }
     }
 
@@ -229,73 +186,65 @@ class HomeViewModel @Inject constructor(
     fun stop(module: ModuleEnum) {
         viewModelScope.launch {
             when (module) {
-                ModuleEnum.A -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleA = _uiState.value.moduleA.copy(
-                            isRunning = false,
-                            btnStart = _uiState.value.moduleA.btnStart.copy(
-                                visibility = View.VISIBLE,
-                            ),
-                            btnStop = _uiState.value.moduleA.btnStop.copy(
-                                visibility = View.GONE,
-                            ),
-                            btnProgram = _uiState.value.moduleA.btnProgram.copy(
-                                isClickable = true,
-                            ),
-                        )
+                A -> {
+                    _aState.value.job?.let { if (it.isActive) it.cancel() }
+                    _aState.value = _aState.value.copy(
+                        job = null,
+                        btnStartVisible = View.VISIBLE,
+                        btnStopVisible = View.GONE,
+                        btnSelectorEnable = true,
+                        runtimeText = "已就绪",
+                        currentActionText = "/",
+                        tempText = "0.0℃",
+                        countDownText = "00:00:00",
                     )
                 }
-                ModuleEnum.B -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleB = _uiState.value.moduleB.copy(
-                            isRunning = false,
-                            btnStart = _uiState.value.moduleB.btnStart.copy(
-                                visibility = View.VISIBLE,
-                            ),
-                            btnStop = _uiState.value.moduleB.btnStop.copy(
-                                visibility = View.GONE,
-                            ),
-                            btnProgram = _uiState.value.moduleB.btnProgram.copy(
-                                isClickable = true,
-                            ),
-                        )
+                B -> {
+                    _bState.value.job?.let { if (it.isActive) it.cancel() }
+                    _bState.value = _bState.value.copy(
+                        job = null,
+                        btnStartVisible = View.VISIBLE,
+                        btnStopVisible = View.GONE,
+                        btnSelectorEnable = true,
+                        runtimeText = "已就绪",
+                        currentActionText = "/",
+                        tempText = "0.0℃",
+                        countDownText = "00:00:00",
                     )
                 }
-                ModuleEnum.C -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleC = _uiState.value.moduleC.copy(
-                            isRunning = false,
-                            btnStart = _uiState.value.moduleC.btnStart.copy(
-                                visibility = View.VISIBLE,
-                            ),
-                            btnStop = _uiState.value.moduleC.btnStop.copy(
-                                visibility = View.GONE,
-                            ),
-                            btnProgram = _uiState.value.moduleC.btnProgram.copy(
-                                isClickable = true,
-                            ),
-                        )
+                C -> {
+                    _cState.value.job?.let { if (it.isActive) it.cancel() }
+                    _cState.value = _cState.value.copy(
+                        job = null,
+                        btnStartVisible = View.VISIBLE,
+                        btnStopVisible = View.GONE,
+                        btnSelectorEnable = true,
+                        runtimeText = "已就绪",
+                        currentActionText = "/",
+                        tempText = "0.0℃",
+                        countDownText = "00:00:00",
                     )
                 }
-                ModuleEnum.D -> {
-                    _uiState.value = _uiState.value.copy(
-                        moduleD = _uiState.value.moduleD.copy(
-                            isRunning = false,
-                            btnStart = _uiState.value.moduleD.btnStart.copy(
-                                visibility = View.VISIBLE,
-                            ),
-                            btnStop = _uiState.value.moduleD.btnStop.copy(
-                                visibility = View.GONE,
-                            ),
-                            btnProgram = _uiState.value.moduleD.btnProgram.copy(
-                                isClickable = true,
-                            ),
-                        )
+                D -> {
+                    _dState.value.job?.let { if (it.isActive) it.cancel() }
+                    _dState.value = _dState.value.copy(
+                        job = null,
+                        btnStartVisible = View.VISIBLE,
+                        btnStopVisible = View.GONE,
+                        btnSelectorEnable = true,
+                        runtimeText = "已就绪",
+                        currentActionText = "/",
+                        tempText = "0.0℃",
+                        countDownText = "00:00:00",
                     )
                 }
             }
-            stopProgram(module)
-            _event.emit(HomeEvent.OnButtonChange(module))
+            if (_aState.value.job == null && _bState.value.job == null && _cState.value.job == null && _dState.value.job == null) {
+                appViewModel.sender(
+                    SerialPortEnum.SERIAL_ONE,
+                    Command(parameter = "0B", data = "0100").toHex()
+                )
+            }
         }
     }
 
@@ -309,10 +258,10 @@ class HomeViewModel @Inject constructor(
             Command(function = "05", parameter = "01", data = "0101302C302C302C302C").toHex()
         )
         appViewModel.sender(SerialPortEnum.SERIAL_ONE, Command().toHex())
-        stopProgram(ModuleEnum.A)
-        stopProgram(ModuleEnum.B)
-        stopProgram(ModuleEnum.C)
-        stopProgram(ModuleEnum.D)
+        stop(A)
+        stop(B)
+        stop(C)
+        stop(D)
     }
 
     /**
@@ -324,18 +273,10 @@ class HomeViewModel @Inject constructor(
                 SerialPortEnum.SERIAL_ONE,
                 Command(
                     parameter = "0B",
-                    data = if (_uiState.value.btnPause.isRunning) "0101" else "0100"
+                    data = if (_eState.value.pauseEnable) "0101" else "0100"
                 ).toHex()
             )
-            _uiState.value = _uiState.value.copy(
-                btnPause = _uiState.value.btnPause.copy(
-                    text = if (_uiState.value.btnPause.isRunning) "暂停摇床" else "继  续",
-                    background = if (_uiState.value.btnPause.isRunning) R.mipmap.btn_pause else R.mipmap.btn_continue,
-                    textColor = if (_uiState.value.btnPause.isRunning) R.color.dark_outline else R.color.red,
-                    isRunning = !_uiState.value.btnPause.isRunning,
-                )
-            )
-            _event.emit(HomeEvent.OnPause)
+            _eState.value = _eState.value.copy(pauseEnable = !_eState.value.pauseEnable)
         }
     }
 
@@ -349,17 +290,10 @@ class HomeViewModel @Inject constructor(
                 SerialPortEnum.SERIAL_FOUR,
                 Command.setTemperature(
                     address = "4",
-                    temperature = if (_uiState.value.btnInsulating.isRunning) "26" else temp
+                    temperature = if (_eState.value.insulatingEnable) "26" else temp
                 )
             )
-            _uiState.value = _uiState.value.copy(
-                btnInsulating = _uiState.value.btnInsulating.copy(
-                    text = if (_uiState.value.btnInsulating.isRunning) "抗体保温" else "保温中 $temp℃",
-                    textColor = if (_uiState.value.btnInsulating.isRunning) R.color.dark_outline else R.color.red,
-                    isRunning = !_uiState.value.btnInsulating.isRunning,
-                )
-            )
-            _event.emit(HomeEvent.OnInsulating)
+            _eState.value = _eState.value.copy(insulatingEnable = !_eState.value.insulatingEnable)
         }
     }
 
@@ -384,36 +318,11 @@ class HomeViewModel @Inject constructor(
             val address = hex.last().toString().toInt()
             val temp = hex.extractTemp()
             when (address) {
-                0 -> {
-                    _uiState.value = _uiState.value.copy(
-                        dashBoardA = _uiState.value.dashBoardA.copy(
-                            temperature = "$temp ℃",
-                        )
-                    )
-                }
-                1 -> {
-                    _uiState.value = _uiState.value.copy(
-                        dashBoardB = _uiState.value.dashBoardB.copy(
-                            temperature = "$temp ℃",
-                        )
-                    )
-                }
-                2 -> {
-                    _uiState.value = _uiState.value.copy(
-                        dashBoardC = _uiState.value.dashBoardC.copy(
-                            temperature = "$temp ℃",
-                        )
-                    )
-                }
-                3 -> {
-                    _uiState.value = _uiState.value.copy(
-                        dashBoardD = _uiState.value.dashBoardD.copy(
-                            temperature = "$temp ℃"
-                        )
-                    )
-                }
+                0 -> _aState.value = _aState.value.copy(tempText = "$temp ℃")
+                1 -> _bState.value = _bState.value.copy(tempText = "$temp ℃")
+                2 -> _cState.value = _cState.value.copy(tempText = "$temp ℃")
+                3 -> _dState.value = _dState.value.copy(tempText = "$temp ℃")
             }
-            _event.emit(HomeEvent.OnDashBoardChange(getModuleEnum(address)))
         }
     }
 
@@ -424,8 +333,10 @@ class HomeViewModel @Inject constructor(
      */
     private fun resetCallBack(command: Command) {
         viewModelScope.launch {
-            command.run {
-                _event.emit(HomeEvent.OnRestCallBack(parameter == "0A" && data == "00"))
+            if (command.parameter == "0A" && command.data == "00") {
+                PopTip.show("复位成功")
+            } else {
+                PopTip.show("复位失败")
             }
         }
     }
@@ -435,41 +346,81 @@ class HomeViewModel @Inject constructor(
      * @param programList [List]<[Program]> 程序列表
      */
     private fun onProgramChange(programList: List<Program>) {
-        val indexA =
-            if (programList.isEmpty()) -1 else (if (_uiState.value.moduleA.index >= programList.size || _uiState.value.moduleA.index == -1) 0 else _uiState.value.moduleA.index)
-        val indexB =
-            if (programList.isEmpty()) -1 else (if (_uiState.value.moduleB.index >= programList.size || _uiState.value.moduleB.index == -1) 0 else _uiState.value.moduleB.index)
-        val indexC =
-            if (programList.isEmpty()) -1 else (if (_uiState.value.moduleC.index >= programList.size || _uiState.value.moduleC.index == -1) 0 else _uiState.value.moduleC.index)
-        val indexD =
-            if (programList.isEmpty()) -1 else (if (_uiState.value.moduleD.index >= programList.size || _uiState.value.moduleD.index == -1) 0 else _uiState.value.moduleD.index)
-        _uiState.value = _uiState.value.copy(
-            programList = programList,
-            moduleA = _uiState.value.moduleA.copy(
-                index = indexA,
-                btnStart = _uiState.value.moduleA.btnStart.copy(
-                    enable = if (programList.isEmpty()) false else programList[indexA].actionCount > 0
+        if (programList.isNotEmpty()) {
+            if (_aState.value.program == null) {
+                _aState.value = _aState.value.copy(
+                    program = programList.first(),
+                    btnStartEnable = programList.first().actionCount > 0
                 )
-            ),
-            moduleB = _uiState.value.moduleB.copy(
-                index = indexB,
-                btnStart = _uiState.value.moduleB.btnStart.copy(
-                    enable = if (programList.isEmpty()) false else programList[indexB].actionCount > 0
+            } else {
+                if (!programList.contains(_aState.value.program)) {
+                    _aState.value = _aState.value.copy(
+                        program = programList.first(),
+                        btnStartEnable = programList.first().actionCount > 0
+                    )
+                } else {
+                    _aState.value = _aState.value.copy(
+                        btnStartEnable = programList.find { it.id == _aState.value.program!!.id }!!.actionCount  > 0
+                    )
+                }
+            }
+            if (_bState.value.program == null) {
+                _bState.value = _bState.value.copy(
+                    program = programList.first(),
+                    btnStartEnable = programList.first().actionCount > 0
                 )
-            ),
-            moduleC = _uiState.value.moduleC.copy(
-                index = indexC,
-                btnStart = _uiState.value.moduleC.btnStart.copy(
-                    enable = if (programList.isEmpty()) false else programList[indexC].actionCount > 0
+            } else {
+                if (!programList.contains(_bState.value.program)) {
+                    _bState.value = _bState.value.copy(
+                        program = programList.first(),
+                        btnStartEnable = programList.first().actionCount > 0
+                    )
+                } else {
+                    _bState.value = _bState.value.copy(
+                        btnStartEnable = programList.find { it.id == _bState.value.program!!.id }!!.actionCount  > 0
+                    )
+                }
+            }
+            if (_cState.value.program == null) {
+                _cState.value = _cState.value.copy(
+                    program = programList.first(),
+                    btnStartEnable = programList.first().actionCount > 0
                 )
-            ),
-            moduleD = _uiState.value.moduleD.copy(
-                index = indexD,
-                btnStart = _uiState.value.moduleD.btnStart.copy(
-                    enable = if (programList.isEmpty()) false else programList[indexD].actionCount > 0
+            } else {
+                if (!programList.contains(_cState.value.program)) {
+                    _cState.value = _cState.value.copy(
+                        program = programList.first(),
+                        btnStartEnable = programList.first().actionCount > 0
+                    )
+                } else {
+                    _cState.value = _cState.value.copy(
+                        btnStartEnable = programList.find { it.id == _cState.value.program!!.id }!!.actionCount  > 0
+                    )
+                }
+            }
+            if (_dState.value.program == null) {
+                _dState.value = _dState.value.copy(
+                    program = programList.first(),
+                    btnStartEnable = programList.first().actionCount > 0
                 )
-            ),
-        )
+            } else {
+                if (!programList.contains(_dState.value.program)) {
+                    _dState.value = _dState.value.copy(
+                        program = programList.first(),
+                        btnStartEnable = programList.first().actionCount > 0
+                    )
+                } else {
+                    _dState.value = _dState.value.copy(
+                        btnStartEnable = programList.find { it.id == _dState.value.program!!.id }!!.actionCount  > 0
+                    )
+                }
+            }
+        } else {
+            _aState.value = _aState.value.copy(program = null, btnStartEnable = false)
+            _bState.value = _bState.value.copy(program = null, btnStartEnable = false)
+            _cState.value = _cState.value.copy(program = null, btnStartEnable = false)
+            _dState.value = _dState.value.copy(program = null, btnStartEnable = false)
+        }
     }
 
     /**
@@ -492,14 +443,6 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
-     * 停止程序
-     * @param module [ModuleEnum] 模块
-     */
-    private fun stopProgram(module: ModuleEnum) {
-        clearJobWhenProgramStop(module)
-    }
-
-    /**
      * 设置Job当程序启动时
      * @param module [ModuleEnum] 模块
      * @param job [Job] Job
@@ -507,99 +450,23 @@ class HomeViewModel @Inject constructor(
     private fun setJobWhenProgramStart(module: ModuleEnum, job: Job) {
         viewModelScope.launch {
             when (module) {
-                ModuleEnum.A -> {
-                    uiState.value.moduleA.job?.let { if (it.isActive) it.cancel() }
-                    _uiState.value = _uiState.value.copy(
-                        moduleA = _uiState.value.moduleA.copy(
-                            job = job
-                        )
-                    )
+                A -> {
+                    _aState.value.job?.let { if (it.isActive) it.cancel() }
+                    _aState.value = _aState.value.copy(job = job)
                 }
-                ModuleEnum.B -> {
-                    uiState.value.moduleB.job?.let { if (it.isActive) it.cancel() }
-                    _uiState.value = _uiState.value.copy(
-                        moduleB = _uiState.value.moduleB.copy(
-                            job = job
-                        )
-                    )
+                B -> {
+                    _bState.value.job?.let { if (it.isActive) it.cancel() }
+                    _bState.value = _bState.value.copy(job = job)
                 }
-                ModuleEnum.C -> {
-                    uiState.value.moduleC.job?.let { if (it.isActive) it.cancel() }
-                    _uiState.value = _uiState.value.copy(
-                        moduleC = _uiState.value.moduleC.copy(
-                            job = job
-                        )
-                    )
+                C -> {
+                    _cState.value.job?.let { if (it.isActive) it.cancel() }
+                    _cState.value = _cState.value.copy(job = job)
                 }
-                ModuleEnum.D -> {
-                    uiState.value.moduleD.job?.let { if (it.isActive) it.cancel() }
-                    _uiState.value = _uiState.value.copy(
-                        moduleD = _uiState.value.moduleD.copy(
-                            job = job
-                        )
-                    )
+                D -> {
+                    _dState.value.job?.let { if (it.isActive) it.cancel() }
+                    _dState.value = _dState.value.copy(job = job)
                 }
             }
-            _event.emit(HomeEvent.OnDashBoardChange(module))
-        }
-    }
-
-    /**
-     * 清除Job当程序停止时
-     * @param module [ModuleEnum] 模块
-     */
-    private fun clearJobWhenProgramStop(module: ModuleEnum) {
-        viewModelScope.launch {
-            when (module) {
-                ModuleEnum.A -> {
-                    uiState.value.moduleA.job?.let { if (it.isActive) it.cancel() }
-                    _uiState.value = _uiState.value.copy(
-                        moduleA = _uiState.value.moduleA.copy(
-                            job = null,
-                            isRunning = false
-                        ),
-                        dashBoardA = DashBoardState()
-                    )
-                }
-                ModuleEnum.B -> {
-                    uiState.value.moduleB.job?.let { if (it.isActive) it.cancel() }
-                    _uiState.value = _uiState.value.copy(
-                        moduleB = _uiState.value.moduleB.copy(
-                            job = null,
-                            isRunning = false
-                        ),
-                        dashBoardB = DashBoardState()
-                    )
-                }
-                ModuleEnum.C -> {
-                    uiState.value.moduleC.job?.let { if (it.isActive) it.cancel() }
-                    _uiState.value = _uiState.value.copy(
-                        moduleC = _uiState.value.moduleC.copy(
-                            job = null,
-                            isRunning = false
-                        ),
-                        dashBoardC = DashBoardState()
-                    )
-                }
-                ModuleEnum.D -> {
-                    uiState.value.moduleD.job?.let { if (it.isActive) it.cancel() }
-                    _uiState.value = _uiState.value.copy(
-                        moduleD = _uiState.value.moduleD.copy(
-                            job = null,
-                            isRunning = false
-                        ),
-                        dashBoardD = DashBoardState()
-                    )
-                }
-            }
-            // 如果四个模块的job都是null的话暂停摇床
-            if (uiState.value.moduleA.job == null && uiState.value.moduleB.job == null && uiState.value.moduleC.job == null && uiState.value.moduleD.job == null) {
-                appViewModel.sender(
-                    SerialPortEnum.SERIAL_ONE,
-                    Command(parameter = "0B", data = "0100").toHex()
-                )
-            }
-            _event.emit(HomeEvent.OnDashBoardChange(module))
         }
     }
 
@@ -612,106 +479,41 @@ class HomeViewModel @Inject constructor(
             job.state.collect {
                 when (it) {
                     is ActionEvent.CurrentAction -> {
-                        val action = it.action
                         when (it.module) {
-                            ModuleEnum.A -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardA = _uiState.value.dashBoardA.copy(
-                                        currentAction = action
-                                    )
-                                )
-                            }
-                            ModuleEnum.B -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardB = _uiState.value.dashBoardB.copy(
-                                        currentAction = action
-                                    )
-                                )
-                            }
-                            ModuleEnum.C -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardC = _uiState.value.dashBoardC.copy(
-                                        currentAction = action
-                                    )
-                                )
-                            }
-                            ModuleEnum.D -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardD = _uiState.value.dashBoardD.copy(
-                                        currentAction = action
-                                    )
-                                )
-                            }
+                            A -> _aState.value =
+                                _aState.value.copy(currentActionText = getActionEnum(it.action.mode).value)
+                            B -> _bState.value =
+                                _bState.value.copy(currentActionText = getActionEnum(it.action.mode).value)
+                            C -> _cState.value =
+                                _cState.value.copy(currentActionText = getActionEnum(it.action.mode).value)
+                            D -> _dState.value =
+                                _dState.value.copy(currentActionText = getActionEnum(it.action.mode).value)
                         }
-                        _event.emit(HomeEvent.OnDashBoardChange(it.module))
                     }
                     is ActionEvent.CurrentActionTime -> {
-                        val time = it.time
                         when (it.module) {
-                            ModuleEnum.A -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardA = _uiState.value.dashBoardA.copy(
-                                        time = time
-                                    )
-                                )
-                            }
-                            ModuleEnum.B -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardB = _uiState.value.dashBoardB.copy(
-                                        time = time
-                                    )
-                                )
-                            }
-                            ModuleEnum.C -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardC = _uiState.value.dashBoardC.copy(
-                                        time = time
-                                    )
-                                )
-                            }
-                            ModuleEnum.D -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardD = _uiState.value.dashBoardD.copy(
-                                        time = time
-                                    )
-                                )
-                            }
+                            A -> _aState.value =
+                                _aState.value.copy(countDownText = it.time)
+                            B -> _bState.value =
+                                _bState.value.copy(countDownText = it.time)
+                            C -> _cState.value =
+                                _cState.value.copy(countDownText = it.time)
+                            D -> _dState.value =
+                                _dState.value.copy(countDownText = it.time)
                         }
-                        _event.emit(HomeEvent.OnDashBoardChange(it.module))
                     }
                     is ActionEvent.Finish -> stop(it.module)
                     is ActionEvent.Count -> {
                         when (it.module) {
-                            ModuleEnum.A -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardA = _uiState.value.dashBoardA.copy(
-                                        count = it.count.toString()
-                                    )
-                                )
-                            }
-                            ModuleEnum.B -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardB = _uiState.value.dashBoardB.copy(
-                                        count = it.count.toString()
-                                    )
-                                )
-                            }
-                            ModuleEnum.C -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardC = _uiState.value.dashBoardC.copy(
-                                        count = it.count.toString()
-                                    )
-                                )
-                            }
-                            ModuleEnum.D -> {
-                                _uiState.value = _uiState.value.copy(
-                                    dashBoardD = _uiState.value.dashBoardD.copy(
-                                        count = it.count.toString()
-                                    )
-                                )
-                            }
+                            A -> _aState.value =
+                                _aState.value.copy(currentActionText = _aState.value.currentActionText + " X${it.count}")
+                            B -> _bState.value =
+                                _bState.value.copy(currentActionText = _bState.value.currentActionText + " X${it.count}")
+                            C -> _cState.value =
+                                _cState.value.copy(currentActionText = _cState.value.currentActionText + " X${it.count}")
+                            D -> _dState.value =
+                                _dState.value.copy(currentActionText = _dState.value.currentActionText + " X${it.count}")
                         }
-                        _event.emit(HomeEvent.OnDashBoardChange(it.module))
                     }
                 }
             }
@@ -720,70 +522,25 @@ class HomeViewModel @Inject constructor(
 
 }
 
-sealed class HomeEvent {
-    data class OnSwitchProgram(val index: Int, val module: ModuleEnum) : HomeEvent()
-    data class OnButtonChange(val module: ModuleEnum) : HomeEvent()
-    data class OnRestCallBack(val success: Boolean) : HomeEvent()
-    data class OnDashBoardChange(val module: ModuleEnum) : HomeEvent()
-    object OnPause : HomeEvent()
-    object OnInsulating : HomeEvent()
-    object OnLoadProgram : HomeEvent()
-}
-
-data class HomeUiState(
-    val programList: List<Program> = emptyList(),
-    val moduleA: ModuleState = ModuleState(),
-    val moduleB: ModuleState = ModuleState(),
-    val moduleC: ModuleState = ModuleState(),
-    val moduleD: ModuleState = ModuleState(),
-    val btnReset: ButtonState = ButtonState(),
-    val btnPause: ButtonState = ButtonState(
-        text = "暂停摇床", background = R.mipmap.btn_pause, textColor = R.color.dark_outline
-    ),
-    val btnInsulating: ButtonState = ButtonState(text = "抗体保温", textColor = R.color.dark_outline),
-    val dashBoardA: DashBoardState = DashBoardState(),
-    val dashBoardB: DashBoardState = DashBoardState(),
-    val dashBoardC: DashBoardState = DashBoardState(),
-    val dashBoardD: DashBoardState = DashBoardState()
-)
 
 data class ModuleState(
-    val index: Int = -1,
-    val isRunning: Boolean = false,
-    val btnStart: ButtonState = ButtonState(enable = false),
-    val btnStop: ButtonState = ButtonState(visibility = View.GONE),
-    val btnProgram: ButtonState = ButtonState(),
     val job: Job? = null,
+    val program: Program? = null,
+    val btnSelectorEnable: Boolean = true,
+    val btnStartEnable: Boolean = true,
+    val btnStartVisible: Int = View.VISIBLE,
+    val btnStopVisible: Int = View.GONE,
+    val countDownText: String = "00:00:00",
+    val runtimeText: String = "已就绪",
+    val currentActionText: String = "/",
+    val tempText: String = "0.0℃",
 )
 
-data class ButtonState(
-    val visibility: Int = View.VISIBLE,
-    val isClickable: Boolean = true,
-    val text: String = "",
-    val enable: Boolean = true,
-    val background: Int = 0,
-    val isRunning: Boolean = false,
-    val icon: Int = 0,
-    val textColor: Int = 0,
-)
-
-data class DashBoardState(
-    val currentAction: Action = Action(),
-    val time: String = "00:00:00",
-    val temperature: String = "0.0℃",
-    val count : String = ""
+data class OperationState(
+    val pauseEnable: Boolean = false,
+    val insulatingEnable: Boolean = false,
 )
 
 enum class ModuleEnum(val value: String, val index: Int) {
     A("模块A", 0), B("模块B", 1), C("模块C", 2), D("模块D", 3),
-}
-
-fun getModuleEnum(index: Int): ModuleEnum {
-    return when (index) {
-        0 -> ModuleEnum.A
-        1 -> ModuleEnum.B
-        2 -> ModuleEnum.C
-        3 -> ModuleEnum.D
-        else -> ModuleEnum.A
-    }
 }

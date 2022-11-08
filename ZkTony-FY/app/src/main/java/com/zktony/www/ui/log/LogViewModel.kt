@@ -4,9 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.extension.getDayEnd
 import com.zktony.www.common.extension.getDayStart
-import com.zktony.www.common.room.entity.LogData
-import com.zktony.www.common.room.entity.LogRecord
-import com.zktony.www.data.repository.LogDataRepository
+import com.zktony.www.common.room.entity.Log
 import com.zktony.www.data.repository.LogRecordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,8 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LogViewModel @Inject constructor(
-    private val logRecordRepository: LogRecordRepository,
-    private val logDataRepository: LogDataRepository
+    private val logRecordRepository: LogRecordRepository
 ) : BaseViewModel() {
 
     private val _event = MutableSharedFlow<LogEvent>()
@@ -34,16 +31,8 @@ class LogViewModel @Inject constructor(
         }
     }
 
-    private fun changeLogData(id: String) {
-        viewModelScope.launch {
-            logDataRepository.getByLogId(id).collect {
-                _event.emit(LogEvent.ChangeLogData(it))
-            }
-        }
-    }
 }
 
 sealed class LogEvent {
-    data class ChangeLogRecord(val logRecordList: List<LogRecord>) : LogEvent()
-    data class ChangeLogData(val logDataList: List<LogData>) : LogEvent()
+    data class ChangeLogRecord(val logRecordList: List<Log>) : LogEvent()
 }

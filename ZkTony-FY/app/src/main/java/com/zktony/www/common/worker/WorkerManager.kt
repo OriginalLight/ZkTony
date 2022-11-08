@@ -21,16 +21,7 @@ class WorkerManager {
     }
 
     private val logRecordRequest by lazy {
-        PeriodicWorkRequestBuilder<LogRecordWorker>(60, TimeUnit.MINUTES)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
-            ).build()
-    }
-
-    private val logDataRequest by lazy {
-        PeriodicWorkRequestBuilder<LogDataWorker>(15, TimeUnit.MINUTES)
+        PeriodicWorkRequestBuilder<LogWorker>(60, TimeUnit.MINUTES)
             .setConstraints(
                 Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -48,11 +39,6 @@ class WorkerManager {
             Constants.BACKGROUND_WORKER_NAME_LOG_RECORD,
             ExistingPeriodicWorkPolicy.REPLACE,
             logRecordRequest
-        )
-        WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
-            Constants.BACKGROUND_WORKER_NAME_LOG_DATA,
-            ExistingPeriodicWorkPolicy.REPLACE,
-            logDataRequest
         )
     }
 

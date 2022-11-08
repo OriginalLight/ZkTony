@@ -17,30 +17,31 @@
 package com.zktony.www.common.room.dao
 
 import androidx.room.*
-import com.zktony.www.common.room.entity.LogData
+import com.zktony.www.common.room.entity.Log
 import kotlinx.coroutines.flow.Flow
+import java.util.*
 
 /**
  * Data access object to query the database.
  */
 @Dao
-interface LogDataDao {
+interface LogDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(logData: LogData)
-
-    @Query("DELETE  FROM log_data WHERE julianday('now') - julianday(createTime) >= '180'")
-    suspend fun deleteByDate()
-
-    @Query("SELECT * FROM log_data WHERE logId == :id ORDER BY createTime ASC")
-    fun getByLogId(id: String): Flow<List<LogData>>
-
-    @Query("DELETE FROM log_data WHERE  julianday('now') - julianday(createTime) <= '1' AND logId IN (SELECT logId FROM log_data GROUP BY logId HAVING count(*) < 12) ")
-    suspend fun deleteDataLessThanTen()
-
-    @Query("SELECT * FROM log_data WHERE upload = 0 LIMIT 200")
-    fun withoutUpload(): Flow<List<LogData>>
+    suspend fun insert(logRecord: Log)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun updateBatch(logDatas: List<LogData>)
+    suspend fun update(log: Log)
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateBatch(logRecords: List<Log>)
+
+    @Query("DELETE FROM log WHERE julianday('now') - julianday(createTime) >= '180'")
+    suspend fun deleteByDate()
+
+    @Query("SELECT * FROM log WHERE createTime BETWEEN :start AND :end ORDER BY createTime DESC")
+    fun getByDate(start: Date, end: Date): Flow<List<Log>>
+
+    @Query("SELECT * FROM log WHERE upload = 0 LIMIT 20")
+    fun withoutUpload(): Flow<List<Log>>
 }

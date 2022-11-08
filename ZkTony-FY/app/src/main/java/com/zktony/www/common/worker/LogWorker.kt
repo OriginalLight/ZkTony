@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.common.network.adapter.isSuccess
-import com.zktony.www.data.repository.LogDataRepository
+import com.zktony.www.data.repository.LogRecordRepository
 import com.zktony.www.common.network.service.LogService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -18,32 +18,31 @@ import javax.inject.Inject
  * @date: 2022-09-20 14:47
  */
 @HiltWorker
-class LogDataWorker @AssistedInject constructor(
+class LogWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
 
     @Inject
-    lateinit var logDataRepository: LogDataRepository
+    lateinit var logRecordRepository: LogRecordRepository
 
     @Inject
     lateinit var service: LogService
 
     override suspend fun doWork(): Result {
         try {
-            logDataRepository.withoutUpload().first().let {
+            logRecordRepository.withoutUpload().first().let {
                 if (it.isEmpty()) {
-                    Logger.d("LogDataWorker", "上传日志数据为空")
+                    Logger.d("LogRecordWorker", "上传日志为空")
                     return Result.success()
                 }
-                val res = service.uploadLogData(it)
+                val res = service.uploadLogRecords(it)
                 if (res.isSuccess) {
-                    // 所有的upload设置为1
-                    logDataRepository.updateBatch(it.map { logData ->
-                        logData.copy(upload = 1)
+                    logRecordRepository.updateBatch(it.map { logRecord ->
+                        logRecord.copy(upload = 1)
                     })
                 } else {
-                    Logger.e("LogDataWorker", "上传日志数据失败")
+                    Logger.e("LogRecordWorker", "上传日志失败")
                     return Result.failure()
                 }
             }
