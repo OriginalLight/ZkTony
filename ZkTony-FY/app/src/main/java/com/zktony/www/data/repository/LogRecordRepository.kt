@@ -1,7 +1,7 @@
 package com.zktony.www.data.repository
 
-import com.zktony.www.common.room.dao.LogRecordDao
-import com.zktony.www.common.room.entity.LogRecord
+import com.zktony.www.common.room.dao.LogDao
+import com.zktony.www.common.room.entity.Log
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 import javax.inject.Inject
@@ -11,33 +11,29 @@ import javax.inject.Inject
  * @date: 2022-09-21 8:52
  */
 class LogRecordRepository @Inject constructor(
-    private val logRecordDao: LogRecordDao
+    private val logDao: LogDao
 ) {
-    suspend fun insert(logRecord: LogRecord) {
-        logRecordDao.insert(logRecord)
+    suspend fun insert(logRecord: Log) {
+        logDao.insert(logRecord)
     }
 
-    suspend fun update(logRecord: LogRecord) {
-        logRecordDao.update(logRecord)
+    suspend fun update(logRecord: Log) {
+        logDao.update(logRecord)
     }
 
-    suspend fun updateBatch(logRecordList: List<LogRecord>) {
-        logRecordDao.updateBatch(logRecordList)
+    suspend fun updateBatch(logRecordList: List<Log>) {
+        logDao.updateBatch(logRecordList)
     }
 
     suspend fun deleteByDate() {
-        logRecordDao.deleteByDate()
+        logDao.deleteByDate()
     }
 
-    suspend fun deleteInvalidedLog() {
-        logRecordDao.deleteInvalidedLog()
+    fun withoutUpload(): Flow<List<Log>> {
+        return logDao.withoutUpload()
     }
 
-    fun withoutUpload(): Flow<List<LogRecord>> {
-        return logRecordDao.withoutUpload()
-    }
-
-    fun getByDate(start: Date, end: Date): Flow<List<LogRecord>> {
-        return logRecordDao.getByDate(start, end)
+    fun getByDate(start: Date, end: Date): Flow<List<Log>> {
+        return logDao.getByDate(start, end)
     }
 }

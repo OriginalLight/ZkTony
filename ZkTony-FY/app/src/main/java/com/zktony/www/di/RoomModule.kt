@@ -42,18 +42,13 @@ object RoomModule {
     }
 
     @Provides
-    fun provideLogRecordDao(database: AppDatabase): LogRecordDao {
-        return database.logRecordDao()
+    fun provideLogRecordDao(database: AppDatabase): LogDao {
+        return database.logDao()
     }
 
     @Provides
     fun provideProgramDao(database: AppDatabase): ProgramDao {
         return database.programDao()
-    }
-
-    @Provides
-    fun provideLogDataDao(database: AppDatabase): LogDataDao {
-        return database.logDataDao()
     }
 
     @Provides

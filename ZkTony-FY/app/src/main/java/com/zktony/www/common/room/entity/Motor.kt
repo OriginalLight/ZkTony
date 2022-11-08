@@ -214,46 +214,6 @@ data class PumpMotor(
         return listOf(hex.toString(), hex1.toString())
     }
 
-    /**
-     * B板子多点运动
-     * @param oneVolume [Float] 泵一出液量
-     * @param twoVolume [Float] 泵二出液量
-     * @param threeVolume [Float] 泵三出液量
-     * @return [String] 十六进制字符串
-     */
-    fun toMultiPointHexB(
-        oneVolume: Float,
-        twoVolume: Float,
-        threeVolume: Float,
-    ): String {
-        val str = StringBuilder()
-        str.append(pumpOneVolumePulseCount(oneVolume))
-        str.append(",")
-        str.append(pumpTwoVolumePulseCount(twoVolume))
-        str.append(",")
-        str.append(pumpThreeVolumePulseCount(threeVolume))
-        str.append(",")
-        return str.toString()
-    }
-
-    /**
-     * C板子多点运动
-     * @param fourVolume [Float] 泵一出液量
-     * @param fiveVolume [Float] 泵二出液量
-     * @return [String] 十六进制字符串
-     */
-    fun toMultiPointHexC(
-        fourVolume: Float,
-        fiveVolume: Float,
-    ): String {
-        val str = StringBuilder()
-        str.append(pumpFourVolumePulseCount(fourVolume))
-        str.append(",")
-        str.append(pumpFiveVolumePulseCount(fiveVolume))
-        str.append(",")
-        str.append("0,")
-        return str.toString()
-    }
 
     fun delayTime(
         one: Float = 0f,
@@ -270,29 +230,4 @@ data class PumpMotor(
         return max(oneTime, max(twoTime, max(threeTime, max(fourTime, fiveTime))))
     }
 
-    /**
-     * 运动延时
-     * @param x [Float] x轴运动距离
-     * @param y [Float] y轴运动距离
-     * @param z [Float] z轴运动距离
-     * @return [Long] 延时时间
-     */
-    fun delayTimeB(x: Float, y: Float, z: Float): Long {
-        val xTime = (x / volumeOne * 60 / pumpOne.speed * 1000).toLong()
-        val yTime = (y / volumeTwo * 60 / pumpTwo.speed * 1000).toLong()
-        val zTime = (z / volumeThree * 60 / pumpThree.speed * 1000).toLong()
-        return xTime + yTime + zTime
-    }
-
-    /**
-     * 运动延时
-     * @param x [Float] x轴运动距离
-     * @param y [Float] y轴运动距离
-     * @return [Long] 延时时间
-     */
-    fun delayTimeC(x: Float, y: Float): Long {
-        val xTime = (x / volumeFour * 60 / pumpFour.speed * 1000).toLong()
-        val yTime = (y / volumeFive * 60 / pumpFive.speed * 1000).toLong()
-        return xTime + yTime
-    }
 }

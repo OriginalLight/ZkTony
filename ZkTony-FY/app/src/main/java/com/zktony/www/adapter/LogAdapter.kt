@@ -9,14 +9,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.R
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.simpleDateFormat
-import com.zktony.www.common.room.entity.LogRecord
+import com.zktony.www.common.room.entity.Log
 import com.zktony.www.databinding.ItemLogBinding
 
 /**
  * @author: 刘贺贺
  * @date: 2022-09-21 14:48
  */
-class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback()) {
+class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
     var isClick = false
     var currentPosition = -1
 
@@ -40,7 +40,7 @@ class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback
         }
     }
 
-    fun getItem(): LogRecord {
+    fun getItem(): Log {
         return getItem(currentPosition)
     }
 
@@ -71,39 +71,27 @@ class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback
     ) : RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("SetTextI18n")
-        fun bind(item: LogRecord) {
+        fun bind(item: Log) {
             binding.apply {
                 logRecord = item
-                tv1.text = (layoutPosition + 1).toString()
-                tv2.text = item.createTime.simpleDateFormat("MM-dd HH:mm")
-                val str = StringBuilder()
-                if (item.model == 0) {
-                    str.append(item.motor)
-                    str.append("R/MIN-")
-                }
-                str.append(item.voltage.toString().removeZero())
-                str.append("V-")
-                str.append((item.time / 60).toString().removeZero())
-                str.append("MIN")
-                tv4.text = str.toString()
                 executePendingBindings()
             }
         }
     }
 }
 
-private class LogDiffCallback : DiffUtil.ItemCallback<LogRecord>() {
+private class LogDiffCallback : DiffUtil.ItemCallback<Log>() {
 
     override fun areItemsTheSame(
-        oldItem: LogRecord,
-        newItem: LogRecord
+        oldItem: Log,
+        newItem: Log
     ): Boolean {
         return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(
-        oldItem: LogRecord,
-        newItem: LogRecord
+        oldItem: Log,
+        newItem: Log
     ): Boolean {
         return oldItem == newItem
     }

@@ -6,7 +6,7 @@
 
         <variable
             name="logRecord"
-            type="com.zktony.www.common.room.entity.LogRecord" />
+            type="com.zktony.www.common.room.entity.Log" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -50,7 +50,6 @@
             android:layout_height="match_parent"
             android:ellipsize="end"
             android:gravity="center"
-            android:text='@{logRecord.model == 0 ? "转膜" : "染色"}'
             android:textColor="@color/black"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -23,15 +23,13 @@ import java.util.*
 /**
  * Data class that represent the a table in the database.
  */
-@Entity(tableName = "log_record")
-data class LogRecord(
+@Entity(tableName = "log")
+data class Log(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val programId: String = "",
-    val model: Int = 0,
-    val motor: Int = 0,
-    val voltage: Float = 0f,
-    val time: Float = 0f,
+    val programName : String = "",
+    val module: Int = 0,
+    val actions: String = "",
     val upload: Int = 0,
     val createTime: Date = Date(System.currentTimeMillis())
 )
