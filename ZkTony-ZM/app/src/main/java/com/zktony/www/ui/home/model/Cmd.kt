@@ -14,10 +14,13 @@ class Cmd {
 
     // 电压系数
     private val voltageCoefficient = 22.727f
+
     // 蠕动泵转速系数
     private val pumpSpeedCoefficient = 2.08f
+
     // 电流系数
     private val currentCoefficient = 3.234f
+
     // 电流偏移量
     private val currentOffset = 0.0045f
 
@@ -289,7 +292,8 @@ class Cmd {
         id = hex.substring(4, 6).hexToInt8()
         cmd = hex.substring(6, 8).hexToInt8()
         zmotorX = hex.substring(8, 10).hexToInt8()
-        stepMotorX = (hex.substring(10, 18).hexHighLow().hex4ToInt32() / pumpSpeedCoefficient).toInt()
+        stepMotorX =
+            (hex.substring(10, 18).hexHighLow().hex4ToInt32() / pumpSpeedCoefficient).toInt()
         powerENX = hex.substring(18, 20).hexToInt8()
         autoX = hex.substring(20, 22).hexToInt8()
         setVoltageX = hex.substring(22, 30).hexHighLow().hex4ToFloat32()
@@ -299,11 +303,13 @@ class Cmd {
             getCurrentX = 0f
         } else {
             getVoltageX = hex.substring(38, 46).hexHighLow().hex4ToFloat32() * voltageCoefficient
-            getCurrentX = hex.substring(46, 54).hexHighLow().hex4ToFloat32() * currentCoefficient + currentOffset
+            getCurrentX = hex.substring(46, 54).hexHighLow()
+                .hex4ToFloat32() * currentCoefficient + currentOffset
         }
         inputSensorX = hex.substring(54, 56).hexToInt8()
         zmotorY = hex.substring(56, 58).hexToInt8()
-        stepMotorY = (hex.substring(58, 66).hexHighLow().hex4ToInt32() / pumpSpeedCoefficient).toInt()
+        stepMotorY =
+            (hex.substring(58, 66).hexHighLow().hex4ToInt32() / pumpSpeedCoefficient).toInt()
         powerENY = hex.substring(66, 68).hexToInt8()
         autoY = hex.substring(68, 70).hexToInt8()
         setVoltageY = hex.substring(70, 78).hexHighLow().hex4ToFloat32()
@@ -313,7 +319,8 @@ class Cmd {
             getCurrentY = 0f
         } else {
             getVoltageY = hex.substring(86, 94).hexHighLow().hex4ToFloat32() * voltageCoefficient
-            getCurrentY = hex.substring(94, 102).hexHighLow().hex4ToFloat32() * currentCoefficient + currentOffset
+            getCurrentY = hex.substring(94, 102).hexHighLow()
+                .hex4ToFloat32() * currentCoefficient + currentOffset
         }
         inputSensorY = hex.substring(102, 104).hexToInt8()
         inputSensorZ = hex.substring(104, 106).hexToInt8()
@@ -345,7 +352,7 @@ class Cmd {
         hex.append(powerENY.int8ToHex())
         hex.append(autoY.int8ToHex())
         hex.append(setVoltageY.float32ToHex4().hexHighLow())
-        hex.append((targetVoltageY /voltageCoefficient).float32ToHex4().hexHighLow())
+        hex.append((targetVoltageY / voltageCoefficient).float32ToHex4().hexHighLow())
         hex.append(getVoltageY.float32ToHex4().hexHighLow())
         hex.append(getCurrentY.float32ToHex4().hexHighLow())
         hex.append(inputSensorY.int8ToHex())

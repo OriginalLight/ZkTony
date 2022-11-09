@@ -4,14 +4,12 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.www.common.utils.Logger
-import com.zktony.www.common.network.adapter.isSuccess
 import com.zktony.www.common.result.NetworkResult
+import com.zktony.www.common.utils.Logger
 import com.zktony.www.data.repository.LogRecordRepository
 import com.zktony.www.data.repository.LogRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -39,7 +37,7 @@ class LogRecordWorker @AssistedInject constructor(
                     return Result.success()
                 }
                 logRepository.uploadLogRecords(logs).collect { res ->
-                    when(res) {
+                    when (res) {
                         is NetworkResult.Success -> {
                             logRecordRepository.updateBatch(logs.map { it.copy(upload = 1) })
                         }

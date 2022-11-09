@@ -29,7 +29,7 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-object DataBaseModule {
+object RoomModule {
 
     @Provides
     @Singleton

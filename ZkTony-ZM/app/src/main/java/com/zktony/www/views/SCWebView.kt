@@ -1,13 +1,13 @@
 package com.zktony.www.views
 
-import android.webkit.WebView
-import com.kongzue.dialogx.interfaces.ScrollController
-import android.util.AttributeSet
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
+import android.util.AttributeSet
 import android.view.MotionEvent
+import android.webkit.WebView
 import androidx.annotation.RequiresApi
+import com.kongzue.dialogx.interfaces.ScrollController
 
 /**
  * @author: 刘贺贺
@@ -21,6 +21,7 @@ class SCWebView : WebView, ScrollController {
         attrs,
         defStyleAttr
     )
+
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     constructor(
         context: Context,
