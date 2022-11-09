@@ -3,10 +3,10 @@
 
     <item android:id="@android:id/background">
         <shape>
-            <corners android:radius="5dp"/>
+            <corners android:radius="5dp" />
         </shape>
         <!--    背景颜色-->
-        <color android:color="#CCCCCC"/>
+        <color android:color="#CCCCCC" />
     </item>
 
     <item android:id="@android:id/progress">
@@ -16,9 +16,9 @@
             <shape>
                 <!--  开始颜色，中途颜色，最后颜色-->
                 <gradient
-                    android:startColor="@color/light_primary"
                     android:centerColor="#FFFF00"
-                    android:endColor="#FF0000"/>
+                    android:endColor="#FF0000"
+                    android:startColor="@color/light_primary" />
             </shape>
         </clip>
     </item>
