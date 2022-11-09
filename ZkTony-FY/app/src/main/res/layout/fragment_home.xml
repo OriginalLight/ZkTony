@@ -1,15 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:binding="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="viewModel"
-            type="com.zktony.www.ui.home.HomeViewModel" />
-    </data>
+    <data/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -22,10 +16,6 @@
             android:id="@+id/con_a"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="2dp"
-            android:layout_marginBottom="1dp"
             android:background="@color/light_onPrimary"
             app:layout_constraintBottom_toTopOf="@+id/con_b"
             app:layout_constraintEnd_toStartOf="@+id/con_e"
@@ -36,8 +26,7 @@
 
             <include
                 android:id="@+id/a"
-                layout="@layout/home_a"
-                binding:viewModel="@{viewModel}" />
+                layout="@layout/home_a" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -45,10 +34,6 @@
             android:id="@+id/con_b"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="1dp"
-            android:layout_marginEnd="2dp"
-            android:layout_marginBottom="1dp"
             android:background="@color/light_onPrimary"
             app:layout_constraintBottom_toTopOf="@+id/con_c"
             app:layout_constraintEnd_toStartOf="@+id/con_e"
@@ -59,8 +44,7 @@
 
             <include
                 android:id="@+id/b"
-                layout="@layout/home_b"
-                binding:viewModel="@{viewModel}" />
+                layout="@layout/home_b" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -68,10 +52,6 @@
             android:id="@+id/con_c"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="1dp"
-            android:layout_marginEnd="2dp"
-            android:layout_marginBottom="1dp"
             android:background="@color/light_onPrimary"
             app:layout_constraintBottom_toTopOf="@+id/con_d"
             app:layout_constraintEnd_toStartOf="@+id/con_e"
@@ -82,8 +62,7 @@
 
             <include
                 android:id="@+id/c"
-                layout="@layout/home_c"
-                binding:viewModel="@{viewModel}" />
+                layout="@layout/home_c" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -91,10 +70,6 @@
             android:id="@+id/con_d"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="1dp"
-            android:layout_marginEnd="2dp"
-            android:layout_marginBottom="2dp"
             android:background="@color/light_onPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/con_e"
@@ -105,8 +80,7 @@
 
             <include
                 android:id="@+id/d"
-                layout="@layout/home_d"
-                binding:viewModel="@{viewModel}" />
+                layout="@layout/home_d" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -114,9 +88,6 @@
             android:id="@+id/con_e"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="2dp"
-            android:layout_marginBottom="2dp"
             android:background="@color/light_onPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -128,8 +99,7 @@
 
             <include
                 android:id="@+id/e"
-                layout="@layout/home_e"
-                binding:viewModel="@{viewModel}" />
+                layout="@layout/home_e" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

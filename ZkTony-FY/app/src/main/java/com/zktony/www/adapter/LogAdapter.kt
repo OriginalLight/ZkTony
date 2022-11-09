@@ -6,63 +6,30 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.zktony.www.R
-import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.simpleDateFormat
 import com.zktony.www.common.room.entity.Log
 import com.zktony.www.databinding.ItemLogBinding
+import com.zktony.www.ui.home.getModuleFromIndex
 
 /**
  * @author: 刘贺贺
  * @date: 2022-09-21 14:48
  */
 class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
-    var isClick = false
-    var currentPosition = -1
 
-    private fun setCurrentPosition(isClick: Boolean, position: Int) {
-        this.isClick = isClick
-        this.currentPosition = position
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun itemClickEvent(holder: ViewHolder) {
-        holder.itemView.setOnClickListener {
-            if (!isClick) {
-                setCurrentPosition(true, holder.bindingAdapterPosition)
-            } else {
-                setCurrentPosition(
-                    currentPosition != holder.bindingAdapterPosition,
-                    holder.bindingAdapterPosition
-                )
-            }
-            notifyDataSetChanged()
-        }
-    }
-
-    fun getItem(): Log {
-        return getItem(currentPosition)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val holder = ViewHolder(
+        return ViewHolder(
             ItemLogBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
             )
         )
-        itemClickEvent(holder)
-        return holder
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
-        if (currentPosition == position && isClick) {
-            holder.itemView.setBackgroundResource(R.color.dark_secondary)
-        } else {
-            holder.itemView.setBackgroundResource(R.color.light_onPrimary)
-        }
     }
 
 
@@ -73,7 +40,10 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
         @SuppressLint("SetTextI18n")
         fun bind(item: Log) {
             binding.apply {
-                logRecord = item
+                log = item
+                order.text = (layoutPosition + 1).toString()
+                module.text = getModuleFromIndex(item.module).value
+                time.text = item.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 executePendingBindings()
             }
         }

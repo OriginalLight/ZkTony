@@ -4,13 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="@layout/fragment_home">
 
-    <data>
-
-        <variable
-            name="viewModel"
-            type="com.zktony.www.ui.home.HomeViewModel" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,17 +12,19 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/con_select"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@color/dark_onPrimaryContainer"
+            android:layout_height="50dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="2dp"
+            android:background="@color/dark_onSurface"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_program"
-                android:layout_width="150dp"
+                android:layout_width="168dp"
                 android:layout_height="40dp"
-                android:layout_marginStart="25dp"
+                android:layout_marginStart="16dp"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:insetTop="4dp"
@@ -37,7 +32,7 @@
                 android:singleLine="true"
                 android:textAllCaps="false"
                 android:textSize="16sp"
-                app:cornerRadius="10dp"
+                app:cornerRadius="2dp"
                 app:elevation="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -69,10 +64,10 @@
                 android:id="@+id/tv_icon"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:layout_marginEnd="26dp"
+                android:layout_marginEnd="21dp"
                 android:text="@string/a"
                 android:textAlignment="center"
-                android:textColor="@color/light_primary"
+                android:textColor="#D50000"
                 android:textSize="40sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -84,7 +79,9 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginEnd="112dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="102dp"
+            android:layout_marginBottom="2dp"
             android:background="@color/light_surface"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -193,45 +190,64 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_start"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginEnd="16dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:text="@string/start"
-            android:textSize="16sp"
-            android:textStyle="bold"
+            app:backgroundTint="#64DD17"
             app:cornerRadius="40dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/con_select"
             app:rippleColor="@color/light_error"
             app:strokeColor="@color/dark_onBackground"
-            app:strokeWidth="5dp" />
+            app:strokeWidth="2dp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_stop"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="4dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginEnd="16dp"
             android:backgroundTint="@color/light_error"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:text="@string/stop"
-            android:textSize="16sp"
-            android:textStyle="bold"
             android:visibility="gone"
             app:cornerRadius="40dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/con_select"
             app:rippleColor="@color/light_primary"
             app:strokeColor="@color/dark_onBackground"
-            app:strokeWidth="5dp" />
+            app:strokeWidth="2dp" />
 
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@color/black"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@color/black"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/black"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/black"
+            app:layout_constraintBottom_toBottomOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

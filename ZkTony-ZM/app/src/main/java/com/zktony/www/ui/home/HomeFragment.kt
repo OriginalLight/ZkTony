@@ -9,30 +9,21 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.kongzue.dialogx.dialogs.MessageDialog
-import com.zktony.serialport.COMSerial
 import com.zktony.www.R
 import com.zktony.www.adapter.SpinnerAdapter
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.utils.Logger
 import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.utils.Constants
-import com.zktony.www.common.extension.addSuffix
-import com.zktony.www.common.extension.addTouchEvent
-import com.zktony.www.common.extension.afterTextChange
-import com.zktony.www.common.extension.getTimeFormat
-import com.zktony.www.common.extension.removeZero
-import com.zktony.www.data.model.Event
-import com.zktony.www.data.model.SerialPort
+import com.zktony.www.common.extension.*
 import com.zktony.www.common.room.entity.Program
+import com.zktony.www.common.utils.Constants
+import com.zktony.www.common.utils.Logger
+import com.zktony.www.data.model.Event
 import com.zktony.www.databinding.FragmentHomeBinding
 import com.zktony.www.ui.home.model.Cmd
 import com.zktony.www.ui.home.model.ControlState
 import com.zktony.www.ui.home.model.Model
-import com.zktony.www.ui.home.model.Model.A
-import com.zktony.www.ui.home.model.Model.B
-import com.zktony.www.ui.home.model.Model.X
-import com.zktony.www.ui.home.model.Model.Y
+import com.zktony.www.ui.home.model.Model.*
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -92,7 +83,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * 初始化监视器
      */
     private fun initObserver() {
-        viewModel.initQueryWork()
         lifecycleScope.launch {
             appViewModel.event.collect {
                 when (it) {
@@ -554,7 +544,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         EventBus.getDefault().post(
                             Event(
                                 Constants.AUDIO_ID,
-                                if (state.modelX === A) R.raw.zm else R.raw.rs
+                                if (state.modelX === A) R.raw.zm_finish else R.raw.rs_finish
                             )
                         )
                         Logger.d(msg = "模块A计时停止：")
@@ -571,7 +561,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         EventBus.getDefault().post(
                             Event(
                                 Constants.AUDIO_ID,
-                                if (state.modelY === A) R.raw.zm else R.raw.rs
+                                if (state.modelY === A) R.raw.zm_finish else R.raw.rs_finish
                             )
                         )
                         Logger.d(msg = "模块B计时停止：")
@@ -921,7 +911,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 program = spinnerAdapterY.getItem(binding.moduleY.sp1.selectedItemPosition)
             }
             if (program != null && program.name.isNotEmpty()) {
-                viewModel.updateProgram(program.copy(def = 1, count = program.count + 1, upload = 0))
+                viewModel.updateProgram(
+                    program.copy(
+                        def = 1,
+                        count = program.count + 1,
+                        upload = 0
+                    )
+                )
                 viewModel.startRecordLog(module, program.id, state)
             } else {
                 viewModel.startRecordLog(module, "no-program", state)

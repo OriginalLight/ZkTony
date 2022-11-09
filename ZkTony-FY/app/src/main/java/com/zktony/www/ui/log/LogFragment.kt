@@ -1,27 +1,18 @@
 package com.zktony.www.ui.log
 
-import android.annotation.SuppressLint
-import android.graphics.Color
+import android.app.DatePickerDialog
 import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import com.github.mikephil.charting.charts.LineChart
-import com.github.mikephil.charting.components.Description
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
 import com.zktony.www.R
 import com.zktony.www.adapter.LogAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.getDayEnd
 import com.zktony.www.common.extension.getDayStart
-import com.zktony.www.common.room.entity.Log
+import com.zktony.www.common.extension.simpleDateFormat
 import com.zktony.www.databinding.FragmentLogBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -33,25 +24,26 @@ class LogFragment :
     override val viewModel: LogViewModel by viewModels()
 
     private val logAdapter by lazy { LogAdapter() }
-    private var logRecordList = emptyList<Log>()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initObserver()
         initRecyclerView()
-        buttonEvent()
+        initButton()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    /**
+     * 初始化观察者
+     */
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.event.distinctUntilChanged().collect {
-                when (it) {
-                    is LogEvent.ChangeLogRecord -> {
-                        logAdapter.submitList(it.logRecordList)
-                        logRecordList = it.logRecordList
-                        logAdapter.currentPosition = -1
-                        logAdapter.isClick = false
-                    }
+            launch {
+                viewModel.logList.collect {
+                    logAdapter.submitList(it)
+                }
+            }
+            launch {
+                viewModel.data.collect {
+                    binding.time.text = it
                 }
             }
         }
@@ -61,21 +53,39 @@ class LogFragment :
      * initRecyclerView
      */
     private fun initRecyclerView() {
-        binding.rc1.adapter = logAdapter
-        viewModel.changeLogRecord(
-            Date(System.currentTimeMillis()).getDayStart(),
-            Date(System.currentTimeMillis()).getDayEnd()
-        )
+        binding.rc.adapter = logAdapter
+        viewModel.initLogList()
     }
 
+    /**
+     * 初始化按钮
+     */
+    private fun initButton() {
+        binding.time.run {
+            clickScale()
+            setOnClickListener {
+                showDatePickerDialog(Calendar.getInstance())
+            }
+        }
+    }
 
     /**
-     * 按钮事件
+     * 日期选择
+     * @param calendar
      */
-    private fun buttonEvent() {
-        binding.ib1.run {
-            this.clickScale()
-        }
+    private fun showDatePickerDialog(calendar: Calendar) {
+        DatePickerDialog(
+            requireActivity(),
+            0,
+            { _, year, monthOfYear, dayOfMonth ->
+                val dateStr = year.toString() + "-" + (monthOfYear + 1) + "-" + dayOfMonth
+                val date = dateStr.simpleDateFormat("yyyy-MM-dd")
+                date?.run { viewModel.changeLogRecord(date.getDayStart(), date.getDayEnd()) }
+            },
+            calendar[Calendar.YEAR],
+            calendar[Calendar.MONTH],
+            calendar[Calendar.DAY_OF_MONTH]
+        ).show()
     }
 
 }

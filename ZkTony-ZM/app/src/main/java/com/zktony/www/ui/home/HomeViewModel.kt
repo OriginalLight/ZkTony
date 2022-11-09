@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.viewModelScope
 import com.zktony.serialport.COMSerial
+import com.zktony.www.R
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.LogData
@@ -80,6 +81,13 @@ class HomeViewModel @Inject constructor(
                     preferences[booleanPreferencesKey(Constants.DETECT)] ?: true
                 }.collect {
                     detect = it
+                }
+            }
+            launch {
+                delay(200L)
+                while (true) {
+                    delay(1000L)
+                    COMSerial.instance.sendHex(SerialPort.TTYS4.device, Cmd.QUERY_HEX)
                 }
             }
         }
@@ -228,36 +236,16 @@ class HomeViewModel @Inject constructor(
             val cmd = appViewModel.latestReceiveCmd
             if (cmd.powerENX == 1 && cmd.getCurrentX < 0.1 && cmd.powerENY == 0) {
                 _errorMessage.emit("模块A异常，请检查！！！")
+                Event(Constants.AUDIO_ID, R.raw.a_error)
             }
             if (cmd.powerENY == 1 && cmd.getCurrentY < 0.1 && cmd.powerENX == 0) {
                 _errorMessage.emit("模块B异常，请检查！！！")
+                Event(Constants.AUDIO_ID, R.raw.b_error)
             }
             if (cmd.powerENX == 1 && cmd.getCurrentX < 0.1 && cmd.powerENY == 1 && cmd.getCurrentY < 0.1) {
                 _errorMessage.emit("模块A、B异常，请检查！！！")
+                Event(Constants.AUDIO_ID, R.raw.all_error)
             }
         }
     }
-
-    /**
-     * 设置定时查询
-     */
-    fun initQueryWork() {
-        viewModelScope.launch {
-            Observable.interval(200, 1000, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(object : Observer<Long> {
-                    override fun onSubscribe(d: Disposable) {}
-                    override fun onNext(aLong: Long) {
-                        COMSerial.instance.sendHex(SerialPort.TTYS4.device, Cmd.QUERY_HEX)
-                    }
-
-                    override fun onError(e: Throwable) {}
-                    override fun onComplete() {}
-                })
-        }
-    }
-
-
 }

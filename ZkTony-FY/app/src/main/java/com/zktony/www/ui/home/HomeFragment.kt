@@ -12,6 +12,7 @@ import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
+import com.zktony.www.common.extension.removeZero
 import com.zktony.www.databinding.FragmentHomeBinding
 import com.zktony.www.ui.home.ModuleEnum.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -292,7 +293,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
             with(tvInsulating) {
                 text =
-                    if (state.insulatingEnable) "保温中 ${appViewModel.settingState.value.temp}℃" else "抗体保温"
+                    if (state.insulatingEnable) "保温中 ${
+                        appViewModel.settingState.value.temp.toString().removeZero()
+                    }℃" else "抗体保温"
                 setTextColor(
                     ContextCompat.getColor(
                         context,
