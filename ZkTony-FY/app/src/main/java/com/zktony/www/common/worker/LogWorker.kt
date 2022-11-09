@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.common.network.adapter.isSuccess
-import com.zktony.www.data.repository.LogRecordRepository
+import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.common.network.service.LogService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -21,34 +21,15 @@ import javax.inject.Inject
 class LogWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
+    private val logRepository: LogRepository,
 ) : CoroutineWorker(appContext, workerParams) {
 
-    @Inject
-    lateinit var logRecordRepository: LogRecordRepository
-
-    @Inject
-    lateinit var service: LogService
-
     override suspend fun doWork(): Result {
-        try {
-            logRecordRepository.withoutUpload().first().let {
-                if (it.isEmpty()) {
-                    Logger.d("LogRecordWorker", "上传日志为空")
-                    return Result.success()
-                }
-                val res = service.uploadLogRecords(it)
-                if (res.isSuccess) {
-                    logRecordRepository.updateBatch(it.map { logRecord ->
-                        logRecord.copy(upload = 1)
-                    })
-                } else {
-                    Logger.e("LogRecordWorker", "上传日志失败")
-                    return Result.failure()
-                }
-            }
-            return Result.success()
+        return try {
+            logRepository.deleteByDate()
+            Result.success()
         } catch (e: Exception) {
-            return Result.failure()
+            Result.failure()
         }
     }
 }

@@ -102,8 +102,6 @@ class AdminViewModel @Inject constructor(
                 putExtra("extra_prefs_set_back_text", "返回")
             }
             CommonApplicationProxy.application.startActivity(intent)
-            delay(200L)
-            changeBar(true)
         }
     }
 

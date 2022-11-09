@@ -11,16 +11,7 @@ import java.util.concurrent.TimeUnit
  */
 class WorkerManager {
 
-    private val programRequest by lazy {
-        PeriodicWorkRequestBuilder<ProgramWorker>(60, TimeUnit.MINUTES)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
-            ).build()
-    }
-
-    private val logRecordRequest by lazy {
+    private val logRequest by lazy {
         PeriodicWorkRequestBuilder<LogWorker>(60, TimeUnit.MINUTES)
             .setConstraints(
                 Constraints.Builder()
@@ -31,14 +22,9 @@ class WorkerManager {
 
     fun createWorker() {
         WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
-            Constants.BACKGROUND_WORKER_NAME_PROGRAM,
-            ExistingPeriodicWorkPolicy.REPLACE,
-            programRequest
-        )
-        WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
             Constants.BACKGROUND_WORKER_NAME_LOG_RECORD,
             ExistingPeriodicWorkPolicy.REPLACE,
-            logRecordRequest
+            logRequest
         )
     }
 

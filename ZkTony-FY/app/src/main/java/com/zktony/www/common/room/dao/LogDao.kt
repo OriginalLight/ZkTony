@@ -39,6 +39,9 @@ interface LogDao {
     @Query("DELETE FROM log WHERE julianday('now') - julianday(createTime) >= '180'")
     suspend fun deleteByDate()
 
+    @Query("SELECT * FROM log ORDER BY createTime DESC LIMIT 20")
+    fun getAll(): Flow<List<Log>>
+
     @Query("SELECT * FROM log WHERE createTime BETWEEN :start AND :end ORDER BY createTime DESC")
     fun getByDate(start: Date, end: Date): Flow<List<Log>>
 

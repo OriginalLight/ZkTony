@@ -8,6 +8,7 @@ import com.zktony.www.base.BaseActivity
 import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.verifyHex
+import com.zktony.www.common.worker.WorkerManager
 import com.zktony.www.databinding.ActivityMainBinding
 import com.zktony.www.serialport.SerialPortEnum
 import com.zktony.www.serialport.SerialPortManager
@@ -31,7 +32,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     }
 
     private fun initView() {
-        // WorkerManager.instance.createWorker()
+        WorkerManager.instance.createWorker()
         lifecycleScope.launch {
             launch {
                 SerialPortManager.instance.addDataListener { com, hexData ->

@@ -125,6 +125,7 @@ class AdminFragment :
         binding.btnWifi.run {
             this.clickScale()
             this.setOnClickListener {
+                binding.swBar.isChecked = true
                 viewModel.changeBar(true)
                 viewModel.wifiSetting()
             }

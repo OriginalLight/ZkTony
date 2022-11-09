@@ -11,9 +11,11 @@ import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.toCommand
 import com.zktony.www.common.model.Queue
 import com.zktony.www.common.room.entity.Action
+import com.zktony.www.common.room.entity.Log
 import com.zktony.www.common.room.entity.Program
 import com.zktony.www.common.room.entity.getActionEnum
 import com.zktony.www.data.repository.ActionRepository
+import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.ProgramRepository
 import com.zktony.www.serialport.SerialPortEnum
 import com.zktony.www.serialport.SerialPortManager
@@ -32,6 +34,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val programRepository: ProgramRepository,
     private val actionRepository: ActionRepository,
+    private val logRepository: LogRepository,
 ) : BaseViewModel() {
 
     @Inject
@@ -360,7 +363,7 @@ class HomeViewModel @Inject constructor(
                     )
                 } else {
                     _aState.value = _aState.value.copy(
-                        btnStartEnable = programList.find { it.id == _aState.value.program!!.id }!!.actionCount  > 0
+                        btnStartEnable = programList.find { it.id == _aState.value.program!!.id }!!.actionCount > 0
                     )
                 }
             }
@@ -377,7 +380,7 @@ class HomeViewModel @Inject constructor(
                     )
                 } else {
                     _bState.value = _bState.value.copy(
-                        btnStartEnable = programList.find { it.id == _bState.value.program!!.id }!!.actionCount  > 0
+                        btnStartEnable = programList.find { it.id == _bState.value.program!!.id }!!.actionCount > 0
                     )
                 }
             }
@@ -394,7 +397,7 @@ class HomeViewModel @Inject constructor(
                     )
                 } else {
                     _cState.value = _cState.value.copy(
-                        btnStartEnable = programList.find { it.id == _cState.value.program!!.id }!!.actionCount  > 0
+                        btnStartEnable = programList.find { it.id == _cState.value.program!!.id }!!.actionCount > 0
                     )
                 }
             }
@@ -411,7 +414,7 @@ class HomeViewModel @Inject constructor(
                     )
                 } else {
                     _dState.value = _dState.value.copy(
-                        btnStartEnable = programList.find { it.id == _dState.value.program!!.id }!!.actionCount  > 0
+                        btnStartEnable = programList.find { it.id == _dState.value.program!!.id }!!.actionCount > 0
                     )
                 }
             }
@@ -453,18 +456,46 @@ class HomeViewModel @Inject constructor(
                 A -> {
                     _aState.value.job?.let { if (it.isActive) it.cancel() }
                     _aState.value = _aState.value.copy(job = job)
+                    logRepository.insert(
+                        Log(
+                            programName = _aState.value.program!!.name,
+                            module = module.index,
+                            actions = _aState.value.program!!.actions,
+                        )
+                    )
                 }
                 B -> {
                     _bState.value.job?.let { if (it.isActive) it.cancel() }
                     _bState.value = _bState.value.copy(job = job)
+                    logRepository.insert(
+                        Log(
+                            programName = _bState.value.program!!.name,
+                            module = module.index,
+                            actions = _bState.value.program!!.actions,
+                        )
+                    )
                 }
                 C -> {
                     _cState.value.job?.let { if (it.isActive) it.cancel() }
                     _cState.value = _cState.value.copy(job = job)
+                    logRepository.insert(
+                        Log(
+                            programName = _cState.value.program!!.name,
+                            module = module.index,
+                            actions = _cState.value.program!!.actions,
+                        )
+                    )
                 }
                 D -> {
                     _dState.value.job?.let { if (it.isActive) it.cancel() }
                     _dState.value = _dState.value.copy(job = job)
+                    logRepository.insert(
+                        Log(
+                            programName = _dState.value.program!!.name,
+                            module = module.index,
+                            actions = _dState.value.program!!.actions,
+                        )
+                    )
                 }
             }
         }
@@ -506,13 +537,37 @@ class HomeViewModel @Inject constructor(
                     is ActionEvent.Count -> {
                         when (it.module) {
                             A -> _aState.value =
-                                _aState.value.copy(currentActionText = _aState.value.currentActionText + " X${it.count}")
+                                _aState.value.copy(
+                                    currentActionText = _aState.value.currentActionText.substring(
+                                        0,
+                                        2
+                                    )
+                                            + " X${it.count}"
+                                )
                             B -> _bState.value =
-                                _bState.value.copy(currentActionText = _bState.value.currentActionText + " X${it.count}")
+                                _bState.value.copy(
+                                    currentActionText = _bState.value.currentActionText.substring(
+                                        0,
+                                        2
+                                    )
+                                            + " X${it.count}"
+                                )
                             C -> _cState.value =
-                                _cState.value.copy(currentActionText = _cState.value.currentActionText + " X${it.count}")
+                                _cState.value.copy(
+                                    currentActionText = _cState.value.currentActionText.substring(
+                                        0,
+                                        2
+                                    )
+                                            + " X${it.count}"
+                                )
                             D -> _dState.value =
-                                _dState.value.copy(currentActionText = _dState.value.currentActionText + " X${it.count}")
+                                _dState.value.copy(
+                                    currentActionText = _dState.value.currentActionText.substring(
+                                        0,
+                                        2
+                                    )
+                                            + " X${it.count}"
+                                )
                         }
                     }
                 }
@@ -542,5 +597,18 @@ data class OperationState(
 )
 
 enum class ModuleEnum(val value: String, val index: Int) {
-    A("模块A", 0), B("模块B", 1), C("模块C", 2), D("模块D", 3),
+    A("模块A", 0),
+    B("模块B", 1),
+    C("模块C", 2),
+    D("模块D", 3),
+}
+
+fun getModuleFromIndex(index: Int): ModuleEnum {
+    return when (index) {
+        0 -> A
+        1 -> B
+        2 -> C
+        3 -> D
+        else -> throw IllegalArgumentException("index must be 0-3")
+    }
 }
