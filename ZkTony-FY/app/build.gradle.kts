@@ -86,7 +86,6 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.hilt.android)
     implementation(libs.hilt.work)
-    implementation(libs.legacy.support.v4)
     implementation(libs.material)
     implementation(libs.okhttp3)
     implementation(libs.okhttp3.logging.interceptor)
