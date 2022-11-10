@@ -2,8 +2,7 @@ package com.zktony.www.common.extension
 
 import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
+import java.util.*
 
 /**
  * @author: 刘贺贺

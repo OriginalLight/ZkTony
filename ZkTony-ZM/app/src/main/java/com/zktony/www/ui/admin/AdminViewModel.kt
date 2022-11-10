@@ -16,7 +16,6 @@ import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.installApk
 import com.zktony.www.common.extension.isNetworkAvailable
-import com.zktony.www.common.extension.showShortToast
 import com.zktony.www.common.network.download.DownloadManager
 import com.zktony.www.common.network.download.DownloadState
 import com.zktony.www.common.result.NetworkResult

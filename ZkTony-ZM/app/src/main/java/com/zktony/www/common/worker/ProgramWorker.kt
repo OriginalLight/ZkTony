@@ -4,13 +4,11 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.www.common.utils.Logger
-import com.zktony.www.common.network.adapter.isSuccess
 import com.zktony.www.common.result.NetworkResult
+import com.zktony.www.common.utils.Logger
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -35,7 +33,7 @@ class ProgramWorker @AssistedInject constructor(
                     return Result.success()
                 }
                 programRepository.uploadProgram(programs).collect { res ->
-                    when(res) {
+                    when (res) {
                         is NetworkResult.Success -> {
                             programRepository.updateBatch(programs.map { it.copy(upload = 1) })
                         }
