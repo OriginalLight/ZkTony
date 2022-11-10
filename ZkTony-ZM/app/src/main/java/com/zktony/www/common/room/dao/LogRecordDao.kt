@@ -16,14 +16,10 @@
 
 package com.zktony.www.common.room.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
-import androidx.room.Update
+import androidx.room.*
 import com.zktony.www.common.room.entity.LogRecord
 import kotlinx.coroutines.flow.Flow
-import java.util.Date
+import java.util.*
 
 /**
  * Data access object to query the database.

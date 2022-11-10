@@ -1,10 +1,6 @@
 package com.zktony.www.common.worker
 
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import com.zktony.www.common.app.CommonApplicationProxy
 import com.zktony.www.common.utils.Constants
 import java.util.concurrent.TimeUnit

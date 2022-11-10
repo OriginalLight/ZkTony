@@ -194,6 +194,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
     }
 
+    /**
+     * 各个模块的ui状态变化
+     * @param module 模块
+     * @param state 状态
+     */
     private fun moduleStateChange(module: ModuleEnum, state: ModuleState) {
         when (module) {
             A -> {
@@ -208,9 +213,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         visibility = state.btnStartVisible
                         alpha = if (state.btnStartEnable) 1f else 0.5f
                     }
-                    with(btnStop) {
-                        visibility = state.btnStopVisible
-                    }
+                    btnStop.visibility = state.btnStopVisible
                     tvActions.text = state.program?.actions ?: "/"
                     dashState.text = state.runtimeText
                     dashAction.text = state.currentActionText
@@ -230,9 +233,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         visibility = state.btnStartVisible
                         alpha = if (state.btnStartEnable) 1f else 0.5f
                     }
-                    with(btnStop) {
-                        visibility = state.btnStopVisible
-                    }
+                    btnStop.visibility = state.btnStopVisible
                     tvActions.text = state.program?.actions ?: "/"
                     dashState.text = state.runtimeText
                     dashAction.text = state.currentActionText
@@ -252,9 +253,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         visibility = state.btnStartVisible
                         alpha = if (state.btnStartEnable) 1f else 0.5f
                     }
-                    with(btnStop) {
-                        visibility = state.btnStopVisible
-                    }
+                    btnStop.visibility = state.btnStopVisible
                     tvActions.text = state.program?.actions ?: "/"
                     dashState.text = state.runtimeText
                     dashAction.text = state.currentActionText
@@ -274,9 +273,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         visibility = state.btnStartVisible
                         alpha = if (state.btnStartEnable) 1f else 0.5f
                     }
-                    with(btnStop) {
-                        visibility = state.btnStopVisible
-                    }
+                    btnStop.visibility = state.btnStopVisible
                     tvActions.text = state.program?.actions ?: "/"
                     dashState.text = state.runtimeText
                     dashAction.text = state.currentActionText
@@ -287,6 +284,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
     }
 
+    /**
+     * 操作按钮的ui状态变化
+     * @param state 状态
+     */
     private fun operationStateChange(state: OperationState) {
         with(binding.e) {
             btnPause.setBackgroundResource(if (state.pauseEnable) R.mipmap.btn_continue else R.mipmap.btn_pause)

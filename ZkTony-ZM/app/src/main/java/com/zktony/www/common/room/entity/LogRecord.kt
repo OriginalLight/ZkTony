@@ -18,8 +18,7 @@ package com.zktony.www.common.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.Date
-import java.util.UUID
+import java.util.*
 
 /**
  * Data class that represent the a table in the database.
