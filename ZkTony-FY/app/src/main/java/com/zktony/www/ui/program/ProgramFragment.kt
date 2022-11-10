@@ -3,6 +3,7 @@ package com.zktony.www.ui.program
 import android.os.Bundle
 import android.text.InputType.TYPE_CLASS_TEXT
 import android.text.InputType.TYPE_TEXT_VARIATION_NORMAL
+import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -42,6 +43,13 @@ class ProgramFragment :
         lifecycleScope.launch {
             viewModel.programList.collect {
                 programAdapter.submitList(it)
+                if(it.isEmpty()){
+                    binding.empty.visibility = View.VISIBLE
+                    binding.rc1.visibility = View.GONE
+                } else {
+                    binding.empty.visibility = View.GONE
+                    binding.rc1.visibility = View.VISIBLE
+                }
             }
         }
     }

@@ -201,10 +201,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     with(btnProgram) {
                         isEnabled = state.btnSelectorEnable
                         text = state.program?.name ?: "/"
+                        alpha = if (state.btnSelectorEnable) 1f else 0.5f
                     }
                     with(btnStart) {
                         isEnabled = state.btnStartEnable
                         visibility = state.btnStartVisible
+                        alpha = if (state.btnStartEnable) 1f else 0.5f
                     }
                     with(btnStop) {
                         visibility = state.btnStopVisible
@@ -221,10 +223,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     with(btnProgram) {
                         isEnabled = state.btnSelectorEnable
                         text = state.program?.name ?: "/"
+                        alpha = if (state.btnSelectorEnable) 1f else 0.5f
                     }
                     with(btnStart) {
                         isEnabled = state.btnStartEnable
                         visibility = state.btnStartVisible
+                        alpha = if (state.btnStartEnable) 1f else 0.5f
                     }
                     with(btnStop) {
                         visibility = state.btnStopVisible
@@ -241,10 +245,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     with(btnProgram) {
                         isEnabled = state.btnSelectorEnable
                         text = state.program?.name ?: "/"
+                        alpha = if (state.btnSelectorEnable) 1f else 0.5f
                     }
                     with(btnStart) {
                         isEnabled = state.btnStartEnable
                         visibility = state.btnStartVisible
+                        alpha = if (state.btnStartEnable) 1f else 0.5f
                     }
                     with(btnStop) {
                         visibility = state.btnStopVisible
@@ -261,10 +267,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     with(btnProgram) {
                         isEnabled = state.btnSelectorEnable
                         text = state.program?.name ?: "/"
+                        alpha = if (state.btnSelectorEnable) 1f else 0.5f
                     }
                     with(btnStart) {
                         isEnabled = state.btnStartEnable
                         visibility = state.btnStartVisible
+                        alpha = if (state.btnStartEnable) 1f else 0.5f
                     }
                     with(btnStop) {
                         visibility = state.btnStopVisible

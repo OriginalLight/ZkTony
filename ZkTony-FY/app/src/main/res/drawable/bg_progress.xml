@@ -16,8 +16,8 @@
             <shape>
                 <!--  开始颜色，中途颜色，最后颜色-->
                 <gradient
-                    android:centerColor="#BBFF00"
-                    android:endColor="#00C80A"
+                    android:centerColor="#9575CD"
+                    android:endColor="#7B1FA2"
                     android:startColor="@color/light_primary" />
             </shape>
         </clip>

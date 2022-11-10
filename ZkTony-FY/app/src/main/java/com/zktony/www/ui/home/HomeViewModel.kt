@@ -18,6 +18,7 @@ import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.ProgramRepository
 import com.zktony.www.serialport.SerialPortEnum
+import com.zktony.www.serialport.SerialPortEnum.*
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import com.zktony.www.ui.home.ModuleEnum.*
@@ -74,24 +75,15 @@ class HomeViewModel @Inject constructor(
                 // 设置和定时查询温控
                 for (i in 0..4) {
                     delay(200L)
-                    appViewModel.senderText(
-                        SerialPortEnum.SERIAL_FOUR,
-                        Command.saveTemperature(i.toString(), "26")
-                    )
+                    appViewModel.senderText(SERIAL_FOUR, Command.saveTemperature(i.toString(), "26"))
                     delay(200L)
-                    appViewModel.senderText(
-                        SerialPortEnum.SERIAL_FOUR,
-                        Command.setTemperature(i.toString(), "26")
-                    )
+                    appViewModel.senderText(SERIAL_FOUR, Command.setTemperature(i.toString(), "26"))
                 }
                 // 每一分钟查询一次温度
                 while (true) {
                     for (i in 0..3) {
                         delay(200L)
-                        appViewModel.senderText(
-                            SerialPortEnum.SERIAL_FOUR,
-                            Command.queryTemperature(i.toString())
-                        )
+                        appViewModel.senderText(SERIAL_FOUR, Command.queryTemperature(i.toString()))
                     }
                     delay(60 * 1000L)
                 }
@@ -188,15 +180,18 @@ class HomeViewModel @Inject constructor(
      */
     fun stop(module: ModuleEnum) {
         viewModelScope.launch {
+            SerialPortManager.instance.setModuleRunning(module, false)
             when (module) {
                 A -> {
                     _aState.value.job?.let { if (it.isActive) it.cancel() }
+                    _aState.value.log?.let { log ->
+                        logRepository.delete(log)
+                    }
                     _aState.value = _aState.value.copy(
                         job = null,
                         btnStartVisible = View.VISIBLE,
                         btnStopVisible = View.GONE,
                         btnSelectorEnable = true,
-                        runtimeText = "已就绪",
                         currentActionText = "/",
                         tempText = "0.0℃",
                         countDownText = "00:00:00",
@@ -204,12 +199,14 @@ class HomeViewModel @Inject constructor(
                 }
                 B -> {
                     _bState.value.job?.let { if (it.isActive) it.cancel() }
+                    _bState.value.log?.let { log ->
+                        logRepository.delete(log)
+                    }
                     _bState.value = _bState.value.copy(
                         job = null,
                         btnStartVisible = View.VISIBLE,
                         btnStopVisible = View.GONE,
                         btnSelectorEnable = true,
-                        runtimeText = "已就绪",
                         currentActionText = "/",
                         tempText = "0.0℃",
                         countDownText = "00:00:00",
@@ -217,12 +214,14 @@ class HomeViewModel @Inject constructor(
                 }
                 C -> {
                     _cState.value.job?.let { if (it.isActive) it.cancel() }
+                    _cState.value.log?.let { log ->
+                        logRepository.delete(log)
+                    }
                     _cState.value = _cState.value.copy(
                         job = null,
                         btnStartVisible = View.VISIBLE,
                         btnStopVisible = View.GONE,
                         btnSelectorEnable = true,
-                        runtimeText = "已就绪",
                         currentActionText = "/",
                         tempText = "0.0℃",
                         countDownText = "00:00:00",
@@ -230,12 +229,14 @@ class HomeViewModel @Inject constructor(
                 }
                 D -> {
                     _dState.value.job?.let { if (it.isActive) it.cancel() }
+                    _dState.value.log?.let { log ->
+                        logRepository.delete(log)
+                    }
                     _dState.value = _dState.value.copy(
                         job = null,
                         btnStartVisible = View.VISIBLE,
                         btnStopVisible = View.GONE,
                         btnSelectorEnable = true,
-                        runtimeText = "已就绪",
                         currentActionText = "/",
                         tempText = "0.0℃",
                         countDownText = "00:00:00",
@@ -243,10 +244,8 @@ class HomeViewModel @Inject constructor(
                 }
             }
             if (_aState.value.job == null && _bState.value.job == null && _cState.value.job == null && _dState.value.job == null) {
-                appViewModel.sender(
-                    SerialPortEnum.SERIAL_ONE,
-                    Command(parameter = "0B", data = "0100").toHex()
-                )
+                appViewModel.sender(SERIAL_ONE, Command.pauseShakeBed())
+                SerialPortManager.instance.commandQueue.clear()
             }
         }
     }
@@ -257,10 +256,10 @@ class HomeViewModel @Inject constructor(
     fun reset() {
         SerialPortManager.instance.commandQueue.clear()
         appViewModel.sender(
-            SerialPortEnum.SERIAL_ONE,
+            SERIAL_ONE,
             Command(function = "05", parameter = "01", data = "0101302C302C302C302C").toHex()
         )
-        appViewModel.sender(SerialPortEnum.SERIAL_ONE, Command().toHex())
+        appViewModel.sender(SERIAL_ONE, Command().toHex())
         stop(A)
         stop(B)
         stop(C)
@@ -273,11 +272,8 @@ class HomeViewModel @Inject constructor(
     fun pause() {
         viewModelScope.launch {
             appViewModel.sender(
-                SerialPortEnum.SERIAL_ONE,
-                Command(
-                    parameter = "0B",
-                    data = if (_eState.value.pauseEnable) "0101" else "0100"
-                ).toHex()
+                SERIAL_ONE,
+                if (_eState.value.pauseEnable) Command.resumeShakeBed() else Command.pauseShakeBed()
             )
             _eState.value = _eState.value.copy(pauseEnable = !_eState.value.pauseEnable)
         }
@@ -290,7 +286,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val temp = appViewModel.settingState.value.temp.toString().removeZero()
             appViewModel.senderText(
-                SerialPortEnum.SERIAL_FOUR,
+                SERIAL_FOUR,
                 Command.setTemperature(
                     address = "4",
                     temperature = if (_eState.value.insulatingEnable) "26" else temp
@@ -432,6 +428,8 @@ class HomeViewModel @Inject constructor(
      * @param program [Program] 程序
      */
     private fun runProgram(module: ModuleEnum, program: Program) {
+        SerialPortManager.instance.setModuleRunning(module, true)
+
         val job = viewModelScope.launch {
             val actionQueue = Queue<Action>()
             actionRepository.getByProgramId(program.id).first().forEach {
@@ -442,58 +440,65 @@ class HomeViewModel @Inject constructor(
             programStateCollector(runner)
             runner.run()
         }
-        setJobWhenProgramStart(module, job)
-    }
-
-    /**
-     * 设置Job当程序启动时
-     * @param module [ModuleEnum] 模块
-     * @param job [Job] Job
-     */
-    private fun setJobWhenProgramStart(module: ModuleEnum, job: Job) {
         viewModelScope.launch {
             when (module) {
                 A -> {
                     _aState.value.job?.let { if (it.isActive) it.cancel() }
-                    _aState.value = _aState.value.copy(job = job)
-                    logRepository.insert(
-                        Log(
-                            programName = _aState.value.program!!.name,
-                            module = module.index,
-                            actions = _aState.value.program!!.actions,
+                    val log = Log(
+                        programName = _aState.value.program!!.name,
+                        module = module.index,
+                        actions = _aState.value.program!!.actions,
+                    )
+                    _aState.value = _aState.value.copy(job = job, log = log)
+                    logRepository.insert(log)
+                    programRepository.update(
+                        _aState.value.program!!.copy(
+                            runCount = _aState.value.program!!.runCount + 1
                         )
                     )
                 }
                 B -> {
                     _bState.value.job?.let { if (it.isActive) it.cancel() }
-                    _bState.value = _bState.value.copy(job = job)
-                    logRepository.insert(
-                        Log(
-                            programName = _bState.value.program!!.name,
-                            module = module.index,
-                            actions = _bState.value.program!!.actions,
+                    val log = Log(
+                        programName = _bState.value.program!!.name,
+                        module = module.index,
+                        actions = _bState.value.program!!.actions,
+                    )
+                    _bState.value = _bState.value.copy(job = job, log = log)
+                    logRepository.insert(log)
+                    programRepository.update(
+                        _bState.value.program!!.copy(
+                            runCount = _bState.value.program!!.runCount + 1
                         )
                     )
                 }
                 C -> {
                     _cState.value.job?.let { if (it.isActive) it.cancel() }
-                    _cState.value = _cState.value.copy(job = job)
-                    logRepository.insert(
-                        Log(
-                            programName = _cState.value.program!!.name,
-                            module = module.index,
-                            actions = _cState.value.program!!.actions,
+                    val log = Log(
+                        programName = _cState.value.program!!.name,
+                        module = module.index,
+                        actions = _cState.value.program!!.actions,
+                    )
+                    _cState.value = _cState.value.copy(job = job, log = log)
+                    logRepository.insert(log)
+                    programRepository.update(
+                        _cState.value.program!!.copy(
+                            runCount = _cState.value.program!!.runCount + 1
                         )
                     )
                 }
                 D -> {
                     _dState.value.job?.let { if (it.isActive) it.cancel() }
-                    _dState.value = _dState.value.copy(job = job)
-                    logRepository.insert(
-                        Log(
-                            programName = _dState.value.program!!.name,
-                            module = module.index,
-                            actions = _dState.value.program!!.actions,
+                    val log = Log(
+                        programName = _dState.value.program!!.name,
+                        module = module.index,
+                        actions = _dState.value.program!!.actions,
+                    )
+                    _dState.value = _dState.value.copy(job = job, log = log)
+                    logRepository.insert(log)
+                    programRepository.update(
+                        _dState.value.program!!.copy(
+                            runCount = _dState.value.program!!.runCount + 1
                         )
                     )
                 }
@@ -533,7 +538,47 @@ class HomeViewModel @Inject constructor(
                                 _dState.value.copy(countDownText = it.time)
                         }
                     }
-                    is ActionEvent.Finish -> stop(it.module)
+                    is ActionEvent.Finish -> {
+                        when (it.module) {
+                            A -> {
+                                _aState.value.log?.let { log ->
+                                    logRepository.update(log.copy(status = 1))
+                                }
+                                _aState.value = _aState.value.copy(
+                                    runtimeText = "已完成",
+                                    log = null
+                                )
+                            }
+                            B -> {
+                                _bState.value.log?.let { log ->
+                                    logRepository.update(log.copy(status = 1))
+                                }
+                                _bState.value = _bState.value.copy(
+                                    runtimeText = "已完成",
+                                    log = null
+                                )
+                            }
+                            C -> {
+                                _cState.value.log?.let { log ->
+                                    logRepository.update(log.copy(status = 1))
+                                }
+                                _cState.value = _cState.value.copy(
+                                    runtimeText = "已完成",
+                                    log = null
+                                )
+                            }
+                            D -> {
+                                _dState.value.log?.let { log ->
+                                    logRepository.update(log.copy(status = 1))
+                                }
+                                _dState.value = _dState.value.copy(
+                                    runtimeText = "已完成",
+                                    log = null
+                                )
+                            }
+                        }
+                        stop(it.module)
+                    }
                     is ActionEvent.Count -> {
                         when (it.module) {
                             A -> _aState.value =
@@ -581,8 +626,9 @@ class HomeViewModel @Inject constructor(
 data class ModuleState(
     val job: Job? = null,
     val program: Program? = null,
+    val log: Log? = null,
     val btnSelectorEnable: Boolean = true,
-    val btnStartEnable: Boolean = true,
+    val btnStartEnable: Boolean = false,
     val btnStartVisible: Int = View.VISIBLE,
     val btnStopVisible: Int = View.GONE,
     val countDownText: String = "00:00:00",

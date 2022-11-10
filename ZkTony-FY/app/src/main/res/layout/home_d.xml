@@ -22,22 +22,26 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_program"
-                android:layout_width="168dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="16dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:backgroundTint="@color/light_primary"
                 android:ellipsize="end"
                 android:gravity="center"
-                android:insetTop="4dp"
-                android:insetBottom="2dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
                 android:singleLine="true"
                 android:textAllCaps="false"
+                android:textColor="@color/light_onPrimary"
                 android:textSize="16sp"
                 app:cornerRadius="2dp"
                 app:elevation="0dp"
+                app:icon="@drawable/ic_drop"
+                app:iconTint="@color/light_onPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:rippleColor="@color/light_onPrimary" />
+                app:rippleColor="@color/purple_700" />
 
             <com.zktony.www.views.MarqueTextView
                 android:id="@+id/tv_actions"
@@ -198,7 +202,7 @@
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:text="@string/start"
-            app:backgroundTint="#64DD17"
+            app:backgroundTint="#388E3C"
             app:cornerRadius="40dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

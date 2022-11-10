@@ -2,6 +2,7 @@ package com.zktony.www.ui.log
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.zktony.www.R
@@ -38,6 +39,13 @@ class LogFragment :
         lifecycleScope.launch {
             launch {
                 viewModel.logList.collect {
+                    if (it.isNotEmpty()) {
+                        binding.rc.visibility = View.VISIBLE
+                        binding.empty.visibility = View.GONE
+                    } else {
+                        binding.rc.visibility = View.GONE
+                        binding.empty.visibility = View.VISIBLE
+                    }
                     logAdapter.submitList(it)
                 }
             }

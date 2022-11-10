@@ -80,7 +80,7 @@ class AdminFragment :
                             setTextColor(ContextCompat.getColor(context, R.color.dark_outline))
                         } else {
                             text = "$progress%"
-                            setTextColor(ContextCompat.getColor(context, R.color.green))
+                            setTextColor(ContextCompat.getColor(context, R.color.light_primary))
                         }
                     }
                 }

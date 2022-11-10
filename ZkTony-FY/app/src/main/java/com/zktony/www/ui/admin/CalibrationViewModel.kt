@@ -6,11 +6,11 @@ import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.data.repository.CalibrationRepository
-import com.zktony.www.serialport.SerialPortEnum
+import com.zktony.www.serialport.SerialPortEnum.*
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
-import com.zktony.www.serialport.protocol.CommandBlock
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -67,16 +67,12 @@ class CalibrationViewModel @Inject constructor(
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val calibration = calibration.value
-            val commandBlock = listOf(
-                CommandBlock.Hex(
-                    SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMotionHex(calibration.wasteTankPosition, 0f)
-                    )
-                ),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,")),
+            SerialPortManager.instance.sendHex(
+                SERIAL_ONE,
+                Command.multiPoint(motionMotor.toMotionHex(calibration.wasteTankPosition, 0f))
             )
-            SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
         }
     }
 
@@ -86,20 +82,18 @@ class CalibrationViewModel @Inject constructor(
     fun wasteTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = calibration.value
-        val commandBlock = listOf(
-            CommandBlock.Hex(
-                SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMotionHex(calibration.wasteTankPosition, 0f) +
-                            motionMotor.toMotionHex(
-                                calibration.wasteTankPosition,
-                                calibration.wasteTankHeight
-                            )
-                )
-            ),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,")),
+        SerialPortManager.instance.sendHex(
+            SERIAL_ONE,
+            Command.multiPoint(
+                motionMotor.toMotionHex(calibration.wasteTankPosition, 0f) +
+                        motionMotor.toMotionHex(
+                            calibration.wasteTankPosition,
+                            calibration.wasteTankHeight
+                        )
+            )
         )
-        SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
     }
 
     /**
@@ -108,17 +102,15 @@ class CalibrationViewModel @Inject constructor(
     fun wasteTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = calibration.value
-        val commandBlock = listOf(
-            CommandBlock.Hex(
-                SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMotionHex(calibration.wasteTankPosition, 0f) +
-                            motionMotor.toMotionHex(0f, 0f)
-                )
-            ),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,")),
+        SerialPortManager.instance.sendHex(
+            SERIAL_ONE,
+            Command.multiPoint(
+                motionMotor.toMotionHex(calibration.wasteTankPosition, 0f) +
+                        motionMotor.toMotionHex(0f, 0f)
+            )
         )
-        SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
     }
 
     /**
@@ -128,16 +120,12 @@ class CalibrationViewModel @Inject constructor(
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val calibration = calibration.value
-            val commandBlock = listOf(
-                CommandBlock.Hex(
-                    SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMotionHex(calibration.washTankPosition, 0f)
-                    )
-                ),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,")),
+            SerialPortManager.instance.sendHex(
+                SERIAL_ONE,
+                Command.multiPoint(motionMotor.toMotionHex(calibration.washTankPosition, 0f))
             )
-            SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
         }
     }
 
@@ -147,20 +135,19 @@ class CalibrationViewModel @Inject constructor(
     fun washTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = calibration.value
-        val commandBlock = listOf(
-            CommandBlock.Hex(
-                SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMotionHex(calibration.washTankPosition, 0f) +
-                            motionMotor.toMotionHex(
-                                calibration.washTankPosition,
-                                calibration.washTankHeight
-                            )
-                )
-            ),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,")),
+        SerialPortManager.instance.sendHex(
+            SERIAL_ONE,
+            Command.multiPoint(
+                motionMotor.toMotionHex(calibration.washTankPosition, 0f) +
+                        motionMotor.toMotionHex(
+                            calibration.washTankPosition,
+                            calibration.washTankHeight
+                        )
+            )
         )
-        SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
+
     }
 
     /**
@@ -169,17 +156,15 @@ class CalibrationViewModel @Inject constructor(
     fun washTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = calibration.value
-        val commandBlock = listOf(
-            CommandBlock.Hex(
-                SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMotionHex(calibration.washTankPosition, 0f) +
-                            motionMotor.toMotionHex(0f, 0f)
-                )
-            ),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,")),
+        SerialPortManager.instance.sendHex(
+            SERIAL_ONE,
+            Command.multiPoint(
+                motionMotor.toMotionHex(calibration.washTankPosition, 0f) +
+                        motionMotor.toMotionHex(0f, 0f)
+            )
         )
-        SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
     }
 
     /**
@@ -189,16 +174,14 @@ class CalibrationViewModel @Inject constructor(
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val calibration = calibration.value
-            val commandBlock = listOf(
-                CommandBlock.Hex(
-                    SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMotionHex(calibration.blockingLiquidTankPosition, 0f)
-                    )
-                ),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,")),
+            SerialPortManager.instance.sendHex(
+                SERIAL_ONE,
+                Command.multiPoint(
+                    motionMotor.toMotionHex(calibration.blockingLiquidTankPosition, 0f)
+                )
             )
-            SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
         }
     }
 
@@ -208,20 +191,18 @@ class CalibrationViewModel @Inject constructor(
     fun blockingLiquidTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = calibration.value
-        val commandBlock = listOf(
-            CommandBlock.Hex(
-                SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMotionHex(calibration.blockingLiquidTankPosition, 0f) +
-                            motionMotor.toMotionHex(
-                                calibration.blockingLiquidTankPosition,
-                                calibration.blockingLiquidTankHeight
-                            )
-                )
-            ),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,")),
+        SerialPortManager.instance.sendHex(
+            SERIAL_ONE,
+            Command.multiPoint(
+                motionMotor.toMotionHex(calibration.blockingLiquidTankPosition, 0f) +
+                        motionMotor.toMotionHex(
+                            calibration.blockingLiquidTankPosition,
+                            calibration.blockingLiquidTankHeight
+                        )
+            )
         )
-        SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
     }
 
     /**
@@ -230,17 +211,15 @@ class CalibrationViewModel @Inject constructor(
     fun blockingLiquidTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = calibration.value
-        val commandBlock = listOf(
-            CommandBlock.Hex(
-                SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMotionHex(calibration.blockingLiquidTankPosition, 0f) +
-                            motionMotor.toMotionHex(0f, 0f)
-                )
-            ),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,")),
+        SerialPortManager.instance.sendHex(
+            SERIAL_ONE,
+            Command.multiPoint(
+                motionMotor.toMotionHex(calibration.blockingLiquidTankPosition, 0f) +
+                        motionMotor.toMotionHex(0f, 0f)
+            )
         )
-        SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
     }
 
     /**
@@ -250,16 +229,14 @@ class CalibrationViewModel @Inject constructor(
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
             val calibration = calibration.value
-            val commandBlock = listOf(
-                CommandBlock.Hex(
-                    SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMotionHex(calibration.antibodyOneTankPosition, 0f)
-                    )
-                ),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,")),
+            SerialPortManager.instance.sendHex(
+                SERIAL_ONE,
+                Command.multiPoint(
+                    motionMotor.toMotionHex(calibration.antibodyOneTankPosition, 0f)
+                )
             )
-            SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
         }
     }
 
@@ -267,33 +244,34 @@ class CalibrationViewModel @Inject constructor(
      * 测试 抗体一槽针头下降
      */
     fun antibodyOneTankNeedleDown() {
-        val motionMotor = appViewModel.settingState.value.motionMotor
-        val calibration = calibration.value
-        val commandBlock = listOf(
-            CommandBlock.Hex(
-                SerialPortEnum.SERIAL_ONE, Command.multiPoint(
+        viewModelScope.launch {
+            val motionMotor = appViewModel.settingState.value.motionMotor
+            val calibration = calibration.value
+            SerialPortManager.instance.sendHex(
+                SERIAL_ONE,
+                Command.multiPoint(
                     motionMotor.toMotionHex(calibration.antibodyOneTankPosition, 0f) +
                             motionMotor.toMotionHex(
                                 calibration.antibodyOneTankPosition,
                                 calibration.antibodyOneTankHeight
                             )
                 )
-            ),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,")),
-            CommandBlock.Delay(3000),
-            CommandBlock.Hex(
-                SerialPortEnum.SERIAL_ONE, Command.multiPoint(
+            )
+            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
+            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
+            delay(3000L)
+            SerialPortManager.instance.sendHex(
+                SERIAL_ONE,
+                Command.multiPoint(
                     motionMotor.toMotionHex(
                         calibration.antibodyOneTankPosition,
                         calibration.recycleAntibodyOneTankHeight
                     )
                 )
-            ),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,")),
-        )
-        SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+            )
+            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
+        }
     }
 
     /**
@@ -302,37 +280,32 @@ class CalibrationViewModel @Inject constructor(
     fun antibodyOneTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = calibration.value
-        val commandBlock = listOf(
-            CommandBlock.Hex(
-                SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMotionHex(calibration.antibodyOneTankPosition, 0f) +
-                            motionMotor.toMotionHex(0f, 0f)
-                )
-            ),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,")),
+        SerialPortManager.instance.sendHex(
+            SERIAL_ONE,
+            Command.multiPoint(
+                motionMotor.toMotionHex(calibration.antibodyOneTankPosition, 0f) +
+                        motionMotor.toMotionHex(0f, 0f)
+            )
         )
-        SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
     }
 
     /**
      * 测试 移动到抗体二槽
      */
     fun toAntibodyTwoTank() {
-        viewModelScope.launch {
-            val motionMotor = appViewModel.settingState.value.motionMotor
-            val calibration = calibration.value
-            val commandBlock = listOf(
-                CommandBlock.Hex(
-                    SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMotionHex(calibration.antibodyTwoTankPosition, 0f)
-                    )
-                ),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,")),
+        val motionMotor = appViewModel.settingState.value.motionMotor
+        val calibration = calibration.value
+        SerialPortManager.instance.sendHex(
+            SERIAL_ONE,
+            Command.multiPoint(
+                motionMotor.toMotionHex(calibration.antibodyTwoTankPosition, 0f)
             )
-            SerialPortManager.instance.commandQueue.enqueue(commandBlock)
-        }
+        )
+        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
+        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
+
     }
 
     /**
@@ -341,20 +314,18 @@ class CalibrationViewModel @Inject constructor(
     fun antibodyTwoTankNeedleDown() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = calibration.value
-        val commandBlock = listOf(
-            CommandBlock.Hex(
-                SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMotionHex(calibration.antibodyTwoTankPosition, 0f) +
-                            motionMotor.toMotionHex(
-                                calibration.antibodyTwoTankPosition,
-                                calibration.antibodyTwoTankHeight
-                            )
-                )
-            ),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,")),
+        SerialPortManager.instance.sendHex(
+            SERIAL_ONE,
+            Command.multiPoint(
+                motionMotor.toMotionHex(calibration.antibodyTwoTankPosition, 0f) +
+                        motionMotor.toMotionHex(
+                            calibration.antibodyTwoTankPosition,
+                            calibration.antibodyTwoTankHeight
+                        )
+            )
         )
-        SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
     }
 
     /**
@@ -363,36 +334,32 @@ class CalibrationViewModel @Inject constructor(
     fun antibodyTwoTankNeedleUp() {
         val motionMotor = appViewModel.settingState.value.motionMotor
         val calibration = calibration.value
-        val commandBlock = listOf(
-            CommandBlock.Hex(
-                SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                    motionMotor.toMotionHex(calibration.antibodyTwoTankPosition, 0f) +
-                            motionMotor.toMotionHex(0f, 0f)
-                )
-            ),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,")),
-            CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,")),
+        SerialPortManager.instance.sendHex(
+            SERIAL_ONE,
+            Command.multiPoint(
+                motionMotor.toMotionHex(calibration.antibodyTwoTankPosition, 0f) +
+                        motionMotor.toMotionHex(0f, 0f)
+            )
         )
-        SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
+
     }
 
     /**
      * 测试 回到原点
      */
     fun toZeroPosition() {
-        viewModelScope.launch {
-            val motionMotor = appViewModel.settingState.value.motionMotor
-            val commandBlock = listOf(
-                CommandBlock.Hex(
-                    SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMotionHex(0f, 0f)
-                    )
-                ),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("0,0,0,")),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("0,0,0,")),
+        val motionMotor = appViewModel.settingState.value.motionMotor
+        SerialPortManager.instance.sendHex(
+            SERIAL_ONE,
+            Command.multiPoint(
+                motionMotor.toMotionHex(0f, 0f)
             )
-            SerialPortManager.instance.commandQueue.enqueue(commandBlock)
-        }
+        )
+        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
+        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
+
     }
 
     /**
@@ -401,16 +368,14 @@ class CalibrationViewModel @Inject constructor(
     fun aspirate() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
-            val commandBlock = listOf(
-                CommandBlock.Hex(
-                    SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMotionHex(0f, 0f)
-                    )
-                ),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_TWO, Command.multiPoint("3200,3200,3200,")),
-                CommandBlock.Hex(SerialPortEnum.SERIAL_THREE, Command.multiPoint("3200,3200,0,")),
+            SerialPortManager.instance.sendHex(
+                SERIAL_ONE,
+                Command.multiPoint(
+                    motionMotor.toMotionHex(0f, 0f)
+                )
             )
-            SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("3200,3200,3200,"))
+            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("3200,3200,0,"))
         }
     }
 
@@ -420,22 +385,17 @@ class CalibrationViewModel @Inject constructor(
     fun drainage() {
         viewModelScope.launch {
             val motionMotor = appViewModel.settingState.value.motionMotor
-            val commandBlock = listOf(
-                CommandBlock.Hex(
-                    SerialPortEnum.SERIAL_ONE, Command.multiPoint(
-                        motionMotor.toMotionHex(0f, 0f)
-                    )
-                ),
-                CommandBlock.Hex(
-                    SerialPortEnum.SERIAL_TWO,
-                    Command.multiPoint("-32000,-32000,-32000,")
-                ),
-                CommandBlock.Hex(
-                    SerialPortEnum.SERIAL_THREE,
-                    Command.multiPoint("-32000,-32000,0,")
-                ),
+            SerialPortManager.instance.sendHex(
+                SERIAL_ONE,
+                Command.multiPoint(
+                    motionMotor.toMotionHex(0f, 0f)
+                )
             )
-            SerialPortManager.instance.commandQueue.enqueue(commandBlock)
+            SerialPortManager.instance.sendHex(
+                SERIAL_TWO,
+                Command.multiPoint("-32000,-32000,-32000,")
+            )
+            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("-32000,-32000,0,"))
         }
     }
 }

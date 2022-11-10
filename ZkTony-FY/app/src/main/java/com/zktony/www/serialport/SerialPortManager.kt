@@ -2,21 +2,29 @@ package com.zktony.www.serialport
 
 import com.zktony.serialport.COMSerial
 import com.zktony.serialport.listener.OnComDataListener
-import com.zktony.www.common.utils.Logger
 import com.zktony.www.common.extension.hexFormat
 import com.zktony.www.common.model.Queue
+import com.zktony.www.common.utils.Logger
+import com.zktony.www.serialport.SerialPortEnum.*
+import com.zktony.www.serialport.protocol.Command
 import com.zktony.www.serialport.protocol.CommandBlock
+import com.zktony.www.ui.home.ModuleEnum
+import com.zktony.www.ui.home.ModuleEnum.*
 import kotlinx.coroutines.delay
 
 class SerialPortManager {
 
     val commandQueue = Queue<List<CommandBlock>>()
+    private var A_RUNNING = false
+    private var B_RUNNING = false
+    private var C_RUNNING = false
+    private var D_RUNNING = false
 
     init {
-        COMSerial.instance.addCOM(SerialPortEnum.SERIAL_ONE.device, 115200)
-        COMSerial.instance.addCOM(SerialPortEnum.SERIAL_TWO.device, 115200)
-        COMSerial.instance.addCOM(SerialPortEnum.SERIAL_THREE.device, 115200)
-        COMSerial.instance.addCOM(SerialPortEnum.SERIAL_FOUR.device, 115200)
+        COMSerial.instance.addCOM(SERIAL_ONE.device, 115200)
+        COMSerial.instance.addCOM(SERIAL_TWO.device, 115200)
+        COMSerial.instance.addCOM(SERIAL_THREE.device, 115200)
+        COMSerial.instance.addCOM(SERIAL_FOUR.device, 115200)
     }
 
     /**
@@ -55,21 +63,33 @@ class SerialPortManager {
      * 命令队列执行
      */
     suspend fun commandQueueActuator() {
-        commandQueue.peek()?.forEach {
-            when (it) {
-                is CommandBlock.Hex -> {
-                    sendHex(it.serialPort, it.hex)
-                }
-                is CommandBlock.Text -> {
-                    sendText(it.serialPort, it.text)
-                }
-                is CommandBlock.Delay -> {
-                    Logger.e(msg = "delay: ${it.delay} ms")
-                    delay(it.delay)
+        commandQueue.peek()?.let {
+            sendHex(SERIAL_ONE, Command.pauseShakeBed())
+            it.forEach { block ->
+                when (block) {
+                    is CommandBlock.Hex -> {
+                        if (isModuleRunning(block.module)) {
+                            sendHex(block.serialPort, block.hex)
+                        }
+                    }
+                    is CommandBlock.Text -> {
+                        if (isModuleRunning(block.module)) {
+                            sendText(block.serialPort, block.text)
+                        }
+                    }
+                    is CommandBlock.Delay -> {
+                        if (isModuleRunning(block.module)) {
+                            Logger.e(msg = "delay: ${block.delay} ms")
+                            delay(block.delay)
+                        }
+                    }
                 }
             }
+            commandQueue.dequeue()
+            if (commandQueue.isEmpty() && (A_RUNNING || B_RUNNING || C_RUNNING || D_RUNNING)) {
+                sendHex(SERIAL_ONE, Command.resumeShakeBed())
+            }
         }
-        commandQueue.dequeue()
         if (commandQueue.isEmpty()) {
             delay(1000L)
             commandQueueActuator()
@@ -85,6 +105,40 @@ class SerialPortManager {
      */
     fun checkQueueExistBlock(block: List<CommandBlock>): Boolean {
         return commandQueue.contains(block)
+    }
+
+    /**
+     * 判断模块是否在运行
+     * @param module 模块
+     */
+    private fun isModuleRunning(module: ModuleEnum): Boolean {
+        return when (module) {
+            A -> A_RUNNING
+            B -> B_RUNNING
+            C -> C_RUNNING
+            D -> D_RUNNING
+        }
+    }
+
+    /**
+     * 设置模块运行状态
+     * @param module 模块
+     * @param running 运行状态
+     */
+    fun setModuleRunning(module: ModuleEnum, running: Boolean) {
+        when (module) {
+            A -> A_RUNNING = running
+            B -> B_RUNNING = running
+            C -> C_RUNNING = running
+            D -> D_RUNNING = running
+        }
+        commandQueue.getQueue().forEach { block ->
+            block.find { it is CommandBlock.Hex && it.module == module }?.let {
+                if (!running) {
+                    commandQueue.remove(block)
+                }
+            }
+        }
     }
 
     companion object {
@@ -106,12 +160,12 @@ enum class SerialPortEnum(val device: String, val value: String, val index: Int)
 
 fun getSerialPortEnum(index: Int): SerialPortEnum {
     return when (index) {
-        0 -> SerialPortEnum.SERIAL_ONE
-        1 -> SerialPortEnum.SERIAL_TWO
-        2 -> SerialPortEnum.SERIAL_THREE
-        3 -> SerialPortEnum.SERIAL_FOUR
-        4 -> SerialPortEnum.SERIAL_FIVE
-        5 -> SerialPortEnum.SERIAL_SIX
-        else -> SerialPortEnum.SERIAL_ONE
+        0 -> SERIAL_ONE
+        1 -> SERIAL_TWO
+        2 -> SERIAL_THREE
+        3 -> SERIAL_FOUR
+        4 -> SERIAL_FIVE
+        5 -> SERIAL_SIX
+        else -> SERIAL_ONE
     }
 }

@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.zktony.www.common.extension.hexFormat
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.room.entity.Calibration
@@ -101,7 +102,7 @@ class AppViewModel @Inject constructor(
     fun receiverSerialOne(command: String) {
         viewModelScope.launch {
             _event.emit(AppEvent.ReceiverSerialOne(command))
-            Logger.d(msg = "receiverSerialOne: $command")
+            Logger.d(msg = "串口一 receivedHex: ${command.hexFormat()}")
         }
     }
 
@@ -112,7 +113,7 @@ class AppViewModel @Inject constructor(
     fun receiverSerialTwo(command: String) {
         viewModelScope.launch {
             _event.emit(AppEvent.ReceiverSerialTwo(command))
-            Logger.d(msg = "receiverSerialTwo: $command")
+            Logger.d(msg = "串口二 receivedHex: ${command.hexFormat()}")
         }
     }
 
@@ -123,7 +124,7 @@ class AppViewModel @Inject constructor(
     fun receiverSerialThree(command: String) {
         viewModelScope.launch {
             _event.emit(AppEvent.ReceiverSerialThree(command))
-            Logger.d(msg = "receiverSerialThree: $command")
+            Logger.d(msg = "串口三 receivedHex: ${command.hexFormat()}")
         }
     }
 
@@ -134,7 +135,7 @@ class AppViewModel @Inject constructor(
     fun receiverSerialFour(command: String) {
         viewModelScope.launch {
             _event.emit(AppEvent.ReceiverSerialFour(command))
-            Logger.d(msg = "receiverSerialFour: $command")
+            Logger.d(msg = "串口四 receivedHex: ${command.hexFormat()}")
         }
     }
 
