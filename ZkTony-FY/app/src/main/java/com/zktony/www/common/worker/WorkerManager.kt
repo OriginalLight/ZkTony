@@ -1,6 +1,9 @@
 package com.zktony.www.common.worker
 
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.zktony.www.common.app.CommonApplicationProxy
 import com.zktony.www.common.utils.Constants
 import java.util.concurrent.TimeUnit
@@ -12,11 +15,8 @@ import java.util.concurrent.TimeUnit
 class WorkerManager {
 
     private val logRequest by lazy {
-        PeriodicWorkRequestBuilder<LogWorker>(60, TimeUnit.MINUTES)
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .build()
+        PeriodicWorkRequestBuilder<LogWorker>(60, TimeUnit.MINUTES).setConstraints(
+                Constraints.Builder().build()
             ).build()
     }
 
