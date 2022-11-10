@@ -29,6 +29,17 @@ class Queue<T> {
     }
 
     /**
+     * 去除队列中的某个元素
+     */
+    fun remove(element: T) {
+        queue.remove(element)
+    }
+
+    fun getQueue(): List<T> {
+        return queue
+    }
+
+    /**
      * 获取队列长度
      */
     fun size(): Int {

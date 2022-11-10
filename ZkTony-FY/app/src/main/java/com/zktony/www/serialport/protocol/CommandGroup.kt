@@ -1,11 +1,11 @@
 package com.zktony.www.serialport.protocol
 
-import com.zktony.www.common.utils.Logger
 import com.zktony.www.common.app.SettingState
 import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.MotionMotor
 import com.zktony.www.common.room.entity.PumpMotor
+import com.zktony.www.common.utils.Logger
 import com.zktony.www.serialport.SerialPortEnum
 import com.zktony.www.serialport.SerialPortEnum.*
 import com.zktony.www.serialport.SerialPortManager
@@ -50,41 +50,47 @@ class CommandGroup {
      */
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
         Logger.d(msg = "${module.value} 添加封闭液")
-        val commandBlock = mutableListOf<CommandBlock>()
-        // 暂停摇床
-        commandBlock.add(CommandBlock.Hex(SERIAL_ONE, Command.pauseShakeBed()))
-        // 设置温度
-        commandBlock.add(
+        val commandBlock = listOf(
+            // 设置温度
             CommandBlock.Text(
-                SERIAL_FOUR,
-                Command.setTemperature(module.index.toString(), action.temperature.toString())
-            )
-        )
-        // 主板运动命令
-        commandBlock.add(
+                serialPort = SERIAL_FOUR,
+                module = module,
+                text = Command.setTemperature(
+                    module.index.toString(),
+                    action.temperature.toString()
+                )
+            ),
+            // 主板运动命令
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
+                serialPort = SERIAL_ONE,
+                module = module,
+                hex = Command.multiPoint(
                     moveTo(
                         calibration.blockingLiquidTankPosition, calibration.blockingLiquidTankHeight
                     )
                 )
-            )
-        )
-        // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquid()[0])))
-        // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquid()[1])))
-        // 运动加液延时
-        commandBlock.add(
+            ),
+            // 从板子一运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_TWO,
+                module = module,
+                hex = Command.multiPoint(addLiquid()[0])
+            ),
+            // 从板子二运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_THREE,
+                module = module,
+                hex = Command.multiPoint(addLiquid()[1])
+            ),
+            // 运动加液延时
             CommandBlock.Delay(
-                motionMotor.delayTime(
+                module = module,
+                delay = motionMotor.delayTime(
                     calibration.blockingLiquidTankPosition * 2,
                     calibration.blockingLiquidTankHeight * 2
                 ) + addLiquidDelay() + 5000
             )
         )
-        // 恢复摇床
-        commandBlock.add(CommandBlock.Hex(SERIAL_ONE, Command.resumeShakeBed()))
         serialPortManager.commandQueue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "${module.value} 添加封闭液完成")
@@ -97,40 +103,46 @@ class CommandGroup {
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
         Logger.d(msg = "${module.value} 添加一抗")
-        val commandBlock = mutableListOf<CommandBlock>()
-        // 暂停摇床
-        commandBlock.add(CommandBlock.Hex(SERIAL_ONE, Command.pauseShakeBed()))
-        // 设置温度
-        commandBlock.add(
+        val commandBlock = listOf(
+            // 设置温度
             CommandBlock.Text(
-                SERIAL_FOUR,
-                Command.setTemperature(module.index.toString(), action.temperature.toString())
-            )
-        )
-        // 主板运动命令
-        commandBlock.add(
+                serialPort = SERIAL_FOUR,
+                module = module,
+                text = Command.setTemperature(
+                    module.index.toString(),
+                    action.temperature.toString()
+                )
+            ),
+            // 主板运动命令
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
+                serialPort = SERIAL_ONE,
+                module = module,
+                hex = Command.multiPoint(
                     moveTo(
                         calibration.antibodyOneTankPosition, calibration.antibodyOneTankHeight
                     )
                 )
-            )
-        )
-        // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquid()[0])))
-        // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquid()[1])))
-        // 运动加液延时
-        commandBlock.add(
+            ),
+            // 从板子一运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_TWO,
+                module = module,
+                hex = Command.multiPoint(addLiquid()[0])
+            ),
+            // 从板子二运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_THREE,
+                module = module,
+                hex = Command.multiPoint(addLiquid()[1])
+            ),
+            // 运动加液延时
             CommandBlock.Delay(
-                motionMotor.delayTime(
+                module = module,
+                delay = motionMotor.delayTime(
                     calibration.antibodyOneTankPosition * 2, calibration.antibodyOneTankHeight * 2
                 ) + addLiquidDelay() + 5000
             )
         )
-        // 恢复摇床
-        commandBlock.add(CommandBlock.Hex(SERIAL_ONE, Command.resumeShakeBed()))
         serialPortManager.commandQueue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "添加一抗完成")
@@ -143,38 +155,48 @@ class CommandGroup {
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
         Logger.d(msg = "${module.value} 回收一抗")
-        val commandBlock = mutableListOf<CommandBlock>()
-        // 暂停摇床
-        commandBlock.add(CommandBlock.Hex(SERIAL_ONE, Command.pauseShakeBed()))
-        // 设置温度
-        commandBlock.add(
+        val commandBlock = listOf(
+            // 设置温度
             CommandBlock.Text(
-                SERIAL_FOUR,
-                Command.setTemperature(module.index.toString(), action.temperature.toString())
-            )
-        )
-        // 主板运动命令
-        commandBlock.add(
+                serialPort = SERIAL_FOUR,
+                module = module,
+                text = Command.setTemperature(
+                    module.index.toString(),
+                    action.temperature.toString()
+                )
+            ),
+            // 主板运动命令
             CommandBlock.Hex(
-                SERIAL_ONE,
-                Command.multiPoint(moveTo(calibration.antibodyOneTankPosition, calibration.recycleAntibodyOneTankHeight))
-            )
-        )
-        // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(recycleLiquid()[0])))
-        // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(recycleLiquid()[1])))
-        // 运动加液延时
-        commandBlock.add(
+                serialPort = SERIAL_ONE,
+                module = module,
+                hex = Command.multiPoint(
+                    moveTo(
+                        calibration.antibodyOneTankPosition,
+                        calibration.recycleAntibodyOneTankHeight
+                    )
+                )
+            ),
+            // 从板子一运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_TWO,
+                module = module,
+                hex = Command.multiPoint(recycleLiquid()[0])
+            ),
+            // 从板子二运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_THREE,
+                module = module,
+                hex = Command.multiPoint(recycleLiquid()[1])
+            ),
+            // 运动加液延时
             CommandBlock.Delay(
-                motionMotor.delayTime(
+                module = module,
+                delay = motionMotor.delayTime(
                     calibration.antibodyOneTankPosition * 2,
                     calibration.recycleAntibodyOneTankHeight * 2
                 ) + addLiquidDelay() + 5000
             )
         )
-        // 恢复摇床
-        commandBlock.add(CommandBlock.Hex(SERIAL_ONE, Command.resumeShakeBed()))
         serialPortManager.commandQueue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "${module.value} 回收一抗完成")
@@ -187,39 +209,46 @@ class CommandGroup {
      */
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
         Logger.d(msg = "${module.value} 添加二抗")
-        val commandBlock = mutableListOf<CommandBlock>()
-        // 暂停摇床
-        commandBlock.add(CommandBlock.Hex(SERIAL_ONE, Command.pauseShakeBed()))
-        // 设置温度
-        commandBlock.add(
+        val commandBlock = listOf(
+            // 设置温度
             CommandBlock.Text(
-                SERIAL_FOUR,
-                Command.setTemperature(module.index.toString(), action.temperature.toString())
-            )
-        )
-        // 主板运动命令
-        commandBlock.add(
+                serialPort = SERIAL_FOUR,
+                module = module,
+                text = Command.setTemperature(
+                    module.index.toString(),
+                    action.temperature.toString()
+                )
+            ),
+            // 主板运动命令
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
+                serialPort = SERIAL_ONE,
+                module = module,
+                hex = Command.multiPoint(
                     moveTo(
                         calibration.antibodyTwoTankPosition, calibration.antibodyTwoTankHeight
                     )
                 )
-            )
-        )
-        // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquid()[0])))
-        // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquid()[1])))
-        // 运动加液延时
-        commandBlock.add(
+            ),
+            // 从板子一运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_TWO,
+                module = module,
+                hex = Command.multiPoint(addLiquid()[0])
+            ),
+            // 从板子二运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_THREE,
+                module = module,
+                hex = Command.multiPoint(addLiquid()[1])
+            ),
+            // 运动加液延时
             CommandBlock.Delay(
-                motionMotor.delayTime(
+                module = module,
+                delay = motionMotor.delayTime(
                     calibration.antibodyTwoTankPosition * 2, calibration.antibodyTwoTankHeight * 2
                 ) + addLiquidDelay() + 5000
             )
         )
-        // 恢复摇床
         serialPortManager.commandQueue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "${module.value} 添加二抗完成")
@@ -232,40 +261,47 @@ class CommandGroup {
      */
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
         Logger.d(msg = "${module.value} 添加洗涤液")
-        val commandBlock = mutableListOf<CommandBlock>()
-        // 暂停摇床
-        commandBlock.add(CommandBlock.Hex(SERIAL_ONE, Command.pauseShakeBed()))
-        // 设置温度
-        commandBlock.add(
+        val commandBlock = listOf(
+            // 设置温度
             CommandBlock.Text(
-                SERIAL_FOUR,
-                Command.setTemperature(module.index.toString(), action.temperature.toString())
-            )
-        )
-        // 主板运动命令
-        commandBlock.add(
+                serialPort = SERIAL_FOUR,
+                module = module,
+                text = Command.setTemperature(
+                    module.index.toString(),
+                    action.temperature.toString()
+                )
+            ),
+            // 主板运动命令
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
+                serialPort = SERIAL_ONE,
+                module = module,
+                hex = Command.multiPoint(
                     moveTo(
                         calibration.washTankPosition, calibration.washTankHeight
                     )
                 )
-            )
-        )
-        // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(addLiquid()[0])))
-        // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(addLiquid()[1])))
-        // 运动加液延时
-        commandBlock.add(
+            ),
+            // 从板子一运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_TWO,
+                module = module,
+                hex = Command.multiPoint(addLiquid()[0])
+            ),
+            // 从板子二运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_THREE,
+                module = module,
+                hex = Command.multiPoint(addLiquid()[1])
+            ),
+            // 运动加液延时
             CommandBlock.Delay(
-                motionMotor.delayTime(
+                module = module,
+                delay = motionMotor.delayTime(
                     calibration.washTankPosition * 2, calibration.washTankHeight * 2
                 ) + addLiquidDelay() + 5000
             )
+
         )
-        // 恢复摇床
-        commandBlock.add(CommandBlock.Hex(SERIAL_ONE, Command.resumeShakeBed()))
         serialPortManager.commandQueue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "${module.value} 添加洗涤液完成")
@@ -279,40 +315,47 @@ class CommandGroup {
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
         Logger.d(msg = "${module.value} 回收到废液槽")
-        val commandBlock = mutableListOf<CommandBlock>()
-        // 暂停摇床
-        commandBlock.add(CommandBlock.Hex(SERIAL_ONE, Command.pauseShakeBed()))
-        // 设置温度
-        commandBlock.add(
+        val commandBlock = listOf(
+            // 设置温度
             CommandBlock.Text(
-                SERIAL_FOUR,
-                Command.setTemperature(module.index.toString(), action.temperature.toString())
-            )
-        )
-        // 主板运动命令
-        commandBlock.add(
+                serialPort = SERIAL_FOUR,
+                module = module,
+                text = Command.setTemperature(
+                    module.index.toString(),
+                    action.temperature.toString()
+                )
+            ),
+            // 主板运动命令
             CommandBlock.Hex(
-                SERIAL_ONE, Command.multiPoint(
+                serialPort = SERIAL_ONE,
+                module = module,
+                hex = Command.multiPoint(
                     moveTo(
                         calibration.wasteTankPosition, calibration.wasteTankHeight
                     )
                 )
-            )
-        )
-        // 从板子一运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_TWO, Command.multiPoint(recycleLiquid()[0])))
-        // 从板子二运动命令
-        commandBlock.add(CommandBlock.Hex(SERIAL_THREE, Command.multiPoint(recycleLiquid()[1])))
-        // 运动加液延时
-        commandBlock.add(
+            ),
+            // 从板子一运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_TWO,
+                module = module,
+                hex = Command.multiPoint(recycleLiquid()[0])
+            ),
+            // 从板子二运动命令
+            CommandBlock.Hex(
+                serialPort = SERIAL_THREE,
+                module = module,
+                hex = Command.multiPoint(recycleLiquid()[1])
+            ),
+            // 运动加液延时
             CommandBlock.Delay(
-                motionMotor.delayTime(
+                module = module,
+                delay = motionMotor.delayTime(
                     calibration.wasteTankPosition * 2, calibration.wasteTankHeight * 2
                 ) + addLiquidDelay() + 5000
             )
+
         )
-        // 恢复摇床
-        commandBlock.add(CommandBlock.Hex(SERIAL_ONE, Command.resumeShakeBed()))
         serialPortManager.commandQueue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "回收到废液槽完成")
@@ -349,13 +392,15 @@ class CommandGroup {
     private fun addLiquid(): List<String> {
         val zero = "0,0,0,"
         val list = mutableListOf<String>()
-        when(module) {
+        when (module) {
             A -> {
                 val stepOne = pumpMotor.toPumpHex(
                     one = action.liquidVolume,
-                    five = if (action.mode == 3) action.liquidVolume else 0f)
+                    five = if (action.mode == 3) action.liquidVolume else 0f
+                )
                 val stepTwo = pumpMotor.toPumpHex(
-                    one = action.liquidVolume + pumpMotor.volumeOne * calibration.drainDistance)
+                    one = action.liquidVolume + pumpMotor.volumeOne * calibration.drainDistance
+                )
 
                 list.add(zero + stepOne[0] + zero + stepTwo[0])
                 list.add(zero + stepOne[1] + zero + stepTwo[1])
@@ -363,9 +408,11 @@ class CommandGroup {
             B -> {
                 val stepOne = pumpMotor.toPumpHex(
                     two = action.liquidVolume,
-                    five = if (action.mode == 3) action.liquidVolume else 0f)
+                    five = if (action.mode == 3) action.liquidVolume else 0f
+                )
                 val stepTwo = pumpMotor.toPumpHex(
-                    two = action.liquidVolume + pumpMotor.volumeTwo * calibration.drainDistance)
+                    two = action.liquidVolume + pumpMotor.volumeTwo * calibration.drainDistance
+                )
 
                 list.add(zero + stepOne[0] + zero + stepTwo[0])
                 list.add(zero + stepOne[1] + zero + stepTwo[1])
@@ -373,9 +420,11 @@ class CommandGroup {
             C -> {
                 val stepOne = pumpMotor.toPumpHex(
                     three = action.liquidVolume,
-                    five = if (action.mode == 3) action.liquidVolume else 0f)
+                    five = if (action.mode == 3) action.liquidVolume else 0f
+                )
                 val stepTwo = pumpMotor.toPumpHex(
-                    three = action.liquidVolume + pumpMotor.volumeThree * calibration.drainDistance)
+                    three = action.liquidVolume + pumpMotor.volumeThree * calibration.drainDistance
+                )
 
                 list.add(zero + stepOne[0] + zero + stepTwo[0])
                 list.add(zero + stepOne[1] + zero + stepTwo[1])
@@ -383,9 +432,11 @@ class CommandGroup {
             D -> {
                 val stepOne = pumpMotor.toPumpHex(
                     four = action.liquidVolume,
-                    five = if (action.mode == 3) action.liquidVolume else 0f)
+                    five = if (action.mode == 3) action.liquidVolume else 0f
+                )
                 val stepTwo = pumpMotor.toPumpHex(
-                    four = action.liquidVolume + pumpMotor.volumeFour * calibration.drainDistance)
+                    four = action.liquidVolume + pumpMotor.volumeFour * calibration.drainDistance
+                )
 
                 list.add(zero + stepOne[0] + zero + stepTwo[0])
                 list.add(zero + stepOne[1] + zero + stepTwo[1])
@@ -478,7 +529,11 @@ class CommandGroup {
 }
 
 sealed class CommandBlock {
-    data class Hex(val serialPort: SerialPortEnum, val hex: String) : CommandBlock()
-    data class Text(val serialPort: SerialPortEnum, val text: String) : CommandBlock()
-    data class Delay(val delay: Long) : CommandBlock()
+    data class Hex(val serialPort: SerialPortEnum, val module: ModuleEnum, val hex: String) :
+        CommandBlock()
+
+    data class Text(val serialPort: SerialPortEnum, val module: ModuleEnum, val text: String) :
+        CommandBlock()
+
+    data class Delay(val module: ModuleEnum, val delay: Long) : CommandBlock()
 }

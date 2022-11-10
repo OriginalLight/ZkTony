@@ -49,6 +49,7 @@ class ActionFragment :
                 viewModel.buttonEnable.collect {
                     binding.btnAdd.run {
                         isEnabled = it
+                        alpha = if (it) 1f else 0.5f
                         text =
                             if (it) resources.getString(R.string.add)
                             else resources.getString(R.string.add_ban)

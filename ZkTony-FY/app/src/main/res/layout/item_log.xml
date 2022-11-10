@@ -39,7 +39,7 @@
             android:layout_marginStart="1dp"
             android:layout_marginTop="2dp"
             android:layout_marginEnd="1dp"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:background="@color/light_onPrimary"
             android:gravity="center"
             android:text="@string/module"
@@ -56,6 +56,20 @@
             android:background="@color/light_onPrimary"
             android:gravity="center"
             android:text="@{log.programName}"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="1dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="1dp"
+            android:layout_weight="1"
+            android:background="@color/light_onPrimary"
+            android:gravity="center"
+            android:text="@string/module"
             android:textColor="@color/black"
             android:textSize="16sp" />
 

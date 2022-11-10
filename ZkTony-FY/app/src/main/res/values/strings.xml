@@ -89,4 +89,7 @@
     <string name="recycle_antibody_one_tank_height">回收一抗下降高度</string>
     <string name="drain_distance">进液/排液/回收多转的圈数</string>
     <string name="module">模块</string>
+    <string name="status">状态</string>
+    <string name="no_log">没有日志</string>
+    <string name="no_program">没有程序</string>
 </resources>

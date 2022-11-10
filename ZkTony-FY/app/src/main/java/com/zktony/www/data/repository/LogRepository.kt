@@ -25,6 +25,10 @@ class LogRepository @Inject constructor(
         logDao.updateBatch(logList)
     }
 
+    suspend fun delete(log: Log) {
+        logDao.delete(log)
+    }
+
     suspend fun deleteByDate() {
         logDao.deleteByDate()
     }
