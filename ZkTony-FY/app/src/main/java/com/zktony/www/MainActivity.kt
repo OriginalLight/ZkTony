@@ -7,6 +7,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.zktony.www.base.BaseActivity
 import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
+import com.zktony.www.common.extension.hexToAscii
 import com.zktony.www.common.extension.verifyHex
 import com.zktony.www.common.worker.WorkerManager
 import com.zktony.www.databinding.ActivityMainBinding
@@ -53,9 +54,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
                             }
                         }
                         SerialPortEnum.SERIAL_FOUR.device -> {
-                            hexData.verifyHex().forEach {
-                                appViewModel.receiverSerialFour(it)
-                            }
+                            appViewModel.receiverSerialFour(hexData.hexToAscii())
                         }
                     }
                 }

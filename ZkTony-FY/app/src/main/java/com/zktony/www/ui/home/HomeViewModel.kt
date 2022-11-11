@@ -17,8 +17,8 @@ import com.zktony.www.common.room.entity.getActionEnum
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.serialport.SerialPortEnum
-import com.zktony.www.serialport.SerialPortEnum.*
+import com.zktony.www.serialport.SerialPortEnum.SERIAL_FOUR
+import com.zktony.www.serialport.SerialPortEnum.SERIAL_ONE
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import com.zktony.www.ui.home.ModuleEnum.*
@@ -75,7 +75,10 @@ class HomeViewModel @Inject constructor(
                 // 设置和定时查询温控
                 for (i in 0..4) {
                     delay(200L)
-                    appViewModel.senderText(SERIAL_FOUR, Command.saveTemperature(i.toString(), "26"))
+                    appViewModel.senderText(
+                        SERIAL_FOUR,
+                        Command.saveTemperature(i.toString(), "26")
+                    )
                     delay(200L)
                     appViewModel.senderText(SERIAL_FOUR, Command.setTemperature(i.toString(), "26"))
                 }
@@ -85,7 +88,7 @@ class HomeViewModel @Inject constructor(
                         delay(200L)
                         appViewModel.senderText(SERIAL_FOUR, Command.queryTemperature(i.toString()))
                     }
-                    delay(60 * 1000L)
+                    delay(10 * 1000L)
                 }
             }
         }
@@ -288,7 +291,7 @@ class HomeViewModel @Inject constructor(
             appViewModel.senderText(
                 SERIAL_FOUR,
                 Command.setTemperature(
-                    address = "4",
+                    address = "0",
                     temperature = if (_eState.value.insulatingEnable) "26" else temp
                 )
             )
@@ -313,14 +316,17 @@ class HomeViewModel @Inject constructor(
      */
     private fun receiverSerialFour(hex: String) {
         viewModelScope.launch {
-            // 读取温度
-            val address = hex.last().toString().toInt()
-            val temp = hex.extractTemp()
-            when (address) {
-                0 -> _aState.value = _aState.value.copy(tempText = "$temp ℃")
-                1 -> _bState.value = _bState.value.copy(tempText = "$temp ℃")
-                2 -> _cState.value = _cState.value.copy(tempText = "$temp ℃")
-                3 -> _dState.value = _dState.value.copy(tempText = "$temp ℃")
+            if (hex.startsWith("TC1:TCACTUALTEMP=")) {
+                // 读取温度
+                val address = hex.substring(hex.length - 2, hex.length - 1).toInt()
+                val temp = hex.extractTemp()
+                when (address) {
+                    1 -> _aState.value = _aState.value.copy(tempText = "$temp ℃")
+                    2 -> _bState.value = _bState.value.copy(tempText = "$temp ℃")
+                    3 -> _cState.value = _cState.value.copy(tempText = "$temp ℃")
+                    4 -> _dState.value = _dState.value.copy(tempText = "$temp ℃")
+                    0 -> _eState.value = _eState.value.copy(insulatingTemp = "$temp ℃")
+                }
             }
         }
     }
@@ -640,6 +646,7 @@ data class ModuleState(
 data class OperationState(
     val pauseEnable: Boolean = false,
     val insulatingEnable: Boolean = false,
+    val insulatingTemp: String = "0.0℃",
 )
 
 enum class ModuleEnum(val value: String, val index: Int) {

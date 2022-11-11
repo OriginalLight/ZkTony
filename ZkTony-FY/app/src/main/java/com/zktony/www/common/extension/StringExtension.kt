@@ -47,5 +47,5 @@ fun String.simpleDateFormat(format: String): Date? {
 fun String.extractTemp(): String {
     val regEx = "[^0-9.]"
     val p = regEx.toRegex()
-    return p.replace(this.substring(4, this.length - 1), "")
+    return p.replace(this.substring(4, this.length - 3), "")
 }

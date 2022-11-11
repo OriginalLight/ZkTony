@@ -236,15 +236,15 @@ class HomeViewModel @Inject constructor(
             val cmd = appViewModel.latestReceiveCmd
             if (cmd.powerENX == 1 && cmd.getCurrentX < 0.1 && cmd.powerENY == 0) {
                 _errorMessage.emit("模块A异常，请检查！！！")
-                Event(Constants.AUDIO_ID, R.raw.a_error)
+                Event(Constants.AUDIO_ID, R.raw.error)
             }
             if (cmd.powerENY == 1 && cmd.getCurrentY < 0.1 && cmd.powerENX == 0) {
                 _errorMessage.emit("模块B异常，请检查！！！")
-                Event(Constants.AUDIO_ID, R.raw.b_error)
+                Event(Constants.AUDIO_ID, R.raw.error)
             }
             if (cmd.powerENX == 1 && cmd.getCurrentX < 0.1 && cmd.powerENY == 1 && cmd.getCurrentY < 0.1) {
                 _errorMessage.emit("模块A、B异常，请检查！！！")
-                Event(Constants.AUDIO_ID, R.raw.all_error)
+                Event(Constants.AUDIO_ID, R.raw.error)
             }
         }
     }
