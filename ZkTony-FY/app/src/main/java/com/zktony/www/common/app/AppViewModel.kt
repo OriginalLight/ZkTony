@@ -135,7 +135,7 @@ class AppViewModel @Inject constructor(
     fun receiverSerialFour(command: String) {
         viewModelScope.launch {
             _event.emit(AppEvent.ReceiverSerialFour(command))
-            Logger.d(msg = "串口四 receivedHex: ${command.hexFormat()}")
+            Logger.d(msg = "串口四 receivedHex: $command")
         }
     }
 

@@ -542,10 +542,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     if (module == X) {
                         binding.moduleX.tv5.text = "已完成"
                         EventBus.getDefault().post(
-                            Event(
-                                Constants.AUDIO_ID,
-                                if (state.modelX === A) R.raw.zm_finish else R.raw.rs_finish
-                            )
+                            Event(Constants.AUDIO_ID, R.raw.finish)
                         )
                         Logger.d(msg = "模块A计时停止：")
                         if (!state.isRunY) {
@@ -559,10 +556,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     if (module == Y) {
                         binding.moduleY.tv5.text = "已完成"
                         EventBus.getDefault().post(
-                            Event(
-                                Constants.AUDIO_ID,
-                                if (state.modelY === A) R.raw.zm_finish else R.raw.rs_finish
-                            )
+                            Event(Constants.AUDIO_ID, R.raw.finish)
                         )
                         Logger.d(msg = "模块B计时停止：")
                         if (!state.isRunX) {

@@ -24,7 +24,7 @@ class SerialPortManager {
         COMSerial.instance.addCOM(SERIAL_ONE.device, 115200)
         COMSerial.instance.addCOM(SERIAL_TWO.device, 115200)
         COMSerial.instance.addCOM(SERIAL_THREE.device, 115200)
-        COMSerial.instance.addCOM(SERIAL_FOUR.device, 115200)
+        COMSerial.instance.addCOM(SERIAL_FOUR.device, 57600)
     }
 
     /**
@@ -85,7 +85,9 @@ class SerialPortManager {
                     }
                 }
             }
-            commandQueue.dequeue()
+            if (!commandQueue.isEmpty() && commandQueue.peek() == it) {
+                commandQueue.dequeue()
+            }
             if (commandQueue.isEmpty() && (A_RUNNING || B_RUNNING || C_RUNNING || D_RUNNING)) {
                 sendHex(SERIAL_ONE, Command.resumeShakeBed())
             }

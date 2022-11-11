@@ -19,7 +19,7 @@ fun Int.int8ToHex(): String {
  * @return int
  */
 fun String.hexToInt8(): Int {
-    return BigInteger(this.trim(), 16).toInt()
+    return BigInteger(this.replace(" ", ""), 16).toInt()
 }
 
 /**
@@ -39,7 +39,7 @@ fun Int.int16ToHex2(): String {
  * @return int
  */
 fun String.hex2ToInt16(): Int {
-    return BigInteger(this.trim(), 16).toInt()
+    return BigInteger(this.replace(" ", ""), 16).toInt()
 }
 
 /**
@@ -59,7 +59,7 @@ fun Int.int32ToHex4(): String {
  * @return int
  */
 fun String.hex4ToInt32(): Int {
-    return BigInteger(this.trim(), 16).toInt()
+    return BigInteger(this.replace(" ", ""), 16).toInt()
 }
 
 /**
@@ -88,7 +88,7 @@ fun String.hex4ToFloat32(): Float {
  * @return Hex x 4 like "000000AA" "00000001"
  */
 fun String.hexHighLow(): String {
-    val str = this.trim()
+    val str = this.replace(" ", "")
     val result = StringBuilder()
     for (i in 0 until str.length / 2) {
         result.append(str.substring(str.length - 2 * (i + 1), str.length - 2 * i))
@@ -159,13 +159,27 @@ fun String.verifyHex(): List<String> {
  * hex命令格式化每两个字符加空格
  */
 fun String.hexFormat(): String {
-    val str = this.trim()
+    // 去掉空格
+    val str = this.replace(" ", "")
     val result = StringBuilder()
     for (i in 0 until str.length / 2) {
         result.append(str.substring(2 * i, 2 * i + 2)).append(" ")
     }
     return result.toString()
 }
+
+fun String.hexToAscii(): String {
+    val hexStr = this.replace(" ", "")
+    val output = StringBuilder("")
+    var i = 0
+    while (i < hexStr.length) {
+        val str = hexStr.substring(i, i + 2)
+        output.append(str.toInt(16).toChar())
+        i += 2
+    }
+    return output.toString()
+}
+
 
 /**
  * 解析电机数据

@@ -100,7 +100,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                             }
                         }
                         binding.tvUpdate.run {
-                            setTextColor(ContextCompat.getColor(context, R.color.green))
+                            setTextColor(ContextCompat.getColor(context, R.color.light_primary))
                             text = "${it.progress}%"
                         }
                     }
