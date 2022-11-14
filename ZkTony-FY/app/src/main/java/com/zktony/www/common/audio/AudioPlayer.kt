@@ -7,24 +7,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 class AudioPlayer {
-    private var isPlaying = false
 
-    suspend fun play(context: Context, resId: Int) {
-        coroutineScope {
-            launch {
-                if (!isPlaying) {
-                    val mediaPlayer = MediaPlayer.create(context, resId)
-                    isPlaying = true
-                    mediaPlayer.start()
-                    mediaPlayer.setOnCompletionListener {
-                        mediaPlayer.release()
-                        isPlaying = false
-                    }
-                } else {
-                    delay(1000)
-                    play(context, resId)
-                }
-            }
+    fun play(context: Context, resId: Int) {
+        val mediaPlayer = MediaPlayer.create(context, resId)
+        mediaPlayer.setVolume(1f, 1f)
+        mediaPlayer.start()
+        mediaPlayer.setOnCompletionListener {
+            mediaPlayer.release()
         }
 
     }
