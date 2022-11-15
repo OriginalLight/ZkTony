@@ -87,7 +87,11 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     is AdminEvent.DownloadError -> {
                         binding.progress.progress = 0
                         binding.progress.visibility = View.INVISIBLE
-                        "下载失败,  请重试！".showShortToast()
+                        binding.tvUpdate.run {
+                            text = "检查更新"
+                            setTextColor(ContextCompat.getColor(context, R.color.dark_outline))
+                        }
+                        PopTip.show("下载失败,  请重试！")
                     }
 
                     is AdminEvent.DownloadProgress -> {

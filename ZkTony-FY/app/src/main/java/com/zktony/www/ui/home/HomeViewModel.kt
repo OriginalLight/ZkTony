@@ -84,7 +84,7 @@ class HomeViewModel @Inject constructor(
                 }
                 // 每一分钟查询一次温度
                 while (true) {
-                    for (i in 0..3) {
+                    for (i in 0..4) {
                         delay(200L)
                         appViewModel.senderText(SERIAL_FOUR, Command.queryTemperature(i.toString()))
                     }
