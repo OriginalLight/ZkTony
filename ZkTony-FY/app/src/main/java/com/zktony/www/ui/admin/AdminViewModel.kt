@@ -79,11 +79,48 @@ class AdminViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 处理串口一返回数据
+     * @param hex [String]
+     */
+    private fun onReceiverSerialOne(hex: String) {
+        hex.toCommand().run {
+            if (function == "03" && parameter == "04") {
+                updateMotorParameters(data.toMotor().copy(board = SerialPortEnum.SERIAL_ONE.index))
+            }
+        }
+    }
+
+    /**
+     * 处理串口二返回数据
+     * @param hex [String]
+     */
+    private fun onReceiverSerialTwo(hex: String) {
+        hex.toCommand().run {
+            if (function == "03" && parameter == "04") {
+                updateMotorParameters(data.toMotor().copy(board = SerialPortEnum.SERIAL_TWO.index))
+            }
+        }
+    }
+
+    /**
+     * 处理串口三返回数据
+     * @param hex [String]
+     */
+    private fun onReceiverSerialThree(hex: String) {
+        hex.toCommand().run {
+            if (function == "03" && parameter == "04") {
+                updateMotorParameters(
+                    data.toMotor().copy(board = SerialPortEnum.SERIAL_THREE.index)
+                )
+            }
+        }
+    }
 
     /**
      * 下位机复位
      */
-    fun reset() {
+    fun lowerComputerReset() {
         Gpio.instance.setDirection("gpio156", 1)
         Gpio.instance.writeGpio("gpio156", 0)
         Gpio.instance.writeGpio("gpio156", 1)
@@ -102,35 +139,6 @@ class AdminViewModel @Inject constructor(
                 putExtra("extra_prefs_set_back_text", "返回")
             }
             CommonApplicationProxy.application.startActivity(intent)
-        }
-    }
-
-    /**
-     * 导航栏切换
-     * @param bar [Boolean]
-     */
-    fun changeBar(bar: Boolean) {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[booleanPreferencesKey(Constants.BAR)] = bar
-            }
-        }
-        val intent = Intent().apply {
-            action = "ACTION_SHOW_NAVBAR"
-            putExtra("cmd", if (bar) "show" else "hide")
-        }
-        CommonApplicationProxy.application.sendBroadcast(intent)
-    }
-
-    /**
-     * 抗体保温温度切换
-     * @param temp [Float]
-     */
-    fun changeTemp(temp: Float) {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[floatPreferencesKey(Constants.TEMP)] = temp
-            }
         }
     }
 
@@ -222,39 +230,30 @@ class AdminViewModel @Inject constructor(
     }
 
     /**
-     * 处理串口一返回数据
-     * @param hex [String]
+     * 导航栏切换
+     * @param bar [Boolean]
      */
-    private fun onReceiverSerialOne(hex: String) {
-        hex.toCommand().run {
-            if (function == "03" && parameter == "04") {
-                updateMotorByCallBack(data.toMotor().copy(board = SerialPortEnum.SERIAL_ONE.index))
+    fun toggleNavigationBar(bar: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[booleanPreferencesKey(Constants.BAR)] = bar
             }
         }
+        val intent = Intent().apply {
+            action = "ACTION_SHOW_NAVBAR"
+            putExtra("cmd", if (bar) "show" else "hide")
+        }
+        CommonApplicationProxy.application.sendBroadcast(intent)
     }
 
     /**
-     * 处理串口二返回数据
-     * @param hex [String]
+     * 抗体保温温度设置
+     * @param temp [Float]
      */
-    private fun onReceiverSerialTwo(hex: String) {
-        hex.toCommand().run {
-            if (function == "03" && parameter == "04") {
-                updateMotorByCallBack(data.toMotor().copy(board = SerialPortEnum.SERIAL_TWO.index))
-            }
-        }
-    }
-
-    /**
-     * 处理串口三返回数据
-     * @param hex [String]
-     */
-    private fun onReceiverSerialThree(hex: String) {
-        hex.toCommand().run {
-            if (function == "03" && parameter == "04") {
-                updateMotorByCallBack(
-                    data.toMotor().copy(board = SerialPortEnum.SERIAL_THREE.index)
-                )
+    fun setAntibodyTemp(temp: Float) {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[floatPreferencesKey(Constants.TEMP)] = temp
             }
         }
     }
@@ -296,7 +295,6 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-
     /**
      * 同步电机参数
      */
@@ -325,7 +323,7 @@ class AdminViewModel @Inject constructor(
      * 根据返回更新电机参数
      * @param motor [Motor]
      */
-    private fun updateMotorByCallBack(motor: Motor) {
+    private fun updateMotorParameters(motor: Motor) {
         viewModelScope.launch {
             motorRepository.getByBoardAndAddress(motor.board, motor.address).firstOrNull()?.let {
                 motorRepository.update(
