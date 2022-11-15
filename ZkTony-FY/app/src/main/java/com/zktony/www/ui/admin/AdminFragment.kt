@@ -94,7 +94,7 @@ class AdminFragment :
     private fun initButton() {
         binding.btnReset.run {
             this.clickScale()
-            this.setOnClickListener { viewModel.reset() }
+            this.setOnClickListener { viewModel.lowerComputerReset() }
         }
         binding.btnSetting.run {
             this.clickScale()
@@ -126,7 +126,7 @@ class AdminFragment :
             this.clickScale()
             this.setOnClickListener {
                 binding.swBar.isChecked = true
-                viewModel.changeBar(true)
+                viewModel.toggleNavigationBar(true)
                 viewModel.wifiSetting()
             }
         }
@@ -193,7 +193,7 @@ class AdminFragment :
         binding.swBar.run {
             this.isChecked = appViewModel.settingState.value.bar
             setOnCheckedChangeListener { _, isChecked ->
-                viewModel.changeBar(isChecked)
+                viewModel.toggleNavigationBar(isChecked)
             }
         }
     }
@@ -213,7 +213,7 @@ class AdminFragment :
             setText(appViewModel.settingState.value.temp.toString().removeZero())
             afterTextChange {
                 if (it.isNotEmpty()) {
-                    viewModel.changeTemp(it.toFloat())
+                    viewModel.setAntibodyTemp(it.toFloat())
                 }
             }
         }
