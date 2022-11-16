@@ -63,12 +63,8 @@ class HomeViewModel @Inject constructor(
                 }
             }
             launch {
-                appViewModel.event.collect {
-                    when (it) {
-                        is AppEvent.ReceiverSerialOne -> receiverSerialOne(it.command)
-                        is AppEvent.ReceiverSerialFour -> receiverSerialFour(it.command)
-                        else -> {}
-                    }
+                SerialPortManager.instance.responseOne.collect {
+                    receiverSerialOne(it)
                 }
             }
             launch {

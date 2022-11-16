@@ -7,19 +7,19 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.www.common.extension.hexFormat
-import com.zktony.www.common.utils.Logger
-import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.MotionMotor
 import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.room.entity.PumpMotor
+import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.repository.RoomRepository
 import com.zktony.www.serialport.SerialPortEnum
 import com.zktony.www.serialport.SerialPortManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -32,9 +32,6 @@ class AppViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val roomRepository: RoomRepository,
 ) : AndroidViewModel(application) {
-
-    private val _event = MutableSharedFlow<AppEvent>()
-    val event: SharedFlow<AppEvent> get() = _event
 
     private val _settingState = MutableStateFlow(SettingState())
     val settingState = _settingState.asStateFlow()
@@ -69,73 +66,6 @@ class AppViewModel @Inject constructor(
             launch {
                 SerialPortManager.instance.commandQueueActuator()
             }
-        }
-    }
-
-
-    /**
-     * 发送指令
-     * @param serialPort [SerialPortEnum]
-     * @param command  [String] 指令
-     */
-    fun sender(serialPort: SerialPortEnum, command: String) {
-        viewModelScope.launch {
-            _event.emit(AppEvent.Sender(serialPort, command))
-        }
-    }
-
-    /**
-     * 发送指令
-     * @param serialPort [SerialPortEnum]
-     * @param command  [String] 指令
-     */
-    fun senderText(serialPort: SerialPortEnum, command: String) {
-        viewModelScope.launch {
-            _event.emit(AppEvent.SenderText(serialPort, command))
-        }
-    }
-
-    /**
-     * 接收指令串口一
-     * @param command [String] 指令
-     */
-    fun receiverSerialOne(command: String) {
-        viewModelScope.launch {
-            _event.emit(AppEvent.ReceiverSerialOne(command))
-            Logger.d(msg = "串口一 receivedHex: ${command.hexFormat()}")
-        }
-    }
-
-    /**
-     * 接收指令串口二
-     * @param command [String] 指令
-     */
-    fun receiverSerialTwo(command: String) {
-        viewModelScope.launch {
-            _event.emit(AppEvent.ReceiverSerialTwo(command))
-            Logger.d(msg = "串口二 receivedHex: ${command.hexFormat()}")
-        }
-    }
-
-    /**
-     * 接收指令串口三
-     * @param command [String] 指令
-     */
-    fun receiverSerialThree(command: String) {
-        viewModelScope.launch {
-            _event.emit(AppEvent.ReceiverSerialThree(command))
-            Logger.d(msg = "串口三 receivedHex: ${command.hexFormat()}")
-        }
-    }
-
-    /**
-     * 接收指令串口四
-     * @param command [String] 指令
-     */
-    fun receiverSerialFour(command: String) {
-        viewModelScope.launch {
-            _event.emit(AppEvent.ReceiverSerialFour(command))
-            Logger.d(msg = "串口四 receivedHex: $command")
         }
     }
 
@@ -212,15 +142,6 @@ class AppViewModel @Inject constructor(
             )
         )
     }
-}
-
-sealed class AppEvent {
-    data class Sender(val serialPort: SerialPortEnum, val command: String) : AppEvent()
-    data class SenderText(val serialPort: SerialPortEnum, val command: String) : AppEvent()
-    data class ReceiverSerialOne(val command: String) : AppEvent()
-    data class ReceiverSerialTwo(val command: String) : AppEvent()
-    data class ReceiverSerialThree(val command: String) : AppEvent()
-    data class ReceiverSerialFour(val command: String) : AppEvent()
 }
 
 data class SettingState(

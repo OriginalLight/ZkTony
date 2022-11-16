@@ -3,6 +3,8 @@ package com.zktony.www.serialport
 import com.zktony.serialport.COMSerial
 import com.zktony.serialport.listener.OnComDataListener
 import com.zktony.www.common.extension.hexFormat
+import com.zktony.www.common.extension.hexToAscii
+import com.zktony.www.common.extension.verifyHex
 import com.zktony.www.common.model.Queue
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.serialport.SerialPortEnum.*
@@ -11,6 +13,10 @@ import com.zktony.www.serialport.protocol.CommandBlock
 import com.zktony.www.ui.home.ModuleEnum
 import com.zktony.www.ui.home.ModuleEnum.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class SerialPortManager {
 
@@ -19,22 +25,46 @@ class SerialPortManager {
     private var B_RUNNING = false
     private var C_RUNNING = false
     private var D_RUNNING = false
+    private val _responseOne = MutableStateFlow("")
+    private val _responseTwo = MutableStateFlow("")
+    private val _responseThree = MutableStateFlow("")
+    private val _responseFour = MutableStateFlow("")
+    val responseOne = _responseOne.asStateFlow()
+    val responseTwo = _responseTwo.asStateFlow()
+    val responseThree = _responseThree.asStateFlow()
+    val responseFour = _responseFour.asStateFlow()
 
     init {
         COMSerial.instance.addCOM(SERIAL_ONE.device, 115200)
         COMSerial.instance.addCOM(SERIAL_TWO.device, 115200)
         COMSerial.instance.addCOM(SERIAL_THREE.device, 115200)
         COMSerial.instance.addCOM(SERIAL_FOUR.device, 57600)
-    }
-
-    /**
-     * 添加串口监听
-     * @param block Unit
-     */
-    inline fun addDataListener(crossinline block: (String, String) -> Unit) {
         COMSerial.instance.addDataListener(object : OnComDataListener {
             override fun comDataBack(com: String, hexData: String) {
-                block.invoke(com, hexData)
+                when (com) {
+                    SERIAL_ONE.device -> {
+                        hexData.verifyHex().forEach {
+                            _responseOne.value = it
+                            Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
+                        }
+                    }
+                    SERIAL_TWO.device -> {
+                        hexData.verifyHex().forEach {
+                            _responseTwo.value = it
+                            Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
+                        }
+                    }
+                    SERIAL_THREE.device -> {
+                        hexData.verifyHex().forEach {
+                            _responseThree.value = it
+                            Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
+                        }
+                    }
+                    SERIAL_FOUR.device -> {
+                        _responseFour.value = hexData.hexToAscii()
+                        Logger.d(msg = "串口四 receivedText: ${hexData.hexFormat()}")
+                    }
+                }
             }
         })
     }
