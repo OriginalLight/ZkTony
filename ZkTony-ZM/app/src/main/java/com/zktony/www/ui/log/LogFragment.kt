@@ -23,15 +23,10 @@ import com.zktony.www.common.extension.getDayStart
 import com.zktony.www.common.extension.simpleDateFormat
 import com.zktony.www.common.room.entity.LogData
 import com.zktony.www.common.room.entity.LogRecord
-import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.model.Event
 import com.zktony.www.databinding.FragmentLogBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import java.util.*
 
 
@@ -46,16 +41,10 @@ class LogFragment :
     private var logDataList = emptyList<LogData>()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        EventBus.getDefault().register(this)
         initTextView()
         initObserver()
         initRecyclerView()
         buttonEvent()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        EventBus.getDefault().unregister(this)
     }
 
     /**
@@ -87,6 +76,7 @@ class LogFragment :
      */
     private fun initRecyclerView() {
         binding.rc1.adapter = logAdapter
+        logAdapter.setOnClick { refreshButton() }
         viewModel.initLogRecord()
     }
 
@@ -256,16 +246,6 @@ class LogFragment :
             binding.btn1.visibility = View.VISIBLE
             binding.btn2.visibility = View.VISIBLE
             viewModel.changeLogData(logAdapter.getItem().id)
-        }
-    }
-
-    /**
-     * 使用EventBus来线程间通信
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onGetMessage(event: Event<String, String>) {
-        if (Constants.LOG_CLICK == event.message) {
-            refreshButton()
         }
     }
 }

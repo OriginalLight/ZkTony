@@ -1,12 +1,12 @@
 package com.zktony.www.common.audio
 
-import android.content.Context
 import android.media.MediaPlayer
+import com.zktony.www.common.app.CommonApplicationProxy
 
 class AudioPlayer {
 
-    fun play(context: Context, resId: Int) {
-        val mediaPlayer = MediaPlayer.create(context, resId)
+    fun play(resId: Int) {
+        val mediaPlayer = MediaPlayer.create(CommonApplicationProxy.application, resId)
         mediaPlayer.setVolume(1f, 1f)
         mediaPlayer.start()
         mediaPlayer.setOnCompletionListener {

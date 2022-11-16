@@ -12,13 +12,10 @@ import com.kongzue.dialogx.dialogs.MessageDialog
 import com.zktony.www.R
 import com.zktony.www.adapter.SpinnerAdapter
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.*
 import com.zktony.www.common.room.entity.Program
-import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.utils.Logger
-import com.zktony.www.data.model.Event
 import com.zktony.www.databinding.FragmentHomeBinding
 import com.zktony.www.ui.home.model.Cmd
 import com.zktony.www.ui.home.model.ControlState
@@ -32,9 +29,6 @@ import io.reactivex.rxjava3.disposables.Disposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -59,7 +53,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private var zDisposable: Disposable? = null
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        EventBus.getDefault().register(this)
         // 初始化监视器
         initObserver()
         // 初始化Spinner
@@ -74,60 +67,54 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         btn1Btn2Event()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        EventBus.getDefault().unregister(this)
-    }
-
     /**
      * 初始化监视器
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            appViewModel.event.collect {
-                when (it) {
-                    is AppEvent.ReceiveCmd -> onRecCmdChanged(it.cmd)
-                    else -> {}
+            launch {
+                appViewModel.received.collect {
+                    onRecCmdChanged(it)
                 }
             }
-        }
-        lifecycleScope.launch {
-            viewModel.errorMessage.collect {
-                if (it.contains("A") && it.contains("B")) {
-                    stop(X)
-                    stop(Y)
-                } else {
-                    if (it.contains("A")) {
+            launch {
+                viewModel.errorMessage.collect {
+                    if (it.contains("A") && it.contains("B")) {
                         stop(X)
-                    }
-                    if (it.contains("B")) {
                         stop(Y)
-                    }
-                }
-                MessageDialog.build()
-                    .setTitle("模块异常")
-                    .setMessage(it)
-                    .setOkButton("确定") { dialog, _ ->
-                        dialog.dismiss()
-                        true
-                    }
-                    .show()
-            }
-        }
-        lifecycleScope.launch {
-            viewModel.getAllProgram().collect {
-                programListA.clear()
-                programListB.clear()
-                it.forEach { program ->
-                    if (program.model == 0) {
-                        programListA.add(program)
                     } else {
-                        programListB.add(program)
+                        if (it.contains("A")) {
+                            stop(X)
+                        }
+                        if (it.contains("B")) {
+                            stop(Y)
+                        }
                     }
+                    MessageDialog.build()
+                        .setTitle("模块异常")
+                        .setMessage(it)
+                        .setOkButton("确定") { dialog, _ ->
+                            dialog.dismiss()
+                            true
+                        }
+                        .show()
                 }
-                if (!state.isRunX && !state.isRunY) {
-                    reloadSpinnerItem(X)
-                    reloadSpinnerItem(Y)
+            }
+            launch {
+                viewModel.getAllProgram().collect {
+                    programListA.clear()
+                    programListB.clear()
+                    it.forEach { program ->
+                        if (program.model == 0) {
+                            programListA.add(program)
+                        } else {
+                            programListB.add(program)
+                        }
+                    }
+                    if (!state.isRunX && !state.isRunY) {
+                        reloadSpinnerItem(X)
+                        reloadSpinnerItem(Y)
+                    }
                 }
             }
         }
@@ -403,68 +390,68 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     @SuppressLint("ClickableViewAccessibility")
     private fun btn3Btn4Event() {
         binding.moduleX.btn3.addTouchEvent({
-            val sendCmd = appViewModel.latestSendCmd
+            val sendCmd = appViewModel.send.value
             it.setBackgroundResource(R.drawable.btn_press_shape)
             it.scaleX = 0.8f
             it.scaleY = 0.8f
             state.stepMotorX = sendCmd.stepMotorX
             sendCmd.stepMotorX = 160
-            appViewModel.sendCmd(sendCmd)
+            appViewModel.send(sendCmd)
         }, {
-            val sendCmd = appViewModel.latestSendCmd
+            val sendCmd = appViewModel.send.value
             it.setBackgroundResource(R.drawable.btn_nopress_shape)
             it.scaleX = 1f
             it.scaleY = 1f
             sendCmd.stepMotorX = state.stepMotorX
-            appViewModel.sendCmd(sendCmd)
+            appViewModel.send(sendCmd)
         })
         binding.moduleX.btn4.addTouchEvent({
-            val sendCmd = appViewModel.latestSendCmd
+            val sendCmd = appViewModel.send.value
             it.setBackgroundResource(R.drawable.btn_press_shape)
             it.scaleX = 0.8f
             it.scaleY = 0.8f
             state.stepMotorX = sendCmd.stepMotorX
             sendCmd.stepMotorX = -160
-            appViewModel.sendCmd(sendCmd)
+            appViewModel.send(sendCmd)
         }, {
-            val sendCmd = appViewModel.latestSendCmd
+            val sendCmd = appViewModel.send.value
             it.setBackgroundResource(R.drawable.btn_nopress_shape)
             it.scaleX = 1f
             it.scaleY = 1f
             sendCmd.stepMotorX = state.stepMotorX
-            appViewModel.sendCmd(sendCmd)
+            appViewModel.send(sendCmd)
         })
         binding.moduleY.btn3.addTouchEvent({
-            val sendCmd = appViewModel.latestSendCmd
+            val sendCmd = appViewModel.send.value
             it.setBackgroundResource(R.drawable.btn_press_shape)
             it.scaleX = 0.8f
             it.scaleY = 0.8f
             state.stepMotorY = sendCmd.stepMotorY
             sendCmd.stepMotorY = 160
-            appViewModel.sendCmd(sendCmd)
+            appViewModel.send(sendCmd)
         }, {
-            val sendCmd = appViewModel.latestSendCmd
+            val sendCmd = appViewModel.send.value
             it.setBackgroundResource(R.drawable.btn_nopress_shape)
             it.scaleX = 1f
             it.scaleY = 1f
             sendCmd.stepMotorY = state.stepMotorY
-            appViewModel.sendCmd(sendCmd)
+            appViewModel.send(sendCmd)
         })
         binding.moduleY.btn4.addTouchEvent({
-            val sendCmd = appViewModel.latestSendCmd
+            val sendCmd = appViewModel.send.value
             it.setBackgroundResource(R.drawable.btn_press_shape)
             it.scaleX = 0.8f
             it.scaleY = 0.8f
             state.stepMotorY = sendCmd.stepMotorY
             sendCmd.stepMotorY = -160
-            appViewModel.sendCmd(sendCmd)
+            appViewModel.send(sendCmd)
         }, {
-            val sendCmd = appViewModel.latestSendCmd
+            val sendCmd = appViewModel.send.value
             it.setBackgroundResource(R.drawable.btn_nopress_shape)
             it.scaleX = 1f
             it.scaleY = 1f
             sendCmd.stepMotorY = state.stepMotorY
-            appViewModel.sendCmd(sendCmd)
+            appViewModel.send(sendCmd)
         })
     }
 
@@ -479,7 +466,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         when (module) {
             X -> {
                 setProgramAndLog(X, state.modelX)
-                if (!state.isRunY && viewModel.detect) {
+                if (!state.isRunY && appViewModel.setting.value.detect) {
                     viewModel.setSentinel()
                 }
                 if (!state.isRunY && state.modelX === A) {
@@ -495,7 +482,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
             Y -> {
                 setProgramAndLog(Y, state.modelY)
-                if (!state.isRunX && viewModel.detect) {
+                if (!state.isRunX && appViewModel.setting.value.detect) {
                     viewModel.setSentinel()
                 }
                 if (!state.isRunX && state.modelY === A) {
@@ -535,16 +522,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
 
                 override fun onError(e: Throwable) {}
+
                 override fun onComplete() {
                     enableEtSp(module)
                     sendStopCmd(module)
                     viewModel.stopRecordLog(module)
+                    viewModel.playAudio(R.raw.finish)
                     if (module == X) {
                         binding.moduleX.tv5.text = "已完成"
-                        EventBus.getDefault().post(
-                            Event(Constants.AUDIO_ID, R.raw.finish)
-                        )
-                        Logger.d(msg = "模块A计时停止：")
+                        Logger.d(msg = "模块A计时停止")
                         if (!state.isRunY) {
                             zDisposable?.run {
                                 if (this.isDisposed.not()) {
@@ -555,10 +541,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }
                     if (module == Y) {
                         binding.moduleY.tv5.text = "已完成"
-                        EventBus.getDefault().post(
-                            Event(Constants.AUDIO_ID, R.raw.finish)
-                        )
-                        Logger.d(msg = "模块B计时停止：")
+                        Logger.d(msg = "模块B计时停止")
                         if (!state.isRunX) {
                             zDisposable?.run {
                                 if (this.isDisposed.not()) {
@@ -624,8 +607,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         Observable.interval(
-            viewModel.interval.toLong(),
-            viewModel.interval.toLong(),
+            appViewModel.setting.value.interval.toLong(),
+            appViewModel.setting.value.interval.toLong(),
             TimeUnit.MINUTES
         )
             .subscribeOn(Schedulers.io())
@@ -636,17 +619,17 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
 
                 override fun onNext(aLong: Long) {
-                    val sendCmd = appViewModel.latestSendCmd
+                    val sendCmd = appViewModel.send.value
                     sendCmd.zmotorX = 1
                     sendCmd.zmotorY = 1
-                    appViewModel.sendCmd(sendCmd)
+                    appViewModel.send(sendCmd)
                     Logger.d(msg = "开始定时自动清理废液")
                     lifecycleScope.launch {
-                        delay(viewModel.duration.toLong() * 1000)
-                        val cmd = appViewModel.latestSendCmd
+                        delay(appViewModel.setting.value.duration.toLong() * 1000)
+                        val cmd = appViewModel.send.value
                         cmd.zmotorX = 0
                         cmd.zmotorY = 0
-                        appViewModel.sendCmd(cmd)
+                        appViewModel.send(cmd)
                         Logger.d(msg = "结束定时自动清理废液")
                     }
                 }
@@ -708,7 +691,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param module 模块
      */
     private fun sendStartCmd(module: Model) {
-        val sendCmd = appViewModel.latestSendCmd
+        val sendCmd = appViewModel.send.value
         if (module == X) {
             state.isRunX = true
             sendCmd.powerENX = 1
@@ -731,7 +714,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
             sendCmd.targetVoltageY = state.voltageY
         }
-        appViewModel.sendCmd(sendCmd)
+        appViewModel.send(sendCmd)
     }
 
     /**
@@ -739,7 +722,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param module 模块
      */
     private fun sendStopCmd(module: Model) {
-        val sendCmd = appViewModel.latestSendCmd
+        val sendCmd = appViewModel.send.value
         if (module == X) {
             state.isRunX = false
             sendCmd.powerENX = 0
@@ -754,7 +737,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             sendCmd.stepMotorY = 0
             sendCmd.targetVoltageY = 0f
         }
-        appViewModel.sendCmd(sendCmd)
+        appViewModel.send(sendCmd)
     }
 
     /**
@@ -919,14 +902,4 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
     }
 
-    /**
-     * 使用EventBus来线程间通信
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onGetMessage(event: Event<String, String>) {
-        if (Constants.RESET == event.message) {
-            stop(X)
-            stop(Y)
-        }
-    }
 }

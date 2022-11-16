@@ -18,6 +18,7 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
+import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.*
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.model.Version
@@ -25,11 +26,15 @@ import com.zktony.www.databinding.FragmentAdminBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.File
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layout.fragment_admin) {
 
     override val viewModel: AdminViewModel by viewModels()
+
+    @Inject
+    lateinit var appViewModel: AppViewModel
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initObserver()
@@ -45,67 +50,33 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     @SuppressLint("SetTextI18n")
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.event.collect {
-                when (it) {
-                    is AdminEvent.ChangeBar -> {
-                        binding.sw1.isChecked = it.bar
-                    }
-
-                    is AdminEvent.ChangeAudio -> {
-                        binding.sw2.isChecked = it.audio
-                    }
-
-                    is AdminEvent.ChangeDetect -> {
-                        binding.sw3.isChecked = it.detect
-                    }
-
-                    is AdminEvent.ChangeInterval -> {
-                        if (!binding.et1.isFocused) {
-                            binding.et1.setText(it.interval.toString())
+            launch {
+                viewModel.file.collect {
+                    it?.let { showLocalUpdate(it) }
+                }
+            }
+            launch {
+                viewModel.version.collect {
+                    it?.let { showRemoteUpdate(it) }
+                }
+            }
+            launch {
+                viewModel.progress.collect { progress ->
+                    binding.progress.run {
+                        if (progress == 0) {
+                            visibility = View.GONE
+                        } else {
+                            visibility = View.VISIBLE
+                            setProgress(progress)
                         }
                     }
-
-                    is AdminEvent.ChangeDuration -> {
-                        if (!binding.et2.isFocused) {
-                            binding.et2.setText(it.duration.toString())
-                        }
-                    }
-
-                    is AdminEvent.CheckUpdate -> {
-                        confirmUpdate(it.file, it.version)
-                    }
-
-                    is AdminEvent.DownloadSuccess -> {
-                        binding.progress.visibility = View.INVISIBLE
-                        binding.tvUpdate.run {
+                    binding.tvUpdate.run {
+                        if (progress == 0) {
                             text = "检查更新"
                             setTextColor(ContextCompat.getColor(context, R.color.dark_outline))
-                        }
-                        requireContext().installApk(it.file)
-                    }
-
-                    is AdminEvent.DownloadError -> {
-                        binding.progress.progress = 0
-                        binding.progress.visibility = View.INVISIBLE
-                        binding.tvUpdate.run {
-                            text = "检查更新"
-                            setTextColor(ContextCompat.getColor(context, R.color.dark_outline))
-                        }
-                        PopTip.show("下载失败,  请重试！")
-                    }
-
-                    is AdminEvent.DownloadProgress -> {
-                        binding.progress.run {
-                            if (visibility != View.VISIBLE) {
-                                visibility = View.VISIBLE
-                            }
-                            if (progress != it.progress) {
-                                progress = it.progress
-                            }
-                        }
-                        binding.tvUpdate.run {
+                        } else {
+                            text = "$progress%"
                             setTextColor(ContextCompat.getColor(context, R.color.light_primary))
-                            text = "${it.progress}%"
                         }
                     }
                 }
@@ -118,30 +89,30 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
      */
     @SuppressLint("ClickableViewAccessibility")
     private fun imageButtonEvent() {
-        binding.ib1.run {
+        binding.reset.run {
             clickScale()
-            setOnClickListener { viewModel.rest() }
+            setOnClickListener { viewModel.lowerComputerReset() }
         }
-        binding.ib2.addTouchEvent({
+        binding.pump.addTouchEvent({
             it.scaleX = 0.8f
             it.scaleY = 0.8f
-            viewModel.changePump(true)
+            viewModel.touchPump(true)
         }, {
             it.scaleX = 1f
             it.scaleY = 1f
-            viewModel.changePump(false)
+            viewModel.touchPump(false)
         })
-        binding.ib3.run {
+        binding.wifi.run {
             clickScale()
-            setOnClickListener { viewModel.wifiSetting(requireContext()) }
+            setOnClickListener { viewModel.wifiSetting() }
         }
-        binding.ib4.run {
+        binding.update.run {
             clickScale()
             setOnClickListener {
-                if (viewModel.uiState.value.isUpdating) {
+                if (viewModel.progress.value > 0) {
                     PopTip.show("正在更新中")
                 } else {
-                    viewModel.checkUpdate(requireContext())
+                    viewModel.checkUpdate()
                 }
             }
         }
@@ -151,14 +122,23 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
      * 初始化Switch
      */
     private fun initSwitch() {
-        binding.sw1.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.changeBar(isChecked, requireContext())
+        binding.navigationBar.run {
+            isChecked = appViewModel.setting.value.bar
+            setOnCheckedChangeListener { _, isChecked ->
+                viewModel.toggleNavigationBar(isChecked)
+            }
         }
-        binding.sw2.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.changeAudio(isChecked)
+        binding.audio.run {
+            isChecked = appViewModel.setting.value.audio
+            setOnCheckedChangeListener { _, isChecked ->
+                viewModel.toggleAudio(isChecked)
+            }
         }
-        binding.sw3.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.changeDetect(isChecked)
+        binding.detet.run {
+            isChecked = appViewModel.setting.value.detect
+            setOnCheckedChangeListener { _, isChecked ->
+                viewModel.toggleDetect(isChecked)
+            }
         }
     }
 
@@ -166,18 +146,28 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
      * 初始化编辑视图
      */
     private fun initEditView() {
-        binding.et1.afterTextChange {
-            if (it.isNotEmpty()) {
-                viewModel.changeInterval(it.removeZero().toInt())
-            } else {
-                viewModel.changeInterval(1)
+        binding.interval.run {
+            setText(appViewModel.setting.value.interval.toString())
+            afterTextChange {
+                viewModel.toggleInterval(
+                    if (it.isNotEmpty()) {
+                        it.toInt()
+                    } else {
+                        1
+                    }
+                )
             }
         }
-        binding.et2.afterTextChange {
-            if (it.isNotEmpty()) {
-                viewModel.changeDuration(it.removeZero().toInt())
-            } else {
-                viewModel.changeDuration(10)
+        binding.duration.run {
+            setText(appViewModel.setting.value.duration.toString())
+            afterTextChange {
+                viewModel.toggleDuration(
+                    if (it.isNotEmpty()) {
+                        it.toInt()
+                    } else {
+                        10
+                    }
+                )
             }
         }
         binding.conVersion.run {
@@ -234,58 +224,53 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     }
 
     /**
-     * 确认更新
-     * @param file [File] 文件
-     * @param version [Version] 版本信息
+     * 显示本地更新
+     * @param file [File]
      */
-    private fun confirmUpdate(file: File?, version: Version?) {
-        file?.run {
-            CustomDialog.build()
-                .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_update_dialog) {
-                    override fun onBind(dialog: CustomDialog, v: View) {
-                        val title = v.findViewById<TextView>(R.id.title)
-                        val message = v.findViewById<TextView>(R.id.message)
-                        val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
-                        val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
-                        title.text = "发现本地新版本"
-                        message.text = "是否更新？"
-                        btnOk.setOnClickListener {
-                            viewModel.doUpdate(
-                                requireContext(),
-                                this@run,
-                                null
-                            )
-                            dialog.dismiss()
-                        }
-                        btnCancel.setOnClickListener { dialog.dismiss() }
+    private fun showLocalUpdate(file: File) {
+        CustomDialog.build()
+            .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_update_dialog) {
+                override fun onBind(dialog: CustomDialog, v: View) {
+                    val title = v.findViewById<TextView>(R.id.title)
+                    val message = v.findViewById<TextView>(R.id.message)
+                    val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
+                    val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
+                    title.text = "发现本地新版本"
+                    message.text = "是否更新？"
+                    btnOk.setOnClickListener {
+                        requireContext().installApk(file)
+                        dialog.dismiss()
                     }
-                })
-                .setMaskColor(Color.parseColor("#4D000000"))
-                .show()
-        } ?: version?.run {
-            CustomDialog.build()
-                .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_update_dialog) {
-                    @SuppressLint("SetTextI18n")
-                    override fun onBind(dialog: CustomDialog, v: View) {
-                        val title = v.findViewById<TextView>(R.id.title)
-                        val message = v.findViewById<TextView>(R.id.message)
-                        val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
-                        val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
-                        title.text = "发现在线新版本"
-                        message.text = this@run.description + "\n是否升级？"
-                        btnOk.setOnClickListener {
-                            viewModel.doUpdate(
-                                requireContext(),
-                                null,
-                                this@run
-                            )
-                            dialog.dismiss()
-                        }
-                        btnCancel.setOnClickListener { dialog.dismiss() }
+                    btnCancel.setOnClickListener { dialog.dismiss() }
+                }
+            })
+            .setMaskColor(Color.parseColor("#4D000000"))
+            .show()
+    }
+
+    /**
+     * 显示更新
+     * @param version [Version]
+     */
+    private fun showRemoteUpdate(version: Version) {
+        CustomDialog.build()
+            .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_update_dialog) {
+                @SuppressLint("SetTextI18n")
+                override fun onBind(dialog: CustomDialog, v: View) {
+                    val title = v.findViewById<TextView>(R.id.title)
+                    val message = v.findViewById<TextView>(R.id.message)
+                    val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
+                    val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
+                    title.text = "发现在线新版本"
+                    message.text = version.description + "\n是否升级？"
+                    btnOk.setOnClickListener {
+                        viewModel.doRemoteUpdate(version)
+                        dialog.dismiss()
                     }
-                })
-                .setMaskColor(Color.parseColor("#4D000000"))
-                .show()
-        }
+                    btnCancel.setOnClickListener { dialog.dismiss() }
+                }
+            })
+            .setMaskColor(Color.parseColor("#4D000000"))
+            .show()
     }
 }
