@@ -15,10 +15,8 @@ import com.zktony.www.adapter.ProgramAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.showShortToast
-import com.zktony.www.common.room.entity.Program
 import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 
@@ -43,7 +41,7 @@ class ProgramFragment :
         lifecycleScope.launch {
             viewModel.programList.collect {
                 programAdapter.submitList(it)
-                if(it.isEmpty()){
+                if (it.isEmpty()) {
                     binding.empty.visibility = View.VISIBLE
                     binding.rc1.visibility = View.GONE
                 } else {

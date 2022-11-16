@@ -4,7 +4,6 @@ import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.extractTemp
 import com.zktony.www.common.extension.removeZero
@@ -17,8 +16,8 @@ import com.zktony.www.common.room.entity.getActionEnum
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.serialport.SerialPortEnum.SERIAL_FOUR
-import com.zktony.www.serialport.SerialPortEnum.SERIAL_ONE
+import com.zktony.www.serialport.SerialPort.SERIAL_FOUR
+import com.zktony.www.serialport.SerialPort.SERIAL_ONE
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import com.zktony.www.ui.home.ModuleEnum.*
@@ -40,6 +39,8 @@ class HomeViewModel @Inject constructor(
 
     @Inject
     lateinit var appViewModel: AppViewModel
+
+    private val serial = SerialPortManager.instance
 
     private val _programList = MutableStateFlow<List<Program>>(emptyList())
     private val _aState = MutableStateFlow(ModuleState())
@@ -63,26 +64,41 @@ class HomeViewModel @Inject constructor(
                 }
             }
             launch {
-                SerialPortManager.instance.responseOne.collect {
-                    receiverSerialOne(it)
+                serial.responseOne.collect {
+                    it?.let {
+                        onSerialOneResponse(it)
+                    }
+                }
+            }
+            launch {
+                serial.responseFour.collect {
+                    it?.let {
+                        onSerialFourResponse(it)
+                    }
                 }
             }
             launch {
                 // 设置和定时查询温控
                 for (i in 0..4) {
                     delay(200L)
-                    appViewModel.senderText(
+                    serial.sendText(
                         SERIAL_FOUR,
                         Command.saveTemperature(i.toString(), "26")
                     )
                     delay(200L)
-                    appViewModel.senderText(SERIAL_FOUR, Command.setTemperature(i.toString(), "26"))
+                    serial.sendText(
+                        SERIAL_FOUR,
+                        Command.setTemperature(i.toString(), "26")
+                    )
                 }
                 // 每一分钟查询一次温度
                 while (true) {
                     for (i in 0..4) {
                         delay(200L)
-                        appViewModel.senderText(SERIAL_FOUR, Command.queryTemperature(i.toString()))
+                        serial.sendText(
+                            SERIAL_FOUR,
+                            Command.queryTemperature(i.toString())
+                        )
                     }
                     delay(10 * 1000L)
                 }
@@ -179,7 +195,7 @@ class HomeViewModel @Inject constructor(
      */
     fun stop(module: ModuleEnum) {
         viewModelScope.launch {
-            SerialPortManager.instance.setModuleRunning(module, false)
+            serial.setModuleRunning(module, false)
             when (module) {
                 A -> {
                     _aState.value.job?.let { if (it.isActive) it.cancel() }
@@ -243,8 +259,8 @@ class HomeViewModel @Inject constructor(
                 }
             }
             if (_aState.value.job == null && _bState.value.job == null && _cState.value.job == null && _dState.value.job == null) {
-                appViewModel.sender(SERIAL_ONE, Command.pauseShakeBed())
-                SerialPortManager.instance.commandQueue.clear()
+                serial.sendHex(SERIAL_ONE, Command.pauseShakeBed())
+                serial.commandQueue.clear()
             }
         }
     }
@@ -253,12 +269,12 @@ class HomeViewModel @Inject constructor(
      * 复位
      */
     fun reset() {
-        SerialPortManager.instance.commandQueue.clear()
-        appViewModel.sender(
+        serial.commandQueue.clear()
+        serial.sendHex(
             SERIAL_ONE,
             Command(function = "05", parameter = "01", data = "0101302C302C302C302C").toHex()
         )
-        appViewModel.sender(SERIAL_ONE, Command().toHex())
+        serial.sendHex(SERIAL_ONE, Command().toHex())
         stop(A)
         stop(B)
         stop(C)
@@ -270,7 +286,7 @@ class HomeViewModel @Inject constructor(
      */
     fun pause() {
         viewModelScope.launch {
-            appViewModel.sender(
+            serial.sendHex(
                 SERIAL_ONE,
                 if (_eState.value.pauseEnable) Command.resumeShakeBed() else Command.pauseShakeBed()
             )
@@ -284,7 +300,7 @@ class HomeViewModel @Inject constructor(
     fun insulating() {
         viewModelScope.launch {
             val temp = appViewModel.settingState.value.temp.toString().removeZero()
-            appViewModel.senderText(
+            serial.sendText(
                 SERIAL_FOUR,
                 Command.setTemperature(
                     address = "0",
@@ -299,7 +315,7 @@ class HomeViewModel @Inject constructor(
      * 串口一数据接收
      * @param hex [String] 数据
      */
-    private fun receiverSerialOne(hex: String) {
+    private fun onSerialOneResponse(hex: String) {
         val command = hex.toCommand()
         when (command.function) {
             "86" -> resetCallBack(command)
@@ -310,7 +326,7 @@ class HomeViewModel @Inject constructor(
      * 串口四数据接收
      * @param hex [String] 数据
      */
-    private fun receiverSerialFour(hex: String) {
+    private fun onSerialFourResponse(hex: String) {
         viewModelScope.launch {
             if (hex.startsWith("TC1:TCACTUALTEMP=")) {
                 // 读取温度
@@ -430,7 +446,7 @@ class HomeViewModel @Inject constructor(
      * @param program [Program] 程序
      */
     private fun runProgram(module: ModuleEnum, program: Program) {
-        SerialPortManager.instance.setModuleRunning(module, true)
+        serial.setModuleRunning(module, true)
 
         val job = viewModelScope.launch {
             val actionQueue = Queue<Action>()

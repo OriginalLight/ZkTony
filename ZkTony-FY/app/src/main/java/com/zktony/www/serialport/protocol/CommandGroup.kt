@@ -6,8 +6,8 @@ import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.MotionMotor
 import com.zktony.www.common.room.entity.PumpMotor
 import com.zktony.www.common.utils.Logger
-import com.zktony.www.serialport.SerialPortEnum
-import com.zktony.www.serialport.SerialPortEnum.*
+import com.zktony.www.serialport.SerialPort
+import com.zktony.www.serialport.SerialPort.*
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.ui.home.ModuleEnum
 import com.zktony.www.ui.home.ModuleEnum.*
@@ -529,10 +529,10 @@ class CommandGroup {
 }
 
 sealed class CommandBlock {
-    data class Hex(val serialPort: SerialPortEnum, val module: ModuleEnum, val hex: String) :
+    data class Hex(val serialPort: SerialPort, val module: ModuleEnum, val hex: String) :
         CommandBlock()
 
-    data class Text(val serialPort: SerialPortEnum, val module: ModuleEnum, val text: String) :
+    data class Text(val serialPort: SerialPort, val module: ModuleEnum, val text: String) :
         CommandBlock()
 
     data class Delay(val module: ModuleEnum, val delay: Long) : CommandBlock()

@@ -13,7 +13,7 @@ import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.room.entity.PumpMotor
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.repository.RoomRepository
-import com.zktony.www.serialport.SerialPortEnum
+import com.zktony.www.serialport.SerialPort
 import com.zktony.www.serialport.SerialPortManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -78,7 +78,7 @@ class AppViewModel @Inject constructor(
         viewModelScope.launch {
             motors.forEach { motor ->
                 when (motor.board) {
-                    SerialPortEnum.SERIAL_ONE.index -> {
+                    SerialPort.SERIAL_ONE.index -> {
                         when (motor.address) {
                             1 -> _settingState.value = settingState.value.copy(
                                 motionMotor = settingState.value.motionMotor.copy(xAxis = motor)
@@ -91,7 +91,7 @@ class AppViewModel @Inject constructor(
                             )
                         }
                     }
-                    SerialPortEnum.SERIAL_TWO.index -> {
+                    SerialPort.SERIAL_TWO.index -> {
                         when (motor.address) {
                             1 -> _settingState.value = settingState.value.copy(
                                 pumpMotor = settingState.value.pumpMotor.copy(pumpOne = motor)
@@ -104,7 +104,7 @@ class AppViewModel @Inject constructor(
                             )
                         }
                     }
-                    SerialPortEnum.SERIAL_THREE.index -> {
+                    SerialPort.SERIAL_THREE.index -> {
                         when (motor.address) {
                             1 -> _settingState.value = settingState.value.copy(
                                 pumpMotor = settingState.value.pumpMotor.copy(pumpFour = motor)
