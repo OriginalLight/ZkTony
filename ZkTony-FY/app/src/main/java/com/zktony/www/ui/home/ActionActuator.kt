@@ -7,6 +7,8 @@ import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.ActionEnum
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.serialport.protocol.CommandGroup
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -23,6 +25,7 @@ class ActionActuator private constructor(
     private val actionQueue: Queue<Action>,
     private val module: ModuleEnum,
     private val settingState: SettingState,
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     private val _state = MutableSharedFlow<ActionEvent>()
     val state: SharedFlow<ActionEvent> get() = _state

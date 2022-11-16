@@ -6,7 +6,7 @@ import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.data.repository.CalibrationRepository
-import com.zktony.www.serialport.SerialPortEnum.*
+import com.zktony.www.serialport.SerialPort.*
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel

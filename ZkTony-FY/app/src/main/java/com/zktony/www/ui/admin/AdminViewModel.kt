@@ -12,7 +12,6 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.gpio.Gpio
 import com.zktony.www.BuildConfig
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.app.CommonApplicationProxy
 import com.zktony.www.common.extension.*
@@ -27,8 +26,9 @@ import com.zktony.www.data.model.Version
 import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
-import com.zktony.www.serialport.SerialPortEnum
-import com.zktony.www.serialport.getSerialPortEnum
+import com.zktony.www.serialport.SerialPort
+import com.zktony.www.serialport.SerialPortManager
+import com.zktony.www.serialport.getSerialPort
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -61,12 +61,23 @@ class AdminViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                appViewModel.event.collect {
-                    when (it) {
-                        is AppEvent.ReceiverSerialOne -> onReceiverSerialOne(it.command)
-                        is AppEvent.ReceiverSerialTwo -> onReceiverSerialTwo(it.command)
-                        is AppEvent.ReceiverSerialThree -> onReceiverSerialThree(it.command)
-                        else -> {}
+                SerialPortManager.instance.responseOne.collect {
+                    it?.let {
+                        onSerialOneResponse(it)
+                    }
+                }
+            }
+            launch {
+                SerialPortManager.instance.responseTwo.collect {
+                    it?.let {
+                        onSerialTwoResponse(it)
+                    }
+                }
+            }
+            launch {
+                SerialPortManager.instance.responseThree.collect {
+                    it?.let {
+                        onSerialThreeResponse(it)
                     }
                 }
             }
@@ -83,10 +94,10 @@ class AdminViewModel @Inject constructor(
      * 处理串口一返回数据
      * @param hex [String]
      */
-    private fun onReceiverSerialOne(hex: String) {
+    private fun onSerialOneResponse(hex: String) {
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotorParameters(data.toMotor().copy(board = SerialPortEnum.SERIAL_ONE.index))
+                updateMotorParameters(data.toMotor().copy(board = SerialPort.SERIAL_ONE.index))
             }
         }
     }
@@ -95,10 +106,10 @@ class AdminViewModel @Inject constructor(
      * 处理串口二返回数据
      * @param hex [String]
      */
-    private fun onReceiverSerialTwo(hex: String) {
+    private fun onSerialTwoResponse(hex: String) {
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotorParameters(data.toMotor().copy(board = SerialPortEnum.SERIAL_TWO.index))
+                updateMotorParameters(data.toMotor().copy(board = SerialPort.SERIAL_TWO.index))
             }
         }
     }
@@ -107,11 +118,11 @@ class AdminViewModel @Inject constructor(
      * 处理串口三返回数据
      * @param hex [String]
      */
-    private fun onReceiverSerialThree(hex: String) {
+    private fun onSerialThreeResponse(hex: String) {
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
                 updateMotorParameters(
-                    data.toMotor().copy(board = SerialPortEnum.SERIAL_THREE.index)
+                    data.toMotor().copy(board = SerialPort.SERIAL_THREE.index)
                 )
             }
         }
@@ -305,8 +316,8 @@ class AdminViewModel @Inject constructor(
                     if (i == 2 && j == 3) {
                         break
                     }
-                    appViewModel.sender(
-                        getSerialPortEnum(i),
+                    SerialPortManager.instance.sendHex(
+                        getSerialPort(i),
                         Command(
                             function = "03",
                             parameter = "04",
