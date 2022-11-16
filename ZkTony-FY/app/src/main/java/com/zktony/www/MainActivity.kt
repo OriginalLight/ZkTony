@@ -29,49 +29,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         binding.navView.setupWithNavController(navController)
 
-        initView()
+        WorkerManager.instance.createWorker()
     }
 
-    private fun initView() {
-        WorkerManager.instance.createWorker()
-        lifecycleScope.launch {
-            launch {
-                SerialPortManager.instance.addDataListener { com, hexData ->
-                    when (com) {
-                        SerialPortEnum.SERIAL_ONE.device -> {
-                            hexData.verifyHex().forEach {
-                                appViewModel.receiverSerialOne(it)
-                            }
-                        }
-                        SerialPortEnum.SERIAL_TWO.device -> {
-                            hexData.verifyHex().forEach {
-                                appViewModel.receiverSerialTwo(it)
-                            }
-                        }
-                        SerialPortEnum.SERIAL_THREE.device -> {
-                            hexData.verifyHex().forEach {
-                                appViewModel.receiverSerialThree(it)
-                            }
-                        }
-                        SerialPortEnum.SERIAL_FOUR.device -> {
-                            appViewModel.receiverSerialFour(hexData.hexToAscii())
-                        }
-                    }
-                }
-            }
-            launch {
-                appViewModel.event.collect {
-                    when (it) {
-                        is AppEvent.Sender -> {
-                            SerialPortManager.instance.sendHex(it.serialPort, it.command)
-                        }
-                        is AppEvent.SenderText -> {
-                            SerialPortManager.instance.sendText(it.serialPort, it.command)
-                        }
-                        else -> {}
-                    }
-                }
-            }
-        }
-    }
 }

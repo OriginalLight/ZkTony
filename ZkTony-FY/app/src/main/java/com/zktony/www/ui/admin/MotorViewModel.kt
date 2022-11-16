@@ -6,6 +6,7 @@ import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.data.repository.MotorRepository
+import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.getSerialPortEnum
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -62,7 +63,7 @@ class MotorViewModel @Inject constructor(
         viewModelScope.launch {
             if (validateMotor(editMotor.value)) {
                 motorRepository.update(editMotor.value)
-                appViewModel.sender(
+                SerialPortManager.instance.sendHex(
                     getSerialPortEnum(editMotor.value.board),
                     Command(
                         parameter = "04",
