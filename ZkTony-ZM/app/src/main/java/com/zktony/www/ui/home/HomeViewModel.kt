@@ -1,19 +1,14 @@
 package com.zktony.www.ui.home
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.viewModelScope
 import com.zktony.serialport.COMSerial
 import com.zktony.www.R
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
+import com.zktony.www.common.audio.AudioPlayer
 import com.zktony.www.common.room.entity.LogData
 import com.zktony.www.common.room.entity.LogRecord
 import com.zktony.www.common.room.entity.Program
-import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.model.Event
 import com.zktony.www.data.model.SerialPort
 import com.zktony.www.data.repository.LogDataRepository
 import com.zktony.www.data.repository.LogRecordRepository
@@ -32,15 +27,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val dataStore: DataStore<Preferences>,
     private val programRepository: ProgramRepository,
     private val logRecordRepository: LogRecordRepository,
     private val logDataRepository: LogDataRepository
@@ -52,9 +44,6 @@ class HomeViewModel @Inject constructor(
 
     private var logDisposableX: Disposable? = null
     private var logDisposableY: Disposable? = null
-    var interval = 1
-    var duration = 10
-    var detect = true
 
 
     private val _errorMessage = MutableSharedFlow<String>()
@@ -62,33 +51,10 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            launch {
-                dataStore.data.map { preferences ->
-                    preferences[intPreferencesKey(Constants.INTERVAL)] ?: 1
-                }.collect {
-                    interval = it
-                }
-            }
-            launch {
-                dataStore.data.map { preferences ->
-                    preferences[intPreferencesKey(Constants.DURATION)] ?: 10
-                }.collect {
-                    duration = it
-                }
-            }
-            launch {
-                dataStore.data.map { preferences ->
-                    preferences[booleanPreferencesKey(Constants.DETECT)] ?: true
-                }.collect {
-                    detect = it
-                }
-            }
-            launch {
-                delay(200L)
-                while (true) {
-                    delay(1000L)
-                    COMSerial.instance.sendHex(SerialPort.TTYS4.device, Cmd.QUERY_HEX)
-                }
+            delay(200L)
+            while (true) {
+                delay(1000L)
+                COMSerial.instance.sendHex(SerialPort.TTYS4.device, Cmd.QUERY_HEX)
             }
         }
     }
@@ -169,7 +135,7 @@ class HomeViewModel @Inject constructor(
 
                     override fun onNext(aLong: Long) {
                         var data = LogData().copy(logId = logRecord.id, time = (aLong * 5).toInt())
-                        val recCmd = appViewModel.latestReceiveCmd
+                        val recCmd = appViewModel.received.value
                         data = if (module == X) {
                             data.copy(
                                 motor = recCmd.stepMotorX,
@@ -211,19 +177,6 @@ class HomeViewModel @Inject constructor(
             logDataRepository.deleteByDate()
             logDataRepository.deleteDataLessThanTen()
             logRecordRepository.deleteInvalidedLog()
-            Observable.timer(2, TimeUnit.SECONDS)
-                .subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
-                .subscribe(object : Observer<Long> {
-                    override fun onSubscribe(d: Disposable) {}
-                    override fun onNext(aLong: Long) {
-                        EventBus.getDefault().post(Event(Constants.BLANK, Constants.UPDATE_LOG))
-                    }
-
-                    override fun onError(e: Throwable) {}
-                    override fun onComplete() {}
-                })
-
         }
     }
 
@@ -233,18 +186,29 @@ class HomeViewModel @Inject constructor(
     fun setSentinel() {
         viewModelScope.launch {
             delay(5500)
-            val cmd = appViewModel.latestReceiveCmd
+            val cmd = appViewModel.received.value
             if (cmd.powerENX == 1 && cmd.getCurrentX < 0.1 && cmd.powerENY == 0) {
                 _errorMessage.emit("模块A异常，请检查！！！")
-                EventBus.getDefault().post(Event(Constants.AUDIO_ID, R.raw.error))
+                playAudio(R.raw.error)
             }
             if (cmd.powerENY == 1 && cmd.getCurrentY < 0.1 && cmd.powerENX == 0) {
                 _errorMessage.emit("模块B异常，请检查！！！")
-                EventBus.getDefault().post(Event(Constants.AUDIO_ID, R.raw.error))
+                playAudio(R.raw.error)
             }
             if (cmd.powerENX == 1 && cmd.getCurrentX < 0.1 && cmd.powerENY == 1 && cmd.getCurrentY < 0.1) {
                 _errorMessage.emit("模块A、B异常，请检查！！！")
-                EventBus.getDefault().post(Event(Constants.AUDIO_ID, R.raw.error))
+                playAudio(R.raw.error)
+            }
+        }
+    }
+
+    /**
+     * 播放音频
+     */
+    fun playAudio(id: Int) {
+        viewModelScope.launch {
+            if (appViewModel.setting.value.audio) {
+                AudioPlayer.instance.play(id)
             }
         }
     }

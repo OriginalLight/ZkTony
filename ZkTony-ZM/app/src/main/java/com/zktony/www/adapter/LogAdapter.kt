@@ -10,10 +10,7 @@ import com.zktony.www.R
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.simpleDateFormat
 import com.zktony.www.common.room.entity.LogRecord
-import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.model.Event
 import com.zktony.www.databinding.ItemLogBinding
-import org.greenrobot.eventbus.EventBus
 
 /**
  * @author: 刘贺贺
@@ -22,10 +19,15 @@ import org.greenrobot.eventbus.EventBus
 class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback()) {
     var isClick = false
     var currentPosition = -1
+    private lateinit var onClick: () -> Unit
 
     private fun setCurrentPosition(isClick: Boolean, position: Int) {
         this.isClick = isClick
         this.currentPosition = position
+    }
+
+    fun setOnClick(onClick: () -> Unit) {
+        this.onClick = onClick
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -39,7 +41,7 @@ class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback
                     holder.bindingAdapterPosition
                 )
             }
-            EventBus.getDefault().post(Event(Constants.BLANK, Constants.LOG_CLICK))
+            onClick.invoke()
             notifyDataSetChanged()
         }
     }

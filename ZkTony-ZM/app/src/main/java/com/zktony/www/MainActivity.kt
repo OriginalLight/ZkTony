@@ -1,34 +1,16 @@
 package com.zktony.www
 
 import android.os.Bundle
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.lifecycle.lifecycleScope
-import com.zktony.serialport.COMSerial
-import com.zktony.serialport.listener.OnComDataListener
 import com.zktony.www.base.BaseActivity
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.app.AppEvent
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.audio.AudioPlayer
-import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.worker.WorkerManager
-import com.zktony.www.data.model.Event
-import com.zktony.www.data.model.SerialPort.TTYS4
 import com.zktony.www.databinding.ActivityMainBinding
 import com.zktony.www.ui.admin.AdminFragment
 import com.zktony.www.ui.home.HomeFragment
-import com.zktony.www.ui.home.model.Cmd
 import com.zktony.www.ui.log.LogFragment
 import com.zktony.www.ui.program.ProgramFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -48,11 +30,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     private var activeFragmentIndex = -1
 
     @Inject
-    lateinit var dataStore: DataStore<Preferences>
-
-    @Inject
     lateinit var appViewModel: AppViewModel
-    private var audio = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,15 +42,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             it.isChecked = true
             true
         }
-        initView()
+        WorkerManager.instance.createWorker()
     }
 
-    private fun initView() {
-        EventBus.getDefault().register(this)
-        WorkerManager.instance.createWorker()
-        initSerialPort()
-        initSettings()
-    }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
@@ -133,56 +105,4 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         switchFragment(0)
         binding.navView.menu.findItem(R.id.navigation_home).isChecked = true
     }
-
-    /**
-     * 初始化设置
-     */
-    private fun initSettings() {
-        lifecycleScope.launch {
-            dataStore.data.map { preferences ->
-                preferences[booleanPreferencesKey(Constants.AUDIO)] ?: true
-            }.distinctUntilChanged().collect {
-                audio = it
-            }
-        }
-    }
-
-    /**
-     * 初始化串口
-     * 当前项目使用TTYS4
-     */
-    private fun initSerialPort() {
-        lifecycleScope.launch {
-            COMSerial.instance.addCOM(TTYS4.device, 115200)
-            COMSerial.instance.addDataListener(object : OnComDataListener {
-                override fun comDataBack(com: String, hexData: String) {
-                    val cmd = Cmd(hexData)
-                    if (cmd.cmd == 2) {
-                        appViewModel.receiveCmd(cmd)
-                    }
-                }
-            })
-            appViewModel.event.collect {
-                when (it) {
-                    is AppEvent.SendCmd -> {
-                        COMSerial.instance.sendHex(TTYS4.device, it.cmd.genHex())
-                    }
-                    else -> {}
-                }
-            }
-        }
-    }
-
-    /**
-     * 使用EventBus来线程间通信
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onGetMessage(event: Event<String, Int>) {
-        if (Constants.AUDIO_ID == event.type && audio) {
-            lifecycleScope.launch {
-                AudioPlayer.instance.play(this@MainActivity, event.message)
-            }
-        }
-    }
-
 }

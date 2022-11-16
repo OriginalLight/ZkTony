@@ -13,15 +13,10 @@ import com.zktony.www.common.extension.addSuffix
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.room.entity.Program
-import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.model.Event
 import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 
 @AndroidEntryPoint
 class ProgramFragment :
@@ -34,7 +29,6 @@ class ProgramFragment :
     private var programList: List<Program> = arrayListOf()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        EventBus.getDefault().register(this)
         binding.con3.visibility = View.GONE
         binding.btn1.visibility = View.GONE
         initRadioGroup()
@@ -44,19 +38,18 @@ class ProgramFragment :
         initObserver()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        EventBus.getDefault().unregister(this)
-    }
 
     /**
      * 初始化循环列表
      */
     private fun initRecyclerView() {
         binding.rc1.adapter = programAdapter
+        programAdapter.setOnClick { refreshEditButton() }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    /**
+     * 初始化观察者
+     */
     private fun initObserver() {
         lifecycleScope.launch {
             viewModel.event.distinctUntilChanged().collect {
@@ -449,13 +442,4 @@ class ProgramFragment :
         }
     }
 
-    /**
-     * 使用EventBus来线程间通信
-     */
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onGetMessage(event: Event<String, String>) {
-        if (Constants.PROGRAM_CLICK == event.message) {
-            refreshEditButton()
-        }
-    }
 }

@@ -9,10 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.R
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.room.entity.Program
-import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.model.Event
 import com.zktony.www.databinding.ItemProgramBinding
-import org.greenrobot.eventbus.EventBus
 
 /**
  * @author: 刘贺贺
@@ -21,10 +18,15 @@ import org.greenrobot.eventbus.EventBus
 class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDiffCallback()) {
     var isClick = false
     var currentPosition = -1
+    private lateinit var onClick: () -> Unit
 
     private fun setCurrentPosition(isClick: Boolean, position: Int) {
         this.isClick = isClick
         this.currentPosition = position
+    }
+
+    fun setOnClick(onClick: () -> Unit) {
+        this.onClick = onClick
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -38,7 +40,7 @@ class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDi
                     holder.bindingAdapterPosition
                 )
             }
-            EventBus.getDefault().post(Event(Constants.BLANK, Constants.PROGRAM_CLICK))
+            onClick.invoke()
             notifyDataSetChanged()
         }
     }

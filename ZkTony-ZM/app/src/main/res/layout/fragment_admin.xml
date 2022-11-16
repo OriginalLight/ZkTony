@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data></data>
+    <data/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -74,7 +74,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <EditText
-                        android:id="@+id/et_1"
+                        android:id="@+id/interval"
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
@@ -124,7 +124,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <EditText
-                        android:id="@+id/et_2"
+                        android:id="@+id/duration"
                         android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
@@ -174,7 +174,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/sw_1"
+                        android:id="@+id/navigation_bar"
                         android:layout_width="50dp"
                         android:layout_height="36dp"
                         android:layout_marginEnd="35dp"
@@ -226,7 +226,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/sw_2"
+                        android:id="@+id/audio"
                         android:layout_width="50dp"
                         android:layout_height="36dp"
                         android:layout_marginEnd="35dp"
@@ -278,7 +278,7 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/sw_3"
+                        android:id="@+id/detet"
                         android:layout_width="50dp"
                         android:layout_height="36dp"
                         android:layout_marginEnd="35dp"
@@ -447,7 +447,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageButton
-                        android:id="@+id/ib_1"
+                        android:id="@+id/reset"
                         android:layout_width="96dp"
                         android:layout_height="96dp"
                         android:background="@mipmap/ic_reset"
@@ -479,7 +479,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageButton
-                        android:id="@+id/ib_2"
+                        android:id="@+id/pump"
                         android:layout_width="96dp"
                         android:layout_height="96dp"
                         android:layout_marginTop="4dp"
@@ -514,7 +514,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageButton
-                        android:id="@+id/ib_3"
+                        android:id="@+id/wifi"
                         android:layout_width="96dp"
                         android:layout_height="96dp"
                         android:background="@mipmap/ic_wifi"
@@ -547,7 +547,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageButton
-                        android:id="@+id/ib_4"
+                        android:id="@+id/update"
                         android:layout_width="96dp"
                         android:layout_height="96dp"
                         android:background="@mipmap/ic_update"
