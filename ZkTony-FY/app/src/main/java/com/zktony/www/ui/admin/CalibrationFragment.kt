@@ -60,9 +60,6 @@ class CalibrationFragment :
                     true
                 }
             }
-            btnTestWasteTankUp.setOnClickListener {
-                viewModel.wasteTankNeedleUp()
-            }
             btnTestWashTankMove.setOnClickListener {
                 viewModel.toWashTank()
             }
@@ -74,9 +71,6 @@ class CalibrationFragment :
                     viewModel.washTankNeedleDown()
                     true
                 }
-            }
-            btnTestWashTankUp.setOnClickListener {
-                viewModel.washTankNeedleUp()
             }
             btnTestBlockingLiquidTankMove.setOnClickListener {
                 viewModel.toBlockingLiquidTank()
@@ -90,9 +84,6 @@ class CalibrationFragment :
                     true
                 }
             }
-            btnTestBlockingLiquidTankUp.setOnClickListener {
-                viewModel.blockingLiquidTankNeedleUp()
-            }
             btnTestAntibodyOneTankMove.setOnClickListener {
                 viewModel.toAntibodyOneTank()
             }
@@ -105,9 +96,6 @@ class CalibrationFragment :
                     true
                 }
             }
-            btnTestAntibodyOneTankUp.setOnClickListener {
-                viewModel.antibodyOneTankNeedleUp()
-            }
             btnTestAntibodyTwoTankMove.setOnClickListener {
                 viewModel.toAntibodyTwoTank()
             }
@@ -119,9 +107,6 @@ class CalibrationFragment :
                     viewModel.antibodyTwoTankNeedleDown()
                     true
                 }
-            }
-            btnTestAntibodyTwoTankUp.setOnClickListener {
-                viewModel.antibodyTwoTankNeedleUp()
             }
             btnTestZeroMove.setOnClickListener {
                 viewModel.toZeroPosition()
