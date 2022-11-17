@@ -12,6 +12,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺
@@ -56,6 +58,11 @@ class ActionActuator private constructor(
             initModule(this@ActionActuator.module)
             initSettingState(this@ActionActuator.settingState)
             initAction(action)
+            scope.launch {
+                wait.collect {
+                    _state.emit(ActionEvent.Wait(module, it))
+                }
+            }
             addBlockingLiquid {
                 countDown((action.time * 60 * 60).toLong(), {
                     _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
@@ -77,6 +84,11 @@ class ActionActuator private constructor(
             initModule(this@ActionActuator.module)
             initSettingState(this@ActionActuator.settingState)
             initAction(action)
+            scope.launch {
+                wait.collect {
+                    _state.emit(ActionEvent.Wait(module, it))
+                }
+            }
             addAntibodyOne {
                 countDown((action.time * 60 * 60).toLong(), {
                     _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
@@ -97,6 +109,11 @@ class ActionActuator private constructor(
             initModule(this@ActionActuator.module)
             initSettingState(this@ActionActuator.settingState)
             initAction(action)
+            scope.launch {
+                wait.collect {
+                    _state.emit(ActionEvent.Wait(module, it))
+                }
+            }
             addAntibodyTwo {
                 countDown((action.time * 60 * 60).toLong(), {
                     _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
@@ -117,17 +134,23 @@ class ActionActuator private constructor(
             initModule(module)
             initSettingState(settingState)
             initAction(action)
+            scope.launch {
+                wait.collect {
+                    _state.emit(ActionEvent.Wait(module, it))
+                }
+            }
             _state.emit(ActionEvent.Count(module, action.count - count + 1))
             addWashingLiquid {
                 countDown((action.time * 60).toLong(), {
                     _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
                 },
                     {
-                        wasteLiquid { }
-                        if (count - 1 > 0) {
-                            executeWashing(action, count - 1)
-                        } else {
-                            executeNext()
+                        wasteLiquid {
+                            if (count - 1 > 0) {
+                                executeWashing(action, count - 1)
+                            } else {
+                                executeNext()
+                            }
                         }
                     })
             }
@@ -196,4 +219,5 @@ sealed class ActionEvent {
     data class CurrentActionTime(val module: ModuleEnum, val time: String) : ActionEvent()
     data class Finish(val module: ModuleEnum) : ActionEvent()
     data class Count(val module: ModuleEnum, val count: Int) : ActionEvent()
+    data class Wait(val module: ModuleEnum, val msg: String) : ActionEvent()
 }

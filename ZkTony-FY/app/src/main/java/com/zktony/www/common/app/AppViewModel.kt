@@ -14,7 +14,6 @@ import com.zktony.www.common.room.entity.PumpMotor
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.repository.RoomRepository
 import com.zktony.www.serialport.SerialPort
-import com.zktony.www.serialport.SerialPortManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,9 +61,6 @@ class AppViewModel @Inject constructor(
                 roomRepository.getCalibrationRepository().getCalibration().collect {
                     loadCalibration(it)
                 }
-            }
-            launch {
-                SerialPortManager.instance.queueActuator()
             }
         }
     }

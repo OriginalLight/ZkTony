@@ -3,6 +3,7 @@ package com.zktony.www.ui.home
 import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
+import com.zktony.www.R
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.extractTemp
@@ -118,24 +119,32 @@ class HomeViewModel @Inject constructor(
                     _aState.value = _aState.value.copy(
                         program = _programList.value[index],
                         btnStartEnable = _programList.value[index].actionCount > 0,
+                        runtimeText = "已就绪",
+                        countDownText = "00:00:00",
                     )
                 }
                 B -> {
                     _bState.value = _bState.value.copy(
                         program = _programList.value[index],
                         btnStartEnable = _programList.value[index].actionCount > 0,
+                        runtimeText = "已就绪",
+                        countDownText = "00:00:00",
                     )
                 }
                 C -> {
                     _cState.value = _cState.value.copy(
                         program = _programList.value[index],
                         btnStartEnable = _programList.value[index].actionCount > 0,
+                        runtimeText = "已就绪",
+                        countDownText = "00:00:00",
                     )
                 }
                 D -> {
                     _dState.value = _dState.value.copy(
                         program = _programList.value[index],
                         btnStartEnable = _programList.value[index].actionCount > 0,
+                        runtimeText = "已就绪",
+                        countDownText = "00:00:00",
                     )
                 }
             }
@@ -195,7 +204,6 @@ class HomeViewModel @Inject constructor(
      */
     fun stop(module: ModuleEnum) {
         viewModelScope.launch {
-            serial.setModuleRunning(module, false)
             when (module) {
                 A -> {
                     _aState.value.job?.let { if (it.isActive) it.cancel() }
@@ -207,8 +215,8 @@ class HomeViewModel @Inject constructor(
                         btnStartVisible = View.VISIBLE,
                         btnStopVisible = View.GONE,
                         btnSelectorEnable = true,
+                        runtimeText = "已就绪",
                         currentActionText = "/",
-                        tempText = "0.0℃",
                         countDownText = "00:00:00",
                     )
                 }
@@ -222,8 +230,8 @@ class HomeViewModel @Inject constructor(
                         btnStartVisible = View.VISIBLE,
                         btnStopVisible = View.GONE,
                         btnSelectorEnable = true,
+                        runtimeText = "已就绪",
                         currentActionText = "/",
-                        tempText = "0.0℃",
                         countDownText = "00:00:00",
                     )
                 }
@@ -237,8 +245,8 @@ class HomeViewModel @Inject constructor(
                         btnStartVisible = View.VISIBLE,
                         btnStopVisible = View.GONE,
                         btnSelectorEnable = true,
+                        runtimeText = "已就绪",
                         currentActionText = "/",
-                        tempText = "0.0℃",
                         countDownText = "00:00:00",
                     )
                 }
@@ -252,15 +260,15 @@ class HomeViewModel @Inject constructor(
                         btnStartVisible = View.VISIBLE,
                         btnStopVisible = View.GONE,
                         btnSelectorEnable = true,
+                        runtimeText = "已就绪",
                         currentActionText = "/",
-                        tempText = "0.0℃",
                         countDownText = "00:00:00",
                     )
                 }
             }
-            if (_aState.value.job == null && _bState.value.job == null && _cState.value.job == null && _dState.value.job == null) {
+            delay(200L)
+            if (serial.getExecuting() == 0) {
                 serial.sendHex(SERIAL_ONE, Command.pauseShakeBed())
-                serial.queue.clear()
             }
         }
     }
@@ -269,16 +277,20 @@ class HomeViewModel @Inject constructor(
      * 复位
      */
     fun reset() {
-        serial.queue.clear()
-        serial.sendHex(
-            SERIAL_ONE,
-            Command(function = "05", parameter = "01", data = "0101302C302C302C302C").toHex()
-        )
-        serial.sendHex(SERIAL_ONE, Command().toHex())
-        stop(A)
-        stop(B)
-        stop(C)
-        stop(D)
+        if (serial.getExecuting() == 0) {
+            serial.sendHex(
+                SERIAL_ONE,
+                Command(function = "05", parameter = "01", data = "0101302C302C302C302C").toHex()
+            )
+            serial.sendHex(SERIAL_ONE, Command().toHex())
+            PopTip.show(R.mipmap.ic_reset, "复位-已下发")
+            stop(A)
+            stop(B)
+            stop(C)
+            stop(D)
+        } else {
+            PopTip.show("请中止所有运行中程序")
+        }
     }
 
     /**
@@ -343,7 +355,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-
     /**
      * 复位反馈
      * @param command [Command] 命令
@@ -370,7 +381,7 @@ class HomeViewModel @Inject constructor(
                     btnStartEnable = programList.first().actionCount > 0
                 )
             } else {
-                if (!programList.contains(_aState.value.program)) {
+                if (programList.find { it.id == _aState.value.program!!.id } == null) {
                     _aState.value = _aState.value.copy(
                         program = programList.first(),
                         btnStartEnable = programList.first().actionCount > 0
@@ -387,7 +398,7 @@ class HomeViewModel @Inject constructor(
                     btnStartEnable = programList.first().actionCount > 0
                 )
             } else {
-                if (!programList.contains(_bState.value.program)) {
+                if (programList.find { it.id == _bState.value.program!!.id } == null) {
                     _bState.value = _bState.value.copy(
                         program = programList.first(),
                         btnStartEnable = programList.first().actionCount > 0
@@ -404,7 +415,7 @@ class HomeViewModel @Inject constructor(
                     btnStartEnable = programList.first().actionCount > 0
                 )
             } else {
-                if (!programList.contains(_cState.value.program)) {
+                if (programList.find { it.id == _cState.value.program!!.id } == null) {
                     _cState.value = _cState.value.copy(
                         program = programList.first(),
                         btnStartEnable = programList.first().actionCount > 0
@@ -421,7 +432,7 @@ class HomeViewModel @Inject constructor(
                     btnStartEnable = programList.first().actionCount > 0
                 )
             } else {
-                if (!programList.contains(_dState.value.program)) {
+                if (programList.find { it.id == _dState.value.program!!.id } == null) {
                     _dState.value = _dState.value.copy(
                         program = programList.first(),
                         btnStartEnable = programList.first().actionCount > 0
@@ -446,8 +457,6 @@ class HomeViewModel @Inject constructor(
      * @param program [Program] 程序
      */
     private fun runProgram(module: ModuleEnum, program: Program) {
-        serial.setModuleRunning(module, true)
-
         val job = viewModelScope.launch {
             val actionQueue = Queue<Action>()
             actionRepository.getByProgramId(program.id).first().forEach {
@@ -564,6 +573,7 @@ class HomeViewModel @Inject constructor(
                                 }
                                 _aState.value = _aState.value.copy(
                                     runtimeText = "已完成",
+                                    countDownText = "已完成",
                                     log = null
                                 )
                             }
@@ -573,6 +583,7 @@ class HomeViewModel @Inject constructor(
                                 }
                                 _bState.value = _bState.value.copy(
                                     runtimeText = "已完成",
+                                    countDownText = "已完成",
                                     log = null
                                 )
                             }
@@ -582,6 +593,7 @@ class HomeViewModel @Inject constructor(
                                 }
                                 _cState.value = _cState.value.copy(
                                     runtimeText = "已完成",
+                                    countDownText = "已完成",
                                     log = null
                                 )
                             }
@@ -591,6 +603,7 @@ class HomeViewModel @Inject constructor(
                                 }
                                 _dState.value = _dState.value.copy(
                                     runtimeText = "已完成",
+                                    countDownText = "已完成",
                                     log = null
                                 )
                             }
@@ -631,6 +644,14 @@ class HomeViewModel @Inject constructor(
                                     )
                                             + " X${it.count}"
                                 )
+                        }
+                    }
+                    is ActionEvent.Wait -> {
+                        when (it.module) {
+                            A -> _aState.value = _aState.value.copy(countDownText = it.msg)
+                            B -> _bState.value = _bState.value.copy(countDownText = it.msg)
+                            C -> _cState.value = _cState.value.copy(countDownText = it.msg)
+                            D -> _dState.value = _dState.value.copy(countDownText = it.msg)
                         }
                     }
                 }
