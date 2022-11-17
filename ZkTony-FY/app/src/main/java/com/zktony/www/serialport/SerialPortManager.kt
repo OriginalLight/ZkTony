@@ -2,16 +2,10 @@ package com.zktony.www.serialport
 
 import com.zktony.serialport.COMSerial
 import com.zktony.serialport.listener.OnComDataListener
-import com.zktony.www.common.extension.hexFormat
-import com.zktony.www.common.extension.hexToAscii
-import com.zktony.www.common.extension.verifyHex
-import com.zktony.www.common.model.Queue
+import com.zktony.www.common.extension.*
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.serialport.SerialPort.*
 import com.zktony.www.serialport.protocol.Command
-import com.zktony.www.serialport.protocol.CommandBlock
-import com.zktony.www.ui.home.ModuleEnum
-import com.zktony.www.ui.home.ModuleEnum.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,14 +16,6 @@ import kotlinx.coroutines.launch
 class SerialPortManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
-
-    val queue = Queue<List<CommandBlock>>()
-
-    private var runningOne = false
-    private var runningTwo = false
-    private var runningThree = false
-    private var runningFour = false
-
     private val _responseOne = MutableStateFlow<String?>(null)
     private val _responseTwo = MutableStateFlow<String?>(null)
     private val _responseThree = MutableStateFlow<String?>(null)
@@ -39,6 +25,12 @@ class SerialPortManager(
     val responseTwo = _responseTwo.asStateFlow()
     val responseThree = _responseThree.asStateFlow()
     val responseFour = _responseFour.asStateFlow()
+
+    // 机构运行状态
+    private var running = false
+    private var runtime = 0L
+    // 正在执行的个数
+    private var executing = 0
 
     init {
         scope.launch {
@@ -72,11 +64,56 @@ class SerialPortManager(
                             }
                             SERIAL_FOUR.device -> {
                                 _responseFour.value = hexData.hexToAscii()
-                                Logger.d(msg = "串口四 receivedText: ${hexData.hexFormat()}")
+                                //Logger.d(msg = "串口四 receivedText: ${hexData.hexToAscii()}")
                             }
                         }
                     }
                 })
+            }
+            launch {
+                responseOne.collect {
+                    it?.let {
+                        val res = it.toCommand()
+                        if(res.function == "85" && res.parameter == "01") {
+                            val total = res.data.substring(2, 4).hexToInt8()
+                            val current = res.data.substring(6, 8).hexToInt8()
+                            if (total == current) {
+                                running = false
+                                runtime = 0L
+                                // 如果还有任务运行恢复摇床
+                                if (executing > 0) {
+                                    Logger.d(msg = "摇床恢复")
+                                    sendHex(SERIAL_ONE, Command.resumeShakeBed())
+                                }
+                            } else {
+                                running = true
+                                runtime = 0L
+                            }
+                        }
+                    }
+                }
+            }
+            launch {
+                while (true) {
+                    delay(1000L)
+                    Logger.d(msg = "running: $running, runtime: $runtime, executing: $executing")
+                    // 如果正在运行，计时 否则清零
+                    if (running) {
+                        runtime += 1L
+                    } else {
+                        runtime = 0L
+                    }
+                    // 如果运行时间超过 60 秒，默认不运行，如果还有任务运行恢复摇床
+                    if (running && runtime >= 60L) {
+                        runtime = 0L
+                        running = false
+                        // 恢复摇床
+                        if (executing > 0) {
+                            Logger.d(msg = "恢复摇床")
+                            sendHex(SERIAL_ONE, Command.resumeShakeBed())
+                        }
+                    }
+                }
             }
         }
     }
@@ -84,110 +121,45 @@ class SerialPortManager(
     /**
      * 发送Hex
      * @param serialPort 串口
-     * @param command 命令
+     * @param hex 命令
      */
-    fun sendHex(serialPort: SerialPort, command: String) {
+    fun sendHex(serialPort: SerialPort, hex: String) {
         scope.launch {
-            COMSerial.instance.sendHex(serialPort.device, command)
-            Logger.e(msg = "${serialPort.value} sendHex: ${command.hexFormat()}")
+            COMSerial.instance.sendHex(serialPort.device, hex)
+            Logger.e(msg = "${serialPort.value} sendHex: ${hex.hexFormat()}")
         }
     }
 
     /**
      * 发送Text
      * @param serialPort 串口
-     * @param command 命令
+     * @param text 命令
      */
-    fun sendText(serialPort: SerialPort, command: String) {
+    fun sendText(serialPort: SerialPort, text: String) {
         scope.launch {
-            COMSerial.instance.sendText(serialPort.device, command)
-            Logger.e(msg = "${serialPort.value} sendText: $command")
+            COMSerial.instance.sendText(serialPort.device, text)
+            //Logger.e(msg = "${serialPort.value} sendText: $text")
         }
     }
 
-    /**
-     * 命令队列执行
-     */
-    suspend fun queueActuator() {
-        queue.peek()?.let {
+    fun isRunning() = running
+
+    fun run(run : Boolean) {
+        running = run
+        if (run) {
             sendHex(SERIAL_ONE, Command.pauseShakeBed())
-            it.forEach { block ->
-                when (block) {
-                    is CommandBlock.Hex -> {
-                        if (isModuleRunning(block.module)) {
-                            sendHex(block.serialPort, block.hex)
-                        }
-                    }
-                    is CommandBlock.Text -> {
-                        if (isModuleRunning(block.module)) {
-                            sendText(block.serialPort, block.text)
-                        }
-                    }
-                    is CommandBlock.Delay -> {
-                        if (isModuleRunning(block.module)) {
-                            Logger.e(msg = "delay: ${block.delay} ms")
-                            delay(block.delay)
-                        }
-                    }
-                }
-            }
-            if (!queue.isEmpty() && queue.peek() == it) {
-                queue.dequeue()
-            }
-            if (queue.isEmpty() && (runningOne || runningTwo || runningThree || runningFour)) {
-                sendHex(SERIAL_ONE, Command.resumeShakeBed())
-            }
-        }
-        if (queue.isEmpty()) {
-            delay(1000L)
-            queueActuator()
-        } else {
-            queueActuator()
         }
     }
 
     /**
-     * 等待命令块执行完成
-     * @param block 命令块
-     * @return Boolean
+     * 设置正在执行的个数
+     * @param count 个数
      */
-    fun checkQueueExistBlock(block: List<CommandBlock>): Boolean {
-        return queue.contains(block)
+    fun setExecuting(count: Int) {
+        executing = count
     }
 
-    /**
-     * 判断模块是否在运行
-     * @param module 模块
-     */
-    private fun isModuleRunning(module: ModuleEnum): Boolean {
-        return when (module) {
-            A -> runningOne
-            B -> runningTwo
-            C -> runningThree
-            D -> runningFour
-        }
-    }
-
-    /**
-     * 设置模块运行状态
-     * @param module 模块
-     * @param running 运行状态
-     */
-    fun setModuleRunning(module: ModuleEnum, running: Boolean) {
-        when (module) {
-            A -> runningOne = running
-            B -> runningTwo = running
-            C -> runningThree = running
-            D -> runningFour = running
-        }
-        queue.getQueue().forEach { block ->
-            block.find { it is CommandBlock.Hex && it.module == module }?.let {
-                if (!running) {
-                    queue.remove(block)
-                }
-            }
-        }
-    }
+    fun getExecuting() = executing
 
     companion object {
         @JvmStatic

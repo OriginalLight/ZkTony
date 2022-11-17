@@ -13,7 +13,9 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.removeZero
+import com.zktony.www.common.utils.Logger
 import com.zktony.www.databinding.FragmentHomeBinding
+import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.ui.home.ModuleEnum.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -46,6 +48,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             launch {
                 viewModel.bState.collect {
                     moduleStateChange(B, it)
+                    Logger.e(msg = it.countDownText)
                 }
             }
             launch {
@@ -164,7 +167,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     PopTip.show(R.mipmap.ic_reset, "长按复位")
                 }
                 setOnLongClickListener {
-                    PopTip.show(R.mipmap.ic_reset, "复位-已下发")
                     this@HomeFragment.viewModel.reset()
                     true
                 }
@@ -200,6 +202,22 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param state 状态
      */
     private fun moduleStateChange(module: ModuleEnum, state: ModuleState) {
+        // 正在执行的个数等于job不为null的个数
+        var runningCount = 0
+        if (viewModel.aState.value.job != null) {
+            runningCount++
+        }
+        if (viewModel.bState.value.job != null) {
+            runningCount++
+        }
+        if (viewModel.cState.value.job != null) {
+            runningCount++
+        }
+        if (viewModel.dState.value.job != null) {
+            runningCount++
+        }
+        SerialPortManager.instance.setExecuting(runningCount)
+
         when (module) {
             A -> {
                 with(binding.a) {
