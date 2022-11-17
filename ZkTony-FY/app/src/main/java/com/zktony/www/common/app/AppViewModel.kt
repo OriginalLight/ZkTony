@@ -64,7 +64,7 @@ class AppViewModel @Inject constructor(
                 }
             }
             launch {
-                SerialPortManager.instance.commandQueueActuator()
+                SerialPortManager.instance.queueActuator()
             }
         }
     }

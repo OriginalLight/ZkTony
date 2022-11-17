@@ -23,7 +23,7 @@ class SerialPortManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
 
-    val commandQueue = Queue<List<CommandBlock>>()
+    val queue = Queue<List<CommandBlock>>()
 
     private var runningOne = false
     private var runningTwo = false
@@ -108,8 +108,8 @@ class SerialPortManager(
     /**
      * 命令队列执行
      */
-    suspend fun commandQueueActuator() {
-        commandQueue.peek()?.let {
+    suspend fun queueActuator() {
+        queue.peek()?.let {
             sendHex(SERIAL_ONE, Command.pauseShakeBed())
             it.forEach { block ->
                 when (block) {
@@ -131,18 +131,18 @@ class SerialPortManager(
                     }
                 }
             }
-            if (!commandQueue.isEmpty() && commandQueue.peek() == it) {
-                commandQueue.dequeue()
+            if (!queue.isEmpty() && queue.peek() == it) {
+                queue.dequeue()
             }
-            if (commandQueue.isEmpty() && (runningOne || runningTwo || runningThree || runningFour)) {
+            if (queue.isEmpty() && (runningOne || runningTwo || runningThree || runningFour)) {
                 sendHex(SERIAL_ONE, Command.resumeShakeBed())
             }
         }
-        if (commandQueue.isEmpty()) {
+        if (queue.isEmpty()) {
             delay(1000L)
-            commandQueueActuator()
+            queueActuator()
         } else {
-            commandQueueActuator()
+            queueActuator()
         }
     }
 
@@ -152,7 +152,7 @@ class SerialPortManager(
      * @return Boolean
      */
     fun checkQueueExistBlock(block: List<CommandBlock>): Boolean {
-        return commandQueue.contains(block)
+        return queue.contains(block)
     }
 
     /**
@@ -180,10 +180,10 @@ class SerialPortManager(
             C -> runningThree = running
             D -> runningFour = running
         }
-        commandQueue.getQueue().forEach { block ->
+        queue.getQueue().forEach { block ->
             block.find { it is CommandBlock.Hex && it.module == module }?.let {
                 if (!running) {
-                    commandQueue.remove(block)
+                    queue.remove(block)
                 }
             }
         }

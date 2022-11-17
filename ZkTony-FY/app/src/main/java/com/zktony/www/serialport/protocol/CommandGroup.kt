@@ -1,6 +1,7 @@
 package com.zktony.www.serialport.protocol
 
 import com.zktony.www.common.app.SettingState
+import com.zktony.www.common.extension.toCommand
 import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.MotionMotor
@@ -11,21 +12,35 @@ import com.zktony.www.serialport.SerialPort.*
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.ui.home.ModuleEnum
 import com.zktony.www.ui.home.ModuleEnum.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺
  * @date: 2022-10-18 15:43
  */
-class CommandGroup {
+class CommandGroup(
+    scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+) {
 
-    private val serialPortManager = SerialPortManager.instance
+    private val serial = SerialPortManager.instance
     private lateinit var module: ModuleEnum
     private lateinit var settingState: SettingState
     private lateinit var action: Action
     private lateinit var motionMotor: MotionMotor
     private lateinit var pumpMotor: PumpMotor
     private lateinit var calibration: Calibration
+
+    val listener = scope.launch {
+        serial.responseOne.collect {
+            it?.let {
+                val response = it.toCommand()
+                when(response.)
+            }
+        }
+    }
 
     fun initModule(module: ModuleEnum) {
         this.module = module
@@ -42,7 +57,6 @@ class CommandGroup {
     fun initAction(action: Action) {
         this.action = action
     }
-
 
     /**
      * 添加封闭液
@@ -91,7 +105,7 @@ class CommandGroup {
                 ) + addLiquidDelay() + 5000
             )
         )
-        serialPortManager.commandQueue.enqueue(commandBlock)
+        serial.queue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "${module.value} 添加封闭液完成")
         block.invoke()
@@ -143,7 +157,7 @@ class CommandGroup {
                 ) + addLiquidDelay() + 5000
             )
         )
-        serialPortManager.commandQueue.enqueue(commandBlock)
+        serial.queue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "添加一抗完成")
         block.invoke()
@@ -197,7 +211,7 @@ class CommandGroup {
                 ) + addLiquidDelay() + 5000
             )
         )
-        serialPortManager.commandQueue.enqueue(commandBlock)
+        serial.queue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "${module.value} 回收一抗完成")
         block.invoke()
@@ -249,7 +263,7 @@ class CommandGroup {
                 ) + addLiquidDelay() + 5000
             )
         )
-        serialPortManager.commandQueue.enqueue(commandBlock)
+        serial.queue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "${module.value} 添加二抗完成")
         block.invoke()
@@ -302,7 +316,7 @@ class CommandGroup {
             )
 
         )
-        serialPortManager.commandQueue.enqueue(commandBlock)
+        serial.queue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "${module.value} 添加洗涤液完成")
         block.invoke()
@@ -356,7 +370,7 @@ class CommandGroup {
             )
 
         )
-        serialPortManager.commandQueue.enqueue(commandBlock)
+        serial.queue.enqueue(commandBlock)
         waitUntilComplete(commandBlock)
         Logger.d(msg = "回收到废液槽完成")
         block.invoke()
@@ -368,7 +382,7 @@ class CommandGroup {
      */
     private suspend fun waitUntilComplete(commandBlock: List<CommandBlock>, delay: Long = 1000L) {
         delay(1000L)
-        if (serialPortManager.checkQueueExistBlock(commandBlock)) {
+        if (serial.checkQueueExistBlock(commandBlock)) {
             waitUntilComplete(commandBlock)
         } else {
             delay(delay)
@@ -536,4 +550,9 @@ sealed class CommandBlock {
         CommandBlock()
 
     data class Delay(val module: ModuleEnum, val delay: Long) : CommandBlock()
+}
+
+sealed class SerialResponse {
+    data class Running(val current : Int, val total : Int) : SerialResponse()
+    object Complete : SerialResponse()
 }

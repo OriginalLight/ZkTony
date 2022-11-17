@@ -260,7 +260,7 @@ class HomeViewModel @Inject constructor(
             }
             if (_aState.value.job == null && _bState.value.job == null && _cState.value.job == null && _dState.value.job == null) {
                 serial.sendHex(SERIAL_ONE, Command.pauseShakeBed())
-                serial.commandQueue.clear()
+                serial.queue.clear()
             }
         }
     }
@@ -269,7 +269,7 @@ class HomeViewModel @Inject constructor(
      * 复位
      */
     fun reset() {
-        serial.commandQueue.clear()
+        serial.queue.clear()
         serial.sendHex(
             SERIAL_ONE,
             Command(function = "05", parameter = "01", data = "0101302C302C302C302C").toHex()
