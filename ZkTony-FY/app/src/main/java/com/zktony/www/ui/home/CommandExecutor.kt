@@ -1,14 +1,13 @@
-package com.zktony.www.serialport.protocol
+package com.zktony.www.ui.home
 
 import com.zktony.www.common.app.SettingState
 import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.MotionMotor
 import com.zktony.www.common.room.entity.PumpMotor
-import com.zktony.www.common.utils.Logger
 import com.zktony.www.serialport.SerialPort.*
 import com.zktony.www.serialport.SerialPortManager
-import com.zktony.www.ui.home.ModuleEnum
+import com.zktony.www.serialport.protocol.Command
 import com.zktony.www.ui.home.ModuleEnum.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
  * @author: 刘贺贺
  * @date: 2022-10-18 15:43
  */
-class CommandGroup {
+class CommandExecutor {
 
     private val serial = SerialPortManager.instance
     private lateinit var module: ModuleEnum
@@ -28,7 +27,7 @@ class CommandGroup {
     private lateinit var pumpMotor: PumpMotor
     private lateinit var calibration: Calibration
 
-    private val _wait = MutableStateFlow("等待中...")
+    private val _wait = MutableStateFlow("等待中")
     val wait = _wait.asStateFlow()
 
     fun initModule(module: ModuleEnum) {
@@ -52,8 +51,8 @@ class CommandGroup {
      * @param block
      */
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
-        waitForFree {
-            serial.run(true)
+        waitForFree("等待加液") {
+            serial.lock(true)
             // 设置温度
             serial.sendText(
                 serialPort = SERIAL_FOUR,
@@ -67,7 +66,8 @@ class CommandGroup {
                 serialPort = SERIAL_ONE,
                 hex = Command.multiPoint(
                     moveTo(
-                        calibration.blockingLiquidTankPosition, calibration.blockingLiquidTankHeight
+                        calibration.blockingLiquidTankPosition,
+                        calibration.blockingLiquidTankHeight
                     )
                 )
             )
@@ -89,8 +89,8 @@ class CommandGroup {
      * @param block
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
-        waitForFree {
-            serial.run(true)
+        waitForFree("等待加液") {
+            serial.lock(true)
             // 设置温度
             serial.sendText(
                 serialPort = SERIAL_FOUR,
@@ -104,7 +104,8 @@ class CommandGroup {
                 serialPort = SERIAL_ONE,
                 hex = Command.multiPoint(
                     moveTo(
-                        calibration.antibodyOneTankPosition, calibration.antibodyOneTankHeight
+                        calibration.antibodyOneTankPosition,
+                        calibration.antibodyOneTankHeight
                     )
                 )
             )
@@ -126,8 +127,8 @@ class CommandGroup {
      * @param block
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
-        waitForFree {
-            serial.run(true)
+        waitForFree("等待回收") {
+            serial.lock(true)
             // 主板运动
             serial.sendHex(
                 serialPort = SERIAL_ONE,
@@ -156,8 +157,8 @@ class CommandGroup {
      * @param block
      */
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
-        waitForFree {
-            serial.run(true)
+        waitForFree("等待加液") {
+            serial.lock(true)
             // 设置温度
             serial.sendText(
                 serialPort = SERIAL_FOUR,
@@ -194,8 +195,8 @@ class CommandGroup {
      * @param block
      */
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
-        waitForFree {
-            serial.run(true)
+        waitForFree("等待加液") {
+            serial.lock(true)
             // 设置温度
             serial.sendText(
                 serialPort = SERIAL_FOUR,
@@ -233,8 +234,8 @@ class CommandGroup {
      * @param block
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
-        waitForFree {
-            serial.run(true)
+        waitForFree("等待清理") {
+            serial.lock(true)
             // 主板运动
             serial.sendHex(
                 serialPort = SERIAL_ONE,
@@ -274,58 +275,23 @@ class CommandGroup {
      */
     private fun addLiquid(): List<String> {
         val zero = "0,0,0,"
-        val list = mutableListOf<String>()
-        when (module) {
-            A -> {
-                val stepOne = pumpMotor.toPumpHex(
-                    one = action.liquidVolume,
-                    five = if (action.mode == 3) action.liquidVolume else 0f
-                )
-                val stepTwo = pumpMotor.toPumpHex(
-                    one = action.liquidVolume + pumpMotor.volumeOne * calibration.drainDistance
-                )
-
-                list.add(zero + stepOne[0] + zero + stepTwo[0])
-                list.add(zero + stepOne[1] + zero + stepTwo[1])
-            }
-            B -> {
-                val stepOne = pumpMotor.toPumpHex(
-                    two = action.liquidVolume,
-                    five = if (action.mode == 3) action.liquidVolume else 0f
-                )
-                val stepTwo = pumpMotor.toPumpHex(
-                    two = action.liquidVolume + pumpMotor.volumeTwo * calibration.drainDistance
-                )
-
-                list.add(zero + stepOne[0] + zero + stepTwo[0])
-                list.add(zero + stepOne[1] + zero + stepTwo[1])
-            }
-            C -> {
-                val stepOne = pumpMotor.toPumpHex(
-                    three = action.liquidVolume,
-                    five = if (action.mode == 3) action.liquidVolume else 0f
-                )
-                val stepTwo = pumpMotor.toPumpHex(
-                    three = action.liquidVolume + pumpMotor.volumeThree * calibration.drainDistance
-                )
-
-                list.add(zero + stepOne[0] + zero + stepTwo[0])
-                list.add(zero + stepOne[1] + zero + stepTwo[1])
-            }
-            D -> {
-                val stepOne = pumpMotor.toPumpHex(
-                    four = action.liquidVolume,
-                    five = if (action.mode == 3) action.liquidVolume else 0f
-                )
-                val stepTwo = pumpMotor.toPumpHex(
-                    four = action.liquidVolume + pumpMotor.volumeFour * calibration.drainDistance
-                )
-
-                list.add(zero + stepOne[0] + zero + stepTwo[0])
-                list.add(zero + stepOne[1] + zero + stepTwo[1])
-            }
-        }
-        return list
+        val stepOne = pumpMotor.toPumpHex(
+            one = if (module == A) action.liquidVolume else 0f,
+            two = if (module == B) action.liquidVolume else 0f,
+            three = if (module == C) action.liquidVolume else 0f,
+            four = if (module == D) action.liquidVolume else 0f,
+            five = if (action.mode == 3) action.liquidVolume else 0f
+        )
+        val stepTwo = pumpMotor.toPumpHex(
+            one = if(module == A) action.liquidVolume + pumpMotor.volumeOne * calibration.drainDistance else 0f,
+            two = if(module == B) action.liquidVolume + pumpMotor.volumeTwo * calibration.drainDistance else 0f,
+            three = if(module == C) action.liquidVolume + pumpMotor.volumeThree * calibration.drainDistance else 0f,
+            four = if(module == D) action.liquidVolume + pumpMotor.volumeFour * calibration.drainDistance else 0f,
+        )
+        return listOf(
+            zero + stepOne[0] + zero + stepTwo[0],
+            zero + stepOne[1] + zero + stepTwo[1]
+        )
     }
 
     /**
@@ -334,55 +300,37 @@ class CommandGroup {
      */
     private fun recycleLiquid(): List<String> {
         val zero = "0,0,0,"
-        val list = mutableListOf<String>()
-        when (module) {
-            A -> {
-                val recycle = pumpMotor.toPumpHex(
-                    one = -(action.liquidVolume + pumpMotor.volumeOne * calibration.drainDistance),
-                )
-                list.add(zero + recycle[0] + zero + zero)
-                list.add(zero + recycle[1] + zero + zero)
-            }
-            B -> {
-                val recycle = pumpMotor.toPumpHex(
-                    two = -(action.liquidVolume + pumpMotor.volumeTwo * calibration.drainDistance),
-                )
-                list.add(zero + recycle[0] + zero + zero)
-                list.add(zero + recycle[1] + zero + zero)
-            }
-            C -> {
-                val recycle = pumpMotor.toPumpHex(
-                    three = -(action.liquidVolume + pumpMotor.volumeThree * calibration.drainDistance),
-                )
-                list.add(zero + recycle[0] + zero + zero)
-                list.add(zero + recycle[1] + zero + zero)
-            }
-            D -> {
-                val recycle = pumpMotor.toPumpHex(
-                    four = -(action.liquidVolume + pumpMotor.volumeFour * calibration.drainDistance),
-                )
-                list.add(zero + recycle[0] + zero + zero)
-                list.add(zero + recycle[1] + zero + zero)
-            }
-        }
-        return list
+        val recycle = pumpMotor.toPumpHex(
+            one = if (module == A) -(action.liquidVolume + pumpMotor.volumeOne * calibration.drainDistance) else 0f,
+            two = if (module == B) -(action.liquidVolume + pumpMotor.volumeTwo * calibration.drainDistance) else 0f,
+            three = if (module == C) -(action.liquidVolume + pumpMotor.volumeThree * calibration.drainDistance) else 0f,
+            four = if (module == D) -(action.liquidVolume + pumpMotor.volumeFour * calibration.drainDistance) else 0f,
+        )
+        return listOf(
+            zero + recycle[0] + zero + zero,
+            zero + recycle[1] + zero + zero
+        )
     }
 
-    private suspend fun waitForFree(block: suspend () -> Unit) {
-        if (serial.isRunning()) {
-            _wait.value = "等待中..."
+    /**
+     * 等待机构空闲
+     * @param msg String 提示信息
+     * @param block suspend () -> Unit 代码块
+     */
+    private suspend fun waitForFree(msg: String, block: suspend () -> Unit) {
+        if (serial.isLock()) {
+            _wait.value = msg
             delay(300L)
-            waitForFree(block)
+            waitForFree(msg, block)
         } else {
             block.invoke()
         }
     }
 
-
     companion object {
         @JvmStatic
-        val instance: CommandGroup by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            CommandGroup()
+        val instance: CommandExecutor by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+            CommandExecutor()
         }
     }
 }

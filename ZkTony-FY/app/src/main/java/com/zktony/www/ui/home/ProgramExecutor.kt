@@ -6,45 +6,39 @@ import com.zktony.www.common.model.Queue
 import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.ActionEnum
 import com.zktony.www.common.utils.Logger
-import com.zktony.www.serialport.protocol.CommandGroup
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺
  * @date: 2022-10-18 16:20
  * 任务执行器
- * @param actionQueue 任务队列
+ * @param queue 任务队列
  * @param module 模块
  * @param settingState 设置状态
  */
-class ActionActuator private constructor(
-    private val actionQueue: Queue<Action>,
+class ProgramExecutor private constructor(
+    private val queue: Queue<Action>,
     private val module: ModuleEnum,
     private val settingState: SettingState,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
-    private val _state = MutableSharedFlow<ActionEvent>()
-    val state: SharedFlow<ActionEvent> get() = _state
-    private val commandGroup by lazy { CommandGroup() }
+    private val _event = MutableSharedFlow<ActionEvent>()
+    val event: SharedFlow<ActionEvent> get() = _event
+    private val commandExecutor by lazy { CommandExecutor() }
 
     /**
      * 执行任务队列
      */
     suspend fun run() {
-        actionQueue.peek()?.let { action ->
-            _state.emit(ActionEvent.CurrentAction(module, action))
+        queue.peek()?.let { action ->
+            _event.emit(ActionEvent.CurrentAction(module, action))
             when (action.mode) {
                 ActionEnum.BLOCKING_LIQUID.index -> executeBlockingLiquid(action)
                 ActionEnum.ANTIBODY_ONE.index -> executeAntibodyOne(action)
                 ActionEnum.ANTIBODY_TWO.index -> executeAntibodyTwo(action)
                 ActionEnum.WASHING.index -> executeWashing(action, action.count)
-                else -> {}
             }
         }
     }
@@ -54,21 +48,25 @@ class ActionActuator private constructor(
      * @param action
      */
     private suspend fun executeBlockingLiquid(action: Action) {
-        commandGroup.run {
-            initModule(this@ActionActuator.module)
-            initSettingState(this@ActionActuator.settingState)
+        commandExecutor.run {
+            initModule(this@ProgramExecutor.module)
+            initSettingState(this@ProgramExecutor.settingState)
             initAction(action)
-            scope.launch {
+            val listener = scope.launch {
                 wait.collect {
-                    _state.emit(ActionEvent.Wait(module, it))
+                    _event.emit(ActionEvent.Wait(module, it))
                 }
             }
+            listener.start()
             addBlockingLiquid {
                 countDown((action.time * 60 * 60).toLong(), {
-                    _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
+                    _event.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
                 },
                     {
-                        wasteLiquid { executeNext() }
+                        wasteLiquid {
+                            listener.cancel()
+                            executeNext()
+                        }
                     })
             }
         }
@@ -80,21 +78,25 @@ class ActionActuator private constructor(
      *  @param action Action
      */
     private suspend fun executeAntibodyOne(action: Action) {
-        commandGroup.run {
-            initModule(this@ActionActuator.module)
-            initSettingState(this@ActionActuator.settingState)
+        commandExecutor.run {
+            initModule(this@ProgramExecutor.module)
+            initSettingState(this@ProgramExecutor.settingState)
             initAction(action)
-            scope.launch {
+            val listener = scope.launch {
                 wait.collect {
-                    _state.emit(ActionEvent.Wait(module, it))
+                    _event.emit(ActionEvent.Wait(module, it))
                 }
             }
+            listener.start()
             addAntibodyOne {
                 countDown((action.time * 60 * 60).toLong(), {
-                    _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
+                    _event.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
                 },
                     {
-                        recycleAntibodyOne { executeNext() }
+                        recycleAntibodyOne {
+                            listener.cancel()
+                            executeNext()
+                        }
                     })
             }
         }
@@ -105,21 +107,25 @@ class ActionActuator private constructor(
      * @param action Action
      */
     private suspend fun executeAntibodyTwo(action: Action) {
-        commandGroup.run {
-            initModule(this@ActionActuator.module)
-            initSettingState(this@ActionActuator.settingState)
+        commandExecutor.run {
+            initModule(this@ProgramExecutor.module)
+            initSettingState(this@ProgramExecutor.settingState)
             initAction(action)
-            scope.launch {
+            val listener = scope.launch {
                 wait.collect {
-                    _state.emit(ActionEvent.Wait(module, it))
+                    _event.emit(ActionEvent.Wait(module, it))
                 }
             }
+            listener.start()
             addAntibodyTwo {
                 countDown((action.time * 60 * 60).toLong(), {
-                    _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
+                    _event.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
                 },
                     {
-                        wasteLiquid { executeNext() }
+                        wasteLiquid {
+                            listener.cancel()
+                            executeNext()
+                        }
                     })
             }
         }
@@ -130,25 +136,28 @@ class ActionActuator private constructor(
      * @param action Action
      */
     private suspend fun executeWashing(action: Action, count: Int) {
-        commandGroup.run {
+        commandExecutor.run {
             initModule(module)
             initSettingState(settingState)
             initAction(action)
-            scope.launch {
+            val listener = scope.launch {
                 wait.collect {
-                    _state.emit(ActionEvent.Wait(module, it))
+                    _event.emit(ActionEvent.Wait(module, it))
                 }
             }
-            _state.emit(ActionEvent.Count(module, action.count - count + 1))
+            listener.start()
+            _event.emit(ActionEvent.Count(module, action.count - count + 1))
             addWashingLiquid {
                 countDown((action.time * 60).toLong(), {
-                    _state.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
+                    _event.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
                 },
                     {
                         wasteLiquid {
                             if (count - 1 > 0) {
+                                listener.cancel()
                                 executeWashing(action, count - 1)
                             } else {
+                                listener.cancel()
                                 executeNext()
                             }
                         }
@@ -161,17 +170,15 @@ class ActionActuator private constructor(
      * 执行下一个任务
      */
     private suspend fun executeNext() {
-        actionQueue.run {
-            dequeue()
-            if (isEmpty()) {
-                // 任务队列执行完成
-                Logger.e(msg = "${module.value}任务队列执行完成")
-                _state.emit(ActionEvent.Finish(module))
-            } else {
-                // 继续执行任务队列
-                Logger.e(msg = "${module.value}执行下一个任务")
-                run()
-            }
+        queue.dequeue()
+        if (queue.isEmpty()) {
+            // 任务队列执行完成
+            Logger.e(msg = "${module.value}任务队列执行完成")
+            _event.emit(ActionEvent.Finish(module))
+        } else {
+            // 继续执行任务队列
+            Logger.e(msg = "${module.value}执行下一个任务")
+            run()
         }
     }
 
@@ -209,7 +216,7 @@ class ActionActuator private constructor(
         fun setModule(module: ModuleEnum) = apply { this.module = module }
         fun setSettingState(settingState: SettingState) = apply { this.settingState = settingState }
 
-        fun build() = ActionActuator(actionQueue, module, settingState)
+        fun build() = ProgramExecutor(actionQueue, module, settingState)
     }
 
 }

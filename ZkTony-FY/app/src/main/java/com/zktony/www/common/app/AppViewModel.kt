@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * [Application]生命周期内的[AndroidViewModel]
+ * [Application] 生命周期内的 [AndroidViewModel]
  */
 @HiltViewModel
 class AppViewModel @Inject constructor(

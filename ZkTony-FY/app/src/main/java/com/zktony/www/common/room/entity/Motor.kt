@@ -99,18 +99,6 @@ data class MotionMotor(
         str.append(",")
         return str.toString()
     }
-
-    /**
-     * 运动延时
-     * @param y [Float] y轴运动距离
-     * @param z [Float] z轴运动距离
-     * @return [Long] 延时时间
-     */
-    fun delayTime(y: Float, z: Float): Long {
-        val yTime = (y / yLength * 60 / yAxis.speed * 1000).toLong()
-        val zTime = (z / zLength * 60 / zAxis.speed * 1000).toLong()
-        return yTime + zTime
-    }
 }
 
 data class PumpMotor(
@@ -213,21 +201,4 @@ data class PumpMotor(
         hex1.append("0,")
         return listOf(hex.toString(), hex1.toString())
     }
-
-
-    fun delayTime(
-        one: Float = 0f,
-        two: Float = 0f,
-        three: Float = 0f,
-        four: Float = 0f,
-        five: Float = 0f
-    ): Long {
-        val oneTime = (one / volumeOne * 60 / pumpOne.speed * 1000).toLong()
-        val twoTime = (two / volumeTwo * 60 / pumpTwo.speed * 1000).toLong()
-        val threeTime = (three / volumeThree * 60 / pumpThree.speed * 1000).toLong()
-        val fourTime = (four / volumeFour * 60 / pumpFour.speed * 1000).toLong()
-        val fiveTime = (five / volumeFive * 60 / pumpFive.speed * 1000).toLong()
-        return max(oneTime, max(twoTime, max(threeTime, max(fourTime, fiveTime))))
-    }
-
 }
