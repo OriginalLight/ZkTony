@@ -27,8 +27,10 @@ class SerialPortManager(
     val responseFour = _responseFour.asStateFlow()
 
     // 机构运行状态
-    private var running = false
-    private var runtime = 0L
+    private var lock = false
+    private var lockTime = 0L
+    private var waitTime = 40L
+    private var drawer = false
     // 正在执行的个数
     private var executing = 0
 
@@ -78,17 +80,19 @@ class SerialPortManager(
                             val total = res.data.substring(2, 4).hexToInt8()
                             val current = res.data.substring(6, 8).hexToInt8()
                             if (total == current) {
-                                running = false
-                                runtime = 0L
+                                lock = false
+                                lockTime = 0L
                                 // 如果还有任务运行恢复摇床
                                 if (executing > 0) {
-                                    Logger.d(msg = "摇床恢复")
                                     sendHex(SERIAL_ONE, Command.resumeShakeBed())
                                 }
                             } else {
-                                running = true
-                                runtime = 0L
+                                lock = true
+                                lockTime = 0L
                             }
+                        }
+                        if (res.function == "86" && res.parameter == "01") {
+                            drawer = res.data.hexToInt8() > 0
                         }
                     }
                 }
@@ -96,20 +100,19 @@ class SerialPortManager(
             launch {
                 while (true) {
                     delay(1000L)
-                    Logger.d(msg = "running: $running, runtime: $runtime, executing: $executing")
+                    Logger.d(msg = "lock: $lock, lockTime: $lockTime, executing: $executing")
                     // 如果正在运行，计时 否则清零
-                    if (running) {
-                        runtime += 1L
+                    if (lock) {
+                        lockTime += 1L
                     } else {
-                        runtime = 0L
+                        lockTime = 0L
                     }
                     // 如果运行时间超过 60 秒，默认不运行，如果还有任务运行恢复摇床
-                    if (running && runtime >= 60L) {
-                        runtime = 0L
-                        running = false
+                    if (lock && lockTime >= waitTime) {
+                        lockTime = 0L
+                        lock = false
                         // 恢复摇床
                         if (executing > 0) {
-                            Logger.d(msg = "恢复摇床")
                             sendHex(SERIAL_ONE, Command.resumeShakeBed())
                         }
                     }
@@ -142,11 +145,19 @@ class SerialPortManager(
         }
     }
 
-    fun isRunning() = running
+    /**
+     * 获取锁
+     * @return Boolean 获取到锁 true: 锁 false: 未锁
+     */
+    fun isLock() = lock
 
-    fun run(run : Boolean) {
-        running = run
-        if (run) {
+    /**
+     *  设置锁
+     *  @param lock [Boolean] 是否锁定 true 锁定 false 解锁
+     */
+    fun lock(lock : Boolean) {
+        this.lock = lock
+        if (lock) {
             sendHex(SERIAL_ONE, Command.pauseShakeBed())
         }
     }
@@ -159,7 +170,12 @@ class SerialPortManager(
         executing = count
     }
 
+    /**
+     * 获取正在执行的个数
+     * @return [Int] 个数
+     */
     fun getExecuting() = executing
+
 
     companion object {
         @JvmStatic

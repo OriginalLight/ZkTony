@@ -52,17 +52,13 @@ class ActionAdapter : ListAdapter<Action, ActionAdapter.ViewHolder>(ActionDiffCa
                         icon.setBackgroundResource(R.mipmap.ic_blocking_liquid)
                         con4.visibility = View.GONE
                     }
-                    1 -> {
-                        icon.setBackgroundResource(R.mipmap.ic_antibody)
-                        con4.visibility = View.GONE
-                    }
-                    2 -> {
-                        icon.setBackgroundResource(R.mipmap.ic_antibody)
-                        con4.visibility = View.GONE
-                    }
                     3 -> {
                         icon.setBackgroundResource(R.mipmap.ic_washing)
                         con4.visibility = View.VISIBLE
+                    }
+                    else -> {
+                        icon.setBackgroundResource(R.mipmap.ic_antibody)
+                        con4.visibility = View.GONE
                     }
                 }
                 model.text = getActionEnum(item.mode).value

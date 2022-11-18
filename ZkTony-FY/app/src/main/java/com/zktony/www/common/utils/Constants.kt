@@ -2,7 +2,7 @@ package com.zktony.www.common.utils
 
 
 /**
- * 设置页常量
+ * 常量
  */
 object Constants {
 
@@ -12,10 +12,11 @@ object Constants {
     const val DEVICE_ID = 2L
     const val BASE_URL = "http://120.48.67.96:8080"
     const val DOMAIN = "https://www.zktony.com"
-    const val BACKGROUND_WORKER_NAME_LOG_RECORD = "BACKGROUND_WORKER_NAME_LOG_RECORD"
-    const val BACKGROUND_WORKER_NAME_LOG_DATA = "BACKGROUND_WORKER_NAME_LOG_DATA"
-    const val BACKGROUND_WORKER_NAME_PROGRAM = "BACKGROUND_WORKER_NAME_PROGRAM"
-    const val RESET = "RESET"
+    const val BACKGROUND_WORKER_NAME_LOG = "BACKGROUND_WORKER_NAME_LOG"
     const val BAR = "BAR"
     const val TEMP = "TEMP"
+
+    // 业务常量
+    const val ZERO_TIME = "00:00:00"
+
 }

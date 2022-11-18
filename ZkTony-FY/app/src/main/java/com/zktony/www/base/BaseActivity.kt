@@ -17,7 +17,7 @@ abstract class BaseActivity<VD : ViewDataBinding>(val inflater: (inflater: Layou
     AppCompatActivity() {
     protected lateinit var binding: VD
 
-    var editText: EditText? = null
+    private var editText: EditText? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

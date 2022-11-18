@@ -53,5 +53,4 @@ class ProgramViewModel @Inject constructor(
             actionRepository.deleteByProgramId(program.id)
         }
     }
-
 }

@@ -25,7 +25,7 @@ class ActionViewModel @Inject constructor(
     val actionList = _actionList.asStateFlow()
     val action = _action.asStateFlow()
     val buttonEnable = _buttonEnable.asStateFlow()
-    val programId = _programId.asStateFlow()
+    private val programId = _programId.asStateFlow()
 
     init {
         viewModelScope.launch {

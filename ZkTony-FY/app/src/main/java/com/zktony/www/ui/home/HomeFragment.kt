@@ -12,8 +12,6 @@ import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.common.extension.removeZero
-import com.zktony.www.common.utils.Logger
 import com.zktony.www.databinding.FragmentHomeBinding
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.ui.home.ModuleEnum.*
@@ -40,32 +38,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            launch {
-                viewModel.aState.collect {
-                    moduleStateChange(A, it)
-                }
-            }
-            launch {
-                viewModel.bState.collect {
-                    moduleStateChange(B, it)
-                    Logger.e(msg = it.countDownText)
-                }
-            }
-            launch {
-                viewModel.cState.collect {
-                    moduleStateChange(C, it)
-                }
-            }
-            launch {
-                viewModel.dState.collect {
-                    moduleStateChange(D, it)
-                }
-            }
-            launch {
-                viewModel.eState.collect {
-                    operationStateChange(it)
-                }
-            }
+            launch { viewModel.aState.collect { moduleStateChange(A, it) } }
+            launch { viewModel.bState.collect { moduleStateChange(B, it) } }
+            launch { viewModel.cState.collect { moduleStateChange(C, it) } }
+            launch { viewModel.dState.collect { moduleStateChange(D, it) } }
+            launch { viewModel.eState.collect { operationStateChange(it) } }
         }
     }
 
@@ -74,18 +51,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     @SuppressLint("SetTextI18n")
     private fun initTextView() {
-        binding.a.tvActions.setOnClickListener {
-            PopTip.show((it as TextView).text)
-        }
-        binding.b.tvActions.setOnClickListener {
-            PopTip.show((it as TextView).text)
-        }
-        binding.c.tvActions.setOnClickListener {
-            PopTip.show((it as TextView).text)
-        }
-        binding.d.tvActions.setOnClickListener {
-            PopTip.show((it as TextView).text)
-        }
+        binding.a.tvActions.setOnClickListener { PopTip.show((it as TextView).text) }
+        binding.b.tvActions.setOnClickListener { PopTip.show((it as TextView).text) }
+        binding.c.tvActions.setOnClickListener { PopTip.show((it as TextView).text) }
+        binding.d.tvActions.setOnClickListener { PopTip.show((it as TextView).text) }
     }
 
     /**
@@ -93,43 +62,29 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun initButton() {
         binding.a.run {
-            btnStart.setOnClickListener {
-                this@HomeFragment.viewModel.start(A)
-            }
+            btnStart.setOnClickListener { this@HomeFragment.viewModel.start(A) }
             btnStop.run {
-                setOnClickListener {
-                    PopTip.show(R.mipmap.ic_stop, "长按停止")
-                }
+                setOnClickListener { PopTip.show(R.mipmap.ic_stop, "长按停止") }
                 setOnLongClickListener {
                     this@HomeFragment.viewModel.stop(A)
                     true
                 }
             }
-            btnProgram.setOnClickListener {
-                showSelectProgramDialog(A)
-            }
+            btnProgram.setOnClickListener { showSelectProgramDialog(A) }
         }
         binding.b.run {
-            btnStart.setOnClickListener {
-                this@HomeFragment.viewModel.start(B)
-            }
+            btnStart.setOnClickListener { this@HomeFragment.viewModel.start(B) }
             btnStop.run {
-                setOnClickListener {
-                    PopTip.show(R.mipmap.ic_stop, "长按停止")
-                }
+                setOnClickListener { PopTip.show(R.mipmap.ic_stop, "长按停止") }
                 setOnLongClickListener {
                     this@HomeFragment.viewModel.stop(B)
                     true
                 }
             }
-            btnProgram.setOnClickListener {
-                showSelectProgramDialog(B)
-            }
+            btnProgram.setOnClickListener { showSelectProgramDialog(B) }
         }
         binding.c.run {
-            btnStart.setOnClickListener {
-                this@HomeFragment.viewModel.start(C)
-            }
+            btnStart.setOnClickListener { this@HomeFragment.viewModel.start(C) }
             btnStop.run {
                 setOnClickListener {
                     PopTip.show(R.mipmap.ic_stop, "长按停止")
@@ -139,14 +94,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            btnProgram.setOnClickListener {
-                showSelectProgramDialog(C)
-            }
+            btnProgram.setOnClickListener { showSelectProgramDialog(C) }
         }
         binding.d.run {
-            btnStart.setOnClickListener {
-                this@HomeFragment.viewModel.start(D)
-            }
+            btnStart.setOnClickListener { this@HomeFragment.viewModel.start(D) }
             btnStop.run {
                 setOnClickListener {
                     PopTip.show(R.mipmap.ic_stop, "长按停止")
@@ -156,16 +107,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            btnProgram.setOnClickListener {
-                showSelectProgramDialog(D)
-            }
+            btnProgram.setOnClickListener { showSelectProgramDialog(D) }
         }
         binding.e.run {
             btnReset.run {
                 clickScale()
-                setOnClickListener {
-                    PopTip.show(R.mipmap.ic_reset, "长按复位")
-                }
+                setOnClickListener { PopTip.show(R.mipmap.ic_reset, "长按复位") }
                 setOnLongClickListener {
                     this@HomeFragment.viewModel.reset()
                     true
@@ -204,18 +151,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun moduleStateChange(module: ModuleEnum, state: ModuleState) {
         // 正在执行的个数等于job不为null的个数
         var runningCount = 0
-        if (viewModel.aState.value.job != null) {
-            runningCount++
-        }
-        if (viewModel.bState.value.job != null) {
-            runningCount++
-        }
-        if (viewModel.cState.value.job != null) {
-            runningCount++
-        }
-        if (viewModel.dState.value.job != null) {
-            runningCount++
-        }
+        viewModel.aState.value.job?.let { runningCount++ }
+        viewModel.bState.value.job?.let { runningCount++ }
+        viewModel.cState.value.job?.let { runningCount++ }
+        viewModel.dState.value.job?.let { runningCount++ }
         SerialPortManager.instance.setExecuting(runningCount)
 
         when (module) {

@@ -22,7 +22,7 @@ class WorkerManager {
 
     fun createWorker() {
         WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
-            Constants.BACKGROUND_WORKER_NAME_LOG_RECORD,
+            Constants.BACKGROUND_WORKER_NAME_LOG,
             ExistingPeriodicWorkPolicy.REPLACE,
             logRequest
         )
