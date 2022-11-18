@@ -100,7 +100,7 @@ class SerialPortManager(
             launch {
                 while (true) {
                     delay(1000L)
-                    Logger.d(msg = "lock: $lock, lockTime: $lockTime, executing: $executing")
+                    Logger.d(msg = "lock: $lock, lockTime: $lockTime, executing: $executing, drawer: $drawer")
                     // 如果正在运行，计时 否则清零
                     if (lock) {
                         lockTime += 1L
@@ -115,6 +115,9 @@ class SerialPortManager(
                         if (executing > 0) {
                             sendHex(SERIAL_ONE, Command.resumeShakeBed())
                         }
+                    }
+                    if (drawer) {
+                        sendHex(SERIAL_ONE, Command.queryDrawer())
                     }
                 }
             }
@@ -175,6 +178,12 @@ class SerialPortManager(
      * @return [Int] 个数
      */
     fun getExecuting() = executing
+
+    /**
+     * 抽屉是否打开
+     * @return [Boolean] true: 打开 false: 关闭
+     */
+    fun isDrawerOpen() = drawer
 
 
     companion object {

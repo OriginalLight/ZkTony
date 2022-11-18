@@ -92,5 +92,14 @@ data class Command(
         fun multiPoint(data: String): String {
             return Command(function = "05", parameter = "04", data = "0101" + data.toHex()).toHex()
         }
+
+        /**
+         * 查询抽屉状态
+         * @return [String] 指令
+         */
+        @JvmStatic
+        fun queryDrawer(): String {
+            return Command(parameter = "0C").toHex()
+        }
     }
 }
