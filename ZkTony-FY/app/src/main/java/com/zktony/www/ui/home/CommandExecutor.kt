@@ -51,6 +51,8 @@ class CommandExecutor {
      * @param block
      */
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
+        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        delay(300L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
@@ -89,6 +91,8 @@ class CommandExecutor {
      * @param block
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
+        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        delay(300L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
@@ -127,6 +131,8 @@ class CommandExecutor {
      * @param block
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
+        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        delay(300L)
         waitForFree("等待回收") {
             serial.lock(true)
             // 主板运动
@@ -157,6 +163,8 @@ class CommandExecutor {
      * @param block
      */
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
+        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        delay(300L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
@@ -195,6 +203,8 @@ class CommandExecutor {
      * @param block
      */
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
+        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        delay(300L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
@@ -234,6 +244,8 @@ class CommandExecutor {
      * @param block
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
+        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        delay(300L)
         waitForFree("等待清理") {
             serial.lock(true)
             // 主板运动
@@ -318,7 +330,7 @@ class CommandExecutor {
      * @param block suspend () -> Unit 代码块
      */
     private suspend fun waitForFree(msg: String, block: suspend () -> Unit) {
-        if (serial.isLock()) {
+        if (serial.isLock() || serial.isDrawerOpen()) {
             _wait.value = msg
             delay(300L)
             waitForFree(msg, block)
