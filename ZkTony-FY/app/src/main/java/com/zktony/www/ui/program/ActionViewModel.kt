@@ -4,18 +4,22 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.ActionEnum
+import com.zktony.www.common.room.entity.getActionEnum
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
 class ActionViewModel @Inject constructor(
-    private val programRepository: ProgramRepository,
-    private val actionRepository: ActionRepository
+    private val programRepo: ProgramRepository,
+    private val actionRepo: ActionRepository
 ) : BaseViewModel() {
 
     private val _actionList = MutableStateFlow(emptyList<Action>())
@@ -31,7 +35,7 @@ class ActionViewModel @Inject constructor(
         viewModelScope.launch {
             programId.collect {
                 if (it != "None") {
-                    actionRepository.getByProgramId(it).collect { actionList ->
+                    actionRepo.getByProgramId(it).collect { actionList ->
                         _actionList.value = actionList
                     }
                 }
@@ -54,13 +58,14 @@ class ActionViewModel @Inject constructor(
      */
     fun addAction() {
         viewModelScope.launch {
-            actionRepository.insert(
+            actionRepo.insert(
                 _action.value.copy(
                     id = UUID.randomUUID().toString(),
                     programId = programId.value
                 )
             )
-            programRepository.updateActions(programId.value)
+            delay(500L)
+            updateActions()
         }
     }
 
@@ -70,8 +75,33 @@ class ActionViewModel @Inject constructor(
      */
     fun deleteAction(action: Action) {
         viewModelScope.launch {
-            actionRepository.delete(action)
-            programRepository.updateActions(programId.value)
+            actionRepo.delete(action)
+            delay(500L)
+            updateActions()
+        }
+    }
+
+    /**
+     * 更新程序中的actions
+     */
+    private fun updateActions() {
+        viewModelScope.launch {
+            actionRepo.getByProgramId(programId.value).firstOrNull()?.let {
+                val str = StringBuilder()
+                if (it.isNotEmpty()) {
+                    it.forEachIndexed { index, action ->
+                        str.append(getActionEnum(action.mode).value)
+                        if (index != it.size - 1) {
+                            str.append(" -> ")
+                        }
+                    }
+                } else {
+                    str.append("没有任何操作，去添加吧...")
+                }
+                programRepo.getById(programId.value).firstOrNull()?.let { program ->
+                    programRepo.update(program.copy(actions = str.toString(), actionCount = it.size))
+                }
+            }
         }
     }
 

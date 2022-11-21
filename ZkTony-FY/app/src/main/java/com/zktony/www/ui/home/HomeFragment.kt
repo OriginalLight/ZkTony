@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.BottomMenu
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.R
@@ -38,11 +40,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            launch { viewModel.aState.collect { moduleStateChange(A, it) } }
-            launch { viewModel.bState.collect { moduleStateChange(B, it) } }
-            launch { viewModel.cState.collect { moduleStateChange(C, it) } }
-            launch { viewModel.dState.collect { moduleStateChange(D, it) } }
-            launch { viewModel.eState.collect { operationStateChange(it) } }
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.stateOne.collect { moduleStateChange(A, it) } }
+                launch { viewModel.stateTwo.collect { moduleStateChange(B, it) } }
+                launch { viewModel.stateThree.collect { moduleStateChange(C, it) } }
+                launch { viewModel.stateFour.collect { moduleStateChange(D, it) } }
+                launch { viewModel.stateOperating.collect { operationStateChange(it) } }
+            }
         }
     }
 
@@ -121,7 +125,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             btnPause.run {
                 clickScale()
                 setOnClickListener {
-                    if (this@HomeFragment.viewModel.eState.value.pauseEnable) {
+                    if (this@HomeFragment.viewModel.stateOperating.value.pauseEnable) {
                         PopTip.show(R.mipmap.ic_stop, "已继续摇床，再次点击暂停")
                     } else {
                         PopTip.show(R.mipmap.ic_stop, "已暂停摇床，再次点击继续")
@@ -132,7 +136,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             btnInsulating.run {
                 clickScale()
                 setOnClickListener {
-                    if (this@HomeFragment.viewModel.eState.value.insulatingEnable) {
+                    if (this@HomeFragment.viewModel.stateOperating.value.insulatingEnable) {
                         PopTip.show(R.mipmap.ic_insulating, "已取消保温，再次点击开启")
                     } else {
                         PopTip.show(R.mipmap.ic_insulating, "抗体保温中，再次点击取消")
@@ -148,13 +152,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param module 模块
      * @param state 状态
      */
-    private fun moduleStateChange(module: ModuleEnum, state: ModuleState) {
+    private fun moduleStateChange(module: ModuleEnum, state: UiState) {
         // 正在执行的个数等于job不为null的个数
         var runningCount = 0
-        viewModel.aState.value.job?.let { runningCount++ }
-        viewModel.bState.value.job?.let { runningCount++ }
-        viewModel.cState.value.job?.let { runningCount++ }
-        viewModel.dState.value.job?.let { runningCount++ }
+        viewModel.stateOne.value.job?.let { runningCount++ }
+        viewModel.stateTwo.value.job?.let { runningCount++ }
+        viewModel.stateThree.value.job?.let { runningCount++ }
+        viewModel.stateFour.value.job?.let { runningCount++ }
         SerialPortManager.instance.setExecuting(runningCount)
 
         when (module) {

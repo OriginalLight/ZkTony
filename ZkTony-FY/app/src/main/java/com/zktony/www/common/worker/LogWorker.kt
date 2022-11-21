@@ -4,14 +4,9 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.www.common.utils.Logger
-import com.zktony.www.common.network.adapter.isSuccess
 import com.zktony.www.data.repository.LogRepository
-import com.zktony.www.common.network.service.LogService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.first
-import javax.inject.Inject
 
 /**
  * @author: 刘贺贺

@@ -27,7 +27,7 @@ import java.util.*
 data class Log(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val programName : String = "",
+    val programName: String = "",
     val module: Int = 0,
     val actions: String = "",
     // 0: running, 1: success, 2: failed

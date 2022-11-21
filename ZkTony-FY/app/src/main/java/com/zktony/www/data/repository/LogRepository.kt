@@ -11,37 +11,37 @@ import javax.inject.Inject
  * @date: 2022-09-21 8:52
  */
 class LogRepository @Inject constructor(
-    private val logDao: LogDao
+    private val dao: LogDao
 ) {
     suspend fun insert(log: Log) {
-        logDao.insert(log)
+        dao.insert(log)
     }
 
     suspend fun update(log: Log) {
-        logDao.update(log)
+        dao.update(log)
     }
 
     suspend fun updateBatch(logList: List<Log>) {
-        logDao.updateBatch(logList)
+        dao.updateBatch(logList)
     }
 
     suspend fun delete(log: Log) {
-        logDao.delete(log)
+        dao.delete(log)
     }
 
     suspend fun deleteByDate() {
-        logDao.deleteByDate()
+        dao.deleteByDate()
     }
 
     fun withoutUpload(): Flow<List<Log>> {
-        return logDao.withoutUpload()
+        return dao.withoutUpload()
     }
 
     fun getAll(): Flow<List<Log>> {
-        return logDao.getAll()
+        return dao.getAll()
     }
 
     fun getByDate(start: Date, end: Date): Flow<List<Log>> {
-        return logDao.getByDate(start, end)
+        return dao.getByDate(start, end)
     }
 }

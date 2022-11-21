@@ -5,7 +5,6 @@ import androidx.room.PrimaryKey
 import com.zktony.www.common.extension.int16ToHex2
 import com.zktony.www.common.extension.int8ToHex
 import java.util.*
-import kotlin.math.max
 
 /**
  * @author: 刘贺贺
@@ -52,13 +51,13 @@ data class Motor(
 }
 
 data class MotionMotor(
-    val xAxis: Motor = Motor(),
-    val yAxis: Motor = Motor(),
-    val zAxis: Motor = Motor(),
+    val x: Motor = Motor(),
+    val y: Motor = Motor(),
+    val z: Motor = Motor(),
     // y轴转一圈移动的长度
-    val yLength: Float = 58f,
+    val distanceY: Float = 58f,
     // z轴转一圈移动的长度
-    val zLength: Float = 3.8f,
+    val distanceZ: Float = 3.8f,
 ) {
     /**
      *  电机转一圈需要的脉冲数
@@ -73,7 +72,7 @@ data class MotionMotor(
      * @param distance [Float] 移动的距离
      */
     private fun yPulseCount(distance: Float): String {
-        return (distance * pulseCount(yAxis) / yLength).toInt().toString()
+        return (distance * pulseCount(y) / distanceY).toInt().toString()
     }
 
     /**
@@ -82,7 +81,7 @@ data class MotionMotor(
      * @param distance [Float] 移动的距离
      */
     private fun zPulseCount(distance: Float): String {
-        return (distance * pulseCount(zAxis) / zLength).toInt().toString()
+        return (distance * pulseCount(z) / distanceZ).toInt().toString()
     }
 
     /**
@@ -102,21 +101,21 @@ data class MotionMotor(
 }
 
 data class PumpMotor(
-    val pumpOne: Motor = Motor(),
-    val pumpTwo: Motor = Motor(),
-    val pumpThree: Motor = Motor(),
-    val pumpFour: Motor = Motor(),
-    val pumpFive: Motor = Motor(),
+    val one: Motor = Motor(),
+    val two: Motor = Motor(),
+    val three: Motor = Motor(),
+    val four: Motor = Motor(),
+    val five: Motor = Motor(),
     // 泵一转一圈的出液量
-    val volumeOne: Float = 0.5f,
+    val volumeOne: Float = 1f,
     // 泵二转一圈的出液量
-    val volumeTwo: Float = 0.5f,
+    val volumeTwo: Float = 1f,
     // 泵三转一圈的出液量
-    val volumeThree: Float = 0.5f,
+    val volumeThree: Float = 1f,
     // 泵四转一圈的出液量
-    val volumeFour: Float = 0.5f,
+    val volumeFour: Float = 1f,
     // 泵五转一圈的出液量
-    val volumeFive: Float = 0.5f,
+    val volumeFive: Float = 1f,
 ) {
 
     /**
@@ -132,7 +131,7 @@ data class PumpMotor(
      * @return [String] 脉冲数
      */
     private fun pumpOneVolumePulseCount(volume: Float): String {
-        return (volume * pulseCount(pumpOne) / this.volumeOne).toInt().toString()
+        return (volume * pulseCount(one) / this.volumeOne).toInt().toString()
     }
 
     /**
@@ -141,7 +140,7 @@ data class PumpMotor(
      * @return [String] 脉冲数
      */
     private fun pumpTwoVolumePulseCount(volume: Float): String {
-        return (volume * pulseCount(pumpTwo) / this.volumeTwo).toInt().toString()
+        return (volume * pulseCount(two) / this.volumeTwo).toInt().toString()
     }
 
     /**
@@ -150,7 +149,7 @@ data class PumpMotor(
      * @return [String] 脉冲数
      */
     private fun pumpThreeVolumePulseCount(volume: Float): String {
-        return (volume * pulseCount(pumpThree) / this.volumeThree).toInt().toString()
+        return (volume * pulseCount(three) / this.volumeThree).toInt().toString()
     }
 
     /**
@@ -159,7 +158,7 @@ data class PumpMotor(
      * @return [String] 脉冲数
      */
     private fun pumpFourVolumePulseCount(volume: Float): String {
-        return (volume * pulseCount(pumpFour) / this.volumeFour).toInt().toString()
+        return (volume * pulseCount(four) / this.volumeFour).toInt().toString()
     }
 
     /**
@@ -168,7 +167,7 @@ data class PumpMotor(
      * @return [String] 脉冲数
      */
     private fun pumpFiveVolumePulseCount(volume: Float): String {
-        return (volume * pulseCount(pumpFive) / this.volumeFive).toInt().toString()
+        return (volume * pulseCount(five) / this.volumeFive).toInt().toString()
     }
 
     /**

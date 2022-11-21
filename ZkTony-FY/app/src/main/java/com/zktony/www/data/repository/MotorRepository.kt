@@ -10,25 +10,25 @@ import javax.inject.Inject
  * @date: 2022-10-13 11:52
  */
 class MotorRepository @Inject constructor(
-    private val motorDao: MotorDao
+    private val dao: MotorDao
 ) {
     suspend fun insert(motor: Motor) {
-        motorDao.insert(motor)
+        dao.insert(motor)
     }
 
     suspend fun insertBatch(motors: List<Motor>) {
-        motorDao.insertBatch(motors)
+        dao.insertBatch(motors)
     }
 
     suspend fun update(motor: Motor) {
-        motorDao.update(motor)
+        dao.update(motor)
     }
 
     fun getAll(): Flow<List<Motor>> {
-        return motorDao.getAll()
+        return dao.getAll()
     }
 
     fun getByBoardAndAddress(board: Int, address: Int): Flow<Motor> {
-        return motorDao.getByBoardAndAddress(board, address)
+        return dao.getByBoardAndAddress(board, address)
     }
 }

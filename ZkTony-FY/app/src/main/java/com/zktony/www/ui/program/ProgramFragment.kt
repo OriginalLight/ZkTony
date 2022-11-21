@@ -5,7 +5,9 @@ import android.text.InputType.TYPE_CLASS_TEXT
 import android.text.InputType.TYPE_TEXT_VARIATION_NORMAL
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.InputDialog
 import com.kongzue.dialogx.dialogs.MessageDialog
@@ -39,14 +41,16 @@ class ProgramFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            viewModel.programList.collect {
-                programAdapter.submitList(it)
-                if (it.isEmpty()) {
-                    binding.empty.visibility = View.VISIBLE
-                    binding.rc1.visibility = View.GONE
-                } else {
-                    binding.empty.visibility = View.GONE
-                    binding.rc1.visibility = View.VISIBLE
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.programList.collect {
+                    programAdapter.submitList(it)
+                    if (it.isEmpty()) {
+                        binding.empty.visibility = View.VISIBLE
+                        binding.rc1.visibility = View.GONE
+                    } else {
+                        binding.empty.visibility = View.GONE
+                        binding.rc1.visibility = View.VISIBLE
+                    }
                 }
             }
         }

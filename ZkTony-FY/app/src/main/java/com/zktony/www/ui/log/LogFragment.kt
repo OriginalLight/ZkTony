@@ -4,7 +4,9 @@ import android.app.DatePickerDialog
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.www.R
 import com.zktony.www.adapter.LogAdapter
 import com.zktony.www.base.BaseFragment
@@ -37,21 +39,23 @@ class LogFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            launch {
-                viewModel.logList.collect {
-                    if (it.isNotEmpty()) {
-                        binding.rc.visibility = View.VISIBLE
-                        binding.empty.visibility = View.GONE
-                    } else {
-                        binding.rc.visibility = View.GONE
-                        binding.empty.visibility = View.VISIBLE
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.logList.collect {
+                        if (it.isNotEmpty()) {
+                            binding.rc.visibility = View.VISIBLE
+                            binding.empty.visibility = View.GONE
+                        } else {
+                            binding.rc.visibility = View.GONE
+                            binding.empty.visibility = View.VISIBLE
+                        }
+                        logAdapter.submitList(it)
                     }
-                    logAdapter.submitList(it)
                 }
-            }
-            launch {
-                viewModel.data.collect {
-                    binding.time.text = it
+                launch {
+                    viewModel.data.collect {
+                        binding.time.text = it
+                    }
                 }
             }
         }

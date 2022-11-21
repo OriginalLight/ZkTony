@@ -12,7 +12,9 @@ import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.*
@@ -54,33 +56,35 @@ class AdminFragment :
     @SuppressLint("SetTextI18n")
     private fun initObserver() {
         lifecycleScope.launch {
-            launch {
-                viewModel.file.collect {
-                    it?.let { showLocalUpdate(it) }
-                }
-            }
-            launch {
-                viewModel.version.collect {
-                    it?.let { showRemoteUpdate(it) }
-                }
-            }
-            launch {
-                viewModel.progress.collect { progress ->
-                    binding.progress.run {
-                        if (progress == 0) {
-                            visibility = View.GONE
-                        } else {
-                            visibility = View.VISIBLE
-                            setProgress(progress)
-                        }
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.file.collect {
+                        it?.let { showLocalUpdate(it) }
                     }
-                    binding.tvUpdate.run {
-                        if (progress == 0) {
-                            text = "检查更新"
-                            setTextColor(ContextCompat.getColor(context, R.color.dark_outline))
-                        } else {
-                            text = "$progress%"
-                            setTextColor(ContextCompat.getColor(context, R.color.light_primary))
+                }
+                launch {
+                    viewModel.version.collect {
+                        it?.let { showRemoteUpdate(it) }
+                    }
+                }
+                launch {
+                    viewModel.progress.collect { progress ->
+                        binding.progress.run {
+                            if (progress == 0) {
+                                visibility = View.GONE
+                            } else {
+                                visibility = View.VISIBLE
+                                setProgress(progress)
+                            }
+                        }
+                        binding.tvUpdate.run {
+                            if (progress == 0) {
+                                text = "检查更新"
+                                setTextColor(ContextCompat.getColor(context, R.color.dark_outline))
+                            } else {
+                                text = "$progress%"
+                                setTextColor(ContextCompat.getColor(context, R.color.light_primary))
+                            }
                         }
                     }
                 }
@@ -191,7 +195,7 @@ class AdminFragment :
      */
     private fun initSwitch() {
         binding.swBar.run {
-            this.isChecked = appViewModel.settingState.value.bar
+            this.isChecked = appViewModel.settings.value.bar
             setOnCheckedChangeListener { _, isChecked ->
                 viewModel.toggleNavigationBar(isChecked)
             }
@@ -210,7 +214,7 @@ class AdminFragment :
      */
     private fun initEditText() {
         binding.etTemp.run {
-            setText(appViewModel.settingState.value.temp.toString().removeZero())
+            setText(appViewModel.settings.value.temp.toString().removeZero())
             afterTextChange {
                 if (it.isNotEmpty()) {
                     viewModel.setAntibodyTemp(it.toFloat())

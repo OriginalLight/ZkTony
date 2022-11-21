@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:animateLayoutChanges="true">
 
-    <data></data>
+    <data />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container"

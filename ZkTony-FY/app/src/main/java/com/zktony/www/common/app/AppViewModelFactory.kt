@@ -6,7 +6,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.zktony.www.data.repository.RoomRepository
+import com.zktony.www.data.repository.CalibrationRepository
+import com.zktony.www.data.repository.MotorRepository
 import javax.inject.Inject
 
 /**
@@ -15,13 +16,14 @@ import javax.inject.Inject
 class AppViewModelFactory @Inject constructor(
     private val application: Application,
     private val dataStore: DataStore<Preferences>,
-    private val roomRepository: RoomRepository
-) : ViewModelProvider.Factory {
+    private val motorRepo: MotorRepository,
+    private val caliRepo: CalibrationRepository
+    ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
         return when (modelClass) {
-            AppViewModel::class.java -> AppViewModel(application, dataStore, roomRepository)
+            AppViewModel::class.java -> AppViewModel(application, dataStore, motorRepo, caliRepo)
             else -> throw IllegalArgumentException("Unknown class $modelClass")
         } as T
     }

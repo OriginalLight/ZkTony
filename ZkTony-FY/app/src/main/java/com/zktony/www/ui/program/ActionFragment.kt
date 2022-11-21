@@ -3,7 +3,9 @@ package com.zktony.www.ui.program
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.BottomMenu
 import com.kongzue.dialogx.dialogs.PopTip
@@ -39,33 +41,35 @@ class ActionFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            launch {
-                viewModel.actionList.collect {
-                    actionAdapter.submitList(it)
-                }
-            }
-            launch {
-                viewModel.buttonEnable.collect {
-                    binding.btnAdd.run {
-                        isEnabled = it
-                        alpha = if (it) 1f else 0.5f
-                        text =
-                            if (it) resources.getString(R.string.add)
-                            else resources.getString(R.string.add_ban)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.actionList.collect {
+                        actionAdapter.submitList(it)
                     }
                 }
-            }
-            launch {
-                viewModel.action.collect {
-                    if (getActionEnum(it.mode) == ActionEnum.WASHING) {
-                        binding.run {
-                            inputCount.visibility = View.VISIBLE
-                            inputTime.hint = resources.getString(R.string.hint_time_min)
+                launch {
+                    viewModel.buttonEnable.collect {
+                        binding.btnAdd.run {
+                            isEnabled = it
+                            alpha = if (it) 1f else 0.5f
+                            text =
+                                if (it) resources.getString(R.string.add)
+                                else resources.getString(R.string.add_ban)
                         }
-                    } else {
-                        binding.run {
-                            inputCount.visibility = View.GONE
-                            inputTime.hint = resources.getString(R.string.hint_time_hour)
+                    }
+                }
+                launch {
+                    viewModel.action.collect {
+                        if (getActionEnum(it.mode) == ActionEnum.WASHING) {
+                            binding.run {
+                                inputCount.visibility = View.VISIBLE
+                                inputTime.hint = resources.getString(R.string.hint_time_min)
+                            }
+                        } else {
+                            binding.run {
+                                inputCount.visibility = View.GONE
+                                inputTime.hint = resources.getString(R.string.hint_time_hour)
+                            }
                         }
                     }
                 }
