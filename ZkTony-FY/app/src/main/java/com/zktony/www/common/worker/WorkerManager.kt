@@ -16,8 +16,8 @@ class WorkerManager {
 
     private val logRequest by lazy {
         PeriodicWorkRequestBuilder<LogWorker>(60, TimeUnit.MINUTES).setConstraints(
-                Constraints.Builder().build()
-            ).build()
+            Constraints.Builder().build()
+        ).build()
     }
 
     fun createWorker() {

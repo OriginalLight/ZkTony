@@ -32,7 +32,6 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
         holder.bind(getItem(position))
     }
 
-
     class ViewHolder(
         private val binding: ItemLogBinding
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -43,25 +42,28 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
                 log = item
                 order.text = (layoutPosition + 1).toString()
                 module.text = getModuleFromIndex(item.module).value.substring(2, 3)
-                module.setTextColor(when(item.module){
-                    0 -> root.context.getColorStateList(android.R.color.holo_red_dark)
-                    1 -> root.context.getColorStateList(android.R.color.holo_blue_dark)
-                    2 -> root.context.getColorStateList(android.R.color.holo_green_dark)
-                    3 -> root.context.getColorStateList(android.R.color.holo_orange_dark)
-                    else -> root.context.getColorStateList(android.R.color.holo_red_dark)
-                })
+                module.setTextColor(
+                    when (item.module) {
+                        0 -> root.context.getColorStateList(android.R.color.holo_red_dark)
+                        1 -> root.context.getColorStateList(android.R.color.holo_blue_dark)
+                        2 -> root.context.getColorStateList(android.R.color.holo_green_dark)
+                        3 -> root.context.getColorStateList(android.R.color.holo_orange_dark)
+                        else -> root.context.getColorStateList(android.R.color.holo_red_dark)
+                    }
+                )
                 status.text = when (item.status) {
-                    0 -> "进行中"
+                    0 -> "未完成"
                     1 -> "已完成"
-                    2 -> "已取消"
-                    else -> "进行中"
+                    else -> "未完成"
                 }
-                status.setTextColor(when (item.status) {
-                    0 -> root.context.getColorStateList(android.R.color.holo_blue_dark)
-                    1 -> root.context.getColorStateList(android.R.color.holo_green_dark)
-                    2 -> root.context.getColorStateList(android.R.color.holo_red_dark)
-                    else -> root.context.getColorStateList(android.R.color.holo_blue_dark)
-                })
+                status.setTextColor(
+                    when (item.status) {
+                        0 -> root.context.getColorStateList(android.R.color.holo_blue_dark)
+                        1 -> root.context.getColorStateList(android.R.color.holo_green_dark)
+                        2 -> root.context.getColorStateList(android.R.color.holo_red_dark)
+                        else -> root.context.getColorStateList(android.R.color.holo_blue_dark)
+                    }
+                )
                 time.text = item.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 executePendingBindings()
             }

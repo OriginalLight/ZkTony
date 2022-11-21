@@ -2,7 +2,9 @@ package com.zktony.www.ui.admin
 
 import android.os.Bundle
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.BottomMenu
 import com.zktony.www.R
@@ -35,13 +37,15 @@ class MotorFragment :
      */
     private fun initObserver() {
         lifecycleScope.launch {
-            launch {
-                viewModel.motorList.collect {
-                    motorAdapter.submitList(it)
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.motorList.collect {
+                        motorAdapter.submitList(it)
+                    }
                 }
-            }
-            launch {
-                viewModel.selectedMotor.collect { onSelectedMotorChange(it) }
+                launch {
+                    viewModel.selectedMotor.collect { onSelectedMotorChange(it) }
+                }
             }
         }
     }

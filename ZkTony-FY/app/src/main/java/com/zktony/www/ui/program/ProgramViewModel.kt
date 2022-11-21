@@ -15,15 +15,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProgramViewModel @Inject constructor(
-    private val programRepository: ProgramRepository,
-    private val actionRepository: ActionRepository
+    private val programRepo: ProgramRepository,
+    private val actionRepo: ActionRepository
 ) : BaseViewModel() {
     private val _programList = MutableStateFlow(emptyList<Program>())
     val programList = _programList.asStateFlow()
 
     init {
         viewModelScope.launch {
-            programRepository.getAll().collect {
+            programRepo.getAll().collect {
                 _programList.value = it
             }
         }
@@ -35,11 +35,11 @@ class ProgramViewModel @Inject constructor(
      */
     fun addProgram(programName: String) {
         viewModelScope.launch {
-            programRepository.getByName(programName).firstOrNull()?.let {
+            programRepo.getByName(programName).firstOrNull()?.let {
                 "已存在相同名称的程序".showShortToast()
                 return@launch
             }
-            programRepository.insert(Program(name = programName))
+            programRepo.insert(Program(name = programName))
         }
     }
 
@@ -49,8 +49,8 @@ class ProgramViewModel @Inject constructor(
      */
     fun deleteProgram(program: Program) {
         viewModelScope.launch {
-            programRepository.delete(program)
-            actionRepository.deleteByProgramId(program.id)
+            programRepo.delete(program)
+            actionRepo.deleteByProgramId(program.id)
         }
     }
 }

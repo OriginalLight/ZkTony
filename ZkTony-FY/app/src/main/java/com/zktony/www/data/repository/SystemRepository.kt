@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class SystemRepository @Inject constructor(
-    private val systemService: SystemService
+    private val service: SystemService
 ) {
     suspend fun getVersionInfo(id: Long) = flow {
         emit(NetworkResult.Loading)
-        emit(systemService.getVersionInfo(id).toResult())
+        emit(service.getVersionInfo(id).toResult())
     }
 }

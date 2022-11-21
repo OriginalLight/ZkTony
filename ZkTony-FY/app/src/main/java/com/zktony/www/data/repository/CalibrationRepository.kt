@@ -10,17 +10,17 @@ import javax.inject.Inject
  * @date: 2022-10-25 11:14
  */
 class CalibrationRepository @Inject constructor(
-    private val calibrationDao: CalibrationDao
+    private val dao: CalibrationDao
 ) {
     suspend fun insert(calibration: Calibration) {
-        calibrationDao.insert(calibration)
+        dao.insert(calibration)
     }
 
     suspend fun update(calibration: Calibration) {
-        calibrationDao.update(calibration)
+        dao.update(calibration)
     }
 
     fun getCalibration(): Flow<List<Calibration>> {
-        return calibrationDao.getCailbration()
+        return dao.getCailbration()
     }
 }

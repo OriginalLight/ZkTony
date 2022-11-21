@@ -2,9 +2,6 @@ package com.zktony.www.common.audio
 
 import android.content.Context
 import android.media.MediaPlayer
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class AudioPlayer {
 

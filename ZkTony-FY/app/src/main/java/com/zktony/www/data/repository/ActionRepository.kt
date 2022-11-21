@@ -10,29 +10,29 @@ import javax.inject.Inject
  * @date: 2022-09-30 11:29
  */
 class ActionRepository @Inject constructor(
-    private val actionDao: ActionDao
+    private val dao: ActionDao
 ) {
     suspend fun insert(action: Action) {
-        actionDao.insert(action)
+        dao.insert(action)
     }
 
     suspend fun delete(action: Action) {
-        actionDao.delete(action)
+        dao.delete(action)
     }
 
     suspend fun deleteByProgramId(programId: String) {
-        actionDao.deleteByProgramId(programId)
+        dao.deleteByProgramId(programId)
     }
 
     suspend fun update(action: Action) {
-        actionDao.update(action)
+        dao.update(action)
     }
 
     suspend fun updateBatch(actions: List<Action>) {
-        actionDao.updateBatch(actions)
+        dao.updateBatch(actions)
     }
 
     fun getByProgramId(programId: String): Flow<List<Action>> {
-        return actionDao.getByProgramId(programId)
+        return dao.getByProgramId(programId)
     }
 }

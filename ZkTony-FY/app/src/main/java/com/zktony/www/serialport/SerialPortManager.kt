@@ -6,32 +6,32 @@ import com.zktony.www.common.extension.*
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.serialport.SerialPort.*
 import com.zktony.www.serialport.protocol.Command
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class SerialPortManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
-    private val _responseOne = MutableStateFlow<String?>(null)
-    private val _responseTwo = MutableStateFlow<String?>(null)
-    private val _responseThree = MutableStateFlow<String?>(null)
-    private val _responseFour = MutableStateFlow<String?>(null)
+    private val _serialOneFlow = MutableStateFlow<String?>(null)
+    private val _serialTwoFlow = MutableStateFlow<String?>(null)
+    private val _serialThreeFlow = MutableStateFlow<String?>(null)
+    private val _serialFourFlow = MutableStateFlow<String?>(null)
 
-    val responseOne = _responseOne.asStateFlow()
-    val responseTwo = _responseTwo.asStateFlow()
-    val responseThree = _responseThree.asStateFlow()
-    val responseFour = _responseFour.asStateFlow()
+    val serialOneFlow = _serialOneFlow.asStateFlow()
+    val serialTwoFlow = _serialTwoFlow.asStateFlow()
+    val serialThreeFlow = _serialThreeFlow.asStateFlow()
+    val serialFourFlow = _serialFourFlow.asStateFlow()
 
     // 机构运行状态
     private var lock = false
+    // 机构运行已经等待的时间
     private var lockTime = 0L
+    // 机构运行小步骤等待时间
     private var waitTime = 40L
+    // 机构的抽屉状态
     private var drawer = false
-    // 正在执行的个数
+    // 正在执行模块的个数
     private var executing = 0
 
     init {
@@ -48,24 +48,24 @@ class SerialPortManager(
                         when (com) {
                             SERIAL_ONE.device -> {
                                 hexData.verifyHex().forEach {
-                                    _responseOne.value = it
+                                    _serialOneFlow.value = it
                                     Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
                                 }
                             }
                             SERIAL_TWO.device -> {
                                 hexData.verifyHex().forEach {
-                                    _responseTwo.value = it
+                                    _serialTwoFlow.value = it
                                     Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
                                 }
                             }
                             SERIAL_THREE.device -> {
                                 hexData.verifyHex().forEach {
-                                    _responseThree.value = it
+                                    _serialThreeFlow.value = it
                                     Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
                                 }
                             }
                             SERIAL_FOUR.device -> {
-                                _responseFour.value = hexData.hexToAscii()
+                                _serialFourFlow.value = hexData.hexToAscii()
                                 //Logger.d(msg = "串口四 receivedText: ${hexData.hexToAscii()}")
                             }
                         }
@@ -73,10 +73,10 @@ class SerialPortManager(
                 })
             }
             launch {
-                responseOne.collect {
+                serialOneFlow.collect {
                     it?.let {
                         val res = it.toCommand()
-                        if(res.function == "85" && res.parameter == "01") {
+                        if (res.function == "85" && res.parameter == "01") {
                             val total = res.data.substring(2, 4).hexToInt8()
                             val current = res.data.substring(6, 8).hexToInt8()
                             if (total == current) {
@@ -92,7 +92,7 @@ class SerialPortManager(
                             }
                         }
                         if (res.function == "86" && res.parameter == "01") {
-                            drawer = res.data.hexToInt8() > 0
+                            drawer = res.data.hexToInt8() == 0
                         }
                     }
                 }
@@ -101,11 +101,9 @@ class SerialPortManager(
                 while (true) {
                     delay(1000L)
                     Logger.d(msg = "lock: $lock, lockTime: $lockTime, executing: $executing, drawer: $drawer")
-                    // 如果正在运行，计时 否则清零
+                    // 如果正在运行，计时
                     if (lock) {
                         lockTime += 1L
-                    } else {
-                        lockTime = 0L
                     }
                     // 如果运行时间超过 60 秒，默认不运行，如果还有任务运行恢复摇床
                     if (lock && lockTime >= waitTime) {
@@ -158,7 +156,7 @@ class SerialPortManager(
      *  设置锁
      *  @param lock [Boolean] 是否锁定 true 锁定 false 解锁
      */
-    fun lock(lock : Boolean) {
+    fun lock(lock: Boolean) {
         this.lock = lock
         if (lock) {
             sendHex(SERIAL_ONE, Command.pauseShakeBed())

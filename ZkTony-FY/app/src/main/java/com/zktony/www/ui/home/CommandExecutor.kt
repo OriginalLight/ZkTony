@@ -1,6 +1,6 @@
 package com.zktony.www.ui.home
 
-import com.zktony.www.common.app.SettingState
+import com.zktony.www.common.app.Settings
 import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.MotionMotor
@@ -21,7 +21,7 @@ class CommandExecutor {
 
     private val serial = SerialPortManager.instance
     private lateinit var module: ModuleEnum
-    private lateinit var settingState: SettingState
+    private lateinit var settings: Settings
     private lateinit var action: Action
     private lateinit var motionMotor: MotionMotor
     private lateinit var pumpMotor: PumpMotor
@@ -34,11 +34,11 @@ class CommandExecutor {
         this.module = module
     }
 
-    fun initSettingState(settingState: SettingState) {
-        this.settingState = settingState
-        this.motionMotor = settingState.motionMotor
-        this.pumpMotor = settingState.pumpMotor
-        this.calibration = settingState.calibration
+    fun initSettingState(settings: Settings) {
+        this.settings = settings
+        this.motionMotor = settings.motionMotor
+        this.pumpMotor = settings.pumpMotor
+        this.calibration = settings.calibration
 
     }
 
@@ -52,35 +52,29 @@ class CommandExecutor {
      */
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
         serial.sendHex(SERIAL_ONE, Command.queryDrawer())
-        delay(300L)
+        delay(500L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR,
-                text = Command.setTemperature(
-                    module.index.toString(),
-                    action.temperature.toString()
+                serialPort = SERIAL_FOUR, text = Command.setTemperature(
+                    module.index.toString(), action.temperature.toString()
                 )
             )
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE,
-                hex = Command.multiPoint(
+                serialPort = SERIAL_ONE, hex = Command.multiPoint(
                     moveTo(
-                        calibration.blockingLiquidTankPosition,
-                        calibration.blockingLiquidTankHeight
+                        calibration.blockingY, calibration.blockingZ
                     )
                 )
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO,
-                hex = Command.multiPoint(addLiquid()[0])
+                serialPort = SERIAL_TWO, hex = Command.multiPoint(addLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE,
-                hex = Command.multiPoint(addLiquid()[1])
+                serialPort = SERIAL_THREE, hex = Command.multiPoint(addLiquid()[1])
             )
             block.invoke()
         }
@@ -92,35 +86,29 @@ class CommandExecutor {
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
         serial.sendHex(SERIAL_ONE, Command.queryDrawer())
-        delay(300L)
+        delay(500L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR,
-                text = Command.setTemperature(
-                    module.index.toString(),
-                    action.temperature.toString()
+                serialPort = SERIAL_FOUR, text = Command.setTemperature(
+                    module.index.toString(), action.temperature.toString()
                 )
             )
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE,
-                hex = Command.multiPoint(
+                serialPort = SERIAL_ONE, hex = Command.multiPoint(
                     moveTo(
-                        calibration.antibodyOneTankPosition,
-                        calibration.antibodyOneTankHeight
+                        calibration.antibodyOneY, calibration.antibodyOneZ
                     )
                 )
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO,
-                hex = Command.multiPoint(addLiquid()[0])
+                serialPort = SERIAL_TWO, hex = Command.multiPoint(addLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE,
-                hex = Command.multiPoint(addLiquid()[1])
+                serialPort = SERIAL_THREE, hex = Command.multiPoint(addLiquid()[1])
             )
             block.invoke()
         }
@@ -132,27 +120,23 @@ class CommandExecutor {
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
         serial.sendHex(SERIAL_ONE, Command.queryDrawer())
-        delay(300L)
+        delay(500L)
         waitForFree("等待回收") {
             serial.lock(true)
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE,
-                hex = Command.multiPoint(
+                serialPort = SERIAL_ONE, hex = Command.multiPoint(
                     moveTo(
-                        calibration.antibodyOneTankPosition,
-                        calibration.recycleAntibodyOneTankHeight
+                        calibration.antibodyOneY, calibration.recycleAntibodyOneZ
                     )
                 )
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO,
-                hex = Command.multiPoint(recycleLiquid()[0])
+                serialPort = SERIAL_TWO, hex = Command.multiPoint(recycleLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE,
-                hex = Command.multiPoint(recycleLiquid()[1])
+                serialPort = SERIAL_THREE, hex = Command.multiPoint(recycleLiquid()[1])
             )
             block.invoke()
         }
@@ -164,35 +148,29 @@ class CommandExecutor {
      */
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
         serial.sendHex(SERIAL_ONE, Command.queryDrawer())
-        delay(300L)
+        delay(500L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR,
-                text = Command.setTemperature(
-                    module.index.toString(),
-                    action.temperature.toString()
+                serialPort = SERIAL_FOUR, text = Command.setTemperature(
+                    module.index.toString(), action.temperature.toString()
                 )
             )
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE,
-                hex = Command.multiPoint(
+                serialPort = SERIAL_ONE, hex = Command.multiPoint(
                     moveTo(
-                        calibration.antibodyTwoTankPosition,
-                        calibration.antibodyTwoTankHeight
+                        calibration.antibodyTwoY, calibration.antibodyTwoZ
                     )
                 )
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO,
-                hex = Command.multiPoint(addLiquid()[0])
+                serialPort = SERIAL_TWO, hex = Command.multiPoint(addLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE,
-                hex = Command.multiPoint(addLiquid()[1])
+                serialPort = SERIAL_THREE, hex = Command.multiPoint(addLiquid()[1])
             )
             block.invoke()
         }
@@ -204,35 +182,29 @@ class CommandExecutor {
      */
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
         serial.sendHex(SERIAL_ONE, Command.queryDrawer())
-        delay(300L)
+        delay(500L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR,
-                text = Command.setTemperature(
-                    module.index.toString(),
-                    action.temperature.toString()
+                serialPort = SERIAL_FOUR, text = Command.setTemperature(
+                    module.index.toString(), action.temperature.toString()
                 )
             )
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE,
-                hex = Command.multiPoint(
+                serialPort = SERIAL_ONE, hex = Command.multiPoint(
                     moveTo(
-                        calibration.washTankPosition,
-                        calibration.washTankHeight
+                        calibration.washingY, calibration.washingZ
                     )
                 )
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO,
-                hex = Command.multiPoint(addLiquid()[0])
+                serialPort = SERIAL_TWO, hex = Command.multiPoint(addLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE,
-                hex = Command.multiPoint(addLiquid()[1])
+                serialPort = SERIAL_THREE, hex = Command.multiPoint(addLiquid()[1])
             )
             block.invoke()
         }
@@ -245,27 +217,23 @@ class CommandExecutor {
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
         serial.sendHex(SERIAL_ONE, Command.queryDrawer())
-        delay(300L)
+        delay(500L)
         waitForFree("等待清理") {
             serial.lock(true)
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE,
-                hex = Command.multiPoint(
+                serialPort = SERIAL_ONE, hex = Command.multiPoint(
                     moveTo(
-                        calibration.wasteTankPosition,
-                        calibration.wasteTankHeight
+                        calibration.wasteY, calibration.wasteZ
                     )
                 )
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO,
-                hex = Command.multiPoint(recycleLiquid()[0])
+                serialPort = SERIAL_TWO, hex = Command.multiPoint(recycleLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE,
-                hex = Command.multiPoint(recycleLiquid()[1])
+                serialPort = SERIAL_THREE, hex = Command.multiPoint(recycleLiquid()[1])
             )
             block.invoke()
         }
@@ -275,10 +243,10 @@ class CommandExecutor {
      * 主机命令生成器
      */
     private fun moveTo(distance: Float, height: Float): String {
-        return motionMotor.toMotionHex(distance, 0f) +
-                motionMotor.toMotionHex(distance, height) +
-                motionMotor.toMotionHex(distance, 0f) +
-                motionMotor.toMotionHex(0f, 0f)
+        return motionMotor.toMotionHex(distance, 0f) + motionMotor.toMotionHex(
+            distance,
+            height
+        ) + motionMotor.toMotionHex(distance, 0f) + motionMotor.toMotionHex(0f, 0f)
     }
 
     /**
@@ -295,14 +263,13 @@ class CommandExecutor {
             five = if (action.mode == 3) action.liquidVolume else 0f
         )
         val stepTwo = pumpMotor.toPumpHex(
-            one = if(module == A) action.liquidVolume + pumpMotor.volumeOne * calibration.drainDistance else 0f,
-            two = if(module == B) action.liquidVolume + pumpMotor.volumeTwo * calibration.drainDistance else 0f,
-            three = if(module == C) action.liquidVolume + pumpMotor.volumeThree * calibration.drainDistance else 0f,
-            four = if(module == D) action.liquidVolume + pumpMotor.volumeFour * calibration.drainDistance else 0f,
+            one = if (module == A) action.liquidVolume + pumpMotor.volumeOne * calibration.extract else 0f,
+            two = if (module == B) action.liquidVolume + pumpMotor.volumeTwo * calibration.extract else 0f,
+            three = if (module == C) action.liquidVolume + pumpMotor.volumeThree * calibration.extract else 0f,
+            four = if (module == D) action.liquidVolume + pumpMotor.volumeFour * calibration.extract else 0f,
         )
         return listOf(
-            zero + stepOne[0] + zero + stepTwo[0],
-            zero + stepOne[1] + zero + stepTwo[1]
+            zero + stepOne[0] + zero + stepTwo[0], zero + stepOne[1] + zero + stepTwo[1]
         )
     }
 
@@ -313,14 +280,13 @@ class CommandExecutor {
     private fun recycleLiquid(): List<String> {
         val zero = "0,0,0,"
         val recycle = pumpMotor.toPumpHex(
-            one = if (module == A) -(action.liquidVolume + pumpMotor.volumeOne * calibration.drainDistance) else 0f,
-            two = if (module == B) -(action.liquidVolume + pumpMotor.volumeTwo * calibration.drainDistance) else 0f,
-            three = if (module == C) -(action.liquidVolume + pumpMotor.volumeThree * calibration.drainDistance) else 0f,
-            four = if (module == D) -(action.liquidVolume + pumpMotor.volumeFour * calibration.drainDistance) else 0f,
+            one = if (module == A) -(action.liquidVolume + pumpMotor.volumeOne * calibration.extract) else 0f,
+            two = if (module == B) -(action.liquidVolume + pumpMotor.volumeTwo * calibration.extract) else 0f,
+            three = if (module == C) -(action.liquidVolume + pumpMotor.volumeThree * calibration.extract) else 0f,
+            four = if (module == D) -(action.liquidVolume + pumpMotor.volumeFour * calibration.extract) else 0f,
         )
         return listOf(
-            zero + recycle[0] + zero + zero,
-            zero + recycle[1] + zero + zero
+            zero + recycle[0] + zero + zero, zero + recycle[1] + zero + zero
         )
     }
 

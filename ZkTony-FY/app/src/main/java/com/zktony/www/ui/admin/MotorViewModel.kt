@@ -10,13 +10,14 @@ import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.getSerialPort
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MotorViewModel @Inject constructor(
-    private val motorRepository: MotorRepository
+    private val repo: MotorRepository
 ) : BaseViewModel() {
 
     @Inject
@@ -31,10 +32,12 @@ class MotorViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            motorRepository.getAll().collect { motors ->
+            repo.getAll().collect { motors ->
                 _motorList.value = motors
-                _editMotor.value = if (editMotor.value.name.isEmpty()) motors.first() else editMotor.value
-                _selectedMotor.value = if (selectedMotor.value.name.isEmpty()) motors.first() else selectedMotor.value
+                _editMotor.value =
+                    if (editMotor.value.name.isEmpty()) motors.first() else editMotor.value
+                _selectedMotor.value =
+                    if (selectedMotor.value.name.isEmpty()) motors.first() else selectedMotor.value
             }
         }
     }
@@ -62,7 +65,7 @@ class MotorViewModel @Inject constructor(
     fun updateMotor() {
         viewModelScope.launch {
             if (validateMotor(editMotor.value)) {
-                motorRepository.update(editMotor.value)
+                repo.update(editMotor.value)
                 SerialPortManager.instance.sendHex(
                     getSerialPort(editMotor.value.board),
                     Command(

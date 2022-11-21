@@ -43,9 +43,9 @@ import javax.inject.Inject
 @HiltViewModel
 class AdminViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
-    private val motorRepository: MotorRepository,
-    private val calibrationRepository: CalibrationRepository,
-    private val systemRepository: SystemRepository,
+    private val motorRepo: MotorRepository,
+    private val caliRepo: CalibrationRepository,
+    private val sysRepo: SystemRepository,
 ) : BaseViewModel() {
 
     @Inject
@@ -61,21 +61,21 @@ class AdminViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                SerialPortManager.instance.responseOne.collect {
+                SerialPortManager.instance.serialOneFlow.collect {
                     it?.let {
                         onSerialOneResponse(it)
                     }
                 }
             }
             launch {
-                SerialPortManager.instance.responseTwo.collect {
+                SerialPortManager.instance.serialTwoFlow.collect {
                     it?.let {
                         onSerialTwoResponse(it)
                     }
                 }
             }
             launch {
-                SerialPortManager.instance.responseThree.collect {
+                SerialPortManager.instance.serialThreeFlow.collect {
                     it?.let {
                         onSerialThreeResponse(it)
                     }
@@ -204,7 +204,7 @@ class AdminViewModel @Inject constructor(
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (CommonApplicationProxy.application.isNetworkAvailable()) {
-                systemRepository.getVersionInfo(DEVICE_ID).collect {
+                sysRepo.getVersionInfo(DEVICE_ID).collect {
                     when (it) {
                         is NetworkResult.Success -> {
                             if (it.data.versionCode > BuildConfig.VERSION_CODE) {
@@ -285,7 +285,7 @@ class AdminViewModel @Inject constructor(
      */
     private fun initMotor() {
         viewModelScope.launch {
-            motorRepository.getAll().first().run {
+            motorRepo.getAll().first().run {
                 if (this.isEmpty()) {
                     val motorList = mutableListOf<Motor>()
                     motorList.add(Motor(name = "X轴", address = 1))
@@ -300,7 +300,7 @@ class AdminViewModel @Inject constructor(
                         )
                         motorList.add(motor)
                     }
-                    motorRepository.insertBatch(motorList)
+                    motorRepo.insertBatch(motorList)
                 }
             }
         }
@@ -317,11 +317,8 @@ class AdminViewModel @Inject constructor(
                         break
                     }
                     SerialPortManager.instance.sendHex(
-                        getSerialPort(i),
-                        Command(
-                            function = "03",
-                            parameter = "04",
-                            data = j.int8ToHex()
+                        getSerialPort(i), Command(
+                            function = "03", parameter = "04", data = j.int8ToHex()
                         ).toHex()
                     )
                     delay(100L)
@@ -336,8 +333,8 @@ class AdminViewModel @Inject constructor(
      */
     private fun updateMotorParameters(motor: Motor) {
         viewModelScope.launch {
-            motorRepository.getByBoardAndAddress(motor.board, motor.address).firstOrNull()?.let {
-                motorRepository.update(
+            motorRepo.getByBoardAndAddress(motor.board, motor.address).firstOrNull()?.let {
+                motorRepo.update(
                     it.copy(
                         subdivision = motor.subdivision,
                         speed = motor.speed,
@@ -357,9 +354,9 @@ class AdminViewModel @Inject constructor(
     private fun initCalibration() {
         viewModelScope.launch {
             // 获取不到校准参数则初始化
-            calibrationRepository.getCalibration().first().let {
+            caliRepo.getCalibration().first().let {
                 if (it.isEmpty()) {
-                    calibrationRepository.insert(Calibration())
+                    caliRepo.insert(Calibration())
                 }
             }
         }

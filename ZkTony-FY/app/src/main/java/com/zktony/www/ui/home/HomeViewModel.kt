@@ -34,9 +34,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val programRepository: ProgramRepository,
-    private val actionRepository: ActionRepository,
-    private val logRepository: LogRepository,
+    private val programRepo: ProgramRepository,
+    private val actionRepo: ActionRepository,
+    private val logRepo: LogRepository,
 ) : BaseViewModel() {
 
     @Inject
@@ -45,35 +45,35 @@ class HomeViewModel @Inject constructor(
     private val serial = SerialPortManager.instance
 
     private val _programList = MutableStateFlow<List<Program>>(emptyList())
-    private val _aState = MutableStateFlow(ModuleState())
-    private val _bState = MutableStateFlow(ModuleState())
-    private val _cState = MutableStateFlow(ModuleState())
-    private val _dState = MutableStateFlow(ModuleState())
-    private val _eState = MutableStateFlow(OperationState())
+    private val _stateOne = MutableStateFlow(UiState())
+    private val _stateTwo = MutableStateFlow(UiState())
+    private val _stateThree = MutableStateFlow(UiState())
+    private val _stateFour = MutableStateFlow(UiState())
+    private val _stateOperating = MutableStateFlow(OperationState())
     val programList = _programList.asStateFlow()
-    val aState = _aState.asStateFlow()
-    val bState = _bState.asStateFlow()
-    val cState = _cState.asStateFlow()
-    val dState = _dState.asStateFlow()
-    val eState = _eState.asStateFlow()
+    val stateOne = _stateOne.asStateFlow()
+    val stateTwo = _stateTwo.asStateFlow()
+    val stateThree = _stateThree.asStateFlow()
+    val stateFour = _stateFour.asStateFlow()
+    val stateOperating = _stateOperating.asStateFlow()
 
     init {
         viewModelScope.launch {
             launch {
-                programRepository.getAll().collect {
+                programRepo.getAll().collect {
                     _programList.value = it
                     onProgramChange(it)
                 }
             }
             launch {
-                serial.responseOne.collect {
+                serial.serialOneFlow.collect {
                     it?.let {
                         onSerialOneResponse(it)
                     }
                 }
             }
             launch {
-                serial.responseFour.collect {
+                serial.serialFourFlow.collect {
                     it?.let {
                         onSerialFourResponse(it)
                     }
@@ -84,13 +84,11 @@ class HomeViewModel @Inject constructor(
                 for (i in 0..4) {
                     delay(200L)
                     serial.sendText(
-                        SERIAL_FOUR,
-                        Command.saveTemperature(i.toString(), "26")
+                        SERIAL_FOUR, Command.saveTemperature(i.toString(), "26")
                     )
                     delay(200L)
                     serial.sendText(
-                        SERIAL_FOUR,
-                        Command.setTemperature(i.toString(), "26")
+                        SERIAL_FOUR, Command.setTemperature(i.toString(), "26")
                     )
                 }
                 // 每一分钟查询一次温度
@@ -98,8 +96,7 @@ class HomeViewModel @Inject constructor(
                     for (i in 0..4) {
                         delay(200L)
                         serial.sendText(
-                            SERIAL_FOUR,
-                            Command.queryTemperature(i.toString())
+                            SERIAL_FOUR, Command.queryTemperature(i.toString())
                         )
                     }
                     delay(10 * 1000L)
@@ -114,10 +111,10 @@ class HomeViewModel @Inject constructor(
      * @return 状态
      */
     private fun getState(module: ModuleEnum) = when (module) {
-        A -> _aState
-        B -> _bState
-        C -> _cState
-        D -> _dState
+        A -> _stateOne
+        B -> _stateTwo
+        C -> _stateThree
+        D -> _stateFour
     }
 
     /**
@@ -164,7 +161,7 @@ class HomeViewModel @Inject constructor(
             state.value.run {
                 job?.let { if (it.isActive) it.cancel() }
                 log?.let { log ->
-                    logRepository.delete(log)
+                    logRepo.delete(log)
                 }
             }
             state.value = state.value.copy(
@@ -172,9 +169,9 @@ class HomeViewModel @Inject constructor(
                 btnStartVisible = View.VISIBLE,
                 btnStopVisible = View.GONE,
                 btnSelectorEnable = true,
-                runtimeText = "已就绪",
+                runtimeText = if (state.value.runtimeText != "已完成") "已就绪" else state.value.runtimeText,
                 currentActionText = "/",
-                countDownText = Constants.ZERO_TIME,
+                countDownText = if (state.value.runtimeText != "已完成") Constants.ZERO_TIME else state.value.countDownText,
             )
             delay(200L)
             if (serial.getExecuting() == 0) {
@@ -194,10 +191,6 @@ class HomeViewModel @Inject constructor(
             )
             serial.sendHex(SERIAL_ONE, Command().toHex())
             PopTip.show(R.mipmap.ic_reset, "复位-已下发")
-            stop(A)
-            stop(B)
-            stop(C)
-            stop(D)
         } else {
             PopTip.show("请中止所有运行中程序")
         }
@@ -210,9 +203,10 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             serial.sendHex(
                 SERIAL_ONE,
-                if (_eState.value.pauseEnable) Command.resumeShakeBed() else Command.pauseShakeBed()
+                if (_stateOperating.value.pauseEnable) Command.resumeShakeBed() else Command.pauseShakeBed()
             )
-            _eState.value = _eState.value.copy(pauseEnable = !_eState.value.pauseEnable)
+            _stateOperating.value =
+                _stateOperating.value.copy(pauseEnable = !_stateOperating.value.pauseEnable)
         }
     }
 
@@ -221,15 +215,15 @@ class HomeViewModel @Inject constructor(
      */
     fun insulating() {
         viewModelScope.launch {
-            val temp = appViewModel.settingState.value.temp.toString().removeZero()
+            val temp = appViewModel.settings.value.temp.toString().removeZero()
             serial.sendText(
-                SERIAL_FOUR,
-                Command.setTemperature(
+                SERIAL_FOUR, Command.setTemperature(
                     address = "0",
-                    temperature = if (_eState.value.insulatingEnable) "26" else temp
+                    temperature = if (_stateOperating.value.insulatingEnable) "26" else temp
                 )
             )
-            _eState.value = _eState.value.copy(insulatingEnable = !_eState.value.insulatingEnable)
+            _stateOperating.value =
+                _stateOperating.value.copy(insulatingEnable = !_stateOperating.value.insulatingEnable)
         }
     }
 
@@ -240,7 +234,15 @@ class HomeViewModel @Inject constructor(
     private fun onSerialOneResponse(hex: String) {
         val command = hex.toCommand()
         when (command.function) {
-            "86" -> resetCallBack(command)
+            "86" -> {
+                if (command.parameter == "0A") {
+                    if (command.data == "00") {
+                        PopTip.show("复位成功")
+                    } else {
+                        PopTip.show("复位失败")
+                    }
+                }
+            }
         }
     }
 
@@ -255,29 +257,17 @@ class HomeViewModel @Inject constructor(
                 val address = hex.substring(hex.length - 2, hex.length - 1).toInt()
                 val temp = hex.extractTemp()
                 when (address) {
-                    1 -> _aState.value = _aState.value.copy(tempText = "$temp ℃")
-                    2 -> _bState.value = _bState.value.copy(tempText = "$temp ℃")
-                    3 -> _cState.value = _cState.value.copy(tempText = "$temp ℃")
-                    4 -> _dState.value = _dState.value.copy(tempText = "$temp ℃")
-                    0 -> _eState.value = _eState.value.copy(insulatingTemp = "$temp ℃")
+                    1 -> _stateOne.value = _stateOne.value.copy(tempText = "$temp ℃")
+                    2 -> _stateTwo.value = _stateTwo.value.copy(tempText = "$temp ℃")
+                    3 -> _stateThree.value = _stateThree.value.copy(tempText = "$temp ℃")
+                    4 -> _stateFour.value = _stateFour.value.copy(tempText = "$temp ℃")
+                    0 -> _stateOperating.value =
+                        _stateOperating.value.copy(insulatingTemp = "$temp ℃")
                 }
             }
         }
     }
 
-    /**
-     * 复位反馈
-     * @param command [Command] 命令
-     */
-    private fun resetCallBack(command: Command) {
-        viewModelScope.launch {
-            if (command.parameter == "0A" && command.data == "00") {
-                PopTip.show("复位成功")
-            } else {
-                PopTip.show("复位失败")
-            }
-        }
-    }
 
     /**
      * 程序发生变化添加删除时候更新选中的index
@@ -285,7 +275,7 @@ class HomeViewModel @Inject constructor(
      */
     private fun onProgramChange(programList: List<Program>) {
         if (programList.isNotEmpty()) {
-            listOf(_aState, _bState, _cState, _dState).forEach { state ->
+            listOf(_stateOne, _stateTwo, _stateThree, _stateFour).forEach { state ->
                 if (state.value.program == null) {
                     state.value = state.value.copy(
                         program = programList[0],
@@ -299,16 +289,17 @@ class HomeViewModel @Inject constructor(
                         )
                     } else {
                         state.value = state.value.copy(
+                            program = programList.find { it.id == state.value.program!!.id },
                             btnStartEnable = programList.find { it.id == state.value.program!!.id }!!.actionCount > 0
                         )
                     }
                 }
             }
         } else {
-            _aState.value = _aState.value.copy(program = null, btnStartEnable = false)
-            _bState.value = _bState.value.copy(program = null, btnStartEnable = false)
-            _cState.value = _cState.value.copy(program = null, btnStartEnable = false)
-            _dState.value = _dState.value.copy(program = null, btnStartEnable = false)
+            _stateOne.value = _stateOne.value.copy(program = null, btnStartEnable = false)
+            _stateTwo.value = _stateTwo.value.copy(program = null, btnStartEnable = false)
+            _stateThree.value = _stateThree.value.copy(program = null, btnStartEnable = false)
+            _stateFour.value = _stateFour.value.copy(program = null, btnStartEnable = false)
         }
     }
 
@@ -320,12 +311,12 @@ class HomeViewModel @Inject constructor(
     private fun runProgram(module: ModuleEnum, program: Program) {
         val job = viewModelScope.launch {
             val actionQueue = Queue<Action>()
-            actionRepository.getByProgramId(program.id).first().forEach {
+            actionRepo.getByProgramId(program.id).first().forEach {
                 actionQueue.enqueue(it)
             }
             val runner = ProgramExecutor.Builder().setModule(module).setActionQueue(actionQueue)
-                .setSettingState(appViewModel.settingState.value).build()
-            programStateCollector(runner)
+                .setSettingState(appViewModel.settings.value).build()
+            stateCollector(runner)
             runner.run()
         }
         viewModelScope.launch {
@@ -336,9 +327,9 @@ class HomeViewModel @Inject constructor(
                 module = module.index,
                 actions = state.value.program!!.actions,
             )
-            logRepository.insert(log)
+            logRepo.insert(log)
             state.value = state.value.copy(job = job, log = log)
-            programRepository.update(
+            programRepo.update(
                 state.value.program!!.copy(
                     runCount = state.value.program!!.runCount + 1
                 )
@@ -350,7 +341,7 @@ class HomeViewModel @Inject constructor(
      * 程序运行状态收集器
      * @param job [ProgramExecutor] 运行器
      */
-    private fun programStateCollector(job: ProgramExecutor) {
+    private fun stateCollector(job: ProgramExecutor) {
         viewModelScope.launch {
             job.event.collect {
                 when (it) {
@@ -366,21 +357,18 @@ class HomeViewModel @Inject constructor(
                     is ActionEvent.Finish -> {
                         val state = getState(it.module)
                         state.value.log?.let { log ->
-                            logRepository.update(log.copy(status = 1))
+                            logRepo.update(log.copy(status = 1))
                         }
                         state.value = state.value.copy(
-                            runtimeText = "已完成",
-                            countDownText = "已完成",
-                            log = null
+                            runtimeText = "已完成", countDownText = "已完成", log = null
                         )
                         stop(it.module)
                     }
                     is ActionEvent.Count -> {
                         val state = getState(it.module)
                         state.value = state.value.copy(
-                            currentActionText = _aState.value.currentActionText.substring(
-                                0,
-                                2
+                            currentActionText = _stateOne.value.currentActionText.substring(
+                                0, 2
                             ) + " X${it.count}"
                         )
                     }
@@ -395,7 +383,7 @@ class HomeViewModel @Inject constructor(
 }
 
 
-data class ModuleState(
+data class UiState(
     val job: Job? = null,
     val program: Program? = null,
     val log: Log? = null,
@@ -416,10 +404,7 @@ data class OperationState(
 )
 
 enum class ModuleEnum(val value: String, val index: Int) {
-    A("模块A", 0),
-    B("模块B", 1),
-    C("模块C", 2),
-    D("模块D", 3),
+    A("模块A", 0), B("模块B", 1), C("模块C", 2), D("模块D", 3),
 }
 
 fun getModuleFromIndex(index: Int): ModuleEnum {
