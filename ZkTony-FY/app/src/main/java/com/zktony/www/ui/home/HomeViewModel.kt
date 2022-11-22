@@ -97,8 +97,7 @@ class HomeViewModel @Inject constructor(
                                 2 -> _stateTwo.value = _stateTwo.value.copy(tempText = "$temp ℃")
                                 3 -> _stateThree.value = _stateThree.value.copy(tempText = "$temp ℃")
                                 4 -> _stateFour.value = _stateFour.value.copy(tempText = "$temp ℃")
-                                0 -> _stateButton.value =
-                                    _stateButton.value.copy(insulatingTemp = "$temp ℃")
+                                0 -> _stateButton.value = _stateButton.value.copy(insulatingTemp = "$temp ℃")
                             }
                         }
                     }
@@ -109,19 +108,26 @@ class HomeViewModel @Inject constructor(
                 for (i in 0..4) {
                     delay(200L)
                     serial.sendText(
-                        SERIAL_FOUR, Command.saveTemperature(i.toString(), "26")
+                        serialPort = SERIAL_FOUR, text = Command.saveTemperature(
+                            address = i.toString(),
+                            temperature = "26"
+                        )
                     )
                     delay(200L)
                     serial.sendText(
-                        SERIAL_FOUR, Command.setTemperature(i.toString(), "26")
+                        serialPort = SERIAL_FOUR, text = Command.setTemperature(
+                            address = i.toString(),
+                            temperature = "26"
+                        )
                     )
                 }
-                // 每一分钟查询一次温度
+                // 每十秒钟查询一次温度
                 while (true) {
                     for (i in 0..4) {
                         delay(200L)
                         serial.sendText(
-                            SERIAL_FOUR, Command.queryTemperature(i.toString())
+                            serialPort = SERIAL_FOUR,
+                            text = Command.queryTemperature(i.toString())
                         )
                     }
                     delay(10 * 1000L)
@@ -199,29 +205,33 @@ class HomeViewModel @Inject constructor(
      */
     fun start(module: ModuleEnum) {
         viewModelScope.launch {
+            // 获取模块对应的状态
             val state = stateSelector(module)
+            // 更新状态
             state.value = state.value.copy(
                 btnStartVisible = View.GONE,
                 btnStopVisible = View.VISIBLE,
                 btnSelectorEnable = false,
                 runtimeText = "运行中",
             )
-            val job = viewModelScope.launch {
+            // 创建job
+            val job = launch {
+                // 将程序中的所有步骤排序放入队列
                 val actionQueue = Queue<Action>()
                 actionRepo.getByProgramId(state.value.program!!.id).first().forEach {
                     actionQueue.enqueue(it)
                 }
-                val runner = ProgramExecutor.Builder()
-                    .setModule(module)
-                    .setActionQueue(actionQueue)
-                    .setSettingState(appViewModel.settings.value)
-                    .build()
+                // 创建程序执行者
+                val runner = ProgramExecutor.Builder().setModule(module).setActionQueue(actionQueue)
+                    .setSettingState(appViewModel.settings.value).build()
+                // 收集执行者的状态
                 launch {
                     runner.event.collect {
                         when (it) {
                             is ActionEvent.CurrentAction -> {
-                                state.value =
-                                    state.value.copy(currentActionText = getActionEnum(it.action.mode).value)
+                                state.value = state.value.copy(
+                                    currentActionText = getActionEnum(it.action.mode).value
+                                )
                             }
                             is ActionEvent.CurrentActionTime -> {
                                 state.value = state.value.copy(countDownText = it.time)
@@ -237,9 +247,10 @@ class HomeViewModel @Inject constructor(
                             }
                             is ActionEvent.Count -> {
                                 state.value = state.value.copy(
-                                    currentActionText = _stateOne.value.currentActionText.substring(
-                                        0, 2
-                                    ) + " X${it.count}"
+                                    currentActionText = if (state.value.currentActionText.startsWith(
+                                            "洗涤"
+                                        )
+                                    ) "洗涤 X${it.count}" else state.value.currentActionText
                                 )
                             }
                             is ActionEvent.Wait -> {
@@ -250,15 +261,22 @@ class HomeViewModel @Inject constructor(
                 }
                 runner.run()
             }
-            viewModelScope.launch {
+            // 更新状态中的job
+            launch {
+                // 取消之前的job，防止多个job同时执行
                 state.value.job?.cancel()
+                // 创建日志
                 val log = Log(
                     programName = state.value.program!!.name,
                     module = module.index,
                     actions = state.value.program!!.actions,
                 )
                 logRepo.insert(log)
-                state.value = state.value.copy(job = job, log = log)
+                // 更新状态中的job和日志
+                state.value = state.value.copy(
+                    job = job, log = log
+                )
+                // 更新当前程序的运行次数
                 programRepo.update(
                     state.value.program!!.copy(
                         runCount = state.value.program!!.runCount + 1
@@ -274,13 +292,17 @@ class HomeViewModel @Inject constructor(
      */
     fun stop(module: ModuleEnum) {
         viewModelScope.launch {
+            // 获取对应模块的状态
             val state = stateSelector(module)
             state.value.run {
+                // 取消协程
                 job?.cancel()
+                // 非正常停止删除日志
                 log?.let { log ->
                     logRepo.delete(log)
                 }
             }
+            // 更新状态
             state.value = state.value.copy(
                 job = null,
                 btnStartVisible = View.VISIBLE,
@@ -290,9 +312,12 @@ class HomeViewModel @Inject constructor(
                 currentActionText = "/",
                 countDownText = if (state.value.runtimeText != "已完成") Constants.ZERO_TIME else state.value.countDownText,
             )
+            // 等待一下，当还有没有其他程序在运行中时，暂停摇床
             delay(200L)
             if (serial.getExecuting() == 0) {
-                serial.sendHex(SERIAL_ONE, Command.pauseShakeBed())
+                serial.sendHex(
+                    serialPort = SERIAL_ONE, hex = Command.pauseShakeBed()
+                )
             }
         }
     }
@@ -301,15 +326,19 @@ class HomeViewModel @Inject constructor(
      * 机构复位
      */
     fun reset() {
-        if (serial.getExecuting() == 0) {
-            serial.sendHex(
-                SERIAL_ONE,
-                Command(function = "05", parameter = "01", data = "0101302C302C302C302C").toHex()
-            )
-            serial.sendHex(SERIAL_ONE, Command().toHex())
-            PopTip.show(R.mipmap.ic_reset, "复位-已下发")
-        } else {
-            PopTip.show("请中止所有运行中程序")
+        viewModelScope.launch {
+            // 如果有正在执行的程序，提示用户
+            if (serial.getExecuting() == 0) {
+                serial.sendHex(
+                    serialPort = SERIAL_ONE, hex = Command(
+                        function = "05", parameter = "01", data = "0101302C302C302C302C"
+                    ).toHex()
+                )
+                serial.sendHex(serialPort = SERIAL_ONE, hex = Command().toHex())
+                PopTip.show(R.mipmap.ic_reset, "复位-已下发")
+            } else {
+                PopTip.show("请中止所有运行中程序")
+            }
         }
     }
 
@@ -318,12 +347,18 @@ class HomeViewModel @Inject constructor(
      */
     fun pauseShakeBed() {
         viewModelScope.launch {
+            // pauseEnable false 未暂停 true 暂停
+            // 发送指令 -> 更新状态
+            // 发送指令 如果是未暂停，发送暂停命令，如果是暂停，发送继续命令
             serial.sendHex(
-                SERIAL_ONE,
-                if (_stateButton.value.pauseEnable) Command.resumeShakeBed() else Command.pauseShakeBed()
+                serialPort = SERIAL_ONE,
+                hex = if (_stateButton.value.pauseEnable) Command.resumeShakeBed()
+                else Command.pauseShakeBed()
             )
-            _stateButton.value =
-                _stateButton.value.copy(pauseEnable = !_stateButton.value.pauseEnable)
+            // 更新状态
+            _stateButton.value = _stateButton.value.copy(
+                pauseEnable = !_stateButton.value.pauseEnable
+            )
         }
     }
 
@@ -332,19 +367,26 @@ class HomeViewModel @Inject constructor(
      */
     fun insulating() {
         viewModelScope.launch {
-            val temp = appViewModel.settings.value.temp.toString().removeZero()
+            // insulatingEnable false 未保温状态 true 保温状态
+            // 发送设置温度命令 -> 更改按钮状态
+            // 发送设置温度命令 如果当前是未保温状态发送设置中的温度，否则发送室温26度
             serial.sendText(
-                SERIAL_FOUR, Command.setTemperature(
-                    address = "0",
-                    temperature = if (_stateButton.value.insulatingEnable) "26" else temp
+                serialPort = SERIAL_FOUR, text = Command.setTemperature(
+                    address = "0", temperature = if (_stateButton.value.insulatingEnable) "26"
+                    else appViewModel.settings.value.temp.toString().removeZero()
                 )
             )
-            _stateButton.value =
-                _stateButton.value.copy(insulatingEnable = !_stateButton.value.insulatingEnable)
+            // 更改按钮状态
+            _stateButton.value = _stateButton.value.copy(
+                insulatingEnable = !_stateButton.value.insulatingEnable
+            )
         }
     }
 }
 
+/**
+ * 每个模块的状态
+ */
 data class UiState(
     val job: Job? = null,
     val program: Program? = null,
@@ -359,16 +401,25 @@ data class UiState(
     val tempText: String = "0.0℃",
 )
 
+/**
+ * 右侧按钮的状态
+ */
 data class ButtonState(
     val pauseEnable: Boolean = false,
     val insulatingEnable: Boolean = false,
     val insulatingTemp: String = "0.0℃",
 )
 
+/**
+ * 模块枚举
+ */
 enum class ModuleEnum(val value: String, val index: Int) {
     A("模块A", 0), B("模块B", 1), C("模块C", 2), D("模块D", 3),
 }
 
+/**
+ * 根据index获取模块
+ */
 fun getModuleFromIndex(index: Int): ModuleEnum {
     return when (index) {
         0 -> A
