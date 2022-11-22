@@ -105,10 +105,12 @@
                             android:textSize="16sp" />
 
                         <EditText
+                            android:id="@+id/waste_tank_position"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.5"
                             android:autofillHints=""
+                            android:gravity="center"
                             android:hint="@string/position"
                             android:inputType="numberDecimal"
                             android:paddingStart="8dp"
@@ -116,10 +118,12 @@
                             tools:ignore="RtlSymmetry" />
 
                         <EditText
+                            android:id="@+id/waste_tank_height"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="0.5"
                             android:autofillHints=""
+                            android:gravity="center"
                             android:hint="@string/height"
                             android:inputType="numberDecimal"
                             android:paddingStart="8dp"
@@ -127,481 +131,376 @@
                             tools:ignore="RtlSymmetry" />
                     </LinearLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_waste_tank_position"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/waste_tank_position"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_distance">
+                        android:orientation="horizontal">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/waste_tank_position"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
-                            android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/wash_tank"
+                            android:textColor="@color/black"
                             android:textSize="16sp" />
 
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_waste_tank_height"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/waste_tank_height"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_height">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/waste_tank_height"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
-                            android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_wash_tank_position"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/wash_tank_position"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_distance">
-
-                        <com.google.android.material.textfield.TextInputEditText
+                        <EditText
                             android:id="@+id/wash_tank_position"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/position"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_wash_tank_height"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/wash_tank_height"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_height">
-
-                        <com.google.android.material.textfield.TextInputEditText
+                        <EditText
                             android:id="@+id/wash_tank_height"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/height"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
+                    </LinearLayout>
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_blocking_liquid_tank_position"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/blocking_liquid_tank_position"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_distance">
+                        android:orientation="horizontal">
 
-                        <com.google.android.material.textfield.TextInputEditText
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/blocking_liquid_tank"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
                             android:id="@+id/blocking_liquid_tank_position"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/position"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_blocking_liquid_tank_height"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/blocking_liquid_tank_height"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_height">
-
-                        <com.google.android.material.textfield.TextInputEditText
+                        <EditText
                             android:id="@+id/blocking_liquid_tank_height"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/height"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
+                    </LinearLayout>
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_antibody_one_tank_position"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/antibody_one_tank_position"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_distance">
+                        android:orientation="horizontal">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/antibody_one_tank_position"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
-                            android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/antibody_two_tank"
+                            android:textColor="@color/black"
                             android:textSize="16sp" />
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_antibody_one_tank_height"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/antibody_one_tank_height"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_height">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/antibody_one_tank_height"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
-                            android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_recycle_antibody_one_tank_height"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/recycle_antibody_one_tank_height"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_height">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/recycle_antibody_one_tank_height"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
-                            android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_antibody_two_tank_position"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/antibody_two_tank_position"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_distance">
-
-                        <com.google.android.material.textfield.TextInputEditText
+                        <EditText
                             android:id="@+id/antibody_two_tank_position"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/position"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_antibody_two_tank_height"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/antibody_two_tank_height"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_height">
-
-                        <com.google.android.material.textfield.TextInputEditText
+                        <EditText
                             android:id="@+id/antibody_two_tank_height"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/height"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
+                    </LinearLayout>
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_y_motor_distance"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/y_motor_distance"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_distance">
+                        android:orientation="horizontal">
 
-                        <com.google.android.material.textfield.TextInputEditText
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/antibody_one_tank"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/antibody_one_tank_position"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/position"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
+
+                        <EditText
+                            android:id="@+id/antibody_one_tank_height"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/height"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
+
+                        <EditText
+                            android:id="@+id/recycle_antibody_one_tank_height"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/recycle"
+                            android:inputType="numberDecimal"
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="32dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_marginEnd="8dp"
+                            android:text="@string/motor_distance"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
                             android:id="@+id/y_motor_distance"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/y_motor"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_z_motor_distance"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/z_motor_distance"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_distance">
-
-                        <com.google.android.material.textfield.TextInputEditText
+                        <EditText
                             android:id="@+id/z_motor_distance"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/z_motor"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
+                    </LinearLayout>
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_pump_one_distance"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/pump_one_distance"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_water">
+                        android:orientation="horizontal">
 
-                        <com.google.android.material.textfield.TextInputEditText
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:paddingStart="8sp"
+                            android:text="@string/pump_distance"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            tools:ignore="RtlSymmetry" />
+
+                        <EditText
                             android:id="@+id/pump_one_distance"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/pump_one"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
 
-                    </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_pump_two_distance"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/pump_two_distance"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_water">
+                        android:orientation="horizontal">
 
-                        <com.google.android.material.textfield.TextInputEditText
+                        <EditText
                             android:id="@+id/pump_two_distance"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/pump_two"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_pump_three_distance"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/pump_three_distance"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_water">
-
-                        <com.google.android.material.textfield.TextInputEditText
+                        <EditText
                             android:id="@+id/pump_three_distance"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/pump_three"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
+                    </LinearLayout>
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_pump_four_distance"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/pump_four_distance"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_water">
+                        android:orientation="horizontal">
 
-                        <com.google.android.material.textfield.TextInputEditText
+                        <EditText
                             android:id="@+id/pump_four_distance"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/pump_four"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_pump_five_distance"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/pump_five_distance"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_water">
-
-                        <com.google.android.material.textfield.TextInputEditText
+                        <EditText
                             android:id="@+id/pump_five_distance"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.5"
+                            android:autofillHints=""
+                            android:gravity="center"
+                            android:hint="@string/pump_five"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
+                    </LinearLayout>
 
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/input_drain_distance"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="32dp"
                         android:layout_marginTop="16dp"
                         android:layout_marginEnd="32dp"
-                        android:elevation="2dp"
-                        android:hint="@string/drain_distance"
-                        app:boxBackgroundColor="@color/light_onPrimary"
-                        app:startIconDrawable="@mipmap/ic_water">
+                        android:orientation="horizontal">
 
-                        <com.google.android.material.textfield.TextInputEditText
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:paddingStart="8dp"
+                            android:text="@string/drain_distance"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            tools:ignore="RtlSymmetry" />
+
+                        <EditText
                             android:id="@+id/drain_distance"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:cursorVisible="true"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:autofillHints=""
+                            android:gravity="center"
                             android:inputType="numberDecimal"
-                            android:maxLength="50"
-                            android:singleLine="true"
-                            android:textSize="16sp" />
+                            android:paddingStart="8dp"
+                            android:textSize="14sp"
+                            tools:ignore="RtlSymmetry" />
 
-                    </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_update"
@@ -765,40 +664,6 @@
                     android:layout_marginEnd="8dp">
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_test_antibody_one_tank_move"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="4dp"
-                        android:text="@string/antibody_one_tank_move"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/btn_test_antibody_one_tank_down"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_test_antibody_one_tank_down"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="4dp"
-                        android:text="@string/needle_down"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toEndOf="@+id/btn_test_antibody_one_tank_move"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp">
-
-                    <com.google.android.material.button.MaterialButton
                         android:id="@+id/btn_test_antibody_two_tank_move"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
@@ -821,6 +686,40 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_weight="1"
                         app:layout_constraintStart_toEndOf="@+id/btn_test_antibody_two_tank_move"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_test_antibody_one_tank_move"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginEnd="4dp"
+                        android:text="@string/antibody_one_tank_move"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/btn_test_antibody_one_tank_down"
+                        app:layout_constraintHorizontal_weight="1"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_test_antibody_one_tank_down"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginStart="4dp"
+                        android:text="@string/needle_down"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_weight="1"
+                        app:layout_constraintStart_toEndOf="@+id/btn_test_antibody_one_tank_move"
                         app:layout_constraintTop_toTopOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

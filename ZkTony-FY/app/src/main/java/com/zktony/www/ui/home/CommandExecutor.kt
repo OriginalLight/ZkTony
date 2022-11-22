@@ -57,24 +57,30 @@ class CommandExecutor {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR, text = Command.setTemperature(
-                    module.index.toString(), action.temperature.toString()
+                serialPort = SERIAL_FOUR,
+                text = Command.setTemperature(
+                    address = module.index.toString(),
+                    temperature = action.temperature.toString()
                 )
             )
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE, hex = Command.multiPoint(
+                serialPort = SERIAL_ONE,
+                hex = Command.multiPoint(
                     moveTo(
-                        calibration.blockingY, calibration.blockingZ
+                        distance = calibration.blockingY,
+                        height = calibration.blockingZ
                     )
                 )
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO, hex = Command.multiPoint(addLiquid()[0])
+                serialPort = SERIAL_TWO,
+                hex = Command.multiPoint(addLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE, hex = Command.multiPoint(addLiquid()[1])
+                serialPort = SERIAL_THREE,
+                hex = Command.multiPoint(addLiquid()[1])
             )
             block.invoke()
         }
@@ -91,24 +97,29 @@ class CommandExecutor {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR, text = Command.setTemperature(
-                    module.index.toString(), action.temperature.toString()
+                serialPort = SERIAL_FOUR,
+                text = Command.setTemperature(
+                    address = module.index.toString(),
+                    temperature = action.temperature.toString()
                 )
             )
             // 主板运动
             serial.sendHex(
                 serialPort = SERIAL_ONE, hex = Command.multiPoint(
                     moveTo(
-                        calibration.antibodyOneY, calibration.antibodyOneZ
+                        distance = calibration.antibodyOneY,
+                        height = calibration.antibodyOneZ
                     )
                 )
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO, hex = Command.multiPoint(addLiquid()[0])
+                serialPort = SERIAL_TWO,
+                hex = Command.multiPoint(addLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE, hex = Command.multiPoint(addLiquid()[1])
+                serialPort = SERIAL_THREE,
+                hex = Command.multiPoint(addLiquid()[1])
             )
             block.invoke()
         }
@@ -125,18 +136,22 @@ class CommandExecutor {
             serial.lock(true)
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE, hex = Command.multiPoint(
+                serialPort = SERIAL_ONE,
+                hex = Command.multiPoint(
                     moveTo(
-                        calibration.antibodyOneY, calibration.recycleAntibodyOneZ
+                        distance = calibration.antibodyOneY,
+                        height = calibration.recycleAntibodyOneZ
                     )
                 )
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO, hex = Command.multiPoint(recycleLiquid()[0])
+                serialPort = SERIAL_TWO,
+                hex = Command.multiPoint(recycleLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE, hex = Command.multiPoint(recycleLiquid()[1])
+                serialPort = SERIAL_THREE,
+                hex = Command.multiPoint(recycleLiquid()[1])
             )
             block.invoke()
         }
@@ -153,15 +168,19 @@ class CommandExecutor {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR, text = Command.setTemperature(
-                    module.index.toString(), action.temperature.toString()
+                serialPort = SERIAL_FOUR,
+                text = Command.setTemperature(
+                    address = module.index.toString(),
+                    temperature = action.temperature.toString()
                 )
             )
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE, hex = Command.multiPoint(
+                serialPort = SERIAL_ONE,
+                hex = Command.multiPoint(
                     moveTo(
-                        calibration.antibodyTwoY, calibration.antibodyTwoZ
+                        distance = calibration.antibodyTwoY,
+                        height = calibration.antibodyTwoZ
                     )
                 )
             )
@@ -187,24 +206,30 @@ class CommandExecutor {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR, text = Command.setTemperature(
-                    module.index.toString(), action.temperature.toString()
+                serialPort = SERIAL_FOUR,
+                text = Command.setTemperature(
+                    address = module.index.toString(),
+                    temperature = action.temperature.toString()
                 )
             )
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE, hex = Command.multiPoint(
+                serialPort = SERIAL_ONE,
+                hex = Command.multiPoint(
                     moveTo(
-                        calibration.washingY, calibration.washingZ
+                        distance = calibration.washingY,
+                        height = calibration.washingZ
                     )
                 )
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO, hex = Command.multiPoint(addLiquid()[0])
+                serialPort = SERIAL_TWO,
+                hex = Command.multiPoint(addLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE, hex = Command.multiPoint(addLiquid()[1])
+                serialPort = SERIAL_THREE,
+                hex = Command.multiPoint(addLiquid()[1])
             )
             block.invoke()
         }
@@ -222,18 +247,22 @@ class CommandExecutor {
             serial.lock(true)
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE, hex = Command.multiPoint(
+                serialPort = SERIAL_ONE,
+                hex = Command.multiPoint(
                     moveTo(
-                        calibration.wasteY, calibration.wasteZ
+                        distance = calibration.wasteY,
+                        height = calibration.wasteZ
                     )
                 )
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO, hex = Command.multiPoint(recycleLiquid()[0])
+                serialPort = SERIAL_TWO,
+                hex = Command.multiPoint(recycleLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE, hex = Command.multiPoint(recycleLiquid()[1])
+                serialPort = SERIAL_THREE,
+                hex = Command.multiPoint(recycleLiquid()[1])
             )
             block.invoke()
         }
@@ -243,10 +272,10 @@ class CommandExecutor {
      * 主机命令生成器
      */
     private fun moveTo(distance: Float, height: Float): String {
-        return motionMotor.toMotionHex(distance, 0f) + motionMotor.toMotionHex(
-            distance,
-            height
-        ) + motionMotor.toMotionHex(distance, 0f) + motionMotor.toMotionHex(0f, 0f)
+        return motionMotor.toMotionHex(distance, 0f) +
+                motionMotor.toMotionHex(distance, height) +
+                motionMotor.toMotionHex(distance, 0f) +
+                motionMotor.toMotionHex(0f, 0f)
     }
 
     /**
@@ -269,7 +298,8 @@ class CommandExecutor {
             four = if (module == D) action.liquidVolume + pumpMotor.volumeFour * calibration.extract else 0f,
         )
         return listOf(
-            zero + stepOne[0] + zero + stepTwo[0], zero + stepOne[1] + zero + stepTwo[1]
+            zero + stepOne[0] + zero + stepTwo[0],
+            zero + stepOne[1] + zero + stepTwo[1]
         )
     }
 
@@ -286,7 +316,8 @@ class CommandExecutor {
             four = if (module == D) -(action.liquidVolume + pumpMotor.volumeFour * calibration.extract) else 0f,
         )
         return listOf(
-            zero + recycle[0] + zero + zero, zero + recycle[1] + zero + zero
+            zero + recycle[0] + zero + zero,
+            zero + recycle[1] + zero + zero
         )
     }
 

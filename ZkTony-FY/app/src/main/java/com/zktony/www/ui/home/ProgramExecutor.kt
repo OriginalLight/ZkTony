@@ -20,6 +20,7 @@ import kotlinx.coroutines.launch
  * @param queue 任务队列
  * @param module 模块
  * @param settings 设置状态
+ * @param scope 协程作用域
  */
 class ProgramExecutor private constructor(
     private val queue: Queue<Action>,
