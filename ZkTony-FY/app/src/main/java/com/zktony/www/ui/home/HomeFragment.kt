@@ -41,11 +41,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun initObserver() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch { viewModel.stateOne.collect { moduleStateChange(A, it) } }
-                launch { viewModel.stateTwo.collect { moduleStateChange(B, it) } }
-                launch { viewModel.stateThree.collect { moduleStateChange(C, it) } }
-                launch { viewModel.stateFour.collect { moduleStateChange(D, it) } }
-                launch { viewModel.stateOperating.collect { operationStateChange(it) } }
+                launch { viewModel.stateOne.collect { uiStateChange(A, it) } }
+                launch { viewModel.stateTwo.collect { uiStateChange(B, it) } }
+                launch { viewModel.stateThree.collect { uiStateChange(C, it) } }
+                launch { viewModel.stateFour.collect { uiStateChange(D, it) } }
+                launch { viewModel.stateButton.collect { buttonStateChange(it) } }
             }
         }
     }
@@ -74,7 +74,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            btnProgram.setOnClickListener { showSelectProgramDialog(A) }
+            btnProgram.setOnClickListener { switchProgramDialog(A) }
         }
         binding.b.run {
             btnStart.setOnClickListener { this@HomeFragment.viewModel.start(B) }
@@ -85,7 +85,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            btnProgram.setOnClickListener { showSelectProgramDialog(B) }
+            btnProgram.setOnClickListener { switchProgramDialog(B) }
         }
         binding.c.run {
             btnStart.setOnClickListener { this@HomeFragment.viewModel.start(C) }
@@ -98,7 +98,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            btnProgram.setOnClickListener { showSelectProgramDialog(C) }
+            btnProgram.setOnClickListener { switchProgramDialog(C) }
         }
         binding.d.run {
             btnStart.setOnClickListener { this@HomeFragment.viewModel.start(D) }
@@ -111,7 +111,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            btnProgram.setOnClickListener { showSelectProgramDialog(D) }
+            btnProgram.setOnClickListener { switchProgramDialog(D) }
         }
         binding.e.run {
             btnReset.run {
@@ -125,18 +125,18 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             btnPause.run {
                 clickScale()
                 setOnClickListener {
-                    if (this@HomeFragment.viewModel.stateOperating.value.pauseEnable) {
+                    if (this@HomeFragment.viewModel.stateButton.value.pauseEnable) {
                         PopTip.show(R.mipmap.ic_stop, "已继续摇床，再次点击暂停")
                     } else {
                         PopTip.show(R.mipmap.ic_stop, "已暂停摇床，再次点击继续")
                     }
-                    this@HomeFragment.viewModel.pause()
+                    this@HomeFragment.viewModel.pauseShakeBed()
                 }
             }
             btnInsulating.run {
                 clickScale()
                 setOnClickListener {
-                    if (this@HomeFragment.viewModel.stateOperating.value.insulatingEnable) {
+                    if (this@HomeFragment.viewModel.stateButton.value.insulatingEnable) {
                         PopTip.show(R.mipmap.ic_insulating, "已取消保温，再次点击开启")
                     } else {
                         PopTip.show(R.mipmap.ic_insulating, "抗体保温中，再次点击取消")
@@ -152,7 +152,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param module 模块
      * @param state 状态
      */
-    private fun moduleStateChange(module: ModuleEnum, state: UiState) {
+    private fun uiStateChange(module: ModuleEnum, state: UiState) {
         // 正在执行的个数等于job不为null的个数
         var runningCount = 0
         viewModel.stateOne.value.job?.let { runningCount++ }
@@ -249,25 +249,22 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * 操作按钮的ui状态变化
      * @param state 状态
      */
-    private fun operationStateChange(state: OperationState) {
+    private fun buttonStateChange(state: ButtonState) {
         with(binding.e) {
             btnPause.setBackgroundResource(if (state.pauseEnable) R.mipmap.btn_continue else R.mipmap.btn_pause)
             with(tvPause) {
                 text = if (state.pauseEnable) "继 续" else "暂停摇床"
                 setTextColor(
                     ContextCompat.getColor(
-                        context,
-                        if (state.pauseEnable) R.color.red else R.color.dark_outline
+                        context, if (state.pauseEnable) R.color.red else R.color.dark_outline
                     )
                 )
             }
             with(tvInsulating) {
-                text =
-                    if (state.insulatingEnable) "保温中 ${state.insulatingTemp}" else "抗体保温"
+                text = if (state.insulatingEnable) "保温中 ${state.insulatingTemp}" else "抗体保温"
                 setTextColor(
                     ContextCompat.getColor(
-                        context,
-                        if (state.insulatingEnable) R.color.red else R.color.dark_outline
+                        context, if (state.insulatingEnable) R.color.red else R.color.dark_outline
                     )
                 )
             }
@@ -278,12 +275,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * 选择程序
      * @param module [ModuleEnum] 模块
      */
-    private fun showSelectProgramDialog(module: ModuleEnum) {
+    private fun switchProgramDialog(module: ModuleEnum) {
         val menuList = viewModel.programList.value.map { it.name }
         if (menuList.isNotEmpty()) {
             BottomMenu.show(menuList).setMessage("请选择程序")
                 .setOnMenuItemClickListener { _, _, index ->
-                    viewModel.onSwitchProgram(index, module)
+                    viewModel.switchProgram(index, module)
                     false
                 }
         }

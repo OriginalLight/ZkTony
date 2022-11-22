@@ -1,8 +1,8 @@
 package com.zktony.www.ui.program
 
 import androidx.lifecycle.viewModelScope
+import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.extension.showShortToast
 import com.zktony.www.common.room.entity.Program
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
@@ -36,7 +36,7 @@ class ProgramViewModel @Inject constructor(
     fun addProgram(programName: String) {
         viewModelScope.launch {
             programRepo.getByName(programName).firstOrNull()?.let {
-                "已存在相同名称的程序".showShortToast()
+                PopTip.show("程序名已存在")
                 return@launch
             }
             programRepo.insert(Program(name = programName))

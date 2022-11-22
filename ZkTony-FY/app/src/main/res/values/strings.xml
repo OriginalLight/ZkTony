@@ -58,7 +58,7 @@
     <string name="calibration_setting">校准设置</string>
     <string name="title_calibration">校准设置</string>
     <string name="parameter_adjustment">参数调整</string>
-    <string name="waste_tank_position">废液槽位置</string>
+    <string name="waste_tank_position">废液槽</string>
     <string name="waste_tank_height">废液槽高度</string>
     <string name="wash_tank_position">洗涤液槽位置</string>
     <string name="wash_tank_height">洗涤液槽高度</string>
@@ -92,4 +92,7 @@
     <string name="status">状态</string>
     <string name="no_log">没有日志</string>
     <string name="no_program">没有程序</string>
+    <string name="position">位置</string>
+    <string name="waste_tank">废液槽</string>
+    <string name="height">高度</string>
 </resources>

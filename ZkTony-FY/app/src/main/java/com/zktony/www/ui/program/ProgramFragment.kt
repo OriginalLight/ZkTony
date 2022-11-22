@@ -28,7 +28,7 @@ class ProgramFragment :
 
     override val viewModel: ProgramViewModel by viewModels()
 
-    private val programAdapter by lazy { ProgramAdapter() }
+    private val adapter by lazy { ProgramAdapter() }
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initObserver()
@@ -43,7 +43,7 @@ class ProgramFragment :
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.programList.collect {
-                    programAdapter.submitList(it)
+                    adapter.submitList(it)
                     if (it.isEmpty()) {
                         binding.empty.visibility = View.VISIBLE
                         binding.rc1.visibility = View.GONE
@@ -60,15 +60,15 @@ class ProgramFragment :
      * 初始化RecyclerView
      */
     private fun initRecyclerView() {
-        binding.rc1.adapter = programAdapter
+        binding.rc1.adapter = adapter
 
-        programAdapter.setOnEditButtonClick {
+        adapter.setOnEditButtonClick {
             val direction =
                 ProgramFragmentDirections.actionNavigationProgramToNavigationAction(it.id)
             findNavController().navigate(direction)
         }
 
-        programAdapter.setOnDeleteButtonClick {
+        adapter.setOnDeleteButtonClick {
             MessageDialog.show(
                 "提示",
                 "确定删除程序 ${it.name} 吗？",
