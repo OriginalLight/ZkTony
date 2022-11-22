@@ -49,33 +49,58 @@ class HomeViewModel @Inject constructor(
     private val _stateTwo = MutableStateFlow(UiState())
     private val _stateThree = MutableStateFlow(UiState())
     private val _stateFour = MutableStateFlow(UiState())
-    private val _stateOperating = MutableStateFlow(OperationState())
+    private val _stateButton = MutableStateFlow(ButtonState())
     val programList = _programList.asStateFlow()
     val stateOne = _stateOne.asStateFlow()
     val stateTwo = _stateTwo.asStateFlow()
     val stateThree = _stateThree.asStateFlow()
     val stateFour = _stateFour.asStateFlow()
-    val stateOperating = _stateOperating.asStateFlow()
+    val stateButton = _stateButton.asStateFlow()
 
     init {
         viewModelScope.launch {
             launch {
                 programRepo.getAll().collect {
                     _programList.value = it
-                    onProgramChange(it)
+                    programListFlow(it)
                 }
             }
             launch {
+                // 串口一flow
                 serial.serialOneFlow.collect {
                     it?.let {
-                        onSerialOneResponse(it)
+                        val command = it.toCommand()
+                        when (command.function) {
+                            "86" -> {
+                                if (command.parameter == "0A") {
+                                    if (command.data == "00") {
+                                        PopTip.show("复位成功")
+                                    } else {
+                                        PopTip.show("复位失败")
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
             launch {
+                // 串口四flow
                 serial.serialFourFlow.collect {
                     it?.let {
-                        onSerialFourResponse(it)
+                        if (it.startsWith("TC1:TCACTUALTEMP=")) {
+                            // 读取温度
+                            val address = it.substring(it.length - 2, it.length - 1).toInt()
+                            val temp = it.extractTemp()
+                            when (address) {
+                                1 -> _stateOne.value = _stateOne.value.copy(tempText = "$temp ℃")
+                                2 -> _stateTwo.value = _stateTwo.value.copy(tempText = "$temp ℃")
+                                3 -> _stateThree.value = _stateThree.value.copy(tempText = "$temp ℃")
+                                4 -> _stateFour.value = _stateFour.value.copy(tempText = "$temp ℃")
+                                0 -> _stateButton.value =
+                                    _stateButton.value.copy(insulatingTemp = "$temp ℃")
+                            }
+                        }
                     }
                 }
             }
@@ -110,7 +135,7 @@ class HomeViewModel @Inject constructor(
      * @param module 模块
      * @return 状态
      */
-    private fun getState(module: ModuleEnum) = when (module) {
+    private fun stateSelector(module: ModuleEnum) = when (module) {
         A -> _stateOne
         B -> _stateTwo
         C -> _stateThree
@@ -118,162 +143,10 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
-     * 切换程序
-     * @param index [Int] 程序索引
-     * @param module [ModuleEnum] 模块
-     */
-    fun onSwitchProgram(index: Int, module: ModuleEnum) {
-        viewModelScope.launch {
-            val state = getState(module)
-            state.value = state.value.copy(
-                program = _programList.value[index],
-                btnStartEnable = _programList.value[index].actionCount > 0,
-                runtimeText = "已就绪",
-                countDownText = Constants.ZERO_TIME,
-            )
-        }
-    }
-
-    /**
-     * 开始执行程序
-     * @param module [ModuleEnum] 模块
-     */
-    fun start(module: ModuleEnum) {
-        viewModelScope.launch {
-            val state = getState(module)
-            state.value = state.value.copy(
-                btnStartVisible = View.GONE,
-                btnStopVisible = View.VISIBLE,
-                btnSelectorEnable = false,
-                runtimeText = "运行中",
-            )
-            runProgram(module, state.value.program!!)
-        }
-    }
-
-    /**
-     * 停止执行程序
-     * @param module [ModuleEnum] 模块
-     */
-    fun stop(module: ModuleEnum) {
-        viewModelScope.launch {
-            val state = getState(module)
-            state.value.run {
-                job?.let { if (it.isActive) it.cancel() }
-                log?.let { log ->
-                    logRepo.delete(log)
-                }
-            }
-            state.value = state.value.copy(
-                job = null,
-                btnStartVisible = View.VISIBLE,
-                btnStopVisible = View.GONE,
-                btnSelectorEnable = true,
-                runtimeText = if (state.value.runtimeText != "已完成") "已就绪" else state.value.runtimeText,
-                currentActionText = "/",
-                countDownText = if (state.value.runtimeText != "已完成") Constants.ZERO_TIME else state.value.countDownText,
-            )
-            delay(200L)
-            if (serial.getExecuting() == 0) {
-                serial.sendHex(SERIAL_ONE, Command.pauseShakeBed())
-            }
-        }
-    }
-
-    /**
-     * 复位
-     */
-    fun reset() {
-        if (serial.getExecuting() == 0) {
-            serial.sendHex(
-                SERIAL_ONE,
-                Command(function = "05", parameter = "01", data = "0101302C302C302C302C").toHex()
-            )
-            serial.sendHex(SERIAL_ONE, Command().toHex())
-            PopTip.show(R.mipmap.ic_reset, "复位-已下发")
-        } else {
-            PopTip.show("请中止所有运行中程序")
-        }
-    }
-
-    /**
-     * 摇床暂停
-     */
-    fun pause() {
-        viewModelScope.launch {
-            serial.sendHex(
-                SERIAL_ONE,
-                if (_stateOperating.value.pauseEnable) Command.resumeShakeBed() else Command.pauseShakeBed()
-            )
-            _stateOperating.value =
-                _stateOperating.value.copy(pauseEnable = !_stateOperating.value.pauseEnable)
-        }
-    }
-
-    /**
-     * 抗体保温
-     */
-    fun insulating() {
-        viewModelScope.launch {
-            val temp = appViewModel.settings.value.temp.toString().removeZero()
-            serial.sendText(
-                SERIAL_FOUR, Command.setTemperature(
-                    address = "0",
-                    temperature = if (_stateOperating.value.insulatingEnable) "26" else temp
-                )
-            )
-            _stateOperating.value =
-                _stateOperating.value.copy(insulatingEnable = !_stateOperating.value.insulatingEnable)
-        }
-    }
-
-    /**
-     * 串口一数据接收
-     * @param hex [String] 数据
-     */
-    private fun onSerialOneResponse(hex: String) {
-        val command = hex.toCommand()
-        when (command.function) {
-            "86" -> {
-                if (command.parameter == "0A") {
-                    if (command.data == "00") {
-                        PopTip.show("复位成功")
-                    } else {
-                        PopTip.show("复位失败")
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 串口四数据接收
-     * @param hex [String] 数据
-     */
-    private fun onSerialFourResponse(hex: String) {
-        viewModelScope.launch {
-            if (hex.startsWith("TC1:TCACTUALTEMP=")) {
-                // 读取温度
-                val address = hex.substring(hex.length - 2, hex.length - 1).toInt()
-                val temp = hex.extractTemp()
-                when (address) {
-                    1 -> _stateOne.value = _stateOne.value.copy(tempText = "$temp ℃")
-                    2 -> _stateTwo.value = _stateTwo.value.copy(tempText = "$temp ℃")
-                    3 -> _stateThree.value = _stateThree.value.copy(tempText = "$temp ℃")
-                    4 -> _stateFour.value = _stateFour.value.copy(tempText = "$temp ℃")
-                    0 -> _stateOperating.value =
-                        _stateOperating.value.copy(insulatingTemp = "$temp ℃")
-                }
-            }
-        }
-    }
-
-
-    /**
      * 程序发生变化添加删除时候更新选中的index
      * @param programList [List]<[Program]> 程序列表
      */
-    private fun onProgramChange(programList: List<Program>) {
+    private fun programListFlow(programList: List<Program>) {
         if (programList.isNotEmpty()) {
             listOf(_stateOne, _stateTwo, _stateThree, _stateFour).forEach { state ->
                 if (state.value.program == null) {
@@ -304,84 +177,173 @@ class HomeViewModel @Inject constructor(
     }
 
     /**
-     * 运行程序
+     * 切换程序
+     * @param index [Int] 程序索引
      * @param module [ModuleEnum] 模块
-     * @param program [Program] 程序
      */
-    private fun runProgram(module: ModuleEnum, program: Program) {
-        val job = viewModelScope.launch {
-            val actionQueue = Queue<Action>()
-            actionRepo.getByProgramId(program.id).first().forEach {
-                actionQueue.enqueue(it)
-            }
-            val runner = ProgramExecutor.Builder().setModule(module).setActionQueue(actionQueue)
-                .setSettingState(appViewModel.settings.value).build()
-            stateCollector(runner)
-            runner.run()
-        }
+    fun switchProgram(index: Int, module: ModuleEnum) {
         viewModelScope.launch {
-            val state = getState(module)
-            state.value.job?.let { if (it.isActive) it.cancel() }
-            val log = Log(
-                programName = state.value.program!!.name,
-                module = module.index,
-                actions = state.value.program!!.actions,
-            )
-            logRepo.insert(log)
-            state.value = state.value.copy(job = job, log = log)
-            programRepo.update(
-                state.value.program!!.copy(
-                    runCount = state.value.program!!.runCount + 1
-                )
+            val state = stateSelector(module)
+            state.value = state.value.copy(
+                program = _programList.value[index],
+                btnStartEnable = _programList.value[index].actionCount > 0,
+                runtimeText = "已就绪",
+                countDownText = Constants.ZERO_TIME,
             )
         }
     }
 
     /**
-     * 程序运行状态收集器
-     * @param job [ProgramExecutor] 运行器
+     * 开始执行程序
+     * @param module [ModuleEnum] 模块
      */
-    private fun stateCollector(job: ProgramExecutor) {
+    fun start(module: ModuleEnum) {
         viewModelScope.launch {
-            job.event.collect {
-                when (it) {
-                    is ActionEvent.CurrentAction -> {
-                        val state = getState(it.module)
-                        state.value =
-                            state.value.copy(currentActionText = getActionEnum(it.action.mode).value)
-                    }
-                    is ActionEvent.CurrentActionTime -> {
-                        val state = getState(it.module)
-                        state.value = state.value.copy(countDownText = it.time)
-                    }
-                    is ActionEvent.Finish -> {
-                        val state = getState(it.module)
-                        state.value.log?.let { log ->
-                            logRepo.update(log.copy(status = 1))
+            val state = stateSelector(module)
+            state.value = state.value.copy(
+                btnStartVisible = View.GONE,
+                btnStopVisible = View.VISIBLE,
+                btnSelectorEnable = false,
+                runtimeText = "运行中",
+            )
+            val job = viewModelScope.launch {
+                val actionQueue = Queue<Action>()
+                actionRepo.getByProgramId(state.value.program!!.id).first().forEach {
+                    actionQueue.enqueue(it)
+                }
+                val runner = ProgramExecutor.Builder()
+                    .setModule(module)
+                    .setActionQueue(actionQueue)
+                    .setSettingState(appViewModel.settings.value)
+                    .build()
+                launch {
+                    runner.event.collect {
+                        when (it) {
+                            is ActionEvent.CurrentAction -> {
+                                state.value =
+                                    state.value.copy(currentActionText = getActionEnum(it.action.mode).value)
+                            }
+                            is ActionEvent.CurrentActionTime -> {
+                                state.value = state.value.copy(countDownText = it.time)
+                            }
+                            is ActionEvent.Finish -> {
+                                state.value.log?.let { log ->
+                                    logRepo.update(log.copy(status = 1))
+                                }
+                                state.value = state.value.copy(
+                                    runtimeText = "已完成", countDownText = "已完成", log = null
+                                )
+                                stop(it.module)
+                            }
+                            is ActionEvent.Count -> {
+                                state.value = state.value.copy(
+                                    currentActionText = _stateOne.value.currentActionText.substring(
+                                        0, 2
+                                    ) + " X${it.count}"
+                                )
+                            }
+                            is ActionEvent.Wait -> {
+                                state.value = state.value.copy(countDownText = it.msg)
+                            }
                         }
-                        state.value = state.value.copy(
-                            runtimeText = "已完成", countDownText = "已完成", log = null
-                        )
-                        stop(it.module)
-                    }
-                    is ActionEvent.Count -> {
-                        val state = getState(it.module)
-                        state.value = state.value.copy(
-                            currentActionText = _stateOne.value.currentActionText.substring(
-                                0, 2
-                            ) + " X${it.count}"
-                        )
-                    }
-                    is ActionEvent.Wait -> {
-                        val state = getState(it.module)
-                        state.value = state.value.copy(countDownText = it.msg)
                     }
                 }
+                runner.run()
+            }
+            viewModelScope.launch {
+                state.value.job?.cancel()
+                val log = Log(
+                    programName = state.value.program!!.name,
+                    module = module.index,
+                    actions = state.value.program!!.actions,
+                )
+                logRepo.insert(log)
+                state.value = state.value.copy(job = job, log = log)
+                programRepo.update(
+                    state.value.program!!.copy(
+                        runCount = state.value.program!!.runCount + 1
+                    )
+                )
             }
         }
     }
-}
 
+    /**
+     * 停止执行程序
+     * @param module [ModuleEnum] 模块
+     */
+    fun stop(module: ModuleEnum) {
+        viewModelScope.launch {
+            val state = stateSelector(module)
+            state.value.run {
+                job?.cancel()
+                log?.let { log ->
+                    logRepo.delete(log)
+                }
+            }
+            state.value = state.value.copy(
+                job = null,
+                btnStartVisible = View.VISIBLE,
+                btnStopVisible = View.GONE,
+                btnSelectorEnable = true,
+                runtimeText = if (state.value.runtimeText != "已完成") "已就绪" else state.value.runtimeText,
+                currentActionText = "/",
+                countDownText = if (state.value.runtimeText != "已完成") Constants.ZERO_TIME else state.value.countDownText,
+            )
+            delay(200L)
+            if (serial.getExecuting() == 0) {
+                serial.sendHex(SERIAL_ONE, Command.pauseShakeBed())
+            }
+        }
+    }
+
+    /**
+     * 机构复位
+     */
+    fun reset() {
+        if (serial.getExecuting() == 0) {
+            serial.sendHex(
+                SERIAL_ONE,
+                Command(function = "05", parameter = "01", data = "0101302C302C302C302C").toHex()
+            )
+            serial.sendHex(SERIAL_ONE, Command().toHex())
+            PopTip.show(R.mipmap.ic_reset, "复位-已下发")
+        } else {
+            PopTip.show("请中止所有运行中程序")
+        }
+    }
+
+    /**
+     * 摇床暂停
+     */
+    fun pauseShakeBed() {
+        viewModelScope.launch {
+            serial.sendHex(
+                SERIAL_ONE,
+                if (_stateButton.value.pauseEnable) Command.resumeShakeBed() else Command.pauseShakeBed()
+            )
+            _stateButton.value =
+                _stateButton.value.copy(pauseEnable = !_stateButton.value.pauseEnable)
+        }
+    }
+
+    /**
+     * 抗体保温
+     */
+    fun insulating() {
+        viewModelScope.launch {
+            val temp = appViewModel.settings.value.temp.toString().removeZero()
+            serial.sendText(
+                SERIAL_FOUR, Command.setTemperature(
+                    address = "0",
+                    temperature = if (_stateButton.value.insulatingEnable) "26" else temp
+                )
+            )
+            _stateButton.value =
+                _stateButton.value.copy(insulatingEnable = !_stateButton.value.insulatingEnable)
+        }
+    }
+}
 
 data class UiState(
     val job: Job? = null,
@@ -397,7 +359,7 @@ data class UiState(
     val tempText: String = "0.0℃",
 )
 
-data class OperationState(
+data class ButtonState(
     val pauseEnable: Boolean = false,
     val insulatingEnable: Boolean = false,
     val insulatingTemp: String = "0.0℃",

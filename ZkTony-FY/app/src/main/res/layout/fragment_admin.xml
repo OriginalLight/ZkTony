@@ -294,6 +294,7 @@
                     android:layout_width="128dp"
                     android:layout_height="match_parent"
                     android:layout_marginTop="4dp"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/con_adjust"
                     app:layout_constraintStart_toStartOf="parent"
