@@ -126,9 +126,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 clickScale()
                 setOnClickListener {
                     if (this@HomeFragment.viewModel.stateButton.value.pauseEnable) {
-                        PopTip.show(R.mipmap.ic_stop, "已继续摇床，再次点击暂停")
+                        PopTip.show("已继续摇床，再次点击暂停")
                     } else {
-                        PopTip.show(R.mipmap.ic_stop, "已暂停摇床，再次点击继续")
+                        PopTip.show("已暂停摇床，再次点击继续")
                     }
                     this@HomeFragment.viewModel.pauseShakeBed()
                 }
@@ -137,9 +137,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 clickScale()
                 setOnClickListener {
                     if (this@HomeFragment.viewModel.stateButton.value.insulatingEnable) {
-                        PopTip.show(R.mipmap.ic_insulating, "已取消保温，再次点击开启")
+                        PopTip.show("已取消保温，再次点击开启")
                     } else {
-                        PopTip.show(R.mipmap.ic_insulating, "抗体保温中，再次点击取消")
+                        PopTip.show("抗体保温中，再次点击取消")
                     }
                     this@HomeFragment.viewModel.insulating()
                 }
