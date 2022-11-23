@@ -239,9 +239,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     message.text = "是否更新？"
                     btnOk.setOnClickListener {
                         requireContext().installApk(file)
+                        viewModel.cleanUpdate()
                         dialog.dismiss()
                     }
-                    btnCancel.setOnClickListener { dialog.dismiss() }
+                    btnCancel.setOnClickListener {
+                        viewModel.cleanUpdate()
+                        dialog.dismiss()
+                    }
                 }
             })
             .setMaskColor(Color.parseColor("#4D000000"))
@@ -265,9 +269,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     message.text = version.description + "\n是否升级？"
                     btnOk.setOnClickListener {
                         viewModel.doRemoteUpdate(version)
+                        viewModel.cleanUpdate()
                         dialog.dismiss()
                     }
-                    btnCancel.setOnClickListener { dialog.dismiss() }
+                    btnCancel.setOnClickListener {
+                        viewModel.cleanUpdate()
+                        dialog.dismiss()
+                    }
                 }
             })
             .setMaskColor(Color.parseColor("#4D000000"))

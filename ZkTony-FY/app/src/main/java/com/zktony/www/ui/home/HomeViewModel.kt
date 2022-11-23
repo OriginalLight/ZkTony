@@ -414,18 +414,8 @@ data class ButtonState(
  * 模块枚举
  */
 enum class ModuleEnum(val value: String, val index: Int) {
-    A("模块A", 0), B("模块B", 1), C("模块C", 2), D("模块D", 3),
-}
-
-/**
- * 根据index获取模块
- */
-fun getModuleFromIndex(index: Int): ModuleEnum {
-    return when (index) {
-        0 -> A
-        1 -> B
-        2 -> C
-        3 -> D
-        else -> throw IllegalArgumentException("index must be 0-3")
-    }
+    A("模块A", 0),
+    B("模块B", 1),
+    C("模块C", 2),
+    D("模块D", 3),
 }

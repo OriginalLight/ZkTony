@@ -28,7 +28,6 @@ import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
 import com.zktony.www.serialport.SerialPort
 import com.zktony.www.serialport.SerialPortManager
-import com.zktony.www.serialport.getSerialPort
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -165,6 +164,15 @@ class AdminViewModel @Inject constructor(
                 checkRemoteUpdate()
             }
         }
+    }
+
+    /**
+     * 取消或确认更新时清空标志
+     * 防止重进进入时显示更新提示
+     */
+    fun cleanUpdate() {
+        _file.value = null
+        _version.value = null
     }
 
     /**
@@ -317,7 +325,7 @@ class AdminViewModel @Inject constructor(
                         break
                     }
                     SerialPortManager.instance.sendHex(
-                        getSerialPort(i), Command(
+                        i.toSerialPort(), Command(
                             function = "03", parameter = "04", data = j.int8ToHex()
                         ).toHex()
                     )

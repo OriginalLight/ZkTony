@@ -153,6 +153,15 @@ class AdminViewModel @Inject constructor(
     }
 
     /**
+     * 取消或确认更新时清空标志
+     * 防止重进进入时显示更新提示
+     */
+    fun cleanUpdate() {
+        _file.value = null
+        _version.value = null
+    }
+
+    /**
      * 检查更新
      */
     fun checkUpdate() {

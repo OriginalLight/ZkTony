@@ -34,15 +34,15 @@ data class Calibration(
     // z轴电机一圈走的距离
     val distanceZ: Float = 3.8f,
     // 蠕动泵一一圈走的进液量
-    val volumeOne: Float = 1f,
+    val volumeOne: Float = 50f,
     // 蠕动泵二一圈走的进液量
-    val volumeTwo: Float = 1f,
+    val volumeTwo: Float = 50f,
     // 蠕动泵三一圈走的进液量
-    val volumeThree: Float = 1f,
+    val volumeThree: Float = 50f,
     // 蠕动泵四一圈走的进液量
-    val volumeFour: Float = 1f,
+    val volumeFour: Float = 50f,
     // 蠕动泵五转的圈数
-    val volumeFive: Float = 1f,
+    val volumeFive: Float = 25f,
     // 多转的圈数
     val extract: Float = 30f,
 )

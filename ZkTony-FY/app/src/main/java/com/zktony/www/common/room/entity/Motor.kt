@@ -107,15 +107,15 @@ data class PumpMotor(
     val four: Motor = Motor(),
     val five: Motor = Motor(),
     // 泵一转一圈的出液量
-    val volumeOne: Float = 1f,
+    val volumeOne: Float = 50f,
     // 泵二转一圈的出液量
-    val volumeTwo: Float = 1f,
+    val volumeTwo: Float = 50f,
     // 泵三转一圈的出液量
-    val volumeThree: Float = 1f,
+    val volumeThree: Float = 50f,
     // 泵四转一圈的出液量
-    val volumeFour: Float = 1f,
+    val volumeFour: Float = 50f,
     // 泵五转一圈的出液量
-    val volumeFive: Float = 1f,
+    val volumeFive: Float = 25f,
 ) {
 
     /**
@@ -131,7 +131,7 @@ data class PumpMotor(
      * @return [String] 脉冲数
      */
     private fun pumpOneVolumePulseCount(volume: Float): String {
-        return (volume * pulseCount(one) / this.volumeOne).toInt().toString()
+        return (volume * pulseCount(one) * 1000 / this.volumeOne).toInt().toString()
     }
 
     /**
@@ -140,7 +140,7 @@ data class PumpMotor(
      * @return [String] 脉冲数
      */
     private fun pumpTwoVolumePulseCount(volume: Float): String {
-        return (volume * pulseCount(two) / this.volumeTwo).toInt().toString()
+        return (volume * pulseCount(two) * 1000 / this.volumeTwo).toInt().toString()
     }
 
     /**
@@ -149,7 +149,7 @@ data class PumpMotor(
      * @return [String] 脉冲数
      */
     private fun pumpThreeVolumePulseCount(volume: Float): String {
-        return (volume * pulseCount(three) / this.volumeThree).toInt().toString()
+        return (volume * pulseCount(three) * 1000 / this.volumeThree).toInt().toString()
     }
 
     /**
@@ -158,7 +158,7 @@ data class PumpMotor(
      * @return [String] 脉冲数
      */
     private fun pumpFourVolumePulseCount(volume: Float): String {
-        return (volume * pulseCount(four) / this.volumeFour).toInt().toString()
+        return (volume * pulseCount(four) * 1000 / this.volumeFour).toInt().toString()
     }
 
     /**
@@ -167,7 +167,7 @@ data class PumpMotor(
      * @return [String] 脉冲数
      */
     private fun pumpFiveVolumePulseCount(volume: Float): String {
-        return (volume * pulseCount(five) / this.volumeFive).toInt().toString()
+        return (volume * pulseCount(five) * 1000 / this.volumeFive).toInt().toString()
     }
 
     /**
