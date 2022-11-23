@@ -108,16 +108,30 @@ class AdminFragment :
                     .setInputInfo(InputInfo().setInputType(TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_PASSWORD))
                     .setOkButton { _, _, inputStr ->
                         if (inputStr.isBlank().not() && inputStr == "123456") {
-                            BottomMenu.show(listOf("校准设置", "电机设置"))
-                                .setMessage("请选择设置，请不要重复点击！！！")
-                                .setOnMenuItemClickListener { _, _, index ->
-                                    when (index) {
-                                        0 -> findNavController().navigate(R.id.action_navigation_admin_to_navigation_calibration)
-                                        1 -> findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor)
-                                        else -> {}
+                            CustomDialog.build()
+                                .setCustomView(object :
+                                    OnBindView<CustomDialog>(R.layout.layout_function_select) {
+                                    override fun onBind(dialog: CustomDialog, v: View) {
+                                        val motor = v.findViewById<MaterialButton>(R.id.motor)
+                                        val cali = v.findViewById<MaterialButton>(R.id.calibration)
+                                        val cancel = v.findViewById<MaterialButton>(R.id.cancel)
+                                        motor.setOnClickListener {
+                                            if (isFastClick().not()) {
+                                                dialog.dismiss()
+                                                findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor)
+                                            }
+                                        }
+                                        cali.setOnClickListener {
+                                            if (isFastClick().not()) {
+                                                dialog.dismiss()
+                                                findNavController().navigate(R.id.action_navigation_admin_to_navigation_calibration)
+                                            }
+                                        }
+                                        cancel.setOnClickListener { dialog.dismiss() }
                                     }
-                                    false
-                                }
+                                })
+                                .setMaskColor(Color.parseColor("#4D000000"))
+                                .show()
                         } else {
                             PopTip.show("密码错误")
                         }
@@ -239,9 +253,13 @@ class AdminFragment :
                     message.text = "是否更新？"
                     btnOk.setOnClickListener {
                         requireContext().installApk(file)
+                        viewModel.cleanUpdate()
                         dialog.dismiss()
                     }
-                    btnCancel.setOnClickListener { dialog.dismiss() }
+                    btnCancel.setOnClickListener {
+                        viewModel.cleanUpdate()
+                        dialog.dismiss()
+                    }
                 }
             })
             .setMaskColor(Color.parseColor("#4D000000"))
@@ -265,13 +283,16 @@ class AdminFragment :
                     message.text = version.description + "\n是否升级？"
                     btnOk.setOnClickListener {
                         viewModel.doRemoteUpdate(version)
+                        viewModel.cleanUpdate()
                         dialog.dismiss()
                     }
-                    btnCancel.setOnClickListener { dialog.dismiss() }
+                    btnCancel.setOnClickListener {
+                        viewModel.cleanUpdate()
+                        dialog.dismiss()
+                    }
                 }
             })
             .setMaskColor(Color.parseColor("#4D000000"))
             .show()
     }
-
 }

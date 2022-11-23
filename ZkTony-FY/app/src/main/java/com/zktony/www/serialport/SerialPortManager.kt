@@ -28,7 +28,7 @@ class SerialPortManager(
     // 机构运行已经等待的时间
     private var lockTime = 0L
     // 机构运行小步骤等待时间
-    private var waitTime = 40L
+    private var waitTime = 80L
     // 机构的抽屉状态
     private var drawer = false
     // 正在执行模块的个数
@@ -199,16 +199,4 @@ enum class SerialPort(val device: String, val value: String, val index: Int) {
     SERIAL_FOUR("/dev/ttyS3", "串口四", 3),
     SERIAL_FIVE("/dev/ttyS4", "串口五", 4),
     SERIAL_SIX("/dev/ttyS5", "串口六", 5),
-}
-
-fun getSerialPort(index: Int): SerialPort {
-    return when (index) {
-        0 -> SERIAL_ONE
-        1 -> SERIAL_TWO
-        2 -> SERIAL_THREE
-        3 -> SERIAL_FOUR
-        4 -> SERIAL_FIVE
-        5 -> SERIAL_SIX
-        else -> SERIAL_ONE
-    }
 }

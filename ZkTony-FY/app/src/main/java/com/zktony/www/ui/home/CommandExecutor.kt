@@ -292,10 +292,10 @@ class CommandExecutor {
             five = if (action.mode == 3) action.liquidVolume else 0f
         )
         val stepTwo = pumpMotor.toPumpHex(
-            one = if (module == A) action.liquidVolume + pumpMotor.volumeOne * calibration.extract else 0f,
-            two = if (module == B) action.liquidVolume + pumpMotor.volumeTwo * calibration.extract else 0f,
-            three = if (module == C) action.liquidVolume + pumpMotor.volumeThree * calibration.extract else 0f,
-            four = if (module == D) action.liquidVolume + pumpMotor.volumeFour * calibration.extract else 0f,
+            one = if (module == A) action.liquidVolume + pumpMotor.volumeOne * calibration.extract / 1000 else 0f,
+            two = if (module == B) action.liquidVolume + pumpMotor.volumeTwo * calibration.extract / 1000 else 0f,
+            three = if (module == C) action.liquidVolume + pumpMotor.volumeThree * calibration.extract / 1000 else 0f,
+            four = if (module == D) action.liquidVolume + pumpMotor.volumeFour * calibration.extract / 1000 else 0f,
         )
         return listOf(
             zero + stepOne[0] + zero + stepTwo[0],
@@ -310,10 +310,10 @@ class CommandExecutor {
     private fun recycleLiquid(): List<String> {
         val zero = "0,0,0,"
         val recycle = pumpMotor.toPumpHex(
-            one = if (module == A) -(action.liquidVolume + pumpMotor.volumeOne * calibration.extract) else 0f,
-            two = if (module == B) -(action.liquidVolume + pumpMotor.volumeTwo * calibration.extract) else 0f,
-            three = if (module == C) -(action.liquidVolume + pumpMotor.volumeThree * calibration.extract) else 0f,
-            four = if (module == D) -(action.liquidVolume + pumpMotor.volumeFour * calibration.extract) else 0f,
+            one = if (module == A) -(action.liquidVolume + pumpMotor.volumeOne * calibration.extract / 1000) else 0f,
+            two = if (module == B) -(action.liquidVolume + pumpMotor.volumeTwo * calibration.extract / 1000) else 0f,
+            three = if (module == C) -(action.liquidVolume + pumpMotor.volumeThree * calibration.extract / 1000) else 0f,
+            four = if (module == D) -(action.liquidVolume + pumpMotor.volumeFour * calibration.extract / 1000) else 0f,
         )
         return listOf(
             zero + recycle[0] + zero + zero,
