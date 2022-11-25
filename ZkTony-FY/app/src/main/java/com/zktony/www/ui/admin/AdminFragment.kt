@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.text.InputType.TYPE_CLASS_TEXT
 import android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
 import android.view.View
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
@@ -174,15 +173,16 @@ class AdminFragment :
                         val btnClose = v.findViewById<View>(R.id.btn_close)
                         val webView = v.findViewById<View>(R.id.webView)
                         btnClose.setOnClickListener { dialog.dismiss() }
-                        val webSettings: WebSettings = (webView as WebView).settings
-                        webSettings.javaScriptEnabled = true
-                        webSettings.loadWithOverviewMode = true
-                        webSettings.useWideViewPort = true
-                        webSettings.setSupportZoom(false)
-                        webSettings.allowFileAccess = true
-                        webSettings.javaScriptCanOpenWindowsAutomatically = true
-                        webSettings.loadsImagesAutomatically = true
-                        webSettings.defaultTextEncodingName = "utf-8"
+                        (webView as WebView).settings.apply {
+                            javaScriptEnabled = true
+                            loadWithOverviewMode = true
+                            useWideViewPort = true
+                            setSupportZoom(true)
+                            allowFileAccess = true
+                            javaScriptCanOpenWindowsAutomatically = true
+                            loadsImagesAutomatically = true
+                            defaultTextEncodingName = "utf-8"
+                        }
                         webView.webViewClient = object : WebViewClient() {
                             @Deprecated("Deprecated in Java")
                             override fun shouldOverrideUrlLoading(
