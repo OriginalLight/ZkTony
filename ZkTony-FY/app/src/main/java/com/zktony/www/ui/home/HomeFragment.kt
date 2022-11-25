@@ -247,7 +247,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     /**
      * 操作按钮的ui状态变化
-     * @param state 状态
+     * @param state [ButtonState] 状态
      */
     private fun buttonStateChange(state: ButtonState) {
         with(binding.e) {
