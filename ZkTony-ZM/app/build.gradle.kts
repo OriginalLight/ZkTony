@@ -72,6 +72,7 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
@@ -93,7 +94,6 @@ dependencies {
     implementation(libs.recyclerview)
     implementation(libs.rxandroid)
     implementation(libs.rxjava)
-    implementation(libs.androidx.core.ktx)
     implementation(libs.retrofit2) {
         exclude(group = "com.squareup.okhttp3", module = "okhttp")
     }
