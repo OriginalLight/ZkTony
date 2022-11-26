@@ -26,20 +26,20 @@ import java.util.List;
 public class LogController {
 
     @Resource
-    private LogRecordRepository logRecordRepository;
+    private LogRecordRepository recordRepository;
 
     @Resource
-    private LogDataRepository logDataRepository;
+    private LogDataRepository dataRepository;
 
     @PostMapping("/data")
     public Result<Void> insertData(@RequestBody List<LogData> logDataList) {
-        logDataRepository.saveAll(logDataList);
+        dataRepository.saveAll(logDataList);
         return Result.ok();
     }
 
     @PostMapping("/record")
     public Result<Void> insertRecord(@RequestBody List<LogRecord> logRecordList) {
-        logRecordRepository.saveAll(logRecordList);
+        recordRepository.saveAll(logRecordList);
         return Result.ok();
     }
 }
