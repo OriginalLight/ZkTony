@@ -4,11 +4,11 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
@@ -179,41 +179,63 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
         binding.conAbout.run {
             this.clickScale()
             this.setOnClickListener {
-                FullScreenDialog.build(object :
-                    OnBindView<FullScreenDialog>(R.layout.layout_about_webview) {
-                    @SuppressLint("SetJavaScriptEnabled")
-                    override fun onBind(dialog: FullScreenDialog, v: View) {
-                        val btnClose = v.findViewById<View>(R.id.btn_close)
-                        val webView = v.findViewById<View>(R.id.webView)
-                        btnClose.setOnClickListener { dialog.dismiss() }
-                        val webSettings: WebSettings = (webView as WebView).settings
-                        webSettings.javaScriptEnabled = true
-                        webSettings.loadWithOverviewMode = true
-                        webSettings.useWideViewPort = true
-                        webSettings.setSupportZoom(false)
-                        webSettings.allowFileAccess = true
-                        webSettings.javaScriptCanOpenWindowsAutomatically = true
-                        webSettings.loadsImagesAutomatically = true
-                        webSettings.defaultTextEncodingName = "utf-8"
-                        webView.webViewClient = object : WebViewClient() {
-                            @Deprecated("Deprecated in Java")
-                            override fun shouldOverrideUrlLoading(
-                                view: WebView,
-                                url: String
-                            ): Boolean {
-                                view.loadUrl(url)
-                                return true
-                            }
-
-                            override fun onPageFinished(view: WebView, url: String) {
-                                super.onPageFinished(view, url)
+                CustomDialog.build()
+                    .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_about_dialog) {
+                        override fun onBind(dialog: CustomDialog, v: View) {
+                            val btnWeb = v.findViewById<MaterialButton>(R.id.btn_web)
+                            btnWeb.isVisible = requireContext().isNetworkAvailable()
+                            btnWeb.setOnClickListener {
+                                if (isFastClick().not()) {
+                                    dialog.dismiss()
+                                    toWebSite()
+                                }
                             }
                         }
-                        webView.loadUrl(Constants.DOMAIN)
-                    }
-                }).setMaxWidth(1920).show()
+                    })
+                    .setMaskColor(Color.parseColor("#4D000000"))
+                    .show()
             }
         }
+    }
+
+    /**
+     * 打开公司网站
+     */
+    private fun toWebSite() {
+        FullScreenDialog.build(object :
+            OnBindView<FullScreenDialog>(R.layout.layout_about_webview) {
+            @SuppressLint("SetJavaScriptEnabled")
+            override fun onBind(dialog: FullScreenDialog, v: View) {
+                val btnClose = v.findViewById<View>(R.id.btn_close)
+                val webView = v.findViewById<View>(R.id.webView)
+                btnClose.setOnClickListener { dialog.dismiss() }
+                (webView as WebView).settings.apply {
+                    javaScriptEnabled = true
+                    loadWithOverviewMode = true
+                    useWideViewPort = true
+                    setSupportZoom(false)
+                    allowFileAccess = true
+                    javaScriptCanOpenWindowsAutomatically = true
+                    loadsImagesAutomatically = true
+                    defaultTextEncodingName = "utf-8"
+                }
+                webView.webViewClient = object : WebViewClient() {
+                    @Deprecated("Deprecated in Java")
+                    override fun shouldOverrideUrlLoading(
+                        view: WebView,
+                        url: String
+                    ): Boolean {
+                        view.loadUrl(url)
+                        return true
+                    }
+
+                    override fun onPageFinished(view: WebView, url: String) {
+                        super.onPageFinished(view, url)
+                    }
+                }
+                webView.loadUrl(Constants.DOMAIN)
+            }
+        }).setMaxWidth(1920).show()
     }
 
     /**
