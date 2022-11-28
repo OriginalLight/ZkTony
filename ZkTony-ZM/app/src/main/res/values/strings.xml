@@ -4,6 +4,8 @@
     <string name="title_program">实验程序</string>
     <string name="title_log">日志</string>
     <string name="title_admin">管理员</string>
-    <string name="about">关于我们</string>
+    <string name="about">使用说明</string>
     <string name="close">关闭</string>
+    <string name="qrcode">微信扫码关注公众号</string>
+    <string name="to_web">产品网站</string>
 </resources>
