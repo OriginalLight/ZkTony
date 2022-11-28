@@ -92,4 +92,5 @@
     <string name="z_motor">Z轴</string>
     <string name="zero_move">TO 原点</string>
     <string name="motor_setting">电机设置</string>
+    <string name="to_web">产品网站</string>
 </resources>

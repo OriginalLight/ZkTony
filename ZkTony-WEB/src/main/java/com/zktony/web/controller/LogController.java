@@ -6,6 +6,7 @@ import com.zktony.web.entity.LogRecord;
 import com.zktony.web.repository.LogDataRepository;
 import com.zktony.web.repository.LogRecordRepository;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,10 +26,10 @@ import java.util.List;
 @RequestMapping("/log")
 public class LogController {
 
-    @Resource
+    @Autowired
     private LogRecordRepository recordRepository;
 
-    @Resource
+    @Autowired
     private LogDataRepository dataRepository;
 
     @PostMapping("/data")

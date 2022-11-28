@@ -28,7 +28,7 @@ class SerialPortManager(
     // 机构运行已经等待的时间
     private var lockTime = 0L
     // 机构运行小步骤等待时间
-    private var waitTime = 80L
+    private var waitTime = 60L * 2
     // 机构的抽屉状态
     private var drawer = false
     // 正在执行模块的个数
