@@ -413,9 +413,9 @@ data class ButtonState(
 /**
  * 模块枚举
  */
-enum class ModuleEnum(val value: String, val index: Int) {
-    A("模块A", 0),
-    B("模块B", 1),
-    C("模块C", 2),
-    D("模块D", 3),
+enum class ModuleEnum(val value: String, val index: Int, val address: Int) {
+    A("模块A", 0, 1),
+    B("模块B", 1, 2),
+    C("模块C", 2, 3),
+    D("模块D", 3, 4),
 }

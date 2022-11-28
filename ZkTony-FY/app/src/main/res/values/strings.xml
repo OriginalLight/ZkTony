@@ -42,6 +42,7 @@
     <string name="mode">模式</string>
     <string name="module">模块</string>
     <string name="motor_distance">移动距离/转</string>
+    <string name="motor_setting">电机设置</string>
     <string name="needle_down">针头 DOWN</string>
     <string name="needle_up">针头 UP</string>
     <string name="no_log">没有日志</string>
@@ -59,6 +60,7 @@
     <string name="pump_one">泵一</string>
     <string name="pump_three">泵三</string>
     <string name="pump_two">泵二</string>
+    <string name="qrcode">微信扫码关注公众号</string>
     <string name="recycle">回收</string>
     <string name="reset">复   位</string>
     <string name="rest">下位机复位</string>
@@ -82,6 +84,7 @@
     <string name="title_log">日志</string>
     <string name="title_program">孵育程序</string>
     <string name="title_program_edit">程序编辑页面</string>
+    <string name="to_web">产品网站</string>
     <string name="update">升级</string>
     <string name="wash_tank">洗涤液</string>
     <string name="wash_tank_move">TO 洗涤液</string>
@@ -91,7 +94,4 @@
     <string name="y_motor">Y轴</string>
     <string name="z_motor">Z轴</string>
     <string name="zero_move">TO 原点</string>
-    <string name="motor_setting">电机设置</string>
-    <string name="to_web">产品网站</string>
-    <string name="qrcode">微信扫码关注公众号</string>
 </resources>
