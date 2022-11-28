@@ -59,7 +59,7 @@ class CommandExecutor {
             serial.sendText(
                 serialPort = SERIAL_FOUR,
                 text = Command.setTemperature(
-                    address = module.index.toString(),
+                    address = module.address.toString(),
                     temperature = action.temperature.toString()
                 )
             )
@@ -99,7 +99,7 @@ class CommandExecutor {
             serial.sendText(
                 serialPort = SERIAL_FOUR,
                 text = Command.setTemperature(
-                    address = module.index.toString(),
+                    address = module.address.toString(),
                     temperature = action.temperature.toString()
                 )
             )
@@ -170,7 +170,7 @@ class CommandExecutor {
             serial.sendText(
                 serialPort = SERIAL_FOUR,
                 text = Command.setTemperature(
-                    address = module.index.toString(),
+                    address = module.address.toString(),
                     temperature = action.temperature.toString()
                 )
             )
@@ -208,7 +208,7 @@ class CommandExecutor {
             serial.sendText(
                 serialPort = SERIAL_FOUR,
                 text = Command.setTemperature(
-                    address = module.index.toString(),
+                    address = module.address.toString(),
                     temperature = action.temperature.toString()
                 )
             )
