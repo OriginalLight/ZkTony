@@ -2,14 +2,17 @@ package com.zktony.www.ui.home
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.kongzue.dialogx.dialogs.BottomMenu
+import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.dialogs.PopTip
+import com.kongzue.dialogx.interfaces.OnIconChangeCallBack
+import com.kongzue.dialogx.util.TextInfo
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
@@ -74,7 +77,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            btnProgram.setOnClickListener { switchProgramDialog(A) }
+            btnProgram.setOnClickListener { showProgramDialog(A) }
         }
         binding.b.run {
             btnStart.setOnClickListener { this@HomeFragment.viewModel.start(B) }
@@ -85,7 +88,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            btnProgram.setOnClickListener { switchProgramDialog(B) }
+            btnProgram.setOnClickListener { showProgramDialog(B) }
         }
         binding.c.run {
             btnStart.setOnClickListener { this@HomeFragment.viewModel.start(C) }
@@ -98,7 +101,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            btnProgram.setOnClickListener { switchProgramDialog(C) }
+            btnProgram.setOnClickListener { showProgramDialog(C) }
         }
         binding.d.run {
             btnStart.setOnClickListener { this@HomeFragment.viewModel.start(D) }
@@ -111,7 +114,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            btnProgram.setOnClickListener { switchProgramDialog(D) }
+            btnProgram.setOnClickListener { showProgramDialog(D) }
         }
         binding.e.run {
             btnReset.run {
@@ -271,18 +274,26 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
     }
 
+
     /**
      * 选择程序
      * @param module [ModuleEnum] 模块
      */
-    private fun switchProgramDialog(module: ModuleEnum) {
+    private fun showProgramDialog(module: ModuleEnum) {
         val menuList = viewModel.programList.value.map { it.name }
-        if (menuList.isNotEmpty()) {
-            BottomMenu.show(menuList).setMessage("请选择程序")
-                .setOnMenuItemClickListener { _, _, index ->
-                    viewModel.switchProgram(index, module)
-                    false
+        PopMenu.show(menuList)
+            .setMenuTextInfo(TextInfo().apply {
+                gravity = Gravity.CENTER
+                fontSize = 16
+            })
+            .setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
+                override fun getIcon(dialog: PopMenu?, index: Int, menuText: String?): Int {
+                    return R.mipmap.ic_program
                 }
-        }
+            })
+            .setOnMenuItemClickListener { _, _, index ->
+                viewModel.switchProgram(index, module)
+                false
+            }.width = 300
     }
 }
