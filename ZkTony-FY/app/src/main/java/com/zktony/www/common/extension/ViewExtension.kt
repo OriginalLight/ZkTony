@@ -3,7 +3,6 @@
 package com.zktony.www.common.extension
 
 import android.annotation.SuppressLint
-import android.content.res.Resources
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MotionEvent
@@ -98,8 +97,4 @@ inline fun Spinner.onItemSelected(crossinline block: (Int) -> Unit) {
         override fun onNothingSelected(parent: AdapterView<*>?) {
         }
     }
-}
-
-inline fun Int.dp(): Int {
-    return (this * Resources.getSystem().displayMetrics.density).toInt()
 }

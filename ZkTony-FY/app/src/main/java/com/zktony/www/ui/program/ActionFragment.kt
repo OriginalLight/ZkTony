@@ -1,15 +1,17 @@
 package com.zktony.www.ui.program
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.kongzue.dialogx.dialogs.BottomMenu
+import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnIconChangeCallBack
+import com.kongzue.dialogx.util.TextInfo
 import com.zktony.www.R
 import com.zktony.www.adapter.ActionAdapter
 import com.zktony.www.base.BaseFragment
@@ -112,28 +114,27 @@ class ActionFragment :
             text = getActionEnum(viewModel.action.value.mode).value
             setOnClickListener {
                 val menuList = ActionEnum.values().map { it.value }
-                BottomMenu.show(menuList)
-                    .setOnIconChangeCallBack(object : OnIconChangeCallBack<BottomMenu>() {
-                        override fun getIcon(
-                            dialog: BottomMenu?,
-                            index: Int,
-                            menuText: String?
-                        ): Int {
-                            when (menuText) {
-                                ActionEnum.BLOCKING_LIQUID.value -> return R.mipmap.ic_blocking_liquid
-                                ActionEnum.ANTIBODY_ONE.value -> return R.mipmap.ic_antibody
-                                ActionEnum.ANTIBODY_TWO.value -> return R.mipmap.ic_antibody
-                                ActionEnum.WASHING.value -> return R.mipmap.ic_washing
+                PopMenu.show(menuList)
+                    .setMenuTextInfo(TextInfo().apply {
+                        gravity = Gravity.CENTER
+                        fontSize = 16
+                    })
+                    .setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
+                        override fun getIcon(dialog: PopMenu?, index: Int, menuText: String?): Int {
+                            return when (menuText) {
+                                ActionEnum.BLOCKING_LIQUID.value -> R.mipmap.ic_blocking_liquid
+                                ActionEnum.ANTIBODY_ONE.value -> R.mipmap.ic_antibody
+                                ActionEnum.ANTIBODY_TWO.value -> R.mipmap.ic_antibody
+                                ActionEnum.WASHING.value -> R.mipmap.ic_washing
+                                else -> R.mipmap.ic_blocking_liquid
                             }
-                            return 0
                         }
-
                     })
                     .setOnMenuItemClickListener { _, text, index ->
                         binding.btnAction.text = text
                         viewModel.switchAction(getActionEnum(index))
                         false
-                    }
+                    }.width = 300
             }
         }
     }
