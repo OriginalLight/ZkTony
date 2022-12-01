@@ -4,7 +4,6 @@ package com.zktony.web.controller;
 import com.zktony.web.commom.model.Result;
 import com.zktony.web.entity.Program;
 import com.zktony.web.repository.ProgramRepository;
-import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
