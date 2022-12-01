@@ -5,7 +5,6 @@ import com.zktony.web.entity.LogData;
 import com.zktony.web.entity.LogRecord;
 import com.zktony.web.repository.LogDataRepository;
 import com.zktony.web.repository.LogRecordRepository;
-import jakarta.annotation.Resource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
