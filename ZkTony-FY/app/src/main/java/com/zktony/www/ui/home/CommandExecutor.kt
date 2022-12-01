@@ -284,6 +284,7 @@ class CommandExecutor {
      */
     private fun addLiquid(): List<String> {
         val zero = "0,0,0,"
+        // 吸液
         val stepOne = pumpMotor.toPumpHex(
             one = if (module == A) action.liquidVolume else 0f,
             two = if (module == B) action.liquidVolume else 0f,
@@ -291,11 +292,12 @@ class CommandExecutor {
             four = if (module == D) action.liquidVolume else 0f,
             five = if (action.mode == 3) action.liquidVolume else 0f
         )
+        // 清空管路
         val stepTwo = pumpMotor.toPumpHex(
-            one = if (module == A) action.liquidVolume + pumpMotor.volumeOne * calibration.extract / 1000 else 0f,
-            two = if (module == B) action.liquidVolume + pumpMotor.volumeTwo * calibration.extract / 1000 else 0f,
-            three = if (module == C) action.liquidVolume + pumpMotor.volumeThree * calibration.extract / 1000 else 0f,
-            four = if (module == D) action.liquidVolume + pumpMotor.volumeFour * calibration.extract / 1000 else 0f,
+            one = if (module == A) pumpMotor.volumeOne * calibration.extract / 1000 else 0f,
+            two = if (module == B) pumpMotor.volumeTwo * calibration.extract / 1000 else 0f,
+            three = if (module == C) pumpMotor.volumeThree * calibration.extract / 1000 else 0f,
+            four = if (module == D) pumpMotor.volumeFour * calibration.extract / 1000 else 0f,
         )
         return listOf(
             zero + stepOne[0] + zero + stepTwo[0],
