@@ -312,11 +312,29 @@ class HomeViewModel @Inject constructor(
                 currentActionText = "/",
                 countDownText = if (state.value.runtimeText != "已完成") Constants.ZERO_TIME else state.value.countDownText,
             )
-            // 等待一下，当还有没有其他程序在运行中时，暂停摇床
+            // 等待一下，当还有没有其他程序在运行中时
+            // 暂停摇床
+            // 恢复到室温
+            // 复位
             delay(200L)
             if (serial.getExecuting() == 0) {
+                // 暂停摇床
                 serial.sendHex(
                     serialPort = SERIAL_ONE, hex = Command.pauseShakeBed()
+                )
+                // 恢复到室温
+                for (i in 1..4) {
+                    delay(200L)
+                    serial.sendText(
+                        serialPort = SERIAL_FOUR, text = Command.setTemperature(
+                            address = i.toString(),
+                            temperature = "26"
+                        )
+                    )
+                }
+                // 复位
+                serial.sendHex(
+                    serialPort = SERIAL_ONE, hex = Command().toHex()
                 )
             }
         }
@@ -345,7 +363,7 @@ class HomeViewModel @Inject constructor(
     /**
      * 摇床暂停
      */
-    fun pauseShakeBed() {
+    fun shakeBed() {
         viewModelScope.launch {
             // pauseEnable false 未暂停 true 暂停
             // 发送指令 -> 更新状态
@@ -365,7 +383,7 @@ class HomeViewModel @Inject constructor(
     /**
      * 抗体保温
      */
-    fun insulating() {
+    fun antibodyWarm() {
         viewModelScope.launch {
             // insulatingEnable false 未保温状态 true 保温状态
             // 发送设置温度命令 -> 更改按钮状态

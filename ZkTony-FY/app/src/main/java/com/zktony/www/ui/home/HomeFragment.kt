@@ -133,7 +133,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     } else {
                         PopTip.show("已暂停摇床，再次点击继续")
                     }
-                    this@HomeFragment.viewModel.pauseShakeBed()
+                    this@HomeFragment.viewModel.shakeBed()
                 }
             }
             btnInsulating.run {
@@ -144,7 +144,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     } else {
                         PopTip.show("抗体保温中，再次点击取消")
                     }
-                    this@HomeFragment.viewModel.insulating()
+                    this@HomeFragment.viewModel.antibodyWarm()
                 }
             }
         }
