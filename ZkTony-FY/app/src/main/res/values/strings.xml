@@ -94,4 +94,6 @@
     <string name="y_motor">Y轴</string>
     <string name="z_motor">Z轴</string>
     <string name="zero_move">TO 原点</string>
+    <string name="notice">注意事项</string>
+    <string name="notice_content">1. 运动机构运行时请不要打开抽屉，以免损坏针头。\n2. 执行程序前请确认有充足的洗涤液。\n3. 程序结束后请及时清理容器，避免滋生微生物等问题。</string>
 </resources>
