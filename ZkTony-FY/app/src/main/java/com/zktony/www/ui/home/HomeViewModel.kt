@@ -95,9 +95,11 @@ class HomeViewModel @Inject constructor(
                             when (address) {
                                 1 -> _stateOne.value = _stateOne.value.copy(tempText = "$temp ℃")
                                 2 -> _stateTwo.value = _stateTwo.value.copy(tempText = "$temp ℃")
-                                3 -> _stateThree.value = _stateThree.value.copy(tempText = "$temp ℃")
+                                3 -> _stateThree.value =
+                                    _stateThree.value.copy(tempText = "$temp ℃")
                                 4 -> _stateFour.value = _stateFour.value.copy(tempText = "$temp ℃")
-                                0 -> _stateButton.value = _stateButton.value.copy(insulatingTemp = "$temp ℃")
+                                0 -> _stateButton.value =
+                                    _stateButton.value.copy(insulatingTemp = "$temp ℃")
                             }
                         }
                     }

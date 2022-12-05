@@ -6,9 +6,12 @@ import com.zktony.www.common.extension.*
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.serialport.SerialPort.*
 import com.zktony.www.serialport.protocol.Command
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class SerialPortManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
@@ -25,12 +28,16 @@ class SerialPortManager(
 
     // 机构运行状态
     private var lock = false
+
     // 机构运行已经等待的时间
     private var lockTime = 0L
+
     // 机构运行小步骤等待时间
     private var waitTime = 60L * 2
+
     // 机构的抽屉状态
     private var drawer = false
+
     // 正在执行模块的个数
     private var executing = 0
 

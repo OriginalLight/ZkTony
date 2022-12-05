@@ -99,7 +99,12 @@ class ActionViewModel @Inject constructor(
                     str.append("没有任何操作，去添加吧...")
                 }
                 programRepo.getById(programId.value).firstOrNull()?.let { program ->
-                    programRepo.update(program.copy(actions = str.toString(), actionCount = it.size))
+                    programRepo.update(
+                        program.copy(
+                            actions = str.toString(),
+                            actionCount = it.size
+                        )
+                    )
                 }
             }
         }

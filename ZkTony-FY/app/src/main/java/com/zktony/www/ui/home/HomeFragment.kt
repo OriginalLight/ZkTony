@@ -296,4 +296,5 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 false
             }.width = 300
     }
+
 }
