@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data/>
+    <data />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -59,7 +59,8 @@
                         android:src="@mipmap/ic_time"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:ignore="ContentDescription" />
 
                     <TextView
                         android:id="@+id/tv_1"
@@ -441,6 +442,7 @@
                     android:layout_width="128dp"
                     android:layout_height="match_parent"
                     android:layout_marginTop="4dp"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@+id/con_b_1_2"
                     app:layout_constraintStart_toStartOf="parent"

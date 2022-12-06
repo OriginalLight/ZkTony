@@ -50,9 +50,9 @@ class AdminViewModel @Inject constructor(
      * 下位机复位
      */
     fun lowerComputerReset() {
-        Gpio.instance.setMulSel('h', 13, 1)
-        Gpio.instance.writeGpio('h', 13, 0)
-        Gpio.instance.writeGpio('h', 13, 1)
+        Gpio.instance.setMulSel('h', 12, 1)
+        Gpio.instance.writeGpio('h', 12, 0)
+        Gpio.instance.writeGpio('h', 12, 1)
     }
 
     /**
