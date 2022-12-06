@@ -23,23 +23,23 @@ class SerialPort
     /**
      * 串口文件描述符，禁止删除或者重命名
      */
-    private var mFd: FileDescriptor? = null
+    private var fd: FileDescriptor? = null
 
     /**
      * 输入流，用于接收串口数据
      */
-    private val mFileInputStream: FileInputStream
+    private val fileInputStream: FileInputStream
 
     /**
      * 输出流，用于发送串口数据
      */
-    private val mFileOutputStream: FileOutputStream
+    private val fileOutputStream: FileOutputStream
 
     val inputStream: FileInputStream
-        get() = mFileInputStream
+        get() = fileInputStream
 
     val outputStream: FileOutputStream
-        get() = mFileOutputStream
+        get() = fileOutputStream
 
     constructor(device: File, baudrate: Int, flags: Int) : this(
         device,
@@ -53,15 +53,15 @@ class SerialPort
 
     init {
         checkPermission(device)
-        mFd = open(device.absolutePath, baudrate, stopBits, dataBits, parity, flowCon, flags)
-        if (mFd == null) {
+        fd = open(device.absolutePath, baudrate, stopBits, dataBits, parity, flowCon, flags)
+        if (fd == null) {
             Log.e(TAG, "native open returns null")
             throw IOException()
         }
         // 输入流，也就是获取从单片机或者传感器，通过串口传入到Android主板的IO数据（使用的时候，执行Read方法）,将外部存储的数据读取到内存里
-        mFileInputStream = FileInputStream(mFd)
+        fileInputStream = FileInputStream(fd)
         // 输出流，Android将需要传输的数据发送到单片机或者传感器（使用的时候，执行Write方法）,将内存的数据写到外部存储
-        mFileOutputStream = FileOutputStream(mFd)
+        fileOutputStream = FileOutputStream(fd)
     }
 
     @Throws(SecurityException::class, IllegalArgumentException::class)
@@ -73,10 +73,7 @@ class SerialPort
                 // Missing read/write permission, trying to chmod the file
                 val command = "/system/xbin/su"
                 val su = Runtime.getRuntime().exec(command)
-                val cmd = """
-            chmod 777 ${device.absolutePath}
-            exit
-            """.trimIndent()
+                val cmd = """chmod 777 ${device.absolutePath} exit""".trimIndent()
                 Log.i(TAG, "提权命令:$cmd")
                 su.outputStream.write(cmd.toByteArray())
 

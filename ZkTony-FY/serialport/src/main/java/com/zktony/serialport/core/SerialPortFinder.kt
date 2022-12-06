@@ -13,7 +13,7 @@ import java.util.*
  * @time 2022/3/5
  */
 class SerialPortFinder {
-    inner class Driver(val name: String, private val mDeviceRoot: String) {
+    inner class Driver(val name: String, private val deviceRoot: String) {
         var mDevices: Vector<File>? = null
         val devices: Vector<File>
             get() {
@@ -23,7 +23,7 @@ class SerialPortFinder {
                     val files = dev.listFiles() ?: throw NullPointerException()
                     var i = 0
                     while (i < files.size) {
-                        if (files[i].absolutePath.startsWith(mDeviceRoot)) {
+                        if (files[i].absolutePath.startsWith(deviceRoot)) {
                             Log.d(TAG, "Found new device: " + files[i])
                             mDevices!!.add(files[i])
                         }
