@@ -1,7 +1,6 @@
 package com.zktony.www.serialport
 
-import com.zktony.serialport.COMSerial
-import com.zktony.serialport.listener.OnComDataListener
+import com.zktony.serialport.MutableSerial
 import com.zktony.www.common.extension.*
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.serialport.SerialPort.*
@@ -44,40 +43,38 @@ class SerialPortManager(
     init {
         scope.launch {
             launch {
-                COMSerial.instance.addCOM(SERIAL_ONE.device, 115200)
-                COMSerial.instance.addCOM(SERIAL_TWO.device, 115200)
-                COMSerial.instance.addCOM(SERIAL_THREE.device, 115200)
-                COMSerial.instance.addCOM(SERIAL_FOUR.device, 57600)
+                MutableSerial.instance.init(SERIAL_ONE.device, 115200)
+                MutableSerial.instance.init(SERIAL_TWO.device, 115200)
+                MutableSerial.instance.init(SERIAL_THREE.device, 115200)
+                MutableSerial.instance.init(SERIAL_FOUR.device, 57600)
             }
             launch {
-                COMSerial.instance.addDataListener(object : OnComDataListener {
-                    override fun comDataBack(com: String, hexData: String) {
-                        when (com) {
-                            SERIAL_ONE.device -> {
-                                hexData.verifyHex().forEach {
-                                    _serialOneFlow.value = it
-                                    Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
-                                }
-                            }
-                            SERIAL_TWO.device -> {
-                                hexData.verifyHex().forEach {
-                                    _serialTwoFlow.value = it
-                                    Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
-                                }
-                            }
-                            SERIAL_THREE.device -> {
-                                hexData.verifyHex().forEach {
-                                    _serialThreeFlow.value = it
-                                    Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
-                                }
-                            }
-                            SERIAL_FOUR.device -> {
-                                _serialFourFlow.value = hexData.hexToAscii()
-                                //Logger.d(msg = "串口四 receivedText: ${hexData.hexToAscii()}")
+                MutableSerial.instance.addListener { com, hexData ->
+                    when (com) {
+                        SERIAL_ONE.device -> {
+                            hexData.verifyHex().forEach {
+                                _serialOneFlow.value = it
+                                Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
                             }
                         }
+                        SERIAL_TWO.device -> {
+                            hexData.verifyHex().forEach {
+                                _serialTwoFlow.value = it
+                                Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
+                            }
+                        }
+                        SERIAL_THREE.device -> {
+                            hexData.verifyHex().forEach {
+                                _serialThreeFlow.value = it
+                                Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
+                            }
+                        }
+                        SERIAL_FOUR.device -> {
+                            _serialFourFlow.value = hexData.hexToAscii()
+                            //Logger.d(msg = "串口四 receivedText: ${hexData.hexToAscii()}")
+                        }
                     }
-                })
+                }
             }
             launch {
                 serialOneFlow.collect {
@@ -136,7 +133,7 @@ class SerialPortManager(
      */
     fun sendHex(serialPort: SerialPort, hex: String) {
         scope.launch {
-            COMSerial.instance.sendHex(serialPort.device, hex)
+            MutableSerial.instance.sendHex(serialPort.device, hex)
             Logger.e(msg = "${serialPort.value} sendHex: ${hex.hexFormat()}")
         }
     }
@@ -148,7 +145,7 @@ class SerialPortManager(
      */
     fun sendText(serialPort: SerialPort, text: String) {
         scope.launch {
-            COMSerial.instance.sendText(serialPort.device, text)
+            MutableSerial.instance.sendText(serialPort.device, text)
             //Logger.e(msg = "${serialPort.value} sendText: $text")
         }
     }

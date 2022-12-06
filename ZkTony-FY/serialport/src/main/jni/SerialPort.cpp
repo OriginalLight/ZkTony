@@ -202,7 +202,7 @@ Java_com_zktony_serialport_core_SerialPort_close(JNIEnv *env, jobject thiz) {
     jclass SerialPortClass = env->GetObjectClass(thiz);
     jclass FileDescriptorClass = env->FindClass("java/io/FileDescriptor");
 
-    jfieldID mFdID = env->GetFieldID(SerialPortClass, "mFd", "Ljava/io/FileDescriptor;");
+    jfieldID mFdID = env->GetFieldID(SerialPortClass, "fd", "Ljava/io/FileDescriptor;");
     jfieldID descriptorID = env->GetFieldID(FileDescriptorClass, "descriptor", "I");
 
     jobject mFd = env->GetObjectField(thiz, mFdID);

@@ -1,18 +1,16 @@
 package com.zktony.serialport
 
-import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import com.zktony.serialport.util.Logger
 import com.zktony.serialport.util.SerialDataUtils.hexToByteArr
-import com.zktony.serialport.util.SerialPortHelper
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.security.InvalidParameterException
 
 abstract class BaseSerialPort : SerialPortHelper {
-    @SuppressLint("HandlerLeak")
+
     private var mHandler: Handler? = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
@@ -21,13 +19,14 @@ abstract class BaseSerialPort : SerialPortHelper {
         }
     }
 
-    constructor() : super() {}
-    constructor(sPort: String?, iBaudRate: Int) : super(sPort, iBaudRate) {}
+    constructor() : super()
+    constructor(sPort: String?, iBaudRate: Int) : super(sPort, iBaudRate)
 
     abstract fun onDataBack(data: String)
-    override fun onDataReceived(ComRecData: String) {
+
+    override fun onDataReceived(recData: String) {
         val message = Message()
-        message.obj = ComRecData
+        message.obj = recData
         mHandler!!.sendMessage(message)
     }
 
@@ -53,10 +52,7 @@ abstract class BaseSerialPort : SerialPortHelper {
             Logger.instance.i(TAG, "Open the serial port successfully")
             0
         } catch (e: SecurityException) {
-            Logger.instance.e(
-                TAG,
-                "Failed to open the serial port: no serial port read/write permission!"
-            )
+            Logger.instance.e(TAG, "Failed to open the serial port: no serial port read/write permission!")
             -1
         } catch (e: IOException) {
             Logger.instance.e(TAG, "Failed to open serial port: unknown error!")
@@ -109,15 +105,6 @@ abstract class BaseSerialPort : SerialPortHelper {
         val msg = Message.obtain()
         msg.obj = bOutArray
         addWaitMessage(msg)
-    }
-
-    /**
-     * is show log
-     *
-     * @param isShowLog true=show
-     */
-    fun setShowLog(isShowLog: Boolean) {
-        Logger.SHOW_LOG = isShowLog
     }
 
     companion object {
