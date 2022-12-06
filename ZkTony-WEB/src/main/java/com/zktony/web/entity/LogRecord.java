@@ -1,5 +1,6 @@
 package com.zktony.web.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -41,6 +42,7 @@ public class LogRecord implements Serializable {
     private Integer upload;
 
     @Column(name = "create_time")
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8", locale = "zh")
     private Date createTime;
 
 }
