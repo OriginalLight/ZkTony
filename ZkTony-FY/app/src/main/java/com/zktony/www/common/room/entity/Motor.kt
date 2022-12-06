@@ -21,7 +21,7 @@ data class Motor(
     // 电机编号
     val name: String = "",
     // 转速
-    val speed: Int = 100,
+    val speed: Int = 600,
     // 加速
     val acceleration: Int = 60,
     // 减速
@@ -107,15 +107,15 @@ data class PumpMotor(
     val four: Motor = Motor(),
     val five: Motor = Motor(),
     // 泵一转一圈的出液量
-    val volumeOne: Float = 50f,
+    val volumeOne: Float = 180f,
     // 泵二转一圈的出液量
-    val volumeTwo: Float = 50f,
+    val volumeTwo: Float = 180f,
     // 泵三转一圈的出液量
-    val volumeThree: Float = 50f,
+    val volumeThree: Float = 180f,
     // 泵四转一圈的出液量
-    val volumeFour: Float = 50f,
+    val volumeFour: Float = 180f,
     // 泵五转一圈的出液量
-    val volumeFive: Float = 25f,
+    val volumeFive: Float = 47f,
 ) {
 
     /**
