@@ -7,14 +7,15 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.serialport.COMSerial
-import com.zktony.serialport.listener.OnComDataListener
+import com.zktony.serialport.MutableSerial
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.data.model.SerialPort
 import com.zktony.www.ui.home.model.Cmd
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -36,15 +37,14 @@ class AppViewModel @Inject constructor(
 
     init {
         initSettings()
-        COMSerial.instance.addCOM(SerialPort.TTYS4.device, 115200)
-        COMSerial.instance.addDataListener(object : OnComDataListener {
-            override fun comDataBack(com: String, hexData: String) {
-                val cmd = Cmd(hexData)
-                if (cmd.cmd == 2) {
-                    receive(cmd)
-                }
+        MutableSerial.instance.init(SerialPort.TTYS4.device, 115200)
+        MutableSerial.instance.addListener { _, data ->
+            val cmd = Cmd(data)
+            if (cmd.cmd == 2) {
+                _received.value = cmd
+                Logger.d(msg = "接收到指令：${cmd.genHex()}")
             }
-        })
+        }
     }
 
     /**
@@ -54,57 +54,54 @@ class AppViewModel @Inject constructor(
     fun send(cmd: Cmd) {
         viewModelScope.launch {
             _send.value = cmd
-            COMSerial.instance.sendHex(SerialPort.TTYS4.device, cmd.genHex())
+            MutableSerial.instance.sendHex(SerialPort.TTYS4.device, cmd.genHex())
             Logger.d(msg = "发送指令：${cmd.genHex()}")
         }
     }
 
-    /**
-     * 接收到数据
-     * @param cmd [Cmd] 指令
-     */
-    fun receive(cmd: Cmd) {
-        viewModelScope.launch {
-            _received.value = cmd
-            Logger.d(msg ="接收到指令：${cmd.genHex()}")
-        }
-    }
 
     private fun initSettings() {
         viewModelScope.launch {
             launch {
                 dataStore.data.map {
                     it[booleanPreferencesKey(Constants.AUDIO)] ?: true
-                }.distinctUntilChanged().collect {
+                }.collect {
                     _setting.value = _setting.value.copy(audio = it)
                 }
             }
             launch {
                 dataStore.data.map {
                     it[booleanPreferencesKey(Constants.BAR)] ?: false
-                }.distinctUntilChanged().collect {
+                }.collect {
                     _setting.value = _setting.value.copy(bar = it)
                 }
             }
             launch {
                 dataStore.data.map {
                     it[booleanPreferencesKey(Constants.DETECT)] ?: true
-                }.distinctUntilChanged().collect {
+                }.collect {
                     _setting.value = _setting.value.copy(detect = it)
                 }
             }
             launch {
                 dataStore.data.map {
                     it[intPreferencesKey(Constants.INTERVAL)] ?: 1
-                }.distinctUntilChanged().collect {
+                }.collect {
                     _setting.value = _setting.value.copy(interval = it)
                 }
             }
             launch {
                 dataStore.data.map {
                     it[intPreferencesKey(Constants.DURATION)] ?: 10
-                }.distinctUntilChanged().collect {
+                }.collect {
                     _setting.value = _setting.value.copy(duration = it)
+                }
+            }
+            launch {
+                dataStore.data.map {
+                    it[intPreferencesKey(Constants.MOTOR_SPEED)] ?: 160
+                }.collect {
+                    _setting.value = _setting.value.copy(motorSpeed = it)
                 }
             }
         }
@@ -117,4 +114,5 @@ data class AppSetting(
     val detect: Boolean = true,
     val duration: Int = 10,
     val interval: Int = 1,
+    val motorSpeed: Int = 160,
 )

@@ -153,6 +153,18 @@ class AdminViewModel @Inject constructor(
     }
 
     /**
+     * 蠕动泵转速
+     * @param speed [Int] 转速
+     */
+    fun toggleMotorSpeed(speed: Int) {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[intPreferencesKey(Constants.MOTOR_SPEED)] = speed
+            }
+        }
+    }
+
+    /**
      * 取消或确认更新时清空标志
      * 防止重进进入时显示更新提示
      */
@@ -247,4 +259,5 @@ class AdminViewModel @Inject constructor(
         }
         return null
     }
+
 }

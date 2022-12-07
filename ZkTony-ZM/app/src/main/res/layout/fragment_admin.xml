@@ -12,570 +12,486 @@
         android:background="@color/dark_onBackground"
         tools:context=".ui.admin.AdminFragment">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/con_a"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toTopOf="@+id/con_b"
+            android:baselineAligned="false"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@+id/con_btn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/con_a_1"
+            <ScrollView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="4dp"
-                android:background="@color/light_onPrimary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/con_a_2"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_weight="1"
+                android:background="@color/light_onPrimary">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_a_1_1"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/bg_line_bottom"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/iv_1"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="8dp"
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:src="@mipmap/ic_time"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:ignore="ContentDescription" />
-
-                    <TextView
-                        android:id="@+id/tv_1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="废液清理间隔（分钟）"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/iv_1"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <EditText
-                        android:id="@+id/interval"
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
-                        android:gravity="center"
-                        android:inputType="number"
-                        android:minHeight="48dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:background="@drawable/bg_line_bottom">
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <ImageView
+                            android:id="@+id/iv_bar"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/ic_bar"
+                            tools:ignore="ContentDescription" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_a_1_2"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/bg_line_bottom"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/con_a_1_1">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toRightOf="@+id/iv_bar"
+                            android:text="导航栏"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
 
-                    <ImageView
-                        android:id="@+id/iv_2"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="8dp"
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/navigation_bar"
+                            android:layout_width="50dp"
+                            android:layout_height="36dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="35dp"
+                            android:checked="true"
+                            android:textOff="隐藏"
+                            android:textOn="显示"
+                            app:thumbTint="@color/light_primary"
+                            app:trackTint="@color/dark_surfaceTint" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:src="@mipmap/ic_time"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="废液清理时长（秒）"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/iv_2"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <EditText
-                        android:id="@+id/duration"
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
                         android:layout_marginEnd="16dp"
-                        android:gravity="center"
-                        android:inputType="number"
-                        android:minHeight="48dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:background="@drawable/bg_line_bottom">
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <ImageView
+                            android:id="@+id/iv_audio"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/ic_audio"
+                            tools:ignore="ContentDescription" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_a_1_3"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/bg_line_bottom"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/con_a_1_2">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toRightOf="@+id/iv_audio"
+                            android:text="语音播报"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
 
-                    <ImageView
-                        android:id="@+id/iv_3"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="8dp"
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/audio"
+                            android:layout_width="50dp"
+                            android:layout_height="36dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="35dp"
+                            android:checked="true"
+                            android:textOff="隐藏"
+                            android:textOn="显示"
+                            app:thumbTint="@color/light_primary"
+                            app:trackTint="@color/dark_surfaceTint" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:src="@mipmap/ic_bar"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_line_bottom">
 
-                    <TextView
-                        android:id="@+id/tv_3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="导航栏"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/iv_3"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        <ImageView
+                            android:id="@+id/iv_detect"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/ic_detect"
+                            tools:ignore="ContentDescription" />
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/navigation_bar"
-                        android:layout_width="50dp"
-                        android:layout_height="36dp"
-                        android:layout_marginEnd="35dp"
-                        android:checked="true"
-                        android:textOff="隐藏"
-                        android:textOn="显示"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:thumbTint="@color/light_primary"
-                        app:trackTint="@color/dark_surfaceTint" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toRightOf="@+id/iv_detect"
+                            android:text="异常检测"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/detect"
+                            android:layout_width="50dp"
+                            android:layout_height="36dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="35dp"
+                            android:checked="true"
+                            android:textOff="关闭"
+                            android:textOn="开启"
+                            app:thumbTint="@color/light_primary"
+                            app:trackTint="@color/dark_surfaceTint" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_a_1_4"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/bg_line_bottom"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/con_a_1_3">
+                    </RelativeLayout>
 
-                    <ImageView
-                        android:id="@+id/iv_4"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="8dp"
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:src="@mipmap/ic_audio"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_line_bottom">
 
-                    <TextView
-                        android:id="@+id/tv_6"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="语音播报"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/iv_4"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        <ImageView
+                            android:id="@+id/iv_interval"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/ic_time"
+                            tools:ignore="ContentDescription" />
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/audio"
-                        android:layout_width="50dp"
-                        android:layout_height="36dp"
-                        android:layout_marginEnd="35dp"
-                        android:checked="true"
-                        android:textOff="关闭"
-                        android:textOn="开启"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:thumbTint="@color/light_primary"
-                        app:trackTint="@color/dark_surfaceTint" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toRightOf="@+id/iv_interval"
+                            android:text="废液清理间隔（分钟）"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <EditText
+                            android:id="@+id/interval"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="16dp"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:minHeight="48dp" />
+                    </RelativeLayout>
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_a_1_5"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/bg_line_bottom"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/con_a_1_4">
-
-                    <ImageView
-                        android:id="@+id/iv_5"
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:layout_marginStart="8dp"
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:src="@mipmap/ic_detect"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_line_bottom">
 
-                    <TextView
-                        android:id="@+id/tv_7"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:text="异常检测"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/iv_5"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        <ImageView
+                            android:id="@+id/iv_duration"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/ic_time"
+                            tools:ignore="ContentDescription" />
 
-                    <androidx.appcompat.widget.SwitchCompat
-                        android:id="@+id/detet"
-                        android:layout_width="50dp"
-                        android:layout_height="36dp"
-                        android:layout_marginEnd="35dp"
-                        android:checked="true"
-                        android:textOff="关闭"
-                        android:textOn="开启"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:thumbTint="@color/light_primary"
-                        app:trackTint="@color/dark_surfaceTint" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toRightOf="@+id/iv_duration"
+                            android:text="废液清理时长（秒）"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <EditText
+                            android:id="@+id/duration"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="16dp"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:minHeight="48dp" />
+                    </RelativeLayout>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_line_bottom">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/con_a_2"
+                        <ImageView
+                            android:id="@+id/iv_motor"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/ic_motor"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toRightOf="@+id/iv_motor"
+                            android:text="填充/回吸转速（转/分）"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <EditText
+                            android:id="@+id/motor_speed"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="16dp"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:minHeight="48dp" />
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </ScrollView>
+
+            <ScrollView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="4dp"
-                android:background="@color/light_onPrimary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toEndOf="@+id/con_a_1"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_weight="1"
+                android:background="@color/light_onPrimary">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_version"
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/bg_line_bottom"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <ImageView
-                        android:id="@+id/iv_version"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:src="@mipmap/ic_version"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_version"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:text="当前软件版本"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/iv_version"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_version_name"
-                        android:layout_width="100dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:gravity="center"
-                        android:text="1.0.0"
-                        android:textSize="20sp"
-                        android:textStyle="italic"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_about"
-                    android:layout_width="match_parent"
-                    android:layout_height="64dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/bg_line_bottom"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/con_version">
-
-                    <ImageView
-                        android:id="@+id/iv_about"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:src="@mipmap/ic_about"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:ignore="ContentDescription" />
-
-                    <TextView
-                        android:id="@+id/tv_about"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="12dp"
-                        android:text="@string/about"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toEndOf="@+id/iv_about"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:ignore="VisualLintOverlap" />
-
-                    <ImageView
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                    <RelativeLayout
+                        android:id="@+id/version"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
-                        android:layout_marginBottom="8dp"
-                        android:src="@drawable/ic_to"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        tools:ignore="ContentDescription" />
+                        android:background="@drawable/bg_line_bottom">
 
+                        <ImageView
+                            android:id="@+id/iv_version"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/ic_version"
+                            tools:ignore="ContentDescription" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toRightOf="@+id/iv_version"
+                            android:text="当前软件版本"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+                        <TextView
+                            android:id="@+id/tv_version_name"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="16dp"
+                            android:gravity="center"
+                            android:text="1.0.0"
+                            android:textSize="20sp"
+                            android:textStyle="italic" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </RelativeLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/con_b"
+                    <RelativeLayout
+                        android:id="@+id/about"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_line_bottom">
+
+                        <ImageView
+                            android:id="@+id/iv_about"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/ic_about"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toRightOf="@+id/iv_about"
+                            android:text="@string/about"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginTop="8dp"
+                            android:layout_marginEnd="16dp"
+                            android:layout_marginBottom="8dp"
+                            android:src="@drawable/ic_to"
+                            tools:ignore="ContentDescription" />
+
+                    </RelativeLayout>
+
+                </LinearLayout>
+
+            </ScrollView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/con_btn"
             android:layout_width="match_parent"
             android:layout_height="128dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
+            android:background="@color/light_onPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/con_b_1"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:background="@color/light_onPrimary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:visibility="gone">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_b_1_1"
-                    android:layout_width="128dp"
-                    android:layout_height="match_parent"
+                <ImageButton
+                    android:id="@+id/reset"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/con_b_1_2"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:background="@mipmap/ic_reset" />
 
-                    <ImageButton
-                        android:id="@+id/reset"
-                        android:layout_width="96dp"
-                        android:layout_height="96dp"
-                        android:background="@mipmap/ic_reset"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/reset"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:text="复位"
+                    android:textSize="16sp" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="80dp"
-                        android:gravity="center"
-                        android:text="复位"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+            </RelativeLayout>
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_b_1_2"
-                    android:layout_width="128dp"
-                    android:layout_height="match_parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/con_b_1_3"
-                    app:layout_constraintStart_toEndOf="@+id/con_b_1_1"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <ImageButton
-                        android:id="@+id/pump"
-                        android:layout_width="96dp"
-                        android:layout_height="96dp"
-                        android:layout_marginTop="4dp"
-                        android:background="@mipmap/ic_motor"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="80dp"
-                        android:gravity="center"
-                        android:text="手动抽水"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_b_1_3"
-                    android:layout_width="128dp"
-                    android:layout_height="match_parent"
+                <ImageButton
+                    android:id="@+id/pump"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/con_b_1_4"
-                    app:layout_constraintStart_toEndOf="@+id/con_b_1_2"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:background="@mipmap/ic_motor" />
 
-                    <ImageButton
-                        android:id="@+id/wifi"
-                        android:layout_width="96dp"
-                        android:layout_height="96dp"
-                        android:background="@mipmap/ic_wifi"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/pump"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:text="手动抽水"
+                    android:textSize="16sp" />
+            </RelativeLayout>
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="80dp"
-                        android:gravity="center"
-                        android:text="WIFI设置"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                <ImageButton
+                    android:id="@+id/wifi"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_centerHorizontal="true"
+                    android:background="@mipmap/ic_wifi" />
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_b_1_4"
-                    android:layout_width="128dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="4dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/con_b_1_3"
-                    app:layout_constraintTop_toTopOf="parent">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/wifi"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:text="WIFI设置"
+                    android:textSize="16sp" />
+            </RelativeLayout>
 
-                    <ImageButton
-                        android:id="@+id/update"
-                        android:layout_width="96dp"
-                        android:layout_height="96dp"
-                        android:background="@mipmap/ic_update"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
 
-                    <TextView
-                        android:id="@+id/tv_update"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="80dp"
-                        android:gravity="center"
-                        android:text="检查更新"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                <ImageButton
+                    android:id="@+id/update"
+                    android:layout_width="96dp"
+                    android:layout_height="96dp"
+                    android:layout_centerHorizontal="true"
+                    android:background="@mipmap/ic_update" />
 
-                </androidx.constraintlayout.widget.ConstraintLayout>
+                <TextView
+                    android:id="@+id/tv_update"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/update"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:text="检查更新"
+                    android:textSize="16sp" />
+            </RelativeLayout>
 
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
 
         <ProgressBar
             android:id="@+id/progress"

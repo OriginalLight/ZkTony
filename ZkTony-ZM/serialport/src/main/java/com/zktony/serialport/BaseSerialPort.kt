@@ -1,19 +1,17 @@
 package com.zktony.serialport
 
-import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import com.zktony.serialport.util.Logger
 import com.zktony.serialport.util.SerialDataUtils.hexToByteArr
-import com.zktony.serialport.util.SerialPortHelper
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.security.InvalidParameterException
 
-abstract class BaseSerialPort : SerialPortHelper {
-    @SuppressLint("HandlerLeak")
-    private var mHandler: Handler? = object : Handler(Looper.getMainLooper()) {
+abstract class BaseSerialPort(sPort: String, iBaudRate: Int) : SerialPortHelper(sPort, iBaudRate) {
+
+    private var handler: Handler? = object : Handler(Looper.getMainLooper()) {
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
             val recData = msg.obj as String
@@ -21,21 +19,17 @@ abstract class BaseSerialPort : SerialPortHelper {
         }
     }
 
-    constructor() : super() {}
-    constructor(sPort: String?, iBaudRate: Int) : super(sPort, iBaudRate) {}
-
     abstract fun onDataBack(data: String)
-    override fun onDataReceived(ComRecData: String) {
+
+    override fun onDataReceived(recData: String) {
         val message = Message()
-        message.obj = ComRecData
-        mHandler!!.sendMessage(message)
+        message.obj = recData
+        handler!!.sendMessage(message)
     }
 
     override fun close() {
         super.close()
-        if (mHandler != null) {
-            mHandler = null
-        }
+        handler?.let { handler = null }
     }
 
     /**
@@ -53,10 +47,7 @@ abstract class BaseSerialPort : SerialPortHelper {
             Logger.instance.i(TAG, "Open the serial port successfully")
             0
         } catch (e: SecurityException) {
-            Logger.instance.e(
-                TAG,
-                "Failed to open the serial port: no serial port read/write permission!"
-            )
+            Logger.instance.e(TAG, "Failed to open the serial port: no serial port read/write permission!")
             -1
         } catch (e: IOException) {
             Logger.instance.e(TAG, "Failed to open serial port: unknown error!")
@@ -86,12 +77,12 @@ abstract class BaseSerialPort : SerialPortHelper {
     /**
      * Send string data
      *
-     * @param sTxt string data
+     * @param sText string data
      */
-    fun sendTxt(sTxt: String) {
+    fun sendText(sText: String) {
         val bOutArray: ByteArray
         try {
-            bOutArray = sTxt.toByteArray(charset("GB18030"))
+            bOutArray = sText.toByteArray(charset("GB18030"))
             val msg = Message.obtain()
             msg.obj = bOutArray
             addWaitMessage(msg)
@@ -109,15 +100,6 @@ abstract class BaseSerialPort : SerialPortHelper {
         val msg = Message.obtain()
         msg.obj = bOutArray
         addWaitMessage(msg)
-    }
-
-    /**
-     * is show log
-     *
-     * @param isShowLog true=show
-     */
-    fun setShowLog(isShowLog: Boolean) {
-        Logger.SHOW_LOG = isShowLog
     }
 
     companion object {

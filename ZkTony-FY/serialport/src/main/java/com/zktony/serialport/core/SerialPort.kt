@@ -11,13 +11,7 @@ import java.io.*
  */
 class SerialPort
 @Throws(IOException::class) constructor(
-    device: File,
-    baudrate: Int,
-    stopBits: Int,
-    dataBits: Int,
-    parity: Int,
-    flowCon: Int,
-    flags: Int
+    device: File, baudRate: Int, stopBits: Int, dataBits: Int, parity: Int, flowCon: Int, flags: Int
 ) {
 
     /**
@@ -42,18 +36,12 @@ class SerialPort
         get() = fileOutputStream
 
     constructor(device: File, baudrate: Int, flags: Int) : this(
-        device,
-        baudrate,
-        1,
-        8,
-        0,
-        0,
-        flags
+        device, baudrate, 1, 8, 0, 0, flags
     )
 
     init {
         checkPermission(device)
-        fd = open(device.absolutePath, baudrate, stopBits, dataBits, parity, flowCon, flags)
+        fd = open(device.absolutePath, baudRate, stopBits, dataBits, parity, flowCon, flags)
         if (fd == null) {
             Log.e(TAG, "native open returns null")
             throw IOException()

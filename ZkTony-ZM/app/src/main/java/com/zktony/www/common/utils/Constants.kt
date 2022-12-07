@@ -5,7 +5,6 @@ package com.zktony.www.common.utils
  * 设置页常量
  */
 object Constants {
-
     const val AUDIO = "AUDIO"
     const val BACKGROUND_WORKER_NAME_LOG_DATA = "BACKGROUND_WORKER_NAME_LOG_DATA"
     const val BACKGROUND_WORKER_NAME_LOG_RECORD = "BACKGROUND_WORKER_NAME_LOG_RECORD"
@@ -17,4 +16,5 @@ object Constants {
     const val DOMAIN = "https://www.zktony.com"
     const val DURATION = "DURATION"
     const val INTERVAL = "INTERVAL"
+    const val MOTOR_SPEED = "MOTOR_SPEED"
 }

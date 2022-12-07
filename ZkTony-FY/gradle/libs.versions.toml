@@ -10,6 +10,7 @@ androidGradlePlugin = "7.3.1"
 appcompat = "1.5.1"
 chart = "v3.1.0"
 constraintLayout = "2.1.4"
+coroutines = "1.6.1"
 dataStore = "1.0.0"
 dialogx = "0.0.46"
 espresso = "3.5.0"
@@ -66,6 +67,7 @@ hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltExt
 hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltExt" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 legacy-support-v4 = { module = "androidx.legacy:legacy-support-v4", version.ref = "legacySupport" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 multidex = { module = "androidx.multidex:multidex", version.ref = "multidex" }

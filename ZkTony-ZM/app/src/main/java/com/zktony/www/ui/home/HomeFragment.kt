@@ -395,7 +395,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.scaleX = 0.8f
             it.scaleY = 0.8f
             state.stepMotorX = sendCmd.stepMotorX
-            sendCmd.stepMotorX = 160
+            sendCmd.stepMotorX = appViewModel.setting.value.motorSpeed
             appViewModel.send(sendCmd)
         }, {
             val sendCmd = appViewModel.send.value
@@ -411,7 +411,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.scaleX = 0.8f
             it.scaleY = 0.8f
             state.stepMotorX = sendCmd.stepMotorX
-            sendCmd.stepMotorX = -160
+            sendCmd.stepMotorX = -appViewModel.setting.value.motorSpeed
             appViewModel.send(sendCmd)
         }, {
             val sendCmd = appViewModel.send.value
@@ -427,7 +427,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.scaleX = 0.8f
             it.scaleY = 0.8f
             state.stepMotorY = sendCmd.stepMotorY
-            sendCmd.stepMotorY = 160
+            sendCmd.stepMotorY = appViewModel.setting.value.motorSpeed
             appViewModel.send(sendCmd)
         }, {
             val sendCmd = appViewModel.send.value
@@ -443,7 +443,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.scaleX = 0.8f
             it.scaleY = 0.8f
             state.stepMotorY = sendCmd.stepMotorY
-            sendCmd.stepMotorY = -160
+            sendCmd.stepMotorY = -appViewModel.setting.value.motorSpeed
             appViewModel.send(sendCmd)
         }, {
             val sendCmd = appViewModel.send.value
