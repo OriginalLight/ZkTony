@@ -49,32 +49,29 @@ class SerialPortManager(
                 MutableSerial.instance.init(SERIAL_FOUR.device, 57600)
             }
             launch {
-                MutableSerial.instance.listenerFlow.collect { pair ->
-                    pair?.let {
-                        val (port, data) = pair
-                        when (port) {
-                            SERIAL_ONE.device -> {
-                                data.verifyHex().forEach {
-                                    _serialOneFlow.value = it
-                                    Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
-                                }
+                MutableSerial.instance.listener = { port, data ->
+                    when (port) {
+                        SERIAL_ONE.device -> {
+                            data.verifyHex().forEach {
+                                _serialOneFlow.value = it
+                                Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
                             }
-                            SERIAL_TWO.device -> {
-                                data.verifyHex().forEach {
-                                    _serialTwoFlow.value = it
-                                    Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
-                                }
+                        }
+                        SERIAL_TWO.device -> {
+                            data.verifyHex().forEach {
+                                _serialTwoFlow.value = it
+                                Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
                             }
-                            SERIAL_THREE.device -> {
-                                data.verifyHex().forEach {
-                                    _serialThreeFlow.value = it
-                                    Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
-                                }
+                        }
+                        SERIAL_THREE.device -> {
+                            data.verifyHex().forEach {
+                                _serialThreeFlow.value = it
+                                Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
                             }
-                            SERIAL_FOUR.device -> {
-                                _serialFourFlow.value = data.hexToAscii()
-                                //Logger.d(msg = "串口四 receivedText: ${hexData.hexToAscii()}")
-                            }
+                        }
+                        SERIAL_FOUR.device -> {
+                            _serialFourFlow.value = data.hexToAscii()
+                            //Logger.d(msg = "串口四 receivedText: ${hexData.hexToAscii()}")
                         }
                     }
                 }

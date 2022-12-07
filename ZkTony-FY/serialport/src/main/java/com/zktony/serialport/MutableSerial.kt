@@ -1,13 +1,10 @@
 package com.zktony.serialport
 
 import com.zktony.serialport.util.Logger
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class MutableSerial {
     private val serialPortMap: MutableMap<String, SerialPortHelper> = HashMap()
-    private val _listener: MutableStateFlow<Pair<String, String>?> = MutableStateFlow(null)
-    val listenerFlow = _listener.asStateFlow()
+    var listener: (String, String) -> Unit = { _, _ -> }
 
     @Synchronized
     fun init(portStr: String, baudRate: Int): Int {
@@ -16,28 +13,23 @@ class MutableSerial {
 
     @Synchronized
     fun init(
-        portStr: String,
-        baudRate: Int,
-        stopBits: Int,
-        dataBits: Int,
-        parity: Int,
-        flowCon: Int
+        portStr: String, baudRate: Int, stopBits: Int, dataBits: Int, parity: Int, flowCon: Int
     ): Int {
         require(!(portStr.isEmpty() || baudRate == 0)) { "Serial port and baud rate cannot be empty" }
         val serial = serialPortMap[portStr]
         if (serial != null && serial.isOpen) {
             return 1
         }
-        val serialPortHelper: SerialPortHelper = object : SerialPortHelper(portStr, baudRate) {}
-            .apply {
-                this.onDataReceived = { data: String ->
-                    _listener.value = Pair(portStr, data)
+        val serialPortHelper: SerialPortHelper =
+            object : SerialPortHelper(portStr, baudRate) {}.apply {
+                    this.onDataReceived = { data: String ->
+                        listener.invoke(portStr, data)
+                    }
+                    this.stopBits = stopBits
+                    this.dataBits = dataBits
+                    this.parity = parity
+                    this.flowCon = flowCon
                 }
-                this.stopBits = stopBits
-                this.dataBits = dataBits
-                this.parity = parity
-                this.flowCon = flowCon
-            }
         val openStatus = serialPortHelper.openSerial()
         if (openStatus == 0) {
             serialPortMap[portStr] = serialPortHelper
