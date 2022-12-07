@@ -158,13 +158,13 @@ class AdminFragment :
                 }
             }
         }
-        binding.conVersion.run {
+        binding.version.run {
             this.clickScale()
             this.setOnClickListener {
                 PopTip.show(R.mipmap.ic_version, "当前软件版本号 ${requireContext().versionName()}")
             }
         }
-        binding.conAbout.run {
+        binding.about.run {
             this.clickScale()
             this.setOnClickListener {
                 CustomDialog.build()

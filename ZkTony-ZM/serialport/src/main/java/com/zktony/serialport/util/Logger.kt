@@ -1,6 +1,7 @@
 package com.zktony.serialport.util
 
 import android.util.Log
+import com.zktony.serialport.BuildConfig
 
 class Logger {
     fun v(tag: String, msg: String) {
@@ -60,10 +61,10 @@ class Logger {
         val instance: Logger by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
             Logger()
         }
-        private const val COMMON_TAG = "serial"
+        private const val COMMON_TAG = "serialport"
 
         @JvmField
-        var SHOW_LOG = false
+        var SHOW_LOG = BuildConfig.DEBUG
 
     }
 }

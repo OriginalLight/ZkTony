@@ -49,29 +49,32 @@ class SerialPortManager(
                 MutableSerial.instance.init(SERIAL_FOUR.device, 57600)
             }
             launch {
-                MutableSerial.instance.addListener { com, hexData ->
-                    when (com) {
-                        SERIAL_ONE.device -> {
-                            hexData.verifyHex().forEach {
-                                _serialOneFlow.value = it
-                                Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
+                MutableSerial.instance.listenerFlow.collect { pair ->
+                    pair?.let {
+                        val (port, data) = pair
+                        when (port) {
+                            SERIAL_ONE.device -> {
+                                data.verifyHex().forEach {
+                                    _serialOneFlow.value = it
+                                    Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
+                                }
                             }
-                        }
-                        SERIAL_TWO.device -> {
-                            hexData.verifyHex().forEach {
-                                _serialTwoFlow.value = it
-                                Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
+                            SERIAL_TWO.device -> {
+                                data.verifyHex().forEach {
+                                    _serialTwoFlow.value = it
+                                    Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
+                                }
                             }
-                        }
-                        SERIAL_THREE.device -> {
-                            hexData.verifyHex().forEach {
-                                _serialThreeFlow.value = it
-                                Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
+                            SERIAL_THREE.device -> {
+                                data.verifyHex().forEach {
+                                    _serialThreeFlow.value = it
+                                    Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
+                                }
                             }
-                        }
-                        SERIAL_FOUR.device -> {
-                            _serialFourFlow.value = hexData.hexToAscii()
-                            //Logger.d(msg = "串口四 receivedText: ${hexData.hexToAscii()}")
+                            SERIAL_FOUR.device -> {
+                                _serialFourFlow.value = data.hexToAscii()
+                                //Logger.d(msg = "串口四 receivedText: ${hexData.hexToAscii()}")
+                            }
                         }
                     }
                 }
@@ -104,7 +107,7 @@ class SerialPortManager(
             launch {
                 while (true) {
                     delay(1000L)
-                    Logger.d(msg = "lock: $lock, lockTime: $lockTime, executing: $executing, drawer: $drawer")
+                    //Logger.d(msg = "lock: $lock, lockTime: $lockTime, executing: $executing, drawer: $drawer")
                     // 如果正在运行，计时
                     if (lock) {
                         lockTime += 1L

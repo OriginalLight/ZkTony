@@ -24,6 +24,7 @@ import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.model.Version
 import com.zktony.www.databinding.FragmentAdminBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -122,22 +123,27 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
      * 初始化Switch
      */
     private fun initSwitch() {
-        binding.navigationBar.run {
-            isChecked = appViewModel.setting.value.bar
-            setOnCheckedChangeListener { _, isChecked ->
-                viewModel.toggleNavigationBar(isChecked)
-            }
-        }
-        binding.audio.run {
-            isChecked = appViewModel.setting.value.audio
-            setOnCheckedChangeListener { _, isChecked ->
-                viewModel.toggleAudio(isChecked)
-            }
-        }
-        binding.detet.run {
-            isChecked = appViewModel.setting.value.detect
-            setOnCheckedChangeListener { _, isChecked ->
-                viewModel.toggleDetect(isChecked)
+        lifecycleScope.launch {
+            delay(1200)
+            binding.run {
+                navigationBar.run {
+                    isChecked = appViewModel.setting.value.bar
+                    setOnCheckedChangeListener { _, isChecked ->
+                        viewModel.toggleNavigationBar(isChecked)
+                    }
+                }
+                audio.run {
+                    isChecked = appViewModel.setting.value.audio
+                    setOnCheckedChangeListener { _, isChecked ->
+                        viewModel.toggleAudio(isChecked)
+                    }
+                }
+                detect.run {
+                    isChecked = appViewModel.setting.value.detect
+                    setOnCheckedChangeListener { _, isChecked ->
+                        viewModel.toggleDetect(isChecked)
+                    }
+                }
             }
         }
     }
@@ -146,54 +152,71 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
      * 初始化编辑视图
      */
     private fun initEditView() {
-        binding.interval.run {
-            setText(appViewModel.setting.value.interval.toString())
-            afterTextChange {
-                viewModel.toggleInterval(
-                    if (it.isNotEmpty()) {
-                        it.toInt()
-                    } else {
-                        1
-                    }
-                )
-            }
-        }
-        binding.duration.run {
-            setText(appViewModel.setting.value.duration.toString())
-            afterTextChange {
-                viewModel.toggleDuration(
-                    if (it.isNotEmpty()) {
-                        it.toInt()
-                    } else {
-                        10
-                    }
-                )
-            }
-        }
-        binding.conVersion.run {
-            this.clickScale()
-            this.setOnClickListener {
-                PopTip.show(R.mipmap.ic_version, "当前软件版本号 ${requireContext().versionName()}")
-            }
-        }
-        binding.conAbout.run {
-            this.clickScale()
-            this.setOnClickListener {
-                CustomDialog.build()
-                    .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_about_dialog) {
-                        override fun onBind(dialog: CustomDialog, v: View) {
-                            val btnWeb = v.findViewById<MaterialButton>(R.id.btn_web)
-                            btnWeb.isVisible = requireContext().isNetworkAvailable()
-                            btnWeb.setOnClickListener {
-                                if (isFastClick().not()) {
-                                    dialog.dismiss()
-                                    toWebSite()
-                                }
+        lifecycleScope.launch {
+            delay(1000)
+            binding.run {
+                interval.run {
+                    setText(appViewModel.setting.value.interval.toString())
+                    afterTextChange {
+                        viewModel.toggleInterval(
+                            if (it.isNotEmpty()) {
+                                it.toInt()
+                            } else {
+                                1
                             }
-                        }
-                    })
-                    .setMaskColor(Color.parseColor("#4D000000"))
-                    .show()
+                        )
+                    }
+                }
+                duration.run {
+                    setText(appViewModel.setting.value.duration.toString())
+                    afterTextChange {
+                        viewModel.toggleDuration(
+                            if (it.isNotEmpty()) {
+                                it.toInt()
+                            } else {
+                                10
+                            }
+                        )
+                    }
+                }
+                motorSpeed.run {
+                    setText(appViewModel.setting.value.motorSpeed.toString())
+                    afterTextChange {
+                        viewModel.toggleMotorSpeed(
+                            if (it.isNotEmpty()) {
+                                it.toInt()
+                            } else {
+                                160
+                            }
+                        )
+                    }
+                }
+                version.run {
+                    this.clickScale()
+                    this.setOnClickListener {
+                        PopTip.show(R.mipmap.ic_version, "当前软件版本号 ${requireContext().versionName()}")
+                    }
+                }
+                about.run {
+                    this.clickScale()
+                    this.setOnClickListener {
+                        CustomDialog.build()
+                            .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_about_dialog) {
+                                override fun onBind(dialog: CustomDialog, v: View) {
+                                    val btnWeb = v.findViewById<MaterialButton>(R.id.btn_web)
+                                    btnWeb.isVisible = requireContext().isNetworkAvailable()
+                                    btnWeb.setOnClickListener {
+                                        if (isFastClick().not()) {
+                                            dialog.dismiss()
+                                            toWebSite()
+                                        }
+                                    }
+                                }
+                            })
+                            .setMaskColor(Color.parseColor("#4D000000"))
+                            .show()
+                    }
+                }
             }
         }
     }

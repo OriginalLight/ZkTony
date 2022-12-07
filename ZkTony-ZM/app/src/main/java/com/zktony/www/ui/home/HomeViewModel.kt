@@ -1,7 +1,7 @@
 package com.zktony.www.ui.home
 
 import androidx.lifecycle.viewModelScope
-import com.zktony.serialport.COMSerial
+import com.zktony.serialport.MutableSerial
 import com.zktony.www.R
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
@@ -54,7 +54,7 @@ class HomeViewModel @Inject constructor(
             delay(200L)
             while (true) {
                 delay(1000L)
-                COMSerial.instance.sendHex(SerialPort.TTYS4.device, Cmd.QUERY_HEX)
+                MutableSerial.instance.sendHex(SerialPort.TTYS4.device, Cmd.QUERY_HEX)
             }
         }
     }
