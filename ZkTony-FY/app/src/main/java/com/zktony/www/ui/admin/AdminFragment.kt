@@ -284,6 +284,7 @@ class AdminFragment :
                     }
                 }
             })
+            .setCancelable(false)
             .setMaskColor(Color.parseColor("#4D000000"))
             .show()
     }
@@ -314,6 +315,7 @@ class AdminFragment :
                     }
                 }
             })
+            .setCancelable(false)
             .setMaskColor(Color.parseColor("#4D000000"))
             .show()
     }

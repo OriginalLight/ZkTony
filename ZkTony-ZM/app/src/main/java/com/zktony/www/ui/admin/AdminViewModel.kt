@@ -1,6 +1,7 @@
 package com.zktony.www.ui.admin
 
 import android.content.Intent
+import android.os.Build
 import android.provider.Settings
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -250,7 +251,12 @@ class AdminViewModel @Inject constructor(
      * @return File? [File]
      */
     private fun checkLocalUpdate(): File? {
-        File("/mnt/usbhost").listFiles()?.forEach {
+        // 如果os版本大于等于7.0 则需要获取文件读写权限
+        var device = File("/mnt/usbhost")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            device = File("/storage")
+        }
+        device.listFiles()?.forEach {
             it.listFiles()?.forEach { apk ->
                 if (apk.name.endsWith(".apk") && apk.name.contains("zktony-zm")) {
                     return apk

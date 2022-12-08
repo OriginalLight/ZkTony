@@ -3,8 +3,8 @@ package com.zktony.serialport
 import com.zktony.serialport.util.Logger
 
 class MutableSerial {
-    private val baseSerials: MutableMap<String, BaseSerialPort> = HashMap()
-    private var listener: (String, String) -> Unit = { _: String, _: String -> }
+    private val serialPortMap: MutableMap<String, SerialPortHelper> = HashMap()
+    var listener: (String, String) -> Unit = { _, _ -> }
 
     @Synchronized
     fun init(portStr: String, baudRate: Int): Int {
@@ -13,33 +13,28 @@ class MutableSerial {
 
     @Synchronized
     fun init(
-        portStr: String,
-        baudRate: Int,
-        stopBits: Int,
-        dataBits: Int,
-        parity: Int,
-        flowCon: Int
+        portStr: String, baudRate: Int, stopBits: Int, dataBits: Int, parity: Int, flowCon: Int
     ): Int {
         require(!(portStr.isEmpty() || baudRate == 0)) { "Serial port and baud rate cannot be empty" }
-        val baseSerials = baseSerials[portStr]
-        if (baseSerials != null && baseSerials.isOpen) {
+        val serial = serialPortMap[portStr]
+        if (serial != null && serial.isOpen) {
             return 1
         }
-        val baseSerial: BaseSerialPort = object : BaseSerialPort(portStr, baudRate) {
-            override fun onDataBack(data: String) {
-                listener.invoke(portStr, data)
+        val serialPortHelper: SerialPortHelper =
+            object : SerialPortHelper(portStr, baudRate) {}.apply {
+                this.onDataReceived = { data: String ->
+                    listener.invoke(portStr, data)
+                }
+                this.stopBits = stopBits
+                this.dataBits = dataBits
+                this.parity = parity
+                this.flowCon = flowCon
             }
-        }.apply {
-            this.stopBits = stopBits
-            this.dataBits = dataBits
-            this.parity = parity
-            this.flowCon = flowCon
-        }
-        val openStatus = baseSerial.openSerial()
-        if (openStatus != 0) {
-            baseSerial.close()
+        val openStatus = serialPortHelper.openSerial()
+        if (openStatus == 0) {
+            serialPortMap[portStr] = serialPortHelper
         } else {
-            this.baseSerials[portStr] = baseSerial
+            serialPortHelper.close()
         }
         return openStatus
     }
@@ -49,31 +44,15 @@ class MutableSerial {
      * Serial port status (open/close)
      */
     fun isOpenSerial(portStr: String): Boolean {
-        val baseSerials = baseSerials[portStr]
-        return baseSerials != null && baseSerials.isOpen
-    }
-
-    /**
-     * 添加串口返回数据回调
-     * Add callback
-     */
-    fun addListener(listener: (String, String) -> Unit) {
-        this.listener = listener
-    }
-
-    /**
-     * 移除串口返回数据回调
-     * Remove callback
-     */
-    fun removeListener() {
-        listener = { _: String, _: String -> }
+        val serial = serialPortMap[portStr]
+        return serial != null && serial.isOpen
     }
 
     /**
      * Close the serial port
      */
     fun close(portStr: String) {
-        val baseSerial = baseSerials[portStr]
+        val baseSerial = serialPortMap[portStr]
         if (baseSerial != null) {
             baseSerial.close()
         } else {
@@ -92,7 +71,7 @@ class MutableSerial {
             Logger.instance.e(TAG, "The serial port is empty")
             return
         }
-        val baseSerial = baseSerials[portStr]
+        val baseSerial = serialPortMap[portStr]
         if (baseSerial != null && baseSerial.isOpen) {
             val dateTrim = hexData.trim { it <= ' ' }.replace(" ", "")
             baseSerial.sendHex(dateTrim)
@@ -112,7 +91,7 @@ class MutableSerial {
             Logger.instance.e(TAG, "The serial port is empty")
             return
         }
-        val baseSerial = baseSerials[portStr]
+        val baseSerial = serialPortMap[portStr]
         if (baseSerial != null && baseSerial.isOpen) {
             baseSerial.sendByteArray(byteData)
         } else {
@@ -131,7 +110,7 @@ class MutableSerial {
             Logger.instance.e(TAG, "The serial port is empty")
             return
         }
-        val baseSerial = baseSerials[portStr]
+        val baseSerial = serialPortMap[portStr]
         if (baseSerial != null && baseSerial.isOpen) {
             baseSerial.sendText(strData)
         } else {

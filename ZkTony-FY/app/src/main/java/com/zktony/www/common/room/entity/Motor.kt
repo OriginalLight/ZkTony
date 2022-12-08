@@ -115,7 +115,7 @@ data class PumpMotor(
     // 泵四转一圈的出液量
     val volumeFour: Float = 180f,
     // 泵五转一圈的出液量
-    val volumeFive: Float = 47f,
+    val volumeFive: Float = 49f,
 ) {
 
     /**

@@ -6,7 +6,7 @@ import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.data.repository.CalibrationRepository
-import com.zktony.www.serialport.SerialPort.*
+import com.zktony.www.serialport.Serial.*
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,10 +68,10 @@ class CalibrationViewModel @Inject constructor(
             val motionMotor = appViewModel.settings.value.motionMotor
             val calibration = calibration.value
             SerialPortManager.instance.sendHex(
-                SERIAL_ONE, Command.multiPoint(motionMotor.toMotionHex(calibration.wasteY, 0f))
+                TTYS0, Command.multiPoint(motionMotor.toMotionHex(calibration.wasteY, 0f))
             )
-            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
-            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,"))
         }
     }
 
@@ -82,14 +82,14 @@ class CalibrationViewModel @Inject constructor(
         val motionMotor = appViewModel.settings.value.motionMotor
         val calibration = calibration.value
         SerialPortManager.instance.sendHex(
-            SERIAL_ONE, Command.multiPoint(
+            TTYS0, Command.multiPoint(
                 motionMotor.toMotionHex(calibration.wasteY, 0f) + motionMotor.toMotionHex(
                     calibration.wasteY, calibration.wasteZ
                 )
             )
         )
-        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
-        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,0,0,0,"))
     }
 
 
@@ -101,10 +101,10 @@ class CalibrationViewModel @Inject constructor(
             val motionMotor = appViewModel.settings.value.motionMotor
             val calibration = calibration.value
             SerialPortManager.instance.sendHex(
-                SERIAL_ONE, Command.multiPoint(motionMotor.toMotionHex(calibration.washingY, 0f))
+                TTYS0, Command.multiPoint(motionMotor.toMotionHex(calibration.washingY, 0f))
             )
-            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
-            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,"))
         }
     }
 
@@ -115,14 +115,14 @@ class CalibrationViewModel @Inject constructor(
         val motionMotor = appViewModel.settings.value.motionMotor
         val calibration = calibration.value
         SerialPortManager.instance.sendHex(
-            SERIAL_ONE, Command.multiPoint(
+            TTYS0, Command.multiPoint(
                 motionMotor.toMotionHex(calibration.washingY, 0f) + motionMotor.toMotionHex(
                     calibration.washingY, calibration.washingZ
                 )
             )
         )
-        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
-        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,0,0,0,"))
 
     }
 
@@ -134,12 +134,12 @@ class CalibrationViewModel @Inject constructor(
             val motionMotor = appViewModel.settings.value.motionMotor
             val calibration = calibration.value
             SerialPortManager.instance.sendHex(
-                SERIAL_ONE, Command.multiPoint(
+                TTYS0, Command.multiPoint(
                     motionMotor.toMotionHex(calibration.blockingY, 0f)
                 )
             )
-            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
-            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,"))
         }
     }
 
@@ -150,14 +150,14 @@ class CalibrationViewModel @Inject constructor(
         val motionMotor = appViewModel.settings.value.motionMotor
         val calibration = calibration.value
         SerialPortManager.instance.sendHex(
-            SERIAL_ONE, Command.multiPoint(
+            TTYS0, Command.multiPoint(
                 motionMotor.toMotionHex(calibration.blockingY, 0f) + motionMotor.toMotionHex(
                     calibration.blockingY, calibration.blockingZ
                 )
             )
         )
-        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
-        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,0,0,0,"))
     }
 
     /**
@@ -168,12 +168,12 @@ class CalibrationViewModel @Inject constructor(
             val motionMotor = appViewModel.settings.value.motionMotor
             val calibration = calibration.value
             SerialPortManager.instance.sendHex(
-                SERIAL_ONE, Command.multiPoint(
+                TTYS0, Command.multiPoint(
                     motionMotor.toMotionHex(calibration.antibodyOneY, 0f)
                 )
             )
-            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
-            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,"))
         }
     }
 
@@ -185,24 +185,24 @@ class CalibrationViewModel @Inject constructor(
             val motionMotor = appViewModel.settings.value.motionMotor
             val calibration = calibration.value
             SerialPortManager.instance.sendHex(
-                SERIAL_ONE, Command.multiPoint(
+                TTYS0, Command.multiPoint(
                     motionMotor.toMotionHex(calibration.antibodyOneY, 0f) + motionMotor.toMotionHex(
                         calibration.antibodyOneY, calibration.antibodyOneZ
                     )
                 )
             )
-            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
-            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,0,0,0,"))
             delay(3000L)
             SerialPortManager.instance.sendHex(
-                SERIAL_ONE, Command.multiPoint(
+                TTYS0, Command.multiPoint(
                     motionMotor.toMotionHex(
                         calibration.antibodyOneY, calibration.recycleAntibodyOneZ
                     )
                 )
             )
-            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
-            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,"))
+            SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,"))
         }
     }
 
@@ -213,12 +213,12 @@ class CalibrationViewModel @Inject constructor(
         val motionMotor = appViewModel.settings.value.motionMotor
         val calibration = calibration.value
         SerialPortManager.instance.sendHex(
-            SERIAL_ONE, Command.multiPoint(
+            TTYS0, Command.multiPoint(
                 motionMotor.toMotionHex(calibration.antibodyTwoY, 0f)
             )
         )
-        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
-        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,"))
 
     }
 
@@ -229,14 +229,14 @@ class CalibrationViewModel @Inject constructor(
         val motionMotor = appViewModel.settings.value.motionMotor
         val calibration = calibration.value
         SerialPortManager.instance.sendHex(
-            SERIAL_ONE, Command.multiPoint(
+            TTYS0, Command.multiPoint(
                 motionMotor.toMotionHex(calibration.antibodyTwoY, 0f) + motionMotor.toMotionHex(
                     calibration.antibodyTwoY, calibration.antibodyTwoZ
                 )
             )
         )
-        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,0,0,0,"))
-        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,0,0,0,"))
     }
 
     /**
@@ -245,12 +245,12 @@ class CalibrationViewModel @Inject constructor(
     fun toZeroPosition() {
         val motionMotor = appViewModel.settings.value.motionMotor
         SerialPortManager.instance.sendHex(
-            SERIAL_ONE, Command.multiPoint(
+            TTYS0, Command.multiPoint(
                 motionMotor.toMotionHex(0f, 0f)
             )
         )
-        SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("0,0,0,"))
-        SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("0,0,0,"))
+        SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("0,0,0,"))
 
     }
 
@@ -261,12 +261,12 @@ class CalibrationViewModel @Inject constructor(
         viewModelScope.launch {
             val motionMotor = appViewModel.settings.value.motionMotor
             SerialPortManager.instance.sendHex(
-                SERIAL_ONE, Command.multiPoint(
+                TTYS0, Command.multiPoint(
                     motionMotor.toMotionHex(0f, 0f)
                 )
             )
-            SerialPortManager.instance.sendHex(SERIAL_TWO, Command.multiPoint("3200,3200,3200,"))
-            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("3200,3200,0,"))
+            SerialPortManager.instance.sendHex(TTYS1, Command.multiPoint("3200,3200,3200,"))
+            SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("3200,3200,0,"))
         }
     }
 
@@ -277,14 +277,14 @@ class CalibrationViewModel @Inject constructor(
         viewModelScope.launch {
             val motionMotor = appViewModel.settings.value.motionMotor
             SerialPortManager.instance.sendHex(
-                SERIAL_ONE, Command.multiPoint(
+                TTYS0, Command.multiPoint(
                     motionMotor.toMotionHex(0f, 0f)
                 )
             )
             SerialPortManager.instance.sendHex(
-                SERIAL_TWO, Command.multiPoint("-32000,-32000,-32000,")
+                TTYS1, Command.multiPoint("-32000,-32000,-32000,")
             )
-            SerialPortManager.instance.sendHex(SERIAL_THREE, Command.multiPoint("-32000,-32000,0,"))
+            SerialPortManager.instance.sendHex(TTYS2, Command.multiPoint("-32000,-32000,0,"))
         }
     }
 }

@@ -18,8 +18,8 @@ import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.serialport.SerialPort.SERIAL_FOUR
-import com.zktony.www.serialport.SerialPort.SERIAL_ONE
+import com.zktony.www.serialport.Serial.TTYS3
+import com.zktony.www.serialport.Serial.TTYS0
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import com.zktony.www.ui.home.ModuleEnum.*
@@ -110,14 +110,14 @@ class HomeViewModel @Inject constructor(
                 for (i in 0..4) {
                     delay(200L)
                     serial.sendText(
-                        serialPort = SERIAL_FOUR, text = Command.saveTemperature(
+                        serial = TTYS3, text = Command.saveTemperature(
                             address = i.toString(),
                             temperature = "26"
                         )
                     )
                     delay(200L)
                     serial.sendText(
-                        serialPort = SERIAL_FOUR, text = Command.setTemperature(
+                        serial = TTYS3, text = Command.setTemperature(
                             address = i.toString(),
                             temperature = "26"
                         )
@@ -128,7 +128,7 @@ class HomeViewModel @Inject constructor(
                     for (i in 0..4) {
                         delay(200L)
                         serial.sendText(
-                            serialPort = SERIAL_FOUR,
+                            serial = TTYS3,
                             text = Command.queryTemperature(i.toString())
                         )
                     }
@@ -322,13 +322,13 @@ class HomeViewModel @Inject constructor(
             if (serial.getExecuting() == 0) {
                 // 暂停摇床
                 serial.sendHex(
-                    serialPort = SERIAL_ONE, hex = Command.pauseShakeBed()
+                    serial = TTYS0, hex = Command.pauseShakeBed()
                 )
                 // 恢复到室温
                 for (i in 1..4) {
                     delay(200L)
                     serial.sendText(
-                        serialPort = SERIAL_FOUR, text = Command.setTemperature(
+                        serial = TTYS3, text = Command.setTemperature(
                             address = i.toString(),
                             temperature = "26"
                         )
@@ -336,7 +336,7 @@ class HomeViewModel @Inject constructor(
                 }
                 // 复位
                 serial.sendHex(
-                    serialPort = SERIAL_ONE, hex = Command().toHex()
+                    serial = TTYS0, hex = Command().toHex()
                 )
             }
         }
@@ -350,11 +350,11 @@ class HomeViewModel @Inject constructor(
             // 如果有正在执行的程序，提示用户
             if (serial.getExecuting() == 0) {
                 serial.sendHex(
-                    serialPort = SERIAL_ONE, hex = Command(
+                    serial = TTYS0, hex = Command(
                         function = "05", parameter = "01", data = "0101302C302C302C302C"
                     ).toHex()
                 )
-                serial.sendHex(serialPort = SERIAL_ONE, hex = Command().toHex())
+                serial.sendHex(serial = TTYS0, hex = Command().toHex())
                 PopTip.show(R.mipmap.ic_reset, "复位-已下发")
             } else {
                 PopTip.show("请中止所有运行中程序")
@@ -371,7 +371,7 @@ class HomeViewModel @Inject constructor(
             // 发送指令 -> 更新状态
             // 发送指令 如果是未暂停，发送暂停命令，如果是暂停，发送继续命令
             serial.sendHex(
-                serialPort = SERIAL_ONE,
+                serial = TTYS0,
                 hex = if (_stateButton.value.pauseEnable) Command.resumeShakeBed()
                 else Command.pauseShakeBed()
             )
@@ -391,7 +391,7 @@ class HomeViewModel @Inject constructor(
             // 发送设置温度命令 -> 更改按钮状态
             // 发送设置温度命令 如果当前是未保温状态发送设置中的温度，否则发送室温26度
             serial.sendText(
-                serialPort = SERIAL_FOUR, text = Command.setTemperature(
+                serial = TTYS3, text = Command.setTemperature(
                     address = "0", temperature = if (_stateButton.value.insulatingEnable) "26"
                     else appViewModel.settings.value.temp.toString().removeZero()
                 )

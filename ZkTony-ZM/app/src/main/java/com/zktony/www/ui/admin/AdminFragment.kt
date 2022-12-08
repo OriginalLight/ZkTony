@@ -293,6 +293,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     }
                 }
             })
+            .setCancelable(false)
             .setMaskColor(Color.parseColor("#4D000000"))
             .show()
     }
@@ -323,6 +324,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     }
                 }
             })
+            .setCancelable(false)
             .setMaskColor(Color.parseColor("#4D000000"))
             .show()
     }
