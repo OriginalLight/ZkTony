@@ -281,6 +281,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun showProgramDialog(module: ModuleEnum) {
         val menuList = viewModel.programList.value.map { it.name }
+        if (menuList.isEmpty()) {
+            PopTip.show("请先添加程序")
+            return
+        }
         PopMenu.show(menuList)
             .setMenuTextInfo(TextInfo().apply {
                 gravity = Gravity.CENTER
