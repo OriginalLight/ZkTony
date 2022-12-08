@@ -38,7 +38,7 @@ class AppViewModel @Inject constructor(
     init {
         initSettings()
         MutableSerial.instance.init(SerialPort.TTYS4.device, 115200)
-        MutableSerial.instance.addListener { _, data ->
+        MutableSerial.instance.listener = { _, data ->
             val cmd = Cmd(data)
             if (cmd.cmd == 2) {
                 _received.value = cmd

@@ -3,7 +3,7 @@ package com.zktony.www.serialport
 import com.zktony.serialport.MutableSerial
 import com.zktony.www.common.extension.*
 import com.zktony.www.common.utils.Logger
-import com.zktony.www.serialport.SerialPort.*
+import com.zktony.www.serialport.Serial.*
 import com.zktony.www.serialport.protocol.Command
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,33 +43,33 @@ class SerialPortManager(
     init {
         scope.launch {
             launch {
-                MutableSerial.instance.init(SERIAL_ONE.device, 115200)
-                MutableSerial.instance.init(SERIAL_TWO.device, 115200)
-                MutableSerial.instance.init(SERIAL_THREE.device, 115200)
-                MutableSerial.instance.init(SERIAL_FOUR.device, 57600)
+                MutableSerial.instance.init(TTYS0.device, 115200)
+                MutableSerial.instance.init(TTYS1.device, 115200)
+                MutableSerial.instance.init(TTYS2.device, 115200)
+                MutableSerial.instance.init(TTYS3.device, 57600)
             }
             launch {
                 MutableSerial.instance.listener = { port, data ->
                     when (port) {
-                        SERIAL_ONE.device -> {
+                        TTYS0.device -> {
                             data.verifyHex().forEach {
                                 _serialOneFlow.value = it
                                 Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
                             }
                         }
-                        SERIAL_TWO.device -> {
+                        TTYS1.device -> {
                             data.verifyHex().forEach {
                                 _serialTwoFlow.value = it
                                 Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
                             }
                         }
-                        SERIAL_THREE.device -> {
+                        TTYS2.device -> {
                             data.verifyHex().forEach {
                                 _serialThreeFlow.value = it
                                 Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
                             }
                         }
-                        SERIAL_FOUR.device -> {
+                        TTYS3.device -> {
                             _serialFourFlow.value = data.hexToAscii()
                             //Logger.d(msg = "串口四 receivedText: ${hexData.hexToAscii()}")
                         }
@@ -88,7 +88,7 @@ class SerialPortManager(
                                 lockTime = 0L
                                 // 如果还有任务运行恢复摇床
                                 if (executing > 0) {
-                                    sendHex(SERIAL_ONE, Command.resumeShakeBed())
+                                    sendHex(TTYS0, Command.resumeShakeBed())
                                 }
                             } else {
                                 lock = true
@@ -115,11 +115,11 @@ class SerialPortManager(
                         lock = false
                         // 恢复摇床
                         if (executing > 0) {
-                            sendHex(SERIAL_ONE, Command.resumeShakeBed())
+                            sendHex(TTYS0, Command.resumeShakeBed())
                         }
                     }
                     if (drawer) {
-                        sendHex(SERIAL_ONE, Command.queryDrawer())
+                        sendHex(TTYS0, Command.queryDrawer())
                     }
                 }
             }
@@ -128,24 +128,24 @@ class SerialPortManager(
 
     /**
      * 发送Hex
-     * @param serialPort 串口
+     * @param serial 串口
      * @param hex 命令
      */
-    fun sendHex(serialPort: SerialPort, hex: String) {
+    fun sendHex(serial: Serial, hex: String) {
         scope.launch {
-            MutableSerial.instance.sendHex(serialPort.device, hex)
-            Logger.e(msg = "${serialPort.value} sendHex: ${hex.hexFormat()}")
+            MutableSerial.instance.sendHex(serial.device, hex)
+            Logger.e(msg = "${serial.value} sendHex: ${hex.hexFormat()}")
         }
     }
 
     /**
      * 发送Text
-     * @param serialPort 串口
+     * @param serial 串口
      * @param text 命令
      */
-    fun sendText(serialPort: SerialPort, text: String) {
+    fun sendText(serial: Serial, text: String) {
         scope.launch {
-            MutableSerial.instance.sendText(serialPort.device, text)
+            MutableSerial.instance.sendText(serial.device, text)
             //Logger.e(msg = "${serialPort.value} sendText: $text")
         }
     }
@@ -163,7 +163,7 @@ class SerialPortManager(
     fun lock(lock: Boolean) {
         this.lock = lock
         if (lock) {
-            sendHex(SERIAL_ONE, Command.pauseShakeBed())
+            sendHex(TTYS0, Command.pauseShakeBed())
         }
     }
 
@@ -196,11 +196,11 @@ class SerialPortManager(
     }
 }
 
-enum class SerialPort(val device: String, val value: String, val index: Int) {
-    SERIAL_ONE("/dev/ttyS0", "串口一", 0),
-    SERIAL_TWO("/dev/ttyS1", "串口二", 1),
-    SERIAL_THREE("/dev/ttyS2", "串口三", 2),
-    SERIAL_FOUR("/dev/ttyS3", "串口四", 3),
-    SERIAL_FIVE("/dev/ttyS4", "串口五", 4),
-    SERIAL_SIX("/dev/ttyS5", "串口六", 5),
+enum class Serial(val device: String, val value: String, val index: Int) {
+    TTYS0("/dev/ttyS0", "串口一", 0),
+    TTYS1("/dev/ttyS1", "串口二", 1),
+    TTYS2("/dev/ttyS2", "串口三", 2),
+    TTYS3("/dev/ttyS3", "串口四", 3),
+    TTYS4("/dev/ttyS4", "串口五", 4),
+    TTYS5("/dev/ttyS5", "串口六", 5),
 }

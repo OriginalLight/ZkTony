@@ -5,7 +5,7 @@ import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.MotionMotor
 import com.zktony.www.common.room.entity.PumpMotor
-import com.zktony.www.serialport.SerialPort.*
+import com.zktony.www.serialport.Serial.*
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import com.zktony.www.ui.home.ModuleEnum.*
@@ -51,13 +51,13 @@ class CommandExecutor {
      * @param block
      */
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
-        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        serial.sendHex(TTYS0, Command.queryDrawer())
         delay(500L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR,
+                serial = TTYS3,
                 text = Command.setTemperature(
                     address = module.address.toString(),
                     temperature = action.temperature.toString()
@@ -65,7 +65,7 @@ class CommandExecutor {
             )
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE,
+                serial = TTYS0,
                 hex = Command.multiPoint(
                     moveTo(
                         distance = calibration.blockingY,
@@ -75,11 +75,11 @@ class CommandExecutor {
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO,
+                serial = TTYS1,
                 hex = Command.multiPoint(addLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE,
+                serial = TTYS2,
                 hex = Command.multiPoint(addLiquid()[1])
             )
             block.invoke()
@@ -91,13 +91,13 @@ class CommandExecutor {
      * @param block
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
-        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        serial.sendHex(TTYS0, Command.queryDrawer())
         delay(500L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR,
+                serial = TTYS3,
                 text = Command.setTemperature(
                     address = module.address.toString(),
                     temperature = action.temperature.toString()
@@ -105,7 +105,7 @@ class CommandExecutor {
             )
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE, hex = Command.multiPoint(
+                serial = TTYS0, hex = Command.multiPoint(
                     moveTo(
                         distance = calibration.antibodyOneY,
                         height = calibration.antibodyOneZ
@@ -114,11 +114,11 @@ class CommandExecutor {
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO,
+                serial = TTYS1,
                 hex = Command.multiPoint(addLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE,
+                serial = TTYS2,
                 hex = Command.multiPoint(addLiquid()[1])
             )
             block.invoke()
@@ -130,13 +130,13 @@ class CommandExecutor {
      * @param block
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
-        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        serial.sendHex(TTYS0, Command.queryDrawer())
         delay(500L)
         waitForFree("等待回收") {
             serial.lock(true)
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE,
+                serial = TTYS0,
                 hex = Command.multiPoint(
                     moveTo(
                         distance = calibration.antibodyOneY,
@@ -146,11 +146,11 @@ class CommandExecutor {
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO,
+                serial = TTYS1,
                 hex = Command.multiPoint(recycleLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE,
+                serial = TTYS2,
                 hex = Command.multiPoint(recycleLiquid()[1])
             )
             block.invoke()
@@ -162,13 +162,13 @@ class CommandExecutor {
      * @param block
      */
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
-        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        serial.sendHex(TTYS0, Command.queryDrawer())
         delay(500L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR,
+                serial = TTYS3,
                 text = Command.setTemperature(
                     address = module.address.toString(),
                     temperature = action.temperature.toString()
@@ -176,7 +176,7 @@ class CommandExecutor {
             )
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE,
+                serial = TTYS0,
                 hex = Command.multiPoint(
                     moveTo(
                         distance = calibration.antibodyTwoY,
@@ -186,10 +186,10 @@ class CommandExecutor {
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO, hex = Command.multiPoint(addLiquid()[0])
+                serial = TTYS1, hex = Command.multiPoint(addLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE, hex = Command.multiPoint(addLiquid()[1])
+                serial = TTYS2, hex = Command.multiPoint(addLiquid()[1])
             )
             block.invoke()
         }
@@ -200,13 +200,13 @@ class CommandExecutor {
      * @param block
      */
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
-        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        serial.sendHex(TTYS0, Command.queryDrawer())
         delay(500L)
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
             serial.sendText(
-                serialPort = SERIAL_FOUR,
+                serial = TTYS3,
                 text = Command.setTemperature(
                     address = module.address.toString(),
                     temperature = action.temperature.toString()
@@ -214,7 +214,7 @@ class CommandExecutor {
             )
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE,
+                serial = TTYS0,
                 hex = Command.multiPoint(
                     moveTo(
                         distance = calibration.washingY,
@@ -224,11 +224,11 @@ class CommandExecutor {
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO,
+                serial = TTYS1,
                 hex = Command.multiPoint(addLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE,
+                serial = TTYS2,
                 hex = Command.multiPoint(addLiquid()[1])
             )
             block.invoke()
@@ -241,13 +241,13 @@ class CommandExecutor {
      * @param block
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
-        serial.sendHex(SERIAL_ONE, Command.queryDrawer())
+        serial.sendHex(TTYS0, Command.queryDrawer())
         delay(500L)
         waitForFree("等待清理") {
             serial.lock(true)
             // 主板运动
             serial.sendHex(
-                serialPort = SERIAL_ONE,
+                serial = TTYS0,
                 hex = Command.multiPoint(
                     moveTo(
                         distance = calibration.wasteY,
@@ -257,11 +257,11 @@ class CommandExecutor {
             )
             // 泵运动
             serial.sendHex(
-                serialPort = SERIAL_TWO,
+                serial = TTYS1,
                 hex = Command.multiPoint(recycleLiquid()[0])
             )
             serial.sendHex(
-                serialPort = SERIAL_THREE,
+                serial = TTYS2,
                 hex = Command.multiPoint(recycleLiquid()[1])
             )
             block.invoke()

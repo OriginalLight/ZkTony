@@ -26,7 +26,7 @@ import com.zktony.www.data.model.Version
 import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
-import com.zktony.www.serialport.SerialPort
+import com.zktony.www.serialport.Serial
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -96,7 +96,7 @@ class AdminViewModel @Inject constructor(
     private fun onSerialOneResponse(hex: String) {
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotorParameters(data.toMotor().copy(board = SerialPort.SERIAL_ONE.index))
+                updateMotorParameters(data.toMotor().copy(board = Serial.TTYS0.index))
             }
         }
     }
@@ -108,7 +108,7 @@ class AdminViewModel @Inject constructor(
     private fun onSerialTwoResponse(hex: String) {
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotorParameters(data.toMotor().copy(board = SerialPort.SERIAL_TWO.index))
+                updateMotorParameters(data.toMotor().copy(board = Serial.TTYS1.index))
             }
         }
     }
@@ -121,7 +121,7 @@ class AdminViewModel @Inject constructor(
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
                 updateMotorParameters(
-                    data.toMotor().copy(board = SerialPort.SERIAL_THREE.index)
+                    data.toMotor().copy(board = Serial.TTYS2.index)
                 )
             }
         }

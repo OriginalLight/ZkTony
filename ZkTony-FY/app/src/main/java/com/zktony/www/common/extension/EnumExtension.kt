@@ -1,6 +1,6 @@
 package com.zktony.www.common.extension
 
-import com.zktony.www.serialport.SerialPort
+import com.zktony.www.serialport.Serial
 import com.zktony.www.ui.home.ModuleEnum
 
 /**
@@ -17,14 +17,14 @@ fun Int.toModuleEnum(): ModuleEnum {
     }
 }
 
-fun Int.toSerialPort(): SerialPort {
+fun Int.toSerialPort(): Serial {
     return when (this) {
-        0 -> SerialPort.SERIAL_ONE
-        1 -> SerialPort.SERIAL_TWO
-        2 -> SerialPort.SERIAL_THREE
-        3 -> SerialPort.SERIAL_FOUR
-        4 -> SerialPort.SERIAL_FIVE
-        5 -> SerialPort.SERIAL_SIX
-        else -> SerialPort.SERIAL_ONE
+        0 -> Serial.TTYS0
+        1 -> Serial.TTYS1
+        2 -> Serial.TTYS2
+        3 -> Serial.TTYS3
+        4 -> Serial.TTYS4
+        5 -> Serial.TTYS5
+        else -> Serial.TTYS0
     }
 }

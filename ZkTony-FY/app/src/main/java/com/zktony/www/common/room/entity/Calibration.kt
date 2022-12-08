@@ -28,7 +28,6 @@ data class Calibration(
     // 二抗槽位置
     val antibodyTwoY: Float = 137f,
     val antibodyTwoZ: Float = 103f,
-
     // y轴电机一圈走的距离
     val distanceY: Float = 58f,
     // z轴电机一圈走的距离
@@ -42,7 +41,7 @@ data class Calibration(
     // 蠕动泵四一圈走的进液量
     val volumeFour: Float = 180f,
     // 蠕动泵五转的圈数
-    val volumeFive: Float = 47f,
+    val volumeFive: Float = 49f,
     // 多转的圈数
     val extract: Float = 100f,
 )
