@@ -4,16 +4,18 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import com.zktony.serialport.core.SerialPort
-import com.zktony.serialport.util.Logger
-import com.zktony.serialport.util.SerialDataUtils
+import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.SerialDataUtils.byteArrToHex
-import java.io.*
+import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.security.InvalidParameterException
 
 /**
  * Serial port auxiliary tool class
  */
-abstract class SerialPortHelper(sPort: String, iBaudRate: Int) {
+abstract class SerialHelper(sPort: Serial, iBaudRate: Int) {
     private lateinit var serialPort: SerialPort
     private lateinit var outputStream: OutputStream
     private lateinit var inputStream: InputStream
@@ -33,71 +35,9 @@ abstract class SerialPortHelper(sPort: String, iBaudRate: Int) {
     var isOpen = false
 
 
-    fun openSerial(): Int {
-        return try {
-            open()
-            Logger.instance.i(TAG, "Open the serial port successfully")
-            0
-        } catch (e: SecurityException) {
-            Logger.instance.e(TAG, "Failed to open the serial port: no serial port read/write permission!")
-            -1
-        } catch (e: IOException) {
-            Logger.instance.e(TAG, "Failed to open serial port: unknown error!")
-            -2
-        } catch (e: InvalidParameterException) {
-            Logger.instance.e(TAG, "Failed to open the serial port: the parameter is wrong!")
-            -3
-        } catch (e: Exception) {
-            Logger.instance.e(TAG, "Failed to open the serial port: other error!")
-            -4
-        }
-    }
-
-    /**
-     * Send HEX data
-     *
-     * @param sHex hex data
-     */
-    fun sendHex(sHex: String) {
-        val hex = sHex.trim { it <= ' ' }.replace(" ".toRegex(), "")
-        val bOutArray = SerialDataUtils.hexToByteArr(hex)
-        val msg = Message.obtain()
-        msg.obj = bOutArray
-        addWaitMessage(msg)
-    }
-
-    /**
-     * Send string data
-     *
-     * @param sText string data
-     */
-    fun sendText(sText: String) {
-        val bOutArray: ByteArray
-        try {
-            bOutArray = sText.toByteArray(charset("GB18030"))
-            val msg = Message.obtain()
-            msg.obj = bOutArray
-            addWaitMessage(msg)
-        } catch (e: UnsupportedEncodingException) {
-            e.printStackTrace()
-        }
-    }
-
-    /**
-     * Send byte data
-     *
-     * @param bOutArray byte data
-     */
-    fun sendByteArray(bOutArray: ByteArray) {
-        val msg = Message.obtain()
-        msg.obj = bOutArray
-        addWaitMessage(msg)
-    }
-
-
     @Throws(SecurityException::class, IOException::class, InvalidParameterException::class)
     fun open() {
-        serialPort = SerialPort(File(port), baudRate, stopBits, dataBits, parity, flowCon, 0)
+        serialPort = SerialPort(File(port.device), baudRate, stopBits, dataBits, parity, flowCon, 0)
         outputStream = serialPort.outputStream
         inputStream = serialPort.inputStream
         readThread = ReadThread()
@@ -116,6 +56,10 @@ abstract class SerialPortHelper(sPort: String, iBaudRate: Int) {
             }
         }
         isOpen = true
+    }
+
+    fun addWaitMessage(msg: Message) {
+        workHandler.sendMessage(msg)
     }
 
     open fun close() {
@@ -139,10 +83,6 @@ abstract class SerialPortHelper(sPort: String, iBaudRate: Int) {
             handlerThread.quit()
         }
         isOpen = false
-    }
-
-    private fun addWaitMessage(msg: Message) {
-        workHandler.sendMessage(msg)
     }
 
     private fun send(bOutArray: ByteArray) {
@@ -193,7 +133,6 @@ abstract class SerialPortHelper(sPort: String, iBaudRate: Int) {
     }
 
     companion object {
-        private const val TAG = "SerialPortHelper"
         private const val TAG_END = "0D0A"
     }
 }

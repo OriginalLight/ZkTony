@@ -3,6 +3,8 @@ package com.zktony.www.ui.home
 import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
+import com.zktony.serialport.util.Serial.TTYS0
+import com.zktony.serialport.util.Serial.TTYS3
 import com.zktony.www.R
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
@@ -18,8 +20,6 @@ import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.serialport.Serial.TTYS3
-import com.zktony.www.serialport.Serial.TTYS0
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import com.zktony.www.ui.home.ModuleEnum.*
@@ -67,7 +67,7 @@ class HomeViewModel @Inject constructor(
             }
             launch {
                 // 串口一flow
-                serial.serialOneFlow.collect {
+                serial.ttys0Flow.collect {
                     it?.let {
                         val command = it.toCommand()
                         when (command.function) {
@@ -86,7 +86,7 @@ class HomeViewModel @Inject constructor(
             }
             launch {
                 // 串口四flow
-                serial.serialFourFlow.collect {
+                serial.ttys3Flow.collect {
                     it?.let {
                         if (it.startsWith("TC1:TCACTUALTEMP=")) {
                             // 读取温度
@@ -319,7 +319,7 @@ class HomeViewModel @Inject constructor(
             // 恢复到室温
             // 复位
             delay(200L)
-            if (serial.getExecuting() == 0) {
+            if (serial.executing == 0) {
                 // 暂停摇床
                 serial.sendHex(
                     serial = TTYS0, hex = Command.pauseShakeBed()
@@ -348,7 +348,7 @@ class HomeViewModel @Inject constructor(
     fun reset() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (serial.getExecuting() == 0) {
+            if (serial.executing == 0) {
                 serial.sendHex(
                     serial = TTYS0, hex = Command(
                         function = "05", parameter = "01", data = "0101302C302C302C302C"

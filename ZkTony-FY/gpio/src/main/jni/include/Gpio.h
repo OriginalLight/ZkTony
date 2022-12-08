@@ -18,12 +18,13 @@ Java_com_zktony_gpio_Gpio_nativeWriteGpio(JNIEnv *env, jobject thiz, jstring pat
 JNIEXPORT jint JNICALL
 Java_com_zktony_gpio_Gpio_nativeReadGpio(JNIEnv *env, jobject thiz, jstring path);
 
+JNIEXPORT jint JNICALL
+Java_com_zktony_gpio_GpioSw_nativeWriteGpio(JNIEnv *env, jobject thiz, jstring path, jstring value);
+
+JNIEXPORT jint JNICALL
+Java_com_zktony_gpio_GpioSw_nativeReadGpio(JNIEnv *env, jobject thiz, jstring path);
+
 #ifdef __cplusplus
 }
 #endif
 #endif
-
-
-
-
-

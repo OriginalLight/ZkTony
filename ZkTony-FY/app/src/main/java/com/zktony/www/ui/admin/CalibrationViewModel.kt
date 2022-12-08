@@ -2,11 +2,11 @@ package com.zktony.www.ui.admin
 
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
+import com.zktony.serialport.util.Serial.*
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.data.repository.CalibrationRepository
-import com.zktony.www.serialport.Serial.*
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel

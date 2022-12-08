@@ -1,11 +1,11 @@
 package com.zktony.www.ui.home
 
+import com.zktony.serialport.util.Serial.*
 import com.zktony.www.common.app.Settings
 import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.MotionMotor
 import com.zktony.www.common.room.entity.PumpMotor
-import com.zktony.www.serialport.Serial.*
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import com.zktony.www.ui.home.ModuleEnum.*
@@ -329,7 +329,7 @@ class CommandExecutor {
      * @param block suspend () -> Unit 代码块
      */
     private suspend fun waitForFree(msg: String, block: suspend () -> Unit) {
-        if (serial.isLock() || serial.isDrawerOpen()) {
+        if (serial.lock || serial.drawer) {
             _wait.value = msg
             delay(300L)
             waitForFree(msg, block)

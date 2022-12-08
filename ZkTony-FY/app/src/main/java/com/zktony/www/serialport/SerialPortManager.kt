@@ -1,9 +1,12 @@
 package com.zktony.www.serialport
 
 import com.zktony.serialport.MutableSerial
-import com.zktony.www.common.extension.*
-import com.zktony.www.common.utils.Logger
-import com.zktony.www.serialport.Serial.*
+import com.zktony.serialport.util.Serial
+import com.zktony.serialport.util.Serial.*
+import com.zktony.www.common.extension.hexToAscii
+import com.zktony.www.common.extension.hexToInt8
+import com.zktony.www.common.extension.toCommand
+import com.zktony.www.common.extension.verifyHex
 import com.zktony.www.serialport.protocol.Command
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,69 +18,70 @@ import kotlinx.coroutines.launch
 class SerialPortManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
-    private val _serialOneFlow = MutableStateFlow<String?>(null)
-    private val _serialTwoFlow = MutableStateFlow<String?>(null)
-    private val _serialThreeFlow = MutableStateFlow<String?>(null)
-    private val _serialFourFlow = MutableStateFlow<String?>(null)
+    private val _ttys0Flow = MutableStateFlow<String?>(null)
+    private val _ttys1Flow = MutableStateFlow<String?>(null)
+    private val _ttys2Flow = MutableStateFlow<String?>(null)
+    private val _ttys3Flow = MutableStateFlow<String?>(null)
 
-    val serialOneFlow = _serialOneFlow.asStateFlow()
-    val serialTwoFlow = _serialTwoFlow.asStateFlow()
-    val serialThreeFlow = _serialThreeFlow.asStateFlow()
-    val serialFourFlow = _serialFourFlow.asStateFlow()
+    val ttys0Flow = _ttys0Flow.asStateFlow()
+    val ttys1Flow = _ttys1Flow.asStateFlow()
+    val ttys2Flow = _ttys2Flow.asStateFlow()
+    val ttys3Flow = _ttys3Flow.asStateFlow()
 
     // 机构运行状态
-    private var lock = false
+    var lock = false
 
     // 机构运行已经等待的时间
     private var lockTime = 0L
 
     // 机构运行小步骤等待时间
-    private var waitTime = 60L * 2
+    private val waitTime = 60L * 2
 
     // 机构的抽屉状态
-    private var drawer = false
+    var drawer = false
 
     // 正在执行模块的个数
-    private var executing = 0
+    var executing = 0
 
     init {
         scope.launch {
             launch {
-                MutableSerial.instance.init(TTYS0.device, 115200)
-                MutableSerial.instance.init(TTYS1.device, 115200)
-                MutableSerial.instance.init(TTYS2.device, 115200)
-                MutableSerial.instance.init(TTYS3.device, 57600)
+                MutableSerial.instance.init(TTYS0, 115200)
+                MutableSerial.instance.init(TTYS1, 115200)
+                MutableSerial.instance.init(TTYS2, 115200)
+                MutableSerial.instance.init(TTYS3, 57600)
             }
             launch {
                 MutableSerial.instance.listener = { port, data ->
                     when (port) {
-                        TTYS0.device -> {
+                        TTYS0 -> {
                             data.verifyHex().forEach {
-                                _serialOneFlow.value = it
-                                Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
+                                _ttys0Flow.value = it
+                                //Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
                             }
                         }
-                        TTYS1.device -> {
+                        TTYS1 -> {
                             data.verifyHex().forEach {
-                                _serialTwoFlow.value = it
-                                Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
+                                _ttys1Flow.value = it
+                                //Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
                             }
                         }
-                        TTYS2.device -> {
+                        TTYS2 -> {
                             data.verifyHex().forEach {
-                                _serialThreeFlow.value = it
-                                Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
+                                _ttys2Flow.value = it
+                                //Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
                             }
                         }
-                        TTYS3.device -> {
-                            _serialFourFlow.value = data.hexToAscii()
+                        TTYS3 -> {
+                            _ttys3Flow.value = data.hexToAscii()
                             //Logger.d(msg = "串口四 receivedText: ${hexData.hexToAscii()}")
                         }
+                        else -> {}
                     }
                 }
             }
             launch {
-                serialOneFlow.collect {
+                ttys0Flow.collect {
                     it?.let {
                         val res = it.toCommand()
                         if (res.function == "85" && res.parameter == "01") {
@@ -133,8 +137,8 @@ class SerialPortManager(
      */
     fun sendHex(serial: Serial, hex: String) {
         scope.launch {
-            MutableSerial.instance.sendHex(serial.device, hex)
-            Logger.e(msg = "${serial.value} sendHex: ${hex.hexFormat()}")
+            MutableSerial.instance.sendHex(serial, hex)
+            //Logger.e(msg = "${serial.value} sendHex: ${hex.hexFormat()}")
         }
     }
 
@@ -145,16 +149,10 @@ class SerialPortManager(
      */
     fun sendText(serial: Serial, text: String) {
         scope.launch {
-            MutableSerial.instance.sendText(serial.device, text)
+            MutableSerial.instance.sendText(serial, text)
             //Logger.e(msg = "${serialPort.value} sendText: $text")
         }
     }
-
-    /**
-     * 获取锁
-     * @return Boolean 获取到锁 true: 锁 false: 未锁
-     */
-    fun isLock() = lock
 
     /**
      *  设置锁
@@ -167,26 +165,6 @@ class SerialPortManager(
         }
     }
 
-    /**
-     * 设置正在执行的个数
-     * @param count 个数
-     */
-    fun setExecuting(count: Int) {
-        executing = count
-    }
-
-    /**
-     * 获取正在执行的个数
-     * @return [Int] 个数
-     */
-    fun getExecuting() = executing
-
-    /**
-     * 抽屉是否打开
-     * @return [Boolean] true: 打开 false: 关闭
-     */
-    fun isDrawerOpen() = drawer
-
 
     companion object {
         @JvmStatic
@@ -194,13 +172,4 @@ class SerialPortManager(
             SerialPortManager()
         }
     }
-}
-
-enum class Serial(val device: String, val value: String, val index: Int) {
-    TTYS0("/dev/ttyS0", "串口一", 0),
-    TTYS1("/dev/ttyS1", "串口二", 1),
-    TTYS2("/dev/ttyS2", "串口三", 2),
-    TTYS3("/dev/ttyS3", "串口四", 3),
-    TTYS4("/dev/ttyS4", "串口五", 4),
-    TTYS5("/dev/ttyS5", "串口六", 5),
 }
