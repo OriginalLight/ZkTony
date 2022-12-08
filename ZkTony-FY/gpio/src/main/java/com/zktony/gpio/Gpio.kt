@@ -1,7 +1,8 @@
 @file:Suppress("unused")
+
 package com.zktony.gpio
 
-import com.zktony.gpio.utils.Logger
+import android.util.Log
 import java.io.File
 
 /**
@@ -35,7 +36,7 @@ class Gpio {
      */
     fun writeGpio(gpio: String, value: Int): Int {
         val dataPath = composePinPath(gpio) + mValue
-        Logger.instance.i(TAG, "writeGpio: $dataPath, value: $value")
+        Log.i(TAG, "writeGpio: $dataPath, value: $value")
         getPermission(dataPath)
         return nativeWriteGpio(dataPath, value.toString())
     }
@@ -47,7 +48,7 @@ class Gpio {
      */
     fun readGpio(gpio: String): Int {
         val dataPath = composePinPath(gpio) + mValue
-        Logger.instance.i(TAG, "readGpio: $dataPath")
+        Log.i(TAG, "readGpio: $dataPath")
         getPermission(dataPath)
         return nativeReadGpio(dataPath)
     }
@@ -60,7 +61,7 @@ class Gpio {
      */
     fun setDirection(gpio: String, value: Int): Int {
         val dataPath = composePinPath(gpio) + mDirection
-        Logger.instance.i(TAG, "setDirection: $dataPath, value: $value")
+        Log.i(TAG, "setDirection: $dataPath, value: $value")
         getPermission(dataPath)
         return nativeWriteGpio(dataPath, value.toString())
     }
@@ -72,7 +73,7 @@ class Gpio {
      */
     fun getDirection(gpio: String): Int {
         val dataPath = composePinPath(gpio) + mDirection
-        Logger.instance.i(TAG, "getDirection: $dataPath")
+        Log.i(TAG, "getDirection: $dataPath")
         getPermission(dataPath)
         return nativeReadGpio(dataPath)
     }
@@ -91,7 +92,7 @@ class Gpio {
      */
     private fun getPermission(path: String) {
         val file = File(path)
-        Logger.instance.i(TAG, "检测读写权限: 是否可读:${file.canRead()}，是否可写：${file.canWrite()}")
+        Log.i(TAG, "检测读写权限: 是否可读:${file.canRead()}，是否可写：${file.canWrite()}")
         if (!file.canRead() || !file.canWrite()) {
             try {
                 val su: Process = Runtime.getRuntime().exec("/system/xbin/su")

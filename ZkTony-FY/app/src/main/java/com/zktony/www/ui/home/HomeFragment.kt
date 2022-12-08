@@ -162,7 +162,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         viewModel.stateTwo.value.job?.let { runningCount++ }
         viewModel.stateThree.value.job?.let { runningCount++ }
         viewModel.stateFour.value.job?.let { runningCount++ }
-        SerialPortManager.instance.setExecuting(runningCount)
+        SerialPortManager.instance.executing = runningCount
 
         when (module) {
             A -> {

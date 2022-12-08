@@ -1,6 +1,6 @@
 package com.zktony.www.common.extension
 
-import com.zktony.www.serialport.Serial
+import com.zktony.serialport.util.Serial
 import com.zktony.www.ui.home.ModuleEnum
 
 /**

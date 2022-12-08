@@ -10,6 +10,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.gpio.Gpio
+import com.zktony.serialport.util.Serial
 import com.zktony.www.BuildConfig
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
@@ -26,7 +27,6 @@ import com.zktony.www.data.model.Version
 import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
-import com.zktony.www.serialport.Serial
 import com.zktony.www.serialport.SerialPortManager
 import com.zktony.www.serialport.protocol.Command
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,21 +60,21 @@ class AdminViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                SerialPortManager.instance.serialOneFlow.collect {
+                SerialPortManager.instance.ttys0Flow.collect {
                     it?.let {
                         onSerialOneResponse(it)
                     }
                 }
             }
             launch {
-                SerialPortManager.instance.serialTwoFlow.collect {
+                SerialPortManager.instance.ttys1Flow.collect {
                     it?.let {
                         onSerialTwoResponse(it)
                     }
                 }
             }
             launch {
-                SerialPortManager.instance.serialThreeFlow.collect {
+                SerialPortManager.instance.ttys2Flow.collect {
                     it?.let {
                         onSerialThreeResponse(it)
                     }

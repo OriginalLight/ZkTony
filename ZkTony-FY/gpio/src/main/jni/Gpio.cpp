@@ -60,3 +60,26 @@ Java_com_zktony_gpio_Gpio_nativeReadGpio(JNIEnv *env, jobject thiz, jstring path
     env->ReleaseStringUTFChars(path, pathStr);
     return ret;
 }
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_zktony_gpio_GpioSw_nativeWriteGpio(JNIEnv *env, jobject thiz, jstring path, jstring value) {
+    const char *pathStr;
+    const char *valueStr;
+    pathStr = env->GetStringUTFChars(path, nullptr);
+    valueStr = env->GetStringUTFChars(value, nullptr);
+    int ret = writeData(valueStr, 1, pathStr);
+    env->ReleaseStringUTFChars(path, pathStr);
+    env->ReleaseStringUTFChars(value, valueStr);
+    return ret;
+}
+
+extern "C"
+JNIEXPORT jint JNICALL
+Java_com_zktony_gpio_GpioSw_nativeReadGpio(JNIEnv *env, jobject thiz, jstring path) {
+    const char *pathStr;
+    pathStr = env->GetStringUTFChars(path, nullptr);
+    int ret = readData(pathStr);
+    env->ReleaseStringUTFChars(path, pathStr);
+    return ret;
+}
