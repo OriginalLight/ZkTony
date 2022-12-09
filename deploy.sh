@@ -3,36 +3,36 @@ PS3='选择功能： '
 funs=("后端" "转膜仪" "孵育" "退出")
 
 web() {
+    echo -n "输入后端版本:" 
+    read ver
     cd ZkTony-WEB/
     chmod +x ./gradlew
     ./gradlew bootBuildImage
-    echo -n "输入后端版本:" 
-    read ver
-    docker tag web:$ver shenmo1234/web:latest
-    docker push shenmo1234/web:latest
-    docker pull shenmo1234/web:latest
+    docker tag web:$ver zktony/web:latest
+    docker push zktony/web:latest
+    docker pull zktony/web:latest
     docker stop web
     docker rm web
-    docker run -d --name web -p 8080:8080 -v /zktony:/zktony shenmo1234/web:latest
+    docker run -d --name web -p 8080:8080 -v /zktony:/zktony zktony/web:latest
     echo "打包上传启动完成"
     exit
 }
 
 zm() {
+    echo -n "输入版本:" 
+    read ver
     cd ZkTony-ZM/
     chmod +x ./gradlew
     ./gradlew assembleRelease
-    echo -n "输入版本:" 
-    read ver
     cp app/release/zktony-zm-$ver-release.apk /zktony/
 }
 
 fy() {
+    echo -n "输入版本:" 
+    read ver
     cd ZkTony-FY/
     chmod +x ./gradlew
     ./gradlew assembleRelease
-    echo -n "输入版本:" 
-    read ver
     cp app/release/zktony-fy-$ver-release.apk /zktony/
 }
 
