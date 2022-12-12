@@ -24,7 +24,7 @@ zm() {
     cd ZkTony-ZM/
     chmod +x ./gradlew
     ./gradlew assembleRelease
-    cp app/build/outputs/apk/release/zktony-zm-$ver-release.apk /zktony/
+    cp ZkTony-ZM/app/build/outputs/apk/release/zktony-zm-$ver-release.apk /zktony/
 }
 
 fy() {
@@ -33,7 +33,7 @@ fy() {
     cd ZkTony-FY/
     chmod +x ./gradlew
     ./gradlew assembleRelease
-    cp app/build/outputs/apk/release/zktony-fy-$ver-release.apk /zktony/
+    cp ZkTony-FY/app/build/outputs/apk/release/zktony-fy-$ver-release.apk /zktony/
 }
 
 select fun in "${funs[@]}"; do
