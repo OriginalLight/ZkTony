@@ -14,12 +14,21 @@
             android:icon="@drawable/ic_program"
             android:title="@string/title_program" />
     </group>
+
+    <group android:id="@+id/g_container">
+        <item
+            android:id="@+id/navigation_container"
+            android:icon="@drawable/ic_container"
+            android:title="@string/title_container" />
+    </group>
+
     <group android:id="@+id/g_log">
         <item
             android:id="@+id/navigation_log"
             android:icon="@drawable/ic_log"
             android:title="@string/title_log" />
     </group>
+
     <group android:id="@+id/g_admin">
         <item
             android:id="@+id/navigation_admin"
