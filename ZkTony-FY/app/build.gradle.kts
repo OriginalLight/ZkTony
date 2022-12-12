@@ -72,7 +72,6 @@ dependencies {
     implementation(project(mapOf("path" to ":serialport")))
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -90,7 +89,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.okhttp3)
     implementation(libs.okhttp3.logging.interceptor)
-    implementation(libs.recyclerview)
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.converter.gson)
 

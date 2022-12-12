@@ -12,6 +12,12 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
+        android:id="@+id/navigation_container"
+        android:name="com.zktony.www.ui.container.ContainerFragment"
+        android:label="@string/title_container"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
         android:id="@+id/navigation_program"
         android:name="com.zktony.www.ui.program.ProgramFragment"
         android:label="@string/title_program"
