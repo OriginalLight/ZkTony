@@ -6,7 +6,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.gpio.Gpio
@@ -263,18 +262,6 @@ class AdminViewModel @Inject constructor(
             putExtra("cmd", if (bar) "show" else "hide")
         }
         CommonApplicationProxy.application.sendBroadcast(intent)
-    }
-
-    /**
-     * 抗体保温温度设置
-     * @param temp [Float]
-     */
-    fun setAntibodyTemp(temp: Float) {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[floatPreferencesKey(Constants.TEMP)] = temp
-            }
-        }
     }
 
     /**

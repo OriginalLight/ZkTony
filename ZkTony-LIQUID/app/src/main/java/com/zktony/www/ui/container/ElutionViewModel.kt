@@ -1,7 +1,9 @@
 package com.zktony.www.ui.container
 
-import androidx.lifecycle.ViewModel
+import com.zktony.www.base.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class ElutionViewModel : ViewModel() {
-    // TODO: Implement the ViewModel
+@HiltViewModel
+class ElutionViewModel @Inject constructor() : BaseViewModel() {
 }

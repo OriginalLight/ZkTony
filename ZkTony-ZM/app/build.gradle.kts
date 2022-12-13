@@ -13,8 +13,8 @@ android {
         applicationId = "com.zktony.www"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
         multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -71,7 +71,6 @@ dependencies {
     implementation(project(mapOf("path" to ":serialport")))
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -91,7 +90,6 @@ dependencies {
     implementation(libs.multidex)
     implementation(libs.okhttp3)
     implementation(libs.okhttp3.logging.interceptor)
-    implementation(libs.recyclerview)
     implementation(libs.rxandroid)
     implementation(libs.rxjava)
     implementation(libs.retrofit2) {
