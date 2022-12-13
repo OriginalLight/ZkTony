@@ -257,9 +257,9 @@ class ProgramFragment :
         binding.et6.visibility = View.GONE
         binding.rg1.setOnCheckedChangeListener { _, checkedId ->
             when (checkedId) {
-                R.id.rb_1 -> program = program.copy(thickness = "0.075")
-                R.id.rb_2 -> program = program.copy(thickness = "0.1")
-                R.id.rb_3 -> program = program.copy(thickness = "0.15")
+                R.id.rb_1 -> program = program.copy(thickness = "0.75")
+                R.id.rb_2 -> program = program.copy(thickness = "1.0")
+                R.id.rb_3 -> program = program.copy(thickness = "1.5")
             }
             viewModel.verifyProgram(program)
         }

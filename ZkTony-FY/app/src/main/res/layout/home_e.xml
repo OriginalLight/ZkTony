@@ -9,11 +9,11 @@
         android:layout_height="match_parent">
 
         <ImageButton
-            android:id="@+id/btn_reset"
+            android:id="@+id/reset"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:background="@mipmap/btn_reset"
-            app:layout_constraintBottom_toTopOf="@+id/btn_pause"
+            app:layout_constraintBottom_toTopOf="@+id/pause"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -26,17 +26,17 @@
             android:text="@string/reset"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_reset" />
+            app:layout_constraintTop_toBottomOf="@+id/reset" />
 
         <ImageButton
-            android:id="@+id/btn_pause"
+            android:id="@+id/pause"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:background="@mipmap/btn_pause"
-            app:layout_constraintBottom_toTopOf="@+id/btn_insulating"
+            app:layout_constraintBottom_toTopOf="@+id/insulating"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_reset"
+            app:layout_constraintTop_toBottomOf="@+id/reset"
             tools:ignore="ContentDescription" />
 
         <TextView
@@ -46,17 +46,17 @@
             android:text="@string/pause"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_pause" />
+            app:layout_constraintTop_toBottomOf="@+id/pause" />
 
         <ImageButton
-            android:id="@+id/btn_insulating"
+            android:id="@+id/insulating"
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:background="@mipmap/btn_defrost"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_pause"
+            app:layout_constraintTop_toBottomOf="@+id/pause"
             tools:ignore="ContentDescription" />
 
         <TextView
@@ -66,7 +66,7 @@
             android:text="@string/insulating"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_insulating" />
+            app:layout_constraintTop_toBottomOf="@+id/insulating" />
 
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="2dp"
@@ -86,5 +86,6 @@
             android:layout_height="2dp"
             android:background="@color/black"
             app:layout_constraintBottom_toBottomOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

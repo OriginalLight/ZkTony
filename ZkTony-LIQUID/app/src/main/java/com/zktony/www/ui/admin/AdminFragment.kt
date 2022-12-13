@@ -47,7 +47,6 @@ class AdminFragment :
         initButton()
         initSwitch()
         initTextView()
-        initEditText()
     }
 
     /**
@@ -243,20 +242,6 @@ class AdminFragment :
      */
     private fun initTextView() {
         binding.tvVersionName.text = requireContext().versionName()
-    }
-
-    /**
-     * 初始化输入框
-     */
-    private fun initEditText() {
-        binding.etTemp.run {
-            setText(appViewModel.settings.value.temp.toString().removeZero())
-            afterTextChange {
-                if (it.isNotEmpty()) {
-                    viewModel.setAntibodyTemp(it.toFloat())
-                }
-            }
-        }
     }
 
     /**

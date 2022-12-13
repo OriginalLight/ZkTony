@@ -33,11 +33,11 @@ class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDi
     private fun itemClickEvent(holder: ViewHolder) {
         holder.itemView.setOnClickListener {
             if (!isClick) {
-                setCurrentPosition(true, holder.bindingAdapterPosition)
+                setCurrentPosition(true, holder.adapterPosition)
             } else {
                 setCurrentPosition(
-                    currentPosition != holder.bindingAdapterPosition,
-                    holder.bindingAdapterPosition
+                    currentPosition != holder.adapterPosition,
+                    holder.adapterPosition
                 )
             }
             onClick.invoke()
