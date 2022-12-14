@@ -11,7 +11,7 @@ import java.util.*
 @Entity
 data class Calibration(
     @PrimaryKey
-    val id: String = UUID.randomUUID().toString(),
+    val id: Int = 1,
     // 废液槽位置
     val wasteY: Float = 6.5f,
     val wasteZ: Float = 20f,
@@ -28,20 +28,6 @@ data class Calibration(
     // 二抗槽位置
     val antibodyTwoY: Float = 137f,
     val antibodyTwoZ: Float = 103f,
-    // y轴电机一圈走的距离
-    val distanceY: Float = 58f,
-    // z轴电机一圈走的距离
-    val distanceZ: Float = 3.8f,
-    // 蠕动泵一一圈走的进液量
-    val volumeOne: Float = 180f,
-    // 蠕动泵二一圈走的进液量
-    val volumeTwo: Float = 180f,
-    // 蠕动泵三一圈走的进液量
-    val volumeThree: Float = 180f,
-    // 蠕动泵四一圈走的进液量
-    val volumeFour: Float = 180f,
-    // 蠕动泵五转的圈数
-    val volumeFive: Float = 49f,
     // 多转的圈数
     val extract: Float = 100f,
 )

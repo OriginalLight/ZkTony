@@ -47,7 +47,7 @@ class MotorAdapter : ListAdapter<Motor, MotorAdapter.ViewHolder>(MotorDiffCallba
         fun bind(item: Motor) {
             binding.apply {
                 motor = item
-                if (item.motorType == 0) {
+                if (item.index in 0..2) {
                     icon.setImageResource(R.mipmap.ic_motor)
                 } else {
                     icon.setImageResource(R.mipmap.ic_pump)

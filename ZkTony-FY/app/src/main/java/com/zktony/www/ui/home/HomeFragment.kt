@@ -18,7 +18,7 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.databinding.FragmentHomeBinding
-import com.zktony.www.serialport.SerialPortManager
+import com.zktony.www.serial.SerialManager
 import com.zktony.www.ui.home.ModuleEnum.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -164,7 +164,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         viewModel.bFlow.value.job?.let { runningCount++ }
         viewModel.cFlow.value.job?.let { runningCount++ }
         viewModel.dFlow.value.job?.let { runningCount++ }
-        SerialPortManager.instance.executing = runningCount
+        SerialManager.instance.executing = runningCount
 
         when (module) {
             A -> {
@@ -288,16 +288,16 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             return
         }
         PopMenu.show(menuList).setMenuTextInfo(TextInfo().apply {
-                gravity = Gravity.CENTER
-                fontSize = 16
-            }).setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
-                override fun getIcon(dialog: PopMenu?, index: Int, menuText: String?): Int {
-                    return R.mipmap.ic_program
-                }
-            }).setOnMenuItemClickListener { _, _, index ->
-                viewModel.switchProgram(index, module)
-                false
-            }.width = 300
+            gravity = Gravity.CENTER
+            fontSize = 16
+        }).setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
+            override fun getIcon(dialog: PopMenu?, index: Int, menuText: String?): Int {
+                return R.mipmap.ic_program
+            }
+        }).setOnMenuItemClickListener { _, _, index ->
+            viewModel.selectProgram(index, module)
+            false
+        }.width = 300
     }
 
 }

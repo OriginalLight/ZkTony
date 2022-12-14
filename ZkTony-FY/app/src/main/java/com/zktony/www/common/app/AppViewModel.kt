@@ -8,13 +8,11 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.www.common.room.entity.Calibration
-import com.zktony.www.common.room.entity.MotionMotor
-import com.zktony.www.common.room.entity.PumpMotor
+import com.zktony.www.common.room.entity.MotorUnits
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.MotorRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
@@ -53,65 +51,34 @@ class AppViewModel @Inject constructor(
             }
             launch {
                 motorRepo.getAll().collect {
+                    // 将list的元素放入motorUnits
                     it.forEach { motor ->
-                        when (motor.board) {
-                            0 -> {
-                                when (motor.address) {
-                                    1 -> _settings.value = settings.value.copy(
-                                        motionMotor = settings.value.motionMotor.copy(x = motor)
-                                    )
-                                    2 -> _settings.value = settings.value.copy(
-                                        motionMotor = settings.value.motionMotor.copy(y = motor)
-                                    )
-                                    3 -> _settings.value = settings.value.copy(
-                                        motionMotor = settings.value.motionMotor.copy(z = motor)
-                                    )
-                                }
-                            }
-                            1 -> {
-                                when (motor.address) {
-                                    1 -> _settings.value = settings.value.copy(
-                                        pumpMotor = settings.value.pumpMotor.copy(one = motor)
-                                    )
-                                    2 -> _settings.value = settings.value.copy(
-                                        pumpMotor = settings.value.pumpMotor.copy(two = motor)
-                                    )
-                                    3 -> _settings.value = settings.value.copy(
-                                        pumpMotor = settings.value.pumpMotor.copy(three = motor)
-                                    )
-                                }
-                            }
-                            2 -> {
-                                when (motor.address) {
-                                    1 -> _settings.value = settings.value.copy(
-                                        pumpMotor = settings.value.pumpMotor.copy(four = motor)
-                                    )
-                                    2 -> _settings.value = settings.value.copy(
-                                        pumpMotor = settings.value.pumpMotor.copy(five = motor)
-                                    )
-                                }
-                            }
+                        when (motor.index) {
+                            0 -> _settings.value =
+                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(x = motor))
+                            1 -> _settings.value =
+                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(y = motor))
+                            2 -> _settings.value =
+                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(z = motor))
+                            3 -> _settings.value =
+                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(p1 = motor))
+                            4 -> _settings.value =
+                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(p2 = motor))
+                            5 -> _settings.value =
+                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(p3 = motor))
+                            6 -> _settings.value =
+                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(p4 = motor))
+                            7 -> _settings.value =
+                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(p5 = motor))
                         }
                     }
                 }
             }
             launch {
-                delay(1000L)
                 caliRepo.getCalibration().collect {
-                    it.firstOrNull()?.let { cali ->
+                    if (it.isNotEmpty()) {
                         _settings.value = settings.value.copy(
-                            calibration = cali,
-                            motionMotor = settings.value.motionMotor.copy(
-                                distanceY = cali.distanceY,
-                                distanceZ = cali.distanceZ
-                            ),
-                            pumpMotor = settings.value.pumpMotor.copy(
-                                volumeOne = cali.volumeOne,
-                                volumeTwo = cali.volumeTwo,
-                                volumeThree = cali.volumeThree,
-                                volumeFour = cali.volumeFour,
-                                volumeFive = cali.volumeFive
-                            )
+                            calibration = it.first(),
                         )
                     }
                 }
@@ -121,9 +88,8 @@ class AppViewModel @Inject constructor(
 }
 
 data class Settings(
-    var temp: Float = 3f,
-    var bar: Boolean = false,
-    var motionMotor: MotionMotor = MotionMotor(),
-    var pumpMotor: PumpMotor = PumpMotor(),
-    var calibration: Calibration = Calibration()
+    val temp: Float = 3f,
+    val bar: Boolean = false,
+    val motorUnits: MotorUnits = MotorUnits(),
+    val calibration: Calibration = Calibration()
 )

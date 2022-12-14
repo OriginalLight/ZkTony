@@ -9,13 +9,14 @@ import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.extension.afterTextChange
+import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.databinding.FragmentCalibrationBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class CalibrationFragment :
@@ -23,10 +24,12 @@ class CalibrationFragment :
 
     override val viewModel: CalibrationViewModel by viewModels()
 
+    @Inject
+    lateinit var appViewModel: AppViewModel
+
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initObserver()
         initButton()
-        initEditText()
     }
 
     private fun initObserver() {
@@ -50,7 +53,58 @@ class CalibrationFragment :
                 setOnClickListener { findNavController().navigateUp() }
             }
             btnUpdate.setOnClickListener {
-                viewModel.updateCalibration()
+                val cali = Calibration()
+                viewModel.updateCalibration(
+                    cali.copy(
+                        wasteY = binding.wasteTankPosition.text.toString().toFloat(),
+                        wasteZ = binding.wasteTankHeight.text.toString().toFloat(),
+                        washingY = binding.washTankPosition.text.toString().toFloat(),
+                        washingZ = binding.washTankHeight.text.toString().toFloat(),
+                        blockingY = binding.blockingLiquidTankPosition.text.toString().toFloat(),
+                        blockingZ = binding.blockingLiquidTankHeight.text.toString().toFloat(),
+                        antibodyOneY = binding.antibodyOneTankPosition.text.toString().toFloat(),
+                        antibodyOneZ = binding.antibodyOneTankHeight.text.toString().toFloat(),
+                        recycleAntibodyOneZ = binding.recycleAntibodyOneTankHeight.text.toString().toFloat(),
+                        antibodyTwoY = binding.antibodyTwoTankPosition.text.toString().toFloat(),
+                        antibodyTwoZ = binding.antibodyTwoTankHeight.text.toString().toFloat(),
+                    )
+                )
+                viewModel.updateMotorValue(
+                    appViewModel.settings.value.motorUnits.y.copy(
+                        unit = binding.yMotorDistance.text.toString().toFloat()
+                    )
+                )
+                viewModel.updateMotorValue(
+                    appViewModel.settings.value.motorUnits.z.copy(
+                        unit = binding.zMotorDistance.text.toString().toFloat()
+                    )
+                )
+                viewModel.updateMotorValue(
+                    appViewModel.settings.value.motorUnits.p1.copy(
+                        unit = binding.pumpOneDistance.text.toString().toFloat()
+                    )
+                )
+                viewModel.updateMotorValue(
+                    appViewModel.settings.value.motorUnits.p2.copy(
+                        unit = binding.pumpTwoDistance.text.toString().toFloat()
+                    )
+                )
+                viewModel.updateMotorValue(
+                    appViewModel.settings.value.motorUnits.p3.copy(
+                        unit = binding.pumpThreeDistance.text.toString().toFloat()
+                    )
+                )
+                viewModel.updateMotorValue(
+                    appViewModel.settings.value.motorUnits.p4.copy(
+                        unit = binding.pumpFourDistance.text.toString().toFloat()
+                    )
+                )
+                viewModel.updateMotorValue(
+                    appViewModel.settings.value.motorUnits.p5.copy(
+                        unit = binding.pumpFiveDistance.text.toString().toFloat()
+                    )
+                )
+                PopTip.show("更新成功")
             }
             btnTestWasteTankMove.setOnClickListener {
                 viewModel.toWasteTank()
@@ -125,324 +179,31 @@ class CalibrationFragment :
     }
 
     /**
-     * 初始化编辑框
-     */
-    private fun initEditText() {
-        val calibration = viewModel.calibration.value
-        binding.run {
-            wasteTankPosition.run {
-                setText(calibration.wasteY.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            wasteY = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            wasteTankHeight.run {
-                setText(calibration.wasteZ.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            wasteZ = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            washTankPosition.run {
-                setText(calibration.washingY.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            washingY = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            washTankHeight.run {
-                setText(calibration.washingZ.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            washingZ = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            blockingLiquidTankPosition.run {
-                setText(calibration.blockingY.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            blockingY = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            blockingLiquidTankHeight.run {
-                setText(calibration.blockingZ.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            blockingZ = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            antibodyOneTankPosition.run {
-                setText(calibration.antibodyOneY.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            antibodyOneY = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            antibodyOneTankHeight.run {
-                setText(calibration.antibodyOneZ.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            antibodyOneZ = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            recycleAntibodyOneTankHeight.run {
-                setText(calibration.recycleAntibodyOneZ.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            recycleAntibodyOneZ = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            antibodyTwoTankPosition.run {
-                setText(calibration.antibodyTwoY.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            antibodyTwoY = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            antibodyTwoTankHeight.run {
-                setText(calibration.antibodyTwoZ.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            antibodyTwoZ = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            yMotorDistance.run {
-                setText(calibration.distanceY.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            distanceY = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            zMotorDistance.run {
-                setText(calibration.distanceZ.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            distanceZ = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            pumpOneDistance.run {
-                setText(calibration.volumeOne.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            volumeOne = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            pumpTwoDistance.run {
-                setText(calibration.volumeTwo.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            volumeTwo = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            pumpThreeDistance.run {
-                setText(calibration.volumeThree.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            volumeThree = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            pumpFourDistance.run {
-                setText(calibration.volumeFour.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            volumeFour = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            pumpFiveDistance.run {
-                setText(calibration.volumeFive.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            volumeFive = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-            drainDistance.run {
-                setText(calibration.extract.toString().removeZero())
-                afterTextChange {
-                    viewModel.calibrationValueChange(
-                        viewModel.editCalibration.value.copy(
-                            extract = if (it.isNotEmpty()) it.toFloat() else 0f
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    /**
      * 校准数据变化
      * @param calibration [Calibration] 校准数据
      */
     private fun onCalibrationValueChange(calibration: Calibration) {
+        val motorUnits = appViewModel.settings.value.motorUnits
         binding.run {
-            wasteTankPosition.run {
-                val str = calibration.wasteY.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            wasteTankHeight.run {
-                val str = calibration.wasteZ.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            washTankPosition.run {
-                val str = calibration.washingY.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            washTankHeight.run {
-                val str = calibration.washingZ.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            blockingLiquidTankPosition.run {
-                val str = calibration.blockingY.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            blockingLiquidTankHeight.run {
-                val str = calibration.blockingZ.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            antibodyOneTankPosition.run {
-                val str = calibration.antibodyOneY.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            antibodyOneTankHeight.run {
-                val str = calibration.antibodyOneZ.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            recycleAntibodyOneTankHeight.run {
-                val str = calibration.recycleAntibodyOneZ.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            antibodyTwoTankPosition.run {
-                val str = calibration.antibodyTwoY.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            antibodyTwoTankHeight.run {
-                val str = calibration.antibodyTwoZ.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            yMotorDistance.run {
-                val str = calibration.distanceY.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            zMotorDistance.run {
-                val str = calibration.distanceZ.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            pumpOneDistance.run {
-                val str = calibration.volumeOne.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            pumpTwoDistance.run {
-                val str = calibration.volumeTwo.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            pumpThreeDistance.run {
-                val str = calibration.volumeThree.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            pumpFourDistance.run {
-                val str = calibration.volumeFour.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            pumpFiveDistance.run {
-                val str = calibration.volumeFive.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
-            drainDistance.run {
-                val str = calibration.extract.toString().removeZero()
-                if (text.toString().removeZero() != str) {
-                    setText(str)
-                }
-            }
+            wasteTankPosition.setText(calibration.wasteY.toString().removeZero())
+            wasteTankHeight.setText(calibration.wasteZ.toString().removeZero())
+            washTankPosition.setText(calibration.washingY.toString().removeZero())
+            washTankHeight.setText(calibration.washingZ.toString().removeZero())
+            blockingLiquidTankPosition.setText(calibration.blockingY.toString().removeZero())
+            blockingLiquidTankHeight.setText(calibration.blockingZ.toString().removeZero())
+            antibodyOneTankPosition.setText(calibration.antibodyOneY.toString().removeZero())
+            antibodyOneTankHeight.setText(calibration.antibodyOneZ.toString().removeZero())
+            recycleAntibodyOneTankHeight.setText(calibration.recycleAntibodyOneZ.toString().removeZero())
+            antibodyTwoTankPosition.setText(calibration.antibodyTwoZ.toString().removeZero())
+            antibodyTwoTankHeight.setText(calibration.antibodyTwoZ.toString().removeZero())
+            yMotorDistance.setText(motorUnits.y.unit.toString().removeZero())
+            zMotorDistance.setText(motorUnits.z.unit.toString().removeZero())
+            pumpOneDistance.setText(motorUnits.p1.unit.toString().removeZero())
+            pumpTwoDistance.setText(motorUnits.p2.unit.toString().removeZero())
+            pumpThreeDistance.setText(motorUnits.p3.unit.toString().removeZero())
+            pumpFourDistance.setText(motorUnits.p4.unit.toString().removeZero())
+            pumpFiveDistance.setText(motorUnits.p5.unit.toString().removeZero())
+            drainDistance.setText(calibration.extract.toString().removeZero())
         }
     }
 }

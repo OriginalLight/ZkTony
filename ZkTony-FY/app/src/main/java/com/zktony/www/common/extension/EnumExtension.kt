@@ -17,7 +17,7 @@ fun Int.toModuleEnum(): ModuleEnum {
     }
 }
 
-fun Int.toSerialPort(): Serial {
+fun Int.toSerial(): Serial {
     return when (this) {
         0 -> Serial.TTYS0
         1 -> Serial.TTYS1
