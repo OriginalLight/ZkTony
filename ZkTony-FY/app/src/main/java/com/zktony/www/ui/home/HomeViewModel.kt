@@ -10,7 +10,7 @@ import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.extractTemp
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.common.extension.toCommand
+import com.zktony.www.common.extension.toV1
 import com.zktony.www.common.model.Queue
 import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.Log
@@ -20,8 +20,8 @@ import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.serialport.SerialPortManager
-import com.zktony.www.serialport.protocol.Command
+import com.zktony.www.serial.SerialManager
+import com.zktony.www.serial.protocol.V1
 import com.zktony.www.ui.home.ModuleEnum.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -42,7 +42,7 @@ class HomeViewModel @Inject constructor(
     @Inject
     lateinit var appViewModel: AppViewModel
 
-    private val serial = SerialPortManager.instance
+    private val serial = SerialManager.instance
 
     private val _proFlow = MutableStateFlow<List<Program>>(emptyList())
     private val _aFlow = MutableStateFlow(ModuleUiState())
@@ -62,18 +62,18 @@ class HomeViewModel @Inject constructor(
             launch {
                 proRepo.getAll().collect {
                     _proFlow.value = it
-                    programListFlow(it)
+                    onProgramChange(it)
                 }
             }
             launch {
                 // 串口一flow
                 serial.ttys0Flow.collect {
                     it?.let {
-                        val command = it.toCommand()
-                        when (command.function) {
+                        val v1 = it.toV1()
+                        when (v1.fn) {
                             "86" -> {
-                                if (command.parameter == "0A") {
-                                    if (command.data == "00") {
+                                if (v1.pa == "0A") {
+                                    if (v1.data == "00") {
                                         PopTip.show("复位成功")
                                         lockBtn(false)
                                     } else {
@@ -109,16 +109,14 @@ class HomeViewModel @Inject constructor(
                 for (i in 0..4) {
                     delay(200L)
                     serial.sendText(
-                        serial = TTYS3, text = Command.saveTemperature(
-                            address = i.toString(),
-                            temperature = "26"
+                        serial = TTYS3, text = V1.saveTemp(
+                            addr = i.toString(), temp = "26"
                         )
                     )
                     delay(200L)
                     serial.sendText(
-                        serial = TTYS3, text = Command.setTemperature(
-                            address = i.toString(),
-                            temperature = "26"
+                        serial = TTYS3, text = V1.setTemp(
+                            addr = i.toString(), temp = "26"
                         )
                     )
                 }
@@ -127,8 +125,7 @@ class HomeViewModel @Inject constructor(
                     for (i in 0..4) {
                         delay(200L)
                         serial.sendText(
-                            serial = TTYS3,
-                            text = Command.queryTemperature(i.toString())
+                            serial = TTYS3, text = V1.queryTemp(i.toString())
                         )
                     }
                     delay(10 * 1000L)
@@ -142,7 +139,7 @@ class HomeViewModel @Inject constructor(
      * @param module 模块
      * @return 状态
      */
-    private fun stateSelector(module: ModuleEnum) = when (module) {
+    private fun flow(module: ModuleEnum) = when (module) {
         A -> _aFlow
         B -> _bFlow
         C -> _cFlow
@@ -153,7 +150,7 @@ class HomeViewModel @Inject constructor(
      * 程序发生变化添加删除时候更新选中的index
      * @param programList [List]<[Program]> 程序列表
      */
-    private fun programListFlow(programList: List<Program>) {
+    private fun onProgramChange(programList: List<Program>) {
         if (programList.isNotEmpty()) {
             listOf(_aFlow, _bFlow, _cFlow, _dFlow).forEach { state ->
                 if (state.value.program == null) {
@@ -188,9 +185,9 @@ class HomeViewModel @Inject constructor(
      * @param index [Int] 程序索引
      * @param module [ModuleEnum] 模块
      */
-    fun switchProgram(index: Int, module: ModuleEnum) {
+    fun selectProgram(index: Int, module: ModuleEnum) {
         viewModelScope.launch {
-            val state = stateSelector(module)
+            val state = flow(module)
             state.value = state.value.copy(
                 program = _proFlow.value[index],
                 startEnable = _proFlow.value[index].actionCount > 0,
@@ -207,7 +204,7 @@ class HomeViewModel @Inject constructor(
     fun start(module: ModuleEnum) {
         viewModelScope.launch {
             // 获取模块对应的状态
-            val state = stateSelector(module)
+            val state = flow(module)
             // 更新状态
             state.value = state.value.copy(
                 startVisible = View.GONE,
@@ -223,8 +220,9 @@ class HomeViewModel @Inject constructor(
                     actionQueue.enqueue(it)
                 }
                 // 创建程序执行者
-                val runner = ProgramExecutor.Builder().setModule(module).setActionQueue(actionQueue)
-                    .setSettingState(appViewModel.settings.value).build()
+                val runner = ProgramExecutor(
+                    queue = actionQueue, module = module, settings = appViewModel.settings.value
+                )
                 // 收集执行者的状态
                 launch {
                     runner.event.collect {
@@ -234,7 +232,7 @@ class HomeViewModel @Inject constructor(
                                     action = getActionEnum(it.action.mode).value
                                 )
                             }
-                            is ActionEvent.CurrentActionTime -> {
+                            is ActionEvent.Time -> {
                                 state.value = state.value.copy(time = it.time)
                             }
                             is ActionEvent.Finish -> {
@@ -294,7 +292,7 @@ class HomeViewModel @Inject constructor(
     fun stop(module: ModuleEnum) {
         viewModelScope.launch {
             // 获取对应模块的状态
-            val state = stateSelector(module)
+            val state = flow(module)
             state.value.run {
                 // 取消协程
                 job?.cancel()
@@ -321,21 +319,20 @@ class HomeViewModel @Inject constructor(
             if (serial.executing == 0) {
                 // 暂停摇床
                 serial.sendHex(
-                    serial = TTYS0, hex = Command.pauseShakeBed()
+                    serial = TTYS0, hex = V1.pauseShakeBed()
                 )
                 // 恢复到室温
                 for (i in 1..4) {
                     delay(200L)
                     serial.sendText(
-                        serial = TTYS3, text = Command.setTemperature(
-                            address = i.toString(),
-                            temperature = "26"
+                        serial = TTYS3, text = V1.setTemp(
+                            addr = i.toString(), temp = "26"
                         )
                     )
                 }
                 // 复位
                 serial.sendHex(
-                    serial = TTYS0, hex = Command().toHex()
+                    serial = TTYS0, hex = V1().toHex()
                 )
                 lockBtn(true)
             }
@@ -353,11 +350,11 @@ class HomeViewModel @Inject constructor(
                     PopTip.show("复位中")
                 } else {
                     serial.sendHex(
-                        serial = TTYS0, hex = Command(
-                            function = "05", parameter = "01", data = "0101302C302C302C302C"
+                        serial = TTYS0, hex = V1(
+                            fn = "05", pa = "01", data = "0101302C302C302C302C"
                         ).toHex()
                     )
-                    serial.sendHex(serial = TTYS0, hex = Command().toHex())
+                    serial.sendHex(serial = TTYS0, hex = V1().toHex())
                     lockBtn(true)
                     PopTip.show(R.mipmap.ic_reset, "复位-已下发")
                 }
@@ -376,9 +373,8 @@ class HomeViewModel @Inject constructor(
             // 发送指令 -> 更新状态
             // 发送指令 如果是未暂停，发送暂停命令，如果是暂停，发送继续命令
             serial.sendHex(
-                serial = TTYS0,
-                hex = if (_uiFlow.value.pause) Command.resumeShakeBed()
-                else Command.pauseShakeBed()
+                serial = TTYS0, hex = if (_uiFlow.value.pause) V1.resumeShakeBed()
+                else V1.pauseShakeBed()
             )
             // 更新状态
             _uiFlow.value = _uiFlow.value.copy(
@@ -396,8 +392,8 @@ class HomeViewModel @Inject constructor(
             // 发送设置温度命令 -> 更改按钮状态
             // 发送设置温度命令 如果当前是未保温状态发送设置中的温度，否则发送室温26度
             serial.sendText(
-                serial = TTYS3, text = Command.setTemperature(
-                    address = "0", temperature = if (_uiFlow.value.insulating) "26"
+                serial = TTYS3, text = V1.setTemp(
+                    addr = "0", temp = if (_uiFlow.value.insulating) "26"
                     else appViewModel.settings.value.temp.toString().removeZero()
                 )
             )

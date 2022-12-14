@@ -20,9 +20,9 @@ interface MotorDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(motor: Motor)
 
-    @Query("SELECT * FROM motor")
+    @Query("SELECT * FROM motor ORDER BY `index` ASC")
     fun getAll(): Flow<List<Motor>>
 
-    @Query("SELECT * FROM motor WHERE board = :board AND address = :address LIMIT 1")
-    fun getByBoardAndAddress(board: Int, address: Int): Flow<Motor>
+    @Query("SELECT * FROM motor WHERE `index` = :index LIMIT 1")
+    fun getByIndex(index: Int): Flow<Motor>
 }

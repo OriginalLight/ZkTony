@@ -28,7 +28,7 @@ class MotorRepository @Inject constructor(
         return dao.getAll()
     }
 
-    fun getByBoardAndAddress(board: Int, address: Int): Flow<Motor> {
-        return dao.getByBoardAndAddress(board, address)
+    fun getByIndex(index: Int): Flow<Motor> {
+        return dao.getByIndex(index)
     }
 }

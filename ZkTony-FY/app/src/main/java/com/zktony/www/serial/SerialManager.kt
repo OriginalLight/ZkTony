@@ -1,13 +1,13 @@
-package com.zktony.www.serialport
+package com.zktony.www.serial
 
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.*
 import com.zktony.www.common.extension.hexToAscii
 import com.zktony.www.common.extension.hexToInt8
-import com.zktony.www.common.extension.toCommand
+import com.zktony.www.common.extension.toV1
 import com.zktony.www.common.extension.verifyHex
-import com.zktony.www.serialport.protocol.Command
+import com.zktony.www.serial.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class SerialPortManager(
+class SerialManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     private val _ttys0Flow = MutableStateFlow<String?>(null)
@@ -83,8 +83,8 @@ class SerialPortManager(
             launch {
                 ttys0Flow.collect {
                     it?.let {
-                        val res = it.toCommand()
-                        if (res.function == "85" && res.parameter == "01") {
+                        val res = it.toV1()
+                        if (res.fn == "85" && res.pa == "01") {
                             val total = res.data.substring(2, 4).hexToInt8()
                             val current = res.data.substring(6, 8).hexToInt8()
                             if (total == current) {
@@ -92,14 +92,14 @@ class SerialPortManager(
                                 lockTime = 0L
                                 // 如果还有任务运行恢复摇床
                                 if (executing > 0) {
-                                    sendHex(TTYS0, Command.resumeShakeBed())
+                                    sendHex(TTYS0, V1.resumeShakeBed())
                                 }
                             } else {
                                 lock = true
                                 lockTime = 0L
                             }
                         }
-                        if (res.function == "86" && res.parameter == "01") {
+                        if (res.fn == "86" && res.pa == "01") {
                             drawer = res.data.hexToInt8() == 0
                         }
                     }
@@ -119,11 +119,11 @@ class SerialPortManager(
                         lock = false
                         // 恢复摇床
                         if (executing > 0) {
-                            sendHex(TTYS0, Command.resumeShakeBed())
+                            sendHex(TTYS0, V1.resumeShakeBed())
                         }
                     }
                     if (drawer) {
-                        sendHex(TTYS0, Command.queryDrawer())
+                        sendHex(TTYS0, V1.queryDrawer())
                     }
                 }
             }
@@ -161,15 +161,15 @@ class SerialPortManager(
     fun lock(lock: Boolean) {
         this.lock = lock
         if (lock) {
-            sendHex(TTYS0, Command.pauseShakeBed())
+            sendHex(TTYS0, V1.pauseShakeBed())
         }
     }
 
 
     companion object {
         @JvmStatic
-        val instance: SerialPortManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            SerialPortManager()
+        val instance: SerialManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+            SerialManager()
         }
     }
 }

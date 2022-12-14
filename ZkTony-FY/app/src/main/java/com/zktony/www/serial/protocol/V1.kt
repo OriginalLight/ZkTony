@@ -1,4 +1,4 @@
-package com.zktony.www.serialport.protocol
+package com.zktony.www.serial.protocol
 
 import com.zktony.www.common.extension.toHex
 
@@ -6,11 +6,11 @@ import com.zktony.www.common.extension.toHex
  * @author: 刘贺贺
  * @date: 2022-10-17 13:09
  */
-data class Command(
-    val header: String = "EE",
-    val address: String = "01",
-    val function: String = "06",
-    val parameter: String = "0A",
+data class V1(
+    val head: String = "EE",
+    val addr: String = "01",
+    val fn: String = "06",
+    val pa: String = "0A",
     val data: String = "",
     val end: String = "FFFCFFFF"
 ) {
@@ -19,40 +19,40 @@ data class Command(
      * @return 16进制字符串
      */
     fun toHex(): String {
-        return header.trim() + address.trim() + function.trim() + parameter.trim() + data.trim() + end.trim()
+        return head.trim() + addr.trim() + fn.trim() + pa.trim() + data.trim() + end.trim()
     }
 
     companion object {
         /**
          * 设置温度 下次开机不生效
-         * @param address 地址
-         * @param temperature 温度
+         * @param addr 地址
+         * @param temp 温度
          * @return 指令
          */
         @JvmStatic
-        fun setTemperature(address: String, temperature: String): String {
-            return "TC1:TCADJUSTTEMP=$temperature@$address\r"
+        fun setTemp(addr: String, temp: String): String {
+            return "TC1:TCADJUSTTEMP=$temp@$addr\r"
         }
 
         /**
          * 保存温度 下次开机生效
-         * @param address 地址
-         * @param temperature 温度
+         * @param addr 地址
+         * @param temp 温度
          * @return 指令
          */
         @JvmStatic
-        fun saveTemperature(address: String, temperature: String): String {
-            return "TC1:TCADJUSTTEMP!$temperature@$address\r"
+        fun saveTemp(addr: String, temp: String): String {
+            return "TC1:TCADJUSTTEMP!$temp@$addr\r"
         }
 
         /**
          * 查询温度
-         * @param address 地址
+         * @param addr 地址
          * @return [String] 指令
          */
         @JvmStatic
-        fun queryTemperature(address: String): String {
-            return "TC1:TCACTUALTEMP?@$address\r"
+        fun queryTemp(addr: String): String {
+            return "TC1:TCACTUALTEMP?@$addr\r"
         }
 
         /**
@@ -61,7 +61,7 @@ data class Command(
          */
         @JvmStatic
         fun pauseShakeBed(): String {
-            return Command(parameter = "0B", data = "0100").toHex()
+            return V1(pa = "0B", data = "0100").toHex()
         }
 
         /**
@@ -70,7 +70,7 @@ data class Command(
          */
         @JvmStatic
         fun resumeShakeBed(): String {
-            return Command(parameter = "0B", data = "0101").toHex()
+            return V1(pa = "0B", data = "0101").toHex()
         }
 
         /**
@@ -80,7 +80,7 @@ data class Command(
          */
         @JvmStatic
         fun singlePoint(data: String): String {
-            return Command(function = "05", parameter = "01", data = "0101" + data.toHex()).toHex()
+            return V1(fn = "05", pa = "01", data = "0101" + data.toHex()).toHex()
         }
 
         /**
@@ -90,7 +90,7 @@ data class Command(
          */
         @JvmStatic
         fun multiPoint(data: String): String {
-            return Command(function = "05", parameter = "04", data = "0101" + data.toHex()).toHex()
+            return V1(fn = "05", pa = "04", data = "0101" + data.toHex()).toHex()
         }
 
         /**
@@ -99,7 +99,7 @@ data class Command(
          */
         @JvmStatic
         fun queryDrawer(): String {
-            return Command(parameter = "0C").toHex()
+            return V1(pa = "0C").toHex()
         }
     }
 }

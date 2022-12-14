@@ -22,21 +22,21 @@ import kotlinx.coroutines.launch
  * @param settings 设置状态
  * @param scope 协程作用域
  */
-class ProgramExecutor private constructor(
-    private val queue: Queue<Action>,
-    private val module: ModuleEnum,
-    private val settings: Settings,
+class ProgramExecutor constructor(
+    val queue: Queue<Action>,
+    val module: ModuleEnum,
+    val settings: Settings,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     private val _event = MutableSharedFlow<ActionEvent>()
     val event: SharedFlow<ActionEvent> get() = _event
-    private val commandExecutor by lazy { CommandExecutor() }
+    private val commandExecutor by lazy { CommandExecutor(module = module, settings = settings) }
 
     /**
      * 执行任务队列
      */
     suspend fun run() {
-        queue.peek()?.let { action ->
+        queue.dequeue()?.let { action ->
             _event.emit(ActionEvent.CurrentAction(module, action))
             when (action.mode) {
                 ActionEnum.BLOCKING_LIQUID.index -> executeBlockingLiquid(action)
@@ -53,8 +53,6 @@ class ProgramExecutor private constructor(
      */
     private suspend fun executeBlockingLiquid(action: Action) {
         commandExecutor.run {
-            initModule(this@ProgramExecutor.module)
-            initSettingState(this@ProgramExecutor.settings)
             initAction(action)
             val listener = scope.launch {
                 wait.collect {
@@ -63,14 +61,17 @@ class ProgramExecutor private constructor(
             }
             listener.start()
             addBlockingLiquid {
-                countDown((action.time * 60 * 60).toLong(), {
-                    _event.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
-                }, {
-                    wasteLiquid {
-                        listener.cancel()
-                        executeNext()
-                    }
-                })
+                countDown(
+                    time = (action.time * 60 * 60).toLong(),
+                    onTick = {
+                        _event.emit(ActionEvent.Time(module, it.getTimeFormat()))
+                    },
+                    onFinish = {
+                        wasteLiquid {
+                            listener.cancel()
+                            executeNext()
+                        }
+                    })
             }
         }
 
@@ -82,8 +83,6 @@ class ProgramExecutor private constructor(
      */
     private suspend fun executeAntibodyOne(action: Action) {
         commandExecutor.run {
-            initModule(this@ProgramExecutor.module)
-            initSettingState(this@ProgramExecutor.settings)
             initAction(action)
             val listener = scope.launch {
                 wait.collect {
@@ -92,14 +91,17 @@ class ProgramExecutor private constructor(
             }
             listener.start()
             addAntibodyOne {
-                countDown((action.time * 60 * 60).toLong(), {
-                    _event.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
-                }, {
-                    recycleAntibodyOne {
-                        listener.cancel()
-                        executeNext()
-                    }
-                })
+                countDown(
+                    time = (action.time * 60 * 60).toLong(),
+                    onTick = {
+                        _event.emit(ActionEvent.Time(module, it.getTimeFormat()))
+                    },
+                    onFinish = {
+                        recycleAntibodyOne {
+                            listener.cancel()
+                            executeNext()
+                        }
+                    })
             }
         }
     }
@@ -110,8 +112,6 @@ class ProgramExecutor private constructor(
      */
     private suspend fun executeAntibodyTwo(action: Action) {
         commandExecutor.run {
-            initModule(this@ProgramExecutor.module)
-            initSettingState(this@ProgramExecutor.settings)
             initAction(action)
             val listener = scope.launch {
                 wait.collect {
@@ -120,14 +120,16 @@ class ProgramExecutor private constructor(
             }
             listener.start()
             addAntibodyTwo {
-                countDown((action.time * 60 * 60).toLong(), {
-                    _event.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
-                }, {
-                    wasteLiquid {
-                        listener.cancel()
-                        executeNext()
-                    }
-                })
+                countDown(
+                    time = (action.time * 60 * 60).toLong(),
+                    onTick = {
+                        _event.emit(ActionEvent.Time(module, it.getTimeFormat()))
+                    }, onFinish = {
+                        wasteLiquid {
+                            listener.cancel()
+                            executeNext()
+                        }
+                    })
             }
         }
     }
@@ -138,8 +140,6 @@ class ProgramExecutor private constructor(
      */
     private suspend fun executeWashing(action: Action, count: Int) {
         commandExecutor.run {
-            initModule(module)
-            initSettingState(settings)
             initAction(action)
             val listener = scope.launch {
                 wait.collect {
@@ -149,19 +149,22 @@ class ProgramExecutor private constructor(
             listener.start()
             _event.emit(ActionEvent.Count(module, action.count - count + 1))
             addWashingLiquid {
-                countDown((action.time * 60).toLong(), {
-                    _event.emit(ActionEvent.CurrentActionTime(module, it.getTimeFormat()))
-                }, {
-                    wasteLiquid {
-                        if (count - 1 > 0) {
-                            listener.cancel()
-                            executeWashing(action, count - 1)
-                        } else {
-                            listener.cancel()
-                            executeNext()
+                countDown(
+                    time = (action.time * 60).toLong(),
+                    onTick = {
+                        _event.emit(ActionEvent.Time(module, it.getTimeFormat()))
+                    },
+                    onFinish = {
+                        wasteLiquid {
+                            if (count - 1 > 0) {
+                                listener.cancel()
+                                executeWashing(action, count - 1)
+                            } else {
+                                listener.cancel()
+                                executeNext()
+                            }
                         }
-                    }
-                })
+                    })
             }
         }
     }
@@ -170,7 +173,6 @@ class ProgramExecutor private constructor(
      * 执行下一个任务
      */
     private suspend fun executeNext() {
-        queue.dequeue()
         if (queue.isEmpty()) {
             // 任务队列执行完成
             Logger.e(msg = "${module.value}任务队列执行完成")
@@ -189,7 +191,9 @@ class ProgramExecutor private constructor(
      * @param onFinish 倒计时结束回调
      */
     private suspend fun countDown(
-        time: Long, onTick: suspend (Long) -> Unit, onFinish: suspend () -> Unit
+        time: Long,
+        onTick: suspend (Long) -> Unit,
+        onFinish: suspend () -> Unit
     ) {
         for (i in time downTo 0) {
             // 每秒执行一次
@@ -202,26 +206,11 @@ class ProgramExecutor private constructor(
         }
     }
 
-    companion object {
-        inline fun build(block: Builder.() -> Unit) = Builder().apply(block).build()
-    }
-
-    class Builder {
-        private var actionQueue: Queue<Action> = Queue()
-        private var module: ModuleEnum = ModuleEnum.A
-        private var settings: Settings = Settings()
-        fun setActionQueue(actionQueue: Queue<Action>) = apply { this.actionQueue = actionQueue }
-        fun setModule(module: ModuleEnum) = apply { this.module = module }
-        fun setSettingState(settings: Settings) = apply { this.settings = settings }
-
-        fun build() = ProgramExecutor(actionQueue, module, settings)
-    }
-
 }
 
 sealed class ActionEvent {
     data class CurrentAction(val module: ModuleEnum, val action: Action) : ActionEvent()
-    data class CurrentActionTime(val module: ModuleEnum, val time: String) : ActionEvent()
+    data class Time(val module: ModuleEnum, val time: String) : ActionEvent()
     data class Finish(val module: ModuleEnum) : ActionEvent()
     data class Count(val module: ModuleEnum, val count: Int) : ActionEvent()
     data class Wait(val module: ModuleEnum, val msg: String) : ActionEvent()
