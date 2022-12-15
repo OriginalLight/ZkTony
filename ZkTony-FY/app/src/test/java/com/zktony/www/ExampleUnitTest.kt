@@ -1,7 +1,5 @@
 package com.zktony.www
 
-import com.zktony.www.common.extension.extractTemp
-import com.zktony.www.common.extension.hexToAscii
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

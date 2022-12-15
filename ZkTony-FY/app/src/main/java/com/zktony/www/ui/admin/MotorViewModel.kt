@@ -66,7 +66,7 @@ class MotorViewModel @Inject constructor(
         viewModelScope.launch {
             if (validateMotor(editMotor.value)) {
                 repo.update(editMotor.value)
-                val serial = when (editMotor.value.index) {
+                val serial = when (editMotor.value.id) {
                     in 0..2 -> {
                         Serial.TTYS0
                     }

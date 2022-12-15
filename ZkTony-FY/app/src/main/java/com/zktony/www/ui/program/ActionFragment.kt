@@ -89,7 +89,7 @@ class ActionFragment :
             viewModel.deleteAction(it)
         }
         arguments?.let {
-            ActionFragmentArgs.fromBundle(it).programId.run {
+            ActionFragmentArgs.fromBundle(it).id.run {
                 if (this != "None") {
                     viewModel.setProgramId(this)
                 }

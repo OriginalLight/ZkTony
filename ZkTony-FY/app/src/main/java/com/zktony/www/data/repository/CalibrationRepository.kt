@@ -20,7 +20,28 @@ class CalibrationRepository @Inject constructor(
         dao.update(calibration)
     }
 
-    fun getCalibration(): Flow<List<Calibration>> {
-        return dao.getCailbration()
+    suspend fun delete(calibration: Calibration) {
+        dao.delete(calibration)
+    }
+
+    fun getAll(): Flow<List<Calibration>> {
+        return dao.getAll()
+    }
+
+    fun getByName(name: String): Flow<List<Calibration>> {
+        return dao.getByName(name)
+    }
+
+    fun getById(id: String): Flow<Calibration> {
+        return dao.getById(id)
+    }
+
+    fun getDefault(): Flow<List<Calibration>> {
+        return dao.getDefault()
+    }
+
+    suspend fun select(cali: Calibration) {
+        dao.removeDefault()
+        dao.update(cali.copy(status = 1))
     }
 }
