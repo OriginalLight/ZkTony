@@ -62,7 +62,17 @@ object RoomModule {
     }
 
     @Provides
+    fun provideContainerDao(database: AppDatabase): ContainerDao {
+        return database.containerDao()
+    }
+
+    @Provides
     fun provideCalibrationDao(database: AppDatabase): CalibrationDao {
         return database.calibrationDao()
+    }
+
+    @Provides
+    fun provideCalibrationDataDao(database: AppDatabase): CalibrationDataDao {
+        return database.calibrationDataDao()
     }
 }

@@ -114,7 +114,7 @@ class AdminFragment :
                                     OnBindView<CustomDialog>(R.layout.layout_function_select) {
                                     override fun onBind(dialog: CustomDialog, v: View) {
                                         val motor = v.findViewById<MaterialButton>(R.id.motor)
-                                        val cali = v.findViewById<MaterialButton>(R.id.calibration)
+                                        val container = v.findViewById<MaterialButton>(R.id.container)
                                         val cancel = v.findViewById<MaterialButton>(R.id.cancel)
                                         motor.setOnClickListener {
                                             if (isFastClick().not()) {
@@ -122,10 +122,10 @@ class AdminFragment :
                                                 findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor)
                                             }
                                         }
-                                        cali.setOnClickListener {
+                                        container.setOnClickListener {
                                             if (isFastClick().not()) {
                                                 dialog.dismiss()
-                                                findNavController().navigate(R.id.action_navigation_admin_to_navigation_calibration)
+                                                findNavController().navigate(R.id.action_navigation_admin_to_navigation_container)
                                             }
                                         }
                                         cancel.setOnClickListener { dialog.dismiss() }

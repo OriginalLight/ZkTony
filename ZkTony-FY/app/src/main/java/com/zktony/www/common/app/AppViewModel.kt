@@ -7,10 +7,11 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.www.common.room.entity.Calibration
-import com.zktony.www.common.room.entity.MotorUnits
+import com.zktony.www.common.room.entity.Container
 import com.zktony.www.common.utils.Constants
+import com.zktony.www.data.model.MotorUnits
 import com.zktony.www.data.repository.CalibrationRepository
+import com.zktony.www.data.repository.ContainerRepository
 import com.zktony.www.data.repository.MotorRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +28,8 @@ class AppViewModel @Inject constructor(
     application: Application,
     private val dataStore: DataStore<Preferences>,
     private val motorRepo: MotorRepository,
-    private val caliRepo: CalibrationRepository
+    private val containerRepo: ContainerRepository,
+    private val calibrationRepo: CalibrationRepository
 ) : AndroidViewModel(application) {
 
     private val _settings = MutableStateFlow(Settings())
@@ -53,7 +55,7 @@ class AppViewModel @Inject constructor(
                 motorRepo.getAll().collect {
                     // 将list的元素放入motorUnits
                     it.forEach { motor ->
-                        when (motor.index) {
+                        when (motor.id) {
                             0 -> _settings.value =
                                 _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(x = motor))
                             1 -> _settings.value =
@@ -75,11 +77,17 @@ class AppViewModel @Inject constructor(
                 }
             }
             launch {
-                caliRepo.getCalibration().collect {
+                containerRepo.getAll().collect {
                     if (it.isNotEmpty()) {
-                        _settings.value = settings.value.copy(
-                            calibration = it.first(),
-                        )
+                        _settings.value = _settings.value.copy(container = it.first())
+                    }
+                }
+            }
+            launch {
+                calibrationRepo.getDefault().collect {
+                    if (it.isNotEmpty()) {
+                        _settings.value =
+                            _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(cali = it.first()))
                     }
                 }
             }
@@ -91,5 +99,5 @@ data class Settings(
     val temp: Float = 3f,
     val bar: Boolean = false,
     val motorUnits: MotorUnits = MotorUnits(),
-    val calibration: Calibration = Calibration()
+    val container: Container = Container(),
 )

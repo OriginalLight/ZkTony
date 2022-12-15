@@ -28,7 +28,7 @@ class MotorRepository @Inject constructor(
         return dao.getAll()
     }
 
-    fun getByIndex(index: Int): Flow<Motor> {
-        return dao.getByIndex(index)
+    fun getById(id: Int): Flow<Motor> {
+        return dao.getById(id)
     }
 }

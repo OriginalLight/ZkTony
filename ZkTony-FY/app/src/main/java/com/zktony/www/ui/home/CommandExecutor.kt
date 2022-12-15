@@ -50,8 +50,8 @@ class CommandExecutor constructor(
                 serial = TTYS0,
                 hex = V1.multiPoint(
                     moveTo(
-                        distance = settings.calibration.blockingY,
-                        height = settings.calibration.blockingZ
+                        distance = settings.container.blockY,
+                        height = settings.container.blockZ
                     )
                 )
             )
@@ -89,8 +89,8 @@ class CommandExecutor constructor(
             serial.sendHex(
                 serial = TTYS0, hex = V1.multiPoint(
                     moveTo(
-                        distance = settings.calibration.antibodyOneY,
-                        height = settings.calibration.antibodyOneZ
+                        distance = settings.container.oneY,
+                        height = settings.container.oneZ
                     )
                 )
             )
@@ -121,8 +121,8 @@ class CommandExecutor constructor(
                 serial = TTYS0,
                 hex = V1.multiPoint(
                     moveTo(
-                        distance = settings.calibration.antibodyOneY,
-                        height = settings.calibration.recycleAntibodyOneZ
+                        distance = settings.container.oneY,
+                        height = settings.container.recycleOneZ
                     )
                 )
             )
@@ -161,8 +161,8 @@ class CommandExecutor constructor(
                 serial = TTYS0,
                 hex = V1.multiPoint(
                     moveTo(
-                        distance = settings.calibration.antibodyTwoY,
-                        height = settings.calibration.antibodyTwoZ
+                        distance = settings.container.twoY,
+                        height = settings.container.twoZ
                     )
                 )
             )
@@ -199,8 +199,8 @@ class CommandExecutor constructor(
                 serial = TTYS0,
                 hex = V1.multiPoint(
                     moveTo(
-                        distance = settings.calibration.washingY,
-                        height = settings.calibration.washingZ
+                        distance = settings.container.washY,
+                        height = settings.container.washZ
                     )
                 )
             )
@@ -232,8 +232,8 @@ class CommandExecutor constructor(
                 serial = TTYS0,
                 hex = V1.multiPoint(
                     moveTo(
-                        distance = settings.calibration.wasteY,
-                        height = settings.calibration.wasteZ
+                        distance = settings.container.wasteY,
+                        height = settings.container.wasteZ
                     )
                 )
             )
@@ -276,10 +276,10 @@ class CommandExecutor constructor(
         )
         // 清空管路
         val stepTwo = settings.motorUnits.toPumpHex(
-            one = if (module == A) settings.motorUnits.p1.unit * settings.calibration.extract / 1000 else 0f,
-            two = if (module == B) settings.motorUnits.p2.unit * settings.calibration.extract / 1000 else 0f,
-            three = if (module == C) settings.motorUnits.p3.unit * settings.calibration.extract / 1000 else 0f,
-            four = if (module == D) settings.motorUnits.p4.unit * settings.calibration.extract / 1000 else 0f,
+            one = if (module == A) settings.motorUnits.cali.p1 * settings.container.extract / 1000 else 0f,
+            two = if (module == B) settings.motorUnits.cali.p2 * settings.container.extract / 1000 else 0f,
+            three = if (module == C) settings.motorUnits.cali.p3 * settings.container.extract / 1000 else 0f,
+            four = if (module == D) settings.motorUnits.cali.p4 * settings.container.extract / 1000 else 0f,
         )
         return Pair(
             zero + stepOne.first + zero + stepTwo.first,
@@ -294,10 +294,10 @@ class CommandExecutor constructor(
     private fun recycleLiquid(): Pair<String, String> {
         val zero = "0,0,0,"
         val recycle = settings.motorUnits.toPumpHex(
-            one = if (module == A) -(action.liquidVolume + settings.motorUnits.p1.unit * settings.calibration.extract / 1000) else 0f,
-            two = if (module == B) -(action.liquidVolume + settings.motorUnits.p2.unit * settings.calibration.extract / 1000) else 0f,
-            three = if (module == C) -(action.liquidVolume + settings.motorUnits.p3.unit * settings.calibration.extract / 1000) else 0f,
-            four = if (module == D) -(action.liquidVolume + settings.motorUnits.p4.unit * settings.calibration.extract / 1000) else 0f,
+            one = if (module == A) -(action.liquidVolume + settings.motorUnits.cali.p1 * settings.container.extract / 1000) else 0f,
+            two = if (module == B) -(action.liquidVolume + settings.motorUnits.cali.p2 * settings.container.extract / 1000) else 0f,
+            three = if (module == C) -(action.liquidVolume + settings.motorUnits.cali.p3 * settings.container.extract / 1000) else 0f,
+            four = if (module == D) -(action.liquidVolume + settings.motorUnits.cali.p4 * settings.container.extract / 1000) else 0f,
         )
         return Pair(
             zero + recycle.first + zero + zero,

@@ -18,12 +18,10 @@ import com.zktony.www.common.extension.*
 import com.zktony.www.common.network.download.DownloadManager
 import com.zktony.www.common.network.download.DownloadState
 import com.zktony.www.common.network.result.NetworkResult
-import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.utils.Constants.DEVICE_ID
 import com.zktony.www.data.model.Version
-import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
 import com.zktony.www.serial.SerialManager
@@ -42,7 +40,6 @@ import javax.inject.Inject
 class AdminViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val motorRepo: MotorRepository,
-    private val caliRepo: CalibrationRepository,
     private val sysRepo: SystemRepository,
 ) : BaseViewModel() {
 
@@ -61,68 +58,43 @@ class AdminViewModel @Inject constructor(
             launch {
                 SerialManager.instance.ttys0Flow.collect {
                     it?.let {
-                        onSerialOneResponse(it)
+                        it.toV1().run {
+                            if (fn == "03" && pa == "04") {
+                                val motor = data.toMotor()
+                                updateMotor(motor.copy(id = motor.address - 1))
+                            }
+                        }
                     }
                 }
             }
             launch {
                 SerialManager.instance.ttys1Flow.collect {
                     it?.let {
-                        onSerialTwoResponse(it)
+                        it.toV1().run {
+                        if (fn == "03" && pa == "04") {
+                            val motor = data.toMotor()
+                            updateMotor(motor.copy(id = motor.address + 2))
+                        }
+                    }
                     }
                 }
             }
             launch {
                 SerialManager.instance.ttys2Flow.collect {
                     it?.let {
-                        onSerialThreeResponse(it)
+                        it.toV1().run {
+                            if (fn == "03" && pa == "04") {
+                                val motor = data.toMotor()
+                                updateMotor(motor.copy(id = motor.address + 5))
+                            }
+                        }
                     }
                 }
             }
             launch {
-                initAndSyncMotor()
-            }
-            launch {
-                initCalibration()
-            }
-        }
-    }
-
-    /**
-     * 处理串口一返回数据
-     * @param hex [String]
-     */
-    private fun onSerialOneResponse(hex: String) {
-        hex.toV1().run {
-            if (fn == "03" && pa == "04") {
-                val motor = data.toMotor()
-                updateMotor(motor.copy(index = motor.address - 1))
-            }
-        }
-    }
-
-    /**
-     * 处理串口二返回数据
-     * @param hex [String]
-     */
-    private fun onSerialTwoResponse(hex: String) {
-        hex.toV1().run {
-            if (fn == "03" && pa == "04") {
-                val motor = data.toMotor()
-                updateMotor(motor.copy(index = motor.address + 2))
-            }
-        }
-    }
-
-    /**
-     * 处理串口三返回数据
-     * @param hex [String]
-     */
-    private fun onSerialThreeResponse(hex: String) {
-        hex.toV1().run {
-            if (fn == "03" && pa == "04") {
-                val motor = data.toMotor()
-                updateMotor(motor.copy(index = motor.address + 5))
+                initMotor()
+                delay(1000L)
+                syncMotor()
             }
         }
     }
@@ -278,17 +250,6 @@ class AdminViewModel @Inject constructor(
     }
 
     /**
-     * 初始化并同步电机
-     */
-    private fun initAndSyncMotor() {
-        viewModelScope.launch {
-            initMotor()
-            delay(1000L)
-            syncMotor()
-        }
-    }
-
-    /**
      * 初始化电机
      */
     private fun initMotor() {
@@ -296,15 +257,14 @@ class AdminViewModel @Inject constructor(
             motorRepo.getAll().first().run {
                 if (this.isEmpty()) {
                     val motorList = mutableListOf<Motor>()
-                    motorList.add(Motor(index = 0, name = "X轴", address = 1, unit = 0f))
-                    motorList.add(Motor(index = 1, name = "Y轴", address = 2, unit = 58f))
-                    motorList.add(Motor(index = 2, name = "Z轴", address = 3, unit = 3.8f))
+                    motorList.add(Motor(id = 0, name = "X轴", address = 1))
+                    motorList.add(Motor(id = 1, name = "Y轴", address = 2))
+                    motorList.add(Motor(id = 2, name = "Z轴", address = 3))
                     for (i in 1..5) {
                         val motor = Motor(
-                            index = i + 2,
+                            id = i + 2,
                             name = "泵$i",
                             address = if (i <= 3) i else i - 3,
-                            unit = if (i!= 5) 180f else 49f
                         )
                         motorList.add(motor)
                     }
@@ -341,7 +301,7 @@ class AdminViewModel @Inject constructor(
      */
     private fun updateMotor(motor: Motor) {
         viewModelScope.launch {
-            motorRepo.getByIndex(motor.index).firstOrNull()?.let {
+            motorRepo.getById(motor.id).firstOrNull()?.let {
                 motorRepo.update(
                     it.copy(
                         subdivision = motor.subdivision,
@@ -356,17 +316,4 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 初始化校准参数
-     */
-    private fun initCalibration() {
-        viewModelScope.launch {
-            // 获取不到校准参数则初始化
-            caliRepo.getCalibration().first().let {
-                if (it.isEmpty()) {
-                    caliRepo.insert(Calibration())
-                }
-            }
-        }
-    }
 }
