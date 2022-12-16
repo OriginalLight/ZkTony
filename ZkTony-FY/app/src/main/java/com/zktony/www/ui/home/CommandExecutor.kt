@@ -58,7 +58,7 @@ class CommandExecutor constructor(
             // 泵运动
             serial.sendHex(
                 serial = TTYS1,
-                hex = V1.multiPoint(addLiquid().second)
+                hex = V1.multiPoint(addLiquid().first)
             )
             serial.sendHex(
                 serial = TTYS2,

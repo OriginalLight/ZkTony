@@ -14,4 +14,5 @@ class CalibrationDataRepository @Inject constructor(
     fun getByCaliId(id: String) = dao.getByCaliId(id)
     suspend fun insert(calibrationData: CalibrationData) = dao.insert(calibrationData)
     suspend fun delete(calibrationData: CalibrationData) = dao.delete(calibrationData)
+    suspend fun deleteByCaliId(id: String) = dao.deleteById(id)
 }

@@ -20,16 +20,16 @@ data class Motor(
     // 转速
     val speed: Int = 600,
     // 加速
-    val acceleration: Int = 60,
+    val acceleration: Int = 100,
     // 减速
-    val deceleration: Int = 60,
+    val deceleration: Int = 100,
     // 等待时间
     val waitTime: Int = 0,
     // 模式
     val mode: Int = 1,
     // 细分
     val subdivision: Int = 16,
-    ) {
+) {
     fun toHex(): String {
         return address.int8ToHex() +
                 subdivision.int8ToHex() +

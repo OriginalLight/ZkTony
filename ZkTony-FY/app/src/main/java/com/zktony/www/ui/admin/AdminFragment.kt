@@ -114,7 +114,8 @@ class AdminFragment :
                                     OnBindView<CustomDialog>(R.layout.layout_function_select) {
                                     override fun onBind(dialog: CustomDialog, v: View) {
                                         val motor = v.findViewById<MaterialButton>(R.id.motor)
-                                        val container = v.findViewById<MaterialButton>(R.id.container)
+                                        val container =
+                                            v.findViewById<MaterialButton>(R.id.container)
                                         val cancel = v.findViewById<MaterialButton>(R.id.cancel)
                                         motor.setOnClickListener {
                                             if (isFastClick().not()) {

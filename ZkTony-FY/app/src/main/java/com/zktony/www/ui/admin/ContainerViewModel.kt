@@ -30,9 +30,9 @@ class ContainerViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             repo.getAll().collect {
-               if (it.isNotEmpty()) {
-                   _container.value = it.first()
-               }
+                if (it.isNotEmpty()) {
+                    _container.value = it.first()
+                }
             }
         }
     }

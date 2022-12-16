@@ -52,10 +52,10 @@ class ContainerFragment :
             update.setOnClickListener {
                 viewModel.replaceContainer(
                     Container().copy(
-                        wasteY = binding.washY.text.toString().toFloat(),
-                        wasteZ = binding.washZ.text.toString().toFloat(),
-                        washY = binding.wasteY.text.toString().toFloat(),
-                        washZ = binding.wasteZ.text.toString().toFloat(),
+                        wasteY = binding.wasteY.text.toString().toFloat(),
+                        wasteZ = binding.wasteZ.text.toString().toFloat(),
+                        washY = binding.washY.text.toString().toFloat(),
+                        washZ = binding.washZ.text.toString().toFloat(),
                         oneY = binding.oneY.text.toString().toFloat(),
                         oneZ = binding.oneZ.text.toString().toFloat(),
                         recycleOneZ = binding.recycleOneZ.text.toString().toFloat(),

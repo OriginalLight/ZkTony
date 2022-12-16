@@ -78,7 +78,7 @@ class CalibrationAdapter :
                 select.run {
                     this.clickScale()
                     this.setOnClickListener {
-                        if(item.status == 0) {
+                        if (item.status == 0) {
                             onSelectClick.invoke(item)
                         }
                     }

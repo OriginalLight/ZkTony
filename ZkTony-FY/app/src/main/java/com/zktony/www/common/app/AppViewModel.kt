@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.Container
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.model.MotorUnits
@@ -85,10 +86,12 @@ class AppViewModel @Inject constructor(
             }
             launch {
                 calibrationRepo.getDefault().collect {
-                    if (it.isNotEmpty()) {
-                        _settings.value =
-                            _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(cali = it.first()))
-                    }
+                    _settings.value =
+                        _settings.value.copy(
+                            motorUnits = _settings.value.motorUnits.copy(
+                                cali = if (it.isEmpty()) Calibration() else it.first()
+                            )
+                        )
                 }
             }
         }
