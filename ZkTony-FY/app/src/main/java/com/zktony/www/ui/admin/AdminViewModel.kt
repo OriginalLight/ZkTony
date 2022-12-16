@@ -71,11 +71,11 @@ class AdminViewModel @Inject constructor(
                 SerialManager.instance.ttys1Flow.collect {
                     it?.let {
                         it.toV1().run {
-                        if (fn == "03" && pa == "04") {
-                            val motor = data.toMotor()
-                            updateMotor(motor.copy(id = motor.address + 2))
+                            if (fn == "03" && pa == "04") {
+                                val motor = data.toMotor()
+                                updateMotor(motor.copy(id = motor.address + 2))
+                            }
                         }
-                    }
                     }
                 }
             }

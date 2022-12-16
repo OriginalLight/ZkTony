@@ -29,9 +29,9 @@ data class MotorUnits(
     fun toMotionHex(yDv: Float, zDv: Float): String {
         val str = StringBuilder()
         str.append("0,")
-        str.append(yDv / cali.y * y.pulse())
+        str.append((yDv / cali.y * y.pulse()).toInt())
         str.append(",")
-        str.append(zDv / cali.z * z.pulse())
+        str.append((zDv / cali.z * z.pulse()).toInt())
         str.append(",")
         return str.toString()
     }
@@ -53,15 +53,16 @@ data class MotorUnits(
     ): Pair<String, String> {
         val hex = StringBuilder()
         val hex1 = StringBuilder()
-        hex.append(one * 1000 / cali.p1 * p1.pulse())
+        hex.append((one * 1000 / cali.p1 * p1.pulse()).toInt())
         hex.append(",")
-        hex.append(two * 1000 / cali.p2 * p2.pulse())
+        hex.append((two * 1000 / cali.p2 * p2.pulse()).toInt())
         hex.append(",")
-        hex.append(three * 1000 / cali.p3 * p3.pulse())
+        hex.append((three * 1000 / cali.p3 * p3.pulse()).toInt())
         hex.append(",")
-        hex1.append(four * 1000 / cali.p4 * p4.pulse())
+
+        hex1.append((four * 1000 / cali.p4 * p4.pulse()).toInt())
         hex1.append(",")
-        hex1.append(five * 1000 / cali.p5 * p5.pulse())
+        hex1.append((five * 1000 / cali.p5 * p5.pulse()).toInt())
         hex1.append(",")
         hex1.append("0,")
         return Pair(hex.toString(), hex1.toString())

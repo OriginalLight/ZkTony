@@ -20,7 +20,7 @@ interface CalibrationDataDao {
     @Query("DELETE FROM calibrationData WHERE calibrationId = :id")
     suspend fun deleteById(id: String)
 
-    @Query("SELECT * FROM CalibrationData WHERE calibrationId = :id")
+    @Query("SELECT * FROM CalibrationData WHERE calibrationId = :id ORDER BY motorId ASC")
     fun getByCaliId(id: String): Flow<List<CalibrationData>>
 
 }

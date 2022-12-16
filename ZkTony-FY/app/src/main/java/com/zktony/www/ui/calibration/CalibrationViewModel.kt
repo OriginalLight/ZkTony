@@ -5,6 +5,7 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.Calibration
+import com.zktony.www.data.repository.CalibrationDataRepository
 import com.zktony.www.data.repository.CalibrationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CalibrationViewModel @Inject constructor(
     private val caliRepo: CalibrationRepository,
+    private val caliDataRepo: CalibrationDataRepository
 ) : BaseViewModel() {
 
     @Inject
@@ -49,7 +51,7 @@ class CalibrationViewModel @Inject constructor(
                 calibration.copy(
                     id = cali.id,
                     name = cali.name,
-                    status = 0
+                    status = if (calibrationList.value.isEmpty()) 1 else 0
                 )
             )
         }
@@ -62,6 +64,7 @@ class CalibrationViewModel @Inject constructor(
     fun delete(cali: Calibration) {
         viewModelScope.launch {
             caliRepo.delete(cali)
+            caliDataRepo.deleteByCaliId(cali.id)
         }
     }
 

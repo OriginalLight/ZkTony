@@ -2,7 +2,7 @@ package com.zktony.www.ui.calibration
 
 import android.os.Bundle
 import android.text.InputType
-import androidx.core.view.isVisible
+import android.view.View
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -18,7 +18,6 @@ import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.showShortToast
 import com.zktony.www.databinding.FragmentCalibrationBinding
-import com.zktony.www.ui.program.ProgramFragmentDirections
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,12 +39,21 @@ class CalibrationFragment :
         initRecyclerView()
     }
 
+    /**
+     * 初始化Flow收集器
+     */
     private fun initFlowCollector() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.calibrationList.collect {
                     adapter.submitList(it)
-                    binding.empty.isVisible = it.isEmpty()
+                    if (it.isEmpty()) {
+                        binding.empty.visibility = View.VISIBLE
+                        binding.recycleView.visibility = View.GONE
+                    } else {
+                        binding.empty.visibility = View.GONE
+                        binding.recycleView.visibility = View.VISIBLE
+                    }
                 }
             }
         }
@@ -59,8 +67,7 @@ class CalibrationFragment :
         binding.add.run {
             clickScale()
             setOnClickListener {
-                InputDialog("程序添加", "请输入程序名", "确定", "取消")
-                    .setCancelable(false)
+                InputDialog("程序添加", "请输入程序名", "确定", "取消").setCancelable(false)
                     .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL))
                     .setOkButton { _, _, inputStr ->
                         if (inputStr.trim().isEmpty()) {
@@ -69,11 +76,11 @@ class CalibrationFragment :
                         }
                         viewModel.add(inputStr.trim())
                         false
-                    }
-                    .show()
+                    }.show()
             }
         }
     }
+
     /**
      * 初始化RecyclerView
      */
@@ -81,15 +88,14 @@ class CalibrationFragment :
         binding.recycleView.adapter = adapter
         adapter.setOnEditButtonClick {
             val direction =
-                ProgramFragmentDirections.actionNavigationProgramToNavigationAction(it.id)
+                CalibrationFragmentDirections.actionNavigationCalibrationToNavigationCalibrationData(
+                    it.id
+                )
             findNavController().navigate(direction)
         }
         adapter.setOnDeleteButtonClick {
             MessageDialog.show(
-                "提示",
-                "确定删除配置 ${it.name} 吗？",
-                "确定",
-                "取消"
+                "提示", "确定删除配置 ${it.name} 吗？", "确定", "取消"
             ).setOkButton { _, _ ->
                 viewModel.delete(it)
                 false
@@ -97,10 +103,7 @@ class CalibrationFragment :
         }
         adapter.setOnSelectClick {
             MessageDialog.show(
-                "提示",
-                "确定使用配置 ${it.name} 吗？",
-                "确定",
-                "取消"
+                "提示", "确定使用配置 ${it.name} 吗？", "确定", "取消"
             ).setOkButton { _, _ ->
                 viewModel.select(it)
                 false

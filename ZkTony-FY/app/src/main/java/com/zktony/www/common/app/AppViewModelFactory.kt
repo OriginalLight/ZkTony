@@ -25,7 +25,13 @@ class AppViewModelFactory @Inject constructor(
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
         return when (modelClass) {
-            AppViewModel::class.java -> AppViewModel(application, dataStore, motorRepo, containerRepo, calibrationRepo)
+            AppViewModel::class.java -> AppViewModel(
+                application,
+                dataStore,
+                motorRepo,
+                containerRepo,
+                calibrationRepo
+            )
             else -> throw IllegalArgumentException("Unknown class $modelClass")
         } as T
     }

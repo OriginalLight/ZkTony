@@ -40,8 +40,6 @@ class App : Application(), Configuration.Provider {
     }
 
     override fun getWorkManagerConfiguration(): Configuration =
-        Configuration.Builder()
-            .setMinimumLoggingLevel(android.util.Log.INFO)
-            .setWorkerFactory(workerFactory)
-            .build()
+        Configuration.Builder().setMinimumLoggingLevel(android.util.Log.INFO)
+            .setWorkerFactory(workerFactory).build()
 }
