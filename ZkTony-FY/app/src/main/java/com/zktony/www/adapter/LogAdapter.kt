@@ -1,6 +1,7 @@
 package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -8,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.common.extension.simpleDateFormat
 import com.zktony.www.common.extension.toModuleEnum
-import com.zktony.www.common.room.entity.Log
+import com.zktony.www.data.model.Log
 import com.zktony.www.databinding.ItemLogBinding
 
 /**
@@ -65,6 +66,14 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
                     }
                 )
                 time.text = item.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                if (layoutPosition % 2 == 0) {
+                    order.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    module.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    name.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    status.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    time.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                }
+
                 executePendingBindings()
             }
         }

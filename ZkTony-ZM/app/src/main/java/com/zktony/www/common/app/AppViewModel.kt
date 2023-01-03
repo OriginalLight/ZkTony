@@ -7,11 +7,10 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.serialport.MutableSerial
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.utils.Logger
-import com.zktony.www.data.model.SerialPort
-import com.zktony.www.ui.home.model.Cmd
+import com.zktony.www.serial.SerialManager
+import com.zktony.www.serial.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,32 +29,39 @@ class AppViewModel @Inject constructor(
 
     private val _setting = MutableStateFlow(AppSetting())
     val setting = _setting.asStateFlow()
-    private val _send = MutableStateFlow(Cmd())
+    private val _send = MutableStateFlow(V1())
     val send = _send.asStateFlow()
-    private val _received = MutableStateFlow(Cmd())
+    private val _received = MutableStateFlow(V1())
     val received = _received.asStateFlow()
 
     init {
-        initSettings()
-        MutableSerial.instance.init(SerialPort.TTYS4.device, 115200)
-        MutableSerial.instance.listener = { _, data ->
-            val cmd = Cmd(data)
-            if (cmd.cmd == 2) {
-                _received.value = cmd
-                Logger.d(msg = "接收到指令：${cmd.genHex()}")
+        viewModelScope.launch {
+            launch {
+                initSettings()
+            }
+            launch {
+                SerialManager.instance.ttys4Flow.collect {
+                    it?.let {
+                        val v1 = V1(it)
+                        if (v1.cmd == 2) {
+                            _received.value = v1
+                            Logger.d(msg = "接收到指令：${v1.genHex()}")
+                        }
+                    }
+                }
             }
         }
     }
 
     /**
      * 发送指令
-     * @param cmd [Cmd] 指令
+     * @param v1 [V1] 指令
      */
-    fun send(cmd: Cmd) {
+    fun send(v1: V1) {
         viewModelScope.launch {
-            _send.value = cmd
-            MutableSerial.instance.sendHex(SerialPort.TTYS4.device, cmd.genHex())
-            Logger.d(msg = "发送指令：${cmd.genHex()}")
+            _send.value = v1
+            SerialManager.instance.send(v1.genHex())
+            Logger.d(msg = "发送指令：${v1.genHex()}")
         }
     }
 

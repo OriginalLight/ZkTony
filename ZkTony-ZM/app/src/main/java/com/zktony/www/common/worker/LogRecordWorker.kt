@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.www.common.result.NetworkResult
+import com.zktony.www.common.network.result.NetworkResult
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.data.repository.LogRecordRepository
 import com.zktony.www.data.repository.LogRepository

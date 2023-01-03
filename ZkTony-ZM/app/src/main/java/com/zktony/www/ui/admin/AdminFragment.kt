@@ -16,6 +16,7 @@ import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.dialogs.FullScreenDialog
 import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
+import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
@@ -194,7 +195,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 version.run {
                     this.clickScale()
                     this.setOnClickListener {
-                        PopTip.show(R.mipmap.ic_version, "当前软件版本号 ${requireContext().versionName()}")
+                        PopTip.show(R.mipmap.ic_version, "当前软件版本号 ${BuildConfig.VERSION_NAME}")
                     }
                 }
                 about.run {
@@ -265,7 +266,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
      * 初始化文本框
      */
     private fun initTextView() {
-        binding.tvVersionName.text = requireContext().versionName()
+        binding.tvVersionName.text = BuildConfig.VERSION_NAME
     }
 
     /**
@@ -324,6 +325,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     }
                 }
             })
+
             .setCancelable(false)
             .setMaskColor(Color.parseColor("#4D000000"))
             .show()

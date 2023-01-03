@@ -14,13 +14,11 @@ import com.zktony.www.adapter.SpinnerAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.*
-import com.zktony.www.common.room.entity.Program
+import com.zktony.www.data.model.Program
 import com.zktony.www.common.utils.Logger
 import com.zktony.www.databinding.FragmentHomeBinding
-import com.zktony.www.ui.home.model.Cmd
-import com.zktony.www.ui.home.model.ControlState
-import com.zktony.www.ui.home.model.Model
-import com.zktony.www.ui.home.model.Model.*
+import com.zktony.www.serial.protocol.V1
+import com.zktony.www.ui.home.Model.*
 import dagger.hilt.android.AndroidEntryPoint
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -47,7 +45,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private val programListX = arrayListOf<Program>()
     private val programListY = arrayListOf<Program>()
 
-    private val state = ControlState()
+    private var state = ControlState()
     private var xDisposable: Disposable? = null
     private var yDisposable: Disposable? = null
     private var zDisposable: Disposable? = null
@@ -124,20 +122,20 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * 返回数据变化
      */
     @SuppressLint("SetTextI18n")
-    private fun onRecCmdChanged(cmd: Cmd) {
-        binding.cmd = cmd
+    private fun onRecCmdChanged(v1: V1) {
+        binding.cmd = v1
         // 运行时禁用开始按钮
-        if (state.isRunX || !state.isCanStartX || cmd.inputSensorX == 0) {
+        if (state.isRunX || !state.isCanStartX() || v1.inputSensorX == 0) {
             binding.moduleX.btn2.isEnabled = false
             binding.moduleX.btn2.setBackgroundResource(R.drawable.btn_ban)
         }
-        if (state.isRunY || !state.isCanStartY || cmd.inputSensorY == 0) {
+        if (state.isRunY || !state.isCanStartY() || v1.inputSensorY == 0) {
             binding.moduleY.btn2.isEnabled = false
             binding.moduleY.btn2.setBackgroundResource(R.drawable.btn_ban)
         }
 
         // moduleX
-        if (cmd.inputSensorX == 0) {
+        if (v1.inputSensorX == 0) {
             binding.moduleX.con5.setBackgroundResource(R.drawable.tv_error)
             binding.moduleX.con6.setBackgroundResource(R.drawable.tv_health)
             binding.moduleX.con7.setBackgroundResource(R.drawable.tv_health)
@@ -147,28 +145,28 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         } else {
             binding.moduleX.con5.setBackgroundResource(R.drawable.tv_health)
-            if (cmd.stepMotorX == 0 && state.isRunX && state.modelX == A) {
+            if (v1.stepMotorX == 0 && state.isRunX && state.modelX == A) {
                 binding.moduleX.con6.setBackgroundResource(R.drawable.tv_error)
             } else {
                 binding.moduleX.con6.setBackgroundResource(R.drawable.tv_health)
             }
-            if (cmd.getVoltageX > cmd.targetVoltageX + 1 || cmd.getVoltageX < cmd.targetVoltageX - 1) {
+            if (v1.getVoltageX > v1.targetVoltageX + 1 || v1.getVoltageX < v1.targetVoltageX - 1) {
                 binding.moduleX.con7.setBackgroundResource(R.drawable.tv_warning)
             } else {
                 binding.moduleX.con7.setBackgroundResource(R.drawable.tv_health)
             }
-            if (cmd.getCurrentX < 0.1f && cmd.getCurrentX > 0) {
+            if (v1.getCurrentX < 0.1f && v1.getCurrentX > 0) {
                 binding.moduleX.con8.setBackgroundResource(R.drawable.tv_warning)
             } else {
                 binding.moduleX.con8.setBackgroundResource(R.drawable.tv_health)
             }
-            if (state.isCanStartX && !state.isRunX) {
+            if (state.isCanStartX() && !state.isRunX) {
                 binding.moduleX.btn2.isEnabled = true
                 binding.moduleX.btn2.setBackgroundResource(R.drawable.btn_press_selector)
             }
         }
         // moduleY
-        if (cmd.inputSensorY == 0) {
+        if (v1.inputSensorY == 0) {
             binding.moduleY.con5.setBackgroundResource(R.drawable.tv_error)
             binding.moduleY.con6.setBackgroundResource(R.drawable.tv_health)
             binding.moduleY.con7.setBackgroundResource(R.drawable.tv_health)
@@ -178,22 +176,22 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         } else {
             binding.moduleY.con5.setBackgroundResource(R.drawable.tv_health)
-            if (cmd.stepMotorY == 0 && state.isRunY && state.modelY === A) {
+            if (v1.stepMotorY == 0 && state.isRunY && state.modelY === A) {
                 binding.moduleY.con6.setBackgroundResource(R.drawable.tv_error)
             } else {
                 binding.moduleY.con6.setBackgroundResource(R.drawable.tv_health)
             }
-            if (cmd.getVoltageY > cmd.targetVoltageY + 1 || cmd.getVoltageY < cmd.targetVoltageY - 1) {
+            if (v1.getVoltageY > v1.targetVoltageY + 1 || v1.getVoltageY < v1.targetVoltageY - 1) {
                 binding.moduleY.con7.setBackgroundResource(R.drawable.tv_warning)
             } else {
                 binding.moduleY.con7.setBackgroundResource(R.drawable.tv_health)
             }
-            if (cmd.getCurrentY < 0.1f && cmd.getCurrentY > 0) {
+            if (v1.getCurrentY < 0.1f && v1.getCurrentY > 0) {
                 binding.moduleY.con8.setBackgroundResource(R.drawable.tv_warning)
             } else {
                 binding.moduleY.con8.setBackgroundResource(R.drawable.tv_health)
             }
-            if (state.isCanStartY && !state.isRunY) {
+            if (state.isCanStartY() && !state.isRunY) {
                 binding.moduleY.btn2.isEnabled = true
                 binding.moduleY.btn2.setBackgroundResource(R.drawable.btn_press_selector)
             }
@@ -207,7 +205,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         binding.moduleX.tab1.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 if (tab.position == 0 && !state.isRunX) {
-                    state.modelX = A
+                    state = state.copy(modelX = A)
                     reloadSpinnerItem(X)
                     // 转膜
                     binding.moduleX.conPump.visibility = View.VISIBLE
@@ -217,14 +215,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }
                 }
                 if (tab.position == 1 && !state.isRunX) {
-                    state.modelX = B
+                    state = state.copy(modelX = B)
                     reloadSpinnerItem(X)
                     // 染色
                     binding.moduleX.conPump.visibility = View.GONE
                     binding.moduleX.et1.setText("")
                     binding.moduleX.et1.hint = "/"
                     binding.moduleX.et1.isEnabled = false
-                    state.motorX = 0
+                    state = state.copy(motorX = 0)
                 }
                 (if (state.modelX === A) {
                     binding.moduleX.tab1.getTabAt(0)
@@ -239,7 +237,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         binding.moduleY.tab1.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 if (tab.position == 0 && !state.isRunY) {
-                    state.modelY = A
+                    state = state.copy(modelY = A)
                     reloadSpinnerItem(Y)
                     // 染色
                     binding.moduleY.conPump.visibility = View.VISIBLE
@@ -249,14 +247,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }
                 }
                 if (tab.position == 1 && !state.isRunY) {
-                    state.modelY = B
+                    state = state.copy(modelY = B)
                     reloadSpinnerItem(Y)
                     // 染色
                     binding.moduleY.conPump.visibility = View.GONE
                     binding.moduleY.et1.setText("")
                     binding.moduleY.et1.hint = "/"
                     binding.moduleY.et1.isEnabled = false
-                    state.motorY = 0
+                    state = state.copy(motorY = 0)
                 }
                 (if (state.modelY === A) {
                     binding.moduleY.tab1.getTabAt(0)
@@ -281,44 +279,44 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         binding.moduleX.et3.addSuffix(" MIN")
         binding.moduleX.et1.afterTextChange {
             val str = it.replace(" RPM", "").removeZero()
-            if (str.isNotEmpty()) {
+            state = if (str.isNotEmpty()) {
                 val motor = str.toInt()
                 if (motor > 250) {
                     binding.moduleX.et1.setText("250")
-                    state.motorX = 250
+                    state.copy(motorX = 250)
                 } else {
-                    state.motorX = motor
+                    state.copy(motorX = motor)
                 }
             } else {
-                state.motorX = 0
+                state.copy(motorX = 0)
             }
         }
         binding.moduleX.et2.afterTextChange {
             val str = it.replace(" V", "").removeZero()
-            if (str.isNotEmpty()) {
+            state = if (str.isNotEmpty()) {
                 val vol = str.toFloat()
                 if (vol > 65f) {
                     binding.moduleX.et2.setText("65")
-                    state.voltageX = 65f
+                    state.copy(voltageX = 65f)
                 } else {
-                    state.voltageX = vol
+                    state.copy(voltageX = vol)
                 }
             } else {
-                state.voltageX = 0f
+                state.copy(voltageX = 0f)
             }
         }
         binding.moduleX.et3.afterTextChange {
             val str = it.replace(" MIN", "").removeZero()
-            if (str.isNotEmpty()) {
+            state = if (str.isNotEmpty()) {
                 val time = str.toFloat()
                 if (time > 99f) {
                     binding.moduleX.et3.setText("99")
-                    state.timeX = (99f * 60).toInt()
+                    state.copy(timeX = (99f * 60).toInt())
                 } else {
-                    state.timeX = (time * 60).toInt()
+                    state.copy(timeX = (time * 60).toInt())
                 }
             } else {
-                state.timeX = 0
+                state.copy(timeX = 0)
             }
         }
 
@@ -328,44 +326,44 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         binding.moduleY.et3.addSuffix(" MIN")
         binding.moduleY.et1.afterTextChange {
             val str = it.replace(" RPM", "").removeZero()
-            if (str.isNotEmpty()) {
+            state = if (str.isNotEmpty()) {
                 val motor = str.toInt()
                 if (motor > 250) {
                     binding.moduleY.et1.setText("250")
-                    state.motorY = 250
+                    state.copy(motorY = 250)
                 } else {
-                    state.motorY = motor
+                    state.copy(motorY = motor)
                 }
             } else {
-                state.motorY = 0
+                state.copy(motorY = 0)
             }
         }
         binding.moduleY.et2.afterTextChange {
             val str = it.replace(" V", "").removeZero()
-            if (str.isNotEmpty()) {
+            state = if (str.isNotEmpty()) {
                 val vol = str.toFloat()
                 if (vol > 65f) {
                     binding.moduleY.et2.setText("65")
-                    state.voltageY = 65f
+                    state.copy(voltageY = 65f)
                 } else {
-                    state.voltageY = vol
+                    state.copy(voltageY = vol)
                 }
             } else {
-                state.voltageY = 0f
+                state.copy(voltageY = 0f)
             }
         }
         binding.moduleY.et3.afterTextChange {
             val str = it.replace(" MIN", "").removeZero()
-            if (str.isNotEmpty()) {
+            state = if (str.isNotEmpty()) {
                 val time = str.toFloat()
                 if (time > 99f) {
                     binding.moduleY.et3.setText("99")
-                    state.timeY = (99f * 60).toInt()
+                    state.copy(timeY = (99f * 60).toInt())
                 } else {
-                    state.timeY = (time * 60).toInt()
+                    state.copy(timeY = (time * 60).toInt())
                 }
             } else {
-                state.timeY = 0
+                state.copy(timeY = 0)
             }
         }
 
@@ -394,7 +392,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.setBackgroundResource(R.drawable.btn_press_shape)
             it.scaleX = 0.8f
             it.scaleY = 0.8f
-            state.stepMotorX = sendCmd.stepMotorX
+            state = state.copy(stepMotorX = sendCmd.stepMotorX)
             sendCmd.stepMotorX = appViewModel.setting.value.motorSpeed
             appViewModel.send(sendCmd)
         }, {
@@ -410,7 +408,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.setBackgroundResource(R.drawable.btn_press_shape)
             it.scaleX = 0.8f
             it.scaleY = 0.8f
-            state.stepMotorX = sendCmd.stepMotorX
+            state = state.copy(stepMotorX = sendCmd.stepMotorX)
             sendCmd.stepMotorX = -appViewModel.setting.value.motorSpeed
             appViewModel.send(sendCmd)
         }, {
@@ -426,7 +424,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.setBackgroundResource(R.drawable.btn_press_shape)
             it.scaleX = 0.8f
             it.scaleY = 0.8f
-            state.stepMotorY = sendCmd.stepMotorY
+            state = state.copy(stepMotorY = sendCmd.stepMotorY)
             sendCmd.stepMotorY = appViewModel.setting.value.motorSpeed
             appViewModel.send(sendCmd)
         }, {
@@ -442,7 +440,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             it.setBackgroundResource(R.drawable.btn_press_shape)
             it.scaleX = 0.8f
             it.scaleY = 0.8f
-            state.stepMotorY = sendCmd.stepMotorY
+            state = state.copy(stepMotorY = sendCmd.stepMotorY)
             sendCmd.stepMotorY = -appViewModel.setting.value.motorSpeed
             appViewModel.send(sendCmd)
         }, {
@@ -577,7 +575,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }
                 }
             }
-            Logger.d(msg = "模块A停止：")
+            Logger.d(msg = "模块A停止")
         }
         if (module == Y) {
             yDisposable?.run {
@@ -593,7 +591,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }
                 }
             }
-            Logger.d(msg = "模块B停止：")
+            Logger.d(msg = "模块B停止")
         }
     }
 
@@ -620,15 +618,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
                 override fun onNext(aLong: Long) {
                     val sendCmd = appViewModel.send.value
-                    sendCmd.zmotorX = 1
-                    sendCmd.zmotorY = 1
+                    sendCmd.motorX = 1
+                    sendCmd.motorY = 1
                     appViewModel.send(sendCmd)
                     Logger.d(msg = "开始定时自动清理废液")
                     lifecycleScope.launch {
                         delay(appViewModel.setting.value.duration.toLong() * 1000)
                         val cmd = appViewModel.send.value
-                        cmd.zmotorX = 0
-                        cmd.zmotorY = 0
+                        cmd.motorX = 0
+                        cmd.motorY = 0
                         appViewModel.send(cmd)
                         Logger.d(msg = "结束定时自动清理废液")
                     }
@@ -693,7 +691,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun sendStartCmd(module: Model) {
         val sendCmd = appViewModel.send.value
         if (module == X) {
-            state.isRunX = true
+            state = state.copy(isRunX = true)
             sendCmd.powerENX = 1
             sendCmd.autoX = 1
             if (state.modelX === A) {
@@ -704,7 +702,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             sendCmd.targetVoltageX = state.voltageX
         }
         if (module == Y) {
-            state.isRunY = true
+            state = state.copy(isRunY = true)
             sendCmd.powerENY = 1
             sendCmd.autoY = 1
             if (state.modelY === A) {
@@ -724,14 +722,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun sendStopCmd(module: Model) {
         val sendCmd = appViewModel.send.value
         if (module == X) {
-            state.isRunX = false
+            state = state.copy(isRunX = false)
             sendCmd.powerENX = 0
             sendCmd.autoX = 0
             sendCmd.stepMotorX = 0
             sendCmd.targetVoltageX = 0f
         }
         if (module == Y) {
-            state.isRunY = false
+            state = state.copy(isRunY = false)
             sendCmd.powerENY = 0
             sendCmd.autoY = 0
             sendCmd.stepMotorY = 0
@@ -762,12 +760,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     val program = spinnerAdapterX.getItem(i)
                     if (state.modelX === A) {
                         binding.moduleX.et1.setText(program.motor.toString().removeZero() + " RPM")
-                        state.motorX = program.motor
+                        state = state.copy(motorX = program.motor)
                     }
                     binding.moduleX.et2.setText(program.voltage.toString().removeZero() + " V")
-                    state.voltageX = program.voltage
+                    state = state.copy(voltageX = program.voltage)
                     binding.moduleX.et3.setText(program.time.toString().removeZero() + " MIN")
-                    state.timeX = (program.time * 60).toInt()
+                    state = state.copy(timeX = (program.time * 60).toInt())
                 }
 
                 override fun onNothingSelected(adapterView: AdapterView<*>?) {}
@@ -783,12 +781,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     val program = spinnerAdapterY.getItem(i)
                     if (state.modelY === A) {
                         binding.moduleY.et1.setText(program.motor.toString().removeZero() + " RPM")
-                        state.motorY = program.motor
+                        state = state.copy(motorY = program.motor)
                     }
                     binding.moduleY.et2.setText(program.voltage.toString().removeZero() + " V")
-                    state.voltageY = program.voltage
+                    state = state.copy(voltageY = program.voltage)
                     binding.moduleY.et3.setText(program.time.toString().removeZero() + " MIN")
-                    state.timeY = (program.time * 60).toInt()
+                    state = state.copy(timeY = (program.time * 60).toInt())
                 }
 
                 override fun onNothingSelected(adapterView: AdapterView<*>?) {}
@@ -820,19 +818,19 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
                 if (state.modelX === A) {
                     binding.moduleX.et1.setText(program.motor.toString().removeZero() + " RPM")
-                    state.motorX = program.motor
+                    state = state.copy(motorX = program.motor)
                 }
                 binding.moduleX.et2.setText(program.voltage.toString().removeZero() + " V")
-                state.voltageX = program.voltage
+                state = state.copy(voltageX = program.voltage)
                 binding.moduleX.et3.setText(program.time.toString().removeZero() + " MIN")
-                state.timeX = (program.time * 60).toInt()
+                state = state.copy(timeX = (program.time * 60).toInt())
             } else {
                 binding.moduleX.et1.setText("")
-                state.motorX = 0
+                state = state.copy(motorX = 0)
                 binding.moduleX.et2.setText("")
-                state.voltageX = 0f
+                state = state.copy(voltageX = 0f)
                 binding.moduleX.et3.setText("")
-                state.timeX = 0
+                state = state.copy(timeX = 0)
             }
 
         }
@@ -855,19 +853,19 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
                 if (state.modelY === A) {
                     binding.moduleY.et1.setText(program.motor.toString().removeZero() + " RPM")
-                    state.motorY = program.motor
+                    state = state.copy(motorY = program.motor)
                 }
                 binding.moduleY.et2.setText(program.voltage.toString().removeZero() + " V")
-                state.voltageY = program.voltage
+                state = state.copy(voltageY = program.voltage)
                 binding.moduleY.et3.setText(program.time.toString().removeZero() + " MIN")
-                state.timeY = (program.time * 60).toInt()
+                state = state.copy(timeY = (program.time * 60).toInt())
             } else {
                 binding.moduleY.et1.setText("")
-                state.motorY = 0
+                state = state.copy(motorY = 0)
                 binding.moduleY.et2.setText("")
-                state.voltageY = 0f
+                state = state.copy(voltageY = 0f)
                 binding.moduleY.et3.setText("")
-                state.timeY = 0
+                state = state.copy(timeY = 0)
             }
         }
     }

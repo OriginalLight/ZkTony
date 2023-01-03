@@ -6,7 +6,7 @@
 
         <variable
             name="log"
-            type="com.zktony.www.common.room.entity.Log" />
+            type="com.zktony.www.data.model.Log" />
     </data>
 
     <LinearLayout
@@ -47,6 +47,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/name"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"

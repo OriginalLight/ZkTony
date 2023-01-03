@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.serialport.util.Serial
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.room.entity.Container
+import com.zktony.www.data.model.Container
 import com.zktony.www.data.repository.ContainerRepository
 import com.zktony.www.serial.SerialManager
 import com.zktony.www.serial.protocol.V1

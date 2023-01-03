@@ -1,7 +1,7 @@
 package com.zktony.www.data.repository
 
-import com.zktony.www.common.room.dao.ProgramDao
-import com.zktony.www.common.room.entity.Program
+import com.zktony.www.data.dao.ProgramDao
+import com.zktony.www.data.model.Program
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
