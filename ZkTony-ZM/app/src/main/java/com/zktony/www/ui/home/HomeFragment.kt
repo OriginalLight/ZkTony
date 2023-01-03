@@ -38,8 +38,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     @Inject
     lateinit var appViewModel: AppViewModel
 
-    lateinit var spinnerAdapterX: SpinnerAdapter<Program>
-    lateinit var spinnerAdapterY: SpinnerAdapter<Program>
+    lateinit var adapterX: SpinnerAdapter<Program>
+    lateinit var adapterY: SpinnerAdapter<Program>
     private val programListA = arrayListOf<Program>()
     private val programListB = arrayListOf<Program>()
     private val programListX = arrayListOf<Program>()
@@ -743,12 +743,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     @SuppressLint("SetTextI18n")
     private fun initSp() {
-        spinnerAdapterX =
+        adapterX =
             SpinnerAdapter(requireContext(), programListX, "name", Program::class.java)
-        spinnerAdapterY =
+        adapterY =
             SpinnerAdapter(requireContext(), programListY, "name", Program::class.java)
-        binding.moduleX.sp1.adapter = spinnerAdapterX
-        binding.moduleY.sp1.adapter = spinnerAdapterY
+        binding.moduleX.sp1.adapter = adapterX
+        binding.moduleY.sp1.adapter = adapterY
         binding.moduleX.sp1.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -757,7 +757,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     i: Int,
                     l: Long
                 ) {
-                    val program = spinnerAdapterX.getItem(i)
+                    val program = adapterX.getItem(i)
                     if (state.modelX === A) {
                         binding.moduleX.et1.setText(program.motor.toString().removeZero() + " RPM")
                         state = state.copy(motorX = program.motor)
@@ -778,7 +778,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     i: Int,
                     l: Long
                 ) {
-                    val program = spinnerAdapterY.getItem(i)
+                    val program = adapterY.getItem(i)
                     if (state.modelY === A) {
                         binding.moduleY.et1.setText(program.motor.toString().removeZero() + " RPM")
                         state = state.copy(motorY = program.motor)
@@ -807,7 +807,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             if (state.modelX === B) {
                 programListX.addAll(programListB)
             }
-            spinnerAdapterX.notifyDataSetChanged()
+            adapterX.notifyDataSetChanged()
             if (programListX.isNotEmpty()) {
                 var program = programListX[0]
                 programListX.forEachIndexed { index, p ->
@@ -842,7 +842,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             if (state.modelY === B) {
                 programListY.addAll(programListB)
             }
-            spinnerAdapterY.notifyDataSetChanged()
+            adapterY.notifyDataSetChanged()
             if (programListY.isNotEmpty()) {
                 var program = programListY[0]
                 programListY.forEachIndexed { index, p ->
@@ -880,10 +880,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             viewModel.updateProgramDefaultByKind(if (model === A) 0 else 1)
             var program: Program? = null
             if (module === X && programListX.isNotEmpty()) {
-                program = spinnerAdapterX.getItem(binding.moduleX.sp1.selectedItemPosition)
+                program = adapterX.getItem(binding.moduleX.sp1.selectedItemPosition)
             }
             if (module === Y && programListY.isNotEmpty()) {
-                program = spinnerAdapterY.getItem(binding.moduleY.sp1.selectedItemPosition)
+                program = adapterY.getItem(binding.moduleY.sp1.selectedItemPosition)
             }
             if (program != null && program.name.isNotEmpty()) {
                 viewModel.updateProgram(
