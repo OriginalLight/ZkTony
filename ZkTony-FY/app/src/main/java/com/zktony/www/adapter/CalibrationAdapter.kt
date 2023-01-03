@@ -1,13 +1,14 @@
 package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.common.room.entity.Calibration
+import com.zktony.www.data.model.Calibration
 import com.zktony.www.databinding.ItemCalibrationBinding
 
 /**
@@ -82,6 +83,10 @@ class CalibrationAdapter :
                             onSelectClick.invoke(item)
                         }
                     }
+                }
+                if (layoutPosition % 2 == 0) {
+                    order.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    name.setBackgroundColor(Color.parseColor("#F5F5F5"))
                 }
                 executePendingBindings()
             }

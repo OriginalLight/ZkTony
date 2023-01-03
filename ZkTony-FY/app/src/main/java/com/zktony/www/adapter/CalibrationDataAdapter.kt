@@ -1,6 +1,7 @@
 package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -8,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.common.room.entity.CalibrationData
+import com.zktony.www.data.model.CalibrationData
 import com.zktony.www.databinding.ItemCalibrationDataBinding
 
 /**
@@ -65,6 +66,12 @@ class CalibrationDataAdapter :
                     this.setOnClickListener {
                         onDeleteButtonClick.invoke(item)
                     }
+                }
+                if (layoutPosition % 2 == 0) {
+                    order.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    name.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    volume.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    actualVolume.setBackgroundColor(Color.parseColor("#F5F5F5"))
                 }
                 executePendingBindings()
             }

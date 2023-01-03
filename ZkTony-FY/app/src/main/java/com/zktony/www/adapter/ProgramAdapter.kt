@@ -1,13 +1,14 @@
 package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.common.room.entity.Program
+import com.zktony.www.data.model.Program
 import com.zktony.www.databinding.ItemProgramBinding
 
 /**
@@ -54,7 +55,7 @@ class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDi
         fun bind(item: Program) {
             binding.apply {
                 program = item
-                tv1.text = (layoutPosition + 1).toString()
+                order.text = (layoutPosition + 1).toString()
                 edit.run {
                     this.clickScale()
                     this.setOnClickListener {
@@ -66,6 +67,11 @@ class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDi
                     this.setOnClickListener {
                         onDeleteButtonClick.invoke(item)
                     }
+                }
+                if (layoutPosition % 2 == 0) {
+                    order.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    name.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    actions.setBackgroundColor(Color.parseColor("#F5F5F5"))
                 }
                 executePendingBindings()
             }

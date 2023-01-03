@@ -91,8 +91,6 @@ dependencies {
     implementation(libs.okhttp3.logging.interceptor)
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.converter.gson)
-    implementation("androidx.legacy:legacy-support-v4:1.0.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
 
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)

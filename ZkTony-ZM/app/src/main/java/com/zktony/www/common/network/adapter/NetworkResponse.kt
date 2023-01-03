@@ -1,7 +1,7 @@
 package com.zktony.www.common.network.adapter
 
 import com.zktony.www.common.network.exception.ApiException
-import com.zktony.www.common.result.NetworkResult
+import com.zktony.www.common.network.result.NetworkResult
 
 /**
  * 接口的返回类型包装类

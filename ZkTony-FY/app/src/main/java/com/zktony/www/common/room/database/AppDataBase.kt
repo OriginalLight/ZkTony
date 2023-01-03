@@ -4,8 +4,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.zktony.www.common.room.converters.DateConverters
-import com.zktony.www.common.room.dao.*
-import com.zktony.www.common.room.entity.*
+import com.zktony.www.data.dao.*
+import com.zktony.www.data.model.*
 
 /**
  * @author 刘贺贺

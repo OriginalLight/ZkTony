@@ -1,8 +1,5 @@
 package com.zktony.www.data.model
 
-import com.zktony.www.common.room.entity.Calibration
-import com.zktony.www.common.room.entity.Motor
-
 /**
  * @author: 刘贺贺
  * @date: 2022-12-15 14:26
@@ -53,6 +50,7 @@ data class MotorUnits(
     ): Pair<String, String> {
         val hex = StringBuilder()
         val hex1 = StringBuilder()
+
         hex.append((one * 1000 / cali.p1 * p1.pulse()).toInt())
         hex.append(",")
         hex.append((two * 1000 / cali.p2 * p2.pulse()).toInt())

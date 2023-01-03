@@ -2,9 +2,9 @@ package com.zktony.www.ui.program
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.room.entity.Action
-import com.zktony.www.common.room.entity.ActionEnum
-import com.zktony.www.common.room.entity.getActionEnum
+import com.zktony.www.data.model.Action
+import com.zktony.www.data.model.ActionEnum
+import com.zktony.www.data.model.getActionEnum
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -180,7 +180,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         alpha = if (state.startEnable) 1f else 0.5f
                     }
                     stop.visibility = state.stopVisible
-                    actions.text = state.program?.actions ?: "/"
+                    if (state.program != null) {
+                        if (actions.text.toString() != state.program.actions) {
+                            actions.text = state.program.actions
+                        }
+                    } else {
+                        actions.text = "/"
+                    }
                     status.text = state.status
                     action.text = state.action
                     temp.text = state.temp
@@ -200,7 +206,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         alpha = if (state.startEnable) 1f else 0.5f
                     }
                     stop.visibility = state.stopVisible
-                    actions.text = state.program?.actions ?: "/"
+                    if (state.program != null) {
+                        if (actions.text.toString() != state.program.actions) {
+                            actions.text = state.program.actions
+                        }
+                    } else {
+                        actions.text = "/"
+                    }
                     status.text = state.status
                     action.text = state.action
                     temp.text = state.temp
@@ -220,7 +232,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         alpha = if (state.startEnable) 1f else 0.5f
                     }
                     stop.visibility = state.stopVisible
-                    actions.text = state.program?.actions ?: "/"
+                    if (state.program != null) {
+                        if (actions.text.toString() != state.program.actions) {
+                            actions.text = state.program.actions
+                        }
+                    } else {
+                        actions.text = "/"
+                    }
                     status.text = state.status
                     action.text = state.action
                     temp.text = state.temp
@@ -240,7 +258,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         alpha = if (state.startEnable) 1f else 0.5f
                     }
                     stop.visibility = state.stopVisible
-                    actions.text = state.program?.actions ?: "/"
+                    if (state.program != null) {
+                        if (actions.text.toString() != state.program.actions) {
+                            actions.text = state.program.actions
+                        }
+                    } else {
+                        actions.text = "/"
+                    }
                     status.text = state.status
                     action.text = state.action
                     temp.text = state.temp

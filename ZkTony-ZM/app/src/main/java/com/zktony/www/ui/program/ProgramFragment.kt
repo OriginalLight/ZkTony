@@ -3,6 +3,7 @@ package com.zktony.www.ui.program
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.kongzue.dialogx.dialogs.MessageDialog
@@ -12,7 +13,7 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.addSuffix
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.common.room.entity.Program
+import com.zktony.www.data.model.Program
 import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -283,11 +284,13 @@ class ProgramFragment :
             when (checkedId) {
                 R.id.rb_6 -> {
                     binding.l10.visibility = View.VISIBLE
+                    binding.et8.imeOptions = EditorInfo.IME_ACTION_NEXT
                     program = program.copy(model = 0)
                 }
 
                 R.id.rb_7 -> {
                     binding.l10.visibility = View.GONE
+                    binding.et8.imeOptions = EditorInfo.IME_ACTION_DONE
                     program = program.copy(model = 1, motor = 0)
                 }
             }

@@ -1,10 +1,10 @@
 package com.zktony.www.data.repository
 
 import com.zktony.www.common.network.adapter.toResult
-import com.zktony.www.common.network.service.LogService
-import com.zktony.www.common.result.NetworkResult
-import com.zktony.www.common.room.entity.LogData
-import com.zktony.www.common.room.entity.LogRecord
+import com.zktony.www.data.service.LogService
+import com.zktony.www.common.network.result.NetworkResult
+import com.zktony.www.data.model.LogData
+import com.zktony.www.data.model.LogRecord
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 

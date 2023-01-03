@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
         <variable
             name="program"
-            type="com.zktony.www.common.room.entity.Program" />
+            type="com.zktony.www.data.model.Program" />
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginStart="2dp"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="2dp"
-        android:background="@color/dark_onBackground">
+        android:background="@color/dark_onBackground"
+        android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/tv_1"
+            android:id="@+id/order"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="1dp"
@@ -29,14 +29,10 @@
             android:gravity="center"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/tv_2"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_weight="1" />
 
         <TextView
-            android:id="@+id/tv_2"
+            android:id="@+id/name"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"
@@ -48,14 +44,10 @@
             android:text="@{program.name}"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tv_3"
-            app:layout_constraintHorizontal_weight="2"
-            app:layout_constraintStart_toEndOf="@+id/tv_1"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_weight="2" />
 
         <com.zktony.www.views.MarqueTextView
-            android:id="@+id/tv_3"
+            android:id="@+id/actions"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"
@@ -71,11 +63,7 @@
             android:text="@{program.actions}"
             android:textColor="@color/black"
             android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/con_operate"
-            app:layout_constraintHorizontal_weight="5"
-            app:layout_constraintStart_toEndOf="@+id/tv_2"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_weight="5" />
 
 
         <LinearLayout
@@ -84,59 +72,54 @@
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"
             android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_weight="2"
-            app:layout_constraintStart_toEndOf="@+id/tv_3"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_weight="2"
+            android:baselineAligned="false">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:id="@+id/delete"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="1dp"
                 android:layout_marginEnd="1dp"
-                android:layout_weight="0.5"
-                android:background="@color/light_errorContainer">
+                android:layout_weight="1"
+                android:background="@color/light_errorContainer"
+                tools:ignore="NestedWeights"
+                android:orientation="vertical"
+                android:gravity="center">
 
                 <ImageView
                     android:id="@+id/iv_delete"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:background="@mipmap/item_delete"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_gravity="center"
                     tools:ignore="ContentDescription" />
 
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:id="@+id/edit"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="1dp"
-                android:layout_weight="0.5"
-                android:background="@color/dark_secondary">
+                android:layout_weight="1"
+                android:background="@color/dark_secondary"
+                android:orientation="vertical"
+                android:gravity="center">
 
                 <ImageView
                     android:id="@+id/iv_edit"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:background="@mipmap/item_edit"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
+                    android:layout_gravity="center"
                     tools:ignore="ContentDescription" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
 
         </LinearLayout>
 
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </layout>

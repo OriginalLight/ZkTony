@@ -21,8 +21,8 @@ import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.getDayEnd
 import com.zktony.www.common.extension.getDayStart
 import com.zktony.www.common.extension.simpleDateFormat
-import com.zktony.www.common.room.entity.LogData
-import com.zktony.www.common.room.entity.LogRecord
+import com.zktony.www.data.model.LogData
+import com.zktony.www.data.model.LogRecord
 import com.zktony.www.databinding.FragmentLogBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged

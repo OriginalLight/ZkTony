@@ -19,7 +19,7 @@ import com.zktony.www.common.extension.installApk
 import com.zktony.www.common.extension.isNetworkAvailable
 import com.zktony.www.common.network.download.DownloadManager
 import com.zktony.www.common.network.download.DownloadState
-import com.zktony.www.common.result.NetworkResult
+import com.zktony.www.common.network.result.NetworkResult
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.utils.Constants.DEVICE_ID
 import com.zktony.www.data.model.Version
@@ -63,11 +63,11 @@ class AdminViewModel @Inject constructor(
     fun touchPump(pump: Boolean) {
         val cmd = appViewModel.send.value
         if (pump) {
-            cmd.zmotorX = 1
-            cmd.zmotorY = 1
+            cmd.motorX = 1
+            cmd.motorY = 1
         } else {
-            cmd.zmotorX = 0
-            cmd.zmotorY = 0
+            cmd.motorX = 0
+            cmd.motorY = 0
         }
         appViewModel.send(cmd)
     }

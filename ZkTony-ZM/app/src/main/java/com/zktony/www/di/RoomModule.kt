@@ -18,8 +18,11 @@ package com.zktony.www.di
 
 import android.content.Context
 import androidx.room.Room
-import com.zktony.www.common.room.dao.*
+import com.zktony.www.data.dao.*
 import com.zktony.www.common.room.database.AppDatabase
+import com.zktony.www.data.dao.LogDataDao
+import com.zktony.www.data.dao.LogRecordDao
+import com.zktony.www.data.dao.ProgramDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

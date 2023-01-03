@@ -18,7 +18,7 @@ import com.zktony.www.common.extension.*
 import com.zktony.www.common.network.download.DownloadManager
 import com.zktony.www.common.network.download.DownloadState
 import com.zktony.www.common.network.result.NetworkResult
-import com.zktony.www.common.room.entity.Motor
+import com.zktony.www.data.model.Motor
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.utils.Constants.DEVICE_ID
 import com.zktony.www.data.model.Version

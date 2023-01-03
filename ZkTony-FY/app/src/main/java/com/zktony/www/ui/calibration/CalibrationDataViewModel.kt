@@ -4,8 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.serialport.util.Serial
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.room.entity.Calibration
-import com.zktony.www.common.room.entity.CalibrationData
+import com.zktony.www.data.model.Calibration
+import com.zktony.www.data.model.CalibrationData
 import com.zktony.www.data.repository.CalibrationDataRepository
 import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.serial.SerialManager

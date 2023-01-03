@@ -7,19 +7,16 @@
 
         <variable
             name="action"
-            type="com.zktony.www.common.room.entity.Action" />
+            type="com.zktony.www.data.model.Action" />
     </data>
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="8dp"
         android:layout_marginBottom="4dp"
         android:foreground="?android:attr/selectableItemBackground"
-        app:cardBackgroundColor="@color/dark_inverseSurface"
+        app:cardBackgroundColor="@color/light_onPrimary"
         app:cardCornerRadius="0dp"
         app:cardElevation="2dp">
 

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.R
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.simpleDateFormat
-import com.zktony.www.common.room.entity.LogRecord
+import com.zktony.www.data.model.LogRecord
 import com.zktony.www.databinding.ItemLogBinding
 
 /**

@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.room.entity.Calibration
+import com.zktony.www.data.model.Calibration
 import com.zktony.www.data.repository.CalibrationDataRepository
 import com.zktony.www.data.repository.CalibrationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

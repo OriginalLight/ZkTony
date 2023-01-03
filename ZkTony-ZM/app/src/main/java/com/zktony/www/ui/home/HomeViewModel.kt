@@ -1,22 +1,19 @@
 package com.zktony.www.ui.home
 
 import androidx.lifecycle.viewModelScope
-import com.zktony.serialport.MutableSerial
 import com.zktony.www.R
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.audio.AudioPlayer
-import com.zktony.www.common.room.entity.LogData
-import com.zktony.www.common.room.entity.LogRecord
-import com.zktony.www.common.room.entity.Program
-import com.zktony.www.data.model.SerialPort
+import com.zktony.www.data.model.LogData
+import com.zktony.www.data.model.LogRecord
+import com.zktony.www.data.model.Program
 import com.zktony.www.data.repository.LogDataRepository
 import com.zktony.www.data.repository.LogRecordRepository
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.ui.home.model.Cmd
-import com.zktony.www.ui.home.model.ControlState
-import com.zktony.www.ui.home.model.Model
-import com.zktony.www.ui.home.model.Model.*
+import com.zktony.www.serial.SerialManager
+import com.zktony.www.serial.protocol.V1
+import com.zktony.www.ui.home.Model.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -54,7 +51,7 @@ class HomeViewModel @Inject constructor(
             delay(200L)
             while (true) {
                 delay(1000L)
-                MutableSerial.instance.sendHex(SerialPort.TTYS4.device, Cmd.QUERY_HEX)
+                SerialManager.instance.send(V1.QUERY_HEX)
             }
         }
     }
@@ -211,5 +208,42 @@ class HomeViewModel @Inject constructor(
                 AudioPlayer.instance.play(id)
             }
         }
+    }
+}
+
+enum class Model {
+    X, Y, A, B
+}
+
+data class ControlState(
+    val modelX: Model = A,
+    val modelY: Model = A,
+    val motorX: Int = 0,
+    val motorY: Int = 0,
+    val voltageX: Float = 0f,
+    val voltageY: Float = 0f,
+    val timeX: Int = 0,
+    val timeY: Int = 0,
+    val isRunX: Boolean = false,
+    val isRunY: Boolean = false,
+    val stepMotorX: Int = 0,
+    val stepMotorY: Int = 0
+) {
+    fun isCanStartX(): Boolean {
+        if (modelX === A) {
+            return motorX > 0 && voltageX > 0 && timeX > 0
+        }
+        return if (modelX === B) {
+            voltageX > 0 && timeX > 0
+        } else false
+    }
+
+    fun isCanStartY(): Boolean {
+        if (modelY === A) {
+            return motorY > 0 && voltageY > 0 && timeY > 0
+        }
+        return if (modelY === B) {
+            voltageY > 0 && timeY > 0
+        } else false
     }
 }
