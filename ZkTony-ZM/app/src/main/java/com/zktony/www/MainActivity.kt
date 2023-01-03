@@ -3,7 +3,6 @@ package com.zktony.www
 import android.os.Bundle
 import com.zktony.www.base.BaseActivity
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.worker.WorkerManager
 import com.zktony.www.databinding.ActivityMainBinding
 import com.zktony.www.ui.admin.AdminFragment
@@ -11,7 +10,6 @@ import com.zktony.www.ui.home.HomeFragment
 import com.zktony.www.ui.log.LogFragment
 import com.zktony.www.ui.program.ProgramFragment
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
@@ -28,9 +26,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             AdminFragment()
         )
     private var activeFragmentIndex = -1
-
-    @Inject
-    lateinit var appViewModel: AppViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
