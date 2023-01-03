@@ -303,6 +303,7 @@
                             android:layout_height="match_parent"
                             android:gravity="center"
                             android:imeOptions="actionNext"
+                            android:singleLine="true"
                             android:textSize="20sp" />
 
                     </LinearLayout>
@@ -346,6 +347,7 @@
                             android:layout_height="match_parent"
                             android:gravity="center"
                             android:imeOptions="actionNext"
+                            android:singleLine="true"
                             android:textSize="20sp" />
 
                     </LinearLayout>
@@ -729,6 +731,8 @@
                                 android:layout_marginStart="16dp"
                                 android:gravity="center"
                                 android:textSize="20sp"
+                                android:imeOptions="actionNext"
+                                android:singleLine="true"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/rg_2"
