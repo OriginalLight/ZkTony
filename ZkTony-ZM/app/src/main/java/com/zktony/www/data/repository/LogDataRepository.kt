@@ -17,6 +17,10 @@ class LogDataRepository @Inject constructor(
         dao.insert(logData)
     }
 
+    suspend fun deleteByRecordId(id: String) {
+        dao.deleteByRecordId(id)
+    }
+
     suspend fun deleteByDate() {
         dao.deleteByDate()
     }

@@ -25,7 +25,6 @@ import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.model.Version
 import com.zktony.www.databinding.FragmentAdminBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.File
 import javax.inject.Inject
@@ -125,7 +124,6 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
      */
     private fun initSwitch() {
         lifecycleScope.launch {
-            delay(1200)
             binding.run {
                 navigationBar.run {
                     isChecked = appViewModel.setting.value.bar
@@ -154,7 +152,6 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
      */
     private fun initEditView() {
         lifecycleScope.launch {
-            delay(1000)
             binding.run {
                 interval.run {
                     setText(appViewModel.setting.value.interval.toString())
@@ -202,7 +199,8 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     this.clickScale()
                     this.setOnClickListener {
                         CustomDialog.build()
-                            .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_about_dialog) {
+                            .setCustomView(object :
+                                OnBindView<CustomDialog>(R.layout.layout_about_dialog) {
                                 override fun onBind(dialog: CustomDialog, v: View) {
                                     val btnWeb = v.findViewById<MaterialButton>(R.id.btn_web)
                                     btnWeb.isVisible = requireContext().isNetworkAvailable()

@@ -36,6 +36,9 @@ interface LogRecordDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateBatch(logRecords: List<LogRecord>)
 
+    @Delete
+    suspend fun delete(logRecord: LogRecord)
+
     @Query("DELETE FROM log_record WHERE julianday('now') - julianday(createTime) >= '180'")
     suspend fun deleteByDate()
 

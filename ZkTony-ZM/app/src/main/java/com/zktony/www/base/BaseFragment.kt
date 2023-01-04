@@ -29,6 +29,7 @@ abstract class BaseFragment<VM : BaseViewModel, VD : ViewDataBinding>(@LayoutRes
     final override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         onViewCreated(savedInstanceState)
+        arguments?.clear()
     }
 
     protected abstract fun onViewCreated(savedInstanceState: Bundle?)
