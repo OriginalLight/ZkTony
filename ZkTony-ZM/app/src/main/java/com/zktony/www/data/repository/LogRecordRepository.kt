@@ -25,6 +25,10 @@ class LogRecordRepository @Inject constructor(
         dao.updateBatch(logRecordList)
     }
 
+    suspend fun delete(logRecord: LogRecord) {
+        dao.delete(logRecord)
+    }
+
     suspend fun deleteByDate() {
         dao.deleteByDate()
     }

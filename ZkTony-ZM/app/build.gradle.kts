@@ -3,6 +3,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("dagger.hilt.android.plugin")
+    id("androidx.navigation.safeargs")
 }
 
 android {
@@ -87,17 +88,12 @@ dependencies {
     implementation(libs.hilt.android)
     implementation(libs.hilt.work)
     implementation(libs.material)
-    implementation(libs.multidex)
     implementation(libs.okhttp3)
     implementation(libs.okhttp3.logging.interceptor)
+    implementation(libs.retrofit2)
+    implementation(libs.retrofit2.converter.gson)
     implementation(libs.rxandroid)
     implementation(libs.rxjava)
-    implementation(libs.retrofit2) {
-        exclude(group = "com.squareup.okhttp3", module = "okhttp")
-    }
-    implementation(libs.retrofit2.converter.gson) {
-        exclude(group = "com.squareup.okhttp3", module = "okhttp")
-    }
 
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)

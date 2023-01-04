@@ -21,7 +21,7 @@ object DownloadManager {
             val request = Request.Builder().url(url).get().build()
             val response = OkHttpClient.Builder().build().newCall(request).execute()
             if (response.isSuccessful) {
-                response.body()!!.let { body ->
+                response.body.let { body ->
                     //文件大小
                     val totalLength = body.contentLength().toDouble()
                     //写文件

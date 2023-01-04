@@ -21,7 +21,36 @@
         android:id="@+id/navigation_log"
         android:name="com.zktony.www.ui.log.LogFragment"
         android:label="@string/title_log"
-        tools:layout="@layout/fragment_log" />
+        tools:layout="@layout/fragment_log" >
+        <action
+            android:id="@+id/action_navigation_log_to_navigation_log_chart"
+            app:destination="@id/navigation_log_chart"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
+            <argument android:name="id" />
+        </action>
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_log_chart"
+        android:name="com.zktony.www.ui.log.LogChartFragment"
+        android:label="@string/title_log_chart"
+        tools:layout="@layout/fragment_log_chart" >
+        <action
+            android:id="@+id/action_navigation_log_chart_to_navigation_log"
+            app:destination="@id/navigation_log"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <argument
+            android:name="id"
+            app:argType="string"
+            android:defaultValue="None"/>
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_admin"

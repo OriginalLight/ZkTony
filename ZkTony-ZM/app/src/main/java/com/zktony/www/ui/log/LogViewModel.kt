@@ -4,13 +4,12 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.extension.getDayEnd
 import com.zktony.www.common.extension.getDayStart
-import com.zktony.www.data.model.LogData
 import com.zktony.www.data.model.LogRecord
 import com.zktony.www.data.repository.LogDataRepository
 import com.zktony.www.data.repository.LogRecordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
@@ -21,8 +20,8 @@ class LogViewModel @Inject constructor(
     private val logDataRepository: LogDataRepository
 ) : BaseViewModel() {
 
-    private val _event = MutableSharedFlow<LogEvent>()
-    val event = _event.asSharedFlow()
+    private val _logList = MutableStateFlow(emptyList<LogRecord>())
+    val logList = _logList.asStateFlow()
 
     /**
      * 获取所有记录
@@ -31,7 +30,7 @@ class LogViewModel @Inject constructor(
         viewModelScope.launch {
             logRecordRepository.getAll()
                 .collect {
-                    _event.emit(LogEvent.ChangeLogRecord(it))
+                    _logList.value = it
                 }
         }
     }
@@ -45,25 +44,19 @@ class LogViewModel @Inject constructor(
         viewModelScope.launch {
             logRecordRepository.getByDate(start.getDayStart(), end.getDayEnd())
                 .collect {
-                    _event.emit(LogEvent.ChangeLogRecord(it))
+                    _logList.value = it
                 }
         }
     }
 
     /**
-     * 获取日志数据
-     * @param id 日志记录id
+     * 删除日志记录
+     * @param logRecord 日志记录
      */
-    fun changeLogData(id: String) {
+    fun delete(logRecord: LogRecord) {
         viewModelScope.launch {
-            logDataRepository.getByLogId(id).collect {
-                _event.emit(LogEvent.ChangeLogData(it))
-            }
+            logRecordRepository.delete(logRecord)
+            logDataRepository.deleteByRecordId(logRecord.id)
         }
     }
-}
-
-sealed class LogEvent {
-    data class ChangeLogRecord(val logRecordList: List<LogRecord>) : LogEvent()
-    data class ChangeLogData(val logDataList: List<LogData>) : LogEvent()
 }

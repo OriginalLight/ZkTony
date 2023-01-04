@@ -3,7 +3,6 @@ package com.zktony.www
 import android.app.Application
 import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
-import androidx.multidex.MultiDex
 import androidx.work.Configuration
 import com.zktony.www.common.app.ApplicationProxy
 import com.zktony.www.common.app.CommonApplicationProxy
@@ -33,11 +32,6 @@ class App : Application(), Configuration.Provider {
         DataStoreFactory.init(this)
         proxies.forEach { it.onCreate(this) }
         DialogXManager(this).init()
-    }
-
-    override fun attachBaseContext(base: Context?) {
-        super.attachBaseContext(base)
-        MultiDex.install(this)
     }
 
     override fun onTerminate() {

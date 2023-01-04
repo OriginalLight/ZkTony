@@ -29,7 +29,10 @@ interface LogDataDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(logData: LogData)
 
-    @Query("DELETE  FROM log_data WHERE julianday('now') - julianday(createTime) >= '180'")
+    @Query("DELETE FROM log_data WHERE logId = :id")
+    suspend fun deleteByRecordId(id: String)
+
+    @Query("DELETE FROM log_data WHERE julianday('now') - julianday(createTime) >= '180'")
     suspend fun deleteByDate()
 
     @Query("SELECT * FROM log_data WHERE logId == :id ORDER BY createTime ASC")

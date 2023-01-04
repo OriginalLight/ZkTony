@@ -1,12 +1,13 @@
 package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.zktony.www.R
+import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.simpleDateFormat
 import com.zktony.www.data.model.LogRecord
@@ -17,74 +18,49 @@ import com.zktony.www.databinding.ItemLogBinding
  * @date: 2022-09-21 14:48
  */
 class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback()) {
-    var isClick = false
-    var currentPosition = -1
-    private lateinit var onClick: () -> Unit
 
-    private fun setCurrentPosition(isClick: Boolean, position: Int) {
-        this.isClick = isClick
-        this.currentPosition = position
-    }
+    private lateinit var onDeleteButtonClick: (LogRecord) -> Unit
+    private lateinit var onChartButtonClick: (LogRecord) -> Unit
 
-    fun setOnClick(onClick: () -> Unit) {
-        this.onClick = onClick
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun itemClickEvent(holder: ViewHolder) {
-        holder.itemView.setOnClickListener {
-            if (!isClick) {
-                setCurrentPosition(true, holder.adapterPosition)
-            } else {
-                setCurrentPosition(
-                    currentPosition != holder.adapterPosition,
-                    holder.adapterPosition
-                )
-            }
-            onClick.invoke()
-            notifyDataSetChanged()
-        }
-    }
-
-    fun getItem(): LogRecord {
-        return getItem(currentPosition)
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val holder = ViewHolder(
+        return ViewHolder(
             ItemLogBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ),
+            onDeleteButtonClick,
+            onChartButtonClick
         )
-        itemClickEvent(holder)
-        return holder
     }
 
-    @SuppressLint("ResourceAsColor")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
-        if (currentPosition == position && isClick) {
-            holder.itemView.setBackgroundResource(R.color.dark_secondary)
-        } else {
-            holder.itemView.setBackgroundResource(R.color.light_onPrimary)
-        }
+    }
+
+    fun setOnDeleteButtonClick(onDeleteButtonClick: (LogRecord) -> Unit) {
+        this.onDeleteButtonClick = onDeleteButtonClick
+    }
+
+    fun setOnChartButtonClick(onChartButtonClick: (LogRecord) -> Unit) {
+        this.onChartButtonClick = onChartButtonClick
     }
 
 
     @SuppressLint("SetTextI18n")
     class ViewHolder(
-        private val binding: ItemLogBinding
+        private val binding: ItemLogBinding,
+        private val onDeleteButtonClick: (LogRecord) -> Unit,
+        private val onChartButtonClick: (LogRecord) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: LogRecord) {
             binding.apply {
-                logRecord = item
-                tv1.text = (layoutPosition + 1).toString()
-                tv2.text = item.createTime.simpleDateFormat("MM-dd HH:mm")
+                order.text = (layoutPosition + 1).toString()
+                experimentTime.text = item.createTime.simpleDateFormat("MM-dd HH:mm")
                 val str = StringBuilder()
-                if (item.model == 0) {
+                if (item.model == 0 || item.model == 2) {
                     str.append(item.motor)
                     str.append("R/MIN-")
                 }
@@ -92,7 +68,33 @@ class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback
                 str.append("V-")
                 str.append((item.time / 60).toString().removeZero())
                 str.append("MIN")
-                tv4.text = str.toString()
+                parameter.text = str.toString()
+                model.text = when (item.model) {
+                    0 -> "A-转膜"
+                    1 -> "A-染色"
+                    2 -> "B-转膜"
+                    3 -> "B-染色"
+                    else -> "未知"
+                }
+                delete.run {
+                    this.clickScale()
+                    setOnClickListener {
+                        onDeleteButtonClick(item)
+                    }
+                }
+                chart.run {
+                    this.clickScale()
+                    setOnClickListener {
+                        onChartButtonClick(item)
+                    }
+                }
+                if (layoutPosition % 2 == 0) {
+                    order.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    experimentTime.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    model.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    parameter.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                }
+
                 executePendingBindings()
             }
         }
