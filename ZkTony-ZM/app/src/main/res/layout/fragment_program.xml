@@ -5,991 +5,108 @@
 
     <data />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:id="@+id/con_1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
+        android:orientation="vertical"
+        android:background="@color/dark_onBackground"
         tools:context=".ui.data.DataFragment">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/con_2"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/light_onPrimary"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_marginTop="2dp"
+            android:layout_height="48dp"
+            android:orientation="horizontal">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/con_3_1"
+            <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@color/dark_onBackground"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/con_3_2"
-                app:layout_constraintHorizontal_weight="4"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="1dp"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/order"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:layout_weight="1"/>
 
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_3_1_1"
-                    android:layout_width="match_parent"
-                    android:layout_height="48dp"
-                    app:layout_constraintBottom_toTopOf="@+id/rc_1"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <TextView
-                        android:id="@+id/tv_title_1"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginEnd="2dp"
-                        android:background="@color/light_onPrimary"
-                        android:gravity="center"
-                        android:text="序号"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/tv_title_2"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_title_2"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="2dp"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginEnd="2dp"
-                        android:background="@color/light_onPrimary"
-                        android:gravity="center"
-                        android:text="程序名"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/tv_title_3"
-                        app:layout_constraintHorizontal_weight="3"
-                        app:layout_constraintStart_toEndOf="@+id/tv_title_1"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_title_3"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="2dp"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginEnd="2dp"
-                        android:background="@color/light_onPrimary"
-                        android:gravity="center"
-                        android:text="模式"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/tv_title_4"
-                        app:layout_constraintHorizontal_weight="2"
-                        app:layout_constraintStart_toEndOf="@+id/tv_title_2"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:id="@+id/tv_title_4"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="2dp"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginEnd="4dp"
-                        android:background="@color/light_onPrimary"
-                        android:gravity="center"
-                        android:text="参数(转速-电压-时长)"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="4"
-                        app:layout_constraintStart_toEndOf="@+id/tv_title_3"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rc_1"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_weight="4"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/con_3_1_1"
-                    tools:listitem="@layout/item_program">
-
-                </androidx.recyclerview.widget.RecyclerView>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/con_3_2"
+            <TextView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_weight="1"
-                app:layout_constraintStart_toEndOf="@+id/con_3_1"
-                app:layout_constraintTop_toTopOf="parent">
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/program_name"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:layout_weight="3"/>
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_tool_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:background="@color/dark_onBackground"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/models"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:layout_weight="2" />
 
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginBottom="4dp"
-                        android:background="@color/light_onPrimary"
-                        android:gravity="center"
-                        android:text="操作"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/parameter"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:layout_weight="4" />
 
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/add"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="2dp"
+                android:background="@color/dark_secondary"
+                android:gravity="center"
+                android:text="@string/add"
+                android:textColor="@color/light_onPrimary"
+                android:textSize="16sp"
+                app:icon="@drawable/ic_add"
+                app:iconGravity="textStart"
+                android:layout_weight="2"
+                app:rippleColor="#7B1FA2"/>
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/con_3_2_1"
-                    android:layout_width="match_parent"
-                    android:layout_height="400dp"
-                    android:animateLayoutChanges="true"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/con_tool_title">
+        </LinearLayout>
 
-                    <Button
-                        android:id="@+id/btn_3"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:background="@drawable/btn_press_selector"
-                        android:text="新建"
-                        android:textSize="20sp"
-                        app:layout_constraintBottom_toTopOf="@+id/btn_4"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="48dp"
+            android:gravity="center"
+            android:text="@string/no_program"
+            android:textColor="@color/black"
+            android:textSize="32sp"
+            android:visibility="gone" />
 
-                    <Button
-                        android:id="@+id/btn_4"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:background="@drawable/btn_press_selector"
-                        android:text="删除"
-                        android:textSize="20sp"
-                        app:layout_constraintBottom_toTopOf="@+id/btn_5"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/btn_3" />
-
-                    <Button
-                        android:id="@+id/btn_5"
-                        android:layout_width="match_parent"
-                        android:layout_height="40dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:background="@drawable/btn_press_selector"
-                        android:text="编辑"
-                        android:textSize="20sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/btn_4" />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/con_3"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="2dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/dark_onBackground"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+            tools:listitem="@layout/item_program" />
 
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:orientation="vertical"
-                android:scrollbars="none"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <LinearLayout
-                    android:layout_width="700dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:animateLayoutChanges="true"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tv_1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginTop="16dp"
-                        android:gravity="center"
-                        android:text="添加程序"
-                        android:textColor="@color/black"
-                        android:textSize="36sp" />
-
-                    <LinearLayout
-                        android:id="@+id/l_1"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:background="@color/light_onPrimary"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"
-                            android:src="@mipmap/ic_name" />
-
-                        <TextView
-                            android:layout_width="180dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="16dp"
-                            android:gravity="start|center_vertical"
-                            android:text="实验程序名称"
-                            android:textColor="@color/light_outline"
-                            android:textSize="16sp" />
-
-                        <EditText
-                            android:id="@+id/et_1"
-                            style="@style/Widget.AppCompat.EditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:imeOptions="actionNext"
-                            android:singleLine="true"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/l_2"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:background="@color/light_onPrimary"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/l_1">
-
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"
-                            android:baselineAligned="false"
-                            android:src="@mipmap/ic_danbai" />
-
-                        <TextView
-                            android:layout_width="180dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="16dp"
-                            android:gravity="start|center_vertical"
-                            android:text="使用蛋白名称"
-                            android:textColor="@color/light_outline"
-                            android:textSize="16sp" />
-
-                        <EditText
-                            android:id="@+id/et_2"
-                            style="@style/Widget.AppCompat.EditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:imeOptions="actionNext"
-                            android:singleLine="true"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/l_3"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:background="@color/light_onPrimary"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/l_2">
-
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"
-                            android:src="@mipmap/ic_size" />
-
-                        <TextView
-                            android:layout_width="180dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="16dp"
-                            android:gravity="start|center_vertical"
-                            android:text="蛋白大小（kD）"
-                            android:textColor="@color/light_outline"
-                            android:textSize="16sp" />
-
-                        <EditText
-                            android:id="@+id/et_3"
-                            style="@style/Widget.AppCompat.EditText"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginBottom="8dp"
-                            android:layout_weight="0.5"
-                            android:gravity="center"
-                            android:hint="min"
-                            android:imeOptions="actionNext"
-                            android:inputType="numberDecimal"
-                            android:textSize="20sp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginEnd="8dp"
-                            android:layout_marginBottom="8dp"
-                            android:gravity="start|center_vertical"
-                            android:text="~"
-                            android:textColor="@color/black"
-                            android:textSize="20sp" />
-
-                        <EditText
-                            android:id="@+id/et_4"
-                            style="@style/Widget.AppCompat.EditText"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"
-                            android:layout_weight="0.5"
-                            android:gravity="center"
-                            android:hint="max"
-                            android:imeOptions="actionNext"
-                            android:inputType="numberDecimal"
-                            android:textSize="20sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/l_4"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:background="@color/light_onPrimary"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/l_3">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <ImageView
-                                android:id="@+id/iv_flag_4"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_marginStart="8dp"
-                                android:src="@mipmap/ic_nongdu"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <RadioGroup
-                                android:id="@+id/rg_4"
-                                android:layout_width="240dp"
-                                android:layout_height="64dp"
-                                android:layout_marginStart="16dp"
-                                android:gravity="start|center_vertical"
-                                android:orientation="horizontal"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/iv_flag_4"
-                                app:layout_constraintTop_toTopOf="parent">
-
-                                <RadioButton
-                                    android:id="@+id/rb_8"
-                                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="32dp"
-                                    android:checked="true"
-                                    android:text="常规胶"
-                                    android:textSize="18sp" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_9"
-                                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="梯度胶"
-                                    android:textSize="18sp" />
-
-                            </RadioGroup>
-
-                            <EditText
-                                android:id="@+id/et_5"
-                                style="@style/Widget.AppCompat.EditText"
-                                android:layout_width="340dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginStart="8dp"
-                                android:layout_weight="0.5"
-                                android:gravity="center"
-                                android:hint="mg/ml"
-                                android:inputType="numberDecimal"
-                                android:textSize="20sp"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/rg_4"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <androidx.constraintlayout.widget.ConstraintLayout
-                                android:id="@+id/con_t"
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:visibility="gone"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/rg_4"
-                                app:layout_constraintTop_toTopOf="parent">
-
-                                <EditText
-                                    android:id="@+id/et_10"
-                                    style="@style/Widget.AppCompat.EditText"
-                                    android:layout_width="0dp"
-                                    android:layout_height="match_parent"
-                                    android:layout_marginStart="8dp"
-                                    android:gravity="center"
-                                    android:hint="min"
-                                    android:imeOptions="actionNext"
-                                    android:inputType="numberDecimal"
-                                    android:textSize="20sp"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toStartOf="@+id/tv_t"
-                                    app:layout_constraintHorizontal_weight="2"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent" />
-
-                                <TextView
-                                    android:id="@+id/tv_t"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="match_parent"
-                                    android:gravity="center"
-                                    android:text="~"
-                                    android:textColor="@color/black"
-                                    android:textSize="20sp"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toStartOf="@+id/et_11"
-                                    app:layout_constraintHorizontal_weight="1"
-                                    app:layout_constraintStart_toEndOf="@+id/et_10"
-                                    app:layout_constraintTop_toTopOf="parent" />
-
-                                <EditText
-                                    android:id="@+id/et_11"
-                                    style="@style/Widget.AppCompat.EditText"
-                                    android:layout_width="0dp"
-                                    android:layout_height="match_parent"
-                                    android:layout_marginEnd="8dp"
-                                    android:gravity="center"
-                                    android:hint="max"
-                                    android:imeOptions="actionNext"
-                                    android:inputType="numberDecimal"
-                                    android:textSize="20sp"
-                                    app:layout_constraintBottom_toBottomOf="parent"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintHorizontal_weight="2"
-                                    app:layout_constraintStart_toEndOf="@+id/tv_t"
-                                    app:layout_constraintTop_toTopOf="parent" />
-
-                            </androidx.constraintlayout.widget.ConstraintLayout>
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/l_5"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:background="@color/light_onPrimary"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/l_4">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <ImageView
-                                android:id="@+id/iv_flag_5"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_marginStart="8dp"
-                                android:src="@mipmap/ic_houdu"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <TextView
-                                android:id="@+id/tv_flag_5"
-                                android:layout_width="80dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginStart="16dp"
-                                android:gravity="start|center_vertical"
-                                android:text="胶厚度"
-                                android:textColor="@color/light_outline"
-                                android:textSize="16sp"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/iv_flag_5"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <RadioGroup
-                                android:id="@+id/rg_1"
-                                android:layout_width="wrap_content"
-                                android:layout_height="64dp"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/tv_flag_5"
-                                app:layout_constraintTop_toTopOf="parent">
-
-                                <RadioButton
-                                    android:id="@+id/rb_1"
-                                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="64dp"
-                                    android:checked="true"
-                                    android:text="0.75mm"
-                                    android:textSize="18sp" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_2"
-                                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="64dp"
-                                    android:text="1.0mm"
-                                    android:textSize="18sp" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_3"
-                                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="1.5mm"
-                                    android:textSize="18sp" />
-
-                            </RadioGroup>
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/l_6"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:background="@color/light_onPrimary"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/l_5">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <ImageView
-                                android:id="@+id/iv_flag_6"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_marginStart="8dp"
-                                android:src="@mipmap/ic_water"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <TextView
-                                android:id="@+id/tv_flag_6"
-                                android:layout_width="80dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginStart="16dp"
-                                android:gravity="start|center_vertical"
-                                android:text="缓冲液"
-                                android:textColor="@color/light_outline"
-                                android:textSize="16sp"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/iv_flag_6"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <RadioGroup
-                                android:id="@+id/rg_2"
-                                android:layout_width="wrap_content"
-                                android:layout_height="64dp"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toStartOf="@+id/et_6"
-                                app:layout_constraintStart_toEndOf="@+id/tv_flag_6"
-                                app:layout_constraintTop_toTopOf="parent">
-
-                                <RadioButton
-                                    android:id="@+id/rb_4"
-                                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="64dp"
-                                    android:checked="true"
-                                    android:text="厂家"
-                                    android:textSize="18sp" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_5"
-                                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="其他"
-                                    android:textSize="18sp" />
-
-                            </RadioGroup>
-
-                            <EditText
-                                android:id="@+id/et_6"
-                                style="@style/Widget.AppCompat.EditText"
-                                android:layout_width="180dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginStart="16dp"
-                                android:gravity="center"
-                                android:textSize="20sp"
-                                android:imeOptions="actionNext"
-                                android:singleLine="true"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/rg_2"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/l_7"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:background="@color/light_onPrimary"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-                        <androidx.constraintlayout.widget.ConstraintLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
-
-                            <ImageView
-                                android:id="@+id/iv_flag_7"
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                android:layout_marginStart="8dp"
-                                android:src="@mipmap/ic_model"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toStartOf="parent"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-                            <TextView
-                                android:id="@+id/tv_flag_7"
-                                android:layout_width="80dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginStart="16dp"
-                                android:gravity="start|center_vertical"
-                                android:text="模式选择"
-                                android:textColor="@color/light_outline"
-                                android:textSize="16sp"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/iv_flag_7"
-                                app:layout_constraintTop_toTopOf="parent" />
-
-
-                            <RadioGroup
-                                android:id="@+id/rg_3"
-                                android:layout_width="wrap_content"
-                                android:layout_height="64dp"
-                                android:gravity="center_vertical"
-                                android:orientation="horizontal"
-                                app:layout_constraintBottom_toBottomOf="parent"
-                                app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toEndOf="@+id/tv_flag_7"
-                                app:layout_constraintTop_toTopOf="parent">
-
-                                <RadioButton
-                                    android:id="@+id/rb_6"
-                                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginEnd="64dp"
-                                    android:checked="true"
-                                    android:text="转膜"
-                                    android:textSize="18sp" />
-
-                                <RadioButton
-                                    android:id="@+id/rb_7"
-                                    style="@style/Widget.Material3.CompoundButton.RadioButton"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="染色"
-                                    android:textSize="18sp" />
-                            </RadioGroup>
-                        </androidx.constraintlayout.widget.ConstraintLayout>
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/l_8"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:background="@color/light_onPrimary"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/l_7">
-
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"
-                            android:src="@mipmap/ic_vol" />
-
-                        <TextView
-                            android:layout_width="280dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="16dp"
-                            android:gravity="start|center_vertical"
-                            android:text="转膜/染色电压 （0v ~ 65v）"
-                            android:textColor="@color/light_outline"
-                            android:textSize="16sp" />
-
-                        <EditText
-                            android:id="@+id/et_7"
-                            style="@style/Widget.AppCompat.EditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:gravity="center"
-                            android:imeOptions="actionNext"
-                            android:inputType="numberDecimal"
-                            android:singleLine="true"
-                            android:textSize="20sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/l_9"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:background="@color/light_onPrimary"
-                        android:orientation="horizontal"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/l_8">
-
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"
-                            android:src="@mipmap/ic_time" />
-
-                        <TextView
-                            android:layout_width="280dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="16dp"
-                            android:gravity="start|center_vertical"
-                            android:text="转膜/染色时间 （0min ~ 99min）"
-                            android:textColor="@color/light_outline"
-                            android:textSize="16sp" />
-
-                        <EditText
-                            android:id="@+id/et_8"
-                            style="@style/Widget.AppCompat.EditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:gravity="center"
-                            android:imeOptions="actionNext"
-                            android:inputType="numberDecimal"
-                            android:singleLine="true"
-                            android:textSize="20sp" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/l_10"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1"
-                        android:background="@color/light_onPrimary"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:layout_marginStart="8dp"
-                            android:layout_marginTop="8dp"
-                            android:layout_marginBottom="8dp"
-                            android:src="@mipmap/ic_motor" />
-
-                        <TextView
-                            android:layout_width="280dp"
-                            android:layout_height="match_parent"
-                            android:layout_marginStart="16dp"
-                            android:gravity="start|center_vertical"
-                            android:text="蠕动泵转速 （0rpm ~ 250rpm）"
-                            android:textColor="@color/light_outline"
-                            android:textSize="16sp" />
-
-                        <EditText
-                            android:id="@+id/et_9"
-                            style="@style/Widget.AppCompat.EditText"
-                            android:layout_width="match_parent"
-                            android:layout_height="48dp"
-                            android:gravity="center"
-                            android:imeOptions="actionDone"
-                            android:inputType="number"
-                            android:singleLine="true"
-                            android:textSize="20sp" />
-                    </LinearLayout>
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="150dp"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_weight="1">
-
-                        <Button
-                            android:id="@+id/btn_1"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="64dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginEnd="64dp"
-                            android:background="@drawable/btn_press_selector"
-                            android:text="确认"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toTopOf="@+id/btn_2"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
-
-                        <Button
-                            android:id="@+id/btn_2"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="64dp"
-                            android:layout_marginTop="24dp"
-                            android:layout_marginEnd="64dp"
-                            android:layout_marginBottom="24dp"
-                            android:background="@drawable/btn_press_selector"
-                            android:text="取消"
-                            android:textSize="20sp"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@+id/btn_1" />
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </LinearLayout>
-
-            </ScrollView>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </layout>
 

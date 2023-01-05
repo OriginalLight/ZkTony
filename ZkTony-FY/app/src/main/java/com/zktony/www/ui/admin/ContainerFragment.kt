@@ -56,6 +56,8 @@ class ContainerFragment :
                         wasteZ = binding.wasteZ.text.toString().toFloat(),
                         washY = binding.washY.text.toString().toFloat(),
                         washZ = binding.washZ.text.toString().toFloat(),
+                        blockY = binding.blockY.text.toString().toFloat(),
+                        blockZ = binding.blockZ.text.toString().toFloat(),
                         oneY = binding.oneY.text.toString().toFloat(),
                         oneZ = binding.oneZ.text.toString().toFloat(),
                         recycleOneZ = binding.recycleOneZ.text.toString().toFloat(),

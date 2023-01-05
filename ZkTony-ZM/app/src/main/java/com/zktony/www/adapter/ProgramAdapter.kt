@@ -1,12 +1,13 @@
 package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.zktony.www.R
+import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.data.model.Program
 import com.zktony.www.databinding.ItemProgramBinding
@@ -16,81 +17,70 @@ import com.zktony.www.databinding.ItemProgramBinding
  * @date: 2022-09-21 11:27
  */
 class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDiffCallback()) {
-    var isClick = false
-    var currentPosition = -1
-    private lateinit var onClick: () -> Unit
 
-    private fun setCurrentPosition(isClick: Boolean, position: Int) {
-        this.isClick = isClick
-        this.currentPosition = position
-    }
-
-    fun setOnClick(onClick: () -> Unit) {
-        this.onClick = onClick
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun itemClickEvent(holder: ViewHolder) {
-        holder.itemView.setOnClickListener {
-            if (!isClick) {
-                setCurrentPosition(true, holder.adapterPosition)
-            } else {
-                setCurrentPosition(
-                    currentPosition != holder.adapterPosition,
-                    holder.adapterPosition
-                )
-            }
-            onClick.invoke()
-            notifyDataSetChanged()
-        }
-    }
-
-    fun getItem(): Program {
-        return getItem(currentPosition)
-    }
+    private lateinit var onDeleteButtonClick: (Program) -> Unit
+    private lateinit var onEditButtonClick: (Program) -> Unit
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val holder = ViewHolder(
+        return ViewHolder(
             ItemProgramBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ),
+            onDeleteButtonClick,
+            onEditButtonClick
         )
-        itemClickEvent(holder)
-        return holder
     }
 
-    @SuppressLint("ResourceAsColor")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
-        if (currentPosition == position && isClick) {
-            holder.itemView.setBackgroundResource(R.color.dark_secondary)
-        } else {
-            holder.itemView.setBackgroundResource(R.color.light_onPrimary)
-        }
+    }
+
+    fun setOnDeleteButtonClick(onDeleteButtonClick: (Program) -> Unit) {
+        this.onDeleteButtonClick = onDeleteButtonClick
+    }
+
+    fun setOnEditButtonClick(onEditButtonClick: (Program) -> Unit) {
+        this.onEditButtonClick = onEditButtonClick
     }
 
 
     @SuppressLint("SetTextI18n")
     class ViewHolder(
-        private val binding: ItemProgramBinding
+        private val binding: ItemProgramBinding,
+        private val onDeleteButtonClick: (Program) -> Unit,
+        private val onEditButtonClick: (Program) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Program) {
             binding.apply {
                 program = item
-                tv1.text = (layoutPosition + 1).toString()
+                order.text = (layoutPosition + 1).toString()
                 val str = StringBuilder()
                 if (item.model == 0) {
                     str.append(item.motor)
-                    str.append("RPM-")
+                    str.append("RPM - ")
                 }
                 str.append(item.voltage.toString().removeZero())
-                str.append("V-")
+                str.append("V - ")
                 str.append(item.time.toString().removeZero())
                 str.append("MIN")
-                tv4.text = str.toString()
+                parameter.text = str.toString()
+                delete.run {
+                    clickScale()
+                    setOnClickListener { onDeleteButtonClick(item) }
+                }
+                edit.run {
+                    clickScale()
+                    setOnClickListener { onEditButtonClick(item) }
+                }
+                if (layoutPosition % 2 == 0) {
+                    order.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    name.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    model.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    parameter.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                }
                 executePendingBindings()
             }
         }

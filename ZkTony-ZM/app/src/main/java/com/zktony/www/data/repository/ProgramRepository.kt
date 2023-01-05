@@ -25,6 +25,10 @@ class ProgramRepository @Inject constructor(
         return dao.getAll()
     }
 
+    fun getById(id: String): Flow<Program> {
+        return dao.getById(id)
+    }
+
     suspend fun updateDefaultByKind(kind: Int) {
         dao.updateDefaultByKind(kind)
     }
