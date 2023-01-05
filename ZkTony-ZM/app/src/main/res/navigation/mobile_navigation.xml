@@ -15,7 +15,62 @@
         android:id="@+id/navigation_program"
         android:name="com.zktony.www.ui.program.ProgramFragment"
         android:label="@string/title_program"
-        tools:layout="@layout/fragment_program" />
+        tools:layout="@layout/fragment_program" >
+        <action
+            android:id="@+id/action_navigation_program_to_navigation_zm"
+            app:destination="@id/navigation_zm"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
+            <argument android:name="id" />
+        </action>
+        <action
+            android:id="@+id/action_navigation_program_to_navigation_rs"
+            app:destination="@id/navigation_rs"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
+            <argument android:name="id" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_zm"
+        android:name="com.zktony.www.ui.program.ZmFragment"
+        android:label="@string/title_zm"
+        tools:layout="@layout/fragment_zm" >
+        <action
+            android:id="@+id/action_navigation_zm_to_navigation_program"
+            app:destination="@id/navigation_program"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <argument
+            android:name="id"
+            app:argType="string"
+            android:defaultValue="None"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_rs"
+        android:name="com.zktony.www.ui.program.RsFragment"
+        android:label="@string/title_rs"
+        tools:layout="@layout/fragment_rs" >
+        <action
+            android:id="@+id/action_navigation_rs_to_navigation_program"
+            app:destination="@id/navigation_program"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <argument
+            android:name="id"
+            app:argType="string"
+            android:defaultValue="None"/>
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_log"

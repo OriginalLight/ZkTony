@@ -94,6 +94,8 @@ dependencies {
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.rxandroid)
     implementation(libs.rxjava)
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
 
     kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)

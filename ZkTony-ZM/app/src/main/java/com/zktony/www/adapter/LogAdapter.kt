@@ -62,10 +62,10 @@ class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback
                 val str = StringBuilder()
                 if (item.model == 0 || item.model == 2) {
                     str.append(item.motor)
-                    str.append("R/MIN-")
+                    str.append("RPM - ")
                 }
                 str.append(item.voltage.toString().removeZero())
-                str.append("V-")
+                str.append("V - ")
                 str.append((item.time / 60).toString().removeZero())
                 str.append("MIN")
                 parameter.text = str.toString()
