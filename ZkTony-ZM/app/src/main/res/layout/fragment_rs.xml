@@ -56,7 +56,8 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
-                android:src="@mipmap/ic_name" />
+                android:src="@mipmap/ic_name"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:layout_width="0dp"
@@ -76,7 +77,8 @@
                 android:imeOptions="actionNext"
                 android:inputType="text"
                 android:textColor="@color/black"
-                android:textSize="22sp" />
+                android:textSize="22sp"
+                tools:ignore="Autofill,LabelFor" />
 
         </LinearLayout>
 
@@ -94,7 +96,8 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
-                android:src="@mipmap/ic_vol" />
+                android:src="@mipmap/ic_vol"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:layout_width="0dp"
@@ -114,7 +117,8 @@
                 android:imeOptions="actionNext"
                 android:inputType="numberDecimal"
                 android:textColor="@color/black"
-                android:textSize="22sp" />
+                android:textSize="22sp"
+                tools:ignore="Autofill,LabelFor" />
 
         </LinearLayout>
 
@@ -132,7 +136,8 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
-                android:src="@mipmap/ic_time" />
+                android:src="@mipmap/ic_time"
+                tools:ignore="ContentDescription" />
 
             <TextView
                 android:layout_width="0dp"
@@ -152,7 +157,8 @@
                 android:imeOptions="actionDone"
                 android:inputType="numberDecimal"
                 android:textColor="@color/black"
-                android:textSize="22sp" />
+                android:textSize="22sp"
+                tools:ignore="Autofill,LabelFor" />
 
         </LinearLayout>
 
@@ -172,9 +178,9 @@
                 android:text="@string/save"
                 android:textSize="22sp"
                 android:textStyle="bold"
+                android:visibility="gone"
                 app:cornerRadius="32dp"
-                app:rippleColor="@color/purple_700"
-                android:visibility="gone"/>
+                app:rippleColor="@color/purple_700" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/cancel"

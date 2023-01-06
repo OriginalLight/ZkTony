@@ -1,5 +1,6 @@
 package com.zktony.www.ui.program
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -39,9 +40,11 @@ class RsFragment : BaseFragment<RsViewModel, FragmentRsBinding>(R.layout.fragmen
             RsFragmentArgs.fromBundle(it).id.run {
                 if (this != "None") {
                     viewModel.loadProgram(this) { program ->
-                        binding.name.setText(program.name)
-                        binding.voltage.setText(program.voltage.toString().removeZero())
-                        binding.time.setText(program.time.toString().removeZero())
+                        binding.run {
+                            name.setText(program.name)
+                            voltage.setText(program.voltage.toString().removeZero())
+                            time.setText(program.time.toString().removeZero())
+                        }
                     }
                 }
             }
@@ -94,6 +97,7 @@ class RsFragment : BaseFragment<RsViewModel, FragmentRsBinding>(R.layout.fragmen
     /**
      * 初始化输入框
      */
+    @SuppressLint("SetTextI18n")
     private fun initEditText() {
         binding.run {
             name.afterTextChange {
@@ -103,9 +107,8 @@ class RsFragment : BaseFragment<RsViewModel, FragmentRsBinding>(R.layout.fragmen
                 val voltage = it.toFloatOrNull() ?: 0f
                 // voltage最大值为65 最小值为0
                 if (voltage > 65f) {
+                    binding.voltage.setText("65")
                     viewModel.setVoltage(65f)
-                } else if (voltage < 0f) {
-                    viewModel.setVoltage(0f)
                 } else {
                     viewModel.setVoltage(voltage)
                 }
@@ -114,9 +117,8 @@ class RsFragment : BaseFragment<RsViewModel, FragmentRsBinding>(R.layout.fragmen
                 val time = it.toFloatOrNull() ?: 0f
                 // time最大值为99 最小值为0
                 if (time > 99f) {
+                    binding.time.setText("99")
                     viewModel.setTime(99f)
-                } else if (time < 0f) {
-                    viewModel.setTime(0f)
                 } else {
                     viewModel.setTime(time)
                 }

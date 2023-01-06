@@ -47,11 +47,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical"
-            android:scrollbars="none"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:scrollbars="none">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -232,6 +228,7 @@
                         android:textSize="22sp" />
 
                     <RadioGroup
+                        android:id="@+id/radio_group_jiao_kind"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="2"
@@ -245,16 +242,16 @@
                             android:checked="true"
                             android:gravity="center"
                             android:text="@string/jiao_normal"
-                            android:textSize="18sp" />
+                            android:textSize="22sp" />
 
                         <RadioButton
                             android:id="@+id/radio_jiao_special"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
+                            android:layout_weight="1"
                             android:gravity="center"
                             android:text="@string/jiao_special"
-                            android:textSize="18sp"
-                            android:layout_weight="1"/>
+                            android:textSize="22sp" />
 
                     </RadioGroup>
 
@@ -262,6 +259,49 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/jiao_normal"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="32dp"
+                    android:background="@color/light_onPrimary"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="8dp"
+                        android:src="@mipmap/ic_nongdu"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/jiao_nongdu_noraml"
+                        android:textColor="@color/black"
+                        android:textSize="22sp" />
+
+                    <EditText
+                        android:id="@+id/jiao_normal_size"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:autofillHints=""
+                        android:gravity="center"
+                        android:imeOptions="actionNext"
+                        android:inputType="numberDecimal"
+                        android:textColor="@color/black"
+                        android:textSize="22sp"
+                        tools:ignore="LabelFor" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/jiao_max_min"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
                     android:layout_marginStart="32dp"
@@ -276,7 +316,7 @@
                         android:layout_height="48dp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="8dp"
-                        android:src="@mipmap/ic_size"
+                        android:src="@mipmap/ic_nongdu"
                         tools:ignore="ContentDescription" />
 
                     <TextView
@@ -339,7 +379,174 @@
                         android:layout_height="48dp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="8dp"
-                        android:src="@mipmap/ic_vol" />
+                        android:src="@mipmap/ic_houdu"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/jiao_houdu"
+                        android:textColor="@color/black"
+                        android:textSize="22sp" />
+
+                    <RadioGroup
+                        android:id="@+id/radio_group_jiao_houdu"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/radio_jiao_075"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:checked="true"
+                            android:gravity="center"
+                            android:text="@string/jiao_075"
+                            android:textSize="22sp" />
+
+                        <RadioButton
+                            android:id="@+id/radio_jiao_10"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="@string/jiao_10"
+                            android:textSize="22sp" />
+
+                        <RadioButton
+                            android:id="@+id/radio_jiao_15"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="@string/jiao_15"
+                            android:textSize="22sp" />
+
+                    </RadioGroup>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="32dp"
+                    android:background="@color/light_onPrimary"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="8dp"
+                        android:src="@mipmap/ic_water"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/water_kind"
+                        android:textColor="@color/black"
+                        android:textSize="22sp" />
+
+                    <RadioGroup
+                        android:id="@+id/radio_group_water_kind"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/factory"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:checked="true"
+                            android:gravity="center"
+                            android:text="@string/factory"
+                            android:textSize="22sp" />
+
+                        <RadioButton
+                            android:id="@+id/other"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="@string/other"
+                            android:textSize="22sp" />
+
+                    </RadioGroup>
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/other_water_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="32dp"
+                    android:background="@color/light_onPrimary"
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="8dp"
+                        android:src="@mipmap/ic_water"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/other_water"
+                        android:textColor="@color/black"
+                        android:textSize="22sp" />
+
+                    <EditText
+                        android:id="@+id/other_water"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:autofillHints=""
+                        android:gravity="center"
+                        android:imeOptions="actionNext"
+                        android:inputType="text"
+                        android:textColor="@color/black"
+                        android:textSize="22sp"
+                        tools:ignore="LabelFor" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="32dp"
+                    android:background="@color/light_onPrimary"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="8dp"
+                        android:src="@mipmap/ic_vol"
+                        tools:ignore="ContentDescription" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -359,7 +566,9 @@
                         android:imeOptions="actionNext"
                         android:inputType="numberDecimal"
                         android:textColor="@color/black"
-                        android:textSize="22sp" />
+                        android:textSize="22sp"
+                        android:autofillHints=""
+                        tools:ignore="LabelFor" />
 
                 </LinearLayout>
 
@@ -377,7 +586,49 @@
                         android:layout_height="48dp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="8dp"
-                        android:src="@mipmap/ic_time" />
+                        android:src="@mipmap/ic_motor"
+                        tools:ignore="ContentDescription" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="@string/motor"
+                        android:textColor="@color/black"
+                        android:textSize="22sp" />
+
+                    <EditText
+                        android:id="@+id/motor"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:gravity="center"
+                        android:imeOptions="actionNext"
+                        android:inputType="number"
+                        android:textColor="@color/black"
+                        android:textSize="22sp"
+                        android:autofillHints=""
+                        tools:ignore="LabelFor" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="32dp"
+                    android:background="@color/light_onPrimary"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="8dp"
+                        android:src="@mipmap/ic_time"
+                        tools:ignore="ContentDescription" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -397,7 +648,9 @@
                         android:imeOptions="actionDone"
                         android:inputType="numberDecimal"
                         android:textColor="@color/black"
-                        android:textSize="22sp" />
+                        android:textSize="22sp"
+                        android:autofillHints=""
+                        tools:ignore="LabelFor" />
 
                 </LinearLayout>
 
@@ -405,6 +658,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
                     android:layout_marginTop="64dp"
+                    android:layout_marginBottom="64dp"
                     android:orientation="horizontal">
 
                     <com.google.android.material.button.MaterialButton

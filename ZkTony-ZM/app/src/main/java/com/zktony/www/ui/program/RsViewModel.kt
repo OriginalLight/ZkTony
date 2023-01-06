@@ -16,7 +16,7 @@ class RsViewModel @Inject constructor(
     private val repo: ProgramRepository
 ) : BaseViewModel() {
 
-    private val _uiState = MutableStateFlow(UiState())
+    private val _uiState = MutableStateFlow(RsUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -27,7 +27,7 @@ class RsViewModel @Inject constructor(
         }
     }
 
-    fun loadProgram(id: String, block: (Program) -> Unit) {
+    fun loadProgram(id: String, block: (RsUiState) -> Unit) {
         viewModelScope.launch {
             repo.getById(id).collect {
                 _uiState.value = _uiState.value.copy(
@@ -36,7 +36,7 @@ class RsViewModel @Inject constructor(
                     voltage = it.voltage,
                     time = it.time
                 )
-                block(it)
+                block(_uiState.value)
             }
         }
     }
@@ -66,7 +66,8 @@ class RsViewModel @Inject constructor(
                     _uiState.value.program!!.copy(
                         name = _uiState.value.name,
                         voltage = _uiState.value.voltage,
-                        time = _uiState.value.time
+                        time = _uiState.value.time,
+                        upload = 0
                     )
                 )
             }
@@ -87,7 +88,7 @@ class RsViewModel @Inject constructor(
     }
 }
 
-data class UiState(
+data class RsUiState(
     val program: Program? = null,
     val programList: List<Program> = emptyList(),
     val name: String = "",
