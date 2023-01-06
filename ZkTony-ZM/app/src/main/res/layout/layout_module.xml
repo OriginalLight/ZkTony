@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="@layout/fragment_home">
+
+    <data />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical">
+
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabBackground="@drawable/tab_background"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="@color/purple_700"
+            app:tabSelectedTextColor="@color/light_onPrimary"
+            app:tabTextAppearance="@style/TextAppearance.AppCompat.Large"
+            app:tabTextColor="@color/black">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/zm"
+                android:textSize="16sp" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rs"
+                android:textSize="16sp" />
+
+        </com.google.android.material.tabs.TabLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:background="@color/black"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="1dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:id="@+id/selector"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/light_onPrimary"
+                    android:orientation="horizontal"
+                    tools:ignore="NestedWeights">
+
+                    <TextView
+                        android:id="@+id/program_name"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:textSize="20sp"
+                        android:layout_weight="1"
+                        android:textColor="@color/black"
+                        android:gravity="center" />
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="4dp"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_drop"
+                        tools:ignore="ContentDescription" />
+
+                </LinearLayout>
+
+                <EditText
+                    android:id="@+id/motor"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/light_onPrimary"
+                    android:gravity="center"
+                    android:hint="@string/rpm"
+                    android:imeOptions="actionNext"
+                    android:nextFocusForward="@id/voltage"
+                    android:inputType="numberDecimal"
+                    android:textSize="20sp"
+                    tools:ignore="Autofill" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/voltage"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/light_onPrimary"
+                    android:gravity="center"
+                    android:hint="@string/vol"
+                    android:imeOptions="actionNext"
+                    android:nextFocusForward="@id/time"
+                    android:inputType="numberDecimal"
+                    android:textSize="20sp"
+                    tools:ignore="Autofill,NestedWeights" />
+
+                <EditText
+                    android:id="@+id/time"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/light_onPrimary"
+                    android:gravity="center"
+                    android:hint="@string/time"
+                    android:imeOptions="actionDone"
+                    android:inputType="numberDecimal"
+                    android:textSize="20sp"
+                    tools:ignore="Autofill" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="4dp"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="1dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/current_status"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="1dp"
+                    android:layout_weight="1"
+                    android:background="#41D50000"
+                    android:gravity="center"
+                    android:text="@string/off"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    tools:ignore="NestedWeights" />
+
+                <TextView
+                    android:id="@+id/current_motor"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="1dp"
+                    android:layout_weight="1"
+                    android:background="#287DF133"
+                    android:gravity="center"
+                    android:text="@string/off"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    tools:ignore="NestedWeights" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="1dp"
+                android:layout_marginEnd="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/current_voltage"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="1dp"
+                    android:layout_weight="1"
+                    android:background="#287DF133"
+                    android:gravity="center"
+                    android:text="@string/off"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    tools:ignore="NestedWeights" />
+
+                <TextView
+                    android:id="@+id/current_current"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="1dp"
+                    android:layout_weight="1"
+                    android:background="#287DF133"
+                    android:gravity="center"
+                    android:text="@string/off"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    tools:ignore="NestedWeights" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/stop"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:text="@string/stop"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:cornerRadius="24dp"
+                app:rippleColor="@color/purple_700" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/start"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:text="@string/start"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:cornerRadius="24dp"
+                app:rippleColor="@color/purple_700" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/pump"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/pump_up"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:text="@string/pump_up"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:cornerRadius="24dp"
+                app:rippleColor="@color/purple_700" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/pump_back"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:text="@string/pump_back"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:cornerRadius="24dp"
+                app:rippleColor="@color/purple_700" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/current_time"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_line"
+            android:gravity="center"
+            android:text="00:00"
+            android:textSize="100sp"
+            tools:ignore="HardcodedText" />
+
+
+    </LinearLayout>
+
+</layout>
+

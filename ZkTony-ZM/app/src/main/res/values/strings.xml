@@ -29,8 +29,8 @@
     <string name="title_rs">染色</string>
     <string name="add_program_rs">程序添加 - 染色</string>
     <string name="add_program_zm">程序添加 - 转膜</string>
-    <string name="time_min">时间（分钟）</string>
-    <string name="voltage">电压（V）</string>
+    <string name="time_min">时间（0 ~ 99）MIN</string>
+    <string name="voltage">电压（0 ~ 65）V</string>
     <string name="save">保存</string>
     <string name="danbai_name">使用蛋白名称</string>
     <string name="danbai_kd">蛋白大小范围（kD）</string>
@@ -39,4 +39,22 @@
     <string name="jiao_normal">常规胶</string>
     <string name="jiao_special">梯度胶</string>
     <string name="jiao_nongdu">梯度胶浓度 （%）</string>
+    <string name="jiao_075">0.75</string>
+    <string name="jiao_10">1.0</string>
+    <string name="jiao_15">1.5</string>
+    <string name="jiao_houdu">胶厚度（mm）</string>
+    <string name="other">其他</string>
+    <string name="factory">厂家</string>
+    <string name="other_water">其他缓冲液信息</string>
+    <string name="motor">泵速（0 ~ 250）RPM</string>
+    <string name="water_kind">缓冲液种类</string>
+    <string name="jiao_nongdu_noraml">常规胶浓度（%）</string>
+    <string name="rpm">转速 RPM</string>
+    <string name="time">时长 MIN</string>
+    <string name="off">OFF</string>
+    <string name="start">开始</string>
+    <string name="stop">停止</string>
+    <string name="pump_back">回吸</string>
+    <string name="pump_up">填充</string>
+    <string name="vol">电压 V</string>
 </resources>

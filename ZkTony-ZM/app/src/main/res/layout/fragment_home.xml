@@ -1,63 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:binding="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
+    <data />
 
-        <variable
-            name="cmd"
-            type="com.zktony.www.serial.protocol.V1" />
-    </data>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:animateLayoutChanges="true"
         android:background="@color/light_onPrimary"
+        android:orientation="horizontal"
         tools:context=".ui.home.HomeFragment">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/container_x"
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@color/black" />
+
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginEnd="-1dp"
-            android:background="@drawable/bg_line"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/container_y"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1">
 
             <include
-                android:id="@+id/module_x"
-                layout="@layout/module_x"
-                binding:cmd="@{cmd}" />
+                android:id="@+id/x"
+                layout="@layout/layout_module" />
+        </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="4dp"
+            android:layout_height="match_parent"
+            android:background="@color/black" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/container_y"
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="-1dp"
-            android:background="@drawable/bg_line"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toEndOf="@+id/container_x"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1">
 
             <include
-                android:id="@+id/module_y"
-                layout="@layout/module_y"
-                binding:cmd="@{cmd}" />
+                android:id="@+id/y"
+                layout="@layout/layout_module" />
+        </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="2dp"
+            android:layout_height="match_parent"
+            android:background="@color/black" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+    </LinearLayout>
 
 </layout>
 

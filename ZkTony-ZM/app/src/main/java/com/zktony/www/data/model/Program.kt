@@ -13,7 +13,7 @@ data class Program(
     val voltage: Float = 0f,
     val time: Float = 0f,
     val count: Int = 0,
-    val thickness: String = "0.075",
+    val thickness: String = "0.75",
     val glueType: Int = 0,
     val glueConcentration: Float = 0f,
     val glueMaxConcentration: Float = 0f,
