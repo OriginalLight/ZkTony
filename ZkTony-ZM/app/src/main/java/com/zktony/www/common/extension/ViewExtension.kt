@@ -7,7 +7,9 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
+import com.google.android.material.tabs.TabLayout
 
 private const val MIN_CLICK_DELAY_TIME = 800
 var lastClickTime: Long = 0
@@ -68,6 +70,15 @@ fun EditText.addSuffix(suffix: String) {
             v.setText(v.text.toString().replace(suffix, ""))
         }
     }
+}
+
+/**
+ * 禁用选项
+ */
+fun TabLayout.disable(disable: Boolean = false) {
+    val tabLayout = this.getChildAt(0) as? ViewGroup
+    tabLayout?.getChildAt(0)?.isEnabled = disable
+    tabLayout?.getChildAt(1)?.isEnabled = disable
 }
 
 @SuppressLint("ClickableViewAccessibility")

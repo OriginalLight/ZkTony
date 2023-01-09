@@ -150,43 +150,30 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     /**
      * 初始化编辑视图
      */
+    @SuppressLint("SetTextI18n")
     private fun initEditView() {
         lifecycleScope.launch {
             binding.run {
                 interval.run {
                     setText(appViewModel.setting.value.interval.toString())
                     afterTextChange {
-                        viewModel.toggleInterval(
-                            if (it.isNotEmpty()) {
-                                it.toInt()
-                            } else {
-                                1
-                            }
-                        )
+                        viewModel.toggleInterval(it.toIntOrNull() ?: 1)
                     }
                 }
                 duration.run {
                     setText(appViewModel.setting.value.duration.toString())
                     afterTextChange {
-                        viewModel.toggleDuration(
-                            if (it.isNotEmpty()) {
-                                it.toInt()
-                            } else {
-                                10
-                            }
-                        )
+                        viewModel.toggleDuration(it.toIntOrNull() ?: 10)
                     }
                 }
                 motorSpeed.run {
                     setText(appViewModel.setting.value.motorSpeed.toString())
                     afterTextChange {
-                        viewModel.toggleMotorSpeed(
-                            if (it.isNotEmpty()) {
-                                it.toInt()
-                            } else {
-                                160
-                            }
-                        )
+                        val speed = it.toIntOrNull() ?: 160
+                        viewModel.toggleMotorSpeed(minOf(speed, 250))
+                        if (speed > 250) {
+                            binding.motorSpeed.setText("250")
+                        }
                     }
                 }
                 version.run {
