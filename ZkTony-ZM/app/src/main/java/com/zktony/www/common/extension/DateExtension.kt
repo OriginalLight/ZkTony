@@ -12,10 +12,9 @@ import java.util.*
 /**
  * 将秒数转化为分秒格式
  */
-fun Long.getTimeFormat(): String {
-    val temp = this.toInt()
-    val mm = temp % 3600 / 60
-    val ss = temp % 3600 % 60
+fun Int.getTimeFormat(): String {
+    val mm = this % 3600 / 60
+    val ss = this % 3600 % 60
     return (if (mm < 10) "0$mm" else mm).toString() + ":" +
             if (ss < 10) "0$ss" else ss
 }

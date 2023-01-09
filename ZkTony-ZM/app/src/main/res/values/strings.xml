@@ -57,4 +57,9 @@
     <string name="pump_back">回吸</string>
     <string name="pump_up">填充</string>
     <string name="vol">电压 V</string>
+    <string name="navigation">导航栏</string>
+    <string name="hide">隐藏</string>
+    <string name="show">显示</string>
+    <string name="audio">语音播报</string>
+    <string name="detect">异常检测</string>
 </resources>

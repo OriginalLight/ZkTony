@@ -61,21 +61,22 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:layout_toRightOf="@+id/iv_bar"
-                            android:text="导航栏"
+                            android:layout_toEndOf="@+id/iv_bar"
+                            android:text="@string/navigation"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            tools:ignore="RelativeOverlap" />
 
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/navigation_bar"
                             android:layout_width="50dp"
                             android:layout_height="36dp"
-                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="35dp"
                             android:checked="true"
-                            android:textOff="隐藏"
-                            android:textOn="显示"
+                            android:textOff="@string/hide"
+                            android:textOn="@string/show"
                             app:thumbTint="@color/light_primary"
                             app:trackTint="@color/dark_surfaceTint" />
 
@@ -103,21 +104,19 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:layout_toRightOf="@+id/iv_audio"
-                            android:text="语音播报"
+                            android:layout_toEndOf="@+id/iv_audio"
+                            android:text="@string/audio"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            tools:ignore="RelativeOverlap" />
 
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/audio"
                             android:layout_width="50dp"
                             android:layout_height="36dp"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
+                            android:layout_alignParentEnd="true"
                             android:layout_marginEnd="35dp"
                             android:checked="true"
-                            android:textOff="隐藏"
-                            android:textOn="显示"
                             app:thumbTint="@color/light_primary"
                             app:trackTint="@color/dark_surfaceTint" />
 
@@ -145,21 +144,20 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:layout_toRightOf="@+id/iv_detect"
-                            android:text="异常检测"
+                            android:layout_toEndOf="@+id/iv_detect"
+                            android:text="@string/detect"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            tools:ignore="RelativeOverlap" />
 
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/detect"
                             android:layout_width="50dp"
                             android:layout_height="36dp"
-                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="35dp"
                             android:checked="true"
-                            android:textOff="关闭"
-                            android:textOn="开启"
                             app:thumbTint="@color/light_primary"
                             app:trackTint="@color/dark_surfaceTint" />
 
@@ -187,7 +185,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:layout_toRightOf="@+id/iv_interval"
+                            android:layout_toEndOf="@+id/iv_interval"
                             android:text="废液清理间隔（分钟）"
                             android:textColor="@color/black"
                             android:textSize="16sp" />
@@ -196,12 +194,12 @@
                             android:id="@+id/interval"
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
-                            android:layout_centerVertical="true"
+                            android:layout_alignParentEnd="true"
                             android:layout_marginEnd="16dp"
                             android:gravity="center"
                             android:inputType="number"
-                            android:minHeight="48dp" />
+                            android:minHeight="48dp"
+                            tools:ignore="Autofill,LabelFor" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -226,7 +224,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:layout_toRightOf="@+id/iv_duration"
+                            android:layout_toEndOf="@+id/iv_duration"
                             android:text="废液清理时长（秒）"
                             android:textColor="@color/black"
                             android:textSize="16sp" />
@@ -235,12 +233,13 @@
                             android:id="@+id/duration"
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
                             android:gravity="center"
                             android:inputType="number"
-                            android:minHeight="48dp" />
+                            android:minHeight="48dp"
+                            tools:ignore="Autofill,LabelFor" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -265,7 +264,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:layout_toRightOf="@+id/iv_motor"
+                            android:layout_toEndOf="@+id/iv_motor"
                             android:text="填充/回吸转速（转/分）"
                             android:textColor="@color/black"
                             android:textSize="16sp" />
@@ -274,12 +273,13 @@
                             android:id="@+id/motor_speed"
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
                             android:gravity="center"
                             android:inputType="number"
-                            android:minHeight="48dp" />
+                            android:minHeight="48dp"
+                            tools:ignore="Autofill,LabelFor" />
                     </RelativeLayout>
 
                 </LinearLayout>
@@ -322,7 +322,7 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:layout_toRightOf="@+id/iv_version"
+                            android:layout_toEndOf="@+id/iv_version"
                             android:text="当前软件版本"
                             android:textColor="@color/black"
                             android:textSize="16sp" />
@@ -331,11 +331,10 @@
                             android:id="@+id/tv_version_name"
                             android:layout_width="100dp"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
                             android:gravity="center"
-                            android:text="1.0.0"
                             android:textSize="20sp"
                             android:textStyle="italic" />
 
@@ -364,15 +363,16 @@
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:layout_toRightOf="@+id/iv_about"
+                            android:layout_toEndOf="@+id/iv_about"
                             android:text="@string/about"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            tools:ignore="RelativeOverlap" />
 
                         <ImageView
                             android:layout_width="30dp"
                             android:layout_height="30dp"
-                            android:layout_alignParentRight="true"
+                            android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="16dp"
@@ -398,7 +398,8 @@
             android:background="@color/light_onPrimary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="DisableBaselineAlignment">
 
             <RelativeLayout
                 android:layout_width="0dp"
@@ -412,7 +413,8 @@
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
-                    android:background="@mipmap/ic_reset" />
+                    android:background="@mipmap/ic_reset"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -436,7 +438,8 @@
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
-                    android:background="@mipmap/ic_motor" />
+                    android:background="@mipmap/ic_motor"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -458,7 +461,8 @@
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@mipmap/ic_wifi" />
+                    android:background="@mipmap/ic_wifi"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -480,7 +484,8 @@
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@mipmap/ic_update" />
+                    android:background="@mipmap/ic_update"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
                     android:id="@+id/tv_update"
