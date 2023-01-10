@@ -19,6 +19,7 @@ import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.*
 import com.zktony.www.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.min
@@ -43,8 +44,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     @SuppressLint("SetTextI18n")
     private fun initFlowCollector() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.uiStateX.collect {
                         // 功能选择部分
@@ -103,6 +104,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 currentStatus.text = "模块A未插入"
                                 currentStatus.setBackgroundColor(Color.parseColor("#41D50000"))
                             }
+                            if (it.currentTime == "已完成") {
+                                viewModel.setCurrentTime(0)
+                            }
                         } else {
                             binding.x.run {
                                 currentStatus.text = "模块A已就绪"
@@ -146,17 +150,19 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         } else {
                             if (it.model == 0) {
                                 if (it.programName == "洗涤") {
-                                    binding.x.start.isEnabled = it.motor > 0 && it.time > 0f
+                                    binding.x.start.isEnabled =
+                                        it.motor > 0 && it.time > 0f && it.currentStatus == 1
                                 } else {
                                     binding.x.start.isEnabled =
-                                        it.motor > 0 && it.time > 0f && it.voltage > 0f
+                                        it.motor > 0 && it.time > 0f && it.voltage > 0f && it.currentStatus == 1
                                 }
                             } else {
-                                binding.x.start.isEnabled = it.time > 0f && it.voltage > 0f
+                                binding.x.start.isEnabled =
+                                    it.time > 0f && it.voltage > 0f && it.currentStatus == 1
                             }
                         }
                         // time
-                        binding.x.currentTime.text = it.currentTime.getTimeFormat()
+                        binding.x.currentTime.text = it.currentTime
                         // 运行中锁定界面
                         if (it.job != null) {
                             binding.x.run {
@@ -233,6 +239,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 currentStatus.text = "模块B未插入"
                                 currentStatus.setBackgroundColor(Color.parseColor("#41D50000"))
                             }
+                            if (it.currentTime == "已完成") {
+                                viewModel.setCurrentTime(1)
+                            }
                         } else {
                             binding.y.run {
                                 currentStatus.text = "模块B已就绪"
@@ -276,17 +285,19 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         } else {
                             if (it.model == 0) {
                                 if (it.programName == "洗涤") {
-                                    binding.y.start.isEnabled = it.motor > 0 && it.time > 0f
+                                    binding.y.start.isEnabled =
+                                        it.motor > 0 && it.time > 0f && it.currentStatus == 1
                                 } else {
                                     binding.y.start.isEnabled =
-                                        it.motor > 0 && it.time > 0f && it.voltage > 0f
+                                        it.motor > 0 && it.time > 0f && it.voltage > 0f && it.currentStatus == 1
                                 }
                             } else {
-                                binding.y.start.isEnabled = it.time > 0f && it.voltage > 0f
+                                binding.y.start.isEnabled =
+                                    it.time > 0f && it.voltage > 0f && it.currentStatus == 1
                             }
                         }
                         // time
-                        binding.y.currentTime.text = it.currentTime.getTimeFormat()
+                        binding.y.currentTime.text = it.currentTime
                         // 运行中锁定界面
                         if (it.job != null) {
                             binding.y.run {
@@ -305,6 +316,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         }
                     }
                 }
+
             }
         }
     }
@@ -369,7 +381,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }
                 }
             }
-            stop.setOnClickListener { }
+            stop.setOnClickListener { viewModel.stop(0) }
             start.setOnClickListener { viewModel.start(0) }
             pumpUp.addTouchEvent({
                 it.scaleX = 0.9f
@@ -392,6 +404,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
         binding.y.run {
             selector.run {
+                clickScale()
                 setOnClickListener {
                     if (viewModel.uiStateY.value.job != null) return@setOnClickListener
                     val programList = viewModel.programList.value
@@ -413,7 +426,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }
                 }
             }
-            stop.setOnClickListener { }
+            stop.setOnClickListener { viewModel.stop(1) }
             start.setOnClickListener { viewModel.start(1) }
             pumpUp.addTouchEvent({
                 it.scaleX = 0.9f
@@ -441,57 +454,60 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     @SuppressLint("SetTextI18n")
     private fun initEditText() {
-        binding.x.run {
-            motor.afterTextChange {
-                val motor = it.replace(" RPM", "").removeZero().toIntOrNull() ?: 0
-                viewModel.setMotor(min(250, motor), 0)
-                if (motor > 250) {
-                    binding.x.motor.setText("250")
+        lifecycleScope.launch {
+            delay(100L)
+            binding.x.run {
+                motor.afterTextChange {
+                    val motor = it.replace(" RPM", "").removeZero().toIntOrNull() ?: 0
+                    viewModel.setMotor(min(250, motor), 0)
+                    if (motor > 250) {
+                        binding.x.motor.setText("250")
+                    }
                 }
-            }
-            motor.addSuffix(" RPM")
-            voltage.afterTextChange {
-                val voltage = it.replace(" V", "").removeZero().toFloatOrNull() ?: 0f
-                viewModel.setVoltage(minOf(65f, voltage), 0)
-                if (voltage > 65f) {
-                    binding.x.voltage.setText("65")
+                motor.addSuffix(" RPM")
+                voltage.afterTextChange {
+                    val voltage = it.replace(" V", "").removeZero().toFloatOrNull() ?: 0f
+                    viewModel.setVoltage(minOf(65f, voltage), 0)
+                    if (voltage > 65f) {
+                        binding.x.voltage.setText("65")
+                    }
                 }
-            }
-            voltage.addSuffix(" V")
-            time.afterTextChange {
-                val time = it.replace(" MIN", "").removeZero().toFloatOrNull() ?: 0f
-                viewModel.setTime(minOf(99f, time), 0)
-                if (time > 99f) {
-                    binding.x.time.setText("99")
+                voltage.addSuffix(" V")
+                time.afterTextChange {
+                    val time = it.replace(" MIN", "").removeZero().toFloatOrNull() ?: 0f
+                    viewModel.setTime(minOf(99f, time), 0)
+                    if (time > 99f) {
+                        binding.x.time.setText("99")
+                    }
                 }
+                time.addSuffix(" MIN")
             }
-            time.addSuffix(" MIN")
-        }
-        binding.y.run {
-            motor.afterTextChange {
-                val motor = it.replace(" RPM", "").removeZero().toIntOrNull() ?: 0
-                viewModel.setMotor(min(250, motor), 1)
-                if (motor > 250) {
-                    binding.y.motor.setText("250")
+            binding.y.run {
+                motor.afterTextChange {
+                    val motor = it.replace(" RPM", "").removeZero().toIntOrNull() ?: 0
+                    viewModel.setMotor(min(250, motor), 1)
+                    if (motor > 250) {
+                        binding.y.motor.setText("250")
+                    }
                 }
-            }
-            motor.addSuffix(" RPM")
-            voltage.afterTextChange {
-                val voltage = it.replace(" V", "").removeZero().toFloatOrNull() ?: 0f
-                viewModel.setVoltage(minOf(65f, voltage), 1)
-                if (voltage > 65f) {
-                    binding.y.voltage.setText("65")
+                motor.addSuffix(" RPM")
+                voltage.afterTextChange {
+                    val voltage = it.replace(" V", "").removeZero().toFloatOrNull() ?: 0f
+                    viewModel.setVoltage(minOf(65f, voltage), 1)
+                    if (voltage > 65f) {
+                        binding.y.voltage.setText("65")
+                    }
                 }
-            }
-            voltage.addSuffix(" V")
-            time.afterTextChange {
-                val time = it.replace(" MIN", "").removeZero().toFloatOrNull() ?: 0f
-                viewModel.setTime(minOf(99f, time), 1)
-                if (time > 99f) {
-                    binding.y.time.setText("99")
+                voltage.addSuffix(" V")
+                time.afterTextChange {
+                    val time = it.replace(" MIN", "").removeZero().toFloatOrNull() ?: 0f
+                    viewModel.setTime(minOf(99f, time), 1)
+                    if (time > 99f) {
+                        binding.y.time.setText("99")
+                    }
                 }
+                time.addSuffix(" MIN")
             }
-            time.addSuffix(" MIN")
         }
     }
 

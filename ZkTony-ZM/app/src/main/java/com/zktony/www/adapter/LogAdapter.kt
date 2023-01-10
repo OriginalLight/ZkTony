@@ -66,7 +66,7 @@ class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback
                 }
                 str.append(item.voltage.toString().removeZero())
                 str.append("V - ")
-                str.append((item.time / 60).toString().removeZero())
+                str.append(item.time.toString().removeZero())
                 str.append("MIN")
                 parameter.text = str.toString()
                 model.text = when (item.model) {

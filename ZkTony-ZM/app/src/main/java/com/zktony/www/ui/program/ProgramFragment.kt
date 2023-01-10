@@ -39,18 +39,16 @@ class ProgramFragment :
      * 初始化观察者
      */
     private fun initFlowCollector() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.programList.collect {
-                        adapter.submitList(it)
-                        if (it.isEmpty()) {
-                            binding.empty.visibility = View.VISIBLE
-                            binding.recyclerView.visibility = View.GONE
-                        } else {
-                            binding.empty.visibility = View.GONE
-                            binding.recyclerView.visibility = View.VISIBLE
-                        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.programList.collect {
+                    adapter.submitList(it)
+                    if (it.isEmpty()) {
+                        binding.empty.visibility = View.VISIBLE
+                        binding.recyclerView.visibility = View.GONE
+                    } else {
+                        binding.empty.visibility = View.GONE
+                        binding.recyclerView.visibility = View.VISIBLE
                     }
                 }
             }

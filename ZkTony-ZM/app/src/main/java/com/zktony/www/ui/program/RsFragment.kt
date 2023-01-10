@@ -55,15 +55,13 @@ class RsFragment : BaseFragment<RsViewModel, FragmentRsBinding>(R.layout.fragmen
      * 初始化观察者
      */
     private fun initFlowCollector() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.uiState.collect {
-                        if (it.name.isNotEmpty() && it.voltage > 0f && it.time > 0f) {
-                            binding.save.visibility = View.VISIBLE
-                        } else {
-                            binding.save.visibility = View.GONE
-                        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect {
+                    if (it.name.isNotEmpty() && it.voltage > 0f && it.time > 0f) {
+                        binding.save.visibility = View.VISIBLE
+                    } else {
+                        binding.save.visibility = View.GONE
                     }
                 }
             }

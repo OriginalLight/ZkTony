@@ -36,25 +36,23 @@ class ZmFragment : BaseFragment<ZmViewModel, FragmentZmBinding>(R.layout.fragmen
      * 初始化Flow观察者
      */
     private fun initFlowCollector() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.uiState.collect { uiState ->
-                        if (uiState.name.isNotEmpty()
-                            && uiState.danbaiName.isNotEmpty()
-                            && uiState.danbaiMin > 0f
-                            && uiState.danbaiMax > 0f
-                            && ((uiState.jiaoKind == 0 && uiState.jiaoNormalSize > 0f) || (uiState.jiaoKind == 1 && uiState.jiaoMax > 0f && uiState.jiaoMin > 0f))
-                            && uiState.jiaoHoudu.isNotEmpty()
-                            && uiState.waterKind.isNotEmpty()
-                            && uiState.voltage > 0f
-                            && uiState.motor > 0f
-                            && uiState.time > 0f
-                        ) {
-                            binding.save.visibility = View.VISIBLE
-                        } else {
-                            binding.save.visibility = View.GONE
-                        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { uiState ->
+                    if (uiState.name.isNotEmpty()
+                        && uiState.danbaiName.isNotEmpty()
+                        && uiState.danbaiMin > 0f
+                        && uiState.danbaiMax > 0f
+                        && ((uiState.jiaoKind == 0 && uiState.jiaoNormalSize > 0f) || (uiState.jiaoKind == 1 && uiState.jiaoMax > 0f && uiState.jiaoMin > 0f))
+                        && uiState.jiaoHoudu.isNotEmpty()
+                        && uiState.waterKind.isNotEmpty()
+                        && uiState.voltage > 0f
+                        && uiState.motor > 0f
+                        && uiState.time > 0f
+                    ) {
+                        binding.save.visibility = View.VISIBLE
+                    } else {
+                        binding.save.visibility = View.GONE
                     }
                 }
             }

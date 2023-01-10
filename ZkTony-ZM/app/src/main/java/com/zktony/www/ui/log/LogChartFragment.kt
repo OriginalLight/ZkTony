@@ -37,8 +37,8 @@ class LogChartFragment :
      * 初始化Flow收集器
      */
     private fun initFlowCollector() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.logList.collect {
                     initData(it)
                 }
@@ -75,7 +75,7 @@ class LogChartFragment :
         val currentList: MutableList<Entry> = ArrayList()
         logData.forEachIndexed { index, log ->
             voltageList.add(Entry((index * 5 + 5).toFloat(), log.voltage))
-            currentList.add(Entry((index * 5 + 5).toFloat(), log.current * 6.5f))
+            currentList.add(Entry((index * 5 + 5).toFloat(), log.current * 10f))
         }
         if (chart.data != null && chart.data.dataSetCount > 0) {
             val voltageDataSet = chart.data.getDataSetByIndex(0) as LineDataSet
@@ -91,7 +91,7 @@ class LogChartFragment :
             voltageSet.setDrawCircles(false)
             voltageSet.setDrawValues(false)
             voltageSet.lineWidth = 1f //线条宽度
-            currentSet.color = Color.parseColor("#65FD03") //线条颜色
+            currentSet.color = Color.parseColor("#FF0000") //线条颜色
             currentSet.setDrawCircles(false)
             currentSet.setDrawValues(false)
             currentSet.lineWidth = 1f //线条宽度
@@ -139,19 +139,22 @@ class LogChartFragment :
         //设置图表左边的y轴
         leftAxis.isEnabled = true
         leftAxis.textColor = Color.parseColor("#3A50D0")
-        leftAxis.enableGridDashedLine(0f, 0f, 0f)
-        leftAxis.axisMaximum = 65f
+        leftAxis.enableGridDashedLine(5f, 5f, 0f)
+        leftAxis.axisLineColor = Color.parseColor("#3A50D0")
+        leftAxis.axisMaximum = 80f
         leftAxis.axisMinimum = 0f
         //设置图表右边的y轴
         rightAxis.isEnabled = true
-        rightAxis.textColor = Color.parseColor("#65FD03")
-        rightAxis.enableGridDashedLine(0f, 0f, 0f)
-        rightAxis.axisMaximum = 10f
+        rightAxis.textColor = Color.parseColor("#FF0000")
+        rightAxis.enableGridDashedLine(5f, 5f, 0f)
+        rightAxis.axisLineColor = Color.parseColor("#FF0000")
+        rightAxis.axisMaximum = 8f
         rightAxis.axisMinimum = 0f
 
         //设置x轴
         val xAxis = chart.xAxis
         xAxis.textColor = Color.parseColor("#333333")
+        xAxis.enableGridDashedLine(5f, 5f, 0f)
         xAxis.textSize = 11f
         xAxis.axisMinimum = 0f
         xAxis.position = XAxis.XAxisPosition.BOTTOM
