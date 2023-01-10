@@ -42,6 +42,7 @@ class HomeViewModel @Inject constructor(
     val programList = _programList.asStateFlow()
     private var cleanJob: Job? = null
     private var sentinelJob: Job? = null
+    private var first = true
 
 
     init {
@@ -63,20 +64,23 @@ class HomeViewModel @Inject constructor(
 
                         )
                     ) + it
-                    setCurrentProgram(3)
+                    if (first) {
+                        setCurrentProgram(3)
+                        first = false
+                    }
                 }
             }
             launch {
                 delay(100)
                 appViewModel.received.collect {
                     _uiStateX.value = _uiStateX.value.copy(
-                        currentStatus = 1,
+                        currentStatus = it.inputSensorX,
                         currentMotor = it.stepMotorX,
                         currentVoltage = it.getVoltageX,
                         currentCurrent = it.getCurrentX
                     )
                     _uiStateY.value = _uiStateY.value.copy(
-                        currentStatus = 1,
+                        currentStatus = it.inputSensorY,
                         currentMotor = it.stepMotorY,
                         currentVoltage = it.getVoltageY,
                         currentCurrent = it.getCurrentY
