@@ -3,6 +3,7 @@ package com.zktony.www.common.extension
 import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.floor
 
 /**
  * @author: 刘贺贺
@@ -13,10 +14,10 @@ import java.util.*
  * 将秒数转化为分秒格式
  */
 fun Int.getTimeFormat(): String {
-    val mm = this % 3600 / 60
-    val ss = this % 3600 % 60
-    return (if (mm < 10) "0$mm" else mm).toString() + ":" +
-            if (ss < 10) "0$ss" else ss
+    val minute = floor(this / 60.0).toInt()
+    val second = this - minute * 60
+    return (if (minute < 10) "0$minute" else minute).toString() + ":" +
+            if (second < 10) "0$second" else second
 }
 
 /**

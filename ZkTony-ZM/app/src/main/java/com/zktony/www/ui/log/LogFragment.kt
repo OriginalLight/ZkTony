@@ -40,8 +40,8 @@ class LogFragment :
 
 
     private fun initFlowCollector() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.logList.collect {
                     adapter.submitList(it)
                     if (it.isEmpty()) {

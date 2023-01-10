@@ -14,7 +14,6 @@
             android:id="@+id/order"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="2dp"
             android:layout_marginEnd="1dp"
             android:layout_weight="1"
             android:background="@color/light_onPrimary"
@@ -63,7 +62,6 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"
-            android:layout_marginEnd="2dp"
             android:orientation="horizontal"
             android:layout_weight="2"
             android:baselineAligned="false">

@@ -38,6 +38,14 @@ class WorkerManager {
             ).build()
     }
 
+    private val logRequest by lazy {
+        PeriodicWorkRequestBuilder<LogWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(
+                Constraints.Builder()
+                    .build()
+            ).build()
+    }
+
     fun createWorker() {
         WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
             Constants.BACKGROUND_WORKER_NAME_PROGRAM,
@@ -53,6 +61,11 @@ class WorkerManager {
             Constants.BACKGROUND_WORKER_NAME_LOG_DATA,
             ExistingPeriodicWorkPolicy.REPLACE,
             logDataRequest
+        )
+        WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
+            Constants.BACKGROUND_WORKER_NAME_LOG,
+            ExistingPeriodicWorkPolicy.REPLACE,
+            logRequest
         )
     }
 
