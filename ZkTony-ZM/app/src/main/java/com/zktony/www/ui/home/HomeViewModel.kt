@@ -254,7 +254,7 @@ class HomeViewModel @Inject constructor(
             if (state.value.programName != "洗涤") {
                 val log = LogRecord().copy(
                     programId = state.value.program?.id ?: "None",
-                    model = state.value.model,
+                    model = if (xy == 0) state.value.model else state.value.model + 2,
                     motor = state.value.motor,
                     voltage = state.value.voltage,
                     time = state.value.time,

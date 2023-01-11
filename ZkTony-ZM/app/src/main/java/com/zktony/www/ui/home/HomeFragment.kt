@@ -146,7 +146,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     val motor = it.replace(" RPM", "").removeZero().toIntOrNull() ?: 0
                     viewModel.setMotor(min(250, motor), xy)
                     if (motor > 250) {
-                        binding.x.motor.setText("250")
+                        bind.motor.setText("250")
                     }
                 }
                 motor.addSuffix(" RPM")
@@ -154,7 +154,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     val voltage = it.replace(" V", "").removeZero().toFloatOrNull() ?: 0f
                     viewModel.setVoltage(minOf(65f, voltage), xy)
                     if (voltage > 65f) {
-                        binding.x.voltage.setText("65")
+                        bind.voltage.setText("65")
                     }
                 }
                 voltage.addSuffix(" V")
@@ -162,7 +162,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     val time = it.replace(" MIN", "").removeZero().toFloatOrNull() ?: 0f
                     viewModel.setTime(minOf(99f, time), xy)
                     if (time > 99f) {
-                        binding.x.time.setText("99")
+                        bind.time.setText("99")
                     }
                 }
                 time.addSuffix(" MIN")
@@ -231,7 +231,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 currentStatus.setBackgroundColor(Color.parseColor("#41D50000"))
             }
             if (uiState.currentTime == "已完成") {
-                viewModel.setCurrentTime(0)
+                viewModel.setCurrentTime(xy)
             }
         } else {
             bind.run {
