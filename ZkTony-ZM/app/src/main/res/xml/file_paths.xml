@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
     <external-path
-        name="app_external"
-        path="/" />
+        name="external"
+        path="." />
+    <external-files-path
+        name="external_files"
+        path="." />
+    <cache-path
+        name="cache"
+        path="." />
     <external-cache-path
-        name="app_cache"
-        path="/" />
+        name="external_cache"
+        path="." />
+    <files-path
+        name="files"
+        path="." />
+    <!-- root-path 解决SD卡读取问题 -->
+    <root-path
+        name="sd_path"
+        path="" />
 </paths>
