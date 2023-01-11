@@ -243,38 +243,8 @@ class HomeViewModel @Inject constructor(
                     })
                 }
                 if (i == 0) {
-                    state.value.log?.cancel()
-                    if (state.value.programName != "洗涤") {
-                        startOrStop(false, xy)
-                    } else {
-                        val latest = appViewModel.send.value
-                        appViewModel.send(latest.apply {
-                            stepMotorX = if (xy == 0) 0 else latest.stepMotorX
-                            stepMotorY = if (xy == 1) 0 else latest.stepMotorY
-                        })
-                    }
-                    state.value = state.value.copy(job = null, log = null, currentTime = "已完成")
-
-                    if (_uiStateX.value.job == null && _uiStateY.value.job == null) {
-                        if (cleanJob != null) {
-                            cleanJob?.cancel()
-                            cleanJob = null
-                        }
-                        if (sentinelJob != null) {
-                            sentinelJob?.cancel()
-                            sentinelJob = null
-                        }
-                    } else if (_uiStateX.value.job != null && _uiStateY.value.job == null) {
-                        if (_uiStateX.value.model == 1 && cleanJob != null) {
-                            cleanJob?.cancel()
-                            cleanJob = null
-                        }
-                    } else if (_uiStateX.value.job == null && _uiStateY.value.job != null) {
-                        if (_uiStateY.value.model == 1 && cleanJob != null) {
-                            cleanJob?.cancel()
-                            cleanJob = null
-                        }
-                    }
+                    stop(xy)
+                    state.value = state.value.copy(currentTime = "已完成")
                     playAudio(R.raw.finish)
                 }
             }
@@ -323,6 +293,15 @@ class HomeViewModel @Inject constructor(
         state.value.job?.cancel()
         state.value.log?.cancel()
         state.value = state.value.copy(job = null, log = null, currentTime = "00:00")
+        if (state.value.programName != "洗涤") {
+            startOrStop(false, xy)
+        } else {
+            val latest = appViewModel.send.value
+            appViewModel.send(latest.apply {
+                stepMotorX = if (xy == 0) 0 else latest.stepMotorX
+                stepMotorY = if (xy == 1) 0 else latest.stepMotorY
+            })
+        }
         if (_uiStateX.value.job == null && _uiStateY.value.job == null) {
             if (cleanJob != null) {
                 cleanJob?.cancel()
@@ -397,21 +376,33 @@ class HomeViewModel @Inject constructor(
                     delay(5000)
                     val rec = appViewModel.received.value
                     var msg = ""
-                    if (rec.powerENX == 1 && rec.getCurrentX < 0.1f && rec.powerENY == 0) {
-                        stop(0)
-                        playAudio(R.raw.error)
-                        msg = "模块A异常，请检查！！！"
-                    }
-                    if (rec.powerENY == 1 && rec.getCurrentY < 0.1f && rec.powerENX == 0) {
-                        stop(1)
-                        playAudio(R.raw.error)
-                        msg = "模块B异常，请检查！！！"
-                    }
-                    if (rec.powerENX == 1 && rec.powerENY == 1 && rec.getCurrentX < 0.1f && rec.getCurrentY < 0.1f) {
-                        stop(0)
-                        stop(1)
-                        playAudio(R.raw.error)
-                        msg = "模块A、B异常，请检查！！！"
+                    if (rec.powerENX == 1 && rec.powerENY == 0) {
+                        if (rec.getCurrentX < 0.05f) {
+                            stop(0)
+                            playAudio(R.raw.error)
+                            msg = "模块A异常，请检查！！！"
+                        }
+                    } else if (rec.powerENX == 0 && rec.powerENY == 1) {
+                        if (rec.getCurrentY < 0.05f) {
+                            stop(1)
+                            playAudio(R.raw.error)
+                            msg = "模块B异常，请检查！！！"
+                        }
+                    } else if (rec.powerENX == 1 && rec.powerENY == 1) {
+                        if (rec.getCurrentX < 0.05f && rec.getCurrentY > 0.05f) {
+                            stop(0)
+                            playAudio(R.raw.error)
+                            msg = "模块A异常，请检查！！！"
+                        } else if (rec.getCurrentX > 0.05f && rec.getCurrentY < 0.05f) {
+                            stop(1)
+                            playAudio(R.raw.error)
+                            msg = "模块B异常，请检查！！！"
+                        } else if (rec.getCurrentX < 0.05f && rec.getCurrentY < 0.05f) {
+                            stop(0)
+                            stop(1)
+                            playAudio(R.raw.error)
+                            msg = "模块A、B异常，请检查！！！"
+                        }
                     }
                     if (msg.isNotEmpty()) {
                         MessageDialog.build()
@@ -419,6 +410,7 @@ class HomeViewModel @Inject constructor(
                             .setMessage(msg)
                             .setOkButton("确定") { dialog, _ ->
                                 dialog.dismiss()
+                                msg = ""
                                 true
                             }
                             .show()

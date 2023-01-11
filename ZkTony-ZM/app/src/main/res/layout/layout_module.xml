@@ -71,10 +71,10 @@
                         android:id="@+id/program_name"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:textSize="20sp"
                         android:layout_weight="1"
+                        android:gravity="center"
                         android:textColor="@color/black"
-                        android:gravity="center" />
+                        android:textSize="20sp" />
 
                     <ImageView
                         android:layout_width="32dp"
@@ -97,8 +97,8 @@
                     android:gravity="center"
                     android:hint="@string/rpm"
                     android:imeOptions="actionNext"
-                    android:nextFocusForward="@id/voltage"
                     android:inputType="numberDecimal"
+                    android:nextFocusForward="@id/voltage"
                     android:textSize="20sp"
                     tools:ignore="Autofill" />
 
@@ -124,8 +124,8 @@
                     android:gravity="center"
                     android:hint="@string/vol"
                     android:imeOptions="actionNext"
-                    android:nextFocusForward="@id/time"
                     android:inputType="numberDecimal"
+                    android:nextFocusForward="@id/time"
                     android:textSize="20sp"
                     tools:ignore="Autofill,NestedWeights" />
 

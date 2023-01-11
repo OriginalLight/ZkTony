@@ -21,7 +21,7 @@ class RsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repo.getAll().collect() {
+            repo.getAll().collect {
                 _uiState.value = _uiState.value.copy(programList = it)
             }
         }
@@ -44,7 +44,7 @@ class RsViewModel @Inject constructor(
     fun save(block: () -> Unit) {
         viewModelScope.launch {
             val programList = _uiState.value.programList
-            if(_uiState.value.program == null) {
+            if (_uiState.value.program == null) {
                 if (programList.isNotEmpty() && programList.any { it.name == _uiState.value.name }) {
                     PopTip.show("名称已存在")
                     return@launch

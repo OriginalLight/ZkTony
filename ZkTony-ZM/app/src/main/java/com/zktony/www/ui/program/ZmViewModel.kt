@@ -54,7 +54,7 @@ class ZmViewModel @Inject constructor(
     fun save(block: () -> Boolean) {
         viewModelScope.launch {
             val programList = _uiState.value.programList
-            if(_uiState.value.program == null) {
+            if (_uiState.value.program == null) {
                 if (programList.isNotEmpty() && programList.any { it.name == _uiState.value.name }) {
                     PopTip.show("名称已存在")
                     return@launch
