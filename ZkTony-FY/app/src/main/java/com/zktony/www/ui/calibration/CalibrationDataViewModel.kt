@@ -122,6 +122,8 @@ class CalibrationDataViewModel @Inject constructor(
         ) + settings.motorUnits.toMotionHex(
             settings.container.washY, 0f
         ) + settings.motorUnits.toMotionHex(0f, 0f)
+
+        SerialManager.instance.lock(true)
         SerialManager.instance.sendHex(
             serial = Serial.TTYS0, hex = V1.multiPoint(
                 if (motorId.value == 7) "0,0,0,0,0,0,0,0,0,0,0,0," else move,

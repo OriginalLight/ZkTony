@@ -5,7 +5,6 @@ import com.zktony.www.common.app.Settings
 import com.zktony.www.data.model.Action
 import com.zktony.www.serial.SerialManager
 import com.zktony.www.serial.protocol.V1
-import com.zktony.www.ui.home.ModuleEnum.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 class CommandExecutor constructor(
     private val serial: SerialManager = SerialManager.instance,
-    private val module: ModuleEnum,
+    private val module: Int,
     private val settings: Settings,
 ) {
     private lateinit var action: Action
@@ -41,7 +40,7 @@ class CommandExecutor constructor(
             serial.sendText(
                 serial = TTYS3,
                 text = V1.setTemp(
-                    addr = module.address.toString(),
+                    addr = (module + 1).toString(),
                     temp = action.temperature.toString()
                 )
             )
@@ -81,7 +80,7 @@ class CommandExecutor constructor(
             serial.sendText(
                 serial = TTYS3,
                 text = V1.setTemp(
-                    addr = module.address.toString(),
+                    addr = (module + 1).toString(),
                     temp = action.temperature.toString()
                 )
             )
@@ -152,7 +151,7 @@ class CommandExecutor constructor(
             serial.sendText(
                 serial = TTYS3,
                 text = V1.setTemp(
-                    addr = module.address.toString(),
+                    addr = (module + 1).toString(),
                     temp = action.temperature.toString()
                 )
             )
@@ -190,7 +189,7 @@ class CommandExecutor constructor(
             serial.sendText(
                 serial = TTYS3,
                 text = V1.setTemp(
-                    addr = module.address.toString(),
+                    addr = (module + 1).toString(),
                     temp = action.temperature.toString()
                 )
             )
@@ -268,18 +267,18 @@ class CommandExecutor constructor(
         val zero = "0,0,0,"
         // 吸液
         val stepOne = settings.motorUnits.toPumpHex(
-            one = if (module == A) action.liquidVolume else 0f,
-            two = if (module == B) action.liquidVolume else 0f,
-            three = if (module == C) action.liquidVolume else 0f,
-            four = if (module == D) action.liquidVolume else 0f,
+            one = if (module == 0) action.liquidVolume else 0f,
+            two = if (module == 1) action.liquidVolume else 0f,
+            three = if (module == 2) action.liquidVolume else 0f,
+            four = if (module == 3) action.liquidVolume else 0f,
             five = if (action.mode == 3) action.liquidVolume else 0f
         )
         // 清空管路
         val stepTwo = settings.motorUnits.toPumpHex(
-            one = if (module == A) settings.motorUnits.cali.p1 * settings.container.extract / 1000 else 0f,
-            two = if (module == B) settings.motorUnits.cali.p2 * settings.container.extract / 1000 else 0f,
-            three = if (module == C) settings.motorUnits.cali.p3 * settings.container.extract / 1000 else 0f,
-            four = if (module == D) settings.motorUnits.cali.p4 * settings.container.extract / 1000 else 0f,
+            one = if (module == 0) settings.motorUnits.cali.p1 * settings.container.extract / 1000 else 0f,
+            two = if (module == 1) settings.motorUnits.cali.p2 * settings.container.extract / 1000 else 0f,
+            three = if (module == 2) settings.motorUnits.cali.p3 * settings.container.extract / 1000 else 0f,
+            four = if (module == 3) settings.motorUnits.cali.p4 * settings.container.extract / 1000 else 0f,
         )
         return Pair(
             zero + stepOne.first + zero + stepTwo.first,
@@ -294,10 +293,10 @@ class CommandExecutor constructor(
     private fun recycleLiquid(): Pair<String, String> {
         val zero = "0,0,0,"
         val recycle = settings.motorUnits.toPumpHex(
-            one = if (module == A) -(action.liquidVolume + settings.motorUnits.cali.p1 * settings.container.extract / 1000) else 0f,
-            two = if (module == B) -(action.liquidVolume + settings.motorUnits.cali.p2 * settings.container.extract / 1000) else 0f,
-            three = if (module == C) -(action.liquidVolume + settings.motorUnits.cali.p3 * settings.container.extract / 1000) else 0f,
-            four = if (module == D) -(action.liquidVolume + settings.motorUnits.cali.p4 * settings.container.extract / 1000) else 0f,
+            one = if (module == 0) -(action.liquidVolume + settings.motorUnits.cali.p1 * settings.container.extract / 1000) else 0f,
+            two = if (module == 1) -(action.liquidVolume + settings.motorUnits.cali.p2 * settings.container.extract / 1000) else 0f,
+            three = if (module == 2) -(action.liquidVolume + settings.motorUnits.cali.p3 * settings.container.extract / 1000) else 0f,
+            four = if (module == 3) -(action.liquidVolume + settings.motorUnits.cali.p4 * settings.container.extract / 1000) else 0f,
         )
         return Pair(
             zero + recycle.first + zero + zero,
@@ -311,7 +310,7 @@ class CommandExecutor constructor(
      * @param block suspend () -> Unit 代码块
      */
     private suspend fun waitForFree(msg: String, block: suspend () -> Unit) {
-        if (serial.lock || serial.drawer) {
+        if (serial.runtimeLock.value || serial.drawer) {
             _wait.value = msg
             delay(300L)
             waitForFree(msg, block)

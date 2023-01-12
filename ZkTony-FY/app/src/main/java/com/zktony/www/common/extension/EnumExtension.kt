@@ -1,21 +1,12 @@
 package com.zktony.www.common.extension
 
 import com.zktony.serialport.util.Serial
-import com.zktony.www.ui.home.ModuleEnum
 
 /**
  * @author: 刘贺贺
  * @date: 2022-11-23 10:53
  */
-fun Int.toModuleEnum(): ModuleEnum {
-    return when (this) {
-        0 -> ModuleEnum.A
-        1 -> ModuleEnum.B
-        2 -> ModuleEnum.C
-        3 -> ModuleEnum.D
-        else -> ModuleEnum.A
-    }
-}
+
 
 fun Int.toSerial(): Serial {
     return when (this) {

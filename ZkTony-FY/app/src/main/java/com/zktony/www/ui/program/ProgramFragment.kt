@@ -40,8 +40,8 @@ class ProgramFragment :
      * 初始化观察者
      */
     private fun initObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.programList.collect {
                     adapter.submitList(it)
                     if (it.isEmpty()) {

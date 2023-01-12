@@ -97,16 +97,20 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     if (menuList.size < 2) {
                         PopTip.show("没有更多程序！")
                     } else {
-                        PopMenu.show(menuList).setMenuTextInfo(TextInfo().apply {
-                            gravity = Gravity.CENTER
-                            fontSize = 16
-                        }).setOnMenuItemClickListener { _, text, _ ->
-                            viewModel.selectProgram(
-                                programList.find { it.name == text.toString() },
-                                xy
-                            )
-                            false
-                        }.width = 300
+                        PopMenu.show(bind.selector, menuList)
+                            .setOverlayBaseView(false)
+                            .setMenuTextInfo(TextInfo().apply {
+                                gravity = Gravity.CENTER
+                                fontSize = 16
+                            }).setOnMenuItemClickListener { _, text, _ ->
+                                viewModel.selectProgram(
+                                    programList.find { it.name == text.toString() },
+                                    xy
+                                )
+                                false
+                            }
+                            .setRadius(0f)
+                            .alignGravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
                     }
                 }
             }

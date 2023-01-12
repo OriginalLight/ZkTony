@@ -10,19 +10,17 @@ import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.extractTemp
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.common.extension.toV1
 import com.zktony.www.common.model.Queue
+import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.model.Action
 import com.zktony.www.data.model.Log
 import com.zktony.www.data.model.Program
 import com.zktony.www.data.model.getActionEnum
-import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.ProgramRepository
 import com.zktony.www.serial.SerialManager
 import com.zktony.www.serial.protocol.V1
-import com.zktony.www.ui.home.ModuleEnum.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -66,26 +64,6 @@ class HomeViewModel @Inject constructor(
                 }
             }
             launch {
-                // 串口一flow
-                serial.ttys0Flow.collect {
-                    it?.let {
-                        val v1 = it.toV1()
-                        when (v1.fn) {
-                            "86" -> {
-                                if (v1.pa == "0A") {
-                                    if (v1.data == "00") {
-                                        PopTip.show("复位成功")
-                                        lockBtn(false)
-                                    } else {
-                                        PopTip.show("复位失败")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            launch {
                 // 串口四flow
                 serial.ttys3Flow.collect {
                     it?.let {
@@ -110,13 +88,13 @@ class HomeViewModel @Inject constructor(
                     delay(200L)
                     serial.sendText(
                         serial = TTYS3, text = V1.saveTemp(
-                            addr = i.toString(), temp = "26"
+                            addr = i.toString(), temp = if (i == 0) "3" else "26"
                         )
                     )
                     delay(200L)
                     serial.sendText(
                         serial = TTYS3, text = V1.setTemp(
-                            addr = i.toString(), temp = "26"
+                            addr = i.toString(), temp = if (i == 0) "3" else "26"
                         )
                     )
                 }
@@ -139,11 +117,12 @@ class HomeViewModel @Inject constructor(
      * @param module 模块
      * @return 状态
      */
-    private fun flow(module: ModuleEnum) = when (module) {
-        A -> _aFlow
-        B -> _bFlow
-        C -> _cFlow
-        D -> _dFlow
+    private fun flow(module: Int) = when (module) {
+        0 -> _aFlow
+        1 -> _bFlow
+        2 -> _cFlow
+        3 -> _dFlow
+        else -> _aFlow
     }
 
     /**
@@ -183,9 +162,9 @@ class HomeViewModel @Inject constructor(
     /**
      * 切换程序
      * @param index [Int] 程序索引
-     * @param module [ModuleEnum] 模块
+     * @param module [Int] 模块
      */
-    fun selectProgram(index: Int, module: ModuleEnum) {
+    fun selectProgram(index: Int, module: Int) {
         viewModelScope.launch {
             val state = flow(module)
             state.value = state.value.copy(
@@ -199,9 +178,9 @@ class HomeViewModel @Inject constructor(
 
     /**
      * 开始执行程序
-     * @param module [ModuleEnum] 模块
+     * @param module [Int] 模块
      */
-    fun start(module: ModuleEnum) {
+    fun start(module: Int) {
         viewModelScope.launch {
             // 获取模块对应的状态
             val state = flow(module)
@@ -267,7 +246,7 @@ class HomeViewModel @Inject constructor(
                 // 创建日志
                 val log = Log(
                     programName = state.value.program!!.name,
-                    module = module.index,
+                    module = module,
                     actions = state.value.program!!.actions,
                 )
                 logRepo.insert(log)
@@ -287,9 +266,9 @@ class HomeViewModel @Inject constructor(
 
     /**
      * 停止执行程序
-     * @param module [ModuleEnum] 模块
+     * @param module [Int] 模块
      */
-    fun stop(module: ModuleEnum) {
+    fun stop(module: Int) {
         viewModelScope.launch {
             // 获取对应模块的状态
             val state = flow(module)
@@ -330,11 +309,7 @@ class HomeViewModel @Inject constructor(
                         )
                     )
                 }
-                // 复位
-                serial.sendHex(
-                    serial = TTYS0, hex = V1().toHex()
-                )
-                lockBtn(true)
+                serial.reset()
             }
         }
     }
@@ -346,16 +321,10 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
             if (serial.executing == 0) {
-                if (_uiFlow.value.reset) {
-                    PopTip.show("复位中")
+                if (serial.runtimeLock.value) {
+                    PopTip.show("运动中禁止复位")
                 } else {
-                    serial.sendHex(
-                        serial = TTYS0, hex = V1(
-                            fn = "05", pa = "01", data = "0101302C302C302C302C"
-                        ).toHex()
-                    )
-                    serial.sendHex(serial = TTYS0, hex = V1().toHex())
-                    lockBtn(true)
+                    serial.reset()
                     PopTip.show(R.mipmap.ic_reset, "复位-已下发")
                 }
             } else {
@@ -403,32 +372,6 @@ class HomeViewModel @Inject constructor(
             )
         }
     }
-
-    /**
-     * 锁定按钮 复位时间内不可点击
-     * @param lock [Boolean] true 锁定 false 解锁
-     */
-    private fun lockBtn(lock: Boolean) {
-        _aFlow.value = _aFlow.value.copy(
-            selectEnable = !lock,
-            startEnable = !lock,
-        )
-        _bFlow.value = _bFlow.value.copy(
-            selectEnable = !lock,
-            startEnable = !lock,
-        )
-        _cFlow.value = _cFlow.value.copy(
-            selectEnable = !lock,
-            startEnable = !lock,
-        )
-        _dFlow.value = _dFlow.value.copy(
-            selectEnable = !lock,
-            startEnable = !lock,
-        )
-        _uiFlow.value = _uiFlow.value.copy(
-            reset = lock,
-        )
-    }
 }
 
 /**
@@ -452,18 +395,7 @@ data class ModuleUiState(
  * 右侧按钮的状态
  */
 data class UiState(
-    val reset: Boolean = false,
     val pause: Boolean = false,
     val insulating: Boolean = false,
     val temp: String = "0.0℃",
 )
-
-/**
- * 模块枚举
- */
-enum class ModuleEnum(val value: String, val index: Int, val address: Int) {
-    A("模块A", 0, 1),
-    B("模块B", 1, 2),
-    C("模块C", 2, 3),
-    D("模块D", 3, 4),
-}

@@ -26,7 +26,7 @@ class MotorFragment :
     private val motorAdapter by lazy { MotorAdapter() }
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initObserver()
+        initFlowCollector()
         initRecyclerView()
         initButton()
         initEditText()
@@ -35,17 +35,11 @@ class MotorFragment :
     /**
      * 初始化观察者
      */
-    private fun initObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.motorList.collect {
-                        motorAdapter.submitList(it)
-                    }
-                }
-                launch {
-                    viewModel.selectedMotor.collect { onSelectedMotorChange(it) }
-                }
+    private fun initFlowCollector() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.motorList.collect { motorAdapter.submitList(it) } }
+                launch { viewModel.selectedMotor.collect { onSelectedMotorChange(it) } }
             }
         }
     }

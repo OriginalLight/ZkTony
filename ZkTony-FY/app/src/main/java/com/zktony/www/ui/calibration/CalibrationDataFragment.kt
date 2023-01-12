@@ -17,6 +17,7 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.data.model.CalibrationData
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
+import com.zktony.www.serial.SerialManager
 import com.zktony.www.ui.program.ActionFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -38,16 +39,17 @@ class CalibrationDataFragment :
      * 初始化Flow收集器
      */
     private fun initFlowCollector() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.caliDataList.collect {
-                        adapter.submitList(it)
-                    }
-                }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.caliDataList.collect { adapter.submitList(it) } }
                 launch {
                     viewModel.motorId.collect {
                         binding.select.text = listOf("泵一", "泵二", "泵三", "泵四", "泵五")[it - 3]
+                    }
+                }
+                launch {
+                    SerialManager.instance.runtimeLock.collect {
+                        binding.addLiquid.isEnabled = !it
                     }
                 }
             }

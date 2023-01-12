@@ -29,10 +29,12 @@ class ContainerFragment :
      * 初始化Flow收集器
      */
     private fun initFlowCollector() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.container.collect {
-                    onContainerChange(it)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch {
+                    viewModel.container.collect {
+                        onContainerChange(it)
+                    }
                 }
             }
         }

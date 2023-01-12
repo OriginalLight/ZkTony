@@ -26,7 +26,7 @@
 
             <include
                 android:id="@+id/a"
-                layout="@layout/home_a" />
+                layout="@layout/layout_home" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -44,7 +44,7 @@
 
             <include
                 android:id="@+id/b"
-                layout="@layout/home_b" />
+                layout="@layout/layout_home" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -62,7 +62,7 @@
 
             <include
                 android:id="@+id/c"
-                layout="@layout/home_c" />
+                layout="@layout/layout_home" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -80,7 +80,7 @@
 
             <include
                 android:id="@+id/d"
-                layout="@layout/home_d" />
+                layout="@layout/layout_home" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -99,7 +99,7 @@
 
             <include
                 android:id="@+id/e"
-                layout="@layout/home_e" />
+                layout="@layout/layout_home_common" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

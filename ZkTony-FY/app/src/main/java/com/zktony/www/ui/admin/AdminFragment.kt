@@ -44,7 +44,7 @@ class AdminFragment :
     lateinit var appViewModel: AppViewModel
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initObserver()
+        initFlowCollector()
         initButton()
         initSwitch()
         initTextView()
@@ -55,9 +55,9 @@ class AdminFragment :
      * 初始化观察者
      */
     @SuppressLint("SetTextI18n")
-    private fun initObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+    private fun initFlowCollector() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.file.collect {
                         it?.let { showLocalUpdate(it) }

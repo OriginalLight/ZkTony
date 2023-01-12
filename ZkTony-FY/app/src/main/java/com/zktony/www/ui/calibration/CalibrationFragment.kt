@@ -43,8 +43,8 @@ class CalibrationFragment :
      * 初始化Flow收集器
      */
     private fun initFlowCollector() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.calibrationList.collect {
                     adapter.submitList(it)
                     if (it.isEmpty()) {

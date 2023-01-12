@@ -1,5 +1,6 @@
 package com.zktony.www.serial
 
+import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.*
@@ -22,20 +23,19 @@ class SerialManager(
     private val _ttys1Flow = MutableStateFlow<String?>(null)
     private val _ttys2Flow = MutableStateFlow<String?>(null)
     private val _ttys3Flow = MutableStateFlow<String?>(null)
+    private val _runtimeLock = MutableStateFlow(false)
 
     val ttys0Flow = _ttys0Flow.asStateFlow()
     val ttys1Flow = _ttys1Flow.asStateFlow()
     val ttys2Flow = _ttys2Flow.asStateFlow()
     val ttys3Flow = _ttys3Flow.asStateFlow()
-
-    // 机构运行状态
-    var lock = false
+    val runtimeLock = _runtimeLock.asStateFlow()
 
     // 机构运行已经等待的时间
     private var lockTime = 0L
 
     // 机构运行小步骤等待时间
-    private val waitTime = 60L * 2
+    private val waitTime = 60L
 
     // 机构的抽屉状态
     var drawer = false
@@ -88,19 +88,26 @@ class SerialManager(
                             val total = res.data.substring(2, 4).hexToInt8()
                             val current = res.data.substring(6, 8).hexToInt8()
                             if (total == current) {
-                                lock = false
+                                _runtimeLock.value = false
                                 lockTime = 0L
                                 // 如果还有任务运行恢复摇床
                                 if (executing > 0) {
                                     sendHex(TTYS0, V1.resumeShakeBed())
                                 }
                             } else {
-                                lock = true
+                                _runtimeLock.value = true
                                 lockTime = 0L
                             }
                         }
-                        if (res.fn == "86" && res.pa == "01") {
-                            drawer = res.data.hexToInt8() == 0
+                        if (res.fn == "86") {
+                            if (res.pa == "01") {
+                                drawer = res.data.hexToInt8() == 0
+                            }
+                            if (res.pa == "0A") {
+                                _runtimeLock.value = false
+                                lockTime = 0L
+                                PopTip.show("复位成功")
+                            }
                         }
                     }
                 }
@@ -110,13 +117,13 @@ class SerialManager(
                     delay(1000L)
                     //Logger.d(msg = "lock: $lock, lockTime: $lockTime, executing: $executing, drawer: $drawer")
                     // 如果正在运行，计时
-                    if (lock) {
+                    if (runtimeLock.value) {
                         lockTime += 1L
                     }
                     // 如果运行时间超过 60 秒，默认不运行，如果还有任务运行恢复摇床
-                    if (lock && lockTime >= waitTime) {
+                    if (runtimeLock.value && lockTime >= waitTime) {
                         lockTime = 0L
-                        lock = false
+                        _runtimeLock.value = false
                         // 恢复摇床
                         if (executing > 0) {
                             sendHex(TTYS0, V1.resumeShakeBed())
@@ -159,10 +166,22 @@ class SerialManager(
      *  @param lock [Boolean] 是否锁定 true 锁定 false 解锁
      */
     fun lock(lock: Boolean) {
-        this.lock = lock
+        _runtimeLock.value = lock
         if (lock) {
             sendHex(TTYS0, V1.pauseShakeBed())
         }
+    }
+
+    suspend fun reset() {
+        if (runtimeLock.value) {
+            delay(300L)
+            reset()
+        } else {
+            _runtimeLock.value = true
+            lockTime = 0L
+            sendHex(serial = TTYS0, hex = V1().toHex())
+        }
+
     }
 
 

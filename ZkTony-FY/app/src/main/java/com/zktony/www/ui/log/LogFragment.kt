@@ -29,7 +29,7 @@ class LogFragment :
     private val logAdapter by lazy { LogAdapter() }
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initObserver()
+        initFlowCollector()
         initRecyclerView()
         initButton()
     }
@@ -37,9 +37,9 @@ class LogFragment :
     /**
      * 初始化观察者
      */
-    private fun initObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+    private fun initFlowCollector() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.logList.collect {
                         if (it.isNotEmpty()) {

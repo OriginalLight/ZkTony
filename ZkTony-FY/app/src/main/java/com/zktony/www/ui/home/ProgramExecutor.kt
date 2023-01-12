@@ -5,7 +5,6 @@ import com.zktony.www.common.extension.getTimeFormat
 import com.zktony.www.common.model.Queue
 import com.zktony.www.data.model.Action
 import com.zktony.www.data.model.ActionEnum
-import com.zktony.www.common.utils.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -24,7 +23,7 @@ import kotlinx.coroutines.launch
  */
 class ProgramExecutor constructor(
     val queue: Queue<Action>,
-    val module: ModuleEnum,
+    val module: Int,
     val settings: Settings,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
@@ -175,11 +174,9 @@ class ProgramExecutor constructor(
     private suspend fun executeNext() {
         if (queue.isEmpty()) {
             // 任务队列执行完成
-            Logger.e(msg = "${module.value}任务队列执行完成")
             _event.emit(ActionEvent.Finish(module))
         } else {
             // 继续执行任务队列
-            Logger.e(msg = "${module.value}执行下一个任务")
             run()
         }
     }
@@ -209,9 +206,9 @@ class ProgramExecutor constructor(
 }
 
 sealed class ActionEvent {
-    data class CurrentAction(val module: ModuleEnum, val action: Action) : ActionEvent()
-    data class Time(val module: ModuleEnum, val time: String) : ActionEvent()
-    data class Finish(val module: ModuleEnum) : ActionEvent()
-    data class Count(val module: ModuleEnum, val count: Int) : ActionEvent()
-    data class Wait(val module: ModuleEnum, val msg: String) : ActionEvent()
+    data class CurrentAction(val module: Int, val action: Action) : ActionEvent()
+    data class Time(val module: Int, val time: String) : ActionEvent()
+    data class Finish(val module: Int) : ActionEvent()
+    data class Count(val module: Int, val count: Int) : ActionEvent()
+    data class Wait(val module: Int, val msg: String) : ActionEvent()
 }
