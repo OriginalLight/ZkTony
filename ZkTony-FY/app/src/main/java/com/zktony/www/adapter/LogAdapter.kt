@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.common.extension.simpleDateFormat
-import com.zktony.www.common.extension.toModuleEnum
 import com.zktony.www.data.model.Log
 import com.zktony.www.databinding.ItemLogBinding
 
@@ -42,7 +41,13 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
             binding.apply {
                 log = item
                 order.text = (layoutPosition + 1).toString()
-                module.text = item.module.toModuleEnum().value.substring(2, 3)
+                module.text = when (item.module) {
+                    0 -> "A"
+                    1 -> "B"
+                    2 -> "C"
+                    3 -> "D"
+                    else -> "A"
+                }
                 module.setTextColor(
                     when (item.module) {
                         0 -> root.context.getColorStateList(android.R.color.holo_red_dark)

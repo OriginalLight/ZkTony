@@ -1,8 +1,10 @@
 package com.zktony.www.ui.home
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
+import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -19,7 +21,6 @@ import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.databinding.FragmentHomeBinding
 import com.zktony.www.serial.SerialManager
-import com.zktony.www.ui.home.ModuleEnum.*
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,22 +34,30 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     lateinit var appViewModel: AppViewModel
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initObserver()
-        initTextView()
-        initButton()
+        initFlowCollector()
+        initTextView(0)
+        initTextView(1)
+        initTextView(2)
+        initTextView(3)
+        initButton(0)
+        initButton(1)
+        initButton(2)
+        initButton(3)
+        initCommonButton()
     }
 
     /**
      * 初始化观察者
      */
-    private fun initObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch { viewModel.aFlow.collect { moduleUiChange(A, it) } }
-                launch { viewModel.bFlow.collect { moduleUiChange(B, it) } }
-                launch { viewModel.cFlow.collect { moduleUiChange(C, it) } }
-                launch { viewModel.dFlow.collect { moduleUiChange(D, it) } }
+    private fun initFlowCollector() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                launch { viewModel.aFlow.collect { moduleUiChange(0, it) } }
+                launch { viewModel.bFlow.collect { moduleUiChange(1, it) } }
+                launch { viewModel.cFlow.collect { moduleUiChange(2, it) } }
+                launch { viewModel.dFlow.collect { moduleUiChange(3, it) } }
                 launch { viewModel.uiFlow.collect { uiChange(it) } }
+                launch { SerialManager.instance.runtimeLock.collect { hideButton(it) } }
             }
         }
     }
@@ -57,65 +66,45 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * 初始化文本框
      */
     @SuppressLint("SetTextI18n")
-    private fun initTextView() {
-        binding.a.actions.setOnClickListener { PopTip.show((it as TextView).text) }
-        binding.b.actions.setOnClickListener { PopTip.show((it as TextView).text) }
-        binding.c.actions.setOnClickListener { PopTip.show((it as TextView).text) }
-        binding.d.actions.setOnClickListener { PopTip.show((it as TextView).text) }
+    private fun initTextView(module: Int) {
+        val bind = getBind(module)
+        bind.actions.setOnClickListener { PopTip.show((it as TextView).text) }
     }
 
     /**
      * 初始化按钮
      */
-    private fun initButton() {
-        binding.run {
-            a.run {
-                start.setOnClickListener { this@HomeFragment.viewModel.start(A) }
-                stop.run {
-                    setOnClickListener { PopTip.show(R.mipmap.ic_stop, "长按停止") }
-                    setOnLongClickListener {
-                        this@HomeFragment.viewModel.stop(A)
-                        true
-                    }
+    private fun initButton(module: Int) {
+        val bind = getBind(module)
+        bind.run {
+            start.setOnClickListener { this@HomeFragment.viewModel.start(module) }
+            stop.run {
+                setOnClickListener { PopTip.show(R.mipmap.ic_stop, "长按停止") }
+                setOnLongClickListener {
+                    this@HomeFragment.viewModel.stop(module)
+                    true
                 }
-                select.setOnClickListener { showProgramDialog(A) }
             }
+            select.setOnClickListener { showProgramDialog(module) }
+        }
+    }
+
+    /**
+     * 初始化共有的按钮
+     */
+    private fun initCommonButton() {
+        binding.run {
             b.run {
-                start.setOnClickListener { this@HomeFragment.viewModel.start(B) }
-                stop.run {
-                    setOnClickListener { PopTip.show(R.mipmap.ic_stop, "长按停止") }
-                    setOnLongClickListener {
-                        this@HomeFragment.viewModel.stop(B)
-                        true
-                    }
-                }
-                select.setOnClickListener { showProgramDialog(B) }
+                tvIcon.text = "B"
+                tvIcon.setTextColor(Color.parseColor("#6200EA"))
             }
             c.run {
-                start.setOnClickListener { this@HomeFragment.viewModel.start(C) }
-                stop.run {
-                    setOnClickListener {
-                        PopTip.show(R.mipmap.ic_stop, "长按停止")
-                    }
-                    setOnLongClickListener {
-                        this@HomeFragment.viewModel.stop(C)
-                        true
-                    }
-                }
-                select.setOnClickListener { showProgramDialog(C) }
+                tvIcon.text = "C"
+                tvIcon.setTextColor(Color.parseColor("#00C853"))
             }
             d.run {
-                start.setOnClickListener { this@HomeFragment.viewModel.start(D) }
-                stop.run {
-                    setOnClickListener {
-                        PopTip.show(R.mipmap.ic_stop, "长按停止")
-                    }
-                    setOnLongClickListener {
-                        this@HomeFragment.viewModel.stop(D)
-                        true
-                    }
-                }
-                select.setOnClickListener { showProgramDialog(D) }
+                tvIcon.text = "D"
+                tvIcon.setTextColor(Color.parseColor("#FFAB00"))
             }
             e.run {
                 reset.run {
@@ -157,7 +146,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param module 模块
      * @param state 状态
      */
-    private fun moduleUiChange(module: ModuleEnum, state: ModuleUiState) {
+    private fun moduleUiChange(module: Int, state: ModuleUiState) {
         // 正在执行的个数等于job不为null的个数
         var runningCount = 0
         viewModel.aFlow.value.job?.let { runningCount++ }
@@ -166,111 +155,31 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         viewModel.dFlow.value.job?.let { runningCount++ }
         SerialManager.instance.executing = runningCount
 
-        when (module) {
-            A -> {
-                binding.a.run {
-                    select.run {
-                        isEnabled = state.selectEnable
-                        text = state.program?.name ?: "/"
-                        alpha = if (state.selectEnable) 1f else 0.5f
-                    }
-                    start.run {
-                        isEnabled = state.startEnable
-                        visibility = state.startVisible
-                        alpha = if (state.startEnable) 1f else 0.5f
-                    }
-                    stop.visibility = state.stopVisible
-                    if (state.program != null) {
-                        if (actions.text.toString() != state.program.actions) {
-                            actions.text = state.program.actions
-                        }
-                    } else {
-                        actions.text = "/"
-                    }
-                    status.text = state.status
-                    action.text = state.action
-                    temp.text = state.temp
-                    time.text = state.time
-                }
+        val bind = getBind(module)
+
+        bind.run {
+            select.run {
+                isEnabled = state.selectEnable
+                text = state.program?.name ?: "/"
+                alpha = if (state.selectEnable) 1f else 0.5f
             }
-            B -> {
-                binding.b.run {
-                    select.run {
-                        isEnabled = state.selectEnable
-                        text = state.program?.name ?: "/"
-                        alpha = if (state.selectEnable) 1f else 0.5f
-                    }
-                    start.run {
-                        isEnabled = state.startEnable
-                        visibility = state.startVisible
-                        alpha = if (state.startEnable) 1f else 0.5f
-                    }
-                    stop.visibility = state.stopVisible
-                    if (state.program != null) {
-                        if (actions.text.toString() != state.program.actions) {
-                            actions.text = state.program.actions
-                        }
-                    } else {
-                        actions.text = "/"
-                    }
-                    status.text = state.status
-                    action.text = state.action
-                    temp.text = state.temp
-                    time.text = state.time
-                }
+            start.run {
+                isEnabled = state.startEnable
+                visibility = state.startVisible
+                alpha = if (state.startEnable) 1f else 0.5f
             }
-            C -> {
-                binding.c.run {
-                    select.run {
-                        isEnabled = state.selectEnable
-                        text = state.program?.name ?: "/"
-                        alpha = if (state.selectEnable) 1f else 0.5f
-                    }
-                    start.run {
-                        isEnabled = state.startEnable
-                        visibility = state.startVisible
-                        alpha = if (state.startEnable) 1f else 0.5f
-                    }
-                    stop.visibility = state.stopVisible
-                    if (state.program != null) {
-                        if (actions.text.toString() != state.program.actions) {
-                            actions.text = state.program.actions
-                        }
-                    } else {
-                        actions.text = "/"
-                    }
-                    status.text = state.status
-                    action.text = state.action
-                    temp.text = state.temp
-                    time.text = state.time
+            stop.visibility = state.stopVisible
+            if (state.program != null) {
+                if (actions.text.toString() != state.program.actions) {
+                    actions.text = state.program.actions
                 }
+            } else {
+                actions.text = "/"
             }
-            D -> {
-                binding.d.run {
-                    select.run {
-                        isEnabled = state.selectEnable
-                        text = state.program?.name ?: "/"
-                        alpha = if (state.selectEnable) 1f else 0.5f
-                    }
-                    start.run {
-                        isEnabled = state.startEnable
-                        visibility = state.startVisible
-                        alpha = if (state.startEnable) 1f else 0.5f
-                    }
-                    stop.visibility = state.stopVisible
-                    if (state.program != null) {
-                        if (actions.text.toString() != state.program.actions) {
-                            actions.text = state.program.actions
-                        }
-                    } else {
-                        actions.text = "/"
-                    }
-                    status.text = state.status
-                    action.text = state.action
-                    temp.text = state.temp
-                    time.text = state.time
-                }
-            }
+            status.text = state.status
+            action.text = state.action
+            temp.text = state.temp
+            time.text = state.time
         }
     }
 
@@ -300,12 +209,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
     }
 
-
     /**
      * 选择程序
-     * @param module [ModuleEnum] 模块
+     * @param module [Int] 模块
      */
-    private fun showProgramDialog(module: ModuleEnum) {
+    private fun showProgramDialog(module: Int) {
         val menuList = viewModel.proFlow.value.map { it.name }
         if (menuList.isEmpty()) {
             PopTip.show("请先添加程序")
@@ -324,4 +232,32 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }.width = 300
     }
 
+    /**
+     * 获取Bind
+     */
+    private fun getBind(module: Int) = when (module) {
+        0 -> binding.a
+        1 -> binding.b
+        2 -> binding.c
+        3 -> binding.d
+        else -> binding.a
+    }
+
+    /**
+     * 当机构运行时隐藏暂停按钮
+     * @param lock 锁
+     */
+    private fun hideButton(lock: Boolean) {
+        if (lock) {
+            binding.e.run {
+                pause.visibility = View.GONE
+                tvPause.visibility = View.GONE
+            }
+        } else {
+            binding.e.run {
+                pause.visibility = View.VISIBLE
+                tvPause.visibility = View.VISIBLE
+            }
+        }
+    }
 }

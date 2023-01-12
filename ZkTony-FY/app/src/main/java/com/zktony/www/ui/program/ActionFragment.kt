@@ -32,7 +32,7 @@ class ActionFragment :
     private val actionAdapter by lazy { ActionAdapter() }
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initObserver()
+        initFlowCollector()
         initRecyclerView()
         initButton()
         initEditText()
@@ -41,9 +41,9 @@ class ActionFragment :
     /**
      * 初始化操作
      */
-    private fun initObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+    private fun initFlowCollector() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.actionList.collect {
                         actionAdapter.submitList(it)
@@ -114,11 +114,12 @@ class ActionFragment :
             text = getActionEnum(viewModel.action.value.mode).value
             setOnClickListener {
                 val menuList = ActionEnum.values().map { it.value }
-                PopMenu.show(menuList)
+                PopMenu.show(binding.btnAction, menuList)
                     .setMenuTextInfo(TextInfo().apply {
                         gravity = Gravity.CENTER
                         fontSize = 16
                     })
+                    .setOverlayBaseView(false)
                     .setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
                         override fun getIcon(dialog: PopMenu?, index: Int, menuText: String?): Int {
                             return when (menuText) {
@@ -134,7 +135,9 @@ class ActionFragment :
                         binding.btnAction.text = text
                         viewModel.switchAction(getActionEnum(index))
                         false
-                    }.width = 300
+                    }
+                    .setRadius(0f)
+                    .alignGravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
             }
         }
     }
