@@ -1,17 +1,17 @@
-name: ZkTony-ZM
+name: ZkTony-LIQUID
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'ZkTony-ZM/**'
+      - 'ZkTony-LIQUID/**'
   pull_request:
     paths:
-      - 'ZkTony-ZM/**'
+      - 'ZkTony-LIQUID/**'
 
 env:
-  SAMPLE_PATH: ZkTony-ZM
+  SAMPLE_PATH: ZkTony-LIQUID
 
 jobs:
   build:
@@ -45,7 +45,7 @@ jobs:
       - name: Change wrapper permissions
         working-directory: ${{ env.SAMPLE_PATH }}
         run: chmod +x ./gradlew
-        
+
       - name: Build project
         working-directory: ${{ env.SAMPLE_PATH }}
         run: ./gradlew assembleRelease
