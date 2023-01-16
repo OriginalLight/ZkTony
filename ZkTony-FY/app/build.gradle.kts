@@ -1,9 +1,10 @@
+@file:Suppress("UnstableApiUsage")
 plugins {
     id("com.android.application")
-    kotlin("android")
-    kotlin("kapt")
+    id("org.jetbrains.kotlin.android")
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs")
+    kotlin("kapt")
 }
 
 android {
@@ -16,7 +17,6 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0.0"
-        multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -68,7 +68,6 @@ android {
 
 dependencies {
     implementation(fileTree("dir" to "libs", "include" to listOf("*.jar", "*.aar")))
-    implementation(project(mapOf("path" to ":gpio")))
     implementation(project(mapOf("path" to ":serialport")))
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)

@@ -1,3 +1,4 @@
+@file:Suppress("UnstableApiUsage")
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -18,6 +19,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "ZkTony"
 include(":app")
-include(":gpio")
 include(":serialport")
 

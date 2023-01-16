@@ -10,6 +10,12 @@ buildscript {
         classpath(libs.hilt.android.gradle.plugin)
         classpath(libs.androidx.navigation.safe.args.gradle.plugin)
     }
+
+    val loggerFactory: org.slf4j.ILoggerFactory = org.slf4j.LoggerFactory.getILoggerFactory()
+    val addNoOpLogger: java.lang.reflect.Method = loggerFactory.javaClass.getDeclaredMethod("addNoOpLogger", String::class.java)
+    addNoOpLogger.isAccessible = true
+    addNoOpLogger.invoke(loggerFactory, "com.android.build.api.component.impl.MutableListBackedUpWithListProperty")
+    addNoOpLogger.invoke(loggerFactory, "com.android.build.api.component.impl.MutableMapBackedUpWithMapProperty")
 }
 
 task("clean", Delete::class) {

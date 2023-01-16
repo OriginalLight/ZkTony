@@ -1,9 +1,10 @@
+@file:Suppress("UnstableApiUsage")
 plugins {
     id("com.android.application")
-    kotlin("android")
-    kotlin("kapt")
+    id("org.jetbrains.kotlin.android")
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs")
+    kotlin("kapt")
 }
 
 android {
@@ -16,7 +17,6 @@ android {
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 4
         versionName = "1.1.0"
-        multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -57,6 +57,7 @@ android {
     buildFeatures {
         dataBinding = true
     }
+
 
     applicationVariants.all {
         outputs.all {

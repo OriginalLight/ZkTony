@@ -95,10 +95,6 @@ class AdminFragment :
      * 初始化按钮
      */
     private fun initButton() {
-        binding.btnReset.run {
-            this.clickScale()
-            this.setOnClickListener { viewModel.lowerComputerReset() }
-        }
         binding.btnSetting.run {
             this.clickScale()
             this.setOnClickListener {

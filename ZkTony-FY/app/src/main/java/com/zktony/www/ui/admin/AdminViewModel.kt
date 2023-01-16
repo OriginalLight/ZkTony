@@ -9,7 +9,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.gpio.Gpio
 import com.zktony.www.BuildConfig
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
@@ -97,15 +96,6 @@ class AdminViewModel @Inject constructor(
                 syncMotor()
             }
         }
-    }
-
-    /**
-     * 下位机复位
-     */
-    fun lowerComputerReset() {
-        Gpio.instance.setDirection("gpio156", 1)
-        Gpio.instance.writeGpio("gpio156", 0)
-        Gpio.instance.writeGpio("gpio156", 1)
     }
 
     /**

@@ -1,3 +1,4 @@
+@file:Suppress("UnstableApiUsage")
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
@@ -9,7 +10,6 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
 
         ndk {
             ndkVersion = libs.versions.ndkVersion.get()

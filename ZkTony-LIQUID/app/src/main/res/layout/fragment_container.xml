@@ -41,11 +41,6 @@
 
         </com.google.android.material.tabs.TabLayout>
 
-        <com.google.android.material.divider.MaterialDivider
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@color/dark_onBackground" />
-
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager"
             android:layout_width="match_parent"

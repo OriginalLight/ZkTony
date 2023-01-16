@@ -8,7 +8,6 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.gpio.Gpio
 import com.zktony.serialport.util.Serial
 import com.zktony.www.BuildConfig
 import com.zktony.www.base.BaseViewModel
@@ -126,14 +125,6 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 下位机复位
-     */
-    fun lowerComputerReset() {
-        Gpio.instance.setDirection("gpio156", 1)
-        Gpio.instance.writeGpio("gpio156", 0)
-        Gpio.instance.writeGpio("gpio156", 1)
-    }
 
     /**
      * wifi设置
