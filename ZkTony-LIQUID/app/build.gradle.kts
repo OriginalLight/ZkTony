@@ -61,7 +61,7 @@ android {
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-fy-${versionName}-${name}.apk"
+                "zktony-liquid-${versionName}-${name}.apk"
         }
     }
 }
