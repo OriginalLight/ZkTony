@@ -4,3 +4,4 @@
  2. **ZkTony-ZM** &emsp; 转膜仪
  3. **ZkTony-FY** &emsp; 全自动孵育工作站
  5. **ZkTony-LIQUID** &emsp; 分液产品
+ 6. **ZkTony-TEST** &emsp; 测试程序
