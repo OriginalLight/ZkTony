@@ -106,7 +106,7 @@ class HomeViewModel @Inject constructor(
                             serial = TTYS3, text = V1.queryTemp(i.toString())
                         )
                     }
-                    delay(10 * 1000L)
+                    delay(2 * 1000L)
                 }
             }
         }

@@ -15,40 +15,13 @@
         android:id="@+id/navigation_container"
         android:name="com.zktony.www.ui.container.ContainerFragment"
         android:label="@string/title_container"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_container" />
 
     <fragment
         android:id="@+id/navigation_program"
         android:name="com.zktony.www.ui.program.ProgramFragment"
         android:label="@string/title_program"
         tools:layout="@layout/fragment_program">
-        <action
-            android:id="@+id/action_navigation_program_to_navigation_action"
-            app:destination="@id/navigation_action"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right">
-            <argument android:name="programId" />
-        </action>
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_action"
-        android:name="com.zktony.www.ui.program.ActionFragment"
-        android:label="@string/title_program_edit"
-        tools:layout="@layout/fragment_action">
-        <action
-            android:id="@+id/action_navigation_action_to_navigation_program"
-            app:destination="@id/navigation_program"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
-        <argument
-            android:name="programId"
-            app:argType="string"
-            android:defaultValue="None"/>
     </fragment>
 
     <fragment

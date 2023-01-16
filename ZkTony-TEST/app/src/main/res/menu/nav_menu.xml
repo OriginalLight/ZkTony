@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:id="@+id/g_home">
+        <item
+            android:id="@+id/navigation_tec"
+            android:icon="@drawable/ic_dashboard"
+            android:title="@string/title_tec" />
+    </group>
+
+</menu>

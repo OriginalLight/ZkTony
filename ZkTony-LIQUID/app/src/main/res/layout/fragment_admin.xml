@@ -202,32 +202,6 @@
             <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:visibility="gone">
-
-                <ImageButton
-                    android:id="@+id/btn_reset"
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_marginTop="4dp"
-                    android:background="@mipmap/ic_reset"
-                    tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/btn_reset"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center"
-                    android:text="@string/rest"
-                    android:textSize="16sp" />
-
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
                 android:layout_weight="1">
 
                 <ImageButton

@@ -63,9 +63,6 @@ class ProgramFragment :
         binding.rc1.adapter = adapter
 
         adapter.setOnEditButtonClick {
-            val direction =
-                ProgramFragmentDirections.actionNavigationProgramToNavigationAction(it.id)
-            findNavController().navigate(direction)
         }
 
         adapter.setOnDeleteButtonClick {
