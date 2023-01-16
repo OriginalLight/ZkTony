@@ -1,6 +1,6 @@
 #!/bin/bash
 PS3='选择功能： '
-funs=("后端" "转膜仪" "孵育" "退出")
+funs=("后端" "转膜仪" "孵育" "四通道分液" "测试程序" "退出")
 
 web() {
     echo -n "输入后端版本:" 
@@ -40,6 +40,30 @@ fy() {
     exit
 }
 
+liquid() {
+    echo -n "输入四通道分液版本:" 
+    read ver
+    cd ZkTony-LIQUID/
+    chmod +x ./gradlew
+    ./gradlew assembleRelease
+    cp app/build/outputs/apk/release/zktony-liquid-$ver-release.apk /zktony/
+    echo "打包更新四通道分液安装包完成"
+    exit
+}
+
+test() {
+    liquid() {
+    echo -n "输入测试程序版本:" 
+    read ver
+    cd ZkTony-TEST/
+    chmod +x ./gradlew
+    ./gradlew assembleRelease
+    cp app/build/outputs/apk/release/zktony-test-$ver-release.apk /zktony/
+    echo "打包更新四通道分液安装包完成"
+    exit
+}
+}
+
 select fun in "${funs[@]}"; do
     case $fun in
         "后端")
@@ -50,6 +74,12 @@ select fun in "${funs[@]}"; do
             ;;
         "孵育")
             fy
+            ;;
+        "四通道分液")
+            liquid
+            ;;
+        "测试程序")
+            test
 	    break
             ;;
 	"退出")
