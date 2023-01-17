@@ -80,6 +80,7 @@ select fun in "${funs[@]}"; do
             ;;
         "测试程序")
             test_program
+            break
             ;;
 	    "退出")
 	        exit
