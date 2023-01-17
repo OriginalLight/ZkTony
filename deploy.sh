@@ -51,7 +51,7 @@ liquid() {
     exit
 }
 
-test() {
+test_program() {
     liquid() {
     echo -n "输入测试程序版本:" 
     read ver
@@ -79,12 +79,11 @@ select fun in "${funs[@]}"; do
             liquid
             ;;
         "测试程序")
-            test
-	    break
+            test_program
             ;;
-	"退出")
-	    exit
-	    ;;
-        *) echo "invalid option $REPLY";;
+	    "退出")
+	        exit
+	        ;;
+            *) echo "invalid option $REPLY";;
     esac
 done
