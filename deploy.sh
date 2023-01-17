@@ -66,25 +66,12 @@ test_program() {
 
 select fun in "${funs[@]}"; do
     case $fun in
-        "后端")
-            web
-            ;;
-        "转膜仪")
-            zm
-            ;;
-        "孵育")
-            fy
-            ;;
-        "四通道分液")
-            liquid
-            ;;
-        "测试程序")
-            test_program
-            break
-            ;;
-	    "退出")
-	        exit
-	        ;;
+        "后端")web;;
+        "转膜仪")zm;;
+        "孵育")fy;;
+        "四通道分液")liquid;;
+        "测试程序")test_program;;
+	    "退出")exit;;
             *) echo "invalid option $REPLY";;
     esac
 done
