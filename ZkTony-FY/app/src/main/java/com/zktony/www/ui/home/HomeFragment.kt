@@ -35,14 +35,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
-        initTextView(0)
-        initTextView(1)
-        initTextView(2)
-        initTextView(3)
-        initButton(0)
-        initButton(1)
-        initButton(2)
-        initButton(3)
+        for (i in 0..3) {
+            initTextView(i)
+            initButton(i)
+        }
         initCommonButton()
     }
 
