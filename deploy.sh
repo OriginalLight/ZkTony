@@ -98,3 +98,5 @@ test_program() {
     echo "打包更新四通道分液安装包完成"
     exit
 }
+
+menu
