@@ -1,44 +1,36 @@
 package com.zktony.web.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import java.io.Serializable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
-/**
- * <p>
- * 
- * </p>
- *
- * @author 刘贺贺
- * @since 2022-09-23
- */
+import java.io.Serial;
+import java.io.Serializable;
+
 @Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
-@TableName("version")
+@Entity
+@Table(name = "version")
 public class Version implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.AUTO)
+    @Id
+    @Column(name = "id", nullable = false)
     private Long id;
 
-    @TableField("url")
+    @Column(name = "url")
     private String url;
 
-    @TableField("version_name")
+    @Column(name = "version_name")
     private String versionName;
 
-    @TableField("version_code")
+    @Column(name = "version_code")
     private Integer versionCode;
 
-    @TableField("description")
+    @Column(name = "description")
     private String description;
-
 
 }

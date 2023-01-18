@@ -1,93 +1,84 @@
 package com.zktony.web.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
-
-/**
- * <p>
- * 
- * </p>
- *
- * @author 刘贺贺
- * @since 2022-09-23
- */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
-@TableName("program")
+@Entity
+@Table(name = "program")
 public class Program implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableId(value = "id", type = IdType.ASSIGN_UUID)
+    @Id
+    @Column(name = "id", nullable = false)
     private String id;
 
-    @TableField("name")
+    @Column(name = "name")
     private String name;
 
-    @TableField("motor")
+    @Column(name = "motor")
     private Integer motor;
 
-    @TableField("voltage")
+    @Column(name = "voltage")
     private Float voltage;
 
-    @TableField("time")
+    @Column(name = "time")
     private Float time;
 
-    @TableField("count")
+    @Column(name = "count")
     private Integer count;
 
-    @TableField("thickness")
+    @Column(name = "thickness")
     private String thickness;
 
-    @TableField("glue_type")
+    @Column(name = "glue_type")
     private Integer glueType;
 
-    @TableField("glue_concentration")
+    @Column(name = "glue_concentration")
     private Float glueConcentration;
 
-    @TableField("glue_max_concentration")
+    @Column(name = "glue_max_concentration")
     private Float glueMaxConcentration;
 
-    @TableField("glue_min_concentration")
+    @Column(name = "glue_min_concentration")
     private Float glueMinConcentration;
 
-    @TableField("protein_max_size")
+    @Column(name = "protein_max_size")
     private Float proteinMaxSize;
 
-    @TableField("protein_min_size")
+    @Column(name = "protein_min_size")
     private Float proteinMinSize;
 
-    @TableField("protein_name")
+    @Column(name = "protein_name")
     private String proteinName;
 
-    @TableField("buffer_type")
+    @Column(name = "buffer_type")
     private String bufferType;
 
-    @TableField("model")
+    @Column(name = "model")
     private Integer model;
 
-    @TableField("status")
+    @Column(name = "status")
     private Integer status;
 
-    @TableField("def")
+    @Column(name = "def")
     private Integer def;
 
-    @TableField("upload")
+    @Column(name = "upload")
     private Integer upload;
 
-    @TableField("create_time")
+    @Column(name = "create_time")
     @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss", timezone = "GMT+8", locale = "zh")
     private Date createTime;
-
 
 }
