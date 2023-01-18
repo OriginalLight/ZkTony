@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zktony.web.mapper.ProgramMapper">
+
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zktony.web.entity.Program">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="motor" property="motor" />
+        <result column="voltage" property="voltage" />
+        <result column="time" property="time" />
+        <result column="count" property="count" />
+        <result column="thickness" property="thickness" />
+        <result column="glue_type" property="glueType" />
+        <result column="glue_concentration" property="glueConcentration" />
+        <result column="glue_max_concentration" property="glueMaxConcentration" />
+        <result column="glue_min_concentration" property="glueMinConcentration" />
+        <result column="protein_max_size" property="proteinMaxSize" />
+        <result column="protein_min_size" property="proteinMinSize" />
+        <result column="protein_name" property="proteinName" />
+        <result column="buffer_type" property="bufferType" />
+        <result column="model" property="model" />
+        <result column="status" property="status" />
+        <result column="def" property="def" />
+        <result column="upload" property="upload" />
+        <result column="create_time" property="createTime" />
+    </resultMap>
+
+</mapper>
