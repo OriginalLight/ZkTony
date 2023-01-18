@@ -3,8 +3,8 @@ package com.zktony.web.controller;
 import com.zktony.web.commom.model.Result;
 import com.zktony.web.entity.LogData;
 import com.zktony.web.entity.LogRecord;
-import com.zktony.web.repository.LogDataRepository;
-import com.zktony.web.repository.LogRecordRepository;
+import com.zktony.web.service.ILogDataService;
+import com.zktony.web.service.ILogRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,20 +26,20 @@ import java.util.List;
 public class LogController {
 
     @Autowired
-    private LogRecordRepository recordRepository;
+    private ILogDataService iLogDataService;
 
     @Autowired
-    private LogDataRepository dataRepository;
+    private ILogRecordService iLogRecordService;
 
     @PostMapping("/data")
     public Result<Void> insertData(@RequestBody List<LogData> logDataList) {
-        dataRepository.saveAll(logDataList);
+        iLogDataService.saveOrUpdateBatch(logDataList);
         return Result.ok();
     }
 
     @PostMapping("/record")
     public Result<Void> insertRecord(@RequestBody List<LogRecord> logRecordList) {
-        recordRepository.saveAll(logRecordList);
+        iLogRecordService.saveOrUpdateBatch(logRecordList);
         return Result.ok();
     }
 }
