@@ -1,6 +1,43 @@
 #!/bin/bash
-PS3='选择功能： '
-funs=("后端" "转膜仪" "孵育" "四通道分液" "测试程序" "退出")
+function menu ()
+{
+cat << EOF
+----------------------------------------
+|***************  Menu ****************|
+----------------------------------------
+`echo -e "\033[35m 1)后端\033[0m"`
+`echo -e "\033[35m 2)转膜仪\033[0m"`
+`echo -e "\033[35m 3)孵育\033[0m"`
+`echo -e "\033[35m 4)四通道分液\033[0m"`
+`echo -e "\033[35m 5)测试程序\033[0m"`
+`echo -e "\033[35m 6)退出\033[0m"`
+EOF
+read -p "Please select：" input
+case $input in
+	1)	
+		web
+	;;
+	2)
+		zm
+	;;
+	3)
+		fy
+	;;
+	4)
+		liquid
+	;;
+    5)
+		test_program
+	;;
+	6)
+		exit 0
+	;;
+	*)
+		echo "Input Error ,Please again !!!"
+		exit 1
+	;;
+esac
+}
 
 web() {
     echo -n "输入后端版本:" 
@@ -51,8 +88,7 @@ liquid() {
     exit
 }
 
-test() {
-    liquid() {
+test_program() {
     echo -n "输入测试程序版本:" 
     read ver
     cd ZkTony-TEST/
@@ -62,29 +98,5 @@ test() {
     echo "打包更新四通道分液安装包完成"
     exit
 }
-}
 
-select fun in "${funs[@]}"; do
-    case $fun in
-        "后端")
-            web
-            ;;
-        "转膜仪")
-            zm
-            ;;
-        "孵育")
-            fy
-            ;;
-        "四通道分液")
-            liquid
-            ;;
-        "测试程序")
-            test
-	    break
-            ;;
-	"退出")
-	    exit
-	    ;;
-        *) echo "invalid option $REPLY";;
-    esac
-done
+menu
