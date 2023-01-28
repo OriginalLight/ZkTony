@@ -92,4 +92,10 @@
     <string name="sample_zone">样品区</string>
     <string name="wash_zone">洗涤区</string>
     <string name="elution_zone">洗脱区</string>
+    <string name="row">行</string>
+    <string name="column">列</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
+    <string name="size">规格:</string>
 </resources>
