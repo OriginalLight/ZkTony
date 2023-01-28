@@ -310,12 +310,12 @@ class CommandExecutor constructor(
      * @param block suspend () -> Unit 代码块
      */
     private suspend fun waitForFree(msg: String, block: suspend () -> Unit) {
-        if (serial.runtimeLock.value || serial.drawer) {
+        if (!serial.runtimeLock.value && !serial.drawer) {
+            block.invoke()
+        } else {
             _wait.value = msg
             delay(300L)
             waitForFree(msg, block)
-        } else {
-            block.invoke()
         }
     }
 }
