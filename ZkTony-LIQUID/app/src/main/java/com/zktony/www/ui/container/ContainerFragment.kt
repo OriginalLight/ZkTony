@@ -32,16 +32,16 @@ class ContainerFragment :
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> {
-                        SampleFragment()
+                        PlateOneFragment()
                     }
                     1 -> {
-                        WashFragment()
+                        SampleFragment()
                     }
                     2 -> {
-                        ElutionFragment()
+                        WashFragment()
                     }
                     else -> {
-                        SampleFragment()
+                        PlateOneFragment()
                     }
                 }
             }
@@ -53,7 +53,7 @@ class ContainerFragment :
         ) { tab, position ->
             tab.text = when (position) {
                 0 -> {
-                    "样品区"
+                    "一号板"
                 }
                 1 -> {
                     "洗涤区"

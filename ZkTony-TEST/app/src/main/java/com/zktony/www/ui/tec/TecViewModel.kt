@@ -41,10 +41,10 @@ class TecViewModel @Inject constructor() : BaseViewModel() {
     fun init() {
         viewModelScope.launch {
             launch {
-                MutableSerial.instance.init(Serial.TTYS0, 57600)
+                MutableSerial.instance.init(Serial.TTYS3, 57600)
                 MutableSerial.instance.listener = { port, data ->
                     when (port) {
-                        Serial.TTYS0 -> {
+                        Serial.TTYS3 -> {
                             _serialFlow.value = data.hexToAscii()
                         }
                         else -> {}
@@ -69,7 +69,7 @@ class TecViewModel @Inject constructor() : BaseViewModel() {
                 while (true) {
                     for (i in 0..4) {
                         delay(200L)
-                        MutableSerial.instance.sendText(Serial.TTYS0, "TC1:TCACTUALTEMP?@$i\r")
+                        MutableSerial.instance.sendText(Serial.TTYS3, "TC1:TCACTUALTEMP?@$i\r")
                     }
                     delay(2 * 1000L)
                 }
@@ -89,7 +89,7 @@ class TecViewModel @Inject constructor() : BaseViewModel() {
 
     fun destroy() {
         viewModelScope.launch {
-            MutableSerial.instance.close(Serial.TTYS0)
+            MutableSerial.instance.close(Serial.TTYS3)
         }
     }
 
@@ -124,8 +124,9 @@ class TecViewModel @Inject constructor() : BaseViewModel() {
         count: Int
     ) {
         val flow = flow(flag)
+        setTempDelay(flag)
         MutableSerial.instance.sendText(
-            Serial.TTYS0,
+            Serial.TTYS3,
             "TC1:TCADJUSTTEMP=${low.toString().removeZero()}@$flag\r"
         )
         flow.value = flow.value.copy(setTemp = low, count = count)
@@ -135,8 +136,9 @@ class TecViewModel @Inject constructor() : BaseViewModel() {
             stop(flag)
             return
         }
+        setTempDelay(flag)
         MutableSerial.instance.sendText(
-            Serial.TTYS0,
+            Serial.TTYS3,
             "TC1:TCADJUSTTEMP=${high.toString().removeZero()}@$flag\r"
         )
         flow.value = flow.value.copy(setTemp = high)
@@ -147,6 +149,22 @@ class TecViewModel @Inject constructor() : BaseViewModel() {
             return
         }
         tecTest(low, high, offset, time, flag, count + 1)
+    }
+
+
+    /**
+     * 设置温度时先关闭输出十秒后打开输出
+     */
+    private suspend fun setTempDelay(flag: Int) {
+        MutableSerial.instance.sendText(
+            Serial.TTYS3,
+            "TC1:TCSW=$0@$flag\r"
+        )
+        delay(15 * 1000L)
+        MutableSerial.instance.sendText(
+            Serial.TTYS3,
+            "TC1:TCSW=$1@$flag\r"
+        )
     }
 
 }

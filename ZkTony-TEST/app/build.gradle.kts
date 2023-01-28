@@ -39,10 +39,12 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".test"
         }
         debug {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".test"
         }
     }
     packagingOptions {
