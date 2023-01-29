@@ -119,7 +119,7 @@ class TecViewModel @Inject constructor() : BaseViewModel() {
         low: Float = 4f,
         high: Float = 37f,
         offset: Float = 3f,
-        time: Int = 20,
+        time: Int = 30,
         flag: Int,
         count: Int
     ) {
@@ -158,12 +158,12 @@ class TecViewModel @Inject constructor() : BaseViewModel() {
     private suspend fun setTempDelay(flag: Int) {
         MutableSerial.instance.sendText(
             Serial.TTYS3,
-            "TC1:TCSW=$0@$flag\r"
+            "TC1:TCSW=0@$flag\r"
         )
-        delay(15 * 1000L)
+        delay(30 * 1000L)
         MutableSerial.instance.sendText(
             Serial.TTYS3,
-            "TC1:TCSW=$1@$flag\r"
+            "TC1:TCSW=1@$flag\r"
         )
     }
 

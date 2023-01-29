@@ -11,7 +11,7 @@ import com.zktony.www.common.room.entity.*
  * @author 刘贺贺
  */
 @Database(
-    entities = [Log::class, Program::class, Action::class, Motor::class, Calibration::class],
+    entities = [Log::class, Program::class, Action::class, Motor::class, Calibration::class, Plate::class, Pore::class],
     version = 1,
     exportSchema = false
 )
@@ -22,4 +22,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun actionDao(): ActionDao
     abstract fun motorDao(): MotorDao
     abstract fun calibrationDao(): CalibrationDao
+
+    abstract fun plateDao(): PlateDao
+
+    abstract fun poreDao(): PoreDao
 }

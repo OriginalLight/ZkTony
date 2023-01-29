@@ -8,6 +8,7 @@ import com.zktony.www.common.extension.hexToAscii
 import com.zktony.www.common.extension.hexToInt8
 import com.zktony.www.common.extension.toV1
 import com.zktony.www.common.extension.verifyHex
+import com.zktony.www.common.utils.Logger
 import com.zktony.www.serial.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -115,7 +116,7 @@ class SerialManager(
             launch {
                 while (true) {
                     delay(1000L)
-                    //Logger.d(msg = "lock: $lock, lockTime: $lockTime, executing: $executing, drawer: $drawer")
+                    Logger.d(msg = "lock: ${runtimeLock.value}, lockTime: $lockTime, executing: $executing, drawer: $drawer")
                     // 如果正在运行，计时
                     if (runtimeLock.value) {
                         lockTime += 1L
