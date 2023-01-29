@@ -30,30 +30,21 @@ class DynamicPlate : View {
     private var onItemClick: (Int, Int) -> Unit = { _, _ -> }
     private var data = listOf<Pore>()
 
-    fun setRow(row: Int) {
-        this.row = row
-        invalidate()
-    }
-
     fun getRow() = row
 
-    fun setColumn(column: Int) {
-        this.column = column
-        space = 576 / column
-        invalidate()
-    }
+    fun getColumn() = column
 
     fun setRowAndColumn(row: Int, column: Int) {
         this.row = row
         this.column = column
         space = 576 / column
+        requestLayout()
         invalidate()
     }
 
-    fun getColumn() = column
-
     fun setShowLocation(showLocation: Boolean) {
         this.showLocation = showLocation
+        requestLayout()
         invalidate()
     }
 
@@ -63,13 +54,13 @@ class DynamicPlate : View {
 
     fun setData(data: List<Pore>) {
         this.data = data
+        requestLayout()
         invalidate()
     }
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        if (row == 0 || column == 0) return
         // 绘制核心方法
         val paint = Paint()
         paint.color = Color.WHITE

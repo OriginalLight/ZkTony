@@ -65,6 +65,7 @@ class PlateFragment :
                                 positionTwo.text = "(${
                                     it.x2.toString().removeZero()
                                 }, ${it.y2.toString().removeZero()})"
+                                dynamicPlate.setRowAndColumn(it.row, it.column)
                             }
                         }
                     }
@@ -76,13 +77,6 @@ class PlateFragment :
                         column.setText(viewModel.uiState.value?.column.toString())
                     }
                 }
-                launch {
-                    delay(500L)
-                    binding.dynamicPlate.setRowAndColumn(
-                        viewModel.uiState.value?.row ?: 2,
-                        viewModel.uiState.value?.column ?: 2
-                    )
-                }
             }
         }
     }
@@ -90,16 +84,8 @@ class PlateFragment :
     @SuppressLint("SetTextI18n")
     private fun initEditText() {
         binding.run {
-            row.afterTextChange {
-                val row = it.toIntOrNull() ?: 2
-                dynamicPlate.setRow(maxOf(row, 2))
-                viewModel.setRow(maxOf(row, 2))
-            }
-            column.afterTextChange {
-                val column = it.toIntOrNull() ?: 2
-                dynamicPlate.setColumn(maxOf(column, 2))
-                viewModel.setColumn(maxOf(column, 2))
-            }
+            row.afterTextChange { viewModel.setRow(maxOf(it.toIntOrNull() ?: 2, 2)) }
+            column.afterTextChange { viewModel.setColumn(maxOf(it.toIntOrNull() ?: 2, 2)) }
         }
     }
 
