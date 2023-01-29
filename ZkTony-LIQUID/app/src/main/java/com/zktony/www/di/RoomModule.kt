@@ -65,4 +65,14 @@ object RoomModule {
     fun provideCalibrationDao(database: AppDatabase): CalibrationDao {
         return database.calibrationDao()
     }
+
+    @Provides
+    fun providePlateDao(database: AppDatabase): PlateDao {
+        return database.plateDao()
+    }
+
+    @Provides
+    fun providePoreDao(database: AppDatabase): PoreDao {
+        return database.poreDao()
+    }
 }

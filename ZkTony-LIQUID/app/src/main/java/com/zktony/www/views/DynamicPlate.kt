@@ -8,7 +8,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.zktony.www.data.model.Pore
+import com.zktony.www.common.room.entity.Pore
 
 
 class DynamicPlate : View {
@@ -21,8 +21,8 @@ class DynamicPlate : View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
             super(context, attrs, defStyleAttr, defStyleRes)
 
-    private var row = 8
-    private var column = 12
+    private var row = 0
+    private var column = 0
     private var space = 48
 
     // 显示定位
@@ -32,9 +32,6 @@ class DynamicPlate : View {
 
     fun setRow(row: Int) {
         this.row = row
-        if (row > 0) {
-            space = 384 / row
-        }
         invalidate()
     }
 
@@ -42,6 +39,14 @@ class DynamicPlate : View {
 
     fun setColumn(column: Int) {
         this.column = column
+        space = 576 / column
+        invalidate()
+    }
+
+    fun setRowAndColumn(row: Int, column: Int) {
+        this.row = row
+        this.column = column
+        space = 576 / column
         invalidate()
     }
 
@@ -52,6 +57,10 @@ class DynamicPlate : View {
         invalidate()
     }
 
+    fun setOnItemClick(onItemClick: (Int, Int) -> Unit) {
+        this.onItemClick = onItemClick
+    }
+
     fun setData(data: List<Pore>) {
         this.data = data
         invalidate()
@@ -60,6 +69,7 @@ class DynamicPlate : View {
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
+        if (row == 0 || column == 0) return
         // 绘制核心方法
         val paint = Paint()
         paint.color = Color.WHITE
@@ -85,7 +95,7 @@ class DynamicPlate : View {
 
         for (i in 0 until row) {
             for (j in 0 until column) {
-                val pore = data.find { it.row == i && it.column == j }
+                val pore = data.find { it.x == i && it.y == j }
                 if (pore != null) {
                     if (pore.checked) {
                         paint.color = Color.GREEN
@@ -109,7 +119,6 @@ class DynamicPlate : View {
             paint.color = Color.BLUE
             paint.textAlign = Paint.Align.CENTER
             paint.textSize = space / 2f
-            canvas.drawText("2", (space / 2).toFloat(), (space / 1.5).toFloat(), paint)
             canvas.drawText(
                 "1",
                 (space / 2).toFloat(),
@@ -117,13 +126,12 @@ class DynamicPlate : View {
                 paint
             )
             canvas.drawText(
-                "3",
+                "2",
                 (space * (column - 1) + space / 2).toFloat(),
-                (space * (row - 1) + space / 1.5).toFloat(),
+                (space / 1.5).toFloat(),
                 paint
             )
         }
-
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -134,7 +142,7 @@ class DynamicPlate : View {
                 val y = event.y.toInt()
                 val i = x / space
                 val j = y / space
-                onItemClick(i, j)
+                onItemClick(i, (row - j - 1))
             }
         }
         return super.onTouchEvent(event)

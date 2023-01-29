@@ -26,22 +26,32 @@ class ContainerFragment :
 
         binding.viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
-                return 3
+                return 5
             }
 
             override fun createFragment(position: Int): Fragment {
+                val fragment = PlateFragment()
+                fragment.arguments = Bundle().apply {
+                    putInt("position", position)
+                }
                 return when (position) {
                     0 -> {
-                        PlateOneFragment()
+                        fragment
                     }
                     1 -> {
-                        SampleFragment()
+                        fragment
                     }
                     2 -> {
+                        fragment
+                    }
+                    3 -> {
+                        fragment
+                    }
+                    4 -> {
                         WashFragment()
                     }
                     else -> {
-                        PlateOneFragment()
+                        fragment
                     }
                 }
             }
@@ -56,13 +66,19 @@ class ContainerFragment :
                     "一号板"
                 }
                 1 -> {
-                    "洗涤区"
+                    "二号板"
                 }
                 2 -> {
-                    "洗脱区"
+                    "三号板"
+                }
+                3 -> {
+                    "四号板"
+                }
+                4 -> {
+                    "洗涤区"
                 }
                 else -> {
-                    "样品区"
+                    "一号板"
                 }
             }
         }.attach()
