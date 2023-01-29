@@ -12,7 +12,7 @@ class ContainerViewModel @Inject constructor(
     private val plateRepository: PlateRepository,
 ) : BaseViewModel() {
 
-    init {
+    fun init() {
         viewModelScope.launch {
             plateRepository.init()
         }

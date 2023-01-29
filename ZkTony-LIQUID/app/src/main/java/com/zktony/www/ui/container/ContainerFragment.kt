@@ -13,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ContainerFragment :
     BaseFragment<ContainerViewModel, FragmentContainerBinding>(R.layout.fragment_container) {
+
     override val viewModel: ContainerViewModel by viewModels()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
@@ -24,34 +25,48 @@ class ContainerFragment :
      */
     private fun initView() {
 
+        viewModel.init()
+
         binding.viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
                 return 5
             }
 
             override fun createFragment(position: Int): Fragment {
-                val fragment = PlateFragment()
-                fragment.arguments = Bundle().apply {
+                val fragmentOne = PlateFragment()
+                val fragmentTwo = PlateFragment()
+                val fragmentThree = PlateFragment()
+                val fragmentFour = PlateFragment()
+                fragmentOne.arguments = Bundle().apply {
+                    putInt("position", position)
+                }
+                fragmentTwo.arguments = Bundle().apply {
+                    putInt("position", position)
+                }
+                fragmentThree.arguments = Bundle().apply {
+                    putInt("position", position)
+                }
+                fragmentFour.arguments = Bundle().apply {
                     putInt("position", position)
                 }
                 return when (position) {
                     0 -> {
-                        fragment
+                        fragmentOne
                     }
                     1 -> {
-                        fragment
+                        fragmentTwo
                     }
                     2 -> {
-                        fragment
+                        fragmentThree
                     }
                     3 -> {
-                        fragment
+                        fragmentFour
                     }
                     4 -> {
                         WashFragment()
                     }
                     else -> {
-                        fragment
+                        fragmentOne
                     }
                 }
             }
