@@ -17,40 +17,50 @@ import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.removeZero
+import com.zktony.www.common.extension.showPositionDialog
 import com.zktony.www.databinding.FragmentPlateBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class PlateFragment :
-    BaseFragment<PlateViewModel, FragmentPlateBinding>(R.layout.fragment_plate) {
-    override val viewModel: PlateViewModel by viewModels()
+class PlateOneFragment :
+    BaseFragment<PlateOneViewModel, FragmentPlateBinding>(R.layout.fragment_plate) {
+    override val viewModel: PlateOneViewModel by viewModels()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initView()
         initFlowCollector()
         initEditText()
+        initTextView()
     }
 
     /**
      * 初始化view
      */
     private fun initView() {
-        arguments?.getInt("position")?.let {
-            viewModel.init(it)
-        }
         binding.dynamicPlate.run {
             setShowLocation(true)
             setOnItemClick { x, y ->
-                if (x == 0 && y == 0) showDialog(0)
-                if (x == this.getColumn() - 1 && y == this.getRow() - 1) showDialog(
-                    1
+                if (x == 0 && y == 0) showPositionDialog(0,
+                    { x1, y1 ->
+                        viewModel.move(x1, y1)
+                    },
+                    { x2, y2, flag ->
+                        viewModel.save(x2, y2, flag)
+                    }
+                )
+                if (x == this.getColumn() - 1 && y == this.getRow() - 1) showPositionDialog(1,
+                    { x1, y1 ->
+                        viewModel.move(x1, y1)
+                    },
+                    { x2, y2, flag ->
+                        viewModel.save(x2, y2, flag)
+                    }
                 )
             }
         }
     }
-
     @SuppressLint("SetTextI18n")
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -59,12 +69,12 @@ class PlateFragment :
                     viewModel.uiState.collect {
                         if (it != null) {
                             binding.run {
-                                positionOne.text = "(${
+                                positionOne.text = "1 = ( ${
                                     it.x1.toString().removeZero()
-                                }, ${it.y1.toString().removeZero()})"
-                                positionTwo.text = "(${
+                                }, ${it.y1.toString().removeZero()} )"
+                                positionTwo.text = "2 = ( ${
                                     it.x2.toString().removeZero()
-                                }, ${it.y2.toString().removeZero()})"
+                                }, ${it.y2.toString().removeZero()} )"
                                 dynamicPlate.setRowAndColumn(it.row, it.column)
                             }
                         }
@@ -89,34 +99,28 @@ class PlateFragment :
         }
     }
 
-    private fun showDialog(flag: Int) {
-        CustomDialog.build()
-            .setCustomView(object :
-                OnBindView<CustomDialog>(R.layout.layout_position_input_dialog) {
-                override fun onBind(dialog: CustomDialog, v: View) {
-                    val title = v.findViewById<TextView>(R.id.title)
-                    val inputX = v.findViewById<EditText>(R.id.input_x)
-                    val inputY = v.findViewById<EditText>(R.id.input_y)
-                    val move = v.findViewById<MaterialButton>(R.id.move)
-                    val save = v.findViewById<MaterialButton>(R.id.save)
-                    val cancel = v.findViewById<MaterialButton>(R.id.cancel)
-                    title.text = if (flag == 0) "设置坐标 1" else "设置坐标 2"
-                    move.setOnClickListener {
-                        val x = inputX.text.toString().toFloatOrNull() ?: 0f
-                        val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                        viewModel.move(x, y)
+    private fun initTextView() {
+        binding.run {
+            positionOne.setOnClickListener {
+                showPositionDialog(0,
+                    { x1, y1 ->
+                        viewModel.move(x1, y1)
+                    },
+                    { x2, y2, flag ->
+                        viewModel.save(x2, y2, flag)
                     }
-                    save.setOnClickListener {
-                        val x = inputX.text.toString().toFloatOrNull() ?: 0f
-                        val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                        viewModel.save(x, y, flag)
-                        dialog.dismiss()
+                )
+            }
+            positionTwo.setOnClickListener {
+                showPositionDialog(1,
+                    { x1, y1 ->
+                        viewModel.move(x1, y1)
+                    },
+                    { x2, y2, flag ->
+                        viewModel.save(x2, y2, flag)
                     }
-                    cancel.setOnClickListener { dialog.dismiss() }
-                }
-            })
-            .setCancelable(false)
-            .setMaskColor(Color.parseColor("#4D000000"))
-            .show()
+                )
+            }
+        }
     }
 }

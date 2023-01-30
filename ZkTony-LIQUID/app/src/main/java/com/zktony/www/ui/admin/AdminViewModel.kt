@@ -17,21 +17,18 @@ import com.zktony.www.common.extension.*
 import com.zktony.www.common.network.download.DownloadManager
 import com.zktony.www.common.network.download.DownloadState
 import com.zktony.www.common.network.result.NetworkResult
-import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.utils.Constants.DEVICE_ID
 import com.zktony.www.data.model.Version
-import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
-import com.zktony.www.serialport.SerialPortManager
-import com.zktony.www.serialport.protocol.Command
+import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.control.serial.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.io.File
@@ -41,7 +38,6 @@ import javax.inject.Inject
 class AdminViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val motorRepo: MotorRepository,
-    private val caliRepo: CalibrationRepository,
     private val sysRepo: SystemRepository,
 ) : BaseViewModel() {
 
@@ -58,21 +54,21 @@ class AdminViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                SerialPortManager.instance.ttys0Flow.collect {
+                SerialManager.instance.ttys0Flow.collect {
                     it?.let {
                         onSerialOneResponse(it)
                     }
                 }
             }
             launch {
-                SerialPortManager.instance.ttys1Flow.collect {
+                SerialManager.instance.ttys1Flow.collect {
                     it?.let {
                         onSerialTwoResponse(it)
                     }
                 }
             }
             launch {
-                SerialPortManager.instance.ttys2Flow.collect {
+                SerialManager.instance.ttys2Flow.collect {
                     it?.let {
                         onSerialThreeResponse(it)
                     }
@@ -80,9 +76,6 @@ class AdminViewModel @Inject constructor(
             }
             launch {
                 initAndSyncMotor()
-            }
-            launch {
-                initCalibration()
             }
         }
     }
@@ -94,7 +87,7 @@ class AdminViewModel @Inject constructor(
     private fun onSerialOneResponse(hex: String) {
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotorParameters(data.toMotor().copy(board = Serial.TTYS0.index))
+                updateMotor(data.toMotor().copy(board = Serial.TTYS0.index))
             }
         }
     }
@@ -106,7 +99,7 @@ class AdminViewModel @Inject constructor(
     private fun onSerialTwoResponse(hex: String) {
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotorParameters(data.toMotor().copy(board = Serial.TTYS1.index))
+                updateMotor(data.toMotor().copy(board = Serial.TTYS1.index))
             }
         }
     }
@@ -118,7 +111,7 @@ class AdminViewModel @Inject constructor(
     private fun onSerialThreeResponse(hex: String) {
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotorParameters(
+                updateMotor(
                     data.toMotor().copy(board = Serial.TTYS2.index)
                 )
             }
@@ -260,37 +253,10 @@ class AdminViewModel @Inject constructor(
      */
     private fun initAndSyncMotor() {
         viewModelScope.launch {
-            initMotor()
-            delay(1000L)
             syncMotor()
         }
     }
 
-    /**
-     * 初始化电机
-     */
-    private fun initMotor() {
-        viewModelScope.launch {
-            motorRepo.getAll().first().run {
-                if (this.isEmpty()) {
-                    val motorList = mutableListOf<Motor>()
-                    motorList.add(Motor(name = "X轴", address = 1))
-                    motorList.add(Motor(name = "Y轴", address = 2))
-                    motorList.add(Motor(name = "Z轴", address = 3))
-                    for (i in 1..5) {
-                        val motor = Motor(
-                            name = "泵$i",
-                            address = if (i <= 3) i else i - 3,
-                            board = if (i <= 3) 1 else 2,
-                            motorType = 1,
-                        )
-                        motorList.add(motor)
-                    }
-                    motorRepo.insertBatch(motorList)
-                }
-            }
-        }
-    }
 
     /**
      * 同步电机参数
@@ -302,8 +268,8 @@ class AdminViewModel @Inject constructor(
                     if (i == 2 && j == 3) {
                         break
                     }
-                    SerialPortManager.instance.sendHex(
-                        i.toSerialPort(), Command(
+                    SerialManager.instance.sendHex(
+                        i.toSerialPort(), V1(
                             function = "03", parameter = "04", data = j.int8ToHex()
                         ).toHex()
                     )
@@ -317,7 +283,7 @@ class AdminViewModel @Inject constructor(
      * 根据返回更新电机参数
      * @param motor [Motor]
      */
-    private fun updateMotorParameters(motor: Motor) {
+    private fun updateMotor(motor: Motor) {
         viewModelScope.launch {
             motorRepo.getByBoardAndAddress(motor.board, motor.address).firstOrNull()?.let {
                 motorRepo.update(
@@ -334,17 +300,4 @@ class AdminViewModel @Inject constructor(
         }
     }
 
-    /**
-     * 初始化校准参数
-     */
-    private fun initCalibration() {
-        viewModelScope.launch {
-            // 获取不到校准参数则初始化
-            caliRepo.getCalibration().first().let {
-                if (it.isEmpty()) {
-                    caliRepo.insert(Calibration())
-                }
-            }
-        }
-    }
 }

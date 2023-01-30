@@ -25,52 +25,33 @@ class ContainerFragment :
      */
     private fun initView() {
 
-        viewModel.init()
-
         binding.viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
                 return 5
             }
 
             override fun createFragment(position: Int): Fragment {
-                val fragmentOne = PlateFragment()
-                val fragmentTwo = PlateFragment()
-                val fragmentThree = PlateFragment()
-                val fragmentFour = PlateFragment()
-                fragmentOne.arguments = Bundle().apply {
-                    putInt("position", position)
-                }
-                fragmentTwo.arguments = Bundle().apply {
-                    putInt("position", position)
-                }
-                fragmentThree.arguments = Bundle().apply {
-                    putInt("position", position)
-                }
-                fragmentFour.arguments = Bundle().apply {
-                    putInt("position", position)
-                }
                 return when (position) {
                     0 -> {
-                        fragmentOne
+                        PlateOneFragment()
                     }
                     1 -> {
-                        fragmentTwo
+                        PlateTwoFragment()
                     }
                     2 -> {
-                        fragmentThree
+                        PlateThreeFragment()
                     }
                     3 -> {
-                        fragmentFour
+                        PlateFourFragment()
                     }
                     4 -> {
                         WashFragment()
                     }
                     else -> {
-                        fragmentOne
+                        PlateOneFragment()
                     }
                 }
             }
-
         }
 
         TabLayoutMediator(

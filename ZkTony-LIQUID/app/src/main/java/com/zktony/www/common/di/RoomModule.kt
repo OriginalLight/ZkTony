@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.zktony.www.di
+package com.zktony.www.common.di
 
 import android.content.Context
 import androidx.room.Room

@@ -1,4 +1,4 @@
-package com.zktony.www.serialport
+package com.zktony.www.control.serial
 
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
@@ -7,7 +7,7 @@ import com.zktony.www.common.extension.hexToAscii
 import com.zktony.www.common.extension.hexToInt8
 import com.zktony.www.common.extension.toCommand
 import com.zktony.www.common.extension.verifyHex
-import com.zktony.www.serialport.protocol.Command
+import com.zktony.www.control.serial.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -15,33 +15,26 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class SerialPortManager(
+class SerialManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     private val _ttys0Flow = MutableStateFlow<String?>(null)
     private val _ttys1Flow = MutableStateFlow<String?>(null)
     private val _ttys2Flow = MutableStateFlow<String?>(null)
     private val _ttys3Flow = MutableStateFlow<String?>(null)
+    private val _lock = MutableStateFlow(false)
 
     val ttys0Flow = _ttys0Flow.asStateFlow()
     val ttys1Flow = _ttys1Flow.asStateFlow()
     val ttys2Flow = _ttys2Flow.asStateFlow()
     val ttys3Flow = _ttys3Flow.asStateFlow()
-
-    // 机构运行状态
-    var lock = false
+    val lockFlow = _lock.asStateFlow()
 
     // 机构运行已经等待的时间
     private var lockTime = 0L
 
     // 机构运行小步骤等待时间
-    private val waitTime = 60L * 2
-
-    // 机构的抽屉状态
-    var drawer = false
-
-    // 正在执行模块的个数
-    var executing = 0
+    private val waitTime = 60L
 
     init {
         scope.launch {
@@ -88,19 +81,12 @@ class SerialPortManager(
                             val total = res.data.substring(2, 4).hexToInt8()
                             val current = res.data.substring(6, 8).hexToInt8()
                             if (total == current) {
-                                lock = false
+                                _lock.value = false
                                 lockTime = 0L
-                                // 如果还有任务运行恢复摇床
-                                if (executing > 0) {
-                                    sendHex(TTYS0, Command.resumeShakeBed())
-                                }
                             } else {
-                                lock = true
+                                _lock.value = true
                                 lockTime = 0L
                             }
-                        }
-                        if (res.function == "86" && res.parameter == "01") {
-                            drawer = res.data.hexToInt8() == 0
                         }
                     }
                 }
@@ -108,22 +94,12 @@ class SerialPortManager(
             launch {
                 while (true) {
                     delay(1000L)
-                    //Logger.d(msg = "lock: $lock, lockTime: $lockTime, executing: $executing, drawer: $drawer")
-                    // 如果正在运行，计时
-                    if (lock) {
+                    if (_lock.value) {
                         lockTime += 1L
-                    }
-                    // 如果运行时间超过 60 秒，默认不运行，如果还有任务运行恢复摇床
-                    if (lock && lockTime >= waitTime) {
-                        lockTime = 0L
-                        lock = false
-                        // 恢复摇床
-                        if (executing > 0) {
-                            sendHex(TTYS0, Command.resumeShakeBed())
+                        if (lockTime >= waitTime) {
+                            _lock.value = false
+                            lockTime = 0L
                         }
-                    }
-                    if (drawer) {
-                        sendHex(TTYS0, Command.queryDrawer())
                     }
                 }
             }
@@ -135,10 +111,14 @@ class SerialPortManager(
      * @param serial 串口
      * @param hex 命令
      */
-    fun sendHex(serial: Serial, hex: String) {
+    fun sendHex(serial: Serial, hex: String, lock : Boolean = false) {
         scope.launch {
             MutableSerial.instance.sendHex(serial, hex)
             //Logger.e(msg = "${serial.value} sendHex: ${hex.hexFormat()}")
+            if (lock) {
+                _lock.value = true
+                lockTime = 0L
+            }
         }
     }
 
@@ -154,22 +134,11 @@ class SerialPortManager(
         }
     }
 
-    /**
-     *  设置锁
-     *  @param lock [Boolean] 是否锁定 true 锁定 false 解锁
-     */
-    fun lock(lock: Boolean) {
-        this.lock = lock
-        if (lock) {
-            sendHex(TTYS0, Command.pauseShakeBed())
-        }
-    }
-
 
     companion object {
         @JvmStatic
-        val instance: SerialPortManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            SerialPortManager()
+        val instance: SerialManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+            SerialManager()
         }
     }
 }

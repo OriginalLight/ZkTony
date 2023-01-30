@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:orientation="vertical"
-        tools:context=".ui.container.PlateFragment">
+        tools:context=".ui.container.PlateOneFragment">
 
         <LinearLayout
             android:layout_width="match_parent"

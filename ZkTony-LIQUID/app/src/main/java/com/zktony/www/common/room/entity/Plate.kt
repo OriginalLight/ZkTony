@@ -22,5 +22,5 @@ data class Plate(
     val y2: Float = 0f,
 ) {
     @Ignore
-    val pores: List<Pore> = listOf()
+    var pores: List<Pore> = listOf()
 }

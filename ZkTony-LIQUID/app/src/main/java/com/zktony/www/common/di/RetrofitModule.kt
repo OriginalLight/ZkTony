@@ -1,4 +1,4 @@
-package com.zktony.www.di
+package com.zktony.www.common.di
 
 import com.zktony.www.BuildConfig
 import com.zktony.www.common.network.adapter.NetworkResponseAdapterFactory

@@ -1,7 +1,7 @@
 package com.zktony.www.common.extension
 
 import com.zktony.www.common.room.entity.Motor
-import com.zktony.www.serialport.protocol.Command
+import com.zktony.www.control.serial.protocol.V1
 import java.math.BigInteger
 
 /**
@@ -199,10 +199,10 @@ fun String.toMotor(): Motor {
 
 /**
  * 解析十六进制字符串为Command
- * @return [Command]
+ * @return [V1]
  */
-fun String.toCommand(): Command {
-    return Command(
+fun String.toCommand(): V1 {
+    return V1(
         header = this.substring(0, 2),
         address = this.substring(2, 4),
         function = this.substring(4, 6),

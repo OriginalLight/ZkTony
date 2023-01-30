@@ -18,5 +18,5 @@ interface CalibrationDao {
     suspend fun update(calibration: Calibration)
 
     @Query("SELECT * FROM calibration")
-    fun getCailbration(): Flow<List<Calibration>>
+    fun getAll(): Flow<List<Calibration>>
 }
