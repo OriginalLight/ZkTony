@@ -3,6 +3,7 @@ package com.zktony.www.data.repository
 import com.zktony.www.common.room.dao.CalibrationDao
 import com.zktony.www.common.room.entity.Calibration
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 /**
@@ -20,7 +21,14 @@ class CalibrationRepository @Inject constructor(
         dao.update(calibration)
     }
 
-    fun getCalibration(): Flow<List<Calibration>> {
-        return dao.getCailbration()
+    fun getAll(): Flow<List<Calibration>> {
+        return dao.getAll()
+    }
+
+    suspend fun init() {
+        val calibrations = dao.getAll().firstOrNull()
+        if (calibrations.isNullOrEmpty()) {
+            dao.insert(Calibration(enable = true))
+        }
     }
 }

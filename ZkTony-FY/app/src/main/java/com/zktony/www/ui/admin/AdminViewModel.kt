@@ -93,7 +93,9 @@ class AdminViewModel @Inject constructor(
             launch {
                 initMotor()
                 delay(1000L)
-                syncMotor()
+                if (!SerialManager.instance.runtimeLock.value) {
+                    syncMotor()
+                }
             }
         }
     }

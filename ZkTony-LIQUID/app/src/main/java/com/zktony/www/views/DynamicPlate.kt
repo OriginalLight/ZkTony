@@ -54,7 +54,6 @@ class DynamicPlate : View {
 
     fun setData(data: List<Pore>) {
         this.data = data
-        requestLayout()
         invalidate()
     }
 

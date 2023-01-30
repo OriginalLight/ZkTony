@@ -1,4 +1,4 @@
-package com.zktony.www.serialport.protocol
+package com.zktony.www.control.serial.protocol
 
 import com.zktony.www.common.extension.toHex
 
@@ -6,7 +6,7 @@ import com.zktony.www.common.extension.toHex
  * @author: 刘贺贺
  * @date: 2022-10-17 13:09
  */
-data class Command(
+data class V1(
     val header: String = "EE",
     val address: String = "01",
     val function: String = "06",
@@ -61,7 +61,7 @@ data class Command(
          */
         @JvmStatic
         fun pauseShakeBed(): String {
-            return Command(parameter = "0B", data = "0100").toHex()
+            return V1(parameter = "0B", data = "0100").toHex()
         }
 
         /**
@@ -70,7 +70,7 @@ data class Command(
          */
         @JvmStatic
         fun resumeShakeBed(): String {
-            return Command(parameter = "0B", data = "0101").toHex()
+            return V1(parameter = "0B", data = "0101").toHex()
         }
 
         /**
@@ -80,7 +80,7 @@ data class Command(
          */
         @JvmStatic
         fun singlePoint(data: String): String {
-            return Command(function = "05", parameter = "01", data = "0101" + data.toHex()).toHex()
+            return V1(function = "05", parameter = "01", data = "0101" + data.toHex()).toHex()
         }
 
         /**
@@ -90,7 +90,7 @@ data class Command(
          */
         @JvmStatic
         fun multiPoint(data: String): String {
-            return Command(function = "05", parameter = "04", data = "0101" + data.toHex()).toHex()
+            return V1(function = "05", parameter = "04", data = "0101" + data.toHex()).toHex()
         }
 
         /**
@@ -99,7 +99,7 @@ data class Command(
          */
         @JvmStatic
         fun queryDrawer(): String {
-            return Command(parameter = "0C").toHex()
+            return V1(parameter = "0C").toHex()
         }
     }
 }

@@ -70,11 +70,11 @@
     <string name="test">测试</string>
     <string name="title_adjust">管理员</string>
     <string name="title_admin">管理员</string>
-    <string name="title_calibration">校准设置</string>
+    <string name="title_calibration">校准管理</string>
     <string name="title_dashboard">流程监控</string>
     <string name="title_home">主界面</string>
     <string name="title_log">日志</string>
-    <string name="title_program">孵育程序</string>
+    <string name="title_program">分液程序</string>
     <string name="title_program_edit">程序编辑页面</string>
     <string name="to_web">产品网站</string>
     <string name="update">升级</string>
@@ -94,12 +94,11 @@
     <string name="elution_zone">洗脱区</string>
     <string name="row">行</string>
     <string name="column">列</string>
-    <string name="appwidget_text">EXAMPLE</string>
-    <string name="add_widget">Add widget</string>
-    <string name="app_widget_description">This is an app widget description</string>
     <string name="size">规格:</string>
     <string name="move">移动</string>
     <string name="save">保存</string>
     <string name="input_x">X轴坐标</string>
     <string name="input_y">Y轴坐标</string>
+    <string name="calibration_name">校准程序名</string>
+    <string name="checked">选中</string>
 </resources>

@@ -42,13 +42,6 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/action_navigation_admin_to_navigation_calibration"
-            app:destination="@id/navigation_calibration"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
     <fragment
@@ -67,16 +60,8 @@
 
     <fragment
         android:id="@+id/navigation_calibration"
-        android:name="com.zktony.www.ui.admin.CalibrationFragment"
+        android:name="com.zktony.www.ui.calibration.CalibrationFragment"
         android:label="@string/title_calibration"
-        tools:layout="@layout/fragment_calibration" >
-        <action
-            android:id="@+id/action_navigation_calibration_to_navigation_admin"
-            app:destination="@id/navigation_admin"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
-    </fragment>
+        tools:layout="@layout/fragment_calibration" />
 
 </navigation>
