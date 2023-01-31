@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.room.entity.Program
-import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +15,6 @@ import javax.inject.Inject
 @HiltViewModel
 class ProgramViewModel @Inject constructor(
     private val programRepo: ProgramRepository,
-    private val actionRepo: ActionRepository
 ) : BaseViewModel() {
     private val _programList = MutableStateFlow(emptyList<Program>())
     val programList = _programList.asStateFlow()
@@ -50,7 +48,6 @@ class ProgramViewModel @Inject constructor(
     fun deleteProgram(program: Program) {
         viewModelScope.launch {
             programRepo.delete(program)
-            actionRepo.deleteByProgramId(program.id)
         }
     }
 }

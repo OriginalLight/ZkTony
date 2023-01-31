@@ -6,6 +6,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.InputDialog
 import com.kongzue.dialogx.dialogs.MessageDialog
 import com.kongzue.dialogx.util.InputInfo
@@ -56,7 +57,10 @@ class CalibrationFragment :
                 false
             }
         }
-        adapter.setOnEditButtonClick { _ -> }
+        adapter.setOnEditButtonClick { it ->
+            val directions = CalibrationFragmentDirections.actionNavigationCalibrationToNavigationCalibrationData(it.id)
+            findNavController().navigate(directions)
+        }
     }
 
     private fun initButton() {

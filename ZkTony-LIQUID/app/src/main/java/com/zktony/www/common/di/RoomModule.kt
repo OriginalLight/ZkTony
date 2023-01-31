@@ -52,11 +52,6 @@ object RoomModule {
     }
 
     @Provides
-    fun provideActionDao(database: AppDatabase): ActionDao {
-        return database.actionDao()
-    }
-
-    @Provides
     fun provideMotorDao(database: AppDatabase): MotorDao {
         return database.motorDao()
     }
@@ -64,6 +59,11 @@ object RoomModule {
     @Provides
     fun provideCalibrationDao(database: AppDatabase): CalibrationDao {
         return database.calibrationDao()
+    }
+
+    @Provides
+    fun provideCalibrationDataDao(database: AppDatabase): CalibrationDataDao {
+        return database.calibrationDataDao()
     }
 
     @Provides
