@@ -70,6 +70,7 @@
 # These classes are duplicated between android.jar and org.apache.http.legacy.jar.
 -dontnote org.apache.http.**
 -dontnote android.net.http.**
+-dontwarn javax.lang.model.element.**
 
 # 保持自定义控件类不被混淆
 -keepclasseswithmembers class * {
