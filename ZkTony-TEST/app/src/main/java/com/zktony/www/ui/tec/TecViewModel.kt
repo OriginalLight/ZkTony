@@ -160,11 +160,12 @@ class TecViewModel @Inject constructor() : BaseViewModel() {
             Serial.TTYS3,
             "TC1:TCSW=0@$flag\r"
         )
-        delay(30 * 1000L)
+        delay(20 * 1000L)
         MutableSerial.instance.sendText(
             Serial.TTYS3,
             "TC1:TCSW=1@$flag\r"
         )
+        delay(1000L)
     }
 
 }
