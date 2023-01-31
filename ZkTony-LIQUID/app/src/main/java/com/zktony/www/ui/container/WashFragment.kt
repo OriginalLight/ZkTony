@@ -1,5 +1,6 @@
 package com.zktony.www.ui.container
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -24,26 +25,26 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
     }
 
     private fun initView() {
-        binding.washPlate.setOnItemClick {
-            showPositionDialog(0,
-                { x1, y1 ->
-                    viewModel.move(x1, y1)
-                },
-                { x2, y2, _ ->
-                    viewModel.save(x2, y2)
-                }
+        binding.position.setOnClickListener {
+            showPositionDialog(
+                textX = viewModel.uiState.value!!.x1,
+                textY = viewModel.uiState.value!!.y1,
+                block1 = { x1, y1 -> viewModel.move(x1, y1) },
+                block2 = { x2, y2 -> viewModel.save(x2, y2) }
             )
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     if (it != null) {
-                        binding.washPlate.setText(
-                            "( ${it.x1.toString().removeZero()} , ${it.y1.toString().removeZero()} )"
-                        )
+                        binding.position.text =
+                            "( ${it.x1.toString().removeZero()} , ${
+                                it.y1.toString().removeZero()
+                            } )"
                     }
                 }
             }

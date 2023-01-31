@@ -23,7 +23,7 @@ class DynamicPlate : View {
 
     private var row = 0
     private var column = 0
-    private var space = 48
+    private var space = 40
 
     // 显示定位
     private var showLocation = false
@@ -37,7 +37,7 @@ class DynamicPlate : View {
     fun setRowAndColumn(row: Int, column: Int) {
         this.row = row
         this.column = column
-        space = 576 / column
+        space = 480 / column
         requestLayout()
         invalidate()
     }
@@ -107,18 +107,17 @@ class DynamicPlate : View {
 
         if (showLocation) {
             paint.color = Color.BLUE
-            paint.textAlign = Paint.Align.CENTER
-            paint.textSize = space / 2f
-            canvas.drawText(
-                "1",
+            canvas.drawCircle(
                 (space / 2).toFloat(),
-                (space * (row - 1) + space / 1.5).toFloat(),
+                (space * (row - 1) + space / 2).toFloat(),
+                space / 3f,
                 paint
             )
-            canvas.drawText(
-                "2",
+            paint.color = Color.GREEN
+            canvas.drawCircle(
                 (space * (column - 1) + space / 2).toFloat(),
-                (space / 1.5).toFloat(),
+                (space / 2).toFloat(),
+                space / 3f,
                 paint
             )
         }

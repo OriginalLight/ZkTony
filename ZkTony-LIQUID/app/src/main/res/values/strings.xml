@@ -101,4 +101,6 @@
     <string name="input_y">Y轴坐标</string>
     <string name="calibration_name">校准程序名</string>
     <string name="checked">选中</string>
+    <string name="button">Button</string>
+    <string name="text">Text</string>
 </resources>

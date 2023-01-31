@@ -17,6 +17,12 @@ interface CalibrationDao {
     @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun update(calibration: Calibration)
 
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateBatch(calibrations: List<Calibration>)
+
+    @Delete
+    suspend fun delete(calibration: Calibration)
+
     @Query("SELECT * FROM calibration")
     fun getAll(): Flow<List<Calibration>>
 }

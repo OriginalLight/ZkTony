@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.data.model.CalibrationData
+import com.zktony.www.common.room.entity.CalibrationData
 import com.zktony.www.databinding.ItemCalibrationDataBinding
 
 /**

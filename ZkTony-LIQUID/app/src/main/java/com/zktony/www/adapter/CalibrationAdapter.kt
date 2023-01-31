@@ -8,15 +8,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.room.entity.Calibration
-import com.zktony.www.common.room.entity.Program
 import com.zktony.www.databinding.ItemCalibrationBinding
-import com.zktony.www.databinding.ItemProgramBinding
 
 /**
  * @author: 刘贺贺
  * @date: 2022-09-21 11:27
  */
-class CalibrationAdapter : ListAdapter<Calibration, CalibrationAdapter.ViewHolder>(CalibrationDiffCallback()) {
+class CalibrationAdapter :
+    ListAdapter<Calibration, CalibrationAdapter.ViewHolder>(CalibrationDiffCallback()) {
 
     private lateinit var onDeleteButtonClick: (Calibration) -> Unit
     private lateinit var onEditButtonClick: (Calibration) -> Unit

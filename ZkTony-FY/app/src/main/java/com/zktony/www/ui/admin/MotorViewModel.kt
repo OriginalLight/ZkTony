@@ -5,7 +5,7 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.serialport.util.Serial
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.data.model.Motor
+import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.serial.SerialManager
 import com.zktony.www.serial.protocol.V1

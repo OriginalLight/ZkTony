@@ -11,6 +11,7 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.showPositionDialog
+import com.zktony.www.common.extension.showSizeDialog
 import com.zktony.www.databinding.FragmentPlateBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -24,32 +25,35 @@ class PlateFourFragment :
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initView()
         initFlowCollector()
-        initEditText()
-        initTextView()
     }
 
     /**
      * 初始化view
      */
     private fun initView() {
-        binding.dynamicPlate.run {
-            setShowLocation(true)
-            setOnItemClick { x, y ->
-                if (x == 0 && y == 0) showPositionDialog(0,
-                    { x1, y1 ->
-                        viewModel.move(x1, y1)
-                    },
-                    { x2, y2, flag ->
-                        viewModel.save(x2, y2, flag)
-                    }
+        binding.run {
+            dynamicPlate.setShowLocation(true)
+            rowColumn.setOnClickListener {
+                showSizeDialog(
+                    textRow = viewModel.uiState.value!!.row,
+                    textColumn = viewModel.uiState.value!!.column,
+                    block1 = { row, column -> viewModel.setRowAndColumn(row, column) }
                 )
-                if (x == this.getColumn() - 1 && y == this.getRow() - 1) showPositionDialog(1,
-                    { x1, y1 ->
-                        viewModel.move(x1, y1)
-                    },
-                    { x2, y2, flag ->
-                        viewModel.save(x2, y2, flag)
-                    }
+            }
+            positionOne.setOnClickListener {
+                showPositionDialog(
+                    textX = viewModel.uiState.value!!.x1,
+                    textY = viewModel.uiState.value!!.y1,
+                    block1 = { x, y -> viewModel.move(x, y) },
+                    block2 = { x, y -> viewModel.save(x, y, 0) }
+                )
+            }
+            positionTwo.setOnClickListener {
+                showPositionDialog(
+                    textX = viewModel.uiState.value!!.x2,
+                    textY = viewModel.uiState.value!!.y2,
+                    block1 = { x, y -> viewModel.move(x, y) },
+                    block2 = { x, y -> viewModel.save(x, y, 1) }
                 )
             }
         }
@@ -63,57 +67,19 @@ class PlateFourFragment :
                     viewModel.uiState.collect {
                         if (it != null) {
                             binding.run {
-                                positionOne.text = "1 = ( ${
+                                rowColumn.text = "${it.row} X ${it.column}"
+                                positionOne.text = "( ${
                                     it.x1.toString().removeZero()
-                                }, ${it.y1.toString().removeZero()} )"
-                                positionTwo.text = "2 = ( ${
+                                } , ${it.y1.toString().removeZero()} )"
+                                positionTwo.text = "( ${
                                     it.x2.toString().removeZero()
-                                }, ${it.y2.toString().removeZero()} )"
+                                } , ${it.y2.toString().removeZero()} )"
+
                                 dynamicPlate.setRowAndColumn(it.row, it.column)
                             }
                         }
                     }
                 }
-                launch {
-                    delay(300L)
-                    binding.run {
-                        row.setText(viewModel.uiState.value?.row.toString())
-                        column.setText(viewModel.uiState.value?.column.toString())
-                    }
-                }
-            }
-        }
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun initEditText() {
-        binding.run {
-            row.afterTextChange { viewModel.setRow(maxOf(it.toIntOrNull() ?: 2, 2)) }
-            column.afterTextChange { viewModel.setColumn(maxOf(it.toIntOrNull() ?: 2, 2)) }
-        }
-    }
-
-    private fun initTextView() {
-        binding.run {
-            positionOne.setOnClickListener {
-                showPositionDialog(0,
-                    { x1, y1 ->
-                        viewModel.move(x1, y1)
-                    },
-                    { x2, y2, flag ->
-                        viewModel.save(x2, y2, flag)
-                    }
-                )
-            }
-            positionTwo.setOnClickListener {
-                showPositionDialog(1,
-                    { x1, y1 ->
-                        viewModel.move(x1, y1)
-                    },
-                    { x2, y2, flag ->
-                        viewModel.save(x2, y2, flag)
-                    }
-                )
             }
         }
     }

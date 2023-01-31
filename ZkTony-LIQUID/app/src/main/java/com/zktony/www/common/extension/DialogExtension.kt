@@ -14,7 +14,7 @@ import com.zktony.www.R
  * @date: 2023-01-30 9:39
  */
 
-fun showPositionDialog(flag: Int, block1:(Float, Float) -> Unit, block2: (Float, Float, Int) -> Unit) {
+fun showPositionDialog(textX:Float, textY: Float, block1:(Float, Float) -> Unit, block2: (Float, Float) -> Unit) {
     CustomDialog.build()
         .setCustomView(object :
             OnBindView<CustomDialog>(R.layout.layout_position_input_dialog) {
@@ -26,6 +26,8 @@ fun showPositionDialog(flag: Int, block1:(Float, Float) -> Unit, block2: (Float,
                 val save = v.findViewById<MaterialButton>(R.id.save)
                 val cancel = v.findViewById<MaterialButton>(R.id.cancel)
                 title.text = "设置坐标"
+                inputX.setText(textX.toString().removeZero())
+                inputY.setText(textY.toString().removeZero())
                 move.setOnClickListener {
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
@@ -34,7 +36,34 @@ fun showPositionDialog(flag: Int, block1:(Float, Float) -> Unit, block2: (Float,
                 save.setOnClickListener {
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                    block2(x, y, flag)
+                    block2(x, y)
+                    dialog.dismiss()
+                }
+                cancel.setOnClickListener { dialog.dismiss() }
+            }
+        })
+        .setCancelable(false)
+        .setMaskColor(Color.parseColor("#4D000000"))
+        .show()
+}
+
+fun showSizeDialog(textRow:Int, textColumn: Int, block1:(Int, Int) -> Unit) {
+    CustomDialog.build()
+        .setCustomView(object :
+            OnBindView<CustomDialog>(R.layout.layout_size_input_dialog) {
+            override fun onBind(dialog: CustomDialog, v: View) {
+                val title = v.findViewById<TextView>(R.id.title)
+                val row = v.findViewById<EditText>(R.id.row)
+                val column = v.findViewById<EditText>(R.id.column)
+                val save = v.findViewById<MaterialButton>(R.id.save)
+                val cancel = v.findViewById<MaterialButton>(R.id.cancel)
+                title.text = "设置孔板规格"
+                row.setText(textRow.toString())
+                column.setText(textColumn.toString())
+                save.setOnClickListener {
+                    val x = row.text.toString().toIntOrNull() ?: 2
+                    val y = column.text.toString().toIntOrNull() ?: 2
+                    block1(x, y)
                     dialog.dismiss()
                 }
                 cancel.setOnClickListener { dialog.dismiss() }
