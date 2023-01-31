@@ -31,7 +31,9 @@ fun showPositionDialog(textX:Float, textY: Float, block1:(Float, Float) -> Unit,
                 move.setOnClickListener {
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                    block1(x, y)
+                    if (isFastClick().not()) {
+                        block1(x, y)
+                    }
                 }
                 save.setOnClickListener {
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
