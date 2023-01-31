@@ -12,10 +12,10 @@ import com.zktony.www.common.extension.extractTemp
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.model.Queue
 import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.model.Action
-import com.zktony.www.data.model.Log
-import com.zktony.www.data.model.Program
-import com.zktony.www.data.model.getActionEnum
+import com.zktony.www.common.room.entity.Action
+import com.zktony.www.common.room.entity.Log
+import com.zktony.www.common.room.entity.Program
+import com.zktony.www.common.room.entity.getActionEnum
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.ProgramRepository

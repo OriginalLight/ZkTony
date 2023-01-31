@@ -2,7 +2,7 @@ package com.zktony.www.ui.program
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.data.model.Program
+import com.zktony.www.common.room.entity.Program
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

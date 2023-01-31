@@ -29,7 +29,7 @@ class MotorManager(
         this.p2 = motor.find { it.board == 1 && it.address == 2 } ?: Motor()
         this.p3 = motor.find { it.board == 1 && it.address == 3 } ?: Motor()
         this.p4 = motor.find { it.board == 2 && it.address == 1 } ?: Motor()
-        this.cali = calibration.find { it.enable } ?: Calibration()
+        this.cali = calibration.find { it.enable == 1 } ?: Calibration()
         Logger.d("MotorManager", "init: $x, $y, $p1, $p2, $p3, $p4, $cali")
     }
 

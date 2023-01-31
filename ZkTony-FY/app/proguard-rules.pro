@@ -97,5 +97,6 @@
 
 # Model
 -keepclasseswithmembers class com.zktony.www.data.model.** {*;}
+-keepclasseswithmembers class * extends com.zktony.www.common.room.entity.** {*;}
 -keepclasseswithmembers class com.zktony.www.common.network.adapter.NetworkResponse {*;}
 -keepclasseswithmembers class * extends com.zktony.www.common.network.adapter.NetworkResponse {*;}

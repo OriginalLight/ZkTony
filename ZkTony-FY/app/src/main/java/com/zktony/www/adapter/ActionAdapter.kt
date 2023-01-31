@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.R
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.data.model.Action
-import com.zktony.www.data.model.getActionEnum
+import com.zktony.www.common.room.entity.Action
+import com.zktony.www.common.room.entity.getActionEnum
 import com.zktony.www.databinding.ItemActionBinding
 
 /**

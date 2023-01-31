@@ -5,7 +5,7 @@ import com.zktony.www.common.network.adapter.NetworkResponseAdapterFactory
 import com.zktony.www.common.network.converter.GsonConverterFactory
 import com.zktony.www.common.network.interceptor.logInterceptor
 import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.service.SystemService
+import com.zktony.www.common.network.service.SystemService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

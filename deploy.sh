@@ -56,45 +56,37 @@ web() {
 }
 
 zm() {
-    echo -n "输入转膜仪版本:" 
-    read ver
     cd ZkTony-ZM/
     chmod +x ./gradlew
     ./gradlew assembleRelease
-    cp app/build/outputs/apk/release/zktony-zm-$ver-release.apk /zktony/
+    cp app/build/outputs/apk/release/zktony-zm-*-release.apk /zktony/
     echo "打包更新转膜仪安装包完成"
     exit
 }
 
 fy() {
-    echo -n "输入孵育版本:" 
-    read ver
     cd ZkTony-FY/
     chmod +x ./gradlew
     ./gradlew assembleRelease
-    cp app/build/outputs/apk/release/zktony-fy-$ver-release.apk /zktony/
+    cp app/build/outputs/apk/release/zktony-fy-*-release.apk /zktony/
     echo "打包更新转膜仪安装包完成"
     exit
 }
 
 liquid() {
-    echo -n "输入四通道分液版本:" 
-    read ver
     cd ZkTony-LIQUID/
     chmod +x ./gradlew
     ./gradlew assembleRelease
-    cp app/build/outputs/apk/release/zktony-liquid-$ver-release.apk /zktony/
+    cp app/build/outputs/apk/release/zktony-liquid-*-release.apk /zktony/
     echo "打包更新四通道分液安装包完成"
     exit
 }
 
 test_program() {
-    echo -n "输入测试程序版本:" 
-    read ver
     cd ZkTony-TEST/
     chmod +x ./gradlew
     ./gradlew assembleRelease
-    cp app/build/outputs/apk/release/zktony-test-$ver-release.apk /zktony/
+    cp app/build/outputs/apk/release/zktony-test-*-release.apk /zktony/
     echo "打包更新四通道分液安装包完成"
     exit
 }

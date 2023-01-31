@@ -1,7 +1,7 @@
 package com.zktony.www.data.repository
 
-import com.zktony.www.data.dao.LogDao
-import com.zktony.www.data.model.Log
+import com.zktony.www.common.room.dao.LogDao
+import com.zktony.www.common.room.entity.Log
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 import javax.inject.Inject

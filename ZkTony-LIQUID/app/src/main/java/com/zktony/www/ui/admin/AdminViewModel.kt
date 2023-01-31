@@ -75,7 +75,7 @@ class AdminViewModel @Inject constructor(
                 }
             }
             launch {
-                initAndSyncMotor()
+                syncMotor()
             }
         }
     }
@@ -223,7 +223,7 @@ class AdminViewModel @Inject constructor(
     private fun checkLocalUpdate(): File? {
         File("/storage").listFiles()?.forEach {
             it.listFiles()?.forEach { apk ->
-                if (apk.name.endsWith(".apk") && apk.name.contains("zktony-fy")) {
+                if (apk.name.endsWith(".apk") && apk.name.contains("zktony-liquid")) {
                     return apk
                 }
             }
@@ -246,15 +246,6 @@ class AdminViewModel @Inject constructor(
             putExtra("cmd", if (bar) "show" else "hide")
         }
         CommonApplicationProxy.application.sendBroadcast(intent)
-    }
-
-    /**
-     * 初始化并同步电机
-     */
-    private fun initAndSyncMotor() {
-        viewModelScope.launch {
-            syncMotor()
-        }
     }
 
 

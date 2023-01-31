@@ -28,17 +28,11 @@ class PlateThreeViewModel @Inject constructor(
         }
     }
 
-    fun setRow(row: Int) {
+    fun setRowAndColumn(row: Int, column: Int) {
         viewModelScope.launch {
-            _uiState.value?.let { plateRepository.updatePlate(it.copy(row = row)) }
+            _uiState.value?.let { plateRepository.updatePlate(it.copy(row = row, column = column)) }
         }
 
-    }
-
-    fun setColumn(column: Int) {
-        viewModelScope.launch {
-            _uiState.value?.let { plateRepository.updatePlate(it.copy(column = column)) }
-        }
     }
 
     fun move(x: Float, y: Float) {

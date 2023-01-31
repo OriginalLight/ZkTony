@@ -15,7 +15,7 @@ import com.zktony.www.R
 import com.zktony.www.adapter.CalibrationDataAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.data.model.CalibrationData
+import com.zktony.www.common.room.entity.CalibrationData
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
 import com.zktony.www.serial.SerialManager
 import com.zktony.www.ui.program.ActionFragmentArgs

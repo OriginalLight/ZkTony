@@ -19,15 +19,15 @@ data class Calibration(
     // y轴电机一圈走的距离
     val y: Float = 57.62f,
     // 蠕动泵一一圈走的进液量
-    val v1: Float = 180f,
+    val v1: Float = 1000f,
     // 蠕动泵二一圈走的进液量
-    val v2: Float = 180f,
+    val v2: Float = 1000f,
     // 蠕动泵三一圈走的进液量
-    val v3: Float = 180f,
+    val v3: Float = 1000f,
     // 蠕动泵四一圈走的进液量
-    val v4: Float = 180f,
+    val v4: Float = 1000f,
     // 是否选用
-    val enable: Boolean = false,
+    val enable: Int = 0,
     // 创建时间
     val createTime: Date = Date(System.currentTimeMillis()),
 

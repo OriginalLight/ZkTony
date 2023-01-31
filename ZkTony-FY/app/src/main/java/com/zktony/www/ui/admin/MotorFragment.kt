@@ -12,7 +12,7 @@ import com.zktony.www.adapter.MotorAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.data.model.Motor
+import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.databinding.FragmentMotorBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

@@ -21,6 +21,14 @@ class CalibrationRepository @Inject constructor(
         dao.update(calibration)
     }
 
+    suspend fun updateBatch(calibrations: List<Calibration>) {
+        dao.updateBatch(calibrations)
+    }
+
+    suspend fun delete(calibration: Calibration) {
+        dao.delete(calibration)
+    }
+
     fun getAll(): Flow<List<Calibration>> {
         return dao.getAll()
     }
@@ -28,7 +36,7 @@ class CalibrationRepository @Inject constructor(
     suspend fun init() {
         val calibrations = dao.getAll().firstOrNull()
         if (calibrations.isNullOrEmpty()) {
-            dao.insert(Calibration(enable = true))
+            dao.insert(Calibration(enable = 1))
         }
     }
 }

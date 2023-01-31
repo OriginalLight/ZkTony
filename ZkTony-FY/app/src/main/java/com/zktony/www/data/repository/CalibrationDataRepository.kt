@@ -1,7 +1,7 @@
 package com.zktony.www.data.repository
 
-import com.zktony.www.data.dao.CalibrationDataDao
-import com.zktony.www.data.model.CalibrationData
+import com.zktony.www.common.room.dao.CalibrationDataDao
+import com.zktony.www.common.room.entity.CalibrationData
 import javax.inject.Inject
 
 /**

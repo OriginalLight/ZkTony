@@ -2,7 +2,7 @@ package com.zktony.www.ui.home
 
 import com.zktony.serialport.util.Serial.*
 import com.zktony.www.common.app.Settings
-import com.zktony.www.data.model.Action
+import com.zktony.www.common.room.entity.Action
 import com.zktony.www.serial.SerialManager
 import com.zktony.www.serial.protocol.V1
 import kotlinx.coroutines.delay

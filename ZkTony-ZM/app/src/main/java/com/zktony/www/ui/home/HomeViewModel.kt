@@ -7,9 +7,9 @@ import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.audio.AudioPlayer
 import com.zktony.www.common.extension.getTimeFormat
-import com.zktony.www.data.model.LogData
-import com.zktony.www.data.model.LogRecord
-import com.zktony.www.data.model.Program
+import com.zktony.www.common.room.entity.LogData
+import com.zktony.www.common.room.entity.LogRecord
+import com.zktony.www.common.room.entity.Program
 import com.zktony.www.data.repository.LogDataRepository
 import com.zktony.www.data.repository.LogRecordRepository
 import com.zktony.www.data.repository.ProgramRepository

@@ -12,81 +12,10 @@
         android:orientation="vertical"
         tools:context=".ui.container.PlateOneFragment">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-                <EditText
-                    android:id="@+id/row"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="16dp"
-                    android:layout_weight="0.6"
-                    android:gravity="center"
-                    android:hint="@string/row"
-                    android:inputType="number"
-                    android:textSize="20sp"
-                    tools:ignore="NestedWeights,TouchTargetSizeCheck" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.2"
-                    android:gravity="center"
-                    android:text="X"
-                    android:textSize="22sp"
-                    tools:ignore="NestedWeights" />
-
-                <EditText
-                    android:id="@+id/column"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="16dp"
-                    android:layout_weight="0.6"
-                    android:gravity="center"
-                    android:hint="@string/column"
-                    android:inputType="number"
-                    android:textSize="20sp"
-                    tools:ignore="TouchTargetSizeCheck" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-                <TextView
-                    android:id="@+id/position_one"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:textSize="22sp"
-                    tools:ignore="NestedWeights" />
-                <TextView
-                    android:id="@+id/position_two"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:textSize="22sp"
-                    tools:ignore="NestedWeights" />
-            </LinearLayout>
-
-
-        </LinearLayout>
-
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
             <com.zktony.www.views.DynamicPlate
                 android:id="@+id/dynamic_plate"
@@ -99,6 +28,58 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="32dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/row_column"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:text="@string/button"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="24dp"
+                app:rippleColor="@color/purple_500"
+                app:strokeColor="@color/light_primary"
+                app:strokeWidth="3dp"
+                tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/position_one"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:text="@string/button"
+                android:textSize="16sp"
+                app:cornerRadius="18dp"
+                app:rippleColor="@color/purple_700"
+                android:layout_weight="1"
+                tools:ignore="VisualLintButtonSize" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/position_two"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="#64DD17"
+                android:text="@string/button"
+                android:textSize="16sp"
+                app:cornerRadius="18dp"
+                app:rippleColor="@color/purple_700"
+                tools:ignore="TextContrastCheck,VisualLintButtonSize" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
