@@ -23,12 +23,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="1dp"
+            android:layout_weight="1"
             android:background="@color/light_onPrimary"
             android:ellipsize="end"
             android:gravity="center"
             android:textColor="@color/black"
-            android:textSize="16sp"
-            android:layout_weight="1" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/name"
@@ -36,14 +36,14 @@
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"
             android:layout_marginEnd="1dp"
+            android:layout_weight="3"
             android:background="@color/light_onPrimary"
             android:ellipsize="end"
             android:gravity="center"
             android:singleLine="true"
             android:text="@{cali.name}"
             android:textColor="@color/black"
-            android:textSize="16sp"
-            android:layout_weight="3" />
+            android:textSize="16sp" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/select"
@@ -51,15 +51,15 @@
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"
             android:layout_marginEnd="1dp"
-            android:background="@color/light_onPrimary"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:background="@color/light_onPrimary">
 
             <RadioButton
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:checked='@{cali.enable == 1}'
-                android:gravity="center"
                 android:clickable="false"
+                android:gravity="center"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -74,9 +74,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"
-            android:orientation="horizontal"
             android:layout_weight="1"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:id="@+id/delete"
@@ -86,16 +86,16 @@
                 android:layout_marginEnd="1dp"
                 android:layout_weight="1"
                 android:background="@color/light_errorContainer"
-                tools:ignore="NestedWeights"
+                android:gravity="center"
                 android:orientation="vertical"
-                android:gravity="center">
+                tools:ignore="NestedWeights">
 
                 <ImageView
                     android:id="@+id/iv_delete"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:background="@mipmap/item_delete"
                     android:layout_gravity="center"
+                    android:background="@mipmap/item_delete"
                     tools:ignore="ContentDescription" />
 
 
@@ -108,15 +108,15 @@
                 android:layout_marginStart="1dp"
                 android:layout_weight="1"
                 android:background="@color/dark_secondary"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <ImageView
                     android:id="@+id/iv_edit"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:background="@mipmap/item_edit"
                     android:layout_gravity="center"
+                    android:background="@mipmap/item_edit"
                     tools:ignore="ContentDescription" />
 
             </LinearLayout>

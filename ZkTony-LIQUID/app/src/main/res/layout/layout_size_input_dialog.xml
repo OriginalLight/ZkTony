@@ -16,12 +16,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="@string/text"
             android:layout_marginTop="8dp"
-            android:textStyle="bold"
+            android:text="@string/text"
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/row"
@@ -30,13 +30,13 @@
             android:layout_below="@+id/title"
             android:layout_alignParentStart="true"
             android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
             android:layout_marginTop="16dp"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:hint="@string/row"
+            android:layout_marginEnd="32dp"
             android:gravity="center"
-            android:inputType="number" />
+            android:hint="@string/row"
+            android:inputType="number"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/column"
@@ -45,13 +45,13 @@
             android:layout_below="@+id/row"
             android:layout_alignParentStart="true"
             android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
             android:layout_marginTop="8dp"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:hint="@string/column"
+            android:layout_marginEnd="32dp"
             android:gravity="center"
-            android:inputType="number" />
+            android:hint="@string/column"
+            android:inputType="number"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/save"
@@ -60,8 +60,8 @@
             android:layout_below="@+id/column"
             android:layout_alignParentStart="true"
             android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
             android:text="@string/save"
             android:textSize="16sp"
             app:cornerRadius="18dp"
