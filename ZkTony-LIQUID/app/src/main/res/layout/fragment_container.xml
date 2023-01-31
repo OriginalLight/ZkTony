@@ -20,10 +20,10 @@
             app:tabIndicatorFullWidth="false"
             app:tabIndicatorHeight="2dp"
             app:tabMode="scrollable"
+            app:tabSelectedTextAppearance="@color/light_error"
             app:tabSelectedTextColor="@color/light_primary"
             app:tabTextColor="@color/black"
-            app:tabSelectedTextAppearance="@color/light_error"
-            app:tabUnboundedRipple="true" >
+            app:tabUnboundedRipple="true">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"

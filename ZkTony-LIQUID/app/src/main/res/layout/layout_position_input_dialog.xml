@@ -16,12 +16,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="@string/switch_function"
             android:layout_marginTop="8dp"
-            android:textStyle="bold"
+            android:text="@string/switch_function"
             android:textAlignment="center"
             android:textColor="@color/black"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/input_x"
@@ -30,13 +30,13 @@
             android:layout_below="@+id/title"
             android:layout_alignParentStart="true"
             android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
             android:layout_marginTop="16dp"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:hint="@string/input_x"
+            android:layout_marginEnd="32dp"
             android:gravity="center"
-            android:inputType="numberDecimal" />
+            android:hint="@string/input_x"
+            android:inputType="numberDecimal"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
 
         <EditText
             android:id="@+id/input_y"
@@ -45,13 +45,13 @@
             android:layout_below="@+id/input_x"
             android:layout_alignParentStart="true"
             android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
             android:layout_marginTop="8dp"
-            android:textSize="18sp"
-            android:textColor="@color/black"
-            android:hint="@string/input_y"
+            android:layout_marginEnd="32dp"
             android:gravity="center"
-            android:inputType="numberDecimal" />
+            android:hint="@string/input_y"
+            android:inputType="numberDecimal"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/move"
@@ -60,8 +60,8 @@
             android:layout_below="@+id/input_y"
             android:layout_alignParentStart="true"
             android:layout_marginStart="48dp"
-            android:layout_marginEnd="48dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="48dp"
             android:layout_marginBottom="8dp"
             android:text="@string/move"
             android:textSize="16sp"
