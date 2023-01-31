@@ -30,7 +30,7 @@ class MotorManager(
         this.p3 = motor.find { it.board == 1 && it.address == 3 } ?: Motor()
         this.p4 = motor.find { it.board == 2 && it.address == 1 } ?: Motor()
         this.cali = calibration.find { it.enable == 1 } ?: Calibration()
-        Logger.d("MotorManager", "init: $x, $y, $p1, $p2, $p3, $p4, $cali")
+        Logger.d("MotorManager", "init: $cali")
     }
 
     fun move(distanceX: Float, distanceY: Float): Pair<Int, Int> {

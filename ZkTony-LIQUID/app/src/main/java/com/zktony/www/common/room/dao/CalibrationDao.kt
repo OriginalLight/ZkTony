@@ -25,4 +25,7 @@ interface CalibrationDao {
 
     @Query("SELECT * FROM calibration")
     fun getAll(): Flow<List<Calibration>>
+
+    @Query("SELECT * FROM calibration WHERE id = :id")
+    fun getById(id: String): Flow<Calibration>
 }

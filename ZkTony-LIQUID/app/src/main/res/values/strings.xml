@@ -103,4 +103,10 @@
     <string name="checked">选中</string>
     <string name="button">Button</string>
     <string name="text">Text</string>
+    <string name="title_calibration_data">校准数据</string>
+    <string name="pump_name">泵名</string>
+    <string name="operate">操作</string>
+    <string name="before_volume">预计加液体积/μL</string>
+    <string name="actual_volume">实际加液体积/μL</string>
+    <string name="add_liquid">加液</string>
 </resources>

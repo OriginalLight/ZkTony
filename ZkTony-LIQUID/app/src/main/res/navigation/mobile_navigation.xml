@@ -21,8 +21,7 @@
         android:id="@+id/navigation_program"
         android:name="com.zktony.www.ui.program.ProgramFragment"
         android:label="@string/title_program"
-        tools:layout="@layout/fragment_program">
-    </fragment>
+        tools:layout="@layout/fragment_program"></fragment>
 
     <fragment
         android:id="@+id/navigation_log"
@@ -62,6 +61,34 @@
         android:id="@+id/navigation_calibration"
         android:name="com.zktony.www.ui.calibration.CalibrationFragment"
         android:label="@string/title_calibration"
-        tools:layout="@layout/fragment_calibration" />
+        tools:layout="@layout/fragment_calibration">
+        <action
+            android:id="@+id/action_navigation_calibration_to_navigation_calibration_data"
+            app:destination="@id/navigation_calibration_data"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
+            <argument android:name="id" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_calibration_data"
+        android:name="com.zktony.www.ui.calibration.CalibrationDataFragment"
+        android:label="@string/title_calibration_data"
+        tools:layout="@layout/fragment_calibration_data">
+        <action
+            android:id="@+id/action_navigation_calibration_data_to_navigation_calibration"
+            app:destination="@id/navigation_calibration"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <argument
+            android:name="id"
+            app:argType="string"
+            android:defaultValue="None"/>
+    </fragment>
 
 </navigation>
