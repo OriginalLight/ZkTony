@@ -25,10 +25,10 @@ class MotorManager(
     fun init(motor: List<Motor>, calibration: List<Calibration>) {
         this.x = motor.find { it.board == 0 && it.address == 1 } ?: Motor()
         this.y = motor.find { it.board == 0 && it.address == 2 } ?: Motor()
-        this.p1 = motor.find { it.board == 1 && it.address == 1 } ?: Motor()
-        this.p2 = motor.find { it.board == 1 && it.address == 2 } ?: Motor()
-        this.p3 = motor.find { it.board == 1 && it.address == 3 } ?: Motor()
-        this.p4 = motor.find { it.board == 2 && it.address == 1 } ?: Motor()
+        this.p1 = motor.find { it.board == 0 && it.address == 3 } ?: Motor()
+        this.p2 = motor.find { it.board == 1 && it.address == 1 } ?: Motor()
+        this.p3 = motor.find { it.board == 1 && it.address == 2 } ?: Motor()
+        this.p4 = motor.find { it.board == 1 && it.address == 3 } ?: Motor()
         this.cali = calibration.find { it.enable == 1 } ?: Calibration()
         Logger.d("MotorManager", "init: $cali")
     }

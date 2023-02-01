@@ -20,11 +20,11 @@ import com.zktony.www.common.network.result.NetworkResult
 import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.utils.Constants.DEVICE_ID
+import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.control.serial.protocol.V1
 import com.zktony.www.data.model.Version
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
-import com.zktony.www.control.serial.SerialManager
-import com.zktony.www.control.serial.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -51,31 +51,28 @@ class AdminViewModel @Inject constructor(
     val version = _version.asStateFlow()
     val progress = _progress.asStateFlow()
 
+    private val serial = SerialManager.instance
+
     init {
         viewModelScope.launch {
             launch {
-                SerialManager.instance.ttys0Flow.collect {
+                serial.ttys0Flow.collect {
                     it?.let {
                         onSerialOneResponse(it)
                     }
                 }
             }
             launch {
-                SerialManager.instance.ttys1Flow.collect {
-                    it?.let {
-                        onSerialTwoResponse(it)
-                    }
-                }
-            }
-            launch {
-                SerialManager.instance.ttys2Flow.collect {
+                serial.ttys2Flow.collect {
                     it?.let {
                         onSerialThreeResponse(it)
                     }
                 }
             }
             launch {
-                syncMotor()
+                if (!serial.lock.value) {
+                    syncMotor()
+                }
             }
         }
     }
@@ -87,19 +84,7 @@ class AdminViewModel @Inject constructor(
     private fun onSerialOneResponse(hex: String) {
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotor(data.toMotor().copy(board = Serial.TTYS0.index))
-            }
-        }
-    }
-
-    /**
-     * 处理串口二返回数据
-     * @param hex [String]
-     */
-    private fun onSerialTwoResponse(hex: String) {
-        hex.toCommand().run {
-            if (function == "03" && parameter == "04") {
-                updateMotor(data.toMotor().copy(board = Serial.TTYS1.index))
+                updateMotor(data.toMotor().copy(board = 0))
             }
         }
     }
@@ -112,7 +97,7 @@ class AdminViewModel @Inject constructor(
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
                 updateMotor(
-                    data.toMotor().copy(board = Serial.TTYS2.index)
+                    data.toMotor().copy(board = 1)
                 )
             }
         }
@@ -254,15 +239,15 @@ class AdminViewModel @Inject constructor(
      */
     private fun syncMotor() {
         viewModelScope.launch {
-            for (i in 0..2) {
+            for (i in 0..1) {
                 for (j in 1..3) {
-                    if (i == 2 && j == 3) {
-                        break
+                    val serial = when (i) {
+                        0 -> Serial.TTYS0
+                        else -> Serial.TTYS2
                     }
                     SerialManager.instance.sendHex(
-                        i.toSerialPort(), V1(
-                            function = "03", parameter = "04", data = j.int8ToHex()
-                        ).toHex()
+                        serial = serial,
+                        hex = V1(function = "03", parameter = "04", data = j.int8ToHex()).toHex()
                     )
                     delay(100L)
                 }

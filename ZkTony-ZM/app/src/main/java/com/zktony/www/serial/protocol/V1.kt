@@ -1,7 +1,7 @@
 /**
  * 返回电压与真实电压关系y = 22.727x
  * 返回蠕动泵的与每分钟转速关系y=2.08x
- * 真实电流和返回电流关系y=3.234x + 0.0045
+ * 真实电流和返回电流关系y=4.608x + 0.011
  */
 package com.zktony.www.serial.protocol
 
@@ -19,10 +19,10 @@ class V1 {
     private val pumpSpeedCoefficient = 2.08f
 
     // 电流系数
-    private val currentCoefficient = 3.234f
+    private val currentCoefficient = 4.608f
 
     // 电流偏移量
-    private val currentOffset = 0.0045f
+    private val currentOffset = 0.011f
 
     /**
      * 头1

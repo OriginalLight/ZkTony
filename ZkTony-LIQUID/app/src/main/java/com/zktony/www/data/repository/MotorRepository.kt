@@ -35,12 +35,11 @@ class MotorRepository @Inject constructor(
             val motorList = mutableListOf<Motor>()
             motorList.add(Motor(name = "X轴", address = 1))
             motorList.add(Motor(name = "Y轴", address = 2))
-            motorList.add(Motor(name = "Z轴", address = 3))
-            for (i in 1..5) {
+            for (i in 1..4) {
                 val motor = Motor(
                     name = "泵$i",
-                    address = if (i <= 3) i else i - 3,
-                    board = if (i <= 3) 1 else 2,
+                    address = if (i == 1) i + 2 else i - 1,
+                    board = if (i == 1) 0 else 1,
                     motorType = 1,
                 )
                 motorList.add(motor)
