@@ -37,7 +37,7 @@ class DynamicPlate : View {
     fun setRowAndColumn(row: Int, column: Int) {
         this.row = row
         this.column = column
-        space = 480 / column
+        space = minOf(480 / column, 320 / row)
         requestLayout()
         invalidate()
     }
