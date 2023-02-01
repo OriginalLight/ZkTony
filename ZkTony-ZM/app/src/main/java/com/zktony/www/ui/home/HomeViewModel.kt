@@ -373,7 +373,7 @@ class HomeViewModel @Inject constructor(
         if (sentinelJob == null && appViewModel.setting.value.detect) {
             val job = viewModelScope.launch {
                 while (true) {
-                    delay(5000)
+                    delay(5000L)
                     val rec = appViewModel.received.value
                     var msg = ""
                     if (rec.powerENX == 1 && rec.powerENY == 0) {
@@ -399,6 +399,7 @@ class HomeViewModel @Inject constructor(
                             msg = "模块B异常，请检查！！！"
                         } else if (rec.getCurrentX < 0.05f && rec.getCurrentY < 0.05f) {
                             stop(0)
+                            delay(300L)
                             stop(1)
                             playAudio(R.raw.error)
                             msg = "模块A、B异常，请检查！！！"
@@ -410,7 +411,6 @@ class HomeViewModel @Inject constructor(
                             .setMessage(msg)
                             .setOkButton("确定") { dialog, _ ->
                                 dialog.dismiss()
-                                msg = ""
                                 true
                             }
                             .show()

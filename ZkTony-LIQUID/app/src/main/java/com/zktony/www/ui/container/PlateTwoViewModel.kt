@@ -1,9 +1,12 @@
 package com.zktony.www.ui.container
 
 import androidx.lifecycle.viewModelScope
+import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.room.entity.Plate
 import com.zktony.www.common.utils.Logger
+import com.zktony.www.control.motion.MotionManager
+import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.data.repository.PlateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,7 +39,13 @@ class PlateTwoViewModel @Inject constructor(
     }
 
     fun move(x: Float, y: Float) {
-
+        val serial = SerialManager.instance
+        if (serial.lock.value || serial.work.value) {
+            PopTip.show("机器正在运行中")
+            return
+        }
+        val m = MotionManager.instance
+        m.executor(m.generator(x = x, y = y))
     }
 
     fun save(x: Float, y: Float, flag: Int) {

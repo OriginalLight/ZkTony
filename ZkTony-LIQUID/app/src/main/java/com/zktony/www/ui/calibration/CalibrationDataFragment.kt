@@ -15,6 +15,7 @@ import com.zktony.www.adapter.CalibrationDataAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
+import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -41,7 +42,7 @@ class CalibrationDataFragment :
                     adapter.submitList(it.caliData)
                     binding.run {
                         select.text = listOf("泵一", "泵二", "泵三", "泵四")[it.pumpId]
-                        addLiquid.isEnabled = it.expect > 0f
+                        addLiquid.isEnabled = it.expect > 0f && !it.lock && !it.work
                         save.isEnabled = it.expect > 0f && it.actual > 0f
                     }
                 }
@@ -107,6 +108,5 @@ class CalibrationDataFragment :
             }
         }
     }
-
 
 }

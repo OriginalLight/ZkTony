@@ -1,13 +1,14 @@
 package com.zktony.www.control.serial
 
+import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.*
-import com.zktony.www.common.extension.hexToAscii
+import com.zktony.www.common.extension.hexFormat
 import com.zktony.www.common.extension.hexToInt8
 import com.zktony.www.common.extension.toCommand
 import com.zktony.www.common.extension.verifyHex
-import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.common.utils.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -19,30 +20,26 @@ class SerialManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     private val _ttys0Flow = MutableStateFlow<String?>(null)
-    private val _ttys1Flow = MutableStateFlow<String?>(null)
     private val _ttys2Flow = MutableStateFlow<String?>(null)
-    private val _ttys3Flow = MutableStateFlow<String?>(null)
     private val _lock = MutableStateFlow(false)
+    private val _work = MutableStateFlow(false)
 
     val ttys0Flow = _ttys0Flow.asStateFlow()
-    val ttys1Flow = _ttys1Flow.asStateFlow()
     val ttys2Flow = _ttys2Flow.asStateFlow()
-    val ttys3Flow = _ttys3Flow.asStateFlow()
-    val lockFlow = _lock.asStateFlow()
+    val lock = _lock.asStateFlow()
+    val work = _work.asStateFlow()
 
     // 机构运行已经等待的时间
     private var lockTime = 0L
 
     // 机构运行小步骤等待时间
-    private val waitTime = 60L
+    private val waitTime = 30L
 
     init {
         scope.launch {
             launch {
                 MutableSerial.instance.init(TTYS0, 115200)
-                MutableSerial.instance.init(TTYS1, 115200)
                 MutableSerial.instance.init(TTYS2, 115200)
-                MutableSerial.instance.init(TTYS3, 57600)
             }
             launch {
                 MutableSerial.instance.listener = { port, data ->
@@ -53,21 +50,11 @@ class SerialManager(
                                 //Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
                             }
                         }
-                        TTYS1 -> {
-                            data.verifyHex().forEach {
-                                _ttys1Flow.value = it
-                                //Logger.d(msg = "串口二 receivedHex: ${it.hexFormat()}")
-                            }
-                        }
                         TTYS2 -> {
                             data.verifyHex().forEach {
                                 _ttys2Flow.value = it
                                 //Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
                             }
-                        }
-                        TTYS3 -> {
-                            _ttys3Flow.value = data.hexToAscii()
-                            //Logger.d(msg = "串口四 receivedText: ${hexData.hexToAscii()}")
                         }
                         else -> {}
                     }
@@ -77,15 +64,21 @@ class SerialManager(
                 ttys0Flow.collect {
                     it?.let {
                         val res = it.toCommand()
-                        if (res.function == "85" && res.parameter == "01") {
-                            val total = res.data.substring(2, 4).hexToInt8()
-                            val current = res.data.substring(6, 8).hexToInt8()
-                            if (total == current) {
-                                _lock.value = false
-                                lockTime = 0L
-                            } else {
-                                _lock.value = true
-                                lockTime = 0L
+                        when(res.function) {
+                            "85" -> {
+                                if (res.parameter == "01") {
+                                    val total = res.data.substring(2, 4).hexToInt8()
+                                    val current = res.data.substring(6, 8).hexToInt8()
+                                    _lock.value = total != current
+                                    lockTime = 0L
+                                }
+                            }
+                            "86" -> {
+                                if (res.parameter == "0A") {
+                                    _lock.value = false
+                                    lockTime = 0L
+                                    PopTip.show("复位成功")
+                                }
                             }
                         }
                     }
@@ -114,23 +107,11 @@ class SerialManager(
     fun sendHex(serial: Serial, hex: String, lock : Boolean = false) {
         scope.launch {
             MutableSerial.instance.sendHex(serial, hex)
-            //Logger.e(msg = "${serial.value} sendHex: ${hex.hexFormat()}")
+            Logger.e(msg = "${serial.value} sendHex: ${hex.hexFormat()}")
             if (lock) {
                 _lock.value = true
                 lockTime = 0L
             }
-        }
-    }
-
-    /**
-     * 发送Text
-     * @param serial 串口
-     * @param text 命令
-     */
-    fun sendText(serial: Serial, text: String) {
-        scope.launch {
-            MutableSerial.instance.sendText(serial, text)
-            //Logger.e(msg = "${serialPort.value} sendText: $text")
         }
     }
 
