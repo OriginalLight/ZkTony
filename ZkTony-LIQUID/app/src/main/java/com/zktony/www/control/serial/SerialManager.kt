@@ -3,7 +3,8 @@ package com.zktony.www.control.serial
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
-import com.zktony.serialport.util.Serial.*
+import com.zktony.serialport.util.Serial.TTYS0
+import com.zktony.serialport.util.Serial.TTYS2
 import com.zktony.www.common.extension.hexFormat
 import com.zktony.www.common.extension.hexToInt8
 import com.zktony.www.common.extension.toCommand
@@ -64,7 +65,7 @@ class SerialManager(
                 ttys0Flow.collect {
                     it?.let {
                         val res = it.toCommand()
-                        when(res.function) {
+                        when (res.function) {
                             "85" -> {
                                 if (res.parameter == "01") {
                                     val total = res.data.substring(2, 4).hexToInt8()
@@ -104,7 +105,7 @@ class SerialManager(
      * @param serial 串口
      * @param hex 命令
      */
-    fun sendHex(serial: Serial, hex: String, lock : Boolean = false) {
+    fun sendHex(serial: Serial, hex: String, lock: Boolean = false) {
         scope.launch {
             MutableSerial.instance.sendHex(serial, hex)
             Logger.e(msg = "${serial.value} sendHex: ${hex.hexFormat()}")

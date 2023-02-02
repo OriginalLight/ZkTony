@@ -8,7 +8,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.zktony.www.common.room.entity.Pore
+import com.zktony.www.common.room.entity.Hole
 
 
 class DynamicPlate : View {
@@ -28,7 +28,7 @@ class DynamicPlate : View {
     // 显示定位
     private var showLocation = false
     private var onItemClick: (Int, Int) -> Unit = { _, _ -> }
-    private var data = listOf<Pore>()
+    private var data = listOf<Hole>()
 
     fun getRow() = row
 
@@ -52,7 +52,7 @@ class DynamicPlate : View {
         this.onItemClick = onItemClick
     }
 
-    fun setData(data: List<Pore>) {
+    fun setData(data: List<Hole>) {
         this.data = data
         invalidate()
     }

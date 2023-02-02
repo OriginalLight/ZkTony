@@ -7,22 +7,23 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.common.room.entity.Program
-import com.zktony.www.databinding.ItemProgramBinding
+import com.zktony.www.common.room.entity.Work
+import com.zktony.www.databinding.ItemWorkBinding
 
 /**
  * @author: 刘贺贺
  * @date: 2022-09-21 11:27
  */
-class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDiffCallback()) {
+class WorkAdapter :
+    ListAdapter<Work, WorkAdapter.ViewHolder>(WorkDiffCallback()) {
 
-    private lateinit var onDeleteButtonClick: (Program) -> Unit
-    private lateinit var onEditButtonClick: (Program) -> Unit
+    private var onDeleteButtonClick: (Work) -> Unit = {}
+    private var onEditButtonClick: (Work) -> Unit = {}
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ItemProgramBinding.inflate(
+            ItemWorkBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -36,25 +37,24 @@ class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDi
         holder.bind(getItem(position))
     }
 
-    fun setOnDeleteButtonClick(onDeleteButtonClick: (Program) -> Unit) {
+    fun setOnDeleteButtonClick(onDeleteButtonClick: (Work) -> Unit) {
         this.onDeleteButtonClick = onDeleteButtonClick
     }
 
-    fun setOnEditButtonClick(onEditButtonClick: (Program) -> Unit) {
+    fun setOnEditButtonClick(onEditButtonClick: (Work) -> Unit) {
         this.onEditButtonClick = onEditButtonClick
     }
 
-
     class ViewHolder(
-        private val binding: ItemProgramBinding,
-        private val onDeleteButtonClick: (Program) -> Unit,
-        private val onEditButtonClick: (Program) -> Unit
+        private val binding: ItemWorkBinding,
+        private val onDeleteButtonClick: (Work) -> Unit,
+        private val onEditButtonClick: (Work) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
-        fun bind(item: Program) {
+        fun bind(item: Work) {
             binding.apply {
-                program = item
-                tv1.text = (layoutPosition + 1).toString()
+                work = item
+                order.text = (layoutPosition + 1).toString()
                 edit.run {
                     this.clickScale()
                     this.setOnClickListener {
@@ -73,18 +73,17 @@ class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDi
     }
 }
 
-private class ProgramDiffCallback : DiffUtil.ItemCallback<Program>() {
-
+private class WorkDiffCallback : DiffUtil.ItemCallback<Work>() {
     override fun areItemsTheSame(
-        oldItem: Program,
-        newItem: Program
+        oldItem: Work,
+        newItem: Work
     ): Boolean {
         return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(
-        oldItem: Program,
-        newItem: Program
+        oldItem: Work,
+        newItem: Work
     ): Boolean {
         return oldItem == newItem
     }

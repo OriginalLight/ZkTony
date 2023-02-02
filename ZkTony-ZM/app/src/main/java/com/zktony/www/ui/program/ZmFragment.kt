@@ -15,6 +15,9 @@ import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.isFastClick
 import com.zktony.www.common.extension.removeZero
+import com.zktony.www.common.utils.Constants.MAX_MOTOR
+import com.zktony.www.common.utils.Constants.MAX_TIME
+import com.zktony.www.common.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.www.databinding.FragmentZmBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -169,34 +172,19 @@ class ZmFragment : BaseFragment<ZmViewModel, FragmentZmBinding>(R.layout.fragmen
             jiaoMin.afterTextChange { viewModel.setJiaoMin(it.toFloatOrNull() ?: 0f) }
             otherWater.afterTextChange { viewModel.setWaterKind(it) }
             voltage.afterTextChange {
-                val voltage = it.toFloatOrNull() ?: 0f
-                // voltage最大值为65 最小值为0
-                if (voltage > 65f) {
-                    binding.voltage.setText("65")
-                    viewModel.setVoltage(65f)
-                } else {
-                    viewModel.setVoltage(voltage)
-                }
-            }
-            motor.afterTextChange {
-                val motor = it.toIntOrNull() ?: 0
-                // motor最大值为250 最小值为0
-                if (motor > 250) {
-                    binding.motor.setText("250")
-                    viewModel.setMotor(250)
-                } else {
-                    viewModel.setMotor(motor)
-                }
+                viewModel.setVoltage(voltage = it.toFloatOrNull() ?: 0f, block = {
+                    binding.voltage.setText(MAX_VOLTAGE_ZM.toString().removeZero())
+                })
             }
             time.afterTextChange {
-                val time = it.toFloatOrNull() ?: 0f
-                // time最大值为99 最小值为0
-                if (time > 99f) {
-                    binding.time.setText("99")
-                    viewModel.setTime(99f)
-                } else {
-                    viewModel.setTime(time)
-                }
+                viewModel.setTime(time = it.toFloatOrNull() ?: 0f, block = {
+                    binding.time.setText(MAX_TIME.toString().removeZero())
+                })
+            }
+            motor.afterTextChange {
+                viewModel.setMotor(motor = it.toIntOrNull() ?: 0, block = {
+                    binding.motor.setText(MAX_MOTOR.toString().removeZero())
+                })
             }
         }
     }

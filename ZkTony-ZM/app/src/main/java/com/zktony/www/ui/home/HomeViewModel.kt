@@ -10,6 +10,10 @@ import com.zktony.www.common.extension.getTimeFormat
 import com.zktony.www.common.room.entity.LogData
 import com.zktony.www.common.room.entity.LogRecord
 import com.zktony.www.common.room.entity.Program
+import com.zktony.www.common.utils.Constants.MAX_MOTOR
+import com.zktony.www.common.utils.Constants.MAX_TIME
+import com.zktony.www.common.utils.Constants.MAX_VOLTAGE_RS
+import com.zktony.www.common.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.www.data.repository.LogDataRepository
 import com.zktony.www.data.repository.LogRecordRepository
 import com.zktony.www.data.repository.ProgramRepository
@@ -138,27 +142,41 @@ class HomeViewModel @Inject constructor(
      * @param motor 泵速度
      * @param xy 模块
      */
-    fun setMotor(motor: Int, xy: Int) {
+    fun setMotor(motor: Int, xy: Int, block: () -> Unit) {
         val state = getUiState(xy)
-        state.value = state.value.copy(motor = motor)
+        state.value = state.value.copy(motor = minOf(motor, MAX_MOTOR))
+        if (motor > MAX_MOTOR) {
+            block()
+        }
     }
 
     /**
      * @param voltage 电压
      * @param xy 模块
      */
-    fun setVoltage(voltage: Float, xy: Int) {
+    fun setVoltage(voltage: Float, xy: Int, block: (Float) -> Unit) {
         val state = getUiState(xy)
-        state.value = state.value.copy(voltage = voltage)
+        val max = when (state.value.model) {
+            0 -> MAX_VOLTAGE_ZM
+            1 -> MAX_VOLTAGE_RS
+            else -> MAX_VOLTAGE_ZM
+        }
+        state.value = state.value.copy(voltage = minOf(voltage, max))
+        if (voltage > max) {
+            block(max)
+        }
     }
 
     /**
      * @param time 时间
      * @param xy 模块
      */
-    fun setTime(time: Float, xy: Int) {
+    fun setTime(time: Float, xy: Int, block: () -> Unit) {
         val state = getUiState(xy)
-        state.value = state.value.copy(time = time)
+        state.value = state.value.copy(time = minOf(time, MAX_TIME))
+        if (time > MAX_TIME) {
+            block()
+        }
     }
 
     /**

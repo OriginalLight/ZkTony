@@ -6,7 +6,6 @@ import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 
 /**
  * @author: 刘贺贺

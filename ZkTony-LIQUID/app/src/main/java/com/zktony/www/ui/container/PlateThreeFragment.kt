@@ -1,27 +1,18 @@
 package com.zktony.www.ui.container
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
-import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.material.button.MaterialButton
-import com.kongzue.dialogx.dialogs.CustomDialog
-import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.showPositionDialog
 import com.zktony.www.common.extension.showSizeDialog
 import com.zktony.www.databinding.FragmentPlateBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint

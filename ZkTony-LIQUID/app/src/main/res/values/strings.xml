@@ -109,4 +109,6 @@
     <string name="before_volume">预计加液体积/μL</string>
     <string name="actual_volume">实际加液体积/μL</string>
     <string name="add_liquid">加液</string>
+    <string name="work_name">加液程序名</string>
+    <string name="work_edit">加液程序编辑</string>
 </resources>

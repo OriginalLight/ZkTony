@@ -4,6 +4,9 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.room.entity.Program
+import com.zktony.www.common.utils.Constants.MAX_MOTOR
+import com.zktony.www.common.utils.Constants.MAX_TIME
+import com.zktony.www.common.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -136,16 +139,25 @@ class ZmViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(waterKind = it)
     }
 
-    fun setVoltage(fl: Float) {
-        _uiState.value = _uiState.value.copy(voltage = fl)
+    fun setVoltage(voltage: Float, block: () -> Unit) {
+        _uiState.value = _uiState.value.copy(voltage = minOf(voltage, MAX_VOLTAGE_ZM))
+        if (voltage > MAX_VOLTAGE_ZM) {
+            block()
+        }
     }
 
-    fun setMotor(fl: Int) {
-        _uiState.value = _uiState.value.copy(motor = fl)
+    fun setTime(time: Float, block: () -> Unit) {
+        _uiState.value = _uiState.value.copy(time = minOf(time, MAX_TIME))
+        if (time > MAX_TIME) {
+            block()
+        }
     }
 
-    fun setTime(fl: Float) {
-        _uiState.value = _uiState.value.copy(time = fl)
+    fun setMotor(motor: Int, block: () -> Unit) {
+        _uiState.value = _uiState.value.copy(motor = minOf(motor, MAX_MOTOR))
+        if (motor > MAX_MOTOR) {
+            block()
+        }
     }
 
     fun setJiaoKind(i: Int) {

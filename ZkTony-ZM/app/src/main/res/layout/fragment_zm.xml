@@ -553,7 +553,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="@string/voltage"
+                        android:text="@string/voltage_zm"
                         android:textColor="@color/black"
                         android:textSize="22sp" />
 

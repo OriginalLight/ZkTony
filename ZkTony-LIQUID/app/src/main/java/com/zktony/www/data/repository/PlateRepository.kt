@@ -1,11 +1,13 @@
 package com.zktony.www.data.repository
 
+import com.zktony.www.common.room.dao.HoleDao
 import com.zktony.www.common.room.dao.PlateDao
-import com.zktony.www.common.room.dao.PoreDao
+import com.zktony.www.common.room.entity.Hole
 import com.zktony.www.common.room.entity.Plate
-import com.zktony.www.common.room.entity.Pore
-import com.zktony.www.common.utils.Logger
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 /**
@@ -14,7 +16,7 @@ import javax.inject.Inject
  */
 class PlateRepository @Inject constructor(
     private val plateDao: PlateDao,
-    private val poreDao: PoreDao,
+    private val holeDao: HoleDao,
 ) {
     suspend fun updatePlate(plate: Plate, calculate: Boolean = true) {
         plateDao.update(plate)
@@ -27,8 +29,8 @@ class PlateRepository @Inject constructor(
         return plateDao.getPlateBySort(id)
     }
 
-    fun getPoreByPlateId(plateId: String): Flow<List<Pore>> {
-        return poreDao.getPlatePore(plateId)
+    fun getPoreByPlateId(plateId: String): Flow<List<Hole>> {
+        return holeDao.getByPlateId(plateId)
     }
 
     suspend fun init() {
@@ -46,12 +48,12 @@ class PlateRepository @Inject constructor(
         }
     }
 
-    suspend fun load() : Flow<List<Plate>> {
+    suspend fun load(): Flow<List<Plate>> {
         return flow {
-            plateDao.getAllPlate().distinctUntilChanged().collect{
+            plateDao.getAllPlate().distinctUntilChanged().collect {
                 it.filter { plate -> plate.sort != 4 }.forEach { plate ->
-                    val pores = poreDao.getPlatePore(plate.id).firstOrNull()
-                    pores?.let { plate.pores = pores }
+                    val pores = holeDao.getByPlateId(plate.id).firstOrNull()
+                    pores?.let { plate.holes = pores }
                 }
                 emit(it)
             }
@@ -66,11 +68,11 @@ class PlateRepository @Inject constructor(
         val y = plate.y2 - plate.y1
         val xSpace = x / (plate.column - 1)
         val ySpace = y / (plate.row - 1)
-        val poreList = mutableListOf<Pore>()
+        val holeList = mutableListOf<Hole>()
         for (i in 0 until plate.row) {
             for (j in 0 until plate.column) {
-                poreList.add(
-                    Pore(
+                holeList.add(
+                    Hole(
                         plateId = plate.id,
                         x = j,
                         y = i,
@@ -80,7 +82,7 @@ class PlateRepository @Inject constructor(
                 )
             }
         }
-        poreDao.deleteByPlateId(plate.id)
-        poreDao.insertBatch(poreList)
+        holeDao.deleteByPlateId(plate.id)
+        holeDao.insertBatch(holeList)
     }
 }

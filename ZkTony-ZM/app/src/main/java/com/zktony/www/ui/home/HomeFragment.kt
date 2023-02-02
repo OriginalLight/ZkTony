@@ -16,11 +16,12 @@ import com.kongzue.dialogx.util.TextInfo
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.*
+import com.zktony.www.common.utils.Constants.MAX_MOTOR
+import com.zktony.www.common.utils.Constants.MAX_TIME
 import com.zktony.www.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlin.math.min
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
@@ -147,27 +148,27 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             val bind = if (xy == 0) binding.x else binding.y
             bind.run {
                 motor.afterTextChange {
-                    val motor = it.replace(" RPM", "").removeZero().toIntOrNull() ?: 0
-                    viewModel.setMotor(min(250, motor), xy)
-                    if (motor > 250) {
-                        bind.motor.setText("250")
-                    }
+                    viewModel.setMotor(
+                        motor = it.replace(" RPM", "").removeZero().toIntOrNull() ?: 0,
+                        xy = xy,
+                        block = { bind.motor.setText(MAX_MOTOR.toString()) }
+                    )
                 }
                 motor.addSuffix(" RPM")
                 voltage.afterTextChange {
-                    val voltage = it.replace(" V", "").removeZero().toFloatOrNull() ?: 0f
-                    viewModel.setVoltage(minOf(65f, voltage), xy)
-                    if (voltage > 65f) {
-                        bind.voltage.setText("65")
-                    }
+                    viewModel.setVoltage(
+                        voltage = it.replace(" V", "").removeZero().toFloatOrNull() ?: 0f,
+                        xy = xy,
+                        block = { max -> bind.voltage.setText(max.toString().removeZero()) }
+                    )
                 }
                 voltage.addSuffix(" V")
                 time.afterTextChange {
-                    val time = it.replace(" MIN", "").removeZero().toFloatOrNull() ?: 0f
-                    viewModel.setTime(minOf(99f, time), xy)
-                    if (time > 99f) {
-                        bind.time.setText("99")
-                    }
+                    viewModel.setTime(
+                        time = it.replace(" MIN", "").removeZero().toFloatOrNull() ?: 0f,
+                        xy = xy,
+                        block = { bind.time.setText(MAX_TIME.toString().removeZero()) }
+                    )
                 }
                 time.addSuffix(" MIN")
             }

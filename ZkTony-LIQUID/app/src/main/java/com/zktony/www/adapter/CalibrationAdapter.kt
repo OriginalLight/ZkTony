@@ -17,9 +17,9 @@ import com.zktony.www.databinding.ItemCalibrationBinding
 class CalibrationAdapter :
     ListAdapter<Calibration, CalibrationAdapter.ViewHolder>(CalibrationDiffCallback()) {
 
-    private lateinit var onDeleteButtonClick: (Calibration) -> Unit
-    private lateinit var onEditButtonClick: (Calibration) -> Unit
-    private lateinit var onCheckedClick: (Calibration) -> Unit
+    private var onDeleteButtonClick: (Calibration) -> Unit = {}
+    private var onEditButtonClick: (Calibration) -> Unit = {}
+    private var onCheckedClick: (Calibration) -> Unit = {}
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

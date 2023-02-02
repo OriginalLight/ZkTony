@@ -47,11 +47,6 @@ object RoomModule {
     }
 
     @Provides
-    fun provideProgramDao(database: AppDatabase): ProgramDao {
-        return database.programDao()
-    }
-
-    @Provides
     fun provideMotorDao(database: AppDatabase): MotorDao {
         return database.motorDao()
     }
@@ -72,7 +67,17 @@ object RoomModule {
     }
 
     @Provides
-    fun providePoreDao(database: AppDatabase): PoreDao {
-        return database.poreDao()
+    fun providePoreDao(database: AppDatabase): HoleDao {
+        return database.holeDao()
+    }
+
+    @Provides
+    fun provideWorkDao(database: AppDatabase): WorkDao {
+        return database.workDao()
+    }
+
+    @Provides
+    fun provideWorkPlateDao(database: AppDatabase): WorkPlateDao {
+        return database.workPlateDao()
     }
 }

@@ -14,7 +14,12 @@ import com.zktony.www.R
  * @date: 2023-01-30 9:39
  */
 
-fun showPositionDialog(textX:Float, textY: Float, block1:(Float, Float) -> Unit, block2: (Float, Float) -> Unit) {
+fun showPositionDialog(
+    textX: Float,
+    textY: Float,
+    block1: (Float, Float) -> Unit,
+    block2: (Float, Float) -> Unit
+) {
     CustomDialog.build()
         .setCustomView(object :
             OnBindView<CustomDialog>(R.layout.layout_position_input_dialog) {
@@ -49,7 +54,7 @@ fun showPositionDialog(textX:Float, textY: Float, block1:(Float, Float) -> Unit,
         .show()
 }
 
-fun showSizeDialog(textRow:Int, textColumn: Int, block1:(Int, Int) -> Unit) {
+fun showSizeDialog(textRow: Int, textColumn: Int, block1: (Int, Int) -> Unit) {
     CustomDialog.build()
         .setCustomView(object :
             OnBindView<CustomDialog>(R.layout.layout_size_input_dialog) {
@@ -63,8 +68,8 @@ fun showSizeDialog(textRow:Int, textColumn: Int, block1:(Int, Int) -> Unit) {
                 row.setText(textRow.toString())
                 column.setText(textColumn.toString())
                 save.setOnClickListener {
-                    val x = row.text.toString().toIntOrNull() ?: 2
-                    val y = column.text.toString().toIntOrNull() ?: 2
+                    val x = row.text.toString().toIntOrNull() ?: 4
+                    val y = column.text.toString().toIntOrNull() ?: 4
                     block1(x, y)
                     dialog.dismiss()
                 }
