@@ -71,7 +71,8 @@
                 android:gravity="center"
                 android:text="@string/add"
                 android:textColor="@color/light_onPrimary"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                tools:ignore="TextContrastCheck" />
 
         </LinearLayout>
 

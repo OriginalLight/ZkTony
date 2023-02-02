@@ -39,7 +39,7 @@ class MotorManager(
         return Pair(mx, my)
     }
 
-    fun liquid(volume: Float, id: Int) : Int {
+    fun liquid(volume: Float, id: Int): Int {
         return when (id) {
             0 -> p1.pulseCount(volume, cali.v1)
             1 -> p2.pulseCount(volume, cali.v2)

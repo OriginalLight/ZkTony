@@ -11,14 +11,23 @@ import com.zktony.www.common.room.entity.*
  * @author 刘贺贺
  */
 @Database(
-    entities = [Log::class, Program::class, Motor::class, Calibration::class, CalibrationData::class, Plate::class, Pore::class],
+    entities =
+    [
+        Log::class,
+        Motor::class,
+        Calibration::class,
+        CalibrationData::class,
+        Plate::class,
+        Hole::class,
+        Work::class,
+        WorkPlate::class,
+    ],
     version = 1,
     exportSchema = false
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun logDao(): LogDao
-    abstract fun programDao(): ProgramDao
     abstract fun motorDao(): MotorDao
     abstract fun calibrationDao(): CalibrationDao
 
@@ -26,5 +35,9 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun plateDao(): PlateDao
 
-    abstract fun poreDao(): PoreDao
+    abstract fun holeDao(): HoleDao
+
+    abstract fun workDao(): WorkDao
+
+    abstract fun workPlateDao(): WorkPlateDao
 }

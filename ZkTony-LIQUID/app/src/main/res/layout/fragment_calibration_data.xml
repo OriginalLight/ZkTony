@@ -157,10 +157,10 @@
                 android:text="@string/pump_one"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                app:cornerRadius="24dp"
                 app:icon="@drawable/ic_drop"
                 app:iconPadding="0dp"
                 app:rippleColor="@color/purple_700"
-                app:cornerRadius="24dp"
                 app:strokeColor="@color/light_primary"
                 app:strokeWidth="3dp"
                 tools:ignore="NestedWeights" />
@@ -210,8 +210,8 @@
                 android:text="@string/add_liquid"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:rippleColor="@color/purple_700"
-                app:cornerRadius="24dp"/>
+                app:cornerRadius="24dp"
+                app:rippleColor="@color/purple_700" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/save"
@@ -226,8 +226,8 @@
                 android:text="@string/save"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:rippleColor="@color/purple_700"
-                app:cornerRadius="24dp"/>
+                app:cornerRadius="24dp"
+                app:rippleColor="@color/purple_700" />
 
         </LinearLayout>
 

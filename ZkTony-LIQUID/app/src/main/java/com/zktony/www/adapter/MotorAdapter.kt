@@ -16,7 +16,7 @@ import com.zktony.www.databinding.ItemMotorBinding
  */
 class MotorAdapter : ListAdapter<Motor, MotorAdapter.ViewHolder>(MotorDiffCallback()) {
 
-    private lateinit var onEditButtonClick: (Motor) -> Unit
+    private var onEditButtonClick: (Motor) -> Unit = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(

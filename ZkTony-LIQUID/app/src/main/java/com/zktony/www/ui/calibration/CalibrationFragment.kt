@@ -58,7 +58,10 @@ class CalibrationFragment :
             }
         }
         adapter.setOnEditButtonClick { it ->
-            val directions = CalibrationFragmentDirections.actionNavigationCalibrationToNavigationCalibrationData(it.id)
+            val directions =
+                CalibrationFragmentDirections.actionNavigationCalibrationToNavigationCalibrationData(
+                    it.id
+                )
             findNavController().navigate(directions)
         }
     }

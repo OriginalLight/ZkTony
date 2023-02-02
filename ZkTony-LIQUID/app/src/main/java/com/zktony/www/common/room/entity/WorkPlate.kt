@@ -9,17 +9,18 @@ import java.util.*
  * @author: 刘贺贺
  * @date: 2023-01-28 16:00
  */
-@Entity(tableName = "plate")
-data class Plate(
+@Entity(tableName = "work_plate")
+data class WorkPlate(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
+    val workId: String = "",
     val sort: Int = 0,
     val row: Int = 8,
     val column: Int = 12,
-    val x1: Float = 0f,
-    val y1: Float = 0f,
-    val x2: Float = 0f,
-    val y2: Float = 0f,
+    val v1: Float = 0f,
+    val v2: Float = 0f,
+    val v3: Float = 0f,
+    val v4: Float = 0f,
 ) {
     @Ignore
     var holes: List<Hole> = emptyList()

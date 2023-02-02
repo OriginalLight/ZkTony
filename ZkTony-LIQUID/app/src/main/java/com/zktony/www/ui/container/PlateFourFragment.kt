@@ -8,13 +8,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.showPositionDialog
 import com.zktony.www.common.extension.showSizeDialog
 import com.zktony.www.databinding.FragmentPlateBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint

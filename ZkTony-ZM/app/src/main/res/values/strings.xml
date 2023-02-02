@@ -30,7 +30,8 @@
     <string name="add_program_rs">程序添加 - 染色</string>
     <string name="add_program_zm">程序添加 - 转膜</string>
     <string name="time_min">时间（0 ~ 99）MIN</string>
-    <string name="voltage">电压（0 ~ 65）V</string>
+    <string name="voltage_zm">电压（0 ~ 50）V</string>
+    <string name="voltage_rs">电压（0 ~ 30）V</string>
     <string name="save">保存</string>
     <string name="danbai_name">使用蛋白名称</string>
     <string name="danbai_kd">蛋白大小范围（kD）</string>

@@ -8,11 +8,12 @@ import java.util.*
  * @author: 刘贺贺
  * @date: 2023-01-28 15:54
  */
-@Entity(tableName = "pore")
-data class Pore(
+@Entity(tableName = "hole")
+data class Hole(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
     val plateId: String = "",
+    val workId: String = "",
     val x: Int = 0,
     val y: Int = 0,
     val xAxis: Float = 0f,

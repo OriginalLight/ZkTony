@@ -15,6 +15,8 @@ import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.isFastClick
 import com.zktony.www.common.extension.removeZero
+import com.zktony.www.common.utils.Constants.MAX_TIME
+import com.zktony.www.common.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.www.databinding.FragmentRsBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -102,24 +104,14 @@ class RsFragment : BaseFragment<RsViewModel, FragmentRsBinding>(R.layout.fragmen
                 viewModel.setName(it)
             }
             voltage.afterTextChange {
-                val voltage = it.toFloatOrNull() ?: 0f
-                // voltage最大值为65 最小值为0
-                if (voltage > 65f) {
-                    binding.voltage.setText("65")
-                    viewModel.setVoltage(65f)
-                } else {
-                    viewModel.setVoltage(voltage)
-                }
+                viewModel.setVoltage(voltage = it.toFloatOrNull() ?: 0f, block = {
+                    binding.voltage.setText(MAX_VOLTAGE_RS.toString().removeZero())
+                })
             }
             time.afterTextChange {
-                val time = it.toFloatOrNull() ?: 0f
-                // time最大值为99 最小值为0
-                if (time > 99f) {
-                    binding.time.setText("99")
-                    viewModel.setTime(99f)
-                } else {
-                    viewModel.setTime(time)
-                }
+                viewModel.setTime(time = it.toFloatOrNull() ?: 0f, block = {
+                    binding.time.setText(MAX_TIME.toString().removeZero())
+                })
             }
         }
     }

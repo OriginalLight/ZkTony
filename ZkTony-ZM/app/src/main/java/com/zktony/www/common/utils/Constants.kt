@@ -18,4 +18,8 @@ object Constants {
     const val DURATION = "DURATION"
     const val INTERVAL = "INTERVAL"
     const val MOTOR_SPEED = "MOTOR_SPEED"
+    const val MAX_MOTOR = 250
+    const val MAX_TIME = 99f
+    const val MAX_VOLTAGE_ZM = 50f
+    const val MAX_VOLTAGE_RS = 30f
 }

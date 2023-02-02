@@ -4,6 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.room.entity.Program
+import com.zktony.www.common.utils.Constants.MAX_TIME
+import com.zktony.www.common.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,12 +81,18 @@ class RsViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(name = it)
     }
 
-    fun setVoltage(it: Float) {
-        _uiState.value = _uiState.value.copy(voltage = it)
+    fun setVoltage(voltage: Float, block: () -> Unit) {
+        _uiState.value = _uiState.value.copy(voltage = minOf(voltage, MAX_VOLTAGE_RS))
+        if (voltage > MAX_VOLTAGE_RS) {
+            block()
+        }
     }
 
-    fun setTime(it: Float) {
-        _uiState.value = _uiState.value.copy(time = it)
+    fun setTime(time: Float, block: () -> Unit) {
+        _uiState.value = _uiState.value.copy(time = minOf(time, MAX_TIME))
+        if (time > MAX_TIME) {
+            block()
+        }
     }
 }
 

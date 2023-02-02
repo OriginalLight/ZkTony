@@ -15,7 +15,6 @@ import com.zktony.www.adapter.CalibrationDataAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

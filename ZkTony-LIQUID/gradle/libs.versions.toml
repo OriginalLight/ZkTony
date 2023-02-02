@@ -6,7 +6,7 @@ ndkVersion = "21.4.7075529"
 cMakeVersion = "3.10.2"
 ## dependencies
 activity = "1.6.1"
-androidGradlePlugin = "7.4.0"
+androidGradlePlugin = "7.4.1"
 appcompat = "1.6.0"
 coroutines = "1.6.4"
 dataStore = "1.0.0"
