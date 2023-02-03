@@ -55,7 +55,7 @@ class WorkFragment : BaseFragment<WorkViewModel, FragmentWorkBinding>(R.layout.f
             }
         }
         adapter.setOnEditButtonClick {
-            val directions = WorkFragmentDirections.actionNavigationWorkToNavigationWorkFlow(it.id)
+            val directions = WorkFragmentDirections.actionNavigationWorkToNavigationWorkPlate(it.id)
             findNavController().navigate(directions)
         }
     }

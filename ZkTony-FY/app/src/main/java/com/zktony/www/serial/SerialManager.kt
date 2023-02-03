@@ -185,6 +185,16 @@ class SerialManager(
 
     }
 
+    fun setTemp(temp: String, addr: String) {
+        scope.launch {
+            sendText(TTYS3, "TC1:TCSW=0@$addr\r")
+            delay(2 * 60 * 1000L)
+            sendText(TTYS3, "TC1:TCSW=1@$addr\r")
+            delay(1000L)
+            sendText(TTYS3, "TC1:TCADJUSTTEMP=$temp@$addr\r")
+        }
+    }
+
 
     companion object {
         @JvmStatic

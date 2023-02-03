@@ -37,12 +37,9 @@ class CommandExecutor constructor(
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
-            serial.sendText(
-                serial = TTYS3,
-                text = V1.setTemp(
-                    addr = (module + 1).toString(),
-                    temp = action.temperature.toString()
-                )
+            serial.setTemp(
+                addr = (module + 1).toString(),
+                temp = action.temperature.toString()
             )
             // 主板运动
             serial.sendHex(
@@ -77,12 +74,9 @@ class CommandExecutor constructor(
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
-            serial.sendText(
-                serial = TTYS3,
-                text = V1.setTemp(
-                    addr = (module + 1).toString(),
-                    temp = action.temperature.toString()
-                )
+            serial.setTemp(
+                addr = (module + 1).toString(),
+                temp = action.temperature.toString()
             )
             // 主板运动
             serial.sendHex(
@@ -148,12 +142,9 @@ class CommandExecutor constructor(
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
-            serial.sendText(
-                serial = TTYS3,
-                text = V1.setTemp(
-                    addr = (module + 1).toString(),
-                    temp = action.temperature.toString()
-                )
+            serial.setTemp(
+                addr = (module + 1).toString(),
+                temp = action.temperature.toString()
             )
             // 主板运动
             serial.sendHex(
@@ -186,12 +177,9 @@ class CommandExecutor constructor(
         waitForFree("等待加液") {
             serial.lock(true)
             // 设置温度
-            serial.sendText(
-                serial = TTYS3,
-                text = V1.setTemp(
-                    addr = (module + 1).toString(),
-                    temp = action.temperature.toString()
-                )
+            serial.setTemp(
+                addr = (module + 1).toString(),
+                temp = action.temperature.toString()
             )
             // 主板运动
             serial.sendHex(
