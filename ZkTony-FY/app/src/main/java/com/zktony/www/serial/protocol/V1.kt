@@ -23,27 +23,6 @@ data class V1(
     }
 
     companion object {
-        /**
-         * 设置温度 下次开机不生效
-         * @param addr 地址
-         * @param temp 温度
-         * @return 指令
-         */
-        @JvmStatic
-        fun setTemp(addr: String, temp: String): String {
-            return "TC1:TCADJUSTTEMP=$temp@$addr\r"
-        }
-
-        /**
-         * 保存温度 下次开机生效
-         * @param addr 地址
-         * @param temp 温度
-         * @return 指令
-         */
-        @JvmStatic
-        fun saveTemp(addr: String, temp: String): String {
-            return "TC1:TCADJUSTTEMP!$temp@$addr\r"
-        }
 
         /**
          * 查询温度
