@@ -16,7 +16,4 @@ data class Work(
     val name: String = "",
     val upload: Int = 0,
     val createTime: Date = Date(System.currentTimeMillis()),
-) {
-    @Ignore
-    var plates: List<WorkPlate> = emptyList()
-}
+)

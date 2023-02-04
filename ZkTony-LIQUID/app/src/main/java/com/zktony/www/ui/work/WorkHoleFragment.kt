@@ -6,28 +6,16 @@ import androidx.navigation.findNavController
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.databinding.FragmentWorkFlowBinding
-import com.zktony.www.ui.calibration.CalibrationDataFragmentArgs
+import com.zktony.www.databinding.FragmentWorkHoleBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class WorkFlowFragment :
-    BaseFragment<WorkFlowViewModel, FragmentWorkFlowBinding>(R.layout.fragment_work_flow) {
-    override val viewModel: WorkFlowViewModel by viewModels()
+class WorkHoleFragment :
+    BaseFragment<WorkHoleViewModel, FragmentWorkHoleBinding>(R.layout.fragment_work_hole) {
+    override val viewModel: WorkHoleViewModel by viewModels()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initView()
         initButton()
-    }
-
-    private fun initView() {
-        arguments?.let {
-            CalibrationDataFragmentArgs.fromBundle(it).id.run {
-                if (this != "None") {
-                    viewModel.init(this)
-                }
-            }
-        }
     }
 
     private fun initButton() {

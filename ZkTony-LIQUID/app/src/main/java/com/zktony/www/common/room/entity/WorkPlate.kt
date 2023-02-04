@@ -17,11 +17,9 @@ data class WorkPlate(
     val sort: Int = 0,
     val row: Int = 8,
     val column: Int = 12,
+    val count: Int = 0,
     val v1: Float = 0f,
     val v2: Float = 0f,
     val v3: Float = 0f,
     val v4: Float = 0f,
-) {
-    @Ignore
-    var holes: List<Hole> = emptyList()
-}
+)

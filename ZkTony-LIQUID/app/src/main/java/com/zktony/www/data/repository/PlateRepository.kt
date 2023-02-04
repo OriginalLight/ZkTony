@@ -29,22 +29,31 @@ class PlateRepository @Inject constructor(
         return plateDao.getPlateBySort(id)
     }
 
-    fun getPoreByPlateId(plateId: String): Flow<List<Hole>> {
+    fun getHoleByPlateId(plateId: String): Flow<List<Hole>> {
         return holeDao.getByPlateId(plateId)
     }
 
     suspend fun init() {
         val plates = plateDao.getAllPlate().firstOrNull()
         if (plates.isNullOrEmpty()) {
+            val plate1 = Plate(sort = 0)
+            val plate2 = Plate(sort = 1)
+            val plate3 = Plate(sort = 2)
+            val plate4 = Plate(sort = 3)
+            val plate5 = Plate(sort = 4)
             plateDao.insertBatch(
                 listOf(
-                    Plate(sort = 0),
-                    Plate(sort = 1),
-                    Plate(sort = 2),
-                    Plate(sort = 3),
-                    Plate(sort = 4),
+                    plate1,
+                    plate2,
+                    plate3,
+                    plate4,
+                    plate5
                 )
             )
+            calculatePoreCoordinate(plate1)
+            calculatePoreCoordinate(plate2)
+            calculatePoreCoordinate(plate3)
+            calculatePoreCoordinate(plate4)
         }
     }
 
