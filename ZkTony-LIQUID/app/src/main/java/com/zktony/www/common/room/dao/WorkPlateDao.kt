@@ -17,13 +17,16 @@ interface WorkPlateDao {
     @Delete
     suspend fun delete(workPlate: WorkPlate)
 
+    @Query("DELETE FROM work_plate WHERE id = :id")
+    suspend fun deleteById(id: String)
+
     @Update
     suspend fun update(workPlate: WorkPlate)
 
-    @Query("SELECT * FROM work_plate WHERE workId = :id")
+    @Query("SELECT * FROM work_plate WHERE workId = :id ORDER BY sort ASC")
     fun getByWorkId(id: String): Flow<List<WorkPlate>>
 
     @Query("DELETE FROM work_plate WHERE workId = :id")
-    fun deleteByWorkId(id: String)
+    suspend fun deleteByWorkId(id: String)
 
 }

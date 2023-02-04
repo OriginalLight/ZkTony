@@ -85,18 +85,8 @@ class HomeViewModel @Inject constructor(
             launch {
                 // 设置和定时查询温控
                 for (i in 0..4) {
-                    delay(200L)
-                    serial.sendText(
-                        serial = TTYS3, text = V1.saveTemp(
-                            addr = i.toString(), temp = if (i == 0) "3" else "26"
-                        )
-                    )
-                    delay(200L)
-                    serial.sendText(
-                        serial = TTYS3, text = V1.setTemp(
-                            addr = i.toString(), temp = if (i == 0) "3" else "26"
-                        )
-                    )
+                    delay(500L)
+                    serial.setTemp(addr = i.toString(), temp = if (i == 0) "3" else "26")
                 }
                 // 每十秒钟查询一次温度
                 while (true) {
@@ -303,11 +293,7 @@ class HomeViewModel @Inject constructor(
                 // 恢复到室温
                 for (i in 1..4) {
                     delay(200L)
-                    serial.sendText(
-                        serial = TTYS3, text = V1.setTemp(
-                            addr = i.toString(), temp = "26"
-                        )
-                    )
+                    serial.setTemp(addr = i.toString(), temp = "26")
                 }
                 serial.reset()
             }
@@ -360,11 +346,9 @@ class HomeViewModel @Inject constructor(
             // insulatingEnable false 未保温状态 true 保温状态
             // 发送设置温度命令 -> 更改按钮状态
             // 发送设置温度命令 如果当前是未保温状态发送设置中的温度，否则发送室温26度
-            serial.sendText(
-                serial = TTYS3, text = V1.setTemp(
-                    addr = "0", temp = if (_uiFlow.value.insulating) "26"
-                    else appViewModel.settings.value.temp.toString().removeZero()
-                )
+            serial.setTemp(
+                addr = "0", temp = if (_uiFlow.value.insulating) "26"
+                else appViewModel.settings.value.temp.toString().removeZero()
             )
             // 更改按钮状态
             _uiFlow.value = _uiFlow.value.copy(
@@ -396,6 +380,6 @@ data class ModuleUiState(
  */
 data class UiState(
     val pause: Boolean = false,
-    val insulating: Boolean = false,
+    val insulating: Boolean = true,
     val temp: String = "0.0℃",
 )
