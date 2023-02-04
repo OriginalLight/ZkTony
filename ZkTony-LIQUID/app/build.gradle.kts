@@ -31,12 +31,14 @@ android {
         debug {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".liquid.debug"
         }
 
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".liquid.release"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

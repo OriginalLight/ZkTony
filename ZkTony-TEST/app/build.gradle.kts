@@ -4,7 +4,8 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs")
-    kotlin("kapt")
+    id("kotlin-kapt")
+    id("com.google.devtools.ksp") version "1.8.0-1.0.8"
 }
 
 android {
@@ -19,6 +20,30 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["dagger.hilt.disableModulesHaveInstallInCheck"] = "true"
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            isDebuggable = true
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".test.debug"
+        }
+
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".test.release"
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
     }
 
     signingConfigs {
@@ -30,23 +55,6 @@ android {
         }
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".test"
-        }
-        debug {
-            isDebuggable = true
-            signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".test"
-        }
-    }
     packagingOptions {
         jniLibs.keepDebugSymbols += listOf(
             "*/x86/*.so",
@@ -54,17 +62,19 @@ android {
             "*/armeabi-v7a/*.so",
             "*/arm64-v8a/*.so"
         )
+        resources {
+            excludes.add("/META-INF/{AL2.0,LGPL2.1}")
+        }
     }
 
     buildFeatures {
         dataBinding = true
     }
 
-
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-test-${versionName}-${name}.apk"
+                "zktony-test-${versionName}.apk"
         }
     }
 }
@@ -85,11 +95,13 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.datastore.preferences)
     implementation(libs.dialogx)
+    implementation(libs.gson)
     implementation(libs.hilt.android)
     implementation(libs.hilt.work)
     implementation(libs.material)
 
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
+
     kapt(libs.hilt.android.compiler)
     kapt(libs.hilt.compiler)
 
