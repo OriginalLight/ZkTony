@@ -4,7 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs")
-    kotlin("kapt")
+    id("kotlin-kapt")
 }
 
 android {
@@ -19,6 +19,28 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments["dagger.hilt.disableModulesHaveInstallInCheck"] = "true"
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            isDebuggable = true
+            signingConfig = signingConfigs.getByName("debug")
+        }
+
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("debug")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
     }
 
     signingConfigs {
@@ -30,21 +52,6 @@ android {
         }
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-            signingConfig = signingConfigs.getByName("debug")
-        }
-        debug {
-            isDebuggable = true
-            signingConfig = signingConfigs.getByName("debug")
-        }
-    }
     packagingOptions {
         jniLibs.keepDebugSymbols += listOf(
             "*/x86/*.so",
@@ -52,16 +59,32 @@ android {
             "*/armeabi-v7a/*.so",
             "*/arm64-v8a/*.so"
         )
+        resources {
+            excludes.add("/META-INF/{AL2.0,LGPL2.1}")
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     buildFeatures {
         dataBinding = true
     }
 
+    kapt {
+        correctErrorTypes = true
+    }
+
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-liquid-${versionName}-${name}.apk"
+                "zktony-liquid-${versionName}.apk"
         }
     }
 }
