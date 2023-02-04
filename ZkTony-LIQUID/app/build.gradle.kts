@@ -5,6 +5,7 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs")
     id("kotlin-kapt")
+    id("com.google.devtools.ksp") version "1.8.0-1.0.8"
 }
 
 android {
@@ -64,21 +65,8 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
-
     buildFeatures {
         dataBinding = true
-    }
-
-    kapt {
-        correctErrorTypes = true
     }
 
     applicationVariants.all {
@@ -114,7 +102,8 @@ dependencies {
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.converter.gson)
 
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
+
     kapt(libs.hilt.android.compiler)
     kapt(libs.hilt.compiler)
 
