@@ -75,8 +75,8 @@ class PlateRepository @Inject constructor(
     private suspend fun calculatePoreCoordinate(plate: Plate) {
         val x = plate.x2 - plate.x1
         val y = plate.y2 - plate.y1
-        val xSpace = x / (plate.column - 1)
-        val ySpace = y / (plate.row - 1)
+        val xSpace = x / if(plate.column == 1) 1 else (plate.column - 1)
+        val ySpace = y / if(plate.row == 1) 1 else (plate.row - 1)
         val holeList = mutableListOf<Hole>()
         for (i in 0 until plate.row) {
             for (j in 0 until plate.column) {
