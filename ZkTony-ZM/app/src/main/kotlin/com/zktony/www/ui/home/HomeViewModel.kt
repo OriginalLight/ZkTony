@@ -10,6 +10,7 @@ import com.zktony.www.common.extension.getTimeFormat
 import com.zktony.www.common.room.entity.LogData
 import com.zktony.www.common.room.entity.LogRecord
 import com.zktony.www.common.room.entity.Program
+import com.zktony.www.common.utils.Constants.ERROR_CURRENT
 import com.zktony.www.common.utils.Constants.MAX_MOTOR
 import com.zktony.www.common.utils.Constants.MAX_TIME
 import com.zktony.www.common.utils.Constants.MAX_VOLTAGE_RS
@@ -78,13 +79,11 @@ class HomeViewModel @Inject constructor(
                 delay(100)
                 appViewModel.received.collect {
                     _uiStateX.value = _uiStateX.value.copy(
-                        currentStatus = it.inputSensorX,
                         currentMotor = it.stepMotorX,
                         currentVoltage = it.getVoltageX,
                         currentCurrent = it.getCurrentX
                     )
                     _uiStateY.value = _uiStateY.value.copy(
-                        currentStatus = it.inputSensorY,
                         currentMotor = it.stepMotorY,
                         currentVoltage = it.getVoltageY,
                         currentCurrent = it.getCurrentY
@@ -395,27 +394,27 @@ class HomeViewModel @Inject constructor(
                     val rec = appViewModel.received.value
                     var msg = ""
                     if (rec.powerENX == 1 && rec.powerENY == 0) {
-                        if (rec.getCurrentX < 0.05f) {
+                        if (rec.getCurrentX < ERROR_CURRENT) {
                             stop(0)
                             playAudio(R.raw.error)
                             msg = "模块A异常，请检查！！！"
                         }
                     } else if (rec.powerENX == 0 && rec.powerENY == 1) {
-                        if (rec.getCurrentY < 0.05f) {
+                        if (rec.getCurrentY < ERROR_CURRENT) {
                             stop(1)
                             playAudio(R.raw.error)
                             msg = "模块B异常，请检查！！！"
                         }
                     } else if (rec.powerENX == 1 && rec.powerENY == 1) {
-                        if (rec.getCurrentX < 0.05f && rec.getCurrentY > 0.05f) {
+                        if (rec.getCurrentX < ERROR_CURRENT && rec.getCurrentY > ERROR_CURRENT) {
                             stop(0)
                             playAudio(R.raw.error)
                             msg = "模块A异常，请检查！！！"
-                        } else if (rec.getCurrentX > 0.05f && rec.getCurrentY < 0.05f) {
+                        } else if (rec.getCurrentX > ERROR_CURRENT && rec.getCurrentY < ERROR_CURRENT) {
                             stop(1)
                             playAudio(R.raw.error)
                             msg = "模块B异常，请检查！！！"
-                        } else if (rec.getCurrentX < 0.05f && rec.getCurrentY < 0.05f) {
+                        } else if (rec.getCurrentX < ERROR_CURRENT && rec.getCurrentY < ERROR_CURRENT) {
                             stop(0)
                             delay(300L)
                             stop(1)
@@ -510,7 +509,6 @@ data class HomeUiState(
     val motor: Int = 0,
     val voltage: Float = 0f,
     val time: Float = 0f,
-    val currentStatus: Int = 0,
     val currentMotor: Int = 0,
     val currentVoltage: Float = 0f,
     val currentTime: String = "00:00",

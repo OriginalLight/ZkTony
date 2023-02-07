@@ -16,6 +16,7 @@ import com.kongzue.dialogx.util.TextInfo
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.*
+import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.utils.Constants.MAX_MOTOR
 import com.zktony.www.common.utils.Constants.MAX_TIME
 import com.zktony.www.databinding.FragmentHomeBinding
@@ -30,12 +31,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
-        initTabLayout(0)
-        initTabLayout(1)
-        initButton(0)
-        initButton(1)
-        initEditText(0)
-        initEditText(1)
+        for (i in 0..1) {
+            initTabLayout(i)
+            initButton(i)
+            initEditText(i)
+        }
     }
 
     /**
@@ -230,19 +230,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
         }
         // 实时信息显示部分
-        if (uiState.currentStatus == 0) {
-            bind.run {
-                currentStatus.text = "模块${if (xy == 0) "A" else "B"}未插入"
-                currentStatus.setBackgroundColor(Color.parseColor("#41D50000"))
-            }
-            if (uiState.currentTime == "已完成") {
-                viewModel.setCurrentTime(xy)
-            }
-        } else {
-            bind.run {
-                currentStatus.text = "模块${if (xy == 0) "A" else "B"}已就绪"
-                currentStatus.setBackgroundColor(Color.parseColor("#287DF133"))
-            }
+        bind.run {
+            currentStatus.text = if (xy == 0) "A" else "B"
+            currentStatus.setBackgroundColor(Color.parseColor("#287DF133"))
         }
 
         if (uiState.currentMotor == 0) {
@@ -281,7 +271,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         (uiState.currentCurrent * 1000).toInt().toString() + " mA"
                     currentCurrent.setBackgroundColor(Color.parseColor("#287DF133"))
                 }
-                if (uiState.currentCurrent < 0.05f) {
+                if (uiState.currentCurrent < Constants.ERROR_CURRENT) {
                     bind.currentCurrent.setBackgroundColor(Color.parseColor("#41D50000"))
                 }
             } else {
@@ -299,14 +289,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             if (uiState.model == 0) {
                 if (uiState.programName == "洗涤") {
                     bind.start.isEnabled =
-                        uiState.motor > 0 && uiState.time > 0f && uiState.currentStatus == 1
+                        uiState.motor > 0 && uiState.time > 0f
                 } else {
                     bind.start.isEnabled =
-                        uiState.motor > 0 && uiState.time > 0f && uiState.voltage > 0f && uiState.currentStatus == 1
+                        uiState.motor > 0 && uiState.time > 0f && uiState.voltage > 0f
                 }
             } else {
                 bind.start.isEnabled =
-                    uiState.time > 0f && uiState.voltage > 0f && uiState.currentStatus == 1
+                    uiState.time > 0f && uiState.voltage > 0f
             }
         }
         // time

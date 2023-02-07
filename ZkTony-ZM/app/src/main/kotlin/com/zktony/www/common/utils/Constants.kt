@@ -22,4 +22,5 @@ object Constants {
     const val MAX_TIME = 99f
     const val MAX_VOLTAGE_ZM = 50f
     const val MAX_VOLTAGE_RS = 30f
+    const val ERROR_CURRENT = 0.1f
 }
