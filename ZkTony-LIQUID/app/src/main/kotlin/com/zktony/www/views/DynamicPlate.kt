@@ -24,6 +24,7 @@ class DynamicPlate : View {
     private var row = 0
     private var column = 0
     private var space = 40
+    private var color = Color.GREEN
 
     // 显示定位
     private var showLocation = false
@@ -57,6 +58,11 @@ class DynamicPlate : View {
         invalidate()
     }
 
+    fun setColor(color: Int) {
+        this.color = color
+        invalidate()
+    }
+
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
@@ -85,10 +91,10 @@ class DynamicPlate : View {
 
         for (i in 0 until row) {
             for (j in 0 until column) {
-                val pore = data.find { it.x == i && it.y == j }
-                if (pore != null) {
-                    if (pore.checked) {
-                        paint.color = Color.GREEN
+                val hole = data.find { it.x == j && it.y == i }
+                if (hole != null) {
+                    if (hole.checked) {
+                        paint.color = color
                     } else {
                         paint.color = Color.WHITE
                     }
@@ -97,7 +103,7 @@ class DynamicPlate : View {
                 }
                 canvas.drawCircle(
                     (j * space + space / 2).toFloat(),
-                    (i * space + space / 2).toFloat(),
+                    (row * space - i * space - space / 2).toFloat(),
                     space / 3f,
                     paint
                 )

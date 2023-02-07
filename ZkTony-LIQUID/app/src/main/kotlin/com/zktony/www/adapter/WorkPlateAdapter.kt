@@ -7,10 +7,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.common.room.entity.Work
 import com.zktony.www.common.room.entity.WorkPlate
-import com.zktony.www.databinding.ItemWorkBinding
-import com.zktony.www.databinding.ItemWorkFlowBinding
+import com.zktony.www.databinding.ItemWorkPlateBinding
 
 /**
  * @author: 刘贺贺
@@ -24,7 +22,7 @@ class WorkPlateAdapter :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ItemWorkFlowBinding.inflate(
+            ItemWorkPlateBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -43,13 +41,13 @@ class WorkPlateAdapter :
     }
 
     class ViewHolder(
-        private val binding: ItemWorkFlowBinding,
+        private val binding: ItemWorkPlateBinding,
         private val onEditButtonClick: (WorkPlate) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
         fun bind(item: WorkPlate) {
             binding.apply {
-                name.text = when(item.sort){
+                name.text = when (item.sort) {
                     0 -> "一号板"
                     1 -> "二号板"
                     2 -> "三号板"

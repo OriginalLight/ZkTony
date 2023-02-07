@@ -1,9 +1,6 @@
 package com.zktony.www.common.room.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.zktony.www.common.room.entity.Hole
 import kotlinx.coroutines.flow.Flow
 
@@ -31,5 +28,11 @@ interface HoleDao {
 
     @Query("SELECT * FROM hole WHERE workId = :workId")
     fun getByWorkId(workId: String): Flow<List<Hole>>
+
+    @Update
+    suspend fun update(hole: Hole)
+
+    @Update
+    suspend fun updateBatch(holes: List<Hole>)
 
 }

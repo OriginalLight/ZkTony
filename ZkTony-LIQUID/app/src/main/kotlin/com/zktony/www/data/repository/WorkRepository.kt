@@ -9,8 +9,6 @@ import com.zktony.www.common.room.entity.Work
 import com.zktony.www.common.room.entity.WorkPlate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.zip
 import javax.inject.Inject
 
 /**
@@ -45,8 +43,32 @@ class WorkRepository @Inject constructor(
         return workPlateDao.getByWorkId(id)
     }
 
+    fun getWorkPlateById(id: String): Flow<WorkPlate> {
+        return workPlateDao.getById(id)
+    }
+
     fun getHoleByWorkId(id: String): Flow<List<Hole>> {
         return holeDao.getByWorkId(id)
+    }
+
+    fun getHoleByPlateId(id: String): Flow<List<Hole>> {
+        return holeDao.getByPlateId(id)
+    }
+
+    suspend fun updateWork(work: Work) {
+        workDao.update(work)
+    }
+
+    suspend fun updatePlate(workPlate: WorkPlate) {
+        workPlateDao.update(workPlate)
+    }
+
+    suspend fun updateHole(hole: Hole) {
+        holeDao.update(hole)
+    }
+
+    suspend fun updateHoleBatch(holes: List<Hole>) {
+        holeDao.updateBatch(holes)
     }
 
     suspend fun removePlate(plate: WorkPlate) {
