@@ -31,6 +31,7 @@
                 tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
             <TextView
+                android:id="@+id/title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
@@ -41,6 +42,76 @@
                 android:textSize="24sp" />
 
         </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_weight="1"
+            android:background="@color/light_onPrimary"
+            android:orientation="vertical">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                tools:ignore="MissingConstraints,NestedWeights">
+
+                <com.zktony.www.views.DynamicPlate
+                    android:id="@+id/dynamic_plate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="32dp"
+                android:orientation="horizontal"
+                tools:ignore="MissingConstraints">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/select_all"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/select_all"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="27dp"
+                    app:rippleColor="@color/purple_500"
+                    tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/volume"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="3"
+                    android:backgroundTint="#64DD17"
+                    android:text="@string/button"
+                    android:textAllCaps="false"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="27dp"
+                    app:rippleColor="@color/purple_700"
+                    tools:ignore="TextContrastCheck,VisualLintButtonSize" />
+
+            </LinearLayout>
+
+        </LinearLayout>
 
     </LinearLayout>
 

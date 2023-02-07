@@ -131,7 +131,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/toggleGroup"
-                tools:listitem="@layout/item_work_flow"
+                tools:listitem="@layout/item_work_plate"
                 android:visibility="gone"/>
 
 

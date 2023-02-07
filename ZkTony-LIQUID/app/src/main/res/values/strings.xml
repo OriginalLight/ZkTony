@@ -113,4 +113,5 @@
     <string name="work_edit">加液程序编辑</string>
     <string name="work_plate">加液板编辑</string>
     <string name="work_hole">孔位编辑</string>
+    <string name="select_all">全选</string>
 </resources>

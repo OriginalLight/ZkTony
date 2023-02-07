@@ -29,4 +29,7 @@ interface WorkPlateDao {
     @Query("DELETE FROM work_plate WHERE workId = :id")
     suspend fun deleteByWorkId(id: String)
 
+    @Query("SELECT * FROM work_plate WHERE id = :id")
+    fun getById(id: String): Flow<WorkPlate>
+
 }
