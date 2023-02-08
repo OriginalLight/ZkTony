@@ -1,7 +1,7 @@
 package com.zktony.web.controller;
 
 
-import com.zktony.web.commom.model.Result;
+import com.zktony.web.model.Result;
 import com.zktony.web.entity.Version;
 import com.zktony.web.repository.VersionRepository;
 import org.springframework.beans.factory.annotation.Autowired;

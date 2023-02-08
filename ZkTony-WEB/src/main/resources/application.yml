@@ -6,7 +6,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://182.160.14.59:30306/zktony?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
+    url: jdbc:mysql://192.168.10.103:30306/zktony?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true
     username: root
     password: wcnm741741..
     hikari:
@@ -19,8 +19,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: false
+    show-sql: true
     open-in-view: false
+    database-platform: org.hibernate.dialect.MySQLDialect
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     serialization:
@@ -28,5 +29,15 @@ spring:
       fail_on_empty_beans: false
     deserialization:
       fail_on_unknown_properties: false
+
+logging:
+  level:
+    com.zktony.web: debug
+  file:
+    name: zktony.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      file-name-pattern: zktony.%d{yyyy-MM-dd}.%i.log
 
 

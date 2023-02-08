@@ -1,4 +1,4 @@
-package com.zktony.web.commom.model;
+package com.zktony.web.model;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

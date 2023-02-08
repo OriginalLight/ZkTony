@@ -48,9 +48,6 @@ web() {
     docker tag web:$ver zktony/web:latest
     docker push zktony/web:latest
     docker pull zktony/web:latest
-    docker stop web
-    docker rm web
-    docker run -d --name web -p 8080:8080 -v /zktony:/zktony zktony/web:latest
     echo "打包上传启动后端完成"
     exit
 }
