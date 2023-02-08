@@ -29,7 +29,7 @@ class ProgramExecutor constructor(
 ) {
     private val _event = MutableSharedFlow<ActionEvent>()
     val event: SharedFlow<ActionEvent> get() = _event
-    private val commandExecutor by lazy { CommandExecutor(module = module, settings = settings) }
+    private val commandExecutor by lazy { CommandExecutor(module = module, con = settings.container) }
 
     /**
      * 执行任务队列

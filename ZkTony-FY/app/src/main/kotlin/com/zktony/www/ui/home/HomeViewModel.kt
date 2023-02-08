@@ -19,8 +19,8 @@ import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.serial.SerialManager
-import com.zktony.www.serial.protocol.V1
+import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.control.serial.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -307,7 +307,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
             if (serial.executing == 0) {
-                if (serial.runtimeLock.value) {
+                if (serial.lock.value) {
                     PopTip.show("运动中禁止复位")
                 } else {
                     serial.reset()

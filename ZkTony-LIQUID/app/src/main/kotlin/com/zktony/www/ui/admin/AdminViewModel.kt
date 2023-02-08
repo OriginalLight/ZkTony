@@ -37,8 +37,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AdminViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
-    private val motorRepo: MotorRepository,
-    private val sysRepo: SystemRepository,
+    private val motorRepository: MotorRepository,
+    private val systemRepository: SystemRepository,
 ) : BaseViewModel() {
 
     @Inject
@@ -84,7 +84,8 @@ class AdminViewModel @Inject constructor(
     private fun onSerialOneResponse(hex: String) {
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotor(data.toMotor().copy(board = 0))
+                val motor = data.toMotor()
+                updateMotor(motor.copy(id = motor.address - 1))
             }
         }
     }
@@ -96,9 +97,8 @@ class AdminViewModel @Inject constructor(
     private fun onSerialThreeResponse(hex: String) {
         hex.toCommand().run {
             if (function == "03" && parameter == "04") {
-                updateMotor(
-                    data.toMotor().copy(board = 1)
-                )
+                val motor = data.toMotor()
+                updateMotor(motor.copy(id = motor.address + 2))
             }
         }
     }
@@ -180,7 +180,7 @@ class AdminViewModel @Inject constructor(
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (CommonApplicationProxy.application.isNetworkAvailable()) {
-                sysRepo.getVersionInfo(DEVICE_ID).collect {
+                systemRepository.getVersionInfo(DEVICE_ID).collect {
                     when (it) {
                         is NetworkResult.Success -> {
                             if (it.data.versionCode > BuildConfig.VERSION_CODE) {
@@ -261,8 +261,8 @@ class AdminViewModel @Inject constructor(
      */
     private fun updateMotor(motor: Motor) {
         viewModelScope.launch {
-            motorRepo.getByBoardAndAddress(motor.board, motor.address).firstOrNull()?.let {
-                motorRepo.update(
+            motorRepository.getById(motor.id).firstOrNull()?.let {
+                motorRepository.update(
                     it.copy(
                         subdivision = motor.subdivision,
                         speed = motor.speed,

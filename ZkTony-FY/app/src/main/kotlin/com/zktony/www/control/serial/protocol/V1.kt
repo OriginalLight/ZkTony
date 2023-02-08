@@ -1,4 +1,4 @@
-package com.zktony.www.serial.protocol
+package com.zktony.www.control.serial.protocol
 
 import com.zktony.www.common.extension.toHex
 
@@ -53,22 +53,12 @@ data class V1(
         }
 
         /**
-         * 单点走位
-         * @param data [String] 字符串
-         * @return [String] 指令
-         */
-        @JvmStatic
-        fun singlePoint(data: String): String {
-            return V1(fn = "05", pa = "01", data = "0101" + data.toHex()).toHex()
-        }
-
-        /**
          * 多点走位
          * @param data [String] 字符串
          * @return [String] 指令
          */
         @JvmStatic
-        fun multiPoint(data: String): String {
+        fun complex(data: String): String {
             return V1(fn = "05", pa = "04", data = "0101" + data.toHex()).toHex()
         }
 

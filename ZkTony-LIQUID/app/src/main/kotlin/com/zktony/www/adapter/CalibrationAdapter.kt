@@ -63,21 +63,21 @@ class CalibrationAdapter :
             binding.apply {
                 cali = item
                 order.text = (layoutPosition + 1).toString()
-                select.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                with(select) {
+                    clickScale()
+                    setOnClickListener {
                         onCheckedClick.invoke(item)
                     }
                 }
-                edit.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                with(edit) {
+                    clickScale()
+                    setOnClickListener {
                         onEditButtonClick.invoke(item)
                     }
                 }
-                delete.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                with(delete) {
+                    clickScale()
+                    setOnClickListener {
                         onDeleteButtonClick.invoke(item)
                     }
                 }

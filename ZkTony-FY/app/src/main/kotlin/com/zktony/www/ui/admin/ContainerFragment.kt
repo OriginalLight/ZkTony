@@ -10,6 +10,7 @@ import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.removeZero
+import com.zktony.www.common.extension.setEqualText
 import com.zktony.www.common.room.entity.Container
 import com.zktony.www.databinding.FragmentContainerBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +34,19 @@ class ContainerFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.container.collect {
-                        onContainerChange(it)
+                        binding.apply {
+                            wasteY.setEqualText(it.wasteY.toString().removeZero())
+                            wasteZ.setEqualText(it.wasteZ.toString().removeZero())
+                            washY.setEqualText(it.washY.toString().removeZero())
+                            washZ.setEqualText(it.washZ.toString().removeZero())
+                            blockY.setEqualText(it.blockY.toString().removeZero())
+                            blockZ.setEqualText(it.blockZ.toString().removeZero())
+                            oneY.setEqualText(it.oneY.toString().removeZero())
+                            oneZ.setEqualText(it.oneZ.toString().removeZero())
+                            recycleOneZ.setEqualText(it.recycleOneZ.toString().removeZero())
+                            twoY.setEqualText(it.twoY.toString().removeZero())
+                            twoZ.setEqualText(it.twoZ.toString().removeZero())
+                        }
                     }
                 }
             }
@@ -44,30 +57,12 @@ class ContainerFragment :
      * 初始化按钮
      */
     private fun initButton() {
-        binding.run {
-            back.run {
+        binding.apply {
+            with(back) {
                 clickScale()
                 setOnClickListener {
                     findNavController().navigateUp()
                 }
-            }
-            update.setOnClickListener {
-                viewModel.replaceContainer(
-                    Container().copy(
-                        wasteY = binding.wasteY.text.toString().toFloat(),
-                        wasteZ = binding.wasteZ.text.toString().toFloat(),
-                        washY = binding.washY.text.toString().toFloat(),
-                        washZ = binding.washZ.text.toString().toFloat(),
-                        blockY = binding.blockY.text.toString().toFloat(),
-                        blockZ = binding.blockZ.text.toString().toFloat(),
-                        oneY = binding.oneY.text.toString().toFloat(),
-                        oneZ = binding.oneZ.text.toString().toFloat(),
-                        recycleOneZ = binding.recycleOneZ.text.toString().toFloat(),
-                        twoY = binding.twoY.text.toString().toFloat(),
-                        twoZ = binding.twoZ.text.toString().toFloat(),
-                        extract = binding.extract.text.toString().toFloat(),
-                    )
-                )
             }
             toWashY.setOnClickListener { viewModel.toWashY() }
             toWashZ.setOnClickListener { viewModel.toWashZ() }
@@ -81,27 +76,23 @@ class ContainerFragment :
             toTwoY.setOnClickListener { viewModel.toTwoY() }
             toTwoZ.setOnClickListener { viewModel.toTwoZ() }
             toZero.setOnClickListener { viewModel.toZero() }
-        }
-    }
-
-    /**
-     * 容器数据变化
-     * @param container [Container] 容器
-     */
-    private fun onContainerChange(container: Container) {
-        binding.run {
-            wasteY.setText(container.wasteY.toString().removeZero())
-            wasteZ.setText(container.wasteZ.toString().removeZero())
-            washY.setText(container.washY.toString().removeZero())
-            washZ.setText(container.washZ.toString().removeZero())
-            blockY.setText(container.blockY.toString().removeZero())
-            blockZ.setText(container.blockZ.toString().removeZero())
-            oneY.setText(container.oneY.toString().removeZero())
-            oneZ.setText(container.oneZ.toString().removeZero())
-            recycleOneZ.setText(container.recycleOneZ.toString().removeZero())
-            twoY.setText(container.twoY.toString().removeZero())
-            twoZ.setText(container.twoZ.toString().removeZero())
-            extract.setText(container.extract.toString().removeZero())
+            update.setOnClickListener {
+                viewModel.update(
+                    Container().copy(
+                        wasteY = binding.wasteY.text.toString().toFloat(),
+                        wasteZ = binding.wasteZ.text.toString().toFloat(),
+                        washY = binding.washY.text.toString().toFloat(),
+                        washZ = binding.washZ.text.toString().toFloat(),
+                        blockY = binding.blockY.text.toString().toFloat(),
+                        blockZ = binding.blockZ.text.toString().toFloat(),
+                        oneY = binding.oneY.text.toString().toFloat(),
+                        oneZ = binding.oneZ.text.toString().toFloat(),
+                        recycleOneZ = binding.recycleOneZ.text.toString().toFloat(),
+                        twoY = binding.twoY.text.toString().toFloat(),
+                        twoZ = binding.twoZ.text.toString().toFloat(),
+                    )
+                )
+            }
         }
     }
 }

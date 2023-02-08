@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LogViewModel @Inject constructor(
-    private val repo: LogRepository
+    private val logRepository: LogRepository
 ) : BaseViewModel() {
 
     private val _logList = MutableStateFlow<List<Log>>(emptyList())
@@ -26,10 +26,10 @@ class LogViewModel @Inject constructor(
     val logList = _logList.asStateFlow()
     val data = _data.asStateFlow()
 
-    fun initLogList() {
+    init {
         viewModelScope.launch {
             _data.value = Date(System.currentTimeMillis()).simpleDateFormat("yyyy-MM-dd")
-            repo.getAll().collect {
+            logRepository.getAll().collect {
                 _logList.value = it
             }
         }
@@ -38,7 +38,7 @@ class LogViewModel @Inject constructor(
     fun changeLogRecord(start: Date, end: Date) {
         viewModelScope.launch {
             _data.value = start.simpleDateFormat("yyyy-MM-dd")
-            repo.getByDate(start.getDayStart(), end.getDayEnd())
+            logRepository.getByDate(start.getDayStart(), end.getDayEnd())
                 .first().let {
                     _logList.value = it
                 }

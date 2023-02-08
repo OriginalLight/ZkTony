@@ -8,9 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
+import com.zktony.www.common.extension.positionDialog
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.common.extension.showPositionDialog
-import com.zktony.www.common.extension.showSizeDialog
+import com.zktony.www.common.extension.sizeDialog
 import com.zktony.www.databinding.FragmentPlateBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -21,42 +21,13 @@ class PlateFourFragment :
     override val viewModel: PlateFourViewModel by viewModels()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initView()
         initFlowCollector()
+        initView()
     }
 
     /**
-     * 初始化view
+     * 初始化flow collector
      */
-    private fun initView() {
-        binding.run {
-            dynamicPlate.setShowLocation(true)
-            rowColumn.setOnClickListener {
-                showSizeDialog(
-                    textRow = viewModel.uiState.value!!.row,
-                    textColumn = viewModel.uiState.value!!.column,
-                    block1 = { row, column -> viewModel.setRowAndColumn(row, column) }
-                )
-            }
-            positionOne.setOnClickListener {
-                showPositionDialog(
-                    textX = viewModel.uiState.value!!.x1,
-                    textY = viewModel.uiState.value!!.y1,
-                    block1 = { x, y -> viewModel.move(x, y) },
-                    block2 = { x, y -> viewModel.save(x, y, 0) }
-                )
-            }
-            positionTwo.setOnClickListener {
-                showPositionDialog(
-                    textX = viewModel.uiState.value!!.x2,
-                    textY = viewModel.uiState.value!!.y2,
-                    block1 = { x, y -> viewModel.move(x, y) },
-                    block2 = { x, y -> viewModel.save(x, y, 1) }
-                )
-            }
-        }
-    }
-
     @SuppressLint("SetTextI18n")
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
@@ -64,7 +35,8 @@ class PlateFourFragment :
                 launch {
                     viewModel.uiState.collect {
                         if (it != null) {
-                            binding.run {
+                            binding.apply {
+                                dynamicPlate.setRowAndColumn(it.row, it.column)
                                 rowColumn.text = "${it.row} X ${it.column}"
                                 positionOne.text = "( ${
                                     it.x1.toString().removeZero()
@@ -72,12 +44,42 @@ class PlateFourFragment :
                                 positionTwo.text = "( ${
                                     it.x2.toString().removeZero()
                                 } , ${it.y2.toString().removeZero()} )"
-
-                                dynamicPlate.setRowAndColumn(it.row, it.column)
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * 初始化view
+     */
+    private fun initView() {
+        binding.apply {
+            dynamicPlate.setShowLocation(true)
+            rowColumn.setOnClickListener {
+                sizeDialog(
+                    textRow = viewModel.uiState.value!!.row,
+                    textColumn = viewModel.uiState.value!!.column,
+                    block1 = { row, column -> viewModel.setRowAndColumn(row, column) }
+                )
+            }
+            positionOne.setOnClickListener {
+                positionDialog(
+                    textX = viewModel.uiState.value!!.x1,
+                    textY = viewModel.uiState.value!!.y1,
+                    block1 = { x, y -> viewModel.move(x, y) },
+                    block2 = { x, y -> viewModel.save(x, y, 0) }
+                )
+            }
+            positionTwo.setOnClickListener {
+                positionDialog(
+                    textX = viewModel.uiState.value!!.x2,
+                    textY = viewModel.uiState.value!!.y2,
+                    block1 = { x, y -> viewModel.move(x, y) },
+                    block2 = { x, y -> viewModel.save(x, y, 1) }
+                )
             }
         }
     }

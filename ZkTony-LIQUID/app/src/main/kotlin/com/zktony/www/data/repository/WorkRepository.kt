@@ -87,14 +87,16 @@ class WorkRepository @Inject constructor(
 
         val holes = mutableListOf<Hole>()
         holeDao.getByPlateId(p.id).first().forEach {
-            holes.add(Hole(
-                plateId = plate.id,
-                workId = id,
-                x = it.x,
-                y = it.y,
-                xAxis = it.xAxis,
-                yAxis = it.yAxis,
-            ))
+            holes.add(
+                Hole(
+                    plateId = plate.id,
+                    workId = id,
+                    x = it.x,
+                    y = it.y,
+                    xAxis = it.xAxis,
+                    yAxis = it.yAxis,
+                )
+            )
         }
         holeDao.insertBatch(holes)
     }

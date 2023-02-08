@@ -15,6 +15,7 @@ import com.zktony.www.adapter.CalibrationDataAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
+import com.zktony.www.common.extension.setEqualText
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -28,10 +29,7 @@ class CalibrationDataFragment :
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
-        initRecycleView()
         initView()
-        initEditText()
-        initButton()
     }
 
     private fun initFlowCollector() {
@@ -39,19 +37,16 @@ class CalibrationDataFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     adapter.submitList(it.caliData)
-                    binding.run {
+                    binding.apply {
                         select.text = listOf("泵一", "泵二", "泵三", "泵四")[it.pumpId]
+                        expect.setEqualText(it.expect.toString())
+                        actual.setEqualText(it.actual.toString())
                         addLiquid.isEnabled = it.expect > 0f && !it.lock && !it.work
                         save.isEnabled = it.expect > 0f && it.actual > 0f
                     }
                 }
             }
         }
-    }
-
-    private fun initRecycleView() {
-        binding.recycleView.adapter = adapter
-        adapter.setOnDeleteButtonClick { data -> viewModel.delete(data) }
     }
 
     private fun initView() {
@@ -62,13 +57,25 @@ class CalibrationDataFragment :
                 }
             }
         }
-    }
+        adapter.setOnDeleteButtonClick { viewModel.delete(it) }
 
-    private fun initButton() {
-        binding.run {
-            back.run {
-                clickScale()
-                setOnClickListener { findNavController().navigateUp() }
+        binding.apply {
+            recycleView.adapter = adapter
+
+            addLiquid.setOnClickListener {
+                viewModel.addLiquid()
+            }
+
+            save.setOnClickListener {
+                viewModel.save()
+            }
+
+            expect.afterTextChange {
+                viewModel.expect(it.toFloatOrNull() ?: 0f)
+            }
+
+            actual.afterTextChange {
+                viewModel.actual(it.toFloatOrNull() ?: 0f)
             }
 
             select.setOnClickListener {
@@ -86,24 +93,9 @@ class CalibrationDataFragment :
                 }.width = 300
             }
 
-            addLiquid.setOnClickListener {
-                viewModel.addLiquid()
-            }
-
-            save.setOnClickListener {
-                viewModel.save()
-            }
-
-        }
-    }
-
-    private fun initEditText() {
-        binding.run {
-            expect.afterTextChange {
-                viewModel.expect(it.toFloatOrNull() ?: 0f)
-            }
-            actual.afterTextChange {
-                viewModel.actual(it.toFloatOrNull() ?: 0f)
+            with(back) {
+                clickScale()
+                setOnClickListener { findNavController().navigateUp() }
             }
         }
     }

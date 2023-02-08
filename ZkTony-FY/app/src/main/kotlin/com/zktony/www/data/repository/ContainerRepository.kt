@@ -3,6 +3,7 @@ package com.zktony.www.data.repository
 import com.zktony.www.common.room.dao.ContainerDao
 import com.zktony.www.common.room.entity.Container
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
 /**
@@ -18,5 +19,12 @@ class ContainerRepository @Inject constructor(
 
     fun getAll(): Flow<List<Container>> {
         return dao.getAll()
+    }
+
+    suspend fun init() {
+        val containers = dao.getAll().firstOrNull()
+        if (containers.isNullOrEmpty()) {
+            dao.insert(Container())
+        }
     }
 }

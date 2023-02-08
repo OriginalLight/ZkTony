@@ -23,6 +23,6 @@ interface MotorDao {
     @Query("SELECT * FROM motor")
     fun getAll(): Flow<List<Motor>>
 
-    @Query("SELECT * FROM motor WHERE board = :board AND address = :address LIMIT 1")
-    fun getByBoardAndAddress(board: Int, address: Int): Flow<Motor>
+    @Query("SELECT * FROM motor WHERE id = :id")
+    fun getById(id: Int): Flow<Motor>
 }

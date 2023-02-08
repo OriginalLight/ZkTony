@@ -72,6 +72,16 @@ fun EditText.addSuffix(suffix: String) {
     }
 }
 
+fun EditText.setEqualText(text: String) {
+    val str = this.text.toString()
+    if (str == text) {
+        return
+    } else {
+        this.setText(text)
+        this.setSelection(text.length)
+    }
+}
+
 @SuppressLint("ClickableViewAccessibility")
 inline fun View.addTouchEvent(crossinline down: (View) -> Unit, crossinline up: (View) -> Unit) {
     this.setOnTouchListener { v, event ->

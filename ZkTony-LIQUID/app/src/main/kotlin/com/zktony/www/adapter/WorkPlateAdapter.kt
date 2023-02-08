@@ -56,9 +56,9 @@ class WorkPlateAdapter :
                 }
                 size.text = "${item.row} X ${item.column}"
                 select.text = "${item.count}"
-                edit.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                with(edit) {
+                    clickScale()
+                    setOnClickListener {
                         onEditButtonClick.invoke(item)
                     }
                 }

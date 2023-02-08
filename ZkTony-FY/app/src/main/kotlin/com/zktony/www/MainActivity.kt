@@ -1,18 +1,17 @@
 package com.zktony.www
 
-import android.graphics.Color
 import android.os.Bundle
-import android.view.View
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.button.MaterialButton
-import com.kongzue.dialogx.dialogs.CustomDialog
-import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.www.base.BaseActivity
 import com.zktony.www.common.app.AppViewModel
+import com.zktony.www.common.extension.noticeDialog
 import com.zktony.www.common.worker.WorkerManager
+import com.zktony.www.control.motor.MotorManager
 import com.zktony.www.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -28,22 +27,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         binding.navView.setupWithNavController(navController)
 
         WorkerManager.instance.createWorker()
-        notice()
+
+        initMotor()
+
+        noticeDialog()
     }
 
-    /**
-     * 显示注意事项
-     */
-    private fun notice() {
-        CustomDialog.build()
-            .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_notice_dialog) {
-                override fun onBind(dialog: CustomDialog, v: View) {
-                    val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
-                    btnOk.setOnClickListener {
-                        dialog.dismiss()
-                    }
+    private fun initMotor() {
+        lifecycleScope.launch {
+            appViewModel.settings.collect {
+                if (it.motor.isNotEmpty() && it.calibration.isNotEmpty()) {
+                    MotorManager.instance.init(it.motor, it.calibration)
                 }
-            }).setMaskColor(Color.parseColor("#4D000000")).setWidth(500).show()
+            }
+        }
     }
 
 }

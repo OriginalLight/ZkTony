@@ -17,7 +17,7 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.room.entity.CalibrationData
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
-import com.zktony.www.serial.SerialManager
+import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.ui.program.ActionFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -48,7 +48,7 @@ class CalibrationDataFragment :
                     }
                 }
                 launch {
-                    SerialManager.instance.runtimeLock.collect {
+                    SerialManager.instance.lock.collect {
                         binding.addLiquid.isEnabled = !it
                     }
                 }

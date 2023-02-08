@@ -60,9 +60,9 @@ class CalibrationDataAdapter :
                 }
                 expect.text = item.expect.toString().removeZero()
                 actual.text = item.actual.toString().removeZero()
-                delete.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                with(delete) {
+                    clickScale()
+                    setOnClickListener {
                         onDeleteButtonClick.invoke(item)
                     }
                 }

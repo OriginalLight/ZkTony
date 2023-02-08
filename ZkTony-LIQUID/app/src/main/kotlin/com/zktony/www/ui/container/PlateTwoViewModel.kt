@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.room.entity.Plate
-import com.zktony.www.common.utils.Logger
 import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.data.repository.PlateRepository
@@ -26,14 +25,15 @@ class PlateTwoViewModel @Inject constructor(
         viewModelScope.launch {
             plateRepository.getPlateBySort(1).distinctUntilChanged().collect {
                 _uiState.value = it
-                Logger.d("PlateViewModel", "init: $it")
             }
         }
     }
 
     fun setRowAndColumn(row: Int, column: Int) {
         viewModelScope.launch {
-            _uiState.value?.let { plateRepository.updatePlate(it.copy(row = row, column = column)) }
+            _uiState.value?.let {
+                plateRepository.updatePlate(it.copy(row = row, column = column))
+            }
         }
 
     }
@@ -44,8 +44,8 @@ class PlateTwoViewModel @Inject constructor(
             PopTip.show("机器正在运行中")
             return
         }
-        val m = MotionManager.instance
-        m.executor(m.generator(x = x, y = y))
+        val manager = MotionManager.instance
+        manager.executor(manager.generator(x = x, y = y))
     }
 
     fun save(x: Float, y: Float, flag: Int) {

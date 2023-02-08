@@ -8,8 +8,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
+import com.zktony.www.common.extension.positionDialog
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.common.extension.showPositionDialog
 import com.zktony.www.databinding.FragmentWashBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -26,7 +26,7 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
 
     private fun initView() {
         binding.position.setOnClickListener {
-            showPositionDialog(
+            positionDialog(
                 textX = viewModel.uiState.value!!.x1,
                 textY = viewModel.uiState.value!!.y1,
                 block1 = { x1, y1 -> viewModel.move(x1, y1) },

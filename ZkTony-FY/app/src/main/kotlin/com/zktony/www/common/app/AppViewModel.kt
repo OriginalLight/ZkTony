@@ -9,7 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.Container
-import com.zktony.www.common.room.entity.MotorUnits
+import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.data.repository.CalibrationRepository
 import com.zktony.www.data.repository.ContainerRepository
@@ -28,9 +28,9 @@ import javax.inject.Inject
 class AppViewModel @Inject constructor(
     application: Application,
     private val dataStore: DataStore<Preferences>,
-    private val motorRepo: MotorRepository,
-    private val containerRepo: ContainerRepository,
-    private val calibrationRepo: CalibrationRepository
+    private val motorRepository: MotorRepository,
+    private val containerRepository: ContainerRepository,
+    private val calibrationRepository: CalibrationRepository
 ) : AndroidViewModel(application) {
 
     private val _settings = MutableStateFlow(Settings())
@@ -38,6 +38,11 @@ class AppViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            launch {
+                motorRepository.init()
+                containerRepository.init()
+                calibrationRepository.init()
+            }
             launch {
                 dataStore.data.map {
                     it[floatPreferencesKey(Constants.TEMP)] ?: 3.0f
@@ -53,45 +58,24 @@ class AppViewModel @Inject constructor(
                 }
             }
             launch {
-                motorRepo.getAll().collect {
-                    // 将list的元素放入motorUnits
-                    it.forEach { motor ->
-                        when (motor.id) {
-                            0 -> _settings.value =
-                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(x = motor))
-                            1 -> _settings.value =
-                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(y = motor))
-                            2 -> _settings.value =
-                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(z = motor))
-                            3 -> _settings.value =
-                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(p1 = motor))
-                            4 -> _settings.value =
-                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(p2 = motor))
-                            5 -> _settings.value =
-                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(p3 = motor))
-                            6 -> _settings.value =
-                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(p4 = motor))
-                            7 -> _settings.value =
-                                _settings.value.copy(motorUnits = _settings.value.motorUnits.copy(p5 = motor))
-                        }
+                motorRepository.getAll().collect {
+                    if (it.isNotEmpty()) {
+                        _settings.value = _settings.value.copy(motor = it)
                     }
                 }
             }
             launch {
-                containerRepo.getAll().collect {
+                containerRepository.getAll().collect {
                     if (it.isNotEmpty()) {
                         _settings.value = _settings.value.copy(container = it.first())
                     }
                 }
             }
             launch {
-                calibrationRepo.getDefault().collect {
-                    _settings.value =
-                        _settings.value.copy(
-                            motorUnits = _settings.value.motorUnits.copy(
-                                cali = if (it.isEmpty()) Calibration() else it.first()
-                            )
-                        )
+                calibrationRepository.getDefault().collect {
+                    if (it.isNotEmpty()) {
+                        _settings.value = _settings.value.copy(calibration = it)
+                    }
                 }
             }
         }
@@ -101,6 +85,7 @@ class AppViewModel @Inject constructor(
 data class Settings(
     val temp: Float = 3f,
     val bar: Boolean = false,
-    val motorUnits: MotorUnits = MotorUnits(),
+    val motor: List<Motor> = emptyList(),
+    val calibration: List<Calibration> = emptyList(),
     val container: Container = Container(),
 )

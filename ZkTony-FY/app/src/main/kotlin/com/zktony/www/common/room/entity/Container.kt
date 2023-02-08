@@ -28,6 +28,4 @@ data class Container(
     // 二抗槽位置
     val twoY: Float = 137f,
     val twoZ: Float = 103f,
-    // 多转的圈数
-    val extract: Float = 100f,
 )

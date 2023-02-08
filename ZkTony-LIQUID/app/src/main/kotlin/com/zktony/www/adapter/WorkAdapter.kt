@@ -55,15 +55,15 @@ class WorkAdapter :
             binding.apply {
                 work = item
                 order.text = (layoutPosition + 1).toString()
-                edit.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                with(edit) {
+                    clickScale()
+                    setOnClickListener {
                         onEditButtonClick.invoke(item)
                     }
                 }
-                delete.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                with(delete) {
+                    clickScale()
+                    setOnClickListener {
                         onDeleteButtonClick.invoke(item)
                     }
                 }
