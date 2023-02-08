@@ -20,7 +20,7 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.databinding.FragmentHomeBinding
-import com.zktony.www.serial.SerialManager
+import com.zktony.www.control.serial.SerialManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -53,7 +53,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 launch { viewModel.cFlow.collect { moduleUiChange(2, it) } }
                 launch { viewModel.dFlow.collect { moduleUiChange(3, it) } }
                 launch { viewModel.uiFlow.collect { uiChange(it) } }
-                launch { SerialManager.instance.runtimeLock.collect { hideButton(it) } }
+                launch { SerialManager.instance.lock.collect { hideButton(it) } }
             }
         }
     }

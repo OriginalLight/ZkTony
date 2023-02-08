@@ -15,7 +15,7 @@ data class Calibration(
     // 名字
     val name: String = "",
     // 状态
-    val status: Int = 0,
+    val enable: Int = 0,
     // x轴
     val x: Float = 0f,
     // y轴
@@ -23,13 +23,15 @@ data class Calibration(
     // z轴
     val z: Float = 3.8f,
     // 校准后泵一单位加液体积
-    val p1: Float = 180f,
+    val v1: Float = 180f,
     // 校准后泵二单位加液体积
-    val p2: Float = 180f,
+    val v2: Float = 180f,
     // 校准后泵三单位加液体积
-    val p3: Float = 180f,
+    val v3: Float = 180f,
     // 校准后泵四单位加液体积
-    val p4: Float = 180f,
+    val v4: Float = 180f,
     // 校准后泵五单位加液体积
-    val p5: Float = 49f,
+    val v5: Float = 180f,
+    // 校准后泵六单位加液体积
+    val v6: Float = 180f,
 )

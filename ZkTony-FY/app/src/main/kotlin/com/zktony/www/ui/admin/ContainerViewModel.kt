@@ -1,13 +1,11 @@
 package com.zktony.www.ui.admin
 
 import androidx.lifecycle.viewModelScope
-import com.zktony.serialport.util.Serial
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.Container
+import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.data.repository.ContainerRepository
-import com.zktony.www.serial.SerialManager
-import com.zktony.www.serial.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,20 +14,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ContainerViewModel @Inject constructor(
-    private val repo: ContainerRepository
+    private val containerRepository: ContainerRepository
 ) : BaseViewModel() {
 
     @Inject
     lateinit var appViewModel: AppViewModel
 
-    private val serial = SerialManager.instance
+    private val manager = MotionManager.instance
 
     private val _container: MutableStateFlow<Container> = MutableStateFlow(Container())
     val container = _container.asStateFlow()
 
     init {
         viewModelScope.launch {
-            repo.getAll().collect {
+            containerRepository.getAll().collect {
                 if (it.isNotEmpty()) {
                     _container.value = it.first()
                 }
@@ -41,9 +39,9 @@ class ContainerViewModel @Inject constructor(
      * 更新容器
      * @param container [Container] 容器
      */
-    fun replaceContainer(container: Container) {
+    fun update(container: Container) {
         viewModelScope.launch {
-            repo.insert(container)
+            containerRepository.insert(container)
         }
     }
 
@@ -52,11 +50,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toWasteY() {
         viewModelScope.launch {
-            val motor = appViewModel.settings.value.motorUnits
-            val move = motor.toMotionHex(container.value.wasteY, 0f)
-            serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-            serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-            serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+            manager.executor(
+                manager.generator(y = container.value.wasteY)
+            )
         }
     }
 
@@ -64,11 +60,11 @@ class ContainerViewModel @Inject constructor(
      * 测试 废液槽针头下降
      */
     fun toWasteZ() {
-        val motor = appViewModel.settings.value.motorUnits
-        val move = motor.toMotionHex(container.value.wasteY, container.value.wasteZ)
-        serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-        serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-        serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+        viewModelScope.launch {
+            manager.executor(
+                manager.generator(y = container.value.wasteY, z = container.value.wasteZ)
+            )
+        }
     }
 
 
@@ -77,11 +73,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toWashY() {
         viewModelScope.launch {
-            val motor = appViewModel.settings.value.motorUnits
-            val move = motor.toMotionHex(container.value.washY, 0f)
-            serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-            serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-            serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+            manager.executor(
+                manager.generator(y = container.value.washY)
+            )
         }
     }
 
@@ -89,11 +83,11 @@ class ContainerViewModel @Inject constructor(
      * 测试 洗液槽针头下降
      */
     fun toWashZ() {
-        val motor = appViewModel.settings.value.motorUnits
-        val move = motor.toMotionHex(container.value.washY, container.value.washZ)
-        serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-        serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-        serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+        viewModelScope.launch {
+            manager.executor(
+                manager.generator(y = container.value.washY, z = container.value.washZ)
+            )
+        }
     }
 
     /**
@@ -101,11 +95,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toBlockY() {
         viewModelScope.launch {
-            val motor = appViewModel.settings.value.motorUnits
-            val move = motor.toMotionHex(container.value.blockY, 0f)
-            serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-            serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-            serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+            manager.executor(
+                manager.generator(y = container.value.blockY)
+            )
         }
     }
 
@@ -113,11 +105,11 @@ class ContainerViewModel @Inject constructor(
      * 测试 阻断液槽针头下降
      */
     fun toBlockZ() {
-        val motor = appViewModel.settings.value.motorUnits
-        val move = motor.toMotionHex(container.value.blockY, container.value.blockZ)
-        serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-        serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-        serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+        viewModelScope.launch {
+            manager.executor(
+                manager.generator(y = container.value.blockY, z = container.value.blockZ)
+            )
+        }
     }
 
     /**
@@ -125,11 +117,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toOneY() {
         viewModelScope.launch {
-            val motor = appViewModel.settings.value.motorUnits
-            val move = motor.toMotionHex(container.value.oneY, 0f)
-            serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-            serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-            serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+            manager.executor(
+                manager.generator(y = container.value.oneY)
+            )
         }
     }
 
@@ -138,11 +128,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toOneZ() {
         viewModelScope.launch {
-            val motor = appViewModel.settings.value.motorUnits
-            val move = motor.toMotionHex(container.value.oneY, container.value.oneZ)
-            serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-            serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-            serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+            manager.executor(
+                manager.generator(y = container.value.oneY, z = container.value.oneZ)
+            )
         }
     }
 
@@ -151,11 +139,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toRecycleOneZ() {
         viewModelScope.launch {
-            val motor = appViewModel.settings.value.motorUnits
-            val move = motor.toMotionHex(container.value.oneY, container.value.recycleOneZ)
-            serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-            serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-            serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+            manager.executor(
+                manager.generator(y = container.value.oneY, z = container.value.recycleOneZ)
+            )
         }
     }
 
@@ -164,11 +150,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toTwoY() {
         viewModelScope.launch {
-            val motor = appViewModel.settings.value.motorUnits
-            val move = motor.toMotionHex(container.value.twoY, 0f)
-            serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-            serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-            serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+            manager.executor(
+                manager.generator(y = container.value.twoY)
+            )
         }
     }
 
@@ -177,11 +161,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toTwoZ() {
         viewModelScope.launch {
-            val motor = appViewModel.settings.value.motorUnits
-            val move = motor.toMotionHex(container.value.twoY, container.value.twoZ)
-            serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-            serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-            serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+            manager.executor(
+                manager.generator(y = container.value.twoY, z = container.value.twoZ)
+            )
         }
     }
 
@@ -190,11 +172,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toZero() {
         viewModelScope.launch {
-            val motor = appViewModel.settings.value.motorUnits
-            val move = motor.toMotionHex(0f, 0f)
-            serial.sendHex(Serial.TTYS0, V1.multiPoint(move))
-            serial.sendHex(Serial.TTYS1, V1.multiPoint("0,0,0,"))
-            serial.sendHex(Serial.TTYS2, V1.multiPoint("0,0,0,"))
+            manager.executor(
+                manager.generator()
+            )
         }
 
     }

@@ -1,7 +1,7 @@
 package com.zktony.www.common.extension
 
 import com.zktony.www.common.room.entity.Motor
-import com.zktony.www.serial.protocol.V1
+import com.zktony.www.control.serial.protocol.V1
 import java.math.BigInteger
 
 /**

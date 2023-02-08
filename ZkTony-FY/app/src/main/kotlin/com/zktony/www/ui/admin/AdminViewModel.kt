@@ -11,7 +11,6 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.BuildConfig
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.app.CommonApplicationProxy
 import com.zktony.www.common.extension.*
 import com.zktony.www.common.network.download.DownloadManager
@@ -23,13 +22,12 @@ import com.zktony.www.common.utils.Constants.DEVICE_ID
 import com.zktony.www.data.model.Version
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
-import com.zktony.www.serial.SerialManager
-import com.zktony.www.serial.protocol.V1
+import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.control.serial.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.io.File
@@ -41,9 +39,6 @@ class AdminViewModel @Inject constructor(
     private val motorRepo: MotorRepository,
     private val sysRepo: SystemRepository,
 ) : BaseViewModel() {
-
-    @Inject
-    lateinit var appViewModel: AppViewModel
 
     private val _file = MutableStateFlow<File?>(null)
     private val _version = MutableStateFlow<Version?>(null)
@@ -91,9 +86,7 @@ class AdminViewModel @Inject constructor(
                 }
             }
             launch {
-                initMotor()
-                delay(1000L)
-                if (!SerialManager.instance.runtimeLock.value) {
+                if (!SerialManager.instance.lock.value) {
                     syncMotor()
                 }
             }
@@ -237,31 +230,6 @@ class AdminViewModel @Inject constructor(
         viewModelScope.launch {
             dataStore.edit { preferences ->
                 preferences[floatPreferencesKey(Constants.TEMP)] = temp
-            }
-        }
-    }
-
-    /**
-     * 初始化电机
-     */
-    private fun initMotor() {
-        viewModelScope.launch {
-            motorRepo.getAll().first().run {
-                if (this.isEmpty()) {
-                    val motorList = mutableListOf<Motor>()
-                    motorList.add(Motor(id = 0, name = "X轴", address = 1))
-                    motorList.add(Motor(id = 1, name = "Y轴", address = 2))
-                    motorList.add(Motor(id = 2, name = "Z轴", address = 3))
-                    for (i in 1..5) {
-                        val motor = Motor(
-                            id = i + 2,
-                            name = "泵$i",
-                            address = if (i <= 3) i else i - 3,
-                        )
-                        motorList.add(motor)
-                    }
-                    motorRepo.insertBatch(motorList)
-                }
             }
         }
     }

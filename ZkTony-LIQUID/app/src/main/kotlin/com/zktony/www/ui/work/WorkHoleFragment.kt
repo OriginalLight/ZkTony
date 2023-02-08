@@ -1,19 +1,17 @@
 package com.zktony.www.ui.work
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
-import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.common.extension.showVolumeDialog
+import com.zktony.www.common.extension.volumeDialog
 import com.zktony.www.databinding.FragmentWorkHoleBinding
 import com.zktony.www.ui.calibration.CalibrationDataFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,7 +25,6 @@ class WorkHoleFragment :
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
         initView()
-        initButton()
     }
 
     @SuppressLint("SetTextI18n")
@@ -36,7 +33,7 @@ class WorkHoleFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     if (it.plate != null) {
-                        binding.run {
+                        binding.apply {
                             title.text = when (it.plate.sort) {
                                 0 -> "一号孔板"
                                 1 -> "二号孔板"
@@ -73,32 +70,30 @@ class WorkHoleFragment :
                 }
             }
         }
-    }
+        binding.apply {
+            dynamicPlate.setOnItemClick { x, y -> viewModel.select(x, y) }
+            volume.setOnClickListener {
+                val plate = viewModel.uiState.value.plate
+                volumeDialog(
+                    v1 = plate?.v1 ?: 0.0f,
+                    v2 = plate?.v2 ?: 0.0f,
+                    v3 = plate?.v3 ?: 0.0f,
+                    v4 = plate?.v4 ?: 0.0f
+                ) { v1, v2, v3, v4 ->
+                    viewModel.setVolume(v1, v2, v3, v4)
+                }
+            }
 
-    private fun initButton() {
-        binding.run {
-            back.run {
+            with(back) {
                 clickScale()
                 setOnClickListener {
                     findNavController().navigateUp()
                 }
             }
-            selectAll.run {
+            with(selectAll) {
                 clickScale()
                 setOnClickListener {
                     viewModel.selectAll()
-                }
-            }
-            dynamicPlate.setOnItemClick { x, y -> viewModel.select(x, y) }
-            volume.setOnClickListener {
-                val plate = viewModel.uiState.value.plate
-                showVolumeDialog(
-                    plate?.v1 ?: 0.0f,
-                    plate?.v2 ?: 0.0f,
-                    plate?.v3 ?: 0.0f,
-                    plate?.v4 ?: 0.0f
-                ) { v1, v2, v3, v4 ->
-                    viewModel.setVolume(v1, v2, v3, v4)
                 }
             }
         }

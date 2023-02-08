@@ -119,4 +119,8 @@
     <string name="input_v2">泵二加液量 μL</string>
     <string name="input_v3">泵三加液量 μL</string>
     <string name="input_v4">泵四加液量 μL</string>
+    <string name="plate_one">一号板</string>
+    <string name="plate_two">二号板</string>
+    <string name="plate_three">三号板</string>
+    <string name="plate_four">四号板</string>
 </resources>

@@ -6,7 +6,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.zktony.www.base.BaseActivity
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.extension.showNotice
+import com.zktony.www.common.extension.noticeDialog
 import com.zktony.www.common.worker.WorkerManager
 import com.zktony.www.control.motor.MotorManager
 import com.zktony.www.databinding.ActivityMainBinding
@@ -30,7 +30,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
         initMotor()
 
-        showNotice()
+        noticeDialog()
     }
 
     private fun initMotor() {

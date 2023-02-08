@@ -1,15 +1,13 @@
 package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
-import com.zktony.serialport.util.Serial
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.CalibrationData
+import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.data.repository.CalibrationDataRepository
 import com.zktony.www.data.repository.CalibrationRepository
-import com.zktony.www.serial.SerialManager
-import com.zktony.www.serial.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,11 +17,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CalibrationDataViewModel @Inject constructor(
-    private val caliRepo: CalibrationRepository, private val caliDataRepo: CalibrationDataRepository
+    private val calibrationRepository: CalibrationRepository,
+    private val calibrationDataRepository: CalibrationDataRepository
 ) : BaseViewModel() {
 
     @Inject
     lateinit var appViewModel: AppViewModel
+
+    private val manager = MotionManager.instance
 
     private val _cali = MutableStateFlow(Calibration())
     private val _caliDataList = MutableStateFlow(emptyList<CalibrationData>())
@@ -38,12 +39,12 @@ class CalibrationDataViewModel @Inject constructor(
     fun initCali(id: String) {
         viewModelScope.launch {
             launch {
-                caliRepo.getById(id).collect {
+                calibrationRepository.getById(id).collect {
                     _cali.value = it
                 }
             }
             launch {
-                caliDataRepo.getByCaliId(id).collect {
+                calibrationDataRepository.getByCaliId(id).collect {
                     _caliDataList.value = it
                 }
             }
@@ -62,7 +63,7 @@ class CalibrationDataViewModel @Inject constructor(
      */
     fun delete(caliData: CalibrationData) {
         viewModelScope.launch {
-            caliDataRepo.delete(caliData)
+            calibrationDataRepository.delete(caliData)
             delay(1000L)
             updateCali()
         }
@@ -83,7 +84,7 @@ class CalibrationDataViewModel @Inject constructor(
                 else -> 0f
             }
             val after = caliData.actualVolume / caliData.volume * before
-            caliDataRepo.insert(
+            calibrationDataRepository.insert(
                 caliData.copy(
                     calibrationId = cali.value.id,
                     motorId = motorId.value,
@@ -100,44 +101,30 @@ class CalibrationDataViewModel @Inject constructor(
      * 加液
      */
     fun addLiquid(liquid: Float) {
-        val settings = appViewModel.settings.value
-        val stepOne = settings.motorUnits.toPumpHex(
-            one = if (motorId.value == 3) liquid else 0f,
-            two = if (motorId.value == 4) liquid else 0f,
-            three = if (motorId.value == 5) liquid else 0f,
-            four = if (motorId.value == 6) liquid else 0f,
-            five = if (motorId.value == 7) liquid else 0f
+        val con = appViewModel.settings.value.container
+        manager.executor(
+            manager.generator(y = con.washY),
+            manager.generator(
+                y = con.washY,
+                z = con.washZ,
+                v1 = if (motorId.value == 3) liquid else 0f,
+                v2 = if (motorId.value == 4) liquid else 0f,
+                v3 = if (motorId.value == 5) liquid else 0f,
+                v4 = if (motorId.value == 6) liquid else 0f,
+                v5 = if (motorId.value == 7) liquid else 0f,
+                v6 = if (motorId.value == 8) liquid else 0f
+            ),
+            manager.generator(
+                y = con.washY,
+                v1 = if (motorId.value == 3) 15000f else 0f,
+                v2 = if (motorId.value == 4) 15000f else 0f,
+                v3 = if (motorId.value == 5) 15000f else 0f,
+                v4 = if (motorId.value == 6) 15000f else 0f,
+                v5 = if (motorId.value == 7) 15000f else 0f,
+                v6 = if (motorId.value == 8) 15000f else 0f
+            ),
+            manager.generator()
         )
-        val stepTwo = settings.motorUnits.toPumpHex(
-            one = if (motorId.value == 3) settings.motorUnits.cali.p1 * settings.container.extract / 1000 else 0f,
-            two = if (motorId.value == 4) settings.motorUnits.cali.p2 * settings.container.extract / 1000 else 0f,
-            three = if (motorId.value == 5) settings.motorUnits.cali.p3 * settings.container.extract / 1000 else 0f,
-            four = if (motorId.value == 6) settings.motorUnits.cali.p4 * settings.container.extract / 1000 else 0f,
-            five = if (motorId.value == 7) settings.motorUnits.cali.p5 * settings.container.extract / 1000 else 0f
-        )
-        val move = settings.motorUnits.toMotionHex(
-            settings.container.washY, 0f
-        ) + settings.motorUnits.toMotionHex(
-            settings.container.washY, settings.container.washZ
-        ) + settings.motorUnits.toMotionHex(
-            settings.container.washY, 0f
-        ) + settings.motorUnits.toMotionHex(0f, 0f)
-
-        SerialManager.instance.lock(true)
-        SerialManager.instance.sendHex(
-            serial = Serial.TTYS0, hex = V1.multiPoint(
-                if (motorId.value == 7) "0,0,0,0,0,0,0,0,0,0,0,0," else move,
-            )
-        )
-        SerialManager.instance.sendHex(
-            serial = Serial.TTYS1,
-            hex = V1.multiPoint("0,0,0," + stepOne.first + "0,0,0," + stepTwo.first)
-        )
-        SerialManager.instance.sendHex(
-            serial = Serial.TTYS2,
-            hex = V1.multiPoint("0,0,0," + stepOne.second + "0,0,0," + stepTwo.second)
-        )
-
 
     }
 
@@ -157,13 +144,13 @@ class CalibrationDataViewModel @Inject constructor(
                 caliDataList.value.filter { it.motorId == 6 }.map { it.after }.average().toFloat()
             val p5 =
                 caliDataList.value.filter { it.motorId == 7 }.map { it.after }.average().toFloat()
-            caliRepo.update(
+            calibrationRepository.update(
                 cali.value.copy(
-                    p1 = if (p1.isNaN()) 180f else p1,
-                    p2 = if (p2.isNaN()) 180f else p2,
-                    p3 = if (p3.isNaN()) 180f else p3,
-                    p4 = if (p4.isNaN()) 180f else p4,
-                    p5 = if (p5.isNaN()) 49f else p5
+                    v1 = if (p1.isNaN()) 180f else p1,
+                    v2 = if (p2.isNaN()) 180f else p2,
+                    v3 = if (p3.isNaN()) 180f else p3,
+                    v4 = if (p4.isNaN()) 180f else p4,
+                    v5 = if (p5.isNaN()) 180f else p5
                 )
             )
         }

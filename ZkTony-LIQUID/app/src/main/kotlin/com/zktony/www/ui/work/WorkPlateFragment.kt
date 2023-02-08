@@ -12,7 +12,6 @@ import com.zktony.www.R
 import com.zktony.www.adapter.WorkPlateAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.common.utils.Logger
 import com.zktony.www.databinding.FragmentWorkPlateBinding
 import com.zktony.www.ui.calibration.CalibrationDataFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,23 +27,20 @@ class WorkPlateFragment :
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
         initView()
-        initButton()
-        initRecyclerView()
     }
 
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
-                    Logger.d("WorkFlowFragment", "uiState: $it")
-                    binding.run {
+                    binding.apply {
+                        help.isVisible = it.plates.isEmpty()
+                        recyclerView.isVisible = it.plates.isNotEmpty()
                         adapter.submitList(it.plates)
                         btn1.isChecked = it.plates.find { plate -> plate.sort == 0 } != null
                         btn2.isChecked = it.plates.find { plate -> plate.sort == 1 } != null
                         btn3.isChecked = it.plates.find { plate -> plate.sort == 2 } != null
                         btn4.isChecked = it.plates.find { plate -> plate.sort == 3 } != null
-                        help.isVisible = it.plates.isEmpty()
-                        recyclerView.isVisible = it.plates.isNotEmpty()
                     }
                 }
             }
@@ -59,16 +55,15 @@ class WorkPlateFragment :
                 }
             }
         }
-    }
-
-    private fun initButton() {
-        binding.run {
-            back.run {
-                clickScale()
-                setOnClickListener {
-                    findNavController().navigateUp()
-                }
-            }
+        adapter.setOnEditButtonClick { plate ->
+            findNavController().navigate(
+                directions = WorkPlateFragmentDirections.actionNavigationWorkPlateToNavigationWorkHole(
+                    plate.id
+                )
+            )
+        }
+        binding.apply {
+            recyclerView.adapter = adapter
             btn1.setOnClickListener {
                 viewModel.checkPlate(0)
             }
@@ -81,14 +76,12 @@ class WorkPlateFragment :
             btn4.setOnClickListener {
                 viewModel.checkPlate(3)
             }
-        }
-    }
-
-    private fun initRecyclerView() {
-        binding.recyclerView.adapter = adapter
-        adapter.setOnEditButtonClick { plate ->
-            val directions = WorkPlateFragmentDirections.actionNavigationWorkPlateToNavigationWorkHole(plate.id)
-            findNavController().navigate(directions)
+            with(back) {
+                clickScale()
+                setOnClickListener {
+                    findNavController().navigateUp()
+                }
+            }
         }
     }
 }

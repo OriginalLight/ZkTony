@@ -1,7 +1,6 @@
 package com.zktony.www.common.room.entity
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import java.util.*
 

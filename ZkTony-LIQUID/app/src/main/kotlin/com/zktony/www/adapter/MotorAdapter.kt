@@ -47,11 +47,7 @@ class MotorAdapter : ListAdapter<Motor, MotorAdapter.ViewHolder>(MotorDiffCallba
         fun bind(item: Motor) {
             binding.apply {
                 motor = item
-                if (item.motorType == 0) {
-                    icon.setImageResource(R.mipmap.ic_motor)
-                } else {
-                    icon.setImageResource(R.mipmap.ic_pump)
-                }
+                icon.setImageResource(if (item.motorType == 0) R.mipmap.ic_motor else R.mipmap.ic_pump)
                 cardView.setOnClickListener { onEditButtonClick(item) }
                 executePendingBindings()
             }

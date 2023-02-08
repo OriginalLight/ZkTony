@@ -315,38 +315,6 @@
 
                         </LinearLayout>
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="32dp"
-                            android:layout_marginTop="16dp"
-                            android:layout_marginEnd="32dp"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="8dp"
-                                android:layout_marginEnd="8dp"
-                                android:text="@string/extract"
-                                android:textColor="@color/black"
-                                android:textSize="16sp" />
-
-                            <EditText
-                                android:id="@+id/extract"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="2"
-                                android:autofillHints=""
-                                android:gravity="center"
-                                android:hint="@string/circle"
-                                android:inputType="number"
-                                android:paddingStart="8dp"
-                                android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
-
-                        </LinearLayout>
-
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/update"

@@ -5,87 +5,112 @@
 
     <data />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:background="@color/dark_onBackground"
-        android:orientation="vertical"
         tools:context=".ui.admin.MotorFragment">
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:background="@color/light_onPrimary">
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/light_onPrimary"
+            app:layout_constraintEnd_toEndOf="parent"
+
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageButton
-                android:id="@+id/btn_back"
+                android:id="@+id/back"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
                 android:background="@drawable/ic_back"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:text="@string/setting_motor"
+                android:text="@string/setting"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/con_a"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:layout_weight="1"
-            android:orientation="horizontal">
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="68dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/con_a_1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginEnd="2dp"
-                android:layout_weight="1"
                 android:background="@color/light_onPrimary"
-                tools:ignore="NestedWeights">
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/con_a_2"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rc_motor"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:id="@+id/recycle_view"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
                     android:isScrollContainer="true"
                     android:paddingTop="8dp"
                     android:paddingBottom="8dp"
                     app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintHorizontal_weight="4"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="1.0"
                     app:spanCount="2"
                     tools:listitem="@layout/item_motor" />
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/con_a_2"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="2dp"
-                android:layout_weight="1"
                 android:background="@color/light_onPrimary"
-                android:orientation="vertical">
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintStart_toEndOf="@+id/con_a_1"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:ignore="UselessParent">
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -136,7 +161,7 @@
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btn_mode"
+                                android:id="@+id/mode"
                                 style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -205,7 +230,7 @@
                                 app:layout_constraintTop_toTopOf="parent" />
 
                             <com.google.android.material.button.MaterialButton
-                                android:id="@+id/btn_subdivision"
+                                android:id="@+id/subdivision"
                                 style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -344,7 +369,7 @@
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btn_update"
+                            android:id="@+id/update"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="32dp"
@@ -362,11 +387,11 @@
 
                 </ScrollView>
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </layout>

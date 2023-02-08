@@ -246,7 +246,7 @@
                 android:layout_weight="1">
 
                 <ImageButton
-                    android:id="@+id/btn_setting"
+                    android:id="@+id/setting"
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
@@ -257,7 +257,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/btn_setting"
+                    android:layout_below="@+id/setting"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:text="@string/setting"
@@ -271,7 +271,7 @@
                 android:layout_weight="1">
 
                 <ImageButton
-                    android:id="@+id/btn_wifi"
+                    android:id="@+id/wifi"
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
@@ -282,7 +282,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/btn_wifi"
+                    android:layout_below="@+id/wifi"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:text="@string/wifi_setting"
@@ -296,7 +296,7 @@
                 android:layout_weight="1">
 
                 <ImageButton
-                    android:id="@+id/btn_update"
+                    android:id="@+id/update"
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
@@ -308,7 +308,7 @@
                     android:id="@+id/tv_update"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@+id/btn_update"
+                    android:layout_below="@+id/update"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:text="@string/check_update"

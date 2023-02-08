@@ -26,30 +26,33 @@ class LogFragment :
 
     override val viewModel: LogViewModel by viewModels()
 
-    private val logAdapter by lazy { LogAdapter() }
+    private val adapter by lazy { LogAdapter() }
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initObserver()
-        initRecyclerView()
-        initButton()
+        initFlowCollector()
+        initView()
     }
 
     /**
      * 初始化观察者
      */
-    private fun initObserver() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
+    private fun initFlowCollector() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.logList.collect {
                         if (it.isNotEmpty()) {
-                            binding.rc.visibility = View.VISIBLE
-                            binding.empty.visibility = View.GONE
+                            binding.apply {
+                                recycleView.visibility = View.VISIBLE
+                                empty.visibility = View.GONE
+                            }
                         } else {
-                            binding.rc.visibility = View.GONE
-                            binding.empty.visibility = View.VISIBLE
+                            binding.apply {
+                                recycleView.visibility = View.GONE
+                                empty.visibility = View.VISIBLE
+                            }
                         }
-                        logAdapter.submitList(it)
+                        adapter.submitList(it)
                     }
                 }
                 launch {
@@ -61,22 +64,14 @@ class LogFragment :
         }
     }
 
-    /**
-     * initRecyclerView
-     */
-    private fun initRecyclerView() {
-        binding.rc.adapter = logAdapter
-        viewModel.initLogList()
-    }
-
-    /**
-     * 初始化按钮
-     */
-    private fun initButton() {
-        binding.time.run {
-            clickScale()
-            setOnClickListener {
-                showDatePickerDialog(Calendar.getInstance())
+    private fun initView() {
+        binding.apply {
+            recycleView.adapter = adapter
+            with(time) {
+                clickScale()
+                setOnClickListener {
+                    showDatePickerDialog(Calendar.getInstance())
+                }
             }
         }
     }

@@ -1,15 +1,12 @@
-package com.zktony.www.serial
+package com.zktony.www.control.serial
 
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.*
-import com.zktony.www.common.extension.hexToAscii
-import com.zktony.www.common.extension.hexToInt8
-import com.zktony.www.common.extension.toV1
-import com.zktony.www.common.extension.verifyHex
+import com.zktony.www.common.extension.*
 import com.zktony.www.common.utils.Logger
-import com.zktony.www.serial.protocol.V1
+import com.zktony.www.control.serial.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -24,13 +21,13 @@ class SerialManager(
     private val _ttys1Flow = MutableStateFlow<String?>(null)
     private val _ttys2Flow = MutableStateFlow<String?>(null)
     private val _ttys3Flow = MutableStateFlow<String?>(null)
-    private val _runtimeLock = MutableStateFlow(false)
+    private val _lock = MutableStateFlow(false)
 
     val ttys0Flow = _ttys0Flow.asStateFlow()
     val ttys1Flow = _ttys1Flow.asStateFlow()
     val ttys2Flow = _ttys2Flow.asStateFlow()
     val ttys3Flow = _ttys3Flow.asStateFlow()
-    val runtimeLock = _runtimeLock.asStateFlow()
+    val lock = _lock.asStateFlow()
 
     // 机构运行已经等待的时间
     private var lockTime = 0L
@@ -89,14 +86,14 @@ class SerialManager(
                             val total = res.data.substring(2, 4).hexToInt8()
                             val current = res.data.substring(6, 8).hexToInt8()
                             if (total == current) {
-                                _runtimeLock.value = false
+                                _lock.value = false
                                 lockTime = 0L
                                 // 如果还有任务运行恢复摇床
                                 if (executing > 0) {
                                     sendHex(TTYS0, V1.resumeShakeBed())
                                 }
                             } else {
-                                _runtimeLock.value = true
+                                _lock.value = true
                                 lockTime = 0L
                             }
                         }
@@ -105,7 +102,7 @@ class SerialManager(
                                 drawer = res.data.hexToInt8() == 0
                             }
                             if (res.pa == "0A") {
-                                _runtimeLock.value = false
+                                _lock.value = false
                                 lockTime = 0L
                                 PopTip.show("复位成功")
                             }
@@ -116,15 +113,15 @@ class SerialManager(
             launch {
                 while (true) {
                     delay(1000L)
-                    Logger.d(msg = "lock: ${runtimeLock.value}, lockTime: $lockTime, executing: $executing, drawer: $drawer")
+                    Logger.d(msg = "lock: ${lock.value}, lockTime: $lockTime, executing: $executing, drawer: $drawer")
                     // 如果正在运行，计时
-                    if (runtimeLock.value) {
+                    if (lock.value) {
                         lockTime += 1L
                     }
                     // 如果运行时间超过 60 秒，默认不运行，如果还有任务运行恢复摇床
-                    if (runtimeLock.value && lockTime >= waitTime) {
+                    if (lock.value && lockTime >= waitTime) {
                         lockTime = 0L
-                        _runtimeLock.value = false
+                        _lock.value = false
                         // 恢复摇床
                         if (executing > 0) {
                             sendHex(TTYS0, V1.resumeShakeBed())
@@ -143,10 +140,14 @@ class SerialManager(
      * @param serial 串口
      * @param hex 命令
      */
-    fun sendHex(serial: Serial, hex: String) {
+    fun sendHex(serial: Serial, hex: String, lock: Boolean = false) {
         scope.launch {
             MutableSerial.instance.sendHex(serial, hex)
-            //Logger.e(msg = "${serial.value} sendHex: ${hex.hexFormat()}")
+            Logger.e(msg = "${serial.value} sendHex: ${hex.hexFormat()}")
+            if (lock) {
+                _lock.value = true
+                lockTime = 0L
+            }
         }
     }
 
@@ -167,18 +168,18 @@ class SerialManager(
      *  @param lock [Boolean] 是否锁定 true 锁定 false 解锁
      */
     fun lock(lock: Boolean) {
-        _runtimeLock.value = lock
+        _lock.value = lock
         if (lock) {
             sendHex(TTYS0, V1.pauseShakeBed())
         }
     }
 
     suspend fun reset() {
-        if (runtimeLock.value) {
+        if (lock.value) {
             delay(300L)
             reset()
         } else {
-            _runtimeLock.value = true
+            _lock.value = true
             lockTime = 0L
             sendHex(serial = TTYS0, hex = V1().toHex())
         }
@@ -188,7 +189,7 @@ class SerialManager(
     fun setTemp(temp: String, addr: String) {
         scope.launch {
             sendText(TTYS3, "TC1:TCSW=0@$addr\r")
-            delay(2 * 60 * 1000L)
+            delay(30 * 1000L)
             sendText(TTYS3, "TC1:TCSW=1@$addr\r")
             delay(1000L)
             sendText(TTYS3, "TC1:TCADJUSTTEMP=$temp@$addr\r")

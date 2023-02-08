@@ -25,26 +25,21 @@ class MotorRepository @Inject constructor(
         return dao.getAll()
     }
 
-    fun getByBoardAndAddress(board: Int, address: Int): Flow<Motor> {
-        return dao.getByBoardAndAddress(board, address)
+    fun getById(id: Int): Flow<Motor> {
+        return dao.getById(id)
     }
 
     suspend fun init() {
         val motors = dao.getAll().firstOrNull()
         if (motors.isNullOrEmpty()) {
-            val motorList = mutableListOf<Motor>()
-            motorList.add(Motor(name = "X轴", address = 1))
-            motorList.add(Motor(name = "Y轴", address = 2))
-            for (i in 1..4) {
-                val motor = Motor(
-                    name = "泵$i",
-                    address = if (i == 1) i + 2 else i - 1,
-                    board = if (i == 1) 0 else 1,
-                    motorType = 1,
-                )
-                motorList.add(motor)
-            }
-            dao.insertBatch(motorList)
+            dao.insertBatch(listOf(
+                Motor(id = 0, name = "X轴", address = 1),
+                Motor(id = 1, name = "Y轴", address = 2),
+                Motor(id = 2, name = "泵一", address = 3),
+                Motor(id = 3, name = "泵二", address = 1),
+                Motor(id = 4, name = "泵三", address = 2),
+                Motor(id = 5, name = "泵四", address = 3)
+            ))
         }
     }
 }

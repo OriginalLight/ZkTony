@@ -58,15 +58,16 @@ class CalibrationDataViewModel @Inject constructor(
     }
 
     fun addLiquid() {
-        val m = MotionManager.instance
-        val gen = when (_uiState.value.pumpId) {
-            0 -> m.generator(v1 = _uiState.value.expect)
-            1 -> m.generator(v2 = _uiState.value.expect)
-            2 -> m.generator(v3 = _uiState.value.expect)
-            3 -> m.generator(v4 = _uiState.value.expect)
+        val manager = MotionManager.instance
+        val state = _uiState.value
+        val gen = when (state.pumpId) {
+            0 -> manager.generator(v1 = state.expect)
+            1 -> manager.generator(v2 = state.expect)
+            2 -> manager.generator(v3 = state.expect)
+            3 -> manager.generator(v4 = state.expect)
             else -> return
         }
-        m.executor(gen)
+        manager.executor(gen)
     }
 
     fun save() {
