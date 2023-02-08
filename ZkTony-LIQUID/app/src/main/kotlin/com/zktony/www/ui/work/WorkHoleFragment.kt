@@ -13,6 +13,7 @@ import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.removeZero
+import com.zktony.www.common.extension.showVolumeDialog
 import com.zktony.www.databinding.FragmentWorkHoleBinding
 import com.zktony.www.ui.calibration.CalibrationDataFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
@@ -89,6 +90,17 @@ class WorkHoleFragment :
                 }
             }
             dynamicPlate.setOnItemClick { x, y -> viewModel.select(x, y) }
+            volume.setOnClickListener {
+                val plate = viewModel.uiState.value.plate
+                showVolumeDialog(
+                    plate?.v1 ?: 0.0f,
+                    plate?.v2 ?: 0.0f,
+                    plate?.v3 ?: 0.0f,
+                    plate?.v4 ?: 0.0f
+                ) { v1, v2, v3, v4 ->
+                    viewModel.setVolume(v1, v2, v3, v4)
+                }
+            }
         }
     }
 }

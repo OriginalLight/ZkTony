@@ -81,6 +81,46 @@ fun showSizeDialog(textRow: Int, textColumn: Int, block1: (Int, Int) -> Unit) {
         .show()
 }
 
+fun showVolumeDialog(
+    v1: Float,
+    v2: Float,
+    v3: Float,
+    v4: Float,
+    block: (Float, Float, Float, Float) -> Unit,
+) {
+    CustomDialog.build()
+        .setCustomView(object :
+            OnBindView<CustomDialog>(R.layout.layout_volume_input_dialog) {
+            override fun onBind(dialog: CustomDialog, v: View) {
+                val inputV1 = v.findViewById<EditText>(R.id.input_v1)
+                val inputV2 = v.findViewById<EditText>(R.id.input_v2)
+                val inputV3 = v.findViewById<EditText>(R.id.input_v3)
+                val inputV4 = v.findViewById<EditText>(R.id.input_v4)
+                val save = v.findViewById<MaterialButton>(R.id.save)
+                val cancel = v.findViewById<MaterialButton>(R.id.cancel)
+                if (v1 != 0f) inputV1.setText(v1.toString().removeZero())
+                if (v2 != 0f) inputV2.setText(v2.toString().removeZero())
+                if (v3 != 0f) inputV3.setText(v3.toString().removeZero())
+                if (v4 != 0f) inputV4.setText(v4.toString().removeZero())
+
+                save.setOnClickListener {
+                    block(
+                        inputV1.text.toString().toFloatOrNull() ?: 0f,
+                        inputV2.text.toString().toFloatOrNull() ?: 0f,
+                        inputV3.text.toString().toFloatOrNull() ?: 0f,
+                        inputV4.text.toString().toFloatOrNull() ?: 0f
+                    )
+                    dialog.dismiss()
+                }
+                cancel.setOnClickListener { dialog.dismiss() }
+            }
+        })
+        .setCancelable(false)
+        .setMaskColor(Color.parseColor("#4D000000"))
+        .setWidth(600)
+        .show()
+}
+
 fun showNotice() {
     CustomDialog.build()
         .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_notice_dialog) {

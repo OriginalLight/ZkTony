@@ -114,4 +114,9 @@
     <string name="work_plate">加液板编辑</string>
     <string name="work_hole">孔位编辑</string>
     <string name="select_all">全选</string>
+    <string name="volume_input">加液量编辑</string>
+    <string name="input_v1">泵一加液量 μL</string>
+    <string name="input_v2">泵二加液量 μL</string>
+    <string name="input_v3">泵三加液量 μL</string>
+    <string name="input_v4">泵四加液量 μL</string>
 </resources>

@@ -1,7 +1,7 @@
 package com.zktony.web.controller;
 
 
-import com.zktony.web.commom.model.Result;
+import com.zktony.web.model.Result;
 import com.zktony.web.entity.Program;
 import com.zktony.web.repository.ProgramRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,11 @@ public class ProgramController {
 
     @PostMapping
     public Result<Void> insert(@RequestBody List<Program> programList) {
-        repository.saveAll(programList);
-        return Result.ok();
+        var result = repository.saveAll(programList);
+        if (result.isEmpty()) {
+            return Result.fail();
+        } else {
+            return Result.ok();
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.zktony.web.controller;
 
-import com.zktony.web.commom.model.Result;
+import com.zktony.web.model.Result;
 import com.zktony.web.entity.LogData;
 import com.zktony.web.entity.LogRecord;
 import com.zktony.web.repository.LogDataRepository;
@@ -33,13 +33,21 @@ public class LogController {
 
     @PostMapping("/data")
     public Result<Void> insertData(@RequestBody List<LogData> logDataList) {
-        dataRepository.saveAll(logDataList);
-        return Result.ok();
+        var result = dataRepository.saveAll(logDataList);
+        if (result.isEmpty()) {
+            return Result.fail();
+        } else {
+            return Result.ok();
+        }
     }
 
     @PostMapping("/record")
     public Result<Void> insertRecord(@RequestBody List<LogRecord> logRecordList) {
-        recordRepository.saveAll(logRecordList);
-        return Result.ok();
+        var result = recordRepository.saveAll(logRecordList);
+        if (result.isEmpty()) {
+            return Result.fail();
+        } else {
+            return Result.ok();
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.zktony.www.common.room.entity.Hole
 import com.zktony.www.common.room.entity.WorkPlate
 import com.zktony.www.data.repository.WorkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -48,12 +49,21 @@ class WorkHoleViewModel @Inject constructor(
 
     fun select(x: Int, y: Int) {
         viewModelScope.launch {
-            _uiState.value.plate?.let {
-                workRepository.updatePlate(it.copy(count = it.count - 1))
-            }
             val hole = _uiState.value.holes.find { it.x == x && it.y == y }
             hole?.let {
                 workRepository.updateHole(it.copy(checked = !it.checked))
+            }
+            delay(500L)
+            _uiState.value.plate?.let {
+                workRepository.updatePlate(it.copy(count = _uiState.value.holes.count { hole -> hole.checked }))
+            }
+        }
+    }
+
+    fun setVolume(v1: Float, v2: Float, v3: Float, v4: Float) {
+        viewModelScope.launch {
+            _uiState.value.plate?.let {
+                workRepository.updatePlate(it.copy(v1 = v1, v2 = v2, v3 = v3, v4 = v4))
             }
         }
     }
