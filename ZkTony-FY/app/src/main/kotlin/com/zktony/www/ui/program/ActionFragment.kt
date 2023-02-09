@@ -3,6 +3,7 @@ package com.zktony.www.ui.program
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -29,13 +30,11 @@ class ActionFragment :
 
     override val viewModel: ActionViewModel by viewModels()
 
-    private val actionAdapter by lazy { ActionAdapter() }
+    private val adapter by lazy { ActionAdapter() }
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
-        initRecyclerView()
-        initButton()
-        initEditText()
+        initView()
     }
 
     /**
@@ -46,29 +45,32 @@ class ActionFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.actionList.collect {
-                        actionAdapter.submitList(it)
+                        adapter.submitList(it)
+                        binding.apply {
+                            recycleView.isVisible = it.isNotEmpty()
+                            empty.isVisible = it.isEmpty()
+                        }
                     }
                 }
                 launch {
                     viewModel.buttonEnable.collect {
-                        binding.btnAdd.run {
+                        binding.btnAdd.apply {
                             isEnabled = it
                             alpha = if (it) 1f else 0.5f
                             text =
-                                if (it) resources.getString(R.string.add)
-                                else resources.getString(R.string.add_ban)
+                                if (it) resources.getString(R.string.add) else resources.getString(R.string.add_ban)
                         }
                     }
                 }
                 launch {
                     viewModel.action.collect {
                         if (getActionEnum(it.mode) == ActionEnum.WASHING) {
-                            binding.run {
+                            binding.apply {
                                 inputCount.visibility = View.VISIBLE
                                 inputTime.hint = resources.getString(R.string.hint_time_min)
                             }
                         } else {
-                            binding.run {
+                            binding.apply {
                                 inputCount.visibility = View.GONE
                                 inputTime.hint = resources.getString(R.string.hint_time_hour)
                             }
@@ -79,107 +81,94 @@ class ActionFragment :
         }
     }
 
-    /**
-     * 初始化RecyclerView
-     */
-    private fun initRecyclerView() {
-        binding.rc1.adapter = actionAdapter
-        actionAdapter.setOnDeleteButtonClick {
-            PopTip.show("已删除")
-            viewModel.deleteAction(it)
-        }
+
+    private fun initView() {
         arguments?.let {
             ActionFragmentArgs.fromBundle(it).id.run {
                 if (this != "None") {
-                    viewModel.setProgramId(this)
+                    viewModel.init(this)
                 }
             }
         }
-    }
+        adapter.setOnDeleteButtonClick {
+            PopTip.show("已删除")
+            viewModel.delete(it)
+        }
+        binding.apply {
+            recycleView.adapter = adapter
 
-    /**
-     * 初始化按钮
-     */
-    private fun initButton() {
-        binding.btnBack.run {
-            this.clickScale()
-            this.setOnClickListener {
-                findNavController().navigateUp()
+            order.afterTextChange {
+                viewModel.editAction(
+                    viewModel.action.value.copy(order = it.toIntOrNull() ?: 0)
+                )
             }
-        }
-        binding.btnAdd.setOnClickListener {
-            viewModel.addAction()
-        }
-        binding.btnAction.run {
-            text = getActionEnum(viewModel.action.value.mode).value
-            setOnClickListener {
-                val menuList = ActionEnum.values().map { it.value }
-                PopMenu.show(binding.btnAction, menuList)
-                    .setMenuTextInfo(TextInfo().apply {
-                        gravity = Gravity.CENTER
-                        fontSize = 16
-                    })
-                    .setOverlayBaseView(false)
-                    .setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
-                        override fun getIcon(dialog: PopMenu?, index: Int, menuText: String?): Int {
-                            return when (menuText) {
-                                ActionEnum.BLOCKING_LIQUID.value -> R.mipmap.ic_blocking_liquid
-                                ActionEnum.ANTIBODY_ONE.value -> R.mipmap.ic_antibody
-                                ActionEnum.ANTIBODY_TWO.value -> R.mipmap.ic_antibody
-                                ActionEnum.WASHING.value -> R.mipmap.ic_washing
-                                else -> R.mipmap.ic_blocking_liquid
+            time.afterTextChange {
+                viewModel.editAction(
+                    viewModel.action.value.copy(time = it.toFloatOrNull() ?: 0f)
+                )
+            }
+            temperature.afterTextChange {
+                viewModel.editAction(
+                    viewModel.action.value.copy(temperature = it.toFloatOrNull() ?: 0f)
+                )
+            }
+            liquidVolume.afterTextChange {
+                viewModel.editAction(
+                    viewModel.action.value.copy(liquidVolume = it.toFloatOrNull() ?: 0f)
+                )
+            }
+            count.afterTextChange {
+                viewModel.editAction(
+                    viewModel.action.value.copy(count = it.toIntOrNull() ?: 0)
+                )
+            }
+
+            with(btnBack) {
+                clickScale()
+                setOnClickListener {
+                    findNavController().navigateUp()
+                }
+            }
+            with(btnAdd) {
+                clickScale()
+                setOnClickListener {
+                    viewModel.insert()
+                }
+            }
+            with(btnAction) {
+                text = getActionEnum(viewModel.action.value.mode).value
+                setOnClickListener {
+                    val menuList = ActionEnum.values().map { it.value }
+                    PopMenu.show(binding.btnAction, menuList)
+                        .setMenuTextInfo(TextInfo().apply {
+                            gravity = Gravity.CENTER
+                            fontSize = 16
+                        })
+                        .setOverlayBaseView(false)
+                        .setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
+                            override fun getIcon(
+                                dialog: PopMenu?,
+                                index: Int,
+                                menuText: String?
+                            ): Int {
+                                return when (menuText) {
+                                    ActionEnum.BLOCKING_LIQUID.value -> R.mipmap.ic_blocking_liquid
+                                    ActionEnum.ANTIBODY_ONE.value -> R.mipmap.ic_antibody
+                                    ActionEnum.ANTIBODY_TWO.value -> R.mipmap.ic_antibody
+                                    ActionEnum.WASHING.value -> R.mipmap.ic_washing
+                                    else -> R.mipmap.ic_blocking_liquid
+                                }
                             }
+                        })
+                        .setOnMenuItemClickListener { _, text, index ->
+                            binding.btnAction.text = text
+                            viewModel.switchAction(getActionEnum(index))
+                            false
                         }
-                    })
-                    .setOnMenuItemClickListener { _, text, index ->
-                        binding.btnAction.text = text
-                        viewModel.switchAction(getActionEnum(index))
-                        false
-                    }
-                    .setRadius(0f)
-                    .alignGravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+                        .setRadius(0f)
+                        .alignGravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+                }
             }
-        }
-    }
-
-    /**
-     * 初始化EditText
-     */
-    private fun initEditText() {
-        binding.order.afterTextChange {
-            viewModel.editAction(
-                viewModel.action.value.copy(
-                    order = if (it.isNotEmpty()) it.toInt() else 0
-                )
-            )
-        }
-        binding.time.afterTextChange {
-            viewModel.editAction(
-                viewModel.action.value.copy(
-                    time = if (it.isNotEmpty()) it.toFloat() else 0f
-                )
-            )
-        }
-        binding.temperature.afterTextChange {
-            viewModel.editAction(
-                viewModel.action.value.copy(
-                    temperature = if (it.isNotEmpty()) it.toFloat() else 0f
-                )
-            )
-        }
-        binding.liquidVolume.afterTextChange {
-            viewModel.editAction(
-                viewModel.action.value.copy(
-                    liquidVolume = if (it.isNotEmpty()) it.toFloat() else 0f
-                )
-            )
-        }
-        binding.count.afterTextChange {
-            viewModel.editAction(
-                viewModel.action.value.copy(
-                    count = if (it.isNotEmpty()) it.toInt() else 0
-                )
-            )
         }
     }
 }

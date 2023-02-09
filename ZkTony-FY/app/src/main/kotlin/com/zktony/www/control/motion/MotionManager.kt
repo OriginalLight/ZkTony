@@ -6,6 +6,8 @@ import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺
@@ -44,22 +46,27 @@ class MotionManager(
 
     // 执行器
     fun executor(vararg gen: Triple<String, String, String>) {
-        val str1 = gen.joinToString("") { it.first }
-        val str2 = gen.joinToString("") { it.second }
-        val str3 = gen.joinToString("") { it.third }
-        serial.sendHex(
-            serial = Serial.TTYS0,
-            hex = V1.complex(data = str1),
-            lock = true
-        )
-        serial.sendHex(
-            serial = Serial.TTYS2,
-            hex = V1.complex(data = str2)
-        )
-        serial.sendHex(
-            serial = Serial.TTYS3,
-            hex = V1.complex(data = str3)
-        )
+        scope.launch {
+            val str1 = gen.joinToString("") { it.first }
+            val str2 = gen.joinToString("") { it.second }
+            val str3 = gen.joinToString("") { it.third }
+            while (serial.lock.value) {
+                delay(100L)
+            }
+            serial.sendHex(
+                serial = Serial.TTYS0,
+                hex = V1.complex(data = str1),
+                lock = true
+            )
+            serial.sendHex(
+                serial = Serial.TTYS1,
+                hex = V1.complex(data = str2)
+            )
+            serial.sendHex(
+                serial = Serial.TTYS2,
+                hex = V1.complex(data = str3)
+            )
+        }
     }
 
     companion object {

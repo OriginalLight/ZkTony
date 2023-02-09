@@ -21,11 +21,8 @@ class MotorAdapter : ListAdapter<Motor, MotorAdapter.ViewHolder>(MotorDiffCallba
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ItemMotorBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            ),
-            onEditButtonClick
+                LayoutInflater.from(parent.context), parent, false
+            ), onEditButtonClick
         )
     }
 
@@ -41,8 +38,7 @@ class MotorAdapter : ListAdapter<Motor, MotorAdapter.ViewHolder>(MotorDiffCallba
 
     @SuppressLint("SetTextI18n")
     class ViewHolder(
-        private val binding: ItemMotorBinding,
-        private val onEditButtonClick: (Motor) -> Unit
+        private val binding: ItemMotorBinding, private val onEditButtonClick: (Motor) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Motor) {
             binding.apply {
@@ -62,15 +58,13 @@ class MotorAdapter : ListAdapter<Motor, MotorAdapter.ViewHolder>(MotorDiffCallba
 private class MotorDiffCallback : DiffUtil.ItemCallback<Motor>() {
 
     override fun areItemsTheSame(
-        oldItem: Motor,
-        newItem: Motor
+        oldItem: Motor, newItem: Motor
     ): Boolean {
         return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(
-        oldItem: Motor,
-        newItem: Motor
+        oldItem: Motor, newItem: Motor
     ): Boolean {
         return oldItem == newItem
     }

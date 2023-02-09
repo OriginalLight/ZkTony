@@ -15,6 +15,7 @@ import com.zktony.www.adapter.CalibrationDataAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
+import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.setEqualText
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,8 +40,12 @@ class CalibrationDataFragment :
                     adapter.submitList(it.caliData)
                     binding.apply {
                         select.text = listOf("泵一", "泵二", "泵三", "泵四")[it.pumpId]
-                        expect.setEqualText(it.expect.toString())
-                        actual.setEqualText(it.actual.toString())
+                        if (it.expect > 0f) {
+                            expect.setEqualText(it.expect.toString().removeZero())
+                        }
+                        if (it.actual > 0f) {
+                            actual.setEqualText(it.actual.toString().removeZero())
+                        }
                         addLiquid.isEnabled = it.expect > 0f && !it.lock && !it.work
                         save.isEnabled = it.expect > 0f && it.actual > 0f
                     }

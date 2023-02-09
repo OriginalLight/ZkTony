@@ -19,11 +19,11 @@ import com.zktony.www.common.network.result.NetworkResult
 import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.common.utils.Constants.DEVICE_ID
+import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.control.serial.protocol.V1
 import com.zktony.www.data.model.Version
 import com.zktony.www.data.repository.MotorRepository
 import com.zktony.www.data.repository.SystemRepository
-import com.zktony.www.control.serial.SerialManager
-import com.zktony.www.control.serial.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -36,8 +36,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AdminViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
-    private val motorRepo: MotorRepository,
-    private val sysRepo: SystemRepository,
+    private val motorRepository: MotorRepository,
+    private val systemRepository: SystemRepository,
 ) : BaseViewModel() {
 
     private val _file = MutableStateFlow<File?>(null)
@@ -169,7 +169,7 @@ class AdminViewModel @Inject constructor(
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (CommonApplicationProxy.application.isNetworkAvailable()) {
-                sysRepo.getVersionInfo(DEVICE_ID).collect {
+                systemRepository.getVersionInfo(DEVICE_ID).collect {
                     when (it) {
                         is NetworkResult.Success -> {
                             if (it.data.versionCode > BuildConfig.VERSION_CODE) {
@@ -241,15 +241,12 @@ class AdminViewModel @Inject constructor(
         viewModelScope.launch {
             for (i in 0..2) {
                 for (j in 1..3) {
-                    if (i == 2 && j == 3) {
-                        break
-                    }
                     SerialManager.instance.sendHex(
                         i.toSerial(), V1(
                             fn = "03", pa = "04", data = j.int8ToHex()
                         ).toHex()
                     )
-                    delay(100L)
+                    delay(200L)
                 }
             }
         }
@@ -261,8 +258,8 @@ class AdminViewModel @Inject constructor(
      */
     private fun updateMotor(motor: Motor) {
         viewModelScope.launch {
-            motorRepo.getById(motor.id).firstOrNull()?.let {
-                motorRepo.update(
+            motorRepository.getById(motor.id).firstOrNull()?.let {
+                motorRepository.update(
                     it.copy(
                         subdivision = motor.subdivision,
                         speed = motor.speed,

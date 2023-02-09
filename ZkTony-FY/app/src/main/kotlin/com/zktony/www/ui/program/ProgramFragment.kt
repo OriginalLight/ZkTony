@@ -1,22 +1,18 @@
 package com.zktony.www.ui.program
 
 import android.os.Bundle
-import android.text.InputType.TYPE_CLASS_TEXT
-import android.text.InputType.TYPE_TEXT_VARIATION_NORMAL
-import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.kongzue.dialogx.dialogs.InputDialog
-import com.kongzue.dialogx.dialogs.MessageDialog
-import com.kongzue.dialogx.util.InputInfo
 import com.zktony.www.R
 import com.zktony.www.adapter.ProgramAdapter
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.common.extension.showShortToast
+import com.zktony.www.common.extension.deleteDialog
+import com.zktony.www.common.extension.inputDialog
 import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -31,75 +27,46 @@ class ProgramFragment :
     private val adapter by lazy { ProgramAdapter() }
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initObserver()
-        initRecyclerView()
-        initButton()
+        initFlowCollector()
+        initView()
     }
 
     /**
      * 初始化观察者
      */
-    private fun initObserver() {
+    private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.programList.collect {
                     adapter.submitList(it)
-                    if (it.isEmpty()) {
-                        binding.empty.visibility = View.VISIBLE
-                        binding.rc1.visibility = View.GONE
-                    } else {
-                        binding.empty.visibility = View.GONE
-                        binding.rc1.visibility = View.VISIBLE
+                    binding.apply {
+                        recycleView.isVisible = it.isNotEmpty()
+                        empty.isVisible = it.isEmpty()
                     }
                 }
             }
         }
     }
 
-    /**
-     * 初始化RecyclerView
-     */
-    private fun initRecyclerView() {
-        binding.rc1.adapter = adapter
-
+    private fun initView() {
         adapter.setOnEditButtonClick {
-            val direction =
-                ProgramFragmentDirections.actionNavigationProgramToNavigationAction(it.id)
-            findNavController().navigate(direction)
+            findNavController().navigate(
+                directions = ProgramFragmentDirections.actionNavigationProgramToNavigationAction(it.id)
+            )
         }
 
         adapter.setOnDeleteButtonClick {
-            MessageDialog.show(
-                "提示",
-                "确定删除程序 ${it.name} 吗？",
-                "确定",
-                "取消"
-            ).setOkButton { _, _ ->
-                viewModel.deleteProgram(it)
-                false
-            }
+            deleteDialog(name = it.name, block = {
+                viewModel.delete(it)
+            })
         }
-    }
 
-    /**
-     * 初始化按钮
-     */
-    private fun initButton() {
-        binding.btnAdd.run {
-            this.clickScale()
-            this.setOnClickListener {
-                InputDialog("程序添加", "请输入程序名", "确定", "取消")
-                    .setCancelable(false)
-                    .setInputInfo(InputInfo().setInputType(TYPE_CLASS_TEXT or TYPE_TEXT_VARIATION_NORMAL))
-                    .setOkButton { _, _, inputStr ->
-                        if (inputStr.trim().isEmpty()) {
-                            "程序名称不能为空".showShortToast()
-                            return@setOkButton false
-                        }
-                        viewModel.addProgram(inputStr.trim())
-                        false
-                    }
-                    .show()
+        binding.apply {
+            recycleView.adapter = adapter
+
+            with(btnAdd) {
+                clickScale()
+                setOnClickListener { inputDialog { viewModel.insert(it) } }
             }
         }
     }

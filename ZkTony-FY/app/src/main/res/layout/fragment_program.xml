@@ -94,20 +94,18 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
+        <ImageView
             android:id="@+id/empty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
-            android:gravity="center"
-            android:text="@string/no_program"
-            android:textColor="@color/black"
-            android:textSize="32sp"
-            android:visibility="gone"
+            android:background="@mipmap/empty"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rc_1"
+            android:id="@+id/recycle_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:isScrollContainer="true"
@@ -118,7 +116,8 @@
             app:layout_constraintHorizontal_weight="4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title"
-            tools:listitem="@layout/item_program">
+            tools:listitem="@layout/item_program"
+            android:visibility="gone">
 
         </androidx.recyclerview.widget.RecyclerView>
 

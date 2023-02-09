@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
  * @date: 2022-12-15 9:11
  */
 
-@Entity
+@Entity(tableName = "container")
 data class Container(
     @PrimaryKey
     val id: Int = 1,

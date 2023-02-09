@@ -1,7 +1,6 @@
 package com.zktony.www.ui.home
 
 import com.zktony.serialport.util.Serial.TTYS0
-import com.zktony.www.common.app.Settings
 import com.zktony.www.common.room.entity.Action
 import com.zktony.www.common.room.entity.Container
 import com.zktony.www.control.motion.MotionManager
@@ -38,7 +37,7 @@ class CommandExecutor constructor(
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
         serial.sendHex(TTYS0, V1.queryDrawer())
         delay(500L)
-        waitForFree("等待加液") {
+        waitForFree {
             // 设置温度
             serial.setTemp(
                 addr = (module + 1).toString(),
@@ -56,7 +55,7 @@ class CommandExecutor constructor(
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
         serial.sendHex(TTYS0, V1.queryDrawer())
         delay(500L)
-        waitForFree("等待加液") {
+        waitForFree {
             // 设置温度
             serial.setTemp(
                 addr = (module + 1).toString(),
@@ -74,7 +73,7 @@ class CommandExecutor constructor(
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
         serial.sendHex(TTYS0, V1.queryDrawer())
         delay(500L)
-        waitForFree("等待回收") {
+        waitForFree {
             recycleLiquid(y = con.oneY, z = con.recycleOneZ)
             block.invoke()
         }
@@ -87,7 +86,7 @@ class CommandExecutor constructor(
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
         serial.sendHex(TTYS0, V1.queryDrawer())
         delay(500L)
-        waitForFree("等待加液") {
+        waitForFree {
             // 设置温度
             serial.setTemp(
                 addr = (module + 1).toString(),
@@ -105,7 +104,7 @@ class CommandExecutor constructor(
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
         serial.sendHex(TTYS0, V1.queryDrawer())
         delay(500L)
-        waitForFree("等待加液") {
+        waitForFree {
             // 设置温度
             serial.setTemp(
                 addr = (module + 1).toString(),
@@ -125,9 +124,7 @@ class CommandExecutor constructor(
     suspend fun wasteLiquid(block: suspend () -> Unit) {
         serial.sendHex(TTYS0, V1.queryDrawer())
         delay(500L)
-        waitForFree("等待清理") {
-            serial.lock(true)
-            // 主板运动
+        waitForFree {
             recycleLiquid(y = con.washY, z = con.wasteZ)
             block.invoke()
         }
@@ -181,16 +178,21 @@ class CommandExecutor constructor(
 
     /**
      * 等待机构空闲
-     * @param msg String 提示信息
      * @param block suspend () -> Unit 代码块
      */
-    private suspend fun waitForFree(msg: String, block: suspend () -> Unit) {
-        if (!serial.lock.value && !serial.drawer) {
-            block.invoke()
+    private suspend fun waitForFree(block: suspend () -> Unit) {
+        if (!serial.lock.value) {
+            if (!serial.drawer.value) {
+                block.invoke()
+            } else {
+                _wait.value = "等待抽屉关闭"
+                delay(300L)
+                waitForFree(block)
+            }
         } else {
-            _wait.value = msg
+            _wait.value = "等待加液/回收完成"
             delay(300L)
-            waitForFree(msg, block)
+            waitForFree(block)
         }
     }
 }

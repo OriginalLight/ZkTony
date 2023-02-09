@@ -16,11 +16,11 @@ import com.zktony.www.common.room.entity.Log
 import com.zktony.www.common.room.entity.Program
 import com.zktony.www.common.room.entity.getActionEnum
 import com.zktony.www.common.utils.Constants
+import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.control.serial.protocol.V1
 import com.zktony.www.data.repository.ActionRepository
 import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.ProgramRepository
-import com.zktony.www.control.serial.SerialManager
-import com.zktony.www.control.serial.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -32,9 +32,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val proRepo: ProgramRepository,
-    private val actionRepo: ActionRepository,
-    private val logRepo: LogRepository,
+    private val programRepository: ProgramRepository,
+    private val actionRepository: ActionRepository,
+    private val logRepository: LogRepository,
 ) : BaseViewModel() {
 
     @Inject
@@ -42,24 +42,24 @@ class HomeViewModel @Inject constructor(
 
     private val serial = SerialManager.instance
 
-    private val _proFlow = MutableStateFlow<List<Program>>(emptyList())
-    private val _aFlow = MutableStateFlow(ModuleUiState())
-    private val _bFlow = MutableStateFlow(ModuleUiState())
-    private val _cFlow = MutableStateFlow(ModuleUiState())
-    private val _dFlow = MutableStateFlow(ModuleUiState())
-    private val _uiFlow = MutableStateFlow(UiState())
-    val proFlow = _proFlow.asStateFlow()
+    private val _programFlow = MutableStateFlow<List<Program>>(emptyList())
+    private val _aFlow = MutableStateFlow(ModuleUiState(status = "A模块已就绪"))
+    private val _bFlow = MutableStateFlow(ModuleUiState(status = "B模块已就绪"))
+    private val _cFlow = MutableStateFlow(ModuleUiState(status = "C模块已就绪"))
+    private val _dFlow = MutableStateFlow(ModuleUiState(status = "D模块已就绪"))
+    private val _buttonFlow = MutableStateFlow(UiState())
+    val programFlow = _programFlow.asStateFlow()
     val aFlow = _aFlow.asStateFlow()
     val bFlow = _bFlow.asStateFlow()
     val cFlow = _cFlow.asStateFlow()
     val dFlow = _dFlow.asStateFlow()
-    val uiFlow = _uiFlow.asStateFlow()
+    val buttonFlow = _buttonFlow.asStateFlow()
 
     init {
         viewModelScope.launch {
             launch {
-                proRepo.getAll().collect {
-                    _proFlow.value = it
+                programRepository.getAll().collect {
+                    _programFlow.value = it
                     onProgramChange(it)
                 }
             }
@@ -76,7 +76,7 @@ class HomeViewModel @Inject constructor(
                                 2 -> _bFlow.value = _bFlow.value.copy(temp = "$temp ℃")
                                 3 -> _cFlow.value = _cFlow.value.copy(temp = "$temp ℃")
                                 4 -> _dFlow.value = _dFlow.value.copy(temp = "$temp ℃")
-                                0 -> _uiFlow.value = _uiFlow.value.copy(temp = "$temp ℃")
+                                0 -> _buttonFlow.value = _buttonFlow.value.copy(temp = "$temp ℃")
                             }
                         }
                     }
@@ -158,8 +158,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val state = flow(module)
             state.value = state.value.copy(
-                program = _proFlow.value[index],
-                startEnable = _proFlow.value[index].actionCount > 0,
+                program = _programFlow.value[index],
+                startEnable = _programFlow.value[index].actionCount > 0,
                 status = "已就绪",
                 time = Constants.ZERO_TIME,
             )
@@ -185,7 +185,7 @@ class HomeViewModel @Inject constructor(
             val job = launch {
                 // 将程序中的所有步骤排序放入队列
                 val actionQueue = Queue<Action>()
-                actionRepo.getByProgramId(state.value.program!!.id).first().forEach {
+                actionRepository.getByProgramId(state.value.program!!.id).first().forEach {
                     actionQueue.enqueue(it)
                 }
                 // 创建程序执行者
@@ -206,7 +206,7 @@ class HomeViewModel @Inject constructor(
                             }
                             is ActionEvent.Finish -> {
                                 state.value.log?.let { log ->
-                                    logRepo.update(log.copy(status = 1))
+                                    logRepository.update(log.copy(status = 1))
                                 }
                                 state.value = state.value.copy(
                                     status = "已完成", time = "已完成", log = null
@@ -239,13 +239,13 @@ class HomeViewModel @Inject constructor(
                     module = module,
                     actions = state.value.program!!.actions,
                 )
-                logRepo.insert(log)
+                logRepository.insert(log)
                 // 更新状态中的job和日志
                 state.value = state.value.copy(
                     job = job, log = log
                 )
                 // 更新当前程序的运行次数
-                proRepo.update(
+                programRepository.update(
                     state.value.program!!.copy(
                         runCount = state.value.program!!.runCount + 1
                     )
@@ -267,7 +267,7 @@ class HomeViewModel @Inject constructor(
                 job?.cancel()
                 // 非正常停止删除日志
                 log?.let { log ->
-                    logRepo.delete(log)
+                    logRepository.delete(log)
                 }
             }
             // 更新状态
@@ -285,11 +285,7 @@ class HomeViewModel @Inject constructor(
             // 恢复到室温
             // 复位
             delay(200L)
-            if (serial.executing == 0) {
-                // 暂停摇床
-                serial.sendHex(
-                    serial = TTYS0, hex = V1.pauseShakeBed()
-                )
+            if (!serial.run.value) {
                 // 恢复到室温
                 for (i in 1..4) {
                     delay(200L)
@@ -306,7 +302,7 @@ class HomeViewModel @Inject constructor(
     fun reset() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (serial.executing == 0) {
+            if (!serial.run.value) {
                 if (serial.lock.value) {
                     PopTip.show("运动中禁止复位")
                 } else {
@@ -327,14 +323,16 @@ class HomeViewModel @Inject constructor(
             // pauseEnable false 未暂停 true 暂停
             // 发送指令 -> 更新状态
             // 发送指令 如果是未暂停，发送暂停命令，如果是暂停，发送继续命令
-            serial.sendHex(
-                serial = TTYS0, hex = if (_uiFlow.value.pause) V1.resumeShakeBed()
-                else V1.pauseShakeBed()
-            )
-            // 更新状态
-            _uiFlow.value = _uiFlow.value.copy(
-                pause = !_uiFlow.value.pause
-            )
+            if (!serial.lock.value) {
+                serial.sendHex(
+                    serial = TTYS0, hex = if (_buttonFlow.value.pause) V1.resumeShakeBed()
+                    else V1.pauseShakeBed()
+                )
+                // 更新状态
+                _buttonFlow.value = _buttonFlow.value.copy(
+                    pause = !_buttonFlow.value.pause
+                )
+            }
         }
     }
 
@@ -347,12 +345,12 @@ class HomeViewModel @Inject constructor(
             // 发送设置温度命令 -> 更改按钮状态
             // 发送设置温度命令 如果当前是未保温状态发送设置中的温度，否则发送室温26度
             serial.setTemp(
-                addr = "0", temp = if (_uiFlow.value.insulating) "26"
+                addr = "0", temp = if (_buttonFlow.value.insulating) "26"
                 else appViewModel.settings.value.temp.toString().removeZero()
             )
             // 更改按钮状态
-            _uiFlow.value = _uiFlow.value.copy(
-                insulating = !_uiFlow.value.insulating
+            _buttonFlow.value = _buttonFlow.value.copy(
+                insulating = !_buttonFlow.value.insulating
             )
         }
     }

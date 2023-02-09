@@ -33,7 +33,7 @@ class ProgramViewModel @Inject constructor(
      * 添加程序
      * @param programName [String] 程序名
      */
-    fun addProgram(programName: String) {
+    fun insert(programName: String) {
         viewModelScope.launch {
             programRepo.getByName(programName).firstOrNull()?.let {
                 PopTip.show("程序名已存在")
@@ -47,7 +47,7 @@ class ProgramViewModel @Inject constructor(
      * 删除程序
      * @param program [Program] 程序
      */
-    fun deleteProgram(program: Program) {
+    fun delete(program: Program) {
         viewModelScope.launch {
             programRepo.delete(program)
             actionRepo.deleteByProgramId(program.id)

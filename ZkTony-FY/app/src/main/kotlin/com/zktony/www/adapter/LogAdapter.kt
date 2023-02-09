@@ -1,7 +1,6 @@
 package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -21,9 +20,7 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ItemLogBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
+                LayoutInflater.from(parent.context), parent, false
             )
         )
     }
@@ -71,13 +68,6 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
                     }
                 )
                 time.text = item.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                if (layoutPosition % 2 == 0) {
-                    order.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    module.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    name.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    status.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    time.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                }
 
                 executePendingBindings()
             }
@@ -88,15 +78,13 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
 private class LogDiffCallback : DiffUtil.ItemCallback<Log>() {
 
     override fun areItemsTheSame(
-        oldItem: Log,
-        newItem: Log
+        oldItem: Log, newItem: Log
     ): Boolean {
         return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(
-        oldItem: Log,
-        newItem: Log
+        oldItem: Log, newItem: Log
     ): Boolean {
         return oldItem == newItem
     }

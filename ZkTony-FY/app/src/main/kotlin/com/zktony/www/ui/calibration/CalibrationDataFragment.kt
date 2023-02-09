@@ -6,19 +6,18 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.findNavController
 import com.kongzue.dialogx.dialogs.PopMenu
-import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnIconChangeCallBack
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.www.R
 import com.zktony.www.adapter.CalibrationDataAdapter
 import com.zktony.www.base.BaseFragment
+import com.zktony.www.common.extension.afterTextChange
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.common.room.entity.CalibrationData
+import com.zktony.www.common.extension.removeZero
+import com.zktony.www.common.extension.setEqualText
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
-import com.zktony.www.control.serial.SerialManager
-import com.zktony.www.ui.program.ActionFragmentArgs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -31,94 +30,79 @@ class CalibrationDataFragment :
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
-        initRecycleView()
-        initButton()
+        initView()
     }
 
-    /**
-     * 初始化Flow收集器
-     */
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch { viewModel.caliDataList.collect { adapter.submitList(it) } }
-                launch {
-                    viewModel.motorId.collect {
-                        binding.select.text = listOf("泵一", "泵二", "泵三", "泵四", "泵五")[it - 3]
-                    }
-                }
-                launch {
-                    SerialManager.instance.lock.collect {
-                        binding.addLiquid.isEnabled = !it
+                viewModel.uiState.collect {
+                    adapter.submitList(it.caliData)
+                    binding.apply {
+                        select.text = listOf("泵一", "泵二", "泵三", "泵四", "泵五", "泵六")[it.pumpId]
+                        if (it.expect > 0f) {
+                            expect.setEqualText(it.expect.toString().removeZero())
+                        }
+                        if (it.actual > 0f) {
+                            actual.setEqualText(it.actual.toString().removeZero())
+                        }
+                        addLiquid.isEnabled = it.expect > 0f && !it.lock
+                        save.isEnabled = it.expect > 0f && it.actual > 0f
                     }
                 }
             }
         }
     }
 
-    /**
-     * 初始化列表
-     */
-    private fun initRecycleView() {
-        binding.recycleView.adapter = adapter
-        adapter.setOnDeleteButtonClick {
-            viewModel.delete(it)
-        }
+    private fun initView() {
         arguments?.let {
-            ActionFragmentArgs.fromBundle(it).id.run {
+            CalibrationDataFragmentArgs.fromBundle(it).id.run {
                 if (this != "None") {
-                    viewModel.initCali(this)
+                    viewModel.init(this)
                 }
+            }
+        }
+        adapter.setOnDeleteButtonClick { viewModel.delete(it) }
+
+        binding.apply {
+            recycleView.adapter = adapter
+
+            addLiquid.setOnClickListener {
+                viewModel.addLiquid()
+            }
+
+            save.setOnClickListener {
+                viewModel.save()
+            }
+
+            expect.afterTextChange {
+                viewModel.expect(it.toFloatOrNull() ?: 0f)
+            }
+
+            actual.afterTextChange {
+                viewModel.actual(it.toFloatOrNull() ?: 0f)
+            }
+
+            select.setOnClickListener {
+                val menuList = listOf("泵一", "泵二", "泵三", "泵四", "泵五", "泵六")
+                PopMenu.show(menuList).setMenuTextInfo(TextInfo().apply {
+                    gravity = Gravity.CENTER
+                    fontSize = 16
+                }).setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
+                    override fun getIcon(dialog: PopMenu?, index: Int, menuText: String?): Int {
+                        return R.mipmap.ic_pump
+                    }
+                }).setOnMenuItemClickListener { _, _, index ->
+                    viewModel.selectPump(index)
+                    false
+                }.width = 300
+            }
+
+            with(back) {
+                clickScale()
+                setOnClickListener { findNavController().navigateUp() }
             }
         }
     }
 
-    /**
-     * 初始化按钮
-     */
-    private fun initButton() {
-        binding.back.run {
-            clickScale()
-            setOnClickListener {
-                findNavController().navigateUp()
-            }
-        }
-        binding.select.setOnClickListener {
-            val menuList = listOf("泵一", "泵二", "泵三", "泵四", "泵五")
-            PopMenu.show(menuList).setMenuTextInfo(TextInfo().apply {
-                gravity = Gravity.CENTER
-                fontSize = 16
-            }).setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
-                override fun getIcon(dialog: PopMenu?, index: Int, menuText: String?): Int {
-                    return R.mipmap.ic_pump
-                }
-            }).setOnMenuItemClickListener { _, _, index ->
-                viewModel.selectMotor(index + 3)
-                binding.select.text = menuList[index]
-                false
-            }.width = 300
-        }
-        binding.save.setOnClickListener {
-            val volume = binding.volume.text.toString()
-            val actualVolume = binding.actualVolume.text.toString()
-            if (volume.isEmpty() || actualVolume.isEmpty()) {
-                PopTip.show("请填写完整数据")
-                return@setOnClickListener
-            }
-            viewModel.add(
-                CalibrationData().copy(
-                    volume = volume.toFloat(),
-                    actualVolume = actualVolume.toFloat(),
-                )
-            )
-        }
-        binding.addLiquid.setOnClickListener {
-            val volume = binding.volume.text.toString()
-            if (volume.isEmpty()) {
-                PopTip.show("请填写完整数据")
-                return@setOnClickListener
-            }
-            viewModel.addLiquid(volume.toFloat())
-        }
-    }
 }

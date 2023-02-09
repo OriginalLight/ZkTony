@@ -96,22 +96,21 @@
 
             </LinearLayout>
 
-            <TextView
+            <ImageView
                 android:id="@+id/empty"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="48dp"
-                android:gravity="center"
-                android:text="@string/no_log"
-                android:textColor="@color/black"
-                android:textSize="32sp"
-                android:visibility="gone"
+                android:background="@mipmap/empty"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/title" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rc"
+                android:id="@+id/recycle_view"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

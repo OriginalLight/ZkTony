@@ -72,7 +72,7 @@ class AppViewModel @Inject constructor(
                 }
             }
             launch {
-                calibrationRepository.getDefault().collect {
+                calibrationRepository.getAll().collect {
                     if (it.isNotEmpty()) {
                         _settings.value = _settings.value.copy(calibration = it)
                     }

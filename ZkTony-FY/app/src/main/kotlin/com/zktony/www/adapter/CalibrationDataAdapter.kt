@@ -19,7 +19,7 @@ import com.zktony.www.databinding.ItemCalibrationDataBinding
 class CalibrationDataAdapter :
     ListAdapter<CalibrationData, CalibrationDataAdapter.ViewHolder>(CalibrationDataDiffCallback()) {
 
-    private lateinit var onDeleteButtonClick: (CalibrationData) -> Unit
+    private var onDeleteButtonClick: (CalibrationData) -> Unit = {}
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -51,28 +51,30 @@ class CalibrationDataAdapter :
             binding.apply {
                 cali = item
                 order.text = (layoutPosition + 1).toString()
-                name.text = when (item.motorId) {
-                    3 -> "泵一"
-                    4 -> "泵二"
-                    5 -> "泵三"
-                    6 -> "泵四"
-                    7 -> "泵五"
+                name.text = when (item.pumpId) {
+                    0 -> "泵一"
+                    1 -> "泵二"
+                    2 -> "泵三"
+                    3 -> "泵四"
+                    4 -> "泵五"
+                    5 -> "泵六"
                     else -> "未知"
                 }
-                volume.text = item.volume.toString().removeZero()
-                actualVolume.text = item.actualVolume.toString().removeZero()
-                delete.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                expect.text = item.expect.toString().removeZero()
+                actual.text = item.actual.toString().removeZero()
+                with(delete) {
+                    clickScale()
+                    setOnClickListener {
                         onDeleteButtonClick.invoke(item)
                     }
                 }
                 if (layoutPosition % 2 == 0) {
                     order.setBackgroundColor(Color.parseColor("#F5F5F5"))
                     name.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    volume.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    actualVolume.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    expect.setBackgroundColor(Color.parseColor("#F5F5F5"))
+                    actual.setBackgroundColor(Color.parseColor("#F5F5F5"))
                 }
+
                 executePendingBindings()
             }
         }
