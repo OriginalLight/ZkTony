@@ -8,20 +8,18 @@ import java.util.*
  * @author: 刘贺贺
  * @date: 2022-12-15 13:30
  */
-@Entity
+@Entity(tableName = "calibration_data")
 data class CalibrationData(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    // 校准ID
-    val calibrationId: String = "",
-    // 电机ID
-    val motorId: Int = 0,
-    // 校准前单位加液体积
-    val before: Float = 0f,
-    // 校准后单位加液体积
-    val after: Float = 0f,
-    // 预计加液量
-    val volume: Float = 0f,
-    // 实际加液量
-    val actualVolume: Float = 0f,
+    val calibrationId: String,
+    val pumpId: Int = 0,
+    // 预计
+    val expect: Float = 180f,
+    // 实际
+    val actual: Float = 180f,
+    // 百分比 = 实际/预计
+    val percent: Float = actual / expect,
+    // 校准时间
+    val createTime: Date = Date(System.currentTimeMillis()),
 )

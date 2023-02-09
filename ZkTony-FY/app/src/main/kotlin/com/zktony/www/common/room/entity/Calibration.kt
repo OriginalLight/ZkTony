@@ -8,12 +8,12 @@ import java.util.*
  * @author: 刘贺贺
  * @date: 2022-10-25 10:42
  */
-@Entity
+@Entity(tableName = "calibration")
 data class Calibration(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
     // 名字
-    val name: String = "",
+    val name: String = "默认",
     // 状态
     val enable: Int = 0,
     // x轴

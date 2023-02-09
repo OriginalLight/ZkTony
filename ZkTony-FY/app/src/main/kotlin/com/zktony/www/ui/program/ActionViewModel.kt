@@ -47,7 +47,7 @@ class ActionViewModel @Inject constructor(
      * 加载程序列表
      * @param programId [String] 程序ID
      */
-    fun setProgramId(programId: String) {
+    fun init(programId: String) {
         viewModelScope.launch {
             _programId.value = programId
         }
@@ -56,7 +56,7 @@ class ActionViewModel @Inject constructor(
     /**
      * 添加程序
      */
-    fun addAction() {
+    fun insert() {
         viewModelScope.launch {
             actionRepo.insert(
                 _action.value.copy(
@@ -73,7 +73,7 @@ class ActionViewModel @Inject constructor(
      * 删除步骤
      * @param action [Action] 步骤
      */
-    fun deleteAction(action: Action) {
+    fun delete(action: Action) {
         viewModelScope.launch {
             actionRepo.delete(action)
             delay(500L)

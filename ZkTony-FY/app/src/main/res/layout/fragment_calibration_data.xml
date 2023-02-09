@@ -145,6 +145,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/select"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
@@ -156,13 +157,16 @@
                 android:text="@string/pump_one"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                app:cornerRadius="24dp"
                 app:icon="@drawable/ic_drop"
                 app:iconPadding="0dp"
                 app:rippleColor="@color/purple_700"
+                app:strokeColor="@color/light_primary"
+                app:strokeWidth="3dp"
                 tools:ignore="NestedWeights" />
 
             <EditText
-                android:id="@+id/volume"
+                android:id="@+id/expect"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
@@ -178,7 +182,7 @@
                 android:textStyle="italic" />
 
             <EditText
-                android:id="@+id/actual_volume"
+                android:id="@+id/actual"
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
@@ -206,6 +210,7 @@
                 android:text="@string/add_liquid"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                app:cornerRadius="24dp"
                 app:rippleColor="@color/purple_700" />
 
             <com.google.android.material.button.MaterialButton
@@ -221,10 +226,10 @@
                 android:text="@string/save"
                 android:textSize="16sp"
                 android:textStyle="bold"
+                app:cornerRadius="24dp"
                 app:rippleColor="@color/purple_700" />
 
         </LinearLayout>
-
 
     </LinearLayout>
 

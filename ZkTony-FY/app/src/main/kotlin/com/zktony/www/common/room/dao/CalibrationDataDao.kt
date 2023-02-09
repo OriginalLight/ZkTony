@@ -12,15 +12,15 @@ import kotlinx.coroutines.flow.Flow
 interface CalibrationDataDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(calibrationData: CalibrationData)
+    suspend fun insert(data: CalibrationData)
 
     @Delete
-    suspend fun delete(calibrationData: CalibrationData)
+    suspend fun delete(data: CalibrationData)
 
-    @Query("DELETE FROM calibrationData WHERE calibrationId = :id")
-    suspend fun deleteById(id: String)
+    @Query("DELETE FROM calibration_data WHERE calibrationId = :calibrationId")
+    suspend fun deleteByCalibrationId(calibrationId: String)
 
-    @Query("SELECT * FROM CalibrationData WHERE calibrationId = :id ORDER BY motorId ASC")
-    fun getByCaliId(id: String): Flow<List<CalibrationData>>
+    @Query("SELECT * FROM calibration_data WHERE calibrationId = :calibrationId ORDER BY pumpId ASC")
+    fun getByCalibrationId(calibrationId: String): Flow<List<CalibrationData>>
 
 }

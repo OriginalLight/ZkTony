@@ -328,8 +328,8 @@
                             android:text="@string/save_config"
                             android:textColor="@color/light_onPrimary"
                             android:textSize="20sp"
-                            app:cornerRadius="10dp"
-                            app:rippleColor="@color/light_error" />
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                     </LinearLayout>
 
@@ -376,7 +376,9 @@
                             android:layout_marginStart="8dp"
                             android:layout_marginEnd="4dp"
                             android:layout_weight="1"
-                            android:text="@string/to_waste_y" />
+                            android:text="@string/to_waste_y"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/to_waste_z"
@@ -384,7 +386,9 @@
                             android:layout_height="match_parent"
                             android:layout_marginStart="4dp"
                             android:layout_weight="1"
-                            android:text="@string/to_waste_z" />
+                            android:text="@string/to_waste_z"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                     </LinearLayout>
 
@@ -403,7 +407,9 @@
                             android:layout_marginStart="8dp"
                             android:layout_marginEnd="4dp"
                             android:layout_weight="1"
-                            android:text="@string/to_wash_y" />
+                            android:text="@string/to_wash_y"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/to_wash_z"
@@ -411,7 +417,9 @@
                             android:layout_height="match_parent"
                             android:layout_marginStart="4dp"
                             android:layout_weight="1"
-                            android:text="@string/to_wash_z" />
+                            android:text="@string/to_wash_z"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                     </LinearLayout>
 
@@ -430,7 +438,9 @@
                             android:layout_marginStart="8dp"
                             android:layout_marginEnd="4dp"
                             android:layout_weight="1"
-                            android:text="@string/to_block_y" />
+                            android:text="@string/to_block_y"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/to_block_z"
@@ -438,7 +448,9 @@
                             android:layout_height="match_parent"
                             android:layout_marginStart="4dp"
                             android:layout_weight="1"
-                            android:text="@string/to_block_z" />
+                            android:text="@string/to_block_z"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                     </LinearLayout>
 
@@ -457,7 +469,9 @@
                             android:layout_marginStart="8dp"
                             android:layout_marginEnd="4dp"
                             android:layout_weight="1"
-                            android:text="@string/to_two_y" />
+                            android:text="@string/to_two_y"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/to_two_z"
@@ -465,7 +479,9 @@
                             android:layout_height="match_parent"
                             android:layout_marginStart="4dp"
                             android:layout_weight="1"
-                            android:text="@string/to_two_z" />
+                            android:text="@string/to_two_z"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                     </LinearLayout>
 
@@ -484,7 +500,9 @@
                             android:layout_marginStart="8dp"
                             android:layout_marginEnd="4dp"
                             android:layout_weight="1"
-                            android:text="@string/to_one_y" />
+                            android:text="@string/to_one_y"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/to_one_z"
@@ -492,7 +510,9 @@
                             android:layout_height="match_parent"
                             android:layout_marginStart="4dp"
                             android:layout_weight="1"
-                            android:text="@string/to_one_z" />
+                            android:text="@string/to_one_z"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/to_recycle_one_z"
@@ -500,7 +520,9 @@
                             android:layout_height="match_parent"
                             android:layout_marginStart="4dp"
                             android:layout_weight="1"
-                            android:text="@string/recycle_z" />
+                            android:text="@string/recycle_z"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                     </LinearLayout>
 
@@ -519,7 +541,9 @@
                             android:layout_marginStart="8dp"
                             android:layout_marginEnd="8dp"
                             android:layout_weight="1"
-                            android:text="@string/to_zero" />
+                            android:text="@string/to_zero"
+                            app:cornerRadius="24dp"
+                            app:rippleColor="#7B1FA2" />
 
                     </LinearLayout>
 

@@ -2,7 +2,7 @@ package com.zktony.www.ui.log
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -26,12 +26,11 @@ class LogFragment :
 
     override val viewModel: LogViewModel by viewModels()
 
-    private val logAdapter by lazy { LogAdapter() }
+    private val adapter by lazy { LogAdapter() }
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
-        initRecyclerView()
-        initButton()
+        initView()
     }
 
     /**
@@ -42,14 +41,11 @@ class LogFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.logList.collect {
-                        if (it.isNotEmpty()) {
-                            binding.rc.visibility = View.VISIBLE
-                            binding.empty.visibility = View.GONE
-                        } else {
-                            binding.rc.visibility = View.GONE
-                            binding.empty.visibility = View.VISIBLE
+                        adapter.submitList(it)
+                        binding.apply {
+                            recycleView.isVisible = it.isNotEmpty()
+                            empty.isVisible = it.isEmpty()
                         }
-                        logAdapter.submitList(it)
                     }
                 }
                 launch {
@@ -61,24 +57,18 @@ class LogFragment :
         }
     }
 
-    /**
-     * initRecyclerView
-     */
-    private fun initRecyclerView() {
-        binding.rc.adapter = logAdapter
-        viewModel.initLogList()
-    }
+    private fun initView() {
+        binding.apply {
+            recycleView.adapter = adapter
 
-    /**
-     * 初始化按钮
-     */
-    private fun initButton() {
-        binding.time.run {
-            clickScale()
-            setOnClickListener {
-                showDatePickerDialog(Calendar.getInstance())
+            with(time) {
+                clickScale()
+                setOnClickListener {
+                    showDatePickerDialog(Calendar.getInstance())
+                }
             }
         }
+
     }
 
     /**

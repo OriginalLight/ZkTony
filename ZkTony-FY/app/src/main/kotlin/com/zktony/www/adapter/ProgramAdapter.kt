@@ -1,7 +1,6 @@
 package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -24,12 +23,8 @@ class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDi
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ItemProgramBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            ),
-            onDeleteButtonClick,
-            onEditButtonClick
+                LayoutInflater.from(parent.context), parent, false
+            ), onDeleteButtonClick, onEditButtonClick
         )
     }
 
@@ -56,22 +51,17 @@ class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDi
             binding.apply {
                 program = item
                 order.text = (layoutPosition + 1).toString()
-                edit.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                with(edit) {
+                    clickScale()
+                    setOnClickListener {
                         onEditButtonClick.invoke(item)
                     }
                 }
-                delete.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                with(delete) {
+                    clickScale()
+                    setOnClickListener {
                         onDeleteButtonClick.invoke(item)
                     }
-                }
-                if (layoutPosition % 2 == 0) {
-                    order.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    name.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    actions.setBackgroundColor(Color.parseColor("#F5F5F5"))
                 }
                 executePendingBindings()
             }
@@ -82,15 +72,13 @@ class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDi
 private class ProgramDiffCallback : DiffUtil.ItemCallback<Program>() {
 
     override fun areItemsTheSame(
-        oldItem: Program,
-        newItem: Program
+        oldItem: Program, newItem: Program
     ): Boolean {
         return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(
-        oldItem: Program,
-        newItem: Program
+        oldItem: Program, newItem: Program
     ): Boolean {
         return oldItem == newItem
     }

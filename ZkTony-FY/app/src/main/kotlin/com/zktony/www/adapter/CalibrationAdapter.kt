@@ -1,7 +1,6 @@
 package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -18,9 +17,9 @@ import com.zktony.www.databinding.ItemCalibrationBinding
 class CalibrationAdapter :
     ListAdapter<Calibration, CalibrationAdapter.ViewHolder>(CalibrationDiffCallback()) {
 
-    private lateinit var onDeleteButtonClick: (Calibration) -> Unit
-    private lateinit var onEditButtonClick: (Calibration) -> Unit
-    private lateinit var onSelectClick: (Calibration) -> Unit
+    private var onDeleteButtonClick: (Calibration) -> Unit = {}
+    private var onEditButtonClick: (Calibration) -> Unit = {}
+    private var onCheckedClick: (Calibration) -> Unit = {}
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,7 +31,7 @@ class CalibrationAdapter :
             ),
             onDeleteButtonClick,
             onEditButtonClick,
-            onSelectClick
+            onCheckedClick
         )
     }
 
@@ -48,8 +47,8 @@ class CalibrationAdapter :
         this.onEditButtonClick = onEditButtonClick
     }
 
-    fun setOnSelectClick(onSelectClick: (Calibration) -> Unit) {
-        this.onSelectClick = onSelectClick
+    fun setOnCheckedClick(onCheckedClick: (Calibration) -> Unit) {
+        this.onCheckedClick = onCheckedClick
     }
 
 
@@ -57,36 +56,30 @@ class CalibrationAdapter :
         private val binding: ItemCalibrationBinding,
         private val onDeleteButtonClick: (Calibration) -> Unit,
         private val onEditButtonClick: (Calibration) -> Unit,
-        private val onSelectClick: (Calibration) -> Unit
+        private val onCheckedClick: (Calibration) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
         fun bind(item: Calibration) {
             binding.apply {
                 cali = item
                 order.text = (layoutPosition + 1).toString()
-                edit.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                with(select) {
+                    clickScale()
+                    setOnClickListener {
+                        onCheckedClick.invoke(item)
+                    }
+                }
+                with(edit) {
+                    clickScale()
+                    setOnClickListener {
                         onEditButtonClick.invoke(item)
                     }
                 }
-                delete.run {
-                    this.clickScale()
-                    this.setOnClickListener {
+                with(delete) {
+                    clickScale()
+                    setOnClickListener {
                         onDeleteButtonClick.invoke(item)
                     }
-                }
-                select.run {
-                    this.clickScale()
-                    this.setOnClickListener {
-                        if (item.status == 0) {
-                            onSelectClick.invoke(item)
-                        }
-                    }
-                }
-                if (layoutPosition % 2 == 0) {
-                    order.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    name.setBackgroundColor(Color.parseColor("#F5F5F5"))
                 }
                 executePendingBindings()
             }

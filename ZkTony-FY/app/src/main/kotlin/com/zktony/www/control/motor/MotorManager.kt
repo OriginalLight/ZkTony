@@ -5,7 +5,6 @@ import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import java.security.cert.X509CRL
 
 /**
  * @author: 刘贺贺

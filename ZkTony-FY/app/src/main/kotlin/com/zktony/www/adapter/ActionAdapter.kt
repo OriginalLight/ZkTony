@@ -24,11 +24,8 @@ class ActionAdapter : ListAdapter<Action, ActionAdapter.ViewHolder>(ActionDiffCa
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ItemActionBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            ),
-            onDeleteButtonClick
+                LayoutInflater.from(parent.context), parent, false
+            ), onDeleteButtonClick
         )
     }
 
@@ -41,8 +38,7 @@ class ActionAdapter : ListAdapter<Action, ActionAdapter.ViewHolder>(ActionDiffCa
     }
 
     class ViewHolder(
-        private val binding: ItemActionBinding,
-        private val onDeleteButtonClick: (Action) -> Unit
+        private val binding: ItemActionBinding, private val onDeleteButtonClick: (Action) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item: Action) {
             binding.apply {
@@ -65,8 +61,8 @@ class ActionAdapter : ListAdapter<Action, ActionAdapter.ViewHolder>(ActionDiffCa
                 cardView.setOnClickListener {
                     PopTip.show(R.mipmap.item_delete, "点击右侧图标删除")
                 }
-                delete.run {
-                    this.clickScale()
+                with(delete) {
+                    clickScale()
                     setOnClickListener {
                         onDeleteButtonClick.invoke(item)
                     }
@@ -80,15 +76,13 @@ class ActionAdapter : ListAdapter<Action, ActionAdapter.ViewHolder>(ActionDiffCa
 private class ActionDiffCallback : DiffUtil.ItemCallback<Action>() {
 
     override fun areItemsTheSame(
-        oldItem: Action,
-        newItem: Action
+        oldItem: Action, newItem: Action
     ): Boolean {
         return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(
-        oldItem: Action,
-        newItem: Action
+        oldItem: Action, newItem: Action
     ): Boolean {
         return oldItem == newItem
     }

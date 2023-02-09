@@ -40,7 +40,7 @@ class MotorRepository @Inject constructor(
                 motorList.add(Motor(id = 0, name = "X轴", address = 1))
                 motorList.add(Motor(id = 1, name = "Y轴", address = 2))
                 motorList.add(Motor(id = 2, name = "Z轴", address = 3))
-                for (i in 1..5) {
+                for (i in 1..6) {
                     val motor = Motor(
                         id = i + 2,
                         name = "泵$i",

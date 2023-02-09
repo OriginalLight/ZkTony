@@ -28,7 +28,7 @@
     <string name="hint_acceleration">加速（10–100）</string>
     <string name="hint_count">请输入执行次数</string>
     <string name="hint_deceleration">减速（10–100）</string>
-    <string name="hint_liquid_volume">请输入加液量（毫升）</string>
+    <string name="hint_liquid_volume">请输入加液量 μL</string>
     <string name="hint_order">请输入执行序号</string>
     <string name="hint_speed">转速（r/min）</string>
     <string name="hint_temperature">请输入温度（℃）</string>
@@ -110,10 +110,11 @@
     <string name="title_calibration_data">校准数据</string>
     <string name="setting_motor">电机设置</string>
     <string name="motor_name">电机名</string>
-    <string name="before_volume">预计加液体积/ML</string>
-    <string name="actual_volume">实际加液体积/ML</string>
+    <string name="before_volume">预计加液体积/μL</string>
+    <string name="actual_volume">实际加液体积/μL</string>
     <string name="operate">操作</string>
     <string name="pump_name">泵名</string>
     <string name="add_liquid">加液</string>
     <string name="save">保存</string>
+    <string name="checked">选中</string>
 </resources>

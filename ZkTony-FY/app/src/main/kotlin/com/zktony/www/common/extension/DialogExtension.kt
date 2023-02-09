@@ -7,7 +7,6 @@ import android.view.Gravity
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.EditText
 import android.widget.TextView
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
@@ -18,7 +17,6 @@ import com.kongzue.dialogx.util.TextInfo
 import com.zktony.www.R
 import com.zktony.www.common.app.CommonApplicationProxy
 import com.zktony.www.common.utils.Constants
-
 
 
 fun inputDialog(block: (String) -> Unit) {

@@ -3,77 +3,68 @@ package com.zktony.www.ui.calibration
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.room.entity.Calibration
-import com.zktony.www.data.repository.CalibrationDataRepository
 import com.zktony.www.data.repository.CalibrationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CalibrationViewModel @Inject constructor(
-    private val caliRepo: CalibrationRepository,
-    private val caliDataRepo: CalibrationDataRepository
+    private val calibrationRepository: CalibrationRepository
 ) : BaseViewModel() {
 
-    @Inject
-    lateinit var appViewModel: AppViewModel
-
-    private val _calibrationList = MutableStateFlow<List<Calibration>>(emptyList())
-    val calibrationList = _calibrationList.asStateFlow()
+    private val _uiState = MutableStateFlow<List<Calibration>?>(null)
+    val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            caliRepo.getAll().collect {
-                _calibrationList.value = it
+            calibrationRepository.getAll().distinctUntilChanged().collect {
+                _uiState.value = it
             }
         }
     }
 
-    /**
-     * 添加
-     * @param name String
-     */
-    fun add(name: String) {
+    fun insert(name: String) {
         viewModelScope.launch {
-            val list = caliRepo.getByName(name).first()
-            if (list.isNotEmpty()) {
-                PopTip.show("已存在相同名称")
-                return@launch
+            val cali = _uiState.value?.find { it.name == name }
+            if (cali != null) {
+                PopTip.show("校准程序名已存在")
+            } else {
+                val calibration = Calibration(name = name)
+                calibrationRepository.insert(calibration)
             }
-            val cali = Calibration(name = name)
-            val calibration = appViewModel.settings.value.motorUnits.cali
-            caliRepo.insert(
-                calibration.copy(
-                    id = cali.id,
-                    name = cali.name,
-                    status = if (calibrationList.value.isEmpty()) 1 else 0
-                )
-            )
         }
     }
 
-    /**
-     * 删除
-     * @param cali Calibration
-     */
-    fun delete(cali: Calibration) {
+    fun delete(calibration: Calibration) {
         viewModelScope.launch {
-            caliRepo.delete(cali)
-            caliDataRepo.deleteByCaliId(cali.id)
+            calibrationRepository.delete(calibration)
+            if (calibration.enable == 1) {
+                val cali = _uiState.value?.find { it.name == "默认" }
+                cali?.let { calibrationRepository.update(it.copy(enable = 1)) }
+            }
         }
     }
 
-    /**
-     * 选中
-     */
-    fun select(cali: Calibration) {
+    fun enable(calibration: Calibration) {
         viewModelScope.launch {
-            caliRepo.select(cali)
+            val cali = _uiState.value?.find { it.enable == 1 }
+            if (cali == null) {
+                calibrationRepository.update(calibration.copy(enable = 1))
+            } else {
+                if (cali.id != calibration.id) {
+                    calibrationRepository.updateBatch(
+                        listOf(
+                            cali.copy(enable = 0),
+                            calibration.copy(enable = 1)
+                        )
+                    )
+                }
+            }
         }
     }
 }
