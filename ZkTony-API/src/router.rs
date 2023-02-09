@@ -3,22 +3,5 @@ use axum::routing::get;
 use crate::handler;
 
 pub fn init() -> axum::Router {
-    axum::Router::new()
-        .route("/", get(handler::index))
-        .route("/category", get(handler::category::index))
-        .route(
-            "/category/add",
-            get(handler::category::add_ui).post(handler::category::add),
-        )
-        .route("/category/edit/:id", get(handler::category::edit_ui))
-        .route("/category/del/:id", get(handler::category::del))
-        .route("/category/del/:id/:real", get(handler::category::del))
-        .route("/category/articles/:id", get(handler::category::articles))
-        .route("/article", get(handler::article::index))
-        .route(
-            "/article/add",
-            get(handler::article::add_ui).post(handler::article::add),
-        )
-        .route("/article/tags", get(handler::article::list_with_tags))
-        .route("/version/:id", get(handler::version::get_by_id))
+    axum::Router::new().route("/version/:id", get(handler::version::get_by_id))
 }
