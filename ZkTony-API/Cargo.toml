@@ -1,20 +1,70 @@
-[package]
+[workspace]
+members = [
+"bin",
+"api",
+"service",
+"configs",
+"db",
+]
+
+
+[workspace.package]
+authors = ["zktony <15252114322@163.com>"]
 edition = "2021"
-name = "zktony-api"
-version = "0.0.1"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-askama = "0.11"
-axum = "0.6.4"
-chrono = "0.4"
-config = "0.13"
-dotenv = "0.15"
-mime = "0.3.16"
-sea-orm = {version = "0.11.0", features = ["runtime-tokio-native-tls", "sqlx-postgres", "debug-print"]}
-serde = {version = "1", features = ["derive"]}
+[workspace.dependencies]
+# axum 
+axum = "0"
+axum-extra = "0"
+axum-server = "0"
+hyper = "0"
+mime = "0"
+tower = "0"
+tower-http = "0"
+#
+anyhow = "1"
+bytes = "1"
+futures = "0.3"
+
+async-stream = "0.3"
+chrono = "0"
+headers = "0.3"
+jsonwebtoken = "8"
+once_cell = "1"
+# 用于生成可排序的唯一id
+scru128 = "2"
+serde = "1"
 serde_json = "1"
-tokio = {version = "1", features = ["full"]}
+tokio = "1"
+tokio-stream = '0'
+#  "tracing"
+toml = "0"
+# tracing
+time = "0.3"
 tracing = "0.1"
+tracing-appender = "0.2"
+# tracing-log = "0.1"
 tracing-subscriber = "0.3"
+
+# 计划任务
+delay_timer = "0"
+reqwest = "0"
+user-agent-parser = "0.3"
+
+#  随机数
+md5 = "0.7"
+rand = "0.8"
+# 系统信息
+sysinfo = "0"
+# 验证码
+captcha_rust = "0.1.3"
+# skyTable  可选依赖
+skytable = "0"
+# swagger openApi
+# utoipa = "2"
+# utoipa-swagger-ui = "2"
+
+# sea-orm
+sea-orm = "0"
