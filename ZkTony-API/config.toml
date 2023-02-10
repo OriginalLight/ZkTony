@@ -1,0 +1,6 @@
+
+[server]
+address = "0.0.0.0:9765"
+
+[database]
+link = 'postgres://postgres:dev112233@120.48.67.96:5432/zktony'

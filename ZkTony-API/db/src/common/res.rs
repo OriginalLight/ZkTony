@@ -10,15 +10,15 @@ use serde::{Deserialize, Serialize};
 /// 查 数据返回
 pub struct ListData<T> {
     pub list: Vec<T>,
-    pub total: usize,
-    pub total_pages: usize,
-    pub page_num: usize,
+    pub total: u64,
+    pub total_pages: u64,
+    pub page_num: u64,
 }
 /// 分页参数
-#[derive(Deserialize, Debug, Serialize, Default)]
+#[derive(Deserialize, Clone, Debug, Serialize, Default)]
 pub struct PageParams {
-    pub page_num: Option<usize>,
-    pub page_size: Option<usize>,
+    pub page_num: Option<u64>,
+    pub page_size: Option<u64>,
 }
 
 /// 数据统一返回格式
@@ -49,10 +49,7 @@ where
             Err(e) => {
                 return Response::builder()
                     .status(StatusCode::INTERNAL_SERVER_ERROR)
-                    .header(
-                        header::CONTENT_TYPE,
-                        HeaderValue::from_static(mime::TEXT_PLAIN_UTF_8.as_ref()),
-                    )
+                    .header(header::CONTENT_TYPE, HeaderValue::from_static(mime::TEXT_PLAIN_UTF_8.as_ref()))
                     .body(body::boxed(Full::from(e.to_string())))
                     .unwrap();
             }
