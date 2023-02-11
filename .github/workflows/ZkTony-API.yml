@@ -9,9 +9,8 @@ on:
   push:
     branches:
       - master
-    paths:
-      - 'ZkTony-API/**'
-  pull_request:
+    tags:
+      - 'v*'
     paths:
       - 'ZkTony-API/**'
 
@@ -108,4 +107,4 @@ jobs:
           COSIGN_EXPERIMENTAL: "true"
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: echo "${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ steps.meta.outputs.version }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+        run: echo "${{ env.REGISTRY }}/${{ IMAGE_NAME }}:${{ steps.meta.outputs.version }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
