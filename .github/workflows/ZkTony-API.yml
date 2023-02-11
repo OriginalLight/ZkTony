@@ -8,7 +8,7 @@ name: ZkTony-API
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'ZkTony-API/**'
   pull_request:
@@ -93,7 +93,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           file: ${{ env.SAMPLE_PATH }}/Dockerfile
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
 

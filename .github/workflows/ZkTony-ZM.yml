@@ -3,7 +3,7 @@ name: ZkTony-ZM
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'ZkTony-ZM/**'
   pull_request:
