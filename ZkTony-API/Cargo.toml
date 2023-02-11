@@ -10,7 +10,7 @@ members = [
 
 [workspace.package]
 authors = ["zktony <15252114322@163.com>"]
-description = "Zktony's API Server"
+description = "Zktony API Server"
 edition = "2021"
 version = "0.1.0"
 
