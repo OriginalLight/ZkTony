@@ -1,16 +1,13 @@
-use service::system;
 use axum::extract::Query;
 use db::{
     common::res::Res,
     db_conn,
-    system::{
-        entities::version,
-        models::version::VersionDbSearchReq
-    },
+    system::{models::version::VersionDbSearchReq, prelude::VersionModel},
     DB,
 };
+use service::system;
 
-pub async fn get_by_id(Query(req): Query<VersionDbSearchReq>) -> Res<version::Model> {
+pub async fn get_by_id(Query(req): Query<VersionDbSearchReq>) -> Res<VersionModel> {
     let db = DB.get_or_init(db_conn).await;
     let res = system::version::get_by_id(db, req.id).await;
 

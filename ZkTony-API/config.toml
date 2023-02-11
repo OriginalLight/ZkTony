@@ -1,6 +1,11 @@
-
 [server]
-address = "0.0.0.0:9765"
+address = "127.0.0.1:9765"
+
+[log]
+dir = "log" 
+enable_oper_log = true 
+file = "app_log" 
+log_level = "DEBUG" #  TRACE DEBUG  INFO  WARN ERROR
 
 [database]
 link = 'postgres://postgres:dev112233@120.48.67.96:5432/zktony'

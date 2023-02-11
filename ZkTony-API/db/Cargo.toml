@@ -1,7 +1,7 @@
 [package]
+edition = "2021"
 name = "db"
 version = "0.1.0"
-edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -9,21 +9,23 @@ edition = "2021"
 # 
 configs = {path = "../configs"}
 #
-axum = {workspace = true,default-features =false}
-mime = {workspace = true,default-features =false}
+axum = {workspace = true, default-features = false}
+mime = {workspace = true, default-features = false}
 
-chrono = {workspace = true,default-features =false,  features = ["serde"]}
+chrono = {workspace = true, default-features = false, features = ["serde"]}
 once_cell = {workspace = true}
 
 # regex = {workspace = true}
-serde = {workspace = true,default-features =false, features = ["derive"]}
-serde_json = {workspace = true,default-features =false}
-tokio = {workspace = true,default-features =false,features=["parking_lot"]}
-tracing = {workspace = true,default-features =false }
-
+serde = {workspace = true, default-features = false, features = ["derive"]}
+serde_json = {workspace = true, default-features = false}
+tokio = {workspace = true, default-features = false, features = ["parking_lot"]}
+tracing = {workspace = true, default-features = false}
 
 # sea-orm
-sea-orm = {workspace = true, default-features = false,features = ["macros", "runtime-tokio-native-tls","with-chrono"]}
+sea-orm = {workspace = true, default-features = false, features = ["macros", "runtime-tokio-native-tls", "with-chrono"]}
 
 [features]
+default = ["postgres", "mysql", "sqlite"]
+mysql = ["sea-orm/sqlx-mysql"]
 postgres = ["sea-orm/sqlx-postgres"]
+sqlite = ["sea-orm/sqlx-sqlite"]

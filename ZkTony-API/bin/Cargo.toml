@@ -1,8 +1,8 @@
 [package]
 default-run = "zktony-api"
+edition = "2021"
 name = "zktony-api"
 version = "0.1.0"
-edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -10,16 +10,16 @@ edition = "2021"
 api = {path = "../api"}
 configs = {path = "../configs"}
 service = {path = "../service"}
+utils = {path = "../utils"}
 
 # axum
-axum = {workspace = true, default-features =false, features = ["http2"]}
-axum-server = { workspace = true, default-features =false, features = ["tls-rustls"] }
-axum-extra = {workspace = true,default-features =false, features = ["spa"]}
-hyper = { workspace = true, default-features =false }
-tokio = {workspace = true,default-features =false,  features = ["rt-multi-thread", "macros", "parking_lot", "signal"]}
-tower-http = {workspace = true, default-features =false, features = ["cors","fs","compression-gzip"]}  #compression-gzip
+axum = {workspace = true, default-features = false, features = ["http2"]}
+axum-extra = {workspace = true, default-features = false, features = ["spa"]}
+axum-server = {workspace = true, default-features = false, features = ["tls-rustls"]}
+hyper = {workspace = true, default-features = false}
+tokio = {workspace = true, default-features = false, features = ["rt-multi-thread", "macros", "parking_lot", "signal"]}
 
 #
-tracing ={workspace = true,default-features =false }
-tracing-appender = {workspace = true,default-features =false }
-tracing-subscriber = {workspace = true,default-features =false,  features = ["json", "env-filter", "local-time", "registry"]}
+tracing = {workspace = true, default-features = false}
+tracing-appender = {workspace = true, default-features = false}
+tracing-subscriber = {workspace = true, default-features = false, features = ["json", "env-filter", "local-time", "registry"]}
