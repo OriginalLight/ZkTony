@@ -1,0 +1,22 @@
+[package]
+edition = "2021"
+name = "utils"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+#
+configs = {path = "../configs"}
+db = {path = "../db"}
+# 
+once_cell = {workspace = true, default-features = false}
+# 
+tokio = {workspace = true, default-features = false}
+# tracing
+tracing = {workspace = true, default-features = false}
+#
+anyhow = {workspace = true, default-features = false}
+
+time = {workspace = true}
+tracing-subscriber = {workspace = true, default-features = false}

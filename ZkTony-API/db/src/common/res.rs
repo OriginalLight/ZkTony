@@ -49,7 +49,10 @@ where
             Err(e) => {
                 return Response::builder()
                     .status(StatusCode::INTERNAL_SERVER_ERROR)
-                    .header(header::CONTENT_TYPE, HeaderValue::from_static(mime::TEXT_PLAIN_UTF_8.as_ref()))
+                    .header(
+                        header::CONTENT_TYPE,
+                        HeaderValue::from_static(mime::TEXT_PLAIN_UTF_8.as_ref()),
+                    )
                     .body(body::boxed(Full::from(e.to_string())))
                     .unwrap();
             }
