@@ -6,20 +6,15 @@ pub struct Entity;
 
 impl EntityName for Entity {
     fn table_name(&self) -> &str {
-        "log_data"
+        "log_detail"
     }
 }
 
 #[derive(Clone, Debug, PartialEq, DeriveModel, DeriveActiveModel, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Model {
     pub id: String,
     pub log_id: String,
-    pub motor: i32,
-    pub voltage: f64,
-    pub current: f64,
-    pub time: f64,
-    pub upload: i32,
+    pub content: String,
     pub create_time: Option<DateTime>,
 }
 
@@ -27,11 +22,7 @@ pub struct Model {
 pub enum Column {
     Id,
     LogId,
-    Motor,
-    Voltage,
-    Current,
-    Time,
-    Upload,
+    Content,
     CreateTime,
 }
 
@@ -56,11 +47,7 @@ impl ColumnTrait for Column {
         match self {
             Self::Id => ColumnType::String(Some(32u32)).def(),
             Self::LogId => ColumnType::String(Some(32u32)).def(),
-            Self::Motor => ColumnType::Integer.def(),
-            Self::Voltage => ColumnType::Float.def(),
-            Self::Current => ColumnType::Float.def(),
-            Self::Time => ColumnType::Float.def(),
-            Self::Upload => ColumnType::Integer.def(),
+            Self::Content => ColumnType::Text.def(),
             Self::CreateTime => ColumnType::DateTime.def().null(),
         }
     }

@@ -4,7 +4,7 @@ import com.zktony.www.BuildConfig
 import com.zktony.www.common.network.adapter.NetworkResponseAdapterFactory
 import com.zktony.www.common.network.converter.GsonConverterFactory
 import com.zktony.www.common.network.interceptor.logInterceptor
-import com.zktony.www.common.network.service.SystemService
+import com.zktony.www.common.network.service.ApplicationService
 import com.zktony.www.common.utils.Constants
 import dagger.Module
 import dagger.Provides
@@ -49,8 +49,8 @@ object RetrofitModule {
 
     @Singleton
     @Provides
-    fun provideSystemService(retrofit: Retrofit): SystemService {
-        return retrofit.create(SystemService::class.java)
+    fun provideApplicationService(retrofit: Retrofit): ApplicationService {
+        return retrofit.create(ApplicationService::class.java)
     }
 
 }

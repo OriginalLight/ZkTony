@@ -8,4 +8,4 @@ file = "app_log"
 log_level = "DEBUG" #  TRACE DEBUG  INFO  WARN ERROR
 
 [database]
-link = 'postgres://postgres:dev112233@120.48.67.96:5432/zktony'
+link = "postgres://postgres:123456@182.160.14.59:30432/zktony"

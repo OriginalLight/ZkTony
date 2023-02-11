@@ -16,15 +16,14 @@ import com.zktony.www.common.app.CommonApplicationProxy
 import com.zktony.www.common.extension.*
 import com.zktony.www.common.network.download.DownloadManager
 import com.zktony.www.common.network.download.DownloadState
+import com.zktony.www.common.network.model.Application
 import com.zktony.www.common.network.result.NetworkResult
+import com.zktony.www.common.repository.ApplicationRepository
 import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Constants
-import com.zktony.www.common.utils.Constants.DEVICE_ID
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
-import com.zktony.www.data.model.Version
-import com.zktony.www.data.repository.MotorRepository
-import com.zktony.www.data.repository.SystemRepository
+import com.zktony.www.common.repository.MotorRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,14 +37,14 @@ import javax.inject.Inject
 class AdminViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     private val motorRepository: MotorRepository,
-    private val systemRepository: SystemRepository,
+    private val applicationRepository: ApplicationRepository,
 ) : BaseViewModel() {
 
     @Inject
     lateinit var appViewModel: AppViewModel
 
     private val _file = MutableStateFlow<File?>(null)
-    private val _version = MutableStateFlow<Version?>(null)
+    private val _version = MutableStateFlow<Application?>(null)
     private val _progress = MutableStateFlow(0)
     val file = _file.asStateFlow()
     val version = _version.asStateFlow()
@@ -145,13 +144,12 @@ class AdminViewModel @Inject constructor(
 
     /**
      *  下载apk
-     *  @param version [Version]
      */
-    fun doRemoteUpdate(version: Version) {
+    fun doRemoteUpdate(application: Application) {
         viewModelScope.launch {
             PopTip.show("开始下载")
             DownloadManager.download(
-                version.url,
+                application.download_url,
                 File(CommonApplicationProxy.application.getExternalFilesDir(null), "update.apk")
             ).collect {
                 when (it) {
@@ -180,10 +178,10 @@ class AdminViewModel @Inject constructor(
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (CommonApplicationProxy.application.isNetworkAvailable()) {
-                systemRepository.getVersionInfo(DEVICE_ID).collect {
+                applicationRepository.getById().collect {
                     when (it) {
                         is NetworkResult.Success -> {
-                            if (it.data.versionCode > BuildConfig.VERSION_CODE) {
+                            if (it.data.version_code > BuildConfig.VERSION_CODE) {
                                 _version.value = it.data
                             } else {
                                 PopTip.show("已经是最新版本")

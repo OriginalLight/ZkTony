@@ -28,19 +28,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
         WorkerManager.instance.createWorker()
 
-        initMotor()
-
         noticeDialog()
-    }
-
-    private fun initMotor() {
-        lifecycleScope.launch {
-            appViewModel.settings.collect {
-                if (it.motor.isNotEmpty() && it.calibration.isNotEmpty()) {
-                    MotorManager.instance.init(it.motor, it.calibration)
-                }
-            }
-        }
     }
 
 }

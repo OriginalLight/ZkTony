@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.room.entity.Hole
 import com.zktony.www.common.room.entity.WorkPlate
-import com.zktony.www.data.repository.WorkRepository
+import com.zktony.www.common.repository.WorkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

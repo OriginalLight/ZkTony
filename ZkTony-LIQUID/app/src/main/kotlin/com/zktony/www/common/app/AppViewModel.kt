@@ -6,17 +6,15 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.www.common.room.entity.Calibration
-import com.zktony.www.common.room.entity.Motor
+import com.zktony.www.common.repository.CalibrationRepository
+import com.zktony.www.common.repository.MotorRepository
+import com.zktony.www.common.repository.PlateRepository
 import com.zktony.www.common.room.entity.Plate
 import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.repository.CalibrationRepository
-import com.zktony.www.data.repository.MotorRepository
-import com.zktony.www.data.repository.PlateRepository
+import com.zktony.www.control.motor.MotorManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,8 +38,8 @@ class AppViewModel @Inject constructor(
         viewModelScope.launch {
             launch {
                 plateRepository.init()
-                calibrationRepository.init()
                 motorRepository.init()
+                calibrationRepository.init()
             }
             launch {
                 dataStore.data.map {
@@ -51,18 +49,18 @@ class AppViewModel @Inject constructor(
                 }
             }
             launch {
-                motorRepository.getAll().distinctUntilChanged().collect {
-                    _settings.value = settings.value.copy(motor = it)
-                }
-            }
-            launch {
                 plateRepository.load().collect {
                     _settings.value = settings.value.copy(plate = it)
                 }
             }
             launch {
-                calibrationRepository.getAll().distinctUntilChanged().collect {
-                    _settings.value = settings.value.copy(calibration = it)
+                motorRepository.getAll().collect {
+                    MotorManager.instance.initMotor(it)
+                }
+            }
+            launch {
+                calibrationRepository.getAll().collect {
+                    MotorManager.instance.initCalibration(it)
                 }
             }
         }
@@ -71,7 +69,5 @@ class AppViewModel @Inject constructor(
 
 data class Settings(
     val bar: Boolean = false,
-    val motor: List<Motor> = emptyList(),
-    val calibration: List<Calibration> = emptyList(),
     val plate: List<Plate> = emptyList()
 )

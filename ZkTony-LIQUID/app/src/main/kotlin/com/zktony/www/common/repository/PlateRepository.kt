@@ -1,4 +1,4 @@
-package com.zktony.www.data.repository
+package com.zktony.www.common.repository
 
 import com.zktony.www.common.room.dao.HoleDao
 import com.zktony.www.common.room.dao.PlateDao

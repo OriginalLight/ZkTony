@@ -6,27 +6,32 @@ pub struct Entity;
 
 impl EntityName for Entity {
     fn table_name(&self) -> &str {
-        "version"
+        "application"
     }
 }
 
 #[derive(Clone, Debug, PartialEq, DeriveModel, DeriveActiveModel, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub struct Model {
     pub id: i32,
-    pub url: String,
+    pub application_id: String,
+    pub build_type: String,
+    pub download_url: String,
     pub version_name: String,
     pub version_code: i32,
     pub description: String,
+    pub create_time: Option<DateTime>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
 pub enum Column {
     Id,
-    Url,
+    ApplicationId,
+    BuildType,
+    DownloadUrl,
     VersionName,
     VersionCode,
     Description,
+    CreateTime,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DerivePrimaryKey)]
@@ -49,10 +54,13 @@ impl ColumnTrait for Column {
     fn def(&self) -> ColumnDef {
         match self {
             Self::Id => ColumnType::Integer.def(),
-            Self::Url => ColumnType::String(Some(32u32)).def(),
-            Self::VersionName => ColumnType::String(Some(30u32)).def(),
+            Self::ApplicationId => ColumnType::String(Some(32u32)).def(),
+            Self::BuildType => ColumnType::String(Some(32u32)).def(),
+            Self::DownloadUrl => ColumnType::String(Some(32u32)).def(),
+            Self::VersionName => ColumnType::String(Some(32u32)).def(),
             Self::VersionCode => ColumnType::Integer.def(),
-            Self::Description => ColumnType::String(Some(20u32)).def(),
+            Self::Description => ColumnType::Text.def(),
+            Self::CreateTime => ColumnType::DateTime.def(),
         }
     }
 }
