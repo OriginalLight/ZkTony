@@ -3,7 +3,7 @@ name: ZkTony-LIQUID
 on:
   push:
     branches:
-      - main
+      - master
     paths:
       - 'ZkTony-LIQUID/**'
   pull_request:
