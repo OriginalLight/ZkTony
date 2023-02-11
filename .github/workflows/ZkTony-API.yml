@@ -77,10 +77,10 @@ jobs:
         id: build-and-push
         uses: docker/build-push-action@v4
         with:
-          context: ${{ env.SAMPLE_PATH }}
+          context: .
           push: true
           tags: zktony/api:latest
-          file: Dockerfile
+          file: ${{ env.SAMPLE_PATH }}/Dockerfile
           labels: api
 
       # Sign the resulting Docker image digest except on PRs.
