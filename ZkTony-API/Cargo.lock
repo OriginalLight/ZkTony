@@ -2665,11 +2665,8 @@ dependencies = [
 name = "utils"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "configs",
- "db",
  "once_cell",
- "time 0.3.17",
  "tokio",
  "tracing",
  "tracing-subscriber",
