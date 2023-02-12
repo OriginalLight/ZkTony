@@ -3,6 +3,7 @@ use serde::Deserialize;
 /// 配置文件
 #[derive(Debug, Deserialize)]
 pub struct Configs {
+    pub cert: Cert,
     pub database: Database,
     pub server: Server,
     pub metrics: Metrics,
@@ -13,12 +14,24 @@ pub struct Configs {
 #[derive(Debug, Deserialize)]
 pub struct Metrics {
     pub address: String,
+    pub timeout: u64,
 }
 
 /// server 配置文件
 #[derive(Debug, Deserialize)]
 pub struct Server {
+    pub name: String,
+    pub version: String,
     pub address: String,
+    pub ssl: bool,
+    pub content_gzip: bool,
+}
+
+// cert 配置文件
+#[derive(Debug, Deserialize)]
+pub struct Cert {
+    pub cert: String,
+    pub key: String,
 }
 
 /// 日志配置

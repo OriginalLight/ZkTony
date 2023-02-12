@@ -14,9 +14,9 @@ RUN apt-get update && apt-get install -y libssl-dev pkg-config
 # which can take a long time within the docker context. Docker will cache it.
 RUN USER=root cargo init
 COPY Cargo.toml Cargo.toml
-COPY config.toml config.toml
 COPY api api
 COPY bin bin
+COPY config config
 COPY configs configs
 COPY db db
 COPY metrics metrics
@@ -34,7 +34,7 @@ WORKDIR /app
 
 # copy server binary from build stage
 COPY --from=builder /code/target/release/zktony-api zktony-api
-COPY --from=builder /code/config.toml config.toml
+COPY --from=builder /code/config config
 
 # indicate what port the server is running on
 EXPOSE 9765

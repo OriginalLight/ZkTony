@@ -15,8 +15,10 @@ utils = {path = "../utils"}
 
 # axum
 axum = {workspace = true, default-features = false}
+axum-server = {workspace = true, default-features = false, features = ["tls-rustls"]}
 hyper = {workspace = true, default-features = false}
 tokio = {workspace = true, default-features = false, features = ["rt-multi-thread", "macros", "parking_lot", "signal"]}
+tower-http = {workspace = true, default-features = false, features = ["cors", "fs", "compression-gzip"]}
 
 #
 tracing = {workspace = true, default-features = false}

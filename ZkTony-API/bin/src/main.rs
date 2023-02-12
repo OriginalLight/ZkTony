@@ -1,12 +1,13 @@
-// use std::time::Duration;
-
-use std::{net::SocketAddr, str::FromStr};
-
-//
-use axum::{middleware, response::Html, Router};
+use axum::{http::Method, middleware, response::Html, Router};
+use axum_server::tls_rustls::RustlsConfig;
 use configs::CFG;
 use metrics::system::metrics::track_metrics;
+use std::{net::SocketAddr, str::FromStr};
 use tokio::signal;
+use tower_http::{
+    compression::{predicate::NotForContentType, CompressionLayer, DefaultPredicate, Predicate},
+    cors::{Any, CorsLayer},
+};
 use tracing_subscriber::{fmt, layer::SubscriberExt, EnvFilter, Registry};
 use utils::my_env::{self, RT};
 
@@ -22,25 +23,66 @@ fn metrics_app() -> Router {
 
 async fn start_main_server() {
     let app = main_app();
+    //  跨域
+    let cors = CorsLayer::new()
+        .allow_methods(vec![Method::GET, Method::POST, Method::PUT, Method::DELETE])
+        .allow_origin(Any)
+        .allow_headers(Any);
+    let app = app.layer(cors);
+    //  压缩
+    let app = match &CFG.server.content_gzip {
+        true => {
+            //  开启压缩后 SSE 数据无法返回  text/event-stream 单独处理不压缩
+            let predicate =
+                DefaultPredicate::new().and(NotForContentType::new("text/event-stream"));
+            app.layer(CompressionLayer::new().compress_when(predicate))
+        }
+        false => app,
+    };
     let app = app.fallback(|| async { Html("<h1>404 Not Found</h1>") });
     let addr = SocketAddr::from_str(&CFG.server.address).unwrap();
     tracing::info!("Server listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .with_graceful_shutdown(shutdown_signal())
-        .await
-        .unwrap()
+    // ssl
+    match CFG.server.ssl {
+        true => {
+            let config = RustlsConfig::from_pem_file(&CFG.cert.cert, &CFG.cert.key)
+                .await
+                .unwrap();
+            axum_server::bind_rustls(addr, config)
+                .serve(app.into_make_service())
+                .await
+                .unwrap()
+        }
+
+        false => axum::Server::bind(&addr)
+            .serve(app.into_make_service())
+            .with_graceful_shutdown(shutdown_signal())
+            .await
+            .unwrap(),
+    }
 }
 
 async fn start_metrics_server() {
     let app = metrics_app();
     let addr = SocketAddr::from_str(&CFG.metrics.address).unwrap();
     tracing::info!("Metrics server listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .with_graceful_shutdown(shutdown_signal())
-        .await
-        .unwrap()
+    match CFG.server.ssl {
+        true => {
+            let config = RustlsConfig::from_pem_file(&CFG.cert.cert, &CFG.cert.key)
+                .await
+                .unwrap();
+            axum_server::bind_rustls(addr, config)
+                .serve(app.into_make_service())
+                .await
+                .unwrap()
+        }
+
+        false => axum::Server::bind(&addr)
+            .serve(app.into_make_service())
+            .with_graceful_shutdown(shutdown_signal())
+            .await
+            .unwrap(),
+    }
 }
 
 // #[tokio::main]
