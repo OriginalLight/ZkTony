@@ -120,8 +120,7 @@ fn main() {
             );
 
         tracing::subscriber::set_global_default(logger).unwrap();
-        let (_main_server, _metrics_server) =
-            tokio::join!(start_main_server(), start_metrics_server());
+        tokio::join!(start_main_server(), start_metrics_server());
     })
 }
 
