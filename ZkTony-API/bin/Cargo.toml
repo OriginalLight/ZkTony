@@ -9,13 +9,12 @@ version = "0.1.0"
 [dependencies]
 api = {path = "../api"}
 configs = {path = "../configs"}
+metrics = {path = "../metrics"}
 service = {path = "../service"}
 utils = {path = "../utils"}
 
 # axum
-axum = {workspace = true, default-features = false, features = ["http2"]}
-axum-extra = {workspace = true, default-features = false, features = ["spa"]}
-axum-server = {workspace = true, default-features = false, features = ["tls-rustls"]}
+axum = {workspace = true, default-features = false}
 hyper = {workspace = true, default-features = false}
 tokio = {workspace = true, default-features = false, features = ["rt-multi-thread", "macros", "parking_lot", "signal"]}
 

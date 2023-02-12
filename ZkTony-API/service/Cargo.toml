@@ -15,7 +15,5 @@ chrono = {workspace = true, default-features = false, features = ["serde"]}
 sea-orm = {workspace = true, default-features = false, features = ["macros", "runtime-tokio-native-tls", "debug-print"]}
 
 [features]
-default = ["postgres", "mysql", "sqlite"]
-mysql = ["sea-orm/sqlx-mysql"]
+default = ["postgres"]
 postgres = ["sea-orm/sqlx-postgres"]
-sqlite = ["sea-orm/sqlx-sqlite"]

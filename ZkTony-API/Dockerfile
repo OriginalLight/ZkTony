@@ -19,6 +19,7 @@ COPY api api
 COPY bin bin
 COPY configs configs
 COPY db db
+COPY metrics metrics
 COPY service service
 COPY utils utils
 
@@ -37,6 +38,7 @@ COPY --from=builder /code/config.toml config.toml
 
 # indicate what port the server is running on
 EXPOSE 9765
+EXPOSE 9000
 
 # run server
 CMD [ "/app/zktony-api" ]

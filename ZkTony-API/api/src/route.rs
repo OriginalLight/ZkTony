@@ -7,9 +7,14 @@ use super::system;
 
 pub fn api() -> Router {
     Router::new()
+        .nest("/", index_api())
         .nest("/application", application_api())
         .nest("/log", log_api())
         .nest("/program", program_api())
+}
+
+pub fn index_api() -> Router {
+    Router::new().route("/", get(system::index::index))
 }
 
 pub fn application_api() -> Router {

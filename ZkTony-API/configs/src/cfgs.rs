@@ -3,10 +3,16 @@ use serde::Deserialize;
 /// 配置文件
 #[derive(Debug, Deserialize)]
 pub struct Configs {
-    /// 程序配置
-    pub server: Server,
     pub database: Database,
+    pub server: Server,
+    pub metrics: Metrics,
     pub log: Log,
+}
+
+// metrics 配置文件
+#[derive(Debug, Deserialize)]
+pub struct Metrics {
+    pub address: String,
 }
 
 /// server 配置文件

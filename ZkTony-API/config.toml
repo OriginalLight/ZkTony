@@ -1,6 +1,9 @@
 [server]
 address = "0.0.0.0:9765"
 
+[metrics]
+address = "0.0.0.0:9000"
+
 [log]
 dir = "log" 
 enable_oper_log = true 
