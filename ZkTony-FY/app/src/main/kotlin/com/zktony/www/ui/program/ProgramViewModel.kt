@@ -4,8 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.room.entity.Program
-import com.zktony.www.data.repository.ActionRepository
-import com.zktony.www.data.repository.ProgramRepository
+import com.zktony.www.common.repository.ActionRepository
+import com.zktony.www.common.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

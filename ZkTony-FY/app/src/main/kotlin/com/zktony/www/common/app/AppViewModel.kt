@@ -7,13 +7,12 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.www.common.room.entity.Calibration
+import com.zktony.www.common.repository.CalibrationRepository
+import com.zktony.www.common.repository.ContainerRepository
+import com.zktony.www.common.repository.MotorRepository
 import com.zktony.www.common.room.entity.Container
-import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.repository.CalibrationRepository
-import com.zktony.www.data.repository.ContainerRepository
-import com.zktony.www.data.repository.MotorRepository
+import com.zktony.www.control.motor.MotorManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -60,7 +59,7 @@ class AppViewModel @Inject constructor(
             launch {
                 motorRepository.getAll().collect {
                     if (it.isNotEmpty()) {
-                        _settings.value = _settings.value.copy(motor = it)
+                        MotorManager.instance.initMotor(it)
                     }
                 }
             }
@@ -74,7 +73,7 @@ class AppViewModel @Inject constructor(
             launch {
                 calibrationRepository.getAll().collect {
                     if (it.isNotEmpty()) {
-                        _settings.value = _settings.value.copy(calibration = it)
+                        MotorManager.instance.initCali(it)
                     }
                 }
             }
@@ -85,7 +84,5 @@ class AppViewModel @Inject constructor(
 data class Settings(
     val temp: Float = 3f,
     val bar: Boolean = false,
-    val motor: List<Motor> = emptyList(),
-    val calibration: List<Calibration> = emptyList(),
     val container: Container = Container(),
 )

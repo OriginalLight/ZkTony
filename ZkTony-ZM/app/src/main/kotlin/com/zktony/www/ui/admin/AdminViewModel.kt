@@ -18,11 +18,10 @@ import com.zktony.www.common.extension.installApk
 import com.zktony.www.common.extension.isNetworkAvailable
 import com.zktony.www.common.network.download.DownloadManager
 import com.zktony.www.common.network.download.DownloadState
+import com.zktony.www.common.network.model.Application
 import com.zktony.www.common.network.result.NetworkResult
+import com.zktony.www.common.repository.ApplicationRepository
 import com.zktony.www.common.utils.Constants
-import com.zktony.www.common.utils.Constants.DEVICE_ID
-import com.zktony.www.data.model.Version
-import com.zktony.www.data.repository.SystemRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,17 +32,17 @@ import javax.inject.Inject
 @HiltViewModel
 class AdminViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
-    private val systemRepository: SystemRepository,
+    private val applicationRepository: ApplicationRepository,
 ) : BaseViewModel() {
 
     @Inject
     lateinit var appViewModel: AppViewModel
 
     private val _file = MutableStateFlow<File?>(null)
-    private val _version = MutableStateFlow<Version?>(null)
+    private val _application = MutableStateFlow<Application?>(null)
     private val _progress = MutableStateFlow(0)
     val file = _file.asStateFlow()
-    val version = _version.asStateFlow()
+    val application = _application.asStateFlow()
     val progress = _progress.asStateFlow()
 
     /**
@@ -135,7 +134,7 @@ class AdminViewModel @Inject constructor(
     fun toggleInterval(interval: Int) {
         viewModelScope.launch {
             dataStore.edit { preferences ->
-                preferences[intPreferencesKey(Constants.INTERVAL)] = interval
+                preferences[intPreferencesKey(Constants.INTERVAL)] = minOf(interval, 10)
             }
         }
     }
@@ -147,7 +146,7 @@ class AdminViewModel @Inject constructor(
     fun toggleDuration(duration: Int) {
         viewModelScope.launch {
             dataStore.edit { preferences ->
-                preferences[intPreferencesKey(Constants.DURATION)] = duration
+                preferences[intPreferencesKey(Constants.DURATION)] = minOf(duration, 200)
             }
         }
     }
@@ -159,7 +158,7 @@ class AdminViewModel @Inject constructor(
     fun toggleMotorSpeed(speed: Int) {
         viewModelScope.launch {
             dataStore.edit { preferences ->
-                preferences[intPreferencesKey(Constants.MOTOR_SPEED)] = speed
+                preferences[intPreferencesKey(Constants.MOTOR_SPEED)] = minOf(speed, 250)
             }
         }
     }
@@ -170,7 +169,7 @@ class AdminViewModel @Inject constructor(
      */
     fun cleanUpdate() {
         _file.value = null
-        _version.value = null
+        _application.value = null
     }
 
     /**
@@ -189,13 +188,13 @@ class AdminViewModel @Inject constructor(
 
     /**
      *  下载apk
-     *  @param version [Version]
+     *  @param application [Version]
      */
-    fun doRemoteUpdate(version: Version) {
+    fun doRemoteUpdate(application: Application) {
         viewModelScope.launch {
             PopTip.show("开始下载")
             DownloadManager.download(
-                version.url,
+                application.download_url,
                 File(CommonApplicationProxy.application.getExternalFilesDir(null), "update.apk")
             ).collect {
                 when (it) {
@@ -224,11 +223,11 @@ class AdminViewModel @Inject constructor(
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (CommonApplicationProxy.application.isNetworkAvailable()) {
-                systemRepository.getVersionInfo(DEVICE_ID).collect {
+                applicationRepository.getById().collect {
                     when (it) {
                         is NetworkResult.Success -> {
-                            if (it.data.versionCode > BuildConfig.VERSION_CODE) {
-                                _version.value = it.data
+                            if (it.data.version_code > BuildConfig.VERSION_CODE) {
+                                _application.value = it.data
                             } else {
                                 PopTip.show("已经是最新版本")
                             }

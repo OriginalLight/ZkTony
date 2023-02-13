@@ -1,34 +1,22 @@
 package com.zktony.www.ui.admin
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.google.android.material.button.MaterialButton
-import com.kongzue.dialogx.dialogs.CustomDialog
-import com.kongzue.dialogx.dialogs.FullScreenDialog
 import com.kongzue.dialogx.dialogs.PopTip
-import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.*
-import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.model.Version
 import com.zktony.www.databinding.FragmentAdminBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.io.File
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -41,10 +29,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
-        imageButtonEvent()
-        initSwitch()
-        initEditView()
-        initTextView()
+        initView()
     }
 
     /**
@@ -56,32 +41,83 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.file.collect {
-                        it?.let { showLocalUpdate(it) }
+                        it?.let {
+                            updateDialog(
+                                title = "发现本地新版本",
+                                message = "是否更新？",
+                                block = {
+                                    requireContext().installApk(it)
+                                    viewModel.cleanUpdate()
+                                }, block1 = {
+                                    viewModel.cleanUpdate()
+                                })
+                        }
                     }
                 }
                 launch {
-                    viewModel.version.collect {
-                        it?.let { showRemoteUpdate(it) }
+                    viewModel.application.collect {
+                        it?.let {
+                            updateDialog(
+                                title = "发现在线新版本",
+                                message = it.description + "\n是否升级？",
+                                block = {
+                                    viewModel.doRemoteUpdate(it)
+                                    viewModel.cleanUpdate()
+                                },
+                                block1 = {
+                                    viewModel.cleanUpdate()
+                                })
+                        }
                     }
                 }
                 launch {
-                    viewModel.progress.collect { progress ->
-                        binding.progress.run {
-                            if (progress == 0) {
-                                visibility = View.GONE
+                    viewModel.progress.collect {
+                        binding.apply {
+                            if (it == 0) {
+                                progress.visibility = View.GONE
                             } else {
-                                visibility = View.VISIBLE
-                                setProgress(progress)
+                                progress.apply {
+                                    visibility = View.VISIBLE
+                                    progress = it
+                                }
+                            }
+                            tvUpdate.apply {
+                                if (it == 0) {
+                                    text = "检查更新"
+                                    setTextColor(
+                                        ContextCompat.getColor(
+                                            context,
+                                            R.color.dark_outline
+                                        )
+                                    )
+                                } else {
+                                    text = "$it%"
+                                    setTextColor(
+                                        ContextCompat.getColor(
+                                            context,
+                                            R.color.light_primary
+                                        )
+                                    )
+                                }
                             }
                         }
-                        binding.tvUpdate.run {
-                            if (progress == 0) {
-                                text = "检查更新"
-                                setTextColor(ContextCompat.getColor(context, R.color.dark_outline))
-                            } else {
-                                text = "$progress%"
-                                setTextColor(ContextCompat.getColor(context, R.color.light_primary))
-                            }
+                    }
+                }
+                launch {
+                    appViewModel.setting.collect {
+                        binding.apply {
+                            if (it.interval > 0) interval.setEqualText(
+                                it.interval.toString().removeZero()
+                            )
+                            if (it.duration > 0) duration.setEqualText(
+                                it.duration.toString().removeZero()
+                            )
+                            if (it.motorSpeed > 0) motorSpeed.setEqualText(
+                                it.motorSpeed.toString().removeZero()
+                            )
+                            navigationBar.isChecked = it.bar
+                            audio.isChecked = it.audio
+                            detect.isChecked = it.detect
                         }
                     }
                 }
@@ -93,230 +129,95 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
      * 初始化Button
      */
     @SuppressLint("ClickableViewAccessibility")
-    private fun imageButtonEvent() {
-        binding.reset.run {
-            clickScale()
-            setOnClickListener { viewModel.lowerComputerReset() }
-        }
-        binding.pump.addTouchEvent({
-            it.scaleX = 0.8f
-            it.scaleY = 0.8f
-            viewModel.touchPump(true)
-        }, {
-            it.scaleX = 1f
-            it.scaleY = 1f
-            viewModel.touchPump(false)
-        })
-        binding.wifi.run {
-            clickScale()
-            setOnClickListener { viewModel.wifiSetting() }
-        }
-        binding.update.run {
-            clickScale()
-            setOnClickListener {
-                if (viewModel.progress.value > 0) {
-                    PopTip.show("正在更新中")
-                } else {
-                    viewModel.checkUpdate()
-                }
-            }
-        }
-    }
+    private fun initView() {
+        binding.apply {
+            tvVersionName.text = BuildConfig.VERSION_NAME
+            tvDeviceName.text = BuildConfig.BUILD_TYPE
 
-    /**
-     * 初始化Switch
-     */
-    private fun initSwitch() {
-        lifecycleScope.launch {
-            binding.run {
-                navigationBar.run {
-                    isChecked = appViewModel.setting.value.bar
-                    setOnCheckedChangeListener { _, isChecked ->
-                        viewModel.toggleNavigationBar(isChecked)
-                    }
-                }
-                audio.run {
-                    isChecked = appViewModel.setting.value.audio
-                    setOnCheckedChangeListener { _, isChecked ->
-                        viewModel.toggleAudio(isChecked)
-                    }
-                }
-                detect.run {
-                    isChecked = appViewModel.setting.value.detect
-                    setOnCheckedChangeListener { _, isChecked ->
-                        viewModel.toggleDetect(isChecked)
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 初始化编辑视图
-     */
-    @SuppressLint("SetTextI18n")
-    private fun initEditView() {
-        lifecycleScope.launch {
-            binding.run {
-                interval.run {
-                    setText(appViewModel.setting.value.interval.toString())
-                    afterTextChange {
-                        viewModel.toggleInterval(it.toIntOrNull() ?: 1)
-                    }
-                }
-                duration.run {
-                    setText(appViewModel.setting.value.duration.toString())
-                    afterTextChange {
-                        viewModel.toggleDuration(it.toIntOrNull() ?: 10)
-                    }
-                }
-                motorSpeed.run {
-                    setText(appViewModel.setting.value.motorSpeed.toString())
-                    afterTextChange {
-                        val speed = it.toIntOrNull() ?: 160
-                        viewModel.toggleMotorSpeed(minOf(speed, 250))
-                        if (speed > 250) {
-                            binding.motorSpeed.setText("250")
-                        }
-                    }
-                }
-                version.run {
-                    this.clickScale()
-                    this.setOnClickListener {
-                        PopTip.show(R.mipmap.ic_version, "当前软件版本号 ${BuildConfig.VERSION_NAME}")
-                    }
-                }
-                about.run {
-                    this.clickScale()
-                    this.setOnClickListener {
-                        CustomDialog.build()
-                            .setCustomView(object :
-                                OnBindView<CustomDialog>(R.layout.layout_about_dialog) {
-                                override fun onBind(dialog: CustomDialog, v: View) {
-                                    val btnWeb = v.findViewById<MaterialButton>(R.id.btn_web)
-                                    btnWeb.isVisible = requireContext().isNetworkAvailable()
-                                    btnWeb.setOnClickListener {
-                                        if (isFastClick().not()) {
-                                            dialog.dismiss()
-                                            toWebSite()
-                                        }
-                                    }
-                                }
-                            })
-                            .setMaskColor(Color.parseColor("#4D000000"))
-                            .show()
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * 打开公司网站
-     */
-    private fun toWebSite() {
-        FullScreenDialog.build(object :
-            OnBindView<FullScreenDialog>(R.layout.layout_about_webview) {
-            @SuppressLint("SetJavaScriptEnabled")
-            override fun onBind(dialog: FullScreenDialog, v: View) {
-                val btnClose = v.findViewById<View>(R.id.btn_close)
-                val webView = v.findViewById<View>(R.id.webView)
-                btnClose.setOnClickListener { dialog.dismiss() }
-                (webView as WebView).settings.apply {
-                    javaScriptEnabled = true
-                    loadWithOverviewMode = true
-                    useWideViewPort = true
-                    setSupportZoom(false)
-                    allowFileAccess = true
-                    javaScriptCanOpenWindowsAutomatically = true
-                    loadsImagesAutomatically = true
-                    defaultTextEncodingName = "utf-8"
-                }
-                webView.webViewClient = object : WebViewClient() {
-                    @Deprecated("Deprecated in Java")
-                    override fun shouldOverrideUrlLoading(
-                        view: WebView,
-                        url: String
-                    ): Boolean {
-                        view.loadUrl(url)
-                        return true
-                    }
-
-                    override fun onPageFinished(view: WebView, url: String) {
-                        super.onPageFinished(view, url)
-                    }
-                }
-                webView.loadUrl(Constants.DOMAIN)
-            }
-        }).setMaxWidth(1920).show()
-    }
-
-    /**
-     * 初始化文本框
-     */
-    private fun initTextView() {
-        binding.tvVersionName.text = BuildConfig.VERSION_NAME
-    }
-
-    /**
-     * 显示本地更新
-     * @param file [File]
-     */
-    private fun showLocalUpdate(file: File) {
-        CustomDialog.build()
-            .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_update_dialog) {
-                override fun onBind(dialog: CustomDialog, v: View) {
-                    val title = v.findViewById<TextView>(R.id.title)
-                    val message = v.findViewById<TextView>(R.id.message)
-                    val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
-                    val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
-                    title.text = "发现本地新版本"
-                    message.text = "是否更新？"
-                    btnOk.setOnClickListener {
-                        requireContext().installApk(file)
-                        viewModel.cleanUpdate()
-                        dialog.dismiss()
-                    }
-                    btnCancel.setOnClickListener {
-                        viewModel.cleanUpdate()
-                        dialog.dismiss()
-                    }
-                }
-            })
-            .setCancelable(false)
-            .setMaskColor(Color.parseColor("#4D000000"))
-            .show()
-    }
-
-    /**
-     * 显示更新
-     * @param version [Version]
-     */
-    private fun showRemoteUpdate(version: Version) {
-        CustomDialog.build()
-            .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_update_dialog) {
-                @SuppressLint("SetTextI18n")
-                override fun onBind(dialog: CustomDialog, v: View) {
-                    val title = v.findViewById<TextView>(R.id.title)
-                    val message = v.findViewById<TextView>(R.id.message)
-                    val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
-                    val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
-                    title.text = "发现在线新版本"
-                    message.text = version.description + "\n是否升级？"
-                    btnOk.setOnClickListener {
-                        viewModel.doRemoteUpdate(version)
-                        viewModel.cleanUpdate()
-                        dialog.dismiss()
-                    }
-                    btnCancel.setOnClickListener {
-                        viewModel.cleanUpdate()
-                        dialog.dismiss()
-                    }
-                }
+            pump.addTouchEvent({
+                it.scaleX = 0.8f
+                it.scaleY = 0.8f
+                viewModel.touchPump(true)
+            }, {
+                it.scaleX = 1f
+                it.scaleY = 1f
+                viewModel.touchPump(false)
             })
 
-            .setCancelable(false)
-            .setMaskColor(Color.parseColor("#4D000000"))
-            .show()
+            interval.afterTextChange {
+                viewModel.toggleInterval(it.toIntOrNull() ?: 0)
+            }
+
+            duration.afterTextChange {
+                viewModel.toggleDuration(it.toIntOrNull() ?: 0)
+            }
+
+            motorSpeed.afterTextChange {
+                viewModel.toggleMotorSpeed(it.toIntOrNull() ?: 0)
+            }
+
+            with(navigationBar) {
+                isChecked = appViewModel.setting.value.bar
+                setOnCheckedChangeListener { _, isChecked ->
+                    viewModel.toggleNavigationBar(isChecked)
+                }
+            }
+
+            with(audio) {
+                isChecked = appViewModel.setting.value.audio
+                setOnCheckedChangeListener { _, isChecked ->
+                    viewModel.toggleAudio(isChecked)
+                }
+            }
+
+            with(detect) {
+                isChecked = appViewModel.setting.value.detect
+                setOnCheckedChangeListener { _, isChecked ->
+                    viewModel.toggleDetect(isChecked)
+                }
+            }
+
+            with(reset) {
+                clickScale()
+                setOnClickListener { viewModel.lowerComputerReset() }
+            }
+
+            with(wifi) {
+                clickScale()
+                setOnClickListener { viewModel.wifiSetting() }
+            }
+
+            with(update) {
+                clickScale()
+                setOnClickListener {
+                    if (viewModel.progress.value > 0) {
+                        PopTip.show("正在更新中")
+                    } else {
+                        viewModel.checkUpdate()
+                    }
+                }
+            }
+
+            with(version) {
+                clickScale()
+                setOnClickListener {
+                    PopTip.show(R.mipmap.ic_version, "当前软件版本号 ${BuildConfig.VERSION_NAME}")
+                }
+            }
+
+            with(about) {
+                clickScale()
+                setOnClickListener {
+                    aboutDialog()
+                }
+            }
+
+            with(device) {
+                clickScale()
+                setOnClickListener {
+                    deviceDialog()
+                }
+            }
+        }
     }
 }

@@ -59,6 +59,16 @@ inline fun EditText.afterTextChange(crossinline block: (String) -> Unit) {
     })
 }
 
+fun EditText.setEqualText(text: String) {
+    val str = this.text.toString()
+    if (str == text) {
+        return
+    } else {
+        this.setText(text)
+        this.setSelection(text.length)
+    }
+}
+
 @SuppressLint("SetTextI18n")
 fun EditText.addSuffix(suffix: String) {
     this.setOnFocusChangeListener { v, hasFocus ->

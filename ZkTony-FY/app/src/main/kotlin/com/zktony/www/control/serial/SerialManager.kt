@@ -30,6 +30,8 @@ class SerialManager(
 
     // 抽屉状态
     private val _drawer = MutableStateFlow(false)
+    // 摇床状态
+    private val _swing = MutableStateFlow(false)
 
     val ttys0Flow = _ttys0Flow.asStateFlow()
     val ttys1Flow = _ttys1Flow.asStateFlow()
@@ -38,6 +40,7 @@ class SerialManager(
     val lock = _lock.asStateFlow()
     val run = _run.asStateFlow()
     val drawer = _drawer.asStateFlow()
+    val swing = _swing.asStateFlow()
 
     // 机构运行已经等待的时间
     private var lockTime = 0L
@@ -186,17 +189,23 @@ class SerialManager(
         _run.value = flag
     }
 
+    fun swing(flag: Boolean) {
+        _swing.value = flag
+    }
+
     private suspend fun shakeBed(flag: Boolean) {
         if (flag) {
             while (lock.value) {
                 delay(500L)
             }
             sendHex(TTYS0, V1.resumeShakeBed())
+            _swing.value = true
         } else {
             while (lock.value) {
                 delay(500L)
             }
             sendHex(TTYS0, V1.pauseShakeBed())
+            _swing.value = false
         }
     }
 

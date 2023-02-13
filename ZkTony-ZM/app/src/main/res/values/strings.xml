@@ -63,4 +63,5 @@
     <string name="show">显示</string>
     <string name="audio">语音播报</string>
     <string name="detect">异常检测</string>
+    <string name="device">设备信息</string>
 </resources>

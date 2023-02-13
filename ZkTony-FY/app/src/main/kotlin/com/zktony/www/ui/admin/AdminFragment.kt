@@ -118,6 +118,7 @@ class AdminFragment :
     private fun initView() {
         binding.apply {
             tvVersionName.text = BuildConfig.VERSION_NAME
+            tvDeviceName.text = BuildConfig.BUILD_TYPE
 
             etTemp.afterTextChange {
                 viewModel.setAntibodyTemp(it.toFloatOrNull() ?: 3f)
@@ -172,6 +173,12 @@ class AdminFragment :
                 clickScale()
                 setOnClickListener {
                     aboutDialog()
+                }
+            }
+            with(device) {
+                clickScale()
+                setOnClickListener {
+                    deviceDialog()
                 }
             }
         }

@@ -18,9 +18,9 @@ import com.zktony.www.common.room.entity.getActionEnum
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
-import com.zktony.www.data.repository.ActionRepository
-import com.zktony.www.data.repository.LogRepository
-import com.zktony.www.data.repository.ProgramRepository
+import com.zktony.www.common.repository.ActionRepository
+import com.zktony.www.common.repository.LogRepository
+import com.zktony.www.common.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -320,18 +320,17 @@ class HomeViewModel @Inject constructor(
      */
     fun shakeBed() {
         viewModelScope.launch {
-            // pauseEnable false 未暂停 true 暂停
-            // 发送指令 -> 更新状态
-            // 发送指令 如果是未暂停，发送暂停命令，如果是暂停，发送继续命令
             if (!serial.lock.value) {
+                val swing = serial.swing.value
+                PopTip.show(
+                    if (swing) "摇床-已暂停" else "摇床-已恢复"
+                )
                 serial.sendHex(
-                    serial = TTYS0, hex = if (_buttonFlow.value.pause) V1.resumeShakeBed()
+                    serial = TTYS0, hex = if (swing) V1.resumeShakeBed()
                     else V1.pauseShakeBed()
                 )
                 // 更新状态
-                _buttonFlow.value = _buttonFlow.value.copy(
-                    pause = !_buttonFlow.value.pause
-                )
+                serial.swing(!swing)
             }
         }
     }
@@ -351,6 +350,24 @@ class HomeViewModel @Inject constructor(
             // 更改按钮状态
             _buttonFlow.value = _buttonFlow.value.copy(
                 insulating = !_buttonFlow.value.insulating
+            )
+        }
+    }
+
+    fun unlock() {
+        viewModelScope.launch {
+            _buttonFlow.value = _buttonFlow.value.copy(
+                lock = false
+            )
+            serial.sendHex(
+                serial = TTYS0, hex = V1.openLock()
+            )
+            delay(20 * 1000L)
+            _buttonFlow.value = _buttonFlow.value.copy(
+                lock = true
+            )
+            serial.sendHex(
+                serial = TTYS0, hex = V1.closeLock()
             )
         }
     }
@@ -377,7 +394,7 @@ data class ModuleUiState(
  * 右侧按钮的状态
  */
 data class UiState(
-    val pause: Boolean = false,
     val insulating: Boolean = true,
     val temp: String = "0.0℃",
+    val lock: Boolean = true,
 )

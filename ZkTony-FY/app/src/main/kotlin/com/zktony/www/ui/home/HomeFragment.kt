@@ -48,6 +48,23 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         binding.e.apply {
                             pause.isVisible = !it
                             tvPause.isVisible = !it
+                            lock.isVisible = !it
+                            tvLock.isVisible = !it
+                        }
+                    }
+                }
+                launch {
+                    SerialManager.instance.swing.collect {
+                        binding.e.apply {
+                            pause.setBackgroundResource(if (!it) R.mipmap.btn_continue else R.mipmap.btn_pause)
+                            with(tvPause) {
+                                text = if (!it) "继续摇床" else "暂停摇床"
+                                setTextColor(
+                                    ContextCompat.getColor(
+                                        context, if (!it) R.color.red else R.color.dark_outline
+                                    )
+                                )
+                            }
                         }
                     }
                 }
@@ -96,11 +113,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 with(pause) {
                     clickScale()
                     setOnClickListener {
-                        if (viewModel.buttonFlow.value.pause) {
-                            PopTip.show("已继续摇床，再次点击暂停")
-                        } else {
-                            PopTip.show("已暂停摇床，再次点击继续")
-                        }
                         viewModel.shakeBed()
                     }
                 }
@@ -113,6 +125,18 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             PopTip.show("抗体保温中，再次点击取消")
                         }
                         viewModel.antibodyWarm()
+                    }
+                }
+                with(lock) {
+                    clickScale()
+                    setOnClickListener {
+                        if (viewModel.buttonFlow.value.lock) {
+                            PopTip.show("已解锁，20秒后上锁")
+                            viewModel.unlock()
+                        } else {
+                            PopTip.show("已解锁")
+                        }
+
                     }
                 }
             }
@@ -167,20 +191,20 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      */
     private fun onUiChange(state: UiState) {
         binding.e.apply {
-            pause.setBackgroundResource(if (state.pause) R.mipmap.btn_continue else R.mipmap.btn_pause)
-            with(tvPause) {
-                text = if (state.pause) "继 续" else "暂停摇床"
-                setTextColor(
-                    ContextCompat.getColor(
-                        context, if (state.pause) R.color.red else R.color.dark_outline
-                    )
-                )
-            }
             with(tvInsulating) {
                 text = if (state.insulating) "保温中 ${state.temp}" else "抗体保温"
                 setTextColor(
                     ContextCompat.getColor(
                         context, if (state.insulating) R.color.red else R.color.dark_outline
+                    )
+                )
+            }
+            with(tvLock) {
+                text = if (state.lock) "已上锁" else "已开锁"
+                lock.setBackgroundResource(if (state.lock) R.mipmap.btn_lock else R.mipmap.btn_unlock)
+                setTextColor(
+                    ContextCompat.getColor(
+                        context, if (state.lock) R.color.dark_outline else R.color.green
                     )
                 )
             }

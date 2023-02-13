@@ -86,16 +86,12 @@
 
         </LinearLayout>
 
-        <TextView
+        <ImageView
             android:id="@+id/empty"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
-            android:gravity="center"
-            android:text="@string/no_program"
-            android:textColor="@color/black"
-            android:textSize="32sp"
-            android:visibility="gone" />
+            android:layout_gravity="center"
+            android:background="@mipmap/empty" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"
@@ -104,7 +100,8 @@
             android:layout_marginTop="2dp"
             android:layout_marginBottom="2dp"
             app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-            tools:listitem="@layout/item_program" />
+            tools:listitem="@layout/item_program"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

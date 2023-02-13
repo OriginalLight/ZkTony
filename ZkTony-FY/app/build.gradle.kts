@@ -74,7 +74,7 @@ android {
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-fy-${versionName}.apk"
+                "zktony-fy-${versionName}-${name}.apk"
         }
     }
 }
@@ -103,6 +103,7 @@ dependencies {
     implementation(libs.okhttp3.logging.interceptor)
     implementation(libs.retrofit2)
     implementation(libs.retrofit2.converter.gson)
+    implementation(libs.zxing)
 
     ksp(libs.androidx.room.compiler)
 

@@ -4,10 +4,12 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.zktony.www.common.network.model.LogDTO
+import com.zktony.www.common.network.model.LogDetailDTO
 import com.zktony.www.common.network.result.NetworkResult
 import com.zktony.www.common.utils.Logger
-import com.zktony.www.data.repository.LogDataRepository
-import com.zktony.www.data.repository.LogRepository
+import com.zktony.www.common.repository.LogDataRepository
+import com.zktony.www.common.repository.LogRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first
@@ -36,7 +38,18 @@ class LogDataWorker @AssistedInject constructor(
                     Logger.d("LogDataWorker", "上传日志数据为空")
                     return Result.success()
                 }
-                logRepository.uploadLogData(logs).collect { res ->
+                val list = mutableListOf<LogDetailDTO>()
+                logs.forEach {
+                    list.add(
+                        LogDetailDTO(
+                            id = it.id,
+                            log_id = it.logId,
+                            content = "泵速：${it.motor}，电压：${it.voltage},电流：${it.current} 时间：${it.time}",
+                            create_time = it.createTime,
+                        )
+                    )
+                }
+                logRepository.uploadLogData(list).collect { res ->
                     when (res) {
                         is NetworkResult.Success -> {
                             logDataRepository.updateBatch(logs.map { it.copy(upload = 1) })

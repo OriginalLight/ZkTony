@@ -70,5 +70,23 @@ data class V1(
         fun queryDrawer(): String {
             return V1(pa = "0C").toHex()
         }
+
+        /**
+         * 开锁
+         * @return [String] 指令
+         */
+        @JvmStatic
+        fun openLock(): String {
+            return V1(pa = "0D").toHex()
+        }
+
+        /**
+         * 关锁
+         * @return [String] 指令
+         */
+        @JvmStatic
+        fun closeLock(): String {
+            return V1(pa = "0E").toHex()
+        }
     }
 }

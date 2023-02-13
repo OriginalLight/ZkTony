@@ -341,6 +341,47 @@
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/device"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_line_bottom">
+
+                        <ImageView
+                            android:id="@+id/iv_device"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/ic_device"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toEndOf="@+id/iv_device"
+                            android:text="设备信息"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/tv_device_name"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="16dp"
+                            android:gravity="center"
+                            android:textSize="20sp"
+                            android:textStyle="italic" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
                         android:id="@+id/about"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"

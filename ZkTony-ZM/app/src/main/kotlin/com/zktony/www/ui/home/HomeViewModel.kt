@@ -15,9 +15,9 @@ import com.zktony.www.common.utils.Constants.MAX_MOTOR
 import com.zktony.www.common.utils.Constants.MAX_TIME
 import com.zktony.www.common.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.www.common.utils.Constants.MAX_VOLTAGE_ZM
-import com.zktony.www.data.repository.LogDataRepository
-import com.zktony.www.data.repository.LogRecordRepository
-import com.zktony.www.data.repository.ProgramRepository
+import com.zktony.www.common.repository.LogDataRepository
+import com.zktony.www.common.repository.LogRecordRepository
+import com.zktony.www.common.repository.ProgramRepository
 import com.zktony.www.serial.SerialManager
 import com.zktony.www.serial.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel

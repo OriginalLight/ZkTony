@@ -117,4 +117,6 @@
     <string name="add_liquid">加液</string>
     <string name="save">保存</string>
     <string name="checked">选中</string>
+    <string name="device" >设备信息</string>
+    <string name="lock">已上锁</string>
 </resources>

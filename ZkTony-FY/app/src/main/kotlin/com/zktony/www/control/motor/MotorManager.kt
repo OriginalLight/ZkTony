@@ -2,7 +2,6 @@ package com.zktony.www.control.motor
 
 import com.zktony.www.common.room.entity.Calibration
 import com.zktony.www.common.room.entity.Motor
-import com.zktony.www.common.utils.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
@@ -14,18 +13,18 @@ class MotorManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
 
-    private lateinit var x: Motor
-    private lateinit var y: Motor
-    private lateinit var z: Motor
-    private lateinit var p1: Motor
-    private lateinit var p2: Motor
-    private lateinit var p3: Motor
-    private lateinit var p4: Motor
-    private lateinit var p5: Motor
-    private lateinit var p6: Motor
-    private lateinit var cali: Calibration
+    private var x: Motor = Motor()
+    private var y: Motor = Motor()
+    private var z: Motor = Motor()
+    private var p1: Motor = Motor()
+    private var p2: Motor = Motor()
+    private var p3: Motor = Motor()
+    private var p4: Motor = Motor()
+    private var p5: Motor = Motor()
+    private var p6: Motor = Motor()
+    private var cali: Calibration = Calibration()
 
-    fun init(motor: List<Motor>, calibration: List<Calibration>) {
+    fun initMotor(motor: List<Motor>) {
         this.x = motor.find { it.id == 0 } ?: Motor()
         this.y = motor.find { it.id == 1 } ?: Motor()
         this.z = motor.find { it.id == 2 } ?: Motor()
@@ -35,8 +34,10 @@ class MotorManager(
         this.p4 = motor.find { it.id == 6 } ?: Motor()
         this.p5 = motor.find { it.id == 7 } ?: Motor()
         this.p6 = motor.find { it.id == 8 } ?: Motor()
+    }
+
+    fun initCali(calibration: List<Calibration>) {
         this.cali = calibration.find { it.enable == 1 } ?: Calibration()
-        Logger.d("MotorManager", "init: $cali")
     }
 
     fun move(distanceY: Float, distanceZ: Float): Pair<Int, Int> {

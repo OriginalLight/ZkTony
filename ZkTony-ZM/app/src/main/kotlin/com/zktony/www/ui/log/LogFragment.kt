@@ -3,21 +3,17 @@ package com.zktony.www.ui.log
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.view.View
 import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.kongzue.dialogx.dialogs.MessageDialog
 import com.zktony.www.R
 import com.zktony.www.adapter.LogAdapter
 import com.zktony.www.base.BaseFragment
-import com.zktony.www.common.extension.clickScale
-import com.zktony.www.common.extension.getDayEnd
-import com.zktony.www.common.extension.getDayStart
-import com.zktony.www.common.extension.simpleDateFormat
+import com.zktony.www.common.extension.*
 import com.zktony.www.databinding.FragmentLogBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -34,8 +30,7 @@ class LogFragment :
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
-        initTextView()
-        initRecyclerView()
+        initView()
     }
 
 
@@ -44,49 +39,33 @@ class LogFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.logList.collect {
                     adapter.submitList(it)
-                    if (it.isEmpty()) {
-                        binding.empty.visibility = View.VISIBLE
-                        binding.recyclerView.visibility = View.GONE
-                    } else {
-                        binding.empty.visibility = View.GONE
-                        binding.recyclerView.visibility = View.VISIBLE
+                    binding.apply {
+                        empty.isVisible = it.isEmpty()
+                        recyclerView.isVisible = it.isNotEmpty()
                     }
                 }
             }
         }
     }
 
-    /**
-     * initRecyclerView
-     */
-    private fun initRecyclerView() {
-        binding.recyclerView.adapter = adapter
+    @SuppressLint("SimpleDateFormat")
+    private fun initView() {
         adapter.setOnDeleteButtonClick {
-            MessageDialog.show(
-                "提示",
-                "确定删除该日志吗？",
-                "确定",
-                "取消"
-            ).setOkButton { _, _ ->
-                viewModel.delete(it)
-                false
-            }
+            deleteDialog(name = "该日志", block = { viewModel.delete(it) })
         }
         adapter.setOnChartButtonClick {
-            val direction =
-                LogFragmentDirections.actionNavigationLogToNavigationLogChart(it.id)
-            findNavController().navigate(direction)
+            findNavController().navigate(
+                directions = LogFragmentDirections.actionNavigationLogToNavigationLogChart(it.id)
+            )
         }
-        viewModel.initLogRecord()
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private fun initTextView() {
-        binding.datePicker.run {
-            clickScale()
-            text = Date(System.currentTimeMillis()).simpleDateFormat("MM 月 dd 日")
-            setOnClickListener {
-                showDatePickerDialog(0, binding.datePicker, Calendar.getInstance())
+        binding.apply {
+            recyclerView.adapter = adapter
+            with(datePicker) {
+                clickScale()
+                text = Date(System.currentTimeMillis()).simpleDateFormat("MM 月 dd 日")
+                setOnClickListener {
+                    showDatePickerDialog(0, binding.datePicker, Calendar.getInstance())
+                }
             }
         }
     }
