@@ -12,7 +12,7 @@
     <string name="app_name">Manager</string>
     <string name="navigation_drawer">Navigation Drawer</string>
     <string name="tab_shipping">发货</string>
-    <string name="tab_search">查询</string>
+    <string name="tab_store">仓库</string>
     <string name="tab_manager">管理</string>
     <string name="tab_setting">设置</string>
 

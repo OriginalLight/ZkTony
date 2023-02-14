@@ -1,17 +1,17 @@
-name: ZkTony-LIQUID
+name: ZkTony-Liquid
 
 on:
   push:
     branches:
       - master
     paths:
-      - 'ZkTony-LIQUID/**'
+      - 'ZkTony-Liquid/**'
   pull_request:
     paths:
-      - 'ZkTony-LIQUID/**'
+      - 'ZkTony-Liquid/**'
 
 env:
-  SAMPLE_PATH: ZkTony-LIQUID
+  SAMPLE_PATH: ZkTony-Liquid
 
 jobs:
   build:

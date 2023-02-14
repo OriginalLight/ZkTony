@@ -18,13 +18,13 @@ package com.zktony.manager.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalShipping
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Source
+import androidx.compose.material.icons.filled.Store
 import androidx.compose.material.icons.outlined.LocalShipping
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Source
+import androidx.compose.material.icons.outlined.Store
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -32,7 +32,7 @@ import com.zktony.manager.R
 
 object Route {
     const val SHIPPING = "Shipping"
-    const val SEARCH = "Search"
+    const val STORE = "Store"
     const val MANAGER = "Manager"
     const val SETTING = "Setting"
 }
@@ -71,10 +71,10 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         iconTextId = R.string.tab_shipping
     ),
     TopLevelDestination(
-        route = Route.SEARCH,
-        selectedIcon = Icons.Default.Search,
-        unselectedIcon = Icons.Outlined.Search,
-        iconTextId = R.string.tab_search
+        route = Route.STORE,
+        selectedIcon = Icons.Default.Store,
+        unselectedIcon = Icons.Outlined.Store,
+        iconTextId = R.string.tab_store
     ),
     TopLevelDestination(
         route = Route.MANAGER,

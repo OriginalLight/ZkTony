@@ -1,17 +1,17 @@
-name: ZkTony-TEST
+name: ZkTony-Test
 
 on:
   push:
     branches:
       - master
     paths:
-      - 'ZkTony-TEST/**'
+      - 'ZkTony-Test/**'
   pull_request:
     paths:
-      - 'ZkTony-TEST/**'
+      - 'ZkTony-Test/**'
 
 env:
-  SAMPLE_PATH: ZkTony-TEST
+  SAMPLE_PATH: ZkTony-Test
 
 jobs:
   build:

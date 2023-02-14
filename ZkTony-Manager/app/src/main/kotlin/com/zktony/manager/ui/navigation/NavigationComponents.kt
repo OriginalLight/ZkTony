@@ -93,18 +93,6 @@ fun NavigationRail(
                             )
                         }
                     )
-                    FloatingActionButton(
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier.padding(top = 8.dp, bottom = 32.dp),
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = stringResource(id = R.string.edit),
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
                     Spacer(Modifier.height(8.dp)) // NavigationRailHeaderPadding
                     Spacer(Modifier.height(4.dp)) // NavigationRailVerticalPadding
                 }

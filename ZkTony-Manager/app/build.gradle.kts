@@ -70,6 +70,11 @@ android {
         compose = true
     }
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
@@ -84,6 +89,9 @@ android {
 
     }
     kotlin {
+        jvmToolchain {
+            languageVersion.set(JavaLanguageVersion.of("11"))
+        }
         sourceSets {
             debug {
                 kotlin.srcDir("build/generated/ksp/debug/kotlin")
@@ -92,6 +100,10 @@ android {
                 kotlin.srcDir("build/generated/ksp/release/kotlin")
             }
         }
+    }
+    java {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 
 }

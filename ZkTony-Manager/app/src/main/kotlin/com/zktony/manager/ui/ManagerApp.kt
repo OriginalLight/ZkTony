@@ -277,7 +277,7 @@ private fun ManagerNavHost(
         composable(Route.MANAGER) {
             EmptyComingSoon()
         }
-        composable(Route.SEARCH) {
+        composable(Route.STORE) {
             EmptyComingSoon()
         }
         composable(Route.SETTING) {
