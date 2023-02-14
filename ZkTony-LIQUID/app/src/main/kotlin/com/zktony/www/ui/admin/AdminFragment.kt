@@ -109,6 +109,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     private fun initView() {
         binding.apply {
             tvVersionName.text = BuildConfig.VERSION_NAME
+            tvDeviceName.text = BuildConfig.BUILD_TYPE
 
             with(swBar) {
                 isChecked = appViewModel.settings.value.bar
@@ -148,6 +149,12 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 clickScale()
                 setOnClickListener {
                     aboutDialog()
+                }
+            }
+            with(device) {
+                clickScale()
+                setOnClickListener {
+                    deviceDialog()
                 }
             }
         }

@@ -83,7 +83,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     bind.tabLayout.addOnTabSelectedListener(object :
                         TabLayout.OnTabSelectedListener {
                         override fun onTabSelected(tab: TabLayout.Tab?) {
-                            if (viewModel.uiStateX.value.job != null) return
                             viewModel.setModel(tab?.position ?: 0, i)
                         }
 

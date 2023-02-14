@@ -17,7 +17,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ZkTony"
+rootProject.name = "ZkTony-LIQUID"
 include(":app")
 include(":serialport")
 

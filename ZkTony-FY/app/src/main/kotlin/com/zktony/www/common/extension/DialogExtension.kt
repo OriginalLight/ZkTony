@@ -82,7 +82,7 @@ fun deviceDialog() {
                 )
                 val image = createQRCodeBitmap(
                     content = "android_id:$id," +
-                            "device_name:转膜仪," +
+                            "device_name:全自动孵育," +
                             "application_id:${BuildConfig.APPLICATION_ID}," +
                             "version_code:${BuildConfig.VERSION_CODE}," +
                             "version_name:${BuildConfig.VERSION_NAME}," +

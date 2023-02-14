@@ -2,12 +2,14 @@ package com.zktony.www.common.extension
 
 import android.annotation.SuppressLint
 import android.graphics.Color
+import android.provider.Settings
 import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
@@ -15,6 +17,7 @@ import com.kongzue.dialogx.dialogs.*
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.kongzue.dialogx.util.InputInfo
 import com.kongzue.dialogx.util.TextInfo
+import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.common.app.CommonApplicationProxy
 import com.zktony.www.common.utils.Constants
@@ -196,6 +199,40 @@ fun selectDialog(block: () -> Unit) {
         })
         .setMaskColor(Color.parseColor("#4D000000"))
         .show()
+}
+
+fun deviceDialog() {
+    CustomDialog.build()
+        .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_device_dialog) {
+            @SuppressLint("HardwareIds")
+            override fun onBind(dialog: CustomDialog, v: View) {
+                val device = v.findViewById<ImageView>(R.id.device)
+                val id = Settings.Secure.getString(
+                    CommonApplicationProxy.application.contentResolver, Settings.Secure.ANDROID_ID
+                )
+                val image = createQRCodeBitmap(
+                    content = "android_id:$id," +
+                            "device_name:四通道加液," +
+                            "application_id:${BuildConfig.APPLICATION_ID}," +
+                            "version_code:${BuildConfig.VERSION_CODE}," +
+                            "version_name:${BuildConfig.VERSION_NAME}," +
+                            "build_type:${BuildConfig.BUILD_TYPE}," +
+                            "build_type:${BuildConfig.BUILD_TYPE}",
+                    width = 500,
+                    height = 500,
+                    character_set = "UTF-8",
+                    error_correction_level = "H",
+                    margin = "1",
+                    color_black = Color.BLACK,
+                    color_white = Color.WHITE
+                )
+                if (image == null) {
+                    PopTip.show("生成二维码失败")
+                    dialog.dismiss()
+                }
+                device.setImageBitmap(image)
+            }
+        }).setMaskColor(Color.parseColor("#4D000000")).show()
 }
 
 fun aboutDialog() {

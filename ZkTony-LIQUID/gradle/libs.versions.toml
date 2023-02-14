@@ -14,7 +14,7 @@ dialogx = "0.0.47"
 espresso = "3.5.1"
 fragment = "1.5.5"
 gson = "2.10.1"
-hilt = "2.44.2"
+hilt = "2.45"
 hiltExt = "1.0.0"
 junit = "4.13.2"
 kotlin = "1.8.0"
@@ -27,6 +27,7 @@ retrofit = "2.9.0"
 room = "2.5.0"
 testExtJunit = "1.1.5"
 work = "2.7.1"
+zxing = "3.5.1"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "androidGradlePlugin" }
@@ -62,3 +63,4 @@ okhttp3 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp3-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
 retrofit2 = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit2-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
+zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
