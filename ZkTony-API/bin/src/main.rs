@@ -12,9 +12,7 @@ use tracing_subscriber::{fmt, layer::SubscriberExt, EnvFilter, Registry};
 use utils::my_env::{self, RT};
 
 fn main_app() -> Router {
-    Router::new()
-        .nest("/", api::api())
-        .route_layer(middleware::from_fn(track_metrics))
+    Router::new().nest("/", api::api())
 }
 
 fn metrics_app() -> Router {
@@ -37,6 +35,10 @@ async fn start_main_server() {
                 DefaultPredicate::new().and(NotForContentType::new("text/event-stream"));
             app.layer(CompressionLayer::new().compress_when(predicate))
         }
+        false => app,
+    };
+    let app = match &CFG.server.metrics {
+        true => app.route_layer(middleware::from_fn(track_metrics)),
         false => app,
     };
     let app = app.fallback(|| async { Html("<h1>404 Not Found</h1>") });
@@ -120,7 +122,12 @@ fn main() {
             );
 
         tracing::subscriber::set_global_default(logger).unwrap();
-        tokio::join!(start_main_server(), start_metrics_server());
+        if CFG.server.metrics {
+            tokio::join!(start_main_server(), start_metrics_server());
+        } else {
+            start_main_server().await;
+        }
+        
     })
 }
 

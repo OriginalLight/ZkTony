@@ -23,6 +23,7 @@ pub struct Server {
     pub name: String,
     pub version: String,
     pub address: String,
+    pub metrics: bool,
     pub ssl: bool,
     pub content_gzip: bool,
 }
