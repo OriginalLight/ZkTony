@@ -16,14 +16,20 @@
 
 package com.zktony.manager.data.repository.impl
 
+import android.content.Context
 import com.zktony.manager.data.model.Application
 import com.zktony.manager.data.remote.provider.RemoteApplicationProvider
 import com.zktony.manager.data.repository.ApplicationRepository
 import com.zktony.manager.data.remote.client.NetworkResult
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 class ApplicationRepositoryImpl : ApplicationRepository {
     override fun getApplicationById(id: String): Flow<NetworkResult<Application>> {
         return RemoteApplicationProvider.getApplicationById(id)
+    }
+
+    override fun downloadApplication(url: String): Flow<NetworkResult<File>> {
+        return RemoteApplicationProvider.downloadApplication(url)
     }
 }

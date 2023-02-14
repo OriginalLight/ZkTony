@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 sealed class NetworkResult<out R> {
 
     data class Success<out T>(val data: T) : NetworkResult<T>()
+
+    data class Progress(val progress: Int) : NetworkResult<Nothing>()
     data class Error(val throwable: Throwable?) : NetworkResult<Nothing>()
     object Loading : NetworkResult<Nothing>()
 
@@ -13,6 +15,7 @@ sealed class NetworkResult<out R> {
         return when (this) {
             is Success<*> -> "Success[data=$data]"
             is Error -> "Error[throwable=$throwable]"
+            is Progress -> "Progress[progress=$progress]"
             Loading -> "Loading"
         }
     }

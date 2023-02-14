@@ -16,14 +16,17 @@
 
 package com.zktony.manager.data.repository
 
+import android.content.Context
 import com.zktony.manager.BuildConfig
 import com.zktony.manager.data.model.Application
 import com.zktony.manager.data.remote.client.NetworkResult
 import kotlinx.coroutines.flow.Flow
+import java.io.File
 
 /**
  * An Interface contract to get all accounts info for User.
  */
 interface ApplicationRepository {
     fun getApplicationById(id: String = BuildConfig.APPLICATION_ID): Flow<NetworkResult<Application>>
+    fun downloadApplication(url: String): Flow<NetworkResult<File>>
 }
