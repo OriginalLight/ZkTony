@@ -18,6 +18,7 @@ package com.zktony.manager.ui.screen
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -56,15 +57,13 @@ fun PermissionScreen(
 
     var start by remember { mutableStateOf(false) }
 
-    if (start) {
+    AnimatedVisibility(visible = start) {
         content()
-    } else {
-        Scaffold(
-            topBar = {
-                TopAppBar(title = { Text("Permissions needed", fontFamily = FontFamily.Serif) }
-                )
-            }
-        ) { innerPadding ->
+    }
+    AnimatedVisibility(visible = !start) {
+        Scaffold(topBar = {
+            TopAppBar(title = { Text("所需权限", fontFamily = FontFamily.Cursive) })
+        }) { innerPadding ->
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
@@ -73,12 +72,10 @@ fun PermissionScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    modifier = Modifier.padding(16.dp),
-                    text = "You have to grant access to these permissions in order to use the app"
+                    modifier = Modifier.padding(16.dp), text = "您必须授予对这些权限的访问权限"
                 )
-                ListItem(
-                    headlineText = { Text("Storage access") },
-                    supportingText = { Text("Add photos from library when creating a log") },
+                ListItem(headlineText = { Text("存储访问") },
+                    supportingText = { Text("创建业务时从图库添加照片") },
                     trailingContent = { PermissionAccessIcon(state.value.hasStorageAccess) },
                     leadingContent = {
                         Icon(
@@ -86,12 +83,10 @@ fun PermissionScreen(
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.surfaceTint
                         )
-                    }
-                )
+                    })
                 Divider()
-                ListItem(
-                    headlineText = { Text("Camera access") },
-                    supportingText = { Text("Take picture when creating a log") },
+                ListItem(headlineText = { Text("摄像头访问") },
+                    supportingText = { Text("扫描二维码时拍照") },
                     trailingContent = { PermissionAccessIcon(state.value.hasCameraAccess) },
                     leadingContent = {
                         Icon(
@@ -99,12 +94,10 @@ fun PermissionScreen(
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.surfaceTint
                         )
-                    }
-                )
+                    })
                 Divider()
-                ListItem(
-                    headlineText = { Text("Precise location access") },
-                    supportingText = { Text("Keep track of the location of a log") },
+                ListItem(headlineText = { Text("精确的位置访问") },
+                    supportingText = { Text("跟踪业务的位置") },
                     trailingContent = { PermissionAccessIcon(state.value.hasLocationAccess) },
                     leadingContent = {
                         Icon(
@@ -112,21 +105,20 @@ fun PermissionScreen(
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.surfaceTint
                         )
-                    }
-                )
+                    })
                 Spacer(Modifier.height(32.dp))
                 if (state.value.hasAllAccess) {
                     FilledTonalButton(onClick = { start = true }) {
-                        Text("Get started")
+                        Text("START")
                     }
                 } else {
                     if (hasRequestedPermissions) {
                         FilledTonalButton(onClick = { openSettings() }) {
-                            Text("Go to settings")
+                            Text("打开设置")
                         }
                     } else {
                         FilledTonalButton(onClick = { requestPermissions.launch(REQUIRED_PERMISSIONS) }) {
-                            Text("Request permissions")
+                            Text("请求权限")
                         }
                     }
                 }
@@ -139,13 +131,11 @@ fun PermissionScreen(
 fun PermissionAccessIcon(hasAccess: Boolean) {
     if (hasAccess) {
         Icon(
-            Icons.Filled.Check,
-            contentDescription = "Permission accepted"
+            Icons.Filled.Check, contentDescription = "接受权限"
         )
     } else {
         Icon(
-            Icons.Filled.Close,
-            contentDescription = "Permission not granted"
+            Icons.Filled.Close, contentDescription = "未授予权限"
         )
     }
 }

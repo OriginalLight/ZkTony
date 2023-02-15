@@ -16,27 +16,17 @@
 
 package com.zktony.manager.ui
 
-import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.adaptive.calculateDisplayFeatures
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.zktony.manager.App
 import com.zktony.manager.ui.screen.PermissionScreen
 import com.zktony.manager.ui.theme.ManagerTheme
@@ -56,15 +46,18 @@ class MainActivity : ComponentActivity() {
                 val windowSize = calculateWindowSizeClass(this)
                 val displayFeatures = calculateDisplayFeatures(this)
 
-                val app = ManagerApp(
-                    windowSize = windowSize,
-                    displayFeatures = displayFeatures,
-                )
-
                 if (permissionManager.hasAllPermissions) {
-                    app
+                    ManagerApp(
+                        windowSize = windowSize,
+                        displayFeatures = displayFeatures,
+                    )
                 } else {
-                    PermissionScreen(content = { app })
+                    PermissionScreen(content = {
+                        ManagerApp(
+                            windowSize = windowSize,
+                            displayFeatures = displayFeatures,
+                        )
+                    })
                 }
             }
         }

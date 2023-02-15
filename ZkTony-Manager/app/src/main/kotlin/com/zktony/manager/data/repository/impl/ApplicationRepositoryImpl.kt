@@ -29,7 +29,7 @@ class ApplicationRepositoryImpl : ApplicationRepository {
         return RemoteApplicationProvider.getApplicationById(id)
     }
 
-    override fun downloadApplication(url: String): Flow<NetworkResult<File>> {
-        return RemoteApplicationProvider.downloadApplication(url)
+    override fun downloadApplication(context: Context, url: String): Flow<NetworkResult<File>> {
+        return RemoteApplicationProvider.downloadApplication(context,url)
     }
 }

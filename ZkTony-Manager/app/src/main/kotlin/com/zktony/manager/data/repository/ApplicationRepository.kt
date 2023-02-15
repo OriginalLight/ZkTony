@@ -28,5 +28,5 @@ import java.io.File
  */
 interface ApplicationRepository {
     fun getApplicationById(id: String = BuildConfig.APPLICATION_ID): Flow<NetworkResult<Application>>
-    fun downloadApplication(url: String): Flow<NetworkResult<File>>
+    fun downloadApplication(context: Context, url: String): Flow<NetworkResult<File>>
 }

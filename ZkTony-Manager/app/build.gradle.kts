@@ -114,7 +114,7 @@ dependencies {
     androidTestImplementation(composeBom)
 
     implementation(libs.accompanist.adaptive)
-    implementation(libs.accompanist.permissions)
+    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.iconsExtended)

@@ -33,11 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.window.layout.DisplayFeature
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.zktony.manager.R
 import com.zktony.manager.ui.utils.ContentType
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ShippingScreen(
     contentType: ContentType,

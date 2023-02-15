@@ -30,12 +30,12 @@ object RemoteApplicationProvider {
             }
     }
 
-    fun downloadApplication(url: String) = flow {
+    fun downloadApplication(context: Context, url: String) = flow {
+        val apk = context.filesDir.absolutePath + File.separator + "zm.apk"
         emit(NetworkResult.Loading)
-        val destPath = Environment.getDownloadCacheDirectory().absolutePath + File.separator + "zm.apk"
         RxHttp.get(url)
             .toDownloadFlow(
-                destPath = destPath,
+                destPath = apk,
                 append = true,
                 capacity = 1,
                 progress = {
@@ -44,7 +44,7 @@ object RemoteApplicationProvider {
             ).catch {
                 emit(NetworkResult.Error(it))
             }.collect {
-                emit(NetworkResult.Success(File(destPath)))
+                emit(NetworkResult.Success(File(apk)))
             }
     }
 

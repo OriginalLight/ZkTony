@@ -34,21 +34,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MenuOpen
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.PermanentDrawerSheet
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -162,16 +148,23 @@ fun BottomNavigationBar(
     navigateToTopLevelDestination: (TopLevelDestination) -> Unit
 ) {
     NavigationBar(modifier = Modifier.fillMaxWidth()) {
-        TOP_LEVEL_DESTINATIONS.forEach { replyDestination ->
+        TOP_LEVEL_DESTINATIONS.forEach { destination ->
             NavigationBarItem(
-                selected = selectedDestination == replyDestination.route,
-                onClick = { navigateToTopLevelDestination(replyDestination) },
+                selected = selectedDestination == destination.route,
+                onClick = { navigateToTopLevelDestination(destination) },
                 icon = {
                     Icon(
-                        imageVector = replyDestination.selectedIcon,
-                        contentDescription = stringResource(id = replyDestination.iconTextId)
+                        imageVector = if (selectedDestination == destination.route) {
+                            destination.selectedIcon
+                        } else {
+                            destination.unselectedIcon
+                        },
+                        contentDescription = stringResource(id = destination.iconTextId),
                     )
-                }
+                },
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.primary,
+                )
             )
         }
     }
@@ -211,27 +204,29 @@ fun PermanentNavigationDrawerContent(
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    TOP_LEVEL_DESTINATIONS.forEach { replyDestination ->
+                    TOP_LEVEL_DESTINATIONS.forEach { destination ->
                         NavigationDrawerItem(
-                            selected = selectedDestination == replyDestination.route,
+                            selected = selectedDestination == destination.route,
                             label = {
                                 Text(
-                                    text = stringResource(id = replyDestination.iconTextId),
+                                    text = stringResource(id = destination.iconTextId),
                                     modifier = Modifier.padding(horizontal = 16.dp)
                                 )
                             },
                             icon = {
                                 Icon(
-                                    imageVector = replyDestination.selectedIcon,
-                                    contentDescription = stringResource(
-                                        id = replyDestination.iconTextId
-                                    )
+                                    imageVector = if (selectedDestination == destination.route) {
+                                        destination.selectedIcon
+                                    } else {
+                                        destination.unselectedIcon
+                                    },
+                                    contentDescription = stringResource(id = destination.iconTextId),
                                 )
                             },
                             colors = NavigationDrawerItemDefaults.colors(
                                 unselectedContainerColor = Color.Transparent
                             ),
-                            onClick = { navigateToTopLevelDestination(replyDestination) }
+                            onClick = { navigateToTopLevelDestination(destination) }
                         )
                     }
                 }
@@ -322,27 +317,29 @@ fun ModalNavigationDrawerContent(
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    TOP_LEVEL_DESTINATIONS.forEach { replyDestination ->
+                    TOP_LEVEL_DESTINATIONS.forEach { destination ->
                         NavigationDrawerItem(
-                            selected = selectedDestination == replyDestination.route,
+                            selected = selectedDestination == destination.route,
                             label = {
                                 Text(
-                                    text = stringResource(id = replyDestination.iconTextId),
+                                    text = stringResource(id = destination.iconTextId),
                                     modifier = Modifier.padding(horizontal = 16.dp)
                                 )
                             },
                             icon = {
                                 Icon(
-                                    imageVector = replyDestination.selectedIcon,
-                                    contentDescription = stringResource(
-                                        id = replyDestination.iconTextId
-                                    )
+                                    imageVector = if (selectedDestination == destination.route) {
+                                        destination.selectedIcon
+                                    } else {
+                                        destination.unselectedIcon
+                                    },
+                                    contentDescription = stringResource(id = destination.iconTextId),
                                 )
                             },
                             colors = NavigationDrawerItemDefaults.colors(
                                 unselectedContainerColor = Color.Transparent
                             ),
-                            onClick = { navigateToTopLevelDestination(replyDestination) }
+                            onClick = { navigateToTopLevelDestination(destination) }
                         )
                     }
                 }

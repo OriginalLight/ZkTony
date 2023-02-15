@@ -23,19 +23,29 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class PermissionManager(private val context: Context) {
     companion object {
-        val REQUIRED_PERMISSIONS = arrayOf(
-            READ_EXTERNAL_STORAGE,
-            CAMERA,
-            ACCESS_FINE_LOCATION,
-            ACCESS_COARSE_LOCATION
-        )
+        val REQUIRED_PERMISSIONS = if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+        ) {
+            arrayOf(
+                READ_MEDIA_IMAGES,
+                CAMERA,
+                ACCESS_FINE_LOCATION,
+                ACCESS_COARSE_LOCATION,
+            )
+        } else {
+            arrayOf(
+                READ_EXTERNAL_STORAGE,
+                CAMERA,
+                ACCESS_FINE_LOCATION,
+                ACCESS_COARSE_LOCATION
+            )
+        }
     }
 
     data class State(
@@ -49,7 +59,11 @@ class PermissionManager(private val context: Context) {
 
     private val _state = MutableStateFlow(
         State(
-            hasStorageAccess = hasAccess(READ_EXTERNAL_STORAGE),
+            hasStorageAccess = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                hasAccess(READ_MEDIA_IMAGES)
+            } else {
+                hasAccess(READ_EXTERNAL_STORAGE)
+            },
             hasCameraAccess = hasAccess(CAMERA),
             hasLocationAccess = hasAccess(listOf(ACCESS_FINE_LOCATION, ACCESS_COARSE_LOCATION)),
         )
@@ -70,10 +84,16 @@ class PermissionManager(private val context: Context) {
     }
 
     fun onPermissionChange(permissions: Map<String, Boolean>) {
+
+        val hasStorageAccess = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            hasAccess(READ_MEDIA_IMAGES)
+        } else {
+            hasAccess(READ_EXTERNAL_STORAGE)
+        }
         val hasLocationAccess = hasAccess(ACCESS_FINE_LOCATION) && hasAccess(ACCESS_COARSE_LOCATION)
 
         _state.value = State(
-            hasStorageAccess = permissions[READ_EXTERNAL_STORAGE] ?: _state.value.hasStorageAccess,
+            hasStorageAccess = hasStorageAccess,
             hasCameraAccess = permissions[CAMERA] ?: _state.value.hasCameraAccess,
             hasLocationAccess = hasLocationAccess
         )
@@ -81,7 +101,11 @@ class PermissionManager(private val context: Context) {
 
     suspend fun checkPermissions() {
         val newState = State(
-            hasStorageAccess = hasAccess(READ_EXTERNAL_STORAGE),
+            hasStorageAccess = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                hasAccess(READ_MEDIA_IMAGES)
+            } else {
+                hasAccess(READ_EXTERNAL_STORAGE)
+            },
             hasCameraAccess = hasAccess(CAMERA),
             hasLocationAccess = hasAccess(ACCESS_FINE_LOCATION) && hasAccess(ACCESS_COARSE_LOCATION)
         )

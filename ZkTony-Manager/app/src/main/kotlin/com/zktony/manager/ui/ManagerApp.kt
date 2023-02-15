@@ -21,12 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.PermanentNavigationDrawer
-import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -43,21 +38,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
-import com.zktony.manager.ui.navigation.ModalNavigationDrawerContent
-import com.zktony.manager.ui.navigation.PermanentNavigationDrawerContent
-import com.zktony.manager.ui.navigation.BottomNavigationBar
-import com.zktony.manager.ui.navigation.NavigationActions
-import com.zktony.manager.ui.navigation.NavigationRail
-import com.zktony.manager.ui.navigation.Route
-import com.zktony.manager.ui.navigation.TopLevelDestination
+import com.zktony.manager.ui.navigation.*
 import com.zktony.manager.ui.screen.EmptyComingSoon
 import com.zktony.manager.ui.screen.ShippingScreen
-import com.zktony.manager.ui.utils.DevicePosture
-import com.zktony.manager.ui.utils.ContentType
-import com.zktony.manager.ui.utils.NavigationContentPosition
-import com.zktony.manager.ui.utils.NavigationType
-import com.zktony.manager.ui.utils.isBookPosture
-import com.zktony.manager.ui.utils.isSeparating
+import com.zktony.manager.ui.utils.*
 import kotlinx.coroutines.launch
 
 @Composable
