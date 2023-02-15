@@ -14,10 +14,10 @@ impl EntityName for Entity {
 pub struct Model {
     pub id: String,
     pub package: String,
-    pub version_code: String,
+    pub version_code: i32,
     pub version_name: String,
     pub build_type: String,
-    pub remarks: i32,
+    pub remarks: String,
     pub create_time: Option<DateTime>,
 }
 

@@ -16,22 +16,10 @@
 
 package com.zktony.manager.ui.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MenuOpen
 import androidx.compose.material3.*
@@ -43,7 +31,6 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import com.zktony.manager.R
@@ -58,7 +45,7 @@ fun NavigationRail(
 ) {
     NavigationRail(
         modifier = Modifier.fillMaxHeight(),
-        containerColor = MaterialTheme.colorScheme.inverseOnSurface
+        containerColor = MaterialTheme.colorScheme.surface
     ) {
         // TODO remove custom nav rail positioning when NavRail component supports it. ticket : b/232495216
         Layout(
@@ -88,16 +75,18 @@ fun NavigationRail(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    TOP_LEVEL_DESTINATIONS.forEach { replyDestination ->
+                    TOP_LEVEL_DESTINATIONS.forEach { destination ->
                         NavigationRailItem(
-                            selected = selectedDestination == replyDestination.route,
-                            onClick = { navigateToTopLevelDestination(replyDestination) },
+                            selected = selectedDestination == destination.route,
+                            onClick = { navigateToTopLevelDestination(destination) },
                             icon = {
                                 Icon(
-                                    imageVector = replyDestination.selectedIcon,
-                                    contentDescription = stringResource(
-                                        id = replyDestination.iconTextId
-                                    )
+                                    imageVector = if (selectedDestination == destination.route) {
+                                        destination.selectedIcon
+                                    } else {
+                                        destination.unselectedIcon
+                                    },
+                                    contentDescription = stringResource(id = destination.iconTextId),
                                 )
                             }
                         )
@@ -177,11 +166,13 @@ fun PermanentNavigationDrawerContent(
     navigationContentPosition: NavigationContentPosition,
     navigateToTopLevelDestination: (TopLevelDestination) -> Unit,
 ) {
-    PermanentDrawerSheet(modifier = Modifier.sizeIn(minWidth = 200.dp, maxWidth = 300.dp)) {
+    PermanentDrawerSheet(
+        modifier = Modifier.sizeIn(minWidth = 200.dp, maxWidth = 300.dp),
+        drawerContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
+    ) {
         // TODO remove custom nav drawer content positioning when NavDrawer component supports it. ticket : b/232495216
         Layout(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.inverseOnSurface)
                 .padding(16.dp),
             content = {
                 Column(
@@ -277,12 +268,12 @@ fun ModalNavigationDrawerContent(
     navigateToTopLevelDestination: (TopLevelDestination) -> Unit,
     onDrawerClicked: () -> Unit = {}
 ) {
-    ModalDrawerSheet {
+    ModalDrawerSheet(
+        drawerContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
+    ) {
         // TODO remove custom nav drawer content positioning when NavDrawer component supports it. ticket : b/232495216
         Layout(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.inverseOnSurface)
-                .padding(16.dp),
+            modifier = Modifier.padding(16.dp),
             content = {
                 Column(
                     modifier = Modifier.layoutId(LayoutType.HEADER),

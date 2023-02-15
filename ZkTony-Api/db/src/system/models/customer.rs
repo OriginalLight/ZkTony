@@ -1,22 +1,13 @@
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug, Clone)]
-pub struct CustomerAddReq {
+pub struct CustomerSaveReq {
     pub id: String,
     pub name: String,
     pub phone: String,
     pub address: String,
     pub remarks: String,
     pub create_time: Option<String>,
-}
-
-#[derive(Deserialize, Debug, Clone)]
-pub struct CustomerUpdateReq {
-    pub id: String,
-    pub name: String,
-    pub phone: String,
-    pub address: String,
-    pub remarks: String,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -31,5 +22,3 @@ pub struct CustomerGetReq {
     pub phone: Option<String>,
     pub address: Option<String>,
 }
-
-

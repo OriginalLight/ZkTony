@@ -163,7 +163,7 @@ private fun ManagerNavigationWrapper(
                 navigateToTopLevelDestination = navigationActions::navigateTo,
             )
         }
-    } else {
+    } else if (navigationType == NavigationType.NAVIGATION_RAIL) {
         ModalNavigationDrawer(
             drawerContent = {
                 ModalNavigationDrawerContent(
@@ -193,6 +193,16 @@ private fun ManagerNavigationWrapper(
                 }
             }
         }
+    } else {
+        ManagerAppContent(
+            navigationType = navigationType,
+            contentType = contentType,
+            displayFeatures = displayFeatures,
+            navigationContentPosition = navigationContentPosition,
+            navController = navController,
+            selectedDestination = selectedDestination,
+            navigateToTopLevelDestination = navigationActions::navigateTo,
+        )
     }
 }
 
