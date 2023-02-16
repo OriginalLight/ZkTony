@@ -1,7 +1,7 @@
 package com.zktony.manager
 
 import android.app.Application
-import com.zktony.manager.data.remote.client.RxHttpClient
+import com.zktony.manager.ui.utils.DataManager
 import com.zktony.manager.ui.utils.PermissionManager
 
 /**
@@ -13,7 +13,7 @@ class App: Application() {
     lateinit var permissions: PermissionManager
     override fun onCreate() {
         super.onCreate()
-        RxHttpClient.instance.init()
+        DataManager.provide(this)
         permissions = PermissionManager(this)
     }
 }

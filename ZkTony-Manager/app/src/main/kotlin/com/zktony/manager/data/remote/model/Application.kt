@@ -1,4 +1,4 @@
-package com.zktony.manager.data.model
+package com.zktony.manager.data.remote.model
 
 data class Application(
     val id: Int,

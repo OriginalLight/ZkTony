@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package com.zktony.manager.data.repository.impl
+package com.zktony.manager.data.store
 
 import android.content.Context
-import com.zktony.manager.data.model.Application
-import com.zktony.manager.data.remote.provider.RemoteApplicationProvider
-import com.zktony.manager.data.repository.ApplicationRepository
+import com.zktony.manager.data.remote.client.DownloadResult
+import com.zktony.manager.data.remote.model.Application
+import com.zktony.manager.data.remote.service.ApplicationService
 import com.zktony.manager.data.remote.client.NetworkResult
 import kotlinx.coroutines.flow.Flow
 import java.io.File
 
-class ApplicationRepositoryImpl : ApplicationRepository {
-    override fun getApplicationById(id: String): Flow<NetworkResult<Application>> {
-        return RemoteApplicationProvider.getApplicationById(id)
+class ApplicationStore(
+    val service: ApplicationService
+) {
+    suspend fun getApplicationById(id: String = "com.zktony.www.zm.debug"): Flow<NetworkResult<Application>> {
+        return service.getApplicationById(id)
     }
 
-    override fun downloadApplication(context: Context, url: String): Flow<NetworkResult<File>> {
-        return RemoteApplicationProvider.downloadApplication(context,url)
+    suspend fun downloadApplication(context: Context, url: String): Flow<DownloadResult> {
+        return service.download(context,url)
     }
 }

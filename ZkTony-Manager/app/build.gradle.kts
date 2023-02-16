@@ -125,6 +125,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.window)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlinx.coroutines.android)
@@ -132,6 +134,7 @@ dependencies {
     implementation(libs.rxhttp)
 
 
+    ksp(libs.androidx.room.compiler)
     ksp(libs.rxhttp.compiler)
 
     androidTestImplementation(libs.androidx.compose.ui.test)
