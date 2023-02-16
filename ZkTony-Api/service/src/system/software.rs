@@ -81,18 +81,6 @@ pub async fn get(db: &DatabaseConnection, req: SoftwareGetReq) -> Result<Vec<Sof
         }
     }
 
-    if let Some(x) = req.version_code {
-        if x > 0 {
-            query = query.filter(software::Column::VersionCode.eq(x));
-        }
-    }
-
-    if let Some(x) = req.version_name {
-        if !x.is_empty() {
-            query = query.filter(software::Column::VersionName.eq(x));
-        }
-    }
-
     if let Some(x) = req.build_type {
         if !x.is_empty() {
             query = query.filter(software::Column::BuildType.eq(x));

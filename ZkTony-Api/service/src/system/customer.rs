@@ -17,7 +17,10 @@ pub async fn add(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<String
         name: Set(req.name),
         address: Set(req.address),
         phone: Set(req.phone),
+        source: Set(req.source),
+        industry: Set(req.industry),
         remarks: Set(req.remarks),
+        create_by: Set(req.create_by),
         create_time: Set(Some(create_time)),
         ..Default::default()
     };
@@ -39,6 +42,8 @@ pub async fn update(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<Str
         name: Set(req.name),
         address: Set(req.address),
         phone: Set(req.phone),
+        source: Set(req.source),
+        industry: Set(req.industry),
         remarks: Set(req.remarks),
         ..Default::default()
     };

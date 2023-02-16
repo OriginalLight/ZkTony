@@ -4,7 +4,7 @@ use axum::{
 };
 
 use super::system::{
-    application, customer, index, log, log_detail, product, program, shipping, software,
+    application, customer, equipment, index, log, log_detail, product, program, software,
 };
 
 pub fn api() -> Router {
@@ -12,10 +12,10 @@ pub fn api() -> Router {
         .nest("/", index_api())
         .nest("/application", application_api())
         .nest("/customer", customer_api())
+        .nest("/equipment", equipment_api())
         .nest("/log", log_api())
         .nest("/product", product_api())
         .nest("/program", program_api())
-        .nest("/shipping", shipping_api())
         .nest("/software", software_api())
 }
 
@@ -37,6 +37,16 @@ pub fn customer_api() -> Router {
     )
 }
 
+pub fn equipment_api() -> Router {
+    Router::new().route(
+        "/",
+        get(equipment::get)
+            .post(equipment::add)
+            .put(equipment::update)
+            .delete(equipment::delete),
+    )
+}
+
 pub fn product_api() -> Router {
     Router::new().route(
         "/",
@@ -55,16 +65,6 @@ pub fn log_api() -> Router {
     Router::new()
         .route("/", post(log::add_batch))
         .route("/detail", post(log_detail::add_batch))
-}
-
-pub fn shipping_api() -> Router {
-    Router::new().route(
-        "/",
-        get(shipping::get)
-            .post(shipping::add)
-            .put(shipping::update)
-            .delete(shipping::delete),
-    )
 }
 
 pub fn software_api() -> Router {

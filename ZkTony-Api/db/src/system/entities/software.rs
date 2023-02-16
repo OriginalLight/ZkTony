@@ -17,7 +17,8 @@ pub struct Model {
     pub version_code: i32,
     pub version_name: String,
     pub build_type: String,
-    pub remarks: String,
+    pub remarks: Option<String>,
+    pub create_by: Option<String>,
     pub create_time: Option<DateTime>,
 }
 
@@ -29,6 +30,7 @@ pub enum Column {
     VersionCode,
     BuildType,
     Remarks,
+    CreateBy,
     CreateTime,
 }
 
@@ -57,6 +59,7 @@ impl ColumnTrait for Column {
             Self::VersionName => ColumnType::String(Some(32u32)).def(),
             Self::BuildType => ColumnType::String(Some(32u32)).def(),
             Self::Remarks => ColumnType::Text.def(),
+            Self::CreateBy => ColumnType::String(Some(32u32)).def(),
             Self::CreateTime => ColumnType::DateTime.def(),
         }
     }

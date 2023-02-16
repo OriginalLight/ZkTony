@@ -3,15 +3,16 @@ use serde::Deserialize;
 #[derive(Deserialize, Debug, Clone)]
 pub struct ProductSaveReq {
     pub id: String,
-    pub name: String,
-    pub model: String,
-    pub voltage: String,
-    pub power: String,
-    pub frequency: String,
-    pub produced_address: String,
-    pub produced_company: String,
+    pub software_id: String,
+    pub customer_id: String,
+    pub equipment_id: String,
+    pub express_number: String,
+    pub express_company: String,
+    pub equipment_number: String,
+    pub equipment_time: String,
     pub attachment: String,
-    pub remarks: String,
+    pub remarks: Option<String>,
+    pub create_by: Option<String>,
     pub create_time: Option<String>,
 }
 
@@ -23,6 +24,13 @@ pub struct ProductDeleteReq {
 #[derive(Deserialize, Debug, Clone)]
 pub struct ProductGetReq {
     pub id: Option<String>,
-    pub name: Option<String>,
-    pub model: Option<String>,
+    pub software_id: Option<String>,
+    pub customer_id: Option<String>,
+    pub equipment_id: Option<String>,
+    pub express_number: Option<String>,
+    pub express_company: Option<String>,
+    pub equipment_number: Option<String>,
+    pub create_by: Option<String>,
+    pub begin_time: Option<String>,
+    pub end_time: Option<String>,
 }

@@ -7,7 +7,8 @@ pub struct SoftwareSaveReq {
     pub version_code: i32,
     pub version_name: String,
     pub build_type: String,
-    pub remarks: String,
+    pub remarks: Option<String>,
+    pub create_by: Option<String>,
     pub create_time: Option<String>,
 }
 
@@ -20,7 +21,5 @@ pub struct SoftwareDeleteReq {
 pub struct SoftwareGetReq {
     pub id: Option<String>,
     pub package: Option<String>,
-    pub version_code: Option<i32>,
-    pub version_name: Option<String>,
     pub build_type: Option<String>,
 }

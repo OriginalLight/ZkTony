@@ -16,7 +16,10 @@ pub struct Model {
     pub name: String,
     pub phone: String,
     pub address: String,
-    pub remarks: String,
+    pub source: String,
+    pub industry: String,
+    pub remarks: Option<String>,
+    pub create_by: Option<String>,
     pub create_time: Option<DateTime>,
 }
 
@@ -26,7 +29,10 @@ pub enum Column {
     Name,
     Phone,
     Address,
+    Source,
+    Industry,
     Remarks,
+    CreateBy,
     CreateTime,
 }
 
@@ -53,7 +59,10 @@ impl ColumnTrait for Column {
             Self::Name => ColumnType::String(Some(32u32)).def(),
             Self::Phone => ColumnType::String(Some(32u32)).def(),
             Self::Address => ColumnType::Text.def(),
+            Self::Source => ColumnType::String(Some(32u32)).def(),
+            Self::Industry => ColumnType::String(Some(32u32)).def(),
             Self::Remarks => ColumnType::Text.def(),
+            Self::CreateBy => ColumnType::String(Some(32u32)).def(),
             Self::CreateTime => ColumnType::DateTime.def(),
         }
     }

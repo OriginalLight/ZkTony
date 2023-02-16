@@ -6,41 +6,35 @@ pub struct Entity;
 
 impl EntityName for Entity {
     fn table_name(&self) -> &str {
-        "shipping"
+        "equipment"
     }
 }
 
 #[derive(Clone, Debug, PartialEq, DeriveModel, DeriveActiveModel, Eq, Serialize, Deserialize)]
 pub struct Model {
     pub id: String,
-    pub software_id: String,
-    pub customer_id: String,
-    pub product_id: String,
-    pub product_number: String,
-    pub producted_time: DateTime,
-    pub shipper: String,
-    pub delivery_time: DateTime,
-    pub delivery_place: String,
-    pub express_number: String,
+    pub name: String,
+    pub model: String,
+    pub voltage: String,
+    pub power: String,
+    pub frequency: String,
     pub attachment: String,
-    pub remarks: String,
+    pub remarks: Option<String>,
+    pub create_by: Option<String>,
     pub create_time: Option<DateTime>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
 pub enum Column {
     Id,
-    SoftwareId,
-    CustomerId,
-    ProductId,
-    ProductNumber,
-    ProductedTime,
-    Shipper,
-    DeliveryTime,
-    DeliveryPlace,
-    ExpressNumber,
+    Name,
+    Model,
+    Voltage,
+    Power,
+    Frequency,
     Attachment,
     Remarks,
+    CreateBy,
     CreateTime,
 }
 
@@ -64,17 +58,14 @@ impl ColumnTrait for Column {
     fn def(&self) -> ColumnDef {
         match self {
             Self::Id => ColumnType::String(Some(32u32)).def(),
-            Self::SoftwareId => ColumnType::String(Some(32u32)).def(),
-            Self::CustomerId => ColumnType::String(Some(32u32)).def(),
-            Self::ProductId => ColumnType::String(Some(32u32)).def(),
-            Self::ProductNumber => ColumnType::String(Some(32u32)).def(),
-            Self::ProductedTime => ColumnType::DateTime.def(),
-            Self::Shipper => ColumnType::String(Some(32u32)).def(),
-            Self::DeliveryTime => ColumnType::DateTime.def(),
-            Self::DeliveryPlace => ColumnType::Text.def(),
-            Self::ExpressNumber => ColumnType::Text.def(),
+            Self::Name => ColumnType::String(Some(32u32)).def(),
+            Self::Model => ColumnType::String(Some(32u32)).def(),
+            Self::Voltage => ColumnType::String(Some(32u32)).def(),
+            Self::Power => ColumnType::String(Some(32u32)).def(),
+            Self::Frequency => ColumnType::String(Some(32u32)).def(),
             Self::Attachment => ColumnType::Text.def(),
             Self::Remarks => ColumnType::Text.def(),
+            Self::CreateBy => ColumnType::String(Some(32u32)).def(),
             Self::CreateTime => ColumnType::DateTime.def(),
         }
     }

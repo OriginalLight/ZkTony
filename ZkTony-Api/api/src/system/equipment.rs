@@ -3,16 +3,16 @@ use db::{
     common::res::Res,
     db_conn,
     system::{
-        models::shipping::{ShippingDeleteReq, ShippingGetReq, ShippingSaveReq},
-        prelude::ShippingModel,
+        models::equipment::{EquipmentDeleteReq, EquipmentGetReq, EquipmentSaveReq},
+        prelude::EquipmentModel,
     },
     DB,
 };
 use service::system;
 
-pub async fn add(Json(req): Json<ShippingSaveReq>) -> Res<String> {
+pub async fn add(Json(req): Json<EquipmentSaveReq>) -> Res<String> {
     let db = DB.get_or_init(db_conn).await;
-    let res = system::shipping::add(&db, req).await;
+    let res = system::equipment::add(&db, req).await;
 
     match res {
         Ok(x) => Res::with_data(x),
@@ -20,9 +20,9 @@ pub async fn add(Json(req): Json<ShippingSaveReq>) -> Res<String> {
     }
 }
 
-pub async fn update(Json(req): Json<ShippingSaveReq>) -> Res<String> {
+pub async fn update(Json(req): Json<EquipmentSaveReq>) -> Res<String> {
     let db = DB.get_or_init(db_conn).await;
-    let res = system::shipping::update(&db, req).await;
+    let res = system::equipment::update(&db, req).await;
 
     match res {
         Ok(x) => Res::with_data(x),
@@ -30,9 +30,9 @@ pub async fn update(Json(req): Json<ShippingSaveReq>) -> Res<String> {
     }
 }
 
-pub async fn delete(Json(req): Json<ShippingDeleteReq>) -> Res<String> {
+pub async fn delete(Json(req): Json<EquipmentDeleteReq>) -> Res<String> {
     let db = DB.get_or_init(db_conn).await;
-    let res = system::shipping::delete(&db, req).await;
+    let res = system::equipment::delete(&db, req).await;
 
     match res {
         Ok(x) => Res::with_data(x),
@@ -40,9 +40,9 @@ pub async fn delete(Json(req): Json<ShippingDeleteReq>) -> Res<String> {
     }
 }
 
-pub async fn get(Json(req): Json<ShippingGetReq>) -> Res<Vec<ShippingModel>> {
+pub async fn get(Json(req): Json<EquipmentGetReq>) -> Res<Vec<EquipmentModel>> {
     let db = DB.get_or_init(db_conn).await;
-    let res = system::shipping::get(&db, req).await;
+    let res = system::equipment::get(&db, req).await;
 
     match res {
         Ok(x) => Res::with_data(x),

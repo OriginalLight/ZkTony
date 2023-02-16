@@ -5,6 +5,6 @@ pub use super::entities::{
     log_detail::{Entity as LogDetailEntity, Model as LogDetailModel},
     product::{Entity as ProductEntity, Model as ProductModel},
     program::{Entity as ProgramEntity, Model as ProgramModel},
-    shipping::{Entity as ShippingEntity, Model as ShippingModel},
+    equipment::{Entity as EquipmentEntity, Model as EquipmentModel},
     software::{Entity as SoftwareEntity, Model as SoftwareModel},
 };

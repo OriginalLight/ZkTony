@@ -4,5 +4,5 @@ pub mod log;
 pub mod log_detail;
 pub mod product;
 pub mod program;
-pub mod shipping;
+pub mod equipment;
 pub mod software;

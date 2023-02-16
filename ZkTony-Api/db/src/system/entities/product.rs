@@ -13,30 +13,32 @@ impl EntityName for Entity {
 #[derive(Clone, Debug, PartialEq, DeriveModel, DeriveActiveModel, Eq, Serialize, Deserialize)]
 pub struct Model {
     pub id: String,
-    pub name: String,
-    pub model: String,
-    pub voltage: String,
-    pub power: String,
-    pub frequency: String,
-    pub produced_address: String,
-    pub produced_company: String,
+    pub software_id: String,
+    pub customer_id: String,
+    pub equipment_id: String,
+    pub express_number: String,
+    pub express_company: String,
+    pub equipment_number: String,
+    pub equipment_time: DateTime,
     pub attachment: String,
-    pub remarks: String,
+    pub remarks: Option<String>,
+    pub create_by: Option<String>,
     pub create_time: Option<DateTime>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveColumn)]
 pub enum Column {
     Id,
-    Name,
-    Model,
-    Voltage,
-    Power,
-    Frequency,
-    ProducedAddress,
-    ProducedCompany,
+    SoftwareId,
+    CustomerId,
+    EquipmentId,
+    ExpressNumber,
+    ExpressCompany,
+    EquipmentNumber,
+    EquipmentTime,
     Attachment,
     Remarks,
+    CreateBy,
     CreateTime,
 }
 
@@ -60,15 +62,16 @@ impl ColumnTrait for Column {
     fn def(&self) -> ColumnDef {
         match self {
             Self::Id => ColumnType::String(Some(32u32)).def(),
-            Self::Name => ColumnType::String(Some(32u32)).def(),
-            Self::Model => ColumnType::String(Some(32u32)).def(),
-            Self::Voltage => ColumnType::String(Some(32u32)).def(),
-            Self::Power => ColumnType::String(Some(32u32)).def(),
-            Self::Frequency => ColumnType::String(Some(32u32)).def(),
-            Self::ProducedAddress => ColumnType::Text.def(),
-            Self::ProducedCompany => ColumnType::Text.def(),
+            Self::SoftwareId => ColumnType::String(Some(32u32)).def(),
+            Self::CustomerId => ColumnType::String(Some(32u32)).def(),
+            Self::EquipmentId => ColumnType::String(Some(32u32)).def(),
+            Self::ExpressNumber => ColumnType::String(Some(32u32)).def(),
+            Self::ExpressCompany => ColumnType::String(Some(32u32)).def(),
+            Self::EquipmentNumber => ColumnType::String(Some(32u32)).def(),
+            Self::EquipmentTime => ColumnType::DateTime.def(),
             Self::Attachment => ColumnType::Text.def(),
             Self::Remarks => ColumnType::Text.def(),
+            Self::CreateBy => ColumnType::String(Some(32u32)).def(),
             Self::CreateTime => ColumnType::DateTime.def(),
         }
     }
