@@ -9,13 +9,14 @@ use sea_orm::{
     sea_query::OnConflict, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set,
 };
 
+// region: add
 pub async fn add(db: &DatabaseConnection, req: EquipmentSaveReq) -> Result<String> {
     let create_time =
         NaiveDateTime::parse_from_str(&req.create_time.unwrap(), "%Y-%m-%d %H:%M:%S").unwrap();
     let add_data = equipment::ActiveModel {
         id: Set(req.id),
         name: Set(req.name),
-        model : Set(req.model),
+        model: Set(req.model),
         voltage: Set(req.voltage),
         power: Set(req.power),
         frequency: Set(req.frequency),
@@ -36,12 +37,14 @@ pub async fn add(db: &DatabaseConnection, req: EquipmentSaveReq) -> Result<Strin
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: update
 pub async fn update(db: &DatabaseConnection, req: EquipmentSaveReq) -> Result<String> {
     let update_data = equipment::ActiveModel {
         id: Set(req.id),
         name: Set(req.name),
-        model : Set(req.model),
+        model: Set(req.model),
         voltage: Set(req.voltage),
         power: Set(req.power),
         frequency: Set(req.frequency),
@@ -60,7 +63,9 @@ pub async fn update(db: &DatabaseConnection, req: EquipmentSaveReq) -> Result<St
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: delete
 pub async fn delete(db: &DatabaseConnection, req: EquipmentDeleteReq) -> Result<String> {
     let res = EquipmentEntity::delete_by_id(req.id)
         .exec(db)
@@ -72,7 +77,9 @@ pub async fn delete(db: &DatabaseConnection, req: EquipmentDeleteReq) -> Result<
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: get
 pub async fn get(db: &DatabaseConnection, req: EquipmentGetReq) -> Result<Vec<EquipmentModel>> {
     let mut query = EquipmentEntity::find();
     if let Some(x) = req.id {
@@ -114,3 +121,4 @@ pub async fn get(db: &DatabaseConnection, req: EquipmentGetReq) -> Result<Vec<Eq
         .await
         .map_err(|e| anyhow::anyhow!(e.to_string(),))
 }
+// endregion

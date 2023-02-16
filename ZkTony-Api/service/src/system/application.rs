@@ -5,6 +5,7 @@ use db::system::{
 };
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 
+// region: gey_by_id
 pub async fn get_by_id(
     db: &DatabaseConnection,
     application_id: String,
@@ -20,3 +21,4 @@ pub async fn get_by_id(
     };
     Ok(res)
 }
+// endregion

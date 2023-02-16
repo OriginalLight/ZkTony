@@ -9,6 +9,7 @@ use sea_orm::{
     sea_query::OnConflict, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set,
 };
 
+// region: add
 pub async fn add(db: &DatabaseConnection, req: SoftwareSaveReq) -> Result<String> {
     let create_time =
         NaiveDateTime::parse_from_str(&req.create_time.unwrap(), "%Y-%m-%d %H:%M:%S").unwrap();
@@ -33,7 +34,9 @@ pub async fn add(db: &DatabaseConnection, req: SoftwareSaveReq) -> Result<String
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: update
 pub async fn update(db: &DatabaseConnection, req: SoftwareSaveReq) -> Result<String> {
     let update_data = software::ActiveModel {
         id: Set(req.id),
@@ -54,7 +57,9 @@ pub async fn update(db: &DatabaseConnection, req: SoftwareSaveReq) -> Result<Str
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: delete
 pub async fn delete(db: &DatabaseConnection, req: SoftwareDeleteReq) -> Result<String> {
     let res = SoftwareEntity::delete_by_id(req.id)
         .exec(db)
@@ -66,7 +71,9 @@ pub async fn delete(db: &DatabaseConnection, req: SoftwareDeleteReq) -> Result<S
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: get
 pub async fn get(db: &DatabaseConnection, req: SoftwareGetReq) -> Result<Vec<SoftwareModel>> {
     let mut query = SoftwareEntity::find();
     if let Some(x) = req.id {
@@ -93,3 +100,4 @@ pub async fn get(db: &DatabaseConnection, req: SoftwareGetReq) -> Result<Vec<Sof
         .await
         .map_err(|e| anyhow::anyhow!(e.to_string(),))
 }
+// endregion

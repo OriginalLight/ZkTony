@@ -9,6 +9,7 @@ use sea_orm::{
     sea_query::OnConflict, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set,
 };
 
+// region: add
 pub async fn add(db: &DatabaseConnection, req: ProductSaveReq) -> Result<String> {
     let create_time =
         NaiveDateTime::parse_from_str(&req.create_time.unwrap(), "%Y-%m-%d %H:%M:%S").unwrap();
@@ -40,7 +41,9 @@ pub async fn add(db: &DatabaseConnection, req: ProductSaveReq) -> Result<String>
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: update
 pub async fn update(db: &DatabaseConnection, req: ProductSaveReq) -> Result<String> {
     let equipment_time =
         NaiveDateTime::parse_from_str(&req.equipment_time, "%Y-%m-%d %H:%M:%S").unwrap();
@@ -68,7 +71,9 @@ pub async fn update(db: &DatabaseConnection, req: ProductSaveReq) -> Result<Stri
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: delete
 pub async fn delete(db: &DatabaseConnection, req: ProductDeleteReq) -> Result<String> {
     let res = ProductEntity::delete_by_id(req.id)
         .exec(db)
@@ -80,7 +85,9 @@ pub async fn delete(db: &DatabaseConnection, req: ProductDeleteReq) -> Result<St
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: get
 pub async fn get(db: &DatabaseConnection, req: ProductGetReq) -> Result<Vec<ProductModel>> {
     let mut query = ProductEntity::find();
     if let Some(x) = req.id {
@@ -146,11 +153,10 @@ pub async fn get(db: &DatabaseConnection, req: ProductGetReq) -> Result<Vec<Prod
         }
     }
 
-
-
     query
         .clone()
         .all(db)
         .await
         .map_err(|e| anyhow::anyhow!(e.to_string(),))
 }
+// endregion

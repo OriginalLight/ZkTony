@@ -7,6 +7,7 @@ use db::system::{
 };
 use sea_orm::{sea_query::OnConflict, DatabaseConnection, EntityTrait, Set};
 
+// region: add_batch
 pub async fn add_batch(db: &DatabaseConnection, reqs: Vec<LogAddReq>) -> Result<String> {
     let mut add_data = Vec::new();
     for req in reqs {
@@ -33,3 +34,4 @@ pub async fn add_batch(db: &DatabaseConnection, reqs: Vec<LogAddReq>) -> Result<
         Err(e) => Err(e),
     }
 }
+// endregion

@@ -9,6 +9,7 @@ use sea_orm::{
     sea_query::OnConflict, ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter, Set,
 };
 
+// region: add
 pub async fn add(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<String> {
     let create_time =
         NaiveDateTime::parse_from_str(&req.create_time.unwrap(), "%Y-%m-%d %H:%M:%S").unwrap();
@@ -35,7 +36,9 @@ pub async fn add(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<String
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: update
 pub async fn update(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<String> {
     let update_data = customer::ActiveModel {
         id: Set(req.id),
@@ -57,7 +60,9 @@ pub async fn update(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<Str
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: delete
 pub async fn delete(db: &DatabaseConnection, req: CustomerDeleteReq) -> Result<String> {
     let res = CustomerEntity::delete_by_id(req.id)
         .exec(db)
@@ -69,7 +74,9 @@ pub async fn delete(db: &DatabaseConnection, req: CustomerDeleteReq) -> Result<S
         Err(e) => Err(e),
     }
 }
+// endregion
 
+// region: get
 pub async fn get(db: &DatabaseConnection, req: CustomerGetReq) -> Result<Vec<CustomerModel>> {
     let mut query = CustomerEntity::find();
     if let Some(x) = req.id {
@@ -102,3 +109,4 @@ pub async fn get(db: &DatabaseConnection, req: CustomerGetReq) -> Result<Vec<Cus
         .await
         .map_err(|e| anyhow::anyhow!(e.to_string(),))
 }
+// endregion
