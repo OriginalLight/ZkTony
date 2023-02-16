@@ -1,0 +1,29 @@
+[package]
+edition = "2021"
+name = "database"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# 
+configs = {path = "../configs"}
+#
+axum = {workspace = true, default-features = false}
+mime = {workspace = true, default-features = false}
+
+chrono = {workspace = true, default-features = false, features = ["serde"]}
+once_cell = {workspace = true}
+
+# regex = {workspace = true}
+serde = {workspace = true, default-features = false, features = ["derive"]}
+serde_json = {workspace = true, default-features = false}
+tokio = {workspace = true, default-features = false, features = ["parking_lot"]}
+tracing = {workspace = true, default-features = false}
+
+# sea-orm
+sea-orm = {workspace = true, default-features = false, features = ["macros", "runtime-tokio-native-tls", "with-chrono"]}
+
+[features]
+default = ["postgres"]
+postgres = ["sea-orm/sqlx-postgres"]

@@ -3,7 +3,7 @@ members = [
   "api",
   "bin",
   "configs",
-  "db",
+  "database",
   "metrics",
   "service",
   "utils",

@@ -3,8 +3,10 @@ use axum::{
     Router,
 };
 
-use super::system::{
-    application, customer, equipment, index, log, log_detail, product, program, software,
+use super::{
+    app::application,
+    log::{log, log_detail, program},
+    manager::{customer, equipment, product, software},
 };
 
 pub fn api() -> Router {
@@ -20,7 +22,7 @@ pub fn api() -> Router {
 }
 
 pub fn index_api() -> Router {
-    Router::new().route("/", get(index::index))
+    Router::new().route("/", get(|| async { "ZkTony-Api" }))
 }
 
 pub fn application_api() -> Router {

@@ -1,7 +1,7 @@
 use axum::{http::Method, middleware, response::Html, Router};
 use axum_server::tls_rustls::RustlsConfig;
 use configs::CFG;
-use metrics::system::metrics::track_metrics;
+use metrics::layer::track_metrics;
 use std::{net::SocketAddr, str::FromStr};
 use tokio::signal;
 use tower_http::{
@@ -11,14 +11,19 @@ use tower_http::{
 use tracing_subscriber::{fmt, layer::SubscriberExt, EnvFilter, Registry};
 use utils::my_env::{self, RT};
 
+// region: main_app
 fn main_app() -> Router {
     Router::new().nest("/", api::api())
 }
+// endregion
 
+// region: metrics_app
 fn metrics_app() -> Router {
     Router::new().nest("/metrics", metrics::api())
 }
+// endregion
 
+// region: start_main_server
 async fn start_main_server() {
     let app = main_app();
     //  跨域
@@ -63,7 +68,9 @@ async fn start_main_server() {
             .unwrap(),
     }
 }
+// endregion
 
+// region: start_metrics_server
 async fn start_metrics_server() {
     let app = metrics_app();
     let addr = SocketAddr::from_str(&CFG.metrics.address).unwrap();
@@ -86,8 +93,9 @@ async fn start_metrics_server() {
             .unwrap(),
     }
 }
+// endregion
 
-// #[tokio::main]
+// region: main
 fn main() {
     RT.block_on(async {
         if std::env::var_os("RUST_LOG").is_none() {
@@ -127,10 +135,11 @@ fn main() {
         } else {
             start_main_server().await;
         }
-        
     })
 }
+// endregion
 
+// region: shutdown_signal
 async fn shutdown_signal() {
     let ctrl_c = async {
         signal::ctrl_c()
@@ -156,3 +165,4 @@ async fn shutdown_signal() {
 
     println!("signal received, starting graceful shutdown");
 }
+// endregion

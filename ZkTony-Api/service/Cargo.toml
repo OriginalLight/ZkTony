@@ -7,7 +7,7 @@ version = "0.1.0"
 
 [dependencies]
 configs = {path = "../configs"}
-db = {path = "../db"}
+database = {path = "../database"}
 
 anyhow = {workspace = true, default-features = false}
 axum = {workspace = true, default-features = false}

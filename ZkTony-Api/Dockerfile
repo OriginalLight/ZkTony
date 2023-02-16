@@ -18,7 +18,7 @@ COPY api api
 COPY bin bin
 COPY config config
 COPY configs configs
-COPY db db
+COPY database database
 COPY metrics metrics
 COPY service service
 COPY utils utils
