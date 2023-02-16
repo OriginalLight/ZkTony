@@ -1,4 +1,4 @@
-use axum::extract::Json;
+use axum::extract::{Json, Query};
 use db::{
     common::res::Res,
     db_conn,
@@ -40,7 +40,7 @@ pub async fn delete(Json(req): Json<SoftwareDeleteReq>) -> Res<String> {
     }
 }
 
-pub async fn get(Json(req): Json<SoftwareGetReq>) -> Res<Vec<SoftwareModel>> {
+pub async fn get(Query(req): Query<SoftwareGetReq>) -> Res<Vec<SoftwareModel>> {
     let db = DB.get_or_init(db_conn).await;
     let res = system::software::get(&db, req).await;
 
