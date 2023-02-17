@@ -31,7 +31,7 @@ import androidx.navigation.NavHostController
 import com.zktony.manager.R
 
 object Route {
-    const val SHIPPING = "Shipping"
+    const val HOME = "Home"
     const val STORE = "Store"
     const val MANAGER = "Manager"
     const val SETTING = "Setting"
@@ -65,10 +65,10 @@ class NavigationActions(private val navController: NavHostController) {
 
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
-        route = Route.SHIPPING,
+        route = Route.HOME,
         selectedIcon = Icons.Default.LocalShipping,
         unselectedIcon = Icons.Outlined.LocalShipping,
-        iconTextId = R.string.tab_shipping
+        iconTextId = R.string.tab_home
     ),
     TopLevelDestination(
         route = Route.STORE,

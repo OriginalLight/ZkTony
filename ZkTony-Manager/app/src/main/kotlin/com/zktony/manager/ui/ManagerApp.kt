@@ -40,7 +40,7 @@ import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
 import com.zktony.manager.ui.navigation.*
 import com.zktony.manager.ui.screen.EmptyComingSoon
-import com.zktony.manager.ui.screen.ShippingScreen
+import com.zktony.manager.ui.screen.HomeScreen
 import com.zktony.manager.ui.utils.*
 import kotlinx.coroutines.launch
 
@@ -142,7 +142,7 @@ private fun ManagerNavigationWrapper(
     }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val selectedDestination =
-        navBackStackEntry?.destination?.route ?: Route.SHIPPING
+        navBackStackEntry?.destination?.route ?: Route.HOME
 
     if (navigationType == NavigationType.PERMANENT_NAVIGATION_DRAWER) {
         // TODO check on custom width of PermanentNavigationDrawer: b/232495216
@@ -258,13 +258,12 @@ private fun ManagerNavHost(
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = Route.SHIPPING,
+        startDestination = Route.HOME,
     ) {
-        composable(Route.SHIPPING) {
-            ShippingScreen(
+        composable(Route.HOME) {
+            HomeScreen(
                 contentType = contentType,
                 displayFeatures = displayFeatures,
-                navController = navController,
                 viewModel = viewModel()
             )
         }

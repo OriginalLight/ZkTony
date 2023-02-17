@@ -11,10 +11,13 @@
 <resources>
     <string name="app_name">Manager</string>
     <string name="navigation_drawer">Navigation Drawer</string>
-    <string name="tab_shipping">发货</string>
+    <string name="tab_home">产品</string>
     <string name="tab_store">仓库</string>
     <string name="tab_manager">管理</string>
     <string name="tab_setting">设置</string>
+
+    <string name="screen_home_title">商品管理</string>
+    <string name="page_shipping_title">发货登记</string>
 
     <string name="profile">Profile</string>
     <string name="search">Search</string>
@@ -32,4 +35,12 @@
     <string name="more_options_button">More options</string>
     <string name="messages">Messages</string>
     <string name="four_hours_ago">4 hrs ago</string>
+    <string name="page_shipping_subtitle">登记仪器、客户、软件、快递信息</string>
+    <string name="page_shipping_history_title">发货记录</string>
+    <string name="page_shipping_history_subtitle">根据条件查找发货记录</string>
+    <string name="page_after_sale_title">售后登记</string>
+    <string name="page_after_sale_subtitle">登记产品的售后记录</string>
+    <string name="page_after_sale_history_title">售后记录</string>
+    <string name="page_after_sale_history_subtitle">根据条件查询产品相关售后记录</string>
+
 </resources>
