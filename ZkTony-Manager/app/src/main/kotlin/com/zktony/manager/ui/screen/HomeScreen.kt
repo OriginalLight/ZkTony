@@ -68,9 +68,9 @@ import kotlinx.coroutines.delay
 // region HomeScreen
 @Composable
 fun HomeScreen(
+    modifier: Modifier = Modifier,
     contentType: ContentType,
     displayFeatures: List<DisplayFeature>,
-    modifier: Modifier = Modifier,
     viewModel: HomeViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

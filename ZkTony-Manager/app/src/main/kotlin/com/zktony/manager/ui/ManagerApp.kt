@@ -41,6 +41,7 @@ import androidx.window.layout.FoldingFeature
 import com.zktony.manager.ui.navigation.*
 import com.zktony.manager.ui.screen.EmptyComingSoon
 import com.zktony.manager.ui.screen.HomeScreen
+import com.zktony.manager.ui.screen.SettingScreen
 import com.zktony.manager.ui.utils.*
 import kotlinx.coroutines.launch
 
@@ -278,7 +279,11 @@ private fun ManagerNavHost(
             EmptyComingSoon()
         }
         composable(Route.SETTING) {
-            EmptyComingSoon()
+            SettingScreen(
+                contentType = contentType,
+                displayFeatures = displayFeatures,
+                viewModel = viewModel()
+            )
         }
     }
 }

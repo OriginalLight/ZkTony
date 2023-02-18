@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ProfileImage(
     drawableResource: Int,
-    description: String,
+    description: String?,
     modifier: Modifier = Modifier
 ) {
     Image(
