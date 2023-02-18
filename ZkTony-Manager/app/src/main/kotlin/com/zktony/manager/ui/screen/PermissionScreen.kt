@@ -16,8 +16,8 @@
 
 package com.zktony.manager.ui.screen
 
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
+import android.Manifest.permission.*
+import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -26,41 +26,50 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.zktony.manager.ui.utils.PermissionManager.Companion.REQUIRED_PERMISSIONS
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun PermissionScreen(
     content: @Composable () -> Unit,
-    viewModel: PermissionViewModel = viewModel(factory = PermissionViewModelFactory())
 ) {
+    val requestPermission = mutableListOf(
+        CAMERA,
+        ACCESS_FINE_LOCATION,
+        ACCESS_COARSE_LOCATION
+    )
 
-    val state = viewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    var hasRequestedPermissions by remember { mutableStateOf(false) }
-
-    val requestPermissions =
-        rememberLauncherForActivityResult(RequestMultiplePermissions()) { permissions ->
-            hasRequestedPermissions = true
-            viewModel.onPermissionChange(permissions)
-        }
-
-    fun openSettings() {
-        ContextCompat.startActivity(context, viewModel.createSettingsIntent(), null)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        requestPermission.add(READ_MEDIA_IMAGES)
+    } else {
+        requestPermission.add(READ_EXTERNAL_STORAGE)
     }
 
-    var start by remember { mutableStateOf(false) }
+    val allPermission = rememberMultiplePermissionsState(permissions = requestPermission)
 
-    AnimatedVisibility(visible = start) {
+    var storageAccess by remember { mutableStateOf(false) }
+    var cameraAccess by remember { mutableStateOf(false) }
+    var fineAccess by remember { mutableStateOf(false) }
+    var coarseAccess by remember { mutableStateOf(false) }
+
+    allPermission.permissions.forEach {
+        when (it.permission) {
+            CAMERA -> cameraAccess = it.status.isGranted
+            ACCESS_FINE_LOCATION -> fineAccess = it.status.isGranted
+            ACCESS_COARSE_LOCATION -> coarseAccess = it.status.isGranted
+            READ_MEDIA_IMAGES -> storageAccess = it.status.isGranted
+            READ_EXTERNAL_STORAGE -> storageAccess = it.status.isGranted
+        }
+    }
+
+    AnimatedVisibility(visible = allPermission.allPermissionsGranted) {
         content()
     }
-    AnimatedVisibility(visible = !start) {
+    AnimatedVisibility(visible = !allPermission.allPermissionsGranted) {
         Scaffold(topBar = {
             TopAppBar(title = { Text("所需权限", fontFamily = FontFamily.Cursive) })
         }) { innerPadding ->
@@ -76,7 +85,7 @@ fun PermissionScreen(
                 )
                 ListItem(headlineText = { Text("存储访问") },
                     supportingText = { Text("创建业务时从图库添加照片") },
-                    trailingContent = { PermissionAccessIcon(state.value.hasStorageAccess) },
+                    trailingContent = { PermissionAccessIcon(storageAccess) },
                     leadingContent = {
                         Icon(
                             Icons.Filled.PhotoLibrary,
@@ -87,7 +96,7 @@ fun PermissionScreen(
                 Divider()
                 ListItem(headlineText = { Text("摄像头访问") },
                     supportingText = { Text("扫描二维码时拍照") },
-                    trailingContent = { PermissionAccessIcon(state.value.hasCameraAccess) },
+                    trailingContent = { PermissionAccessIcon(cameraAccess) },
                     leadingContent = {
                         Icon(
                             Icons.Filled.Camera,
@@ -98,7 +107,7 @@ fun PermissionScreen(
                 Divider()
                 ListItem(headlineText = { Text("精确的位置访问") },
                     supportingText = { Text("跟踪业务的位置") },
-                    trailingContent = { PermissionAccessIcon(state.value.hasLocationAccess) },
+                    trailingContent = { PermissionAccessIcon(fineAccess && coarseAccess) },
                     leadingContent = {
                         Icon(
                             Icons.Filled.Explore,
@@ -107,20 +116,8 @@ fun PermissionScreen(
                         )
                     })
                 Spacer(Modifier.height(32.dp))
-                if (state.value.hasAllAccess) {
-                    FilledTonalButton(onClick = { start = true }) {
-                        Text("START")
-                    }
-                } else {
-                    if (hasRequestedPermissions) {
-                        FilledTonalButton(onClick = { openSettings() }) {
-                            Text("打开设置")
-                        }
-                    } else {
-                        FilledTonalButton(onClick = { requestPermissions.launch(REQUIRED_PERMISSIONS) }) {
-                            Text("请求权限")
-                        }
-                    }
+                FilledTonalButton(onClick = { allPermission.launchMultiplePermissionRequest() }) {
+                    Text("请求权限")
                 }
             }
         }

@@ -11,7 +11,7 @@ import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
 import com.zktony.www.common.extension.removeZero
 import com.zktony.www.common.extension.setEqualText
-import com.zktony.www.common.room.entity.Container
+import com.zktony.www.data.local.room.entity.Container
 import com.zktony.www.databinding.FragmentContainerBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

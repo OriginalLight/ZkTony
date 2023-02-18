@@ -36,9 +36,10 @@ object DataManager {
         dao = database.userDao()
     ) }
 
+
+
     @DefaultDomain
     const val BASE_URL = "http://192.168.10.103:9765"
-
 
     fun provide(context: Context) {
         val okHttpClient = OkHttpClient.Builder()

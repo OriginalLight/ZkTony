@@ -16,9 +16,13 @@
 
 package com.zktony.manager.ui.screen
 
+import android.app.Activity
+import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -33,7 +37,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -50,10 +56,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.layout.DisplayFeature
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
+import com.google.gson.Gson
 import com.zktony.manager.R
+import com.zktony.manager.data.remote.model.Software
+import com.zktony.manager.ui.QrCodeActivity
 import com.zktony.manager.ui.components.ManagerAppBar
 import com.zktony.manager.ui.components.ManagerCheckAppBar
-import com.zktony.manager.ui.components.QrCodeScanner
 import com.zktony.manager.ui.utils.ContentType
 import kotlinx.coroutines.delay
 
@@ -97,11 +105,10 @@ fun HomeScreenSinglePane(
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
-//        HomePageContent(
-//            modifier = modifier,
-//            viewModel = viewModel,
-//        )
-        QrCodeScanner()
+        HomePageContent(
+            modifier = modifier,
+            viewModel = viewModel,
+        )
     }
     AnimatedVisibility(
         visible = (uiState.page == HomePage.SHIPPING),
@@ -335,9 +342,19 @@ fun ShippingPageContent(
         viewModel.navigateTo(HomePage.HOME)
     }
 
+    val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
     val localFocusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
+    val qrCodeScanner =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                val result = it.data?.getStringExtra("SCAN_RESULT")
+                // result 是json字符串解析成software对象
+                val software = Gson().fromJson(result, Software::class.java)
+                viewModel.setSoftware(software)
+            }
+        }
 
     Column {
         ManagerAppBar(
@@ -346,58 +363,57 @@ fun ShippingPageContent(
             isFullScreen = true
         )
 
-        Row(
+        TextField(
+            value = uiState.software.id,
+            label = { Text(text = "Android ID") },
+            onValueChange = { viewModel.setSoftware(uiState.software.copy(id = it)) },
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp)
-                .shadow(elevation = 4.dp, shape = MaterialTheme.shapes.small)
-                .background(MaterialTheme.colorScheme.surface),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            TextField(
-                value = uiState.software.id,
-                label = { Text(text = "Software ID") },
-                onValueChange = { viewModel.setSoftware(uiState.software.copy(id = it)) },
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .focusRequester(focusRequester),
-                colors = TextFieldDefaults.textFieldColors(
-                    textColor = MaterialTheme.colorScheme.onSurface,
-                    placeholderColor = MaterialTheme.colorScheme.outline,
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                textStyle = LocalTextStyle.current.copy(
-                    textAlign = TextAlign.Start,
-                    fontSize = 16.sp,
-                    fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
-                ),
-                maxLines = 1,
-                keyboardOptions = KeyboardOptions.Default.copy(
-                    imeAction = ImeAction.Done,
-                    keyboardType = KeyboardType.Text
-                ),
-                keyboardActions = KeyboardActions(onDone = {
-                    keyboardController?.hide()
-                    localFocusManager.clearFocus()
-                }),
-                visualTransformation = VisualTransformation.None,
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(
-                onClick = {
-                    viewModel.setSoftware(uiState.software.copy(id = ""))
-                    keyboardController?.hide()
-                    localFocusManager.clearFocus()
-                },
-                modifier = Modifier.padding(8.dp)
-            ) {
+                .padding(16.dp)
+                .focusRequester(focusRequester),
+            trailingIcon = {
                 Icon(
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier
+                        .size(36.dp)
+                        .absoluteOffset(x = (-8).dp)
+                        .clickable {
+                            qrCodeScanner.launch(
+                                Intent(
+                                    context,
+                                    QrCodeActivity::class.java
+                                )
+                            )
+                        },
                     imageVector = Icons.Outlined.QrCode,
                     contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
                 )
-            }
-        }
+            },
+            shape = MaterialTheme.shapes.medium,
+            colors = TextFieldDefaults.textFieldColors(
+                textColor = MaterialTheme.colorScheme.onSurface,
+                placeholderColor = MaterialTheme.colorScheme.outline,
+                containerColor = MaterialTheme.colorScheme.surface,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent
+            ),
+            textStyle = LocalTextStyle.current.copy(
+                textAlign = TextAlign.Start,
+                fontSize = 16.sp,
+                fontStyle = MaterialTheme.typography.bodyLarge.fontStyle,
+            ),
+            maxLines = 1,
+            singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Text
+            ),
+            keyboardActions = KeyboardActions(onDone = {
+                keyboardController?.hide()
+                localFocusManager.clearFocus()
+            }),
+            visualTransformation = VisualTransformation.None,
+        )
 
     }
 

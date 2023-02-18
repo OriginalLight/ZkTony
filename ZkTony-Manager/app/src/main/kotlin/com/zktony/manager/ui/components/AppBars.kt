@@ -71,6 +71,7 @@ fun ManagerAppBar(
         },
         actions = {
             IconButton(
+                modifier = Modifier.padding(8.dp),
                 onClick = { onDone() },
             ) {
                 Icon(

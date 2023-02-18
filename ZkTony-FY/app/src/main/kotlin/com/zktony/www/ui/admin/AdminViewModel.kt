@@ -13,16 +13,16 @@ import com.zktony.www.BuildConfig
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.CommonApplicationProxy
 import com.zktony.www.common.extension.*
-import com.zktony.www.common.network.download.DownloadManager
-import com.zktony.www.common.network.download.DownloadState
-import com.zktony.www.common.network.model.Application
-import com.zktony.www.common.network.result.NetworkResult
-import com.zktony.www.common.repository.ApplicationRepository
-import com.zktony.www.common.repository.MotorRepository
-import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.data.local.room.entity.Motor
+import com.zktony.www.data.remote.download.DownloadManager
+import com.zktony.www.data.remote.download.DownloadState
+import com.zktony.www.data.remote.model.Application
+import com.zktony.www.data.remote.result.NetworkResult
+import com.zktony.www.data.repository.ApplicationRepository
+import com.zktony.www.data.repository.MotorRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -133,7 +133,7 @@ class AdminViewModel @Inject constructor(
 
     /**
      *  下载apk
-     *  @param application [Version]
+     *  @param application [Application]
      */
     fun doRemoteUpdate(application: Application) {
         viewModelScope.launch {

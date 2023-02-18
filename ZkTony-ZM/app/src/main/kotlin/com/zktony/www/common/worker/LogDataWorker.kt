@@ -4,12 +4,11 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.www.common.network.model.LogDTO
-import com.zktony.www.common.network.model.LogDetailDTO
-import com.zktony.www.common.network.result.NetworkResult
 import com.zktony.www.common.utils.Logger
-import com.zktony.www.common.repository.LogDataRepository
-import com.zktony.www.common.repository.LogRepository
+import com.zktony.www.data.remote.model.LogDetailDTO
+import com.zktony.www.data.remote.result.NetworkResult
+import com.zktony.www.data.repository.LogDataRepository
+import com.zktony.www.data.repository.LogRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.first

@@ -17,7 +17,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ZkTony"
+rootProject.name = "ZkTony-ZM"
 include(":app")
 include(":gpio")
 include(":serialport")

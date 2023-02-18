@@ -6,12 +6,12 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.www.common.repository.CalibrationRepository
-import com.zktony.www.common.repository.MotorRepository
-import com.zktony.www.common.repository.PlateRepository
-import com.zktony.www.common.room.entity.Plate
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.control.motor.MotorManager
+import com.zktony.www.data.local.room.entity.Plate
+import com.zktony.www.data.repository.CalibrationRepository
+import com.zktony.www.data.repository.MotorRepository
+import com.zktony.www.data.repository.PlateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

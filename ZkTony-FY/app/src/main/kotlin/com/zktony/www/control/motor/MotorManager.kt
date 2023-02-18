@@ -1,7 +1,7 @@
 package com.zktony.www.control.motor
 
-import com.zktony.www.common.room.entity.Calibration
-import com.zktony.www.common.room.entity.Motor
+import com.zktony.www.data.local.room.entity.Calibration
+import com.zktony.www.data.local.room.entity.Motor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 

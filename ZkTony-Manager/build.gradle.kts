@@ -18,16 +18,10 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        maven { url = uri("https://developer.huawei.com/repo/")}
     }
     dependencies {
         classpath(libs.android.gradlePlugin)
         classpath(libs.kotlin.gradlePlugin)
-    }
-}
-
-subprojects {
-    repositories {
-        google()
-        mavenCentral()
     }
 }

@@ -6,9 +6,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.zktony.www.common.repository.CalibrationRepository
-import com.zktony.www.common.repository.MotorRepository
-import com.zktony.www.common.repository.PlateRepository
+import com.zktony.www.data.repository.CalibrationRepository
+import com.zktony.www.data.repository.MotorRepository
+import com.zktony.www.data.repository.PlateRepository
 import javax.inject.Inject
 
 /**

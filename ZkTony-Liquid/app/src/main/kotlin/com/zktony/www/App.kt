@@ -6,8 +6,8 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import com.zktony.www.common.app.ApplicationProxy
 import com.zktony.www.common.app.CommonApplicationProxy
-import com.zktony.www.common.datastore.DataStoreFactory
 import com.zktony.www.common.dialog.DialogXManager
+import com.zktony.www.data.local.datastore.DataStoreFactory
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 

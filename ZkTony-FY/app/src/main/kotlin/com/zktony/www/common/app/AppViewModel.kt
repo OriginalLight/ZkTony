@@ -7,10 +7,10 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.www.common.repository.CalibrationRepository
-import com.zktony.www.common.repository.ContainerRepository
-import com.zktony.www.common.repository.MotorRepository
-import com.zktony.www.common.room.entity.Container
+import com.zktony.www.data.repository.CalibrationRepository
+import com.zktony.www.data.repository.ContainerRepository
+import com.zktony.www.data.repository.MotorRepository
+import com.zktony.www.data.local.room.entity.Container
 import com.zktony.www.common.utils.Constants
 import com.zktony.www.control.motor.MotorManager
 import dagger.hilt.android.lifecycle.HiltViewModel

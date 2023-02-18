@@ -4,9 +4,9 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.extension.getDayEnd
 import com.zktony.www.common.extension.getDayStart
-import com.zktony.www.common.room.entity.LogRecord
-import com.zktony.www.common.repository.LogDataRepository
-import com.zktony.www.common.repository.LogRecordRepository
+import com.zktony.www.data.local.room.entity.LogRecord
+import com.zktony.www.data.repository.LogDataRepository
+import com.zktony.www.data.repository.LogRecordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

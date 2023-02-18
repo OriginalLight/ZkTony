@@ -16,7 +16,7 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.zktony.www.R
 import com.zktony.www.base.BaseFragment
 import com.zktony.www.common.extension.clickScale
-import com.zktony.www.common.room.entity.LogData
+import com.zktony.www.data.local.room.entity.LogData
 import com.zktony.www.databinding.FragmentLogChartBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

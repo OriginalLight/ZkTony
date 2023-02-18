@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.www.common.repository.LogDataRepository
-import com.zktony.www.common.repository.LogRecordRepository
+import com.zktony.www.data.repository.LogDataRepository
+import com.zktony.www.data.repository.LogRecordRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import javax.inject.Inject

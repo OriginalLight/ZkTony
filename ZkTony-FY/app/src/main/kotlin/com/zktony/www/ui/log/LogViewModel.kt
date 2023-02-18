@@ -5,8 +5,8 @@ import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.extension.getDayEnd
 import com.zktony.www.common.extension.getDayStart
 import com.zktony.www.common.extension.simpleDateFormat
-import com.zktony.www.common.room.entity.Log
-import com.zktony.www.common.repository.LogRepository
+import com.zktony.www.data.local.room.entity.Log
+import com.zktony.www.data.repository.LogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -1,24 +1,19 @@
 package com.zktony.www.control.motor
 
-import com.zktony.www.common.repository.CalibrationRepository
-import com.zktony.www.common.repository.MotorRepository
-import com.zktony.www.common.room.entity.Calibration
-import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.common.utils.Logger
+import com.zktony.www.data.local.room.entity.Calibration
+import com.zktony.www.data.local.room.entity.Motor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import javax.inject.Inject
+import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺
  * @date: 2023-01-30 14:27
  */
 class MotorManager(
-    scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
-
-    @Inject lateinit var motorRepository: MotorRepository
-    @Inject lateinit var calibrationRepository: CalibrationRepository
 
     private var x: Motor = Motor()
     private var y: Motor = Motor()
@@ -29,18 +24,22 @@ class MotorManager(
     private var calibration: Calibration = Calibration()
 
     fun initMotor(motorList: List<Motor>) {
-        x = motorList.find { it.id == 0 } ?: Motor()
-        y = motorList.find { it.id == 1 } ?: Motor()
-        p1 = motorList.find { it.id == 2 } ?: Motor()
-        p2 = motorList.find { it.id == 3 } ?: Motor()
-        p3 = motorList.find { it.id == 4 } ?: Motor()
-        p4 = motorList.find { it.id == 5 } ?: Motor()
-        Logger.d(msg = "MotorManager initMotor")
+        scope.launch {
+            x = motorList.find { it.id == 0 } ?: Motor()
+            y = motorList.find { it.id == 1 } ?: Motor()
+            p1 = motorList.find { it.id == 2 } ?: Motor()
+            p2 = motorList.find { it.id == 3 } ?: Motor()
+            p3 = motorList.find { it.id == 4 } ?: Motor()
+            p4 = motorList.find { it.id == 5 } ?: Motor()
+            Logger.d(msg = "MotorManager initMotor")
+        }
+
     }
 
     fun initCalibration(calibrationList: List<Calibration>) {
-        calibration = calibrationList.find { it.enable == 1 } ?: Calibration()
-        Logger.d(msg = "MotorManager initCalibration")
+        scope.launch {
+            calibration = calibrationList.find { it.enable == 1 } ?: Calibration()
+        }
     }
 
     fun move(distanceX: Float, distanceY: Float): Pair<Int, Int> {

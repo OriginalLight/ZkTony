@@ -8,7 +8,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.zktony.www.common.room.entity.Hole
+import com.zktony.www.data.local.room.entity.Hole
 
 
 class DynamicPlate : View {

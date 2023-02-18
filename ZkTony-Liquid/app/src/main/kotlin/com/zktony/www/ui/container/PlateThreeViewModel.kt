@@ -3,10 +3,10 @@ package com.zktony.www.ui.container
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.room.entity.Plate
 import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.control.serial.SerialManager
-import com.zktony.www.common.repository.PlateRepository
+import com.zktony.www.data.local.room.entity.Plate
+import com.zktony.www.data.repository.PlateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged

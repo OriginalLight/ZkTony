@@ -34,4 +34,13 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+# huawei
+-ignorewarnings
+-keepattributes *Annotation*
+-keepattributes Exceptions
+-keepattributes InnerClasses
+-keepattributes Signature
+-keepattributes SourceFile,LineNumberTable
+-keep class com.huawei.**{*;}
+
 -keepclasseswithmembers class com.zktony.manager.data.remote.model.** {*;}

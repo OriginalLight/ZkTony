@@ -1,17 +1,14 @@
 package com.zktony.www
 
 import android.os.Bundle
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.zktony.www.base.BaseActivity
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.noticeDialog
 import com.zktony.www.common.worker.WorkerManager
-import com.zktony.www.control.motor.MotorManager
 import com.zktony.www.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint

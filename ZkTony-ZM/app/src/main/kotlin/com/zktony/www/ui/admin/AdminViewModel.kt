@@ -16,12 +16,12 @@ import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.app.CommonApplicationProxy
 import com.zktony.www.common.extension.installApk
 import com.zktony.www.common.extension.isNetworkAvailable
-import com.zktony.www.common.network.download.DownloadManager
-import com.zktony.www.common.network.download.DownloadState
-import com.zktony.www.common.network.model.Application
-import com.zktony.www.common.network.result.NetworkResult
-import com.zktony.www.common.repository.ApplicationRepository
 import com.zktony.www.common.utils.Constants
+import com.zktony.www.data.remote.download.DownloadManager
+import com.zktony.www.data.remote.download.DownloadState
+import com.zktony.www.data.remote.model.Application
+import com.zktony.www.data.remote.result.NetworkResult
+import com.zktony.www.data.repository.ApplicationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

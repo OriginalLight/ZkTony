@@ -3,8 +3,8 @@ package com.zktony.www.ui.work
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.room.entity.Work
-import com.zktony.www.common.repository.WorkRepository
+import com.zktony.www.data.local.room.entity.Work
+import com.zktony.www.data.repository.WorkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

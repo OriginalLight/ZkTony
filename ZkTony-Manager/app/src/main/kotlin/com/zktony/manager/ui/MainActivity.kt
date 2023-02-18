@@ -37,8 +37,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val permissionManager = (application as App).permissions
-
         setContent {
             ManagerTheme(
                 dynamicColor = false,
@@ -46,19 +44,12 @@ class MainActivity : ComponentActivity() {
                 val windowSize = calculateWindowSizeClass(this)
                 val displayFeatures = calculateDisplayFeatures(this)
 
-                if (permissionManager.hasAllPermissions) {
+                PermissionScreen(content = {
                     ManagerApp(
                         windowSize = windowSize,
                         displayFeatures = displayFeatures,
                     )
-                } else {
-                    PermissionScreen(content = {
-                        ManagerApp(
-                            windowSize = windowSize,
-                            displayFeatures = displayFeatures,
-                        )
-                    })
-                }
+                })
             }
         }
     }

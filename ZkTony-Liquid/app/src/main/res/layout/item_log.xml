@@ -6,7 +6,7 @@
 
         <variable
             name="log"
-            type="com.zktony.www.common.room.entity.Log" />
+            type="com.zktony.www.data.local.room.entity.Log" />
     </data>
 
     <LinearLayout

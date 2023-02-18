@@ -144,41 +144,59 @@ private fun ManagerNavigationWrapper(
     val selectedDestination =
         navBackStackEntry?.destination?.route ?: Route.HOME
 
-    if (navigationType == NavigationType.PERMANENT_NAVIGATION_DRAWER) {
-        // TODO check on custom width of PermanentNavigationDrawer: b/232495216
-        PermanentNavigationDrawer(drawerContent = {
-            PermanentNavigationDrawerContent(
-                selectedDestination = selectedDestination,
-                navigationContentPosition = navigationContentPosition,
-                navigateToTopLevelDestination = navigationActions::navigateTo,
-            )
-        }) {
-            ManagerAppContent(
-                navigationType = navigationType,
-                contentType = contentType,
-                displayFeatures = displayFeatures,
-                navigationContentPosition = navigationContentPosition,
-                navController = navController,
-                selectedDestination = selectedDestination,
-                navigateToTopLevelDestination = navigationActions::navigateTo,
-            )
-        }
-    } else if (navigationType == NavigationType.NAVIGATION_RAIL) {
-        ModalNavigationDrawer(
-            drawerContent = {
-                ModalNavigationDrawerContent(
+    when (navigationType) {
+        NavigationType.PERMANENT_NAVIGATION_DRAWER -> {
+            // TODO check on custom width of PermanentNavigationDrawer: b/232495216
+            PermanentNavigationDrawer(drawerContent = {
+                PermanentNavigationDrawerContent(
                     selectedDestination = selectedDestination,
                     navigationContentPosition = navigationContentPosition,
                     navigateToTopLevelDestination = navigationActions::navigateTo,
-                    onDrawerClicked = {
-                        scope.launch {
-                            drawerState.close()
-                        }
-                    }
                 )
-            },
-            drawerState = drawerState
-        ) {
+            }) {
+                ManagerAppContent(
+                    navigationType = navigationType,
+                    contentType = contentType,
+                    displayFeatures = displayFeatures,
+                    navigationContentPosition = navigationContentPosition,
+                    navController = navController,
+                    selectedDestination = selectedDestination,
+                    navigateToTopLevelDestination = navigationActions::navigateTo,
+                )
+            }
+        }
+        NavigationType.NAVIGATION_RAIL -> {
+            ModalNavigationDrawer(
+                drawerContent = {
+                    ModalNavigationDrawerContent(
+                        selectedDestination = selectedDestination,
+                        navigationContentPosition = navigationContentPosition,
+                        navigateToTopLevelDestination = navigationActions::navigateTo,
+                        onDrawerClicked = {
+                            scope.launch {
+                                drawerState.close()
+                            }
+                        }
+                    )
+                },
+                drawerState = drawerState
+            ) {
+                ManagerAppContent(
+                    navigationType = navigationType,
+                    contentType = contentType,
+                    displayFeatures = displayFeatures,
+                    navigationContentPosition = navigationContentPosition,
+                    navController = navController,
+                    selectedDestination = selectedDestination,
+                    navigateToTopLevelDestination = navigationActions::navigateTo,
+                ) {
+                    scope.launch {
+                        drawerState.open()
+                    }
+                }
+            }
+        }
+        NavigationType.BOTTOM_NAVIGATION -> {
             ManagerAppContent(
                 navigationType = navigationType,
                 contentType = contentType,
@@ -187,22 +205,8 @@ private fun ManagerNavigationWrapper(
                 navController = navController,
                 selectedDestination = selectedDestination,
                 navigateToTopLevelDestination = navigationActions::navigateTo,
-            ) {
-                scope.launch {
-                    drawerState.open()
-                }
-            }
+            )
         }
-    } else {
-        ManagerAppContent(
-            navigationType = navigationType,
-            contentType = contentType,
-            displayFeatures = displayFeatures,
-            navigationContentPosition = navigationContentPosition,
-            navController = navController,
-            selectedDestination = selectedDestination,
-            navigateToTopLevelDestination = navigationActions::navigateTo,
-        )
     }
 }
 

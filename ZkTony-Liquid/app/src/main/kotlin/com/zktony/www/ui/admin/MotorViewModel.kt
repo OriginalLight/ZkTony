@@ -4,10 +4,10 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.serialport.util.Serial
 import com.zktony.www.base.BaseViewModel
-import com.zktony.www.common.room.entity.Motor
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
-import com.zktony.www.common.repository.MotorRepository
+import com.zktony.www.data.local.room.entity.Motor
+import com.zktony.www.data.repository.MotorRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

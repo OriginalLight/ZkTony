@@ -6,7 +6,7 @@
 
         <variable
             name="work"
-            type="com.zktony.www.common.room.entity.Work" />
+            type="com.zktony.www.data.local.room.entity.Work" />
     </data>
 
     <LinearLayout

@@ -53,3 +53,6 @@ fun Date.simpleDateFormat(format: String): String {
     val sdf = SimpleDateFormat(format)
     return sdf.format(this)
 }
+
+fun currentTime(): String =
+    Date(System.currentTimeMillis()).simpleDateFormat("yyyy-MM-dd HH:mm:ss")

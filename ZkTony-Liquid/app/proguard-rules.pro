@@ -97,8 +97,8 @@
 -keep class android.view.** { *; }
 
 # Model
--keep class com.zktony.www.common.network.model.** {*;}
--keepclasseswithmembers class com.zktony.www.common.network.adapter.NetworkResponse {*;}
--keepclasseswithmembers class * extends com.zktony.www.common.network.adapter.NetworkResponse {*;}
--keepclasseswithmembers class com.zktony.www.common.room.entity.** {*;}
+-keep class com.zktony.www.data.remote.model.** {*;}
+-keepclasseswithmembers class com.zktony.www.data.remote.adapter.NetworkResponse {*;}
+-keepclasseswithmembers class * extends com.zktony.www.data.remote.adapter.NetworkResponse {*;}
+-keepclasseswithmembers class com.zktony.www.data.local.room.entity.** {*;}
 
