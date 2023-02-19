@@ -42,5 +42,6 @@
     <string name="page_after_sale_subtitle">登记产品的售后记录</string>
     <string name="page_after_sale_history_title">售后记录</string>
     <string name="page_after_sale_history_subtitle">根据条件查询产品相关售后记录</string>
+    <string name="screen_setting_title">设置</string>
 
 </resources>
