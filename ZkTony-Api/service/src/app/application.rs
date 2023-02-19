@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use axum::http::StatusCode;
 use database::entities::{
     app::application,
     prelude::{ApplicationEntity, ApplicationModel},
@@ -9,16 +9,19 @@ use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 pub async fn get_by_id(
     db: &DatabaseConnection,
     application_id: String,
-) -> Result<ApplicationModel> {
+) -> Result<ApplicationModel, (StatusCode, String)> {
     let v = ApplicationEntity::find()
         .filter(application::Column::ApplicationId.eq(application_id))
         .one(db)
-        .await?;
+        .await
+        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
 
-    let res = match v {
-        Some(m) => m,
-        None => return Err(anyhow!("没有找到数据",)),
-    };
-    Ok(res)
+    match v {
+        Ok(m) => match m {
+            Some(v) => Ok(v),
+            None => Err((StatusCode::NOT_FOUND, "Not Found".to_string())),
+        },
+        Err(e) => Err(e),
+    }
 }
 // endregion
