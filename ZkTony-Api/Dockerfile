@@ -16,6 +16,7 @@ RUN USER=root cargo init
 COPY Cargo.toml Cargo.toml
 COPY api api
 COPY bin bin
+COPY common common
 COPY config config
 COPY configs configs
 COPY database database
