@@ -1,4 +1,4 @@
-package com.zktony.www.common.model
+package com.zktony.www.common.utils
 
 /**
  * @author: 刘贺贺

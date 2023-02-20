@@ -30,7 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -39,9 +39,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
 import com.zktony.manager.ui.navigation.*
-import com.zktony.manager.ui.screen.EmptyComingSoon
-import com.zktony.manager.ui.screen.HomeScreen
-import com.zktony.manager.ui.screen.SettingScreen
+import com.zktony.manager.ui.screen.*
 import com.zktony.manager.ui.utils.*
 import kotlinx.coroutines.launch
 
@@ -269,7 +267,7 @@ private fun ManagerNavHost(
             HomeScreen(
                 contentType = contentType,
                 displayFeatures = displayFeatures,
-                viewModel = viewModel()
+                viewModel = hiltViewModel()
             )
         }
         composable(Route.MANAGER) {
@@ -282,7 +280,7 @@ private fun ManagerNavHost(
             SettingScreen(
                 contentType = contentType,
                 displayFeatures = displayFeatures,
-                viewModel = viewModel()
+                viewModel = hiltViewModel()
             )
         }
     }

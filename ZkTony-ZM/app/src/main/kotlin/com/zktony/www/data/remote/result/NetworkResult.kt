@@ -1,7 +1,9 @@
 package com.zktony.www.data.remote.result
 
 import com.zktony.www.data.remote.result.NetworkResult.Success
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import retrofit2.Response
 
 sealed class NetworkResult<out R> {
 
@@ -32,4 +34,19 @@ inline fun <reified T> NetworkResult<T>.updateOnSuccess(stateFlow: MutableStateF
     if (this is Success) {
         stateFlow.value = data
     }
+}
+
+fun <T> Flow<Response<T>>.getNetworkResult() = flow {
+    emit(NetworkResult.Loading)
+    this@getNetworkResult
+        .flowOn(Dispatchers.IO)
+        .catch { emit(NetworkResult.Error(it)) }
+        .collect {
+            val body = it.body()
+            if (body != null) {
+                emit(Success(body))
+            } else {
+                emit(Success(null))
+            }
+        }
 }

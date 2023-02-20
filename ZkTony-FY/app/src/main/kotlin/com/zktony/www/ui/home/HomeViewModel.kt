@@ -10,7 +10,7 @@ import com.zktony.www.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.extractTemp
 import com.zktony.www.common.extension.removeZero
-import com.zktony.www.common.model.Queue
+import com.zktony.www.common.utils.Queue
 import com.zktony.www.data.local.room.entity.Action
 import com.zktony.www.data.local.room.entity.Log
 import com.zktony.www.data.local.room.entity.Program

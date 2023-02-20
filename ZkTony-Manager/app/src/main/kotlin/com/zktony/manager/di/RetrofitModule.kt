@@ -1,12 +1,10 @@
-package com.zktony.www.data.di
+package com.zktony.manager.di
 
 import com.google.gson.GsonBuilder
-import com.zktony.www.BuildConfig
-import com.zktony.www.common.utils.Constants
-import com.zktony.www.data.remote.adapter.FlowCallAdapterFactory
-import com.zktony.www.data.remote.service.ApplicationService
-import com.zktony.www.data.remote.service.LogService
-import com.zktony.www.data.remote.service.ProgramService
+import com.zktony.manager.BuildConfig
+import com.zktony.manager.data.remote.adapter.FlowCallAdapterFactory
+import com.zktony.manager.data.remote.service.ApplicationService
+import com.zktony.manager.data.remote.service.SoftwareService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +18,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 object RetrofitModule {
+
+    private const val BASE_URL = "http://192.168.10.103:9765"
+
 
     @Singleton
     @Provides
@@ -35,7 +36,7 @@ object RetrofitModule {
     @Provides
     fun getRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
+            .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addCallAdapterFactory(FlowCallAdapterFactory.createAsync())
             .addConverterFactory(GsonConverterFactory.create(
@@ -54,14 +55,8 @@ object RetrofitModule {
 
     @Singleton
     @Provides
-    fun provideLogService(retrofit: Retrofit): LogService {
-        return retrofit.create(LogService::class.java)
-    }
-
-    @Singleton
-    @Provides
-    fun provideProgramService(retrofit: Retrofit): ProgramService {
-        return retrofit.create(ProgramService::class.java)
+    fun provideSoftwareService(retrofit: Retrofit): SoftwareService {
+        return retrofit.create(SoftwareService::class.java)
     }
 
 }

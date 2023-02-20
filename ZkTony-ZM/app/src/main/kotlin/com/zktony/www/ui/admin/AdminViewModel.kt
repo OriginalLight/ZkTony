@@ -188,7 +188,7 @@ class AdminViewModel @Inject constructor(
 
     /**
      *  下载apk
-     *  @param application [Version]
+     *  @param application [Application]
      */
     fun doRemoteUpdate(application: Application) {
         viewModelScope.launch {
@@ -226,10 +226,15 @@ class AdminViewModel @Inject constructor(
                 applicationRepository.getById().collect {
                     when (it) {
                         is NetworkResult.Success -> {
-                            if (it.data.version_code > BuildConfig.VERSION_CODE) {
-                                _application.value = it.data
+                            if (it.data != null) {
+                                if (it.data.version_code > BuildConfig.VERSION_CODE) {
+                                    _application.value = it.data
+                                } else {
+                                    PopTip.show("当前已是最新版本")
+
+                                }
                             } else {
-                                PopTip.show("已经是最新版本")
+                                PopTip.show("升级接口异常请联系管理员")
                             }
                         }
                         is NetworkResult.Error -> {

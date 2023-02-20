@@ -1,13 +1,13 @@
-package com.zktony.manager.data.remote.client
+package com.zktony.manager.data.remote.result
 
-import com.zktony.manager.data.remote.client.NetworkResult.Success
-import kotlinx.coroutines.flow.MutableStateFlow
+import com.zktony.manager.data.remote.result.NetworkResult.Success
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
+import retrofit2.Response
 
 sealed class NetworkResult<out R> {
 
     data class Success<out T>(val data: T) : NetworkResult<T>()
-
-    data class Progress(val progress: Int) : NetworkResult<Nothing>()
     data class Error(val throwable: Throwable?) : NetworkResult<Nothing>()
     object Loading : NetworkResult<Nothing>()
 
@@ -15,7 +15,6 @@ sealed class NetworkResult<out R> {
         return when (this) {
             is Success<*> -> "Success[data=$data]"
             is Error -> "Error[throwable=$throwable]"
-            is Progress -> "Progress[progress=$progress]"
             Loading -> "Loading"
         }
     }
@@ -35,4 +34,19 @@ inline fun <reified T> NetworkResult<T>.updateOnSuccess(stateFlow: MutableStateF
     if (this is Success) {
         stateFlow.value = data
     }
+}
+
+fun <T> Flow<Response<T>>.getNetworkResult() = flow {
+    emit(NetworkResult.Loading)
+    this@getNetworkResult
+        .flowOn(Dispatchers.IO)
+        .catch { emit(NetworkResult.Error(it)) }
+        .collect {
+            val body = it.body()
+            if (body != null) {
+                emit(Success(body))
+            } else {
+                emit(Success(null))
+            }
+        }
 }

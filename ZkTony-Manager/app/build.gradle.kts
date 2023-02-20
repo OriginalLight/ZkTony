@@ -17,8 +17,9 @@
 plugins {
     id("com.android.application")
     id("kotlin-android")
+    id("kotlin-kapt")
     id("org.jetbrains.kotlin.android")
-    id("com.google.devtools.ksp") version "1.8.0-1.0.8"
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -126,6 +127,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.materialWindow)
     implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
@@ -133,15 +135,19 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.window)
+    implementation(libs.hilt.android)
     implementation(libs.huawei.hms.scanplus)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.okhttp3)
-    implementation(libs.rxhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.retrofit2)
+    implementation(libs.retrofit2.converter.gson)
 
 
-    ksp(libs.androidx.room.compiler)
-    ksp(libs.rxhttp.compiler)
+    kapt(libs.androidx.room.compiler)
+    kapt(libs.hilt.compiler)
+    kapt(libs.hilt.ext.compiler)
 
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

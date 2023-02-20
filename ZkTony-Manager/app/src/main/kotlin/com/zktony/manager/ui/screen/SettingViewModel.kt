@@ -3,22 +3,24 @@ package com.zktony.manager.ui.screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.manager.data.local.model.User
-import com.zktony.manager.data.store.UserStore
-import com.zktony.manager.ui.utils.DataManager
+import com.zktony.manager.data.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SettingViewModel(
-    private val userStore: UserStore = DataManager.userStore
+@HiltViewModel
+class SettingViewModel @Inject constructor(
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SettingUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            userStore.getAll().collect {
+            userRepository.getAll().collect {
                 if (it.isNotEmpty()) {
                     _uiState.value = _uiState.value.copy(user = it.first())
                 }
@@ -42,7 +44,7 @@ class SettingViewModel(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(loading = true)
             delay(1000)
-            userStore.insert(_uiState.value.user)
+            userRepository.insert(_uiState.value.user)
             _uiState.value = _uiState.value.copy(loading = false, page = SettingPage.SETTING)
         }
     }

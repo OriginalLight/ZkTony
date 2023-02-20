@@ -5,7 +5,6 @@ plugins {
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs")
     id("kotlin-kapt")
-    id("com.google.devtools.ksp") version "1.8.0-1.0.8"
 }
 
 android {
@@ -16,8 +15,8 @@ android {
         applicationId = "com.zktony.www"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 9
-        versionName = "1.2.2"
+        versionCode = 10
+        versionName = "1.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -107,8 +106,7 @@ dependencies {
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.zxing)
 
-    ksp(libs.androidx.room.compiler)
-
+    kapt(libs.androidx.room.compiler)
     kapt(libs.hilt.android.compiler)
     kapt(libs.hilt.compiler)
 

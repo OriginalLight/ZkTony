@@ -2,12 +2,10 @@ package com.zktony.www.data.repository
 
 import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Program
-import com.zktony.www.data.remote.adapter.toResult
 import com.zktony.www.data.remote.model.ProgramDTO
-import com.zktony.www.data.remote.result.NetworkResult
+import com.zktony.www.data.remote.result.getNetworkResult
 import com.zktony.www.data.remote.service.ProgramService
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 /**
@@ -50,9 +48,7 @@ class ProgramRepository @Inject constructor(
         return dao.withoutUpload()
     }
 
-    suspend fun uploadProgram(programs: List<ProgramDTO>) = flow {
-        emit(NetworkResult.Loading)
-        emit(service.uploadProgram(programs).toResult())
-    }
+    suspend fun uploadProgram(programs: List<ProgramDTO>) =
+        service.uploadProgram(programs).getNetworkResult()
 
 }
