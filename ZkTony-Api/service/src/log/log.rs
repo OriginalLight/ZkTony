@@ -1,5 +1,5 @@
-use anyhow::Result;
 use chrono::NaiveDateTime;
+use common::error::AppError;
 use database::{
     entities::{
         log::log::{self, Column},
@@ -10,7 +10,7 @@ use database::{
 use sea_orm::{sea_query::OnConflict, DatabaseConnection, EntityTrait, Set};
 
 // region: add_batch
-pub async fn add_batch(db: &DatabaseConnection, reqs: Vec<LogAddReq>) -> Result<String> {
+pub async fn add_batch(db: &DatabaseConnection, reqs: Vec<LogAddReq>) -> Result<String, AppError> {
     let mut add_data = Vec::new();
     for req in reqs {
         let create_time =
@@ -29,10 +29,10 @@ pub async fn add_batch(db: &DatabaseConnection, reqs: Vec<LogAddReq>) -> Result<
         .on_conflict(OnConflict::column(Column::Id).do_nothing().to_owned())
         .exec(db)
         .await
-        .map_err(|e| anyhow::anyhow!(e.to_string(),));
+        .map_err(|_| AppError::DataBaseError);
 
     match res {
-        Ok(_) => Ok("save log success".to_string()),
+        Ok(_) => Ok("Success".to_string()),
         Err(e) => Err(e),
     }
 }

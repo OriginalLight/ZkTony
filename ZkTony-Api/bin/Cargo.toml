@@ -8,6 +8,7 @@ version = "0.1.0"
 
 [dependencies]
 api = {path = "../api"}
+common = {path = "../common"}
 configs = {path = "../configs"}
 metrics = {path = "../metrics"}
 service = {path = "../service"}

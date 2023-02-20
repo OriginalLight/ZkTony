@@ -4,15 +4,17 @@ name = "service"
 version = "0.1.0"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-configs = {path = "../configs"}
-database = {path = "../database"}
-
-anyhow = {workspace = true, default-features = false}
-axum = {workspace = true, default-features = false}
-chrono = {workspace = true, default-features = false, features = ["serde"]}
-sea-orm = {workspace = true, default-features = false, features = ["macros", "runtime-tokio-native-tls", "debug-print"]}
+common = { path = "../common" }
+configs = { path = "../configs" }
+database = { path = "../database" }
+axum = { workspace = true, default-features = false }
+chrono = { workspace = true, default-features = false, features = ["serde"] }
+sea-orm = { workspace = true, default-features = false, features = [
+    "macros",
+    "runtime-tokio-native-tls",
+    "debug-print"
+] }
 
 [features]
 default = ["postgres"]

@@ -1,5 +1,5 @@
-use anyhow::Result;
 use chrono::NaiveDateTime;
+use common::error::AppError;
 use database::{
     entities::{
         manager::customer::{self, Column},
@@ -12,7 +12,7 @@ use sea_orm::{
 };
 
 // region: add
-pub async fn add(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<String> {
+pub async fn add(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<String, AppError> {
     let create_time =
         NaiveDateTime::parse_from_str(&req.create_time.unwrap(), "%Y-%m-%d %H:%M:%S").unwrap();
     let add_data = customer::ActiveModel {
@@ -31,17 +31,17 @@ pub async fn add(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<String
         .on_conflict(OnConflict::column(Column::Id).do_nothing().to_owned())
         .exec(db)
         .await
-        .map_err(|e| anyhow::anyhow!(e.to_string(),));
+        .map_err(|_| AppError::DataBaseError);
 
     match res {
-        Ok(_) => Ok("Add software success".to_string()),
+        Ok(_) => Ok("Success".to_string()),
         Err(e) => Err(e),
     }
 }
 // endregion
 
 // region: update
-pub async fn update(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<String> {
+pub async fn update(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<String, AppError> {
     let update_data = customer::ActiveModel {
         id: Set(req.id),
         name: Set(req.name),
@@ -55,31 +55,34 @@ pub async fn update(db: &DatabaseConnection, req: CustomerSaveReq) -> Result<Str
     let res = CustomerEntity::update(update_data)
         .exec(db)
         .await
-        .map_err(|e| anyhow::anyhow!(e.to_string(),));
+        .map_err(|_| AppError::DataBaseError);
 
     match res {
-        Ok(_) => Ok("Update software success".to_string()),
+        Ok(_) => Ok("Success".to_string()),
         Err(e) => Err(e),
     }
 }
 // endregion
 
 // region: delete
-pub async fn delete(db: &DatabaseConnection, req: CustomerDeleteReq) -> Result<String> {
+pub async fn delete(db: &DatabaseConnection, req: CustomerDeleteReq) -> Result<String, AppError> {
     let res = CustomerEntity::delete_by_id(req.id)
         .exec(db)
         .await
-        .map_err(|e| anyhow::anyhow!(e.to_string(),));
+        .map_err(|_| AppError::DataBaseError);
 
     match res {
-        Ok(_) => Ok("Delete software success".to_string()),
+        Ok(_) => Ok("Success".to_string()),
         Err(e) => Err(e),
     }
 }
 // endregion
 
 // region: get
-pub async fn get(db: &DatabaseConnection, req: CustomerGetReq) -> Result<Vec<CustomerModel>> {
+pub async fn get(
+    db: &DatabaseConnection,
+    req: CustomerGetReq,
+) -> Result<Option<Vec<CustomerModel>>, AppError> {
     let mut query = CustomerEntity::find();
     if let Some(x) = req.id {
         if !x.is_empty() {
@@ -105,10 +108,21 @@ pub async fn get(db: &DatabaseConnection, req: CustomerGetReq) -> Result<Vec<Cus
         }
     }
 
-    query
+    let res = query
         .clone()
         .all(db)
         .await
-        .map_err(|e| anyhow::anyhow!(e.to_string(),))
+        .map_err(|_| AppError::DataBaseError);
+
+    match res {
+        Ok(x) => {
+            if x.is_empty() {
+                Ok(None)
+            } else {
+                Ok(Some(x))
+            }
+        }
+        Err(e) => Err(e),
+    }
 }
 // endregion

@@ -61,16 +61,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "anyhow"
-version = "1.0.69"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "224afbd727c3d6e4b90103ece64b8d1b67fbb1973b1046c2281eed3f3803f800"
-
-[[package]]
 name = "api"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "common",
  "database",
  "service",
 ]
@@ -389,6 +384,15 @@ checksum = "3538270d33cc669650c4b093848450d380def10c331d38c768e34cac80576e6e"
 dependencies = [
  "termcolor",
  "unicode-width",
+]
+
+[[package]]
+name = "common"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -2047,9 +2051,9 @@ dependencies = [
 name = "service"
 version = "0.1.0"
 dependencies = [
- "anyhow",
  "axum",
  "chrono",
+ "common",
  "configs",
  "database",
  "sea-orm",
@@ -2986,6 +2990,7 @@ dependencies = [
  "api",
  "axum",
  "axum-server",
+ "common",
  "configs",
  "hyper",
  "metrics 0.1.0",

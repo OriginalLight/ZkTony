@@ -1,4 +1,4 @@
-use axum::http::StatusCode;
+use common::error::AppError;
 use database::entities::{
     app::application,
     prelude::{ApplicationEntity, ApplicationModel},
@@ -9,19 +9,11 @@ use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
 pub async fn get_by_id(
     db: &DatabaseConnection,
     application_id: String,
-) -> Result<ApplicationModel, (StatusCode, String)> {
-    let v = ApplicationEntity::find()
+) -> Result<Option<ApplicationModel>, AppError> {
+    ApplicationEntity::find()
         .filter(application::Column::ApplicationId.eq(application_id))
         .one(db)
         .await
-        .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()));
-
-    match v {
-        Ok(m) => match m {
-            Some(v) => Ok(v),
-            None => Err((StatusCode::NOT_FOUND, "Not Found".to_string())),
-        },
-        Err(e) => Err(e),
-    }
+        .map_err(|_| AppError::DataBaseError)
 }
 // endregion

@@ -1,5 +1,6 @@
-use axum::{http::Method, middleware, response::Html, Router};
+use axum::{http::Method, middleware, response::IntoResponse, Router};
 use axum_server::tls_rustls::RustlsConfig;
+use common::error::AppError;
 use configs::CFG;
 use metrics::layer::track_metrics;
 use std::{net::SocketAddr, str::FromStr};
@@ -46,7 +47,7 @@ async fn start_main_server() {
         true => app.route_layer(middleware::from_fn(track_metrics)),
         false => app,
     };
-    let app = app.fallback(|| async { Html("<h1>404 Not Found</h1>") });
+    let app = app.fallback(|| async { AppError::NotFound.into_response() });
     let addr = SocketAddr::from_str(&CFG.server.address).unwrap();
     tracing::info!("Server listening on {}", addr);
     // ssl
