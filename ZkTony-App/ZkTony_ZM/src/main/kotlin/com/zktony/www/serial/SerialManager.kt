@@ -21,7 +21,7 @@ class SerialManager(
     init {
         scope.launch {
             launch {
-                MutableSerial.instance.init(Serial.TTYS4, 115200)
+                MutableSerial.instance.init(Serial.TTYS4, 115200, 100L, 30L)
             }
             launch {
                 MutableSerial.instance.listener = { _, data ->

@@ -11,7 +11,6 @@ import com.zktony.serialport.util.Serial.TTYS0
 import com.zktony.serialport.util.Serial.TTYS3
 import com.zktony.www.R
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.extension.extractTemp
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
 import com.zktony.www.data.local.room.entity.Action
@@ -70,7 +69,7 @@ class HomeViewModel @Inject constructor(
                         if (it.startsWith("TC1:TCACTUALTEMP=")) {
                             // 读取温度
                             val address = it.substring(it.length - 2, it.length - 1).toInt()
-                            val temp = it.extractTemp()
+                            val temp = it.replace("TC1:TCACTUALTEMP=", "").split("@")[0].removeZero()
                             when (address) {
                                 1 -> _aFlow.value = _aFlow.value.copy(temp = "$temp ℃")
                                 2 -> _bFlow.value = _bFlow.value.copy(temp = "$temp ℃")
@@ -91,12 +90,12 @@ class HomeViewModel @Inject constructor(
                 // 每十秒钟查询一次温度
                 while (true) {
                     for (i in 0..4) {
-                        delay(200L)
+                        delay(300L)
                         serial.sendText(
                             serial = TTYS3, text = V1.queryTemp(i.toString())
                         )
                     }
-                    delay(2 * 1000L)
+                    delay(3 * 1000L)
                 }
             }
         }
@@ -326,8 +325,7 @@ class HomeViewModel @Inject constructor(
                     if (swing) "摇床-已暂停" else "摇床-已恢复"
                 )
                 serial.sendHex(
-                    serial = TTYS0, hex = if (swing) V1.resumeShakeBed()
-                    else V1.pauseShakeBed()
+                    serial = TTYS0, hex = if (swing) V1.pauseShakeBed() else V1.resumeShakeBed()
                 )
                 // 更新状态
                 serial.swing(!swing)
@@ -362,7 +360,7 @@ class HomeViewModel @Inject constructor(
             serial.sendHex(
                 serial = TTYS0, hex = V1.openLock()
             )
-            delay(20 * 1000L)
+            delay(10 * 1000L)
             _buttonFlow.value = _buttonFlow.value.copy(
                 lock = true
             )

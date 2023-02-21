@@ -185,12 +185,12 @@ class CommandExecutor constructor(
             if (!serial.drawer.value) {
                 block.invoke()
             } else {
-                _wait.value = "等待抽屉关闭"
+                _wait.value = "抽屉未关闭"
                 delay(300L)
                 waitForFree(block)
             }
         } else {
-            _wait.value = "等待加液/回收完成"
+            _wait.value = "等待加液"
             delay(300L)
             waitForFree(block)
         }

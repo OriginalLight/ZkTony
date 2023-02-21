@@ -56,12 +56,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 launch {
                     SerialManager.instance.swing.collect {
                         binding.e.apply {
-                            pause.setBackgroundResource(if (!it) R.mipmap.btn_continue else R.mipmap.btn_pause)
+                            pause.setBackgroundResource(if (it) R.mipmap.btn_pause else R.mipmap.btn_continue)
                             with(tvPause) {
-                                text = if (!it) "继续摇床" else "暂停摇床"
+                                text = if (it) "暂停摇床" else "继续摇床"
                                 setTextColor(
                                     ContextCompat.getColor(
-                                        context, if (!it) R.color.red else R.color.dark_outline
+                                        context, if (it)  R.color.dark_outline else R.color.red
                                     )
                                 )
                             }
@@ -131,7 +131,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     clickScale()
                     setOnClickListener {
                         if (viewModel.buttonFlow.value.lock) {
-                            PopTip.show("已解锁，20秒后上锁")
+                            PopTip.show("已解锁，10秒后上锁")
                             viewModel.unlock()
                         } else {
                             PopTip.show("已解锁")

@@ -9,8 +9,8 @@ class MutableSerial {
     var listener: (Serial, String) -> Unit = { _, _ -> }
 
     @Synchronized
-    fun init(portStr: Serial, baudRate: Int): Int {
-        return init(portStr, baudRate, 1, 8, 0, 0)
+    fun init(portStr: Serial, baudRate: Int, sendDelay: Long = 30L, readDelay: Long = 30L): Int {
+        return init(portStr, baudRate, 1, 8, 0, 0, sendDelay, readDelay)
     }
 
     @Synchronized
@@ -20,14 +20,16 @@ class MutableSerial {
         stopBits: Int,
         dataBits: Int,
         parity: Int,
-        flowCon: Int
+        flowCon: Int,
+        sendDelay: Long,
+        readDelay: Long
     ): Int {
         require(baudRate != 0) { "Serial port and baud rate cannot be empty" }
         val serial = serialMap[portStr]
         if (serial != null && serial.isOpen) {
             return 1
         }
-        val baseSerial: BaseSerial = object : BaseSerial(portStr, baudRate) {}.apply {
+        val baseSerial: BaseSerial = object : BaseSerial(portStr, baudRate, sendDelay, readDelay) {}.apply {
             this.onDataReceived = { data: String ->
                 listener.invoke(portStr, data)
             }

@@ -15,7 +15,7 @@ import java.security.InvalidParameterException
 /**
  * Serial port auxiliary tool class
  */
-abstract class SerialHelper(sPort: Serial, iBaudRate: Int) {
+abstract class SerialHelper(sPort: Serial, iBaudRate: Int, outDelay: Long, inDelay: Long) {
     private lateinit var serialPort: SerialPort
     private lateinit var outputStream: OutputStream
     private lateinit var inputStream: InputStream
@@ -23,8 +23,8 @@ abstract class SerialHelper(sPort: Serial, iBaudRate: Int) {
     private lateinit var workHandler: Handler
     private lateinit var handlerThread: HandlerThread
     private var fullData = ""
-    private val sendDelay = 100L
-    private val readDelay = 30L
+    private val sendDelay = outDelay
+    private val readDelay = inDelay
     private val port = sPort
     private val baudRate = iBaudRate
     var onDataReceived: (String) -> Unit = { _ -> }

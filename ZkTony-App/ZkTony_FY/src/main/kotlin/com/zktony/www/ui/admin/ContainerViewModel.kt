@@ -62,6 +62,7 @@ class ContainerViewModel @Inject constructor(
     fun toWasteZ() {
         viewModelScope.launch {
             manager.executor(
+                manager.generator(y = container.value.wasteY),
                 manager.generator(y = container.value.wasteY, z = container.value.wasteZ)
             )
         }
@@ -85,6 +86,7 @@ class ContainerViewModel @Inject constructor(
     fun toWashZ() {
         viewModelScope.launch {
             manager.executor(
+                manager.generator(y = container.value.washY),
                 manager.generator(y = container.value.washY, z = container.value.washZ)
             )
         }
@@ -107,6 +109,7 @@ class ContainerViewModel @Inject constructor(
     fun toBlockZ() {
         viewModelScope.launch {
             manager.executor(
+                manager.generator(y = container.value.blockY),
                 manager.generator(y = container.value.blockY, z = container.value.blockZ)
             )
         }
@@ -129,6 +132,7 @@ class ContainerViewModel @Inject constructor(
     fun toOneZ() {
         viewModelScope.launch {
             manager.executor(
+                manager.generator(y = container.value.oneY),
                 manager.generator(y = container.value.oneY, z = container.value.oneZ)
             )
         }
@@ -140,6 +144,7 @@ class ContainerViewModel @Inject constructor(
     fun toRecycleOneZ() {
         viewModelScope.launch {
             manager.executor(
+                manager.generator(y = container.value.oneY),
                 manager.generator(y = container.value.oneY, z = container.value.recycleOneZ)
             )
         }
@@ -162,6 +167,7 @@ class ContainerViewModel @Inject constructor(
     fun toTwoZ() {
         viewModelScope.launch {
             manager.executor(
+                manager.generator(y = container.value.twoY),
                 manager.generator(y = container.value.twoY, z = container.value.twoZ)
             )
         }

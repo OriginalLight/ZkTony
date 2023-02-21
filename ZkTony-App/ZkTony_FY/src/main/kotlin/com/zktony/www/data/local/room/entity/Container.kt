@@ -13,19 +13,19 @@ data class Container(
     @PrimaryKey
     val id: Int = 1,
     // 废液槽位置
-    val wasteY: Float = 6.5f,
-    val wasteZ: Float = 20f,
+    val wasteY: Float = 1f,
+    val wasteZ: Float = 100f,
     // 洗涤槽液位置
-    val washY: Float = 50f,
-    val washZ: Float = 98f,
+    val washY: Float = 45f,
+    val washZ: Float = 100f,
     // 封闭液槽位置
-    val blockY: Float = 89f,
-    val blockZ: Float = 98f,
+    val blockY: Float = 83f,
+    val blockZ: Float = 100f,
     // 一抗槽位置
-    val oneY: Float = 175.5f,
-    val oneZ: Float = 103f,
-    val recycleOneZ: Float = 30f,
+    val oneY: Float = 168f,
+    val oneZ: Float = 100f,
+    val recycleOneZ: Float = 80f,
     // 二抗槽位置
-    val twoY: Float = 137f,
-    val twoZ: Float = 103f,
+    val twoY: Float = 130f,
+    val twoZ: Float = 100f,
 )

@@ -12,7 +12,8 @@ import java.security.InvalidParameterException
  * @author: 刘贺贺
  * @date: 2022-12-08 14:39
  */
-abstract class BaseSerial(sPort: Serial, iBaudRate: Int) : SerialHelper(sPort, iBaudRate) {
+abstract class BaseSerial(sPort: Serial, iBaudRate: Int, outDelay: Long, inDelay: Long) :
+    SerialHelper(sPort, iBaudRate, outDelay, inDelay) {
 
     /**
      * Open the serial port
