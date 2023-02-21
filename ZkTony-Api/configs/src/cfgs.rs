@@ -6,15 +6,7 @@ pub struct Configs {
     pub cert: Cert,
     pub database: Database,
     pub server: Server,
-    pub metrics: Metrics,
     pub log: Log,
-}
-
-// metrics 配置文件
-#[derive(Debug, Deserialize)]
-pub struct Metrics {
-    pub address: String,
-    pub timeout: u64,
 }
 
 /// server 配置文件
@@ -23,7 +15,6 @@ pub struct Server {
     pub name: String,
     pub version: String,
     pub address: String,
-    pub metrics: bool,
     pub ssl: bool,
     pub content_gzip: bool,
 }
