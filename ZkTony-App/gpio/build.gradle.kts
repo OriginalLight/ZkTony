@@ -1,7 +1,8 @@
 @file:Suppress("UnstableApiUsage")
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.android.library")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -12,18 +13,17 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
 
         ndk {
-            ndkVersion = libs.versions.ndkVersion.get()
+            ndkVersion = libs.versions.ndk.get()
             abiFilters += listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
         }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles("consumer-rules.pro")
     }
 
     externalNativeBuild {
         cmake {
             path = file("CMakeLists.txt")
-            version = libs.versions.cMakeVersion.get()
+            version = libs.versions.cmake.get()
         }
     }
 }

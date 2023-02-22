@@ -1,7 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-include(":common")
-
 pluginManagement {
     repositories {
         gradlePluginPortal()
@@ -25,6 +23,7 @@ include(":ZkTony_FY")
 include(":ZkTony_LIQUID")
 include(":ZkTony_TEST")
 include(":ZkTony_ZM")
+include(":common")
 include(":gpio")
 include(":serialport")
 

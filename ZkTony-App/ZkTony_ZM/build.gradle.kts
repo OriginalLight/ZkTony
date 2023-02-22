@@ -1,10 +1,11 @@
 @file:Suppress("UnstableApiUsage")
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("dagger.hilt.android.plugin")
-    id("androidx.navigation.safeargs")
-    id("kotlin-kapt")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kapt)
+    alias(libs.plugins.safeargs)
+    alias(libs.plugins.hilt)
 }
 
 android {
