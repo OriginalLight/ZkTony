@@ -12,13 +12,12 @@ import java.security.InvalidParameterException
  * @author: 刘贺贺
  * @date: 2022-12-08 14:39
  */
-abstract class BaseSerial(sPort: Serial, iBaudRate: Int, outDelay: Long, inDelay: Long) :
-    SerialHelper(sPort, iBaudRate, outDelay, inDelay) {
+abstract class BaseSerial(sPort: Serial, iBaudRate: Int) : SerialHelper(sPort, iBaudRate) {
 
     /**
      * Open the serial port
      */
-    fun openSerial(): Int {
+    fun init(): Int {
         return try {
             open()
             Log.i(TAG, "Open the serial port successfully")
@@ -41,7 +40,7 @@ abstract class BaseSerial(sPort: Serial, iBaudRate: Int, outDelay: Long, inDelay
     /**
      * Send HEX data
      *
-     * @param sHex hex data
+     * @param hex hex data
      */
     fun sendHex(sHex: String) {
         val hex = sHex.trim { it <= ' ' }.replace(" ".toRegex(), "")
@@ -54,7 +53,7 @@ abstract class BaseSerial(sPort: Serial, iBaudRate: Int, outDelay: Long, inDelay
     /**
      * Send string data
      *
-     * @param sText string data
+     * @param text string data
      */
     fun sendText(sText: String) {
         val bOutArray: ByteArray
@@ -71,11 +70,11 @@ abstract class BaseSerial(sPort: Serial, iBaudRate: Int, outDelay: Long, inDelay
     /**
      * Send byte data
      *
-     * @param bOutArray byte data
+     * @param bytes byte data
      */
-    fun sendByteArray(bOutArray: ByteArray) {
+    fun sendByteArray(bytes: ByteArray) {
         val msg = Message.obtain()
-        msg.obj = bOutArray
+        msg.obj = bytes
         addWaitMessage(msg)
     }
 

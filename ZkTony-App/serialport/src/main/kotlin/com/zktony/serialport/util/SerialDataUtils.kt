@@ -12,7 +12,7 @@ object SerialDataUtils {
      * 判断奇数或偶数，位运算，最后一位是1则为奇数，为0是偶数
      * Judging odd or even numbers, bit operations, the last bit is 1 is odd, 0 is even
      */
-    fun isOdd(num: Int): Int {
+    private fun isOdd(num: Int): Int {
         return num and 1
     }
 
@@ -28,7 +28,7 @@ object SerialDataUtils {
      * Hex字符串转byte
      * Hex string to byte
      */
-    fun hexToByte(inHex: String): Byte {
+    private fun hexToByte(inHex: String): Byte {
         return inHex.toInt(16).toByte()
     }
 
@@ -36,7 +36,7 @@ object SerialDataUtils {
      * 1字节转2个Hex字符
      * 1 byte to 2 Hex characters
      */
-    fun byte2Hex(inByte: Byte): String {
+    private fun byte2Hex(inByte: Byte): String {
         return String.format("%02x", inByte).uppercase(Locale.getDefault())
     }
 

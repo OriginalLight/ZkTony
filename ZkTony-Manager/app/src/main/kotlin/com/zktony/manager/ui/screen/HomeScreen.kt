@@ -16,13 +16,8 @@
 
 package com.zktony.manager.ui.screen
 
-import android.app.Activity
-import android.content.Intent
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,7 +34,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -55,16 +49,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.layout.DisplayFeature
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
-import com.google.gson.Gson
 import com.zktony.manager.R
-import com.zktony.manager.data.remote.model.Software
-import com.zktony.manager.ui.QrCodeActivity
 import com.zktony.manager.ui.components.FunctionCard
 import com.zktony.manager.ui.components.ManagerCheckAppBar
+import com.zktony.manager.ui.components.QrCodeTextField
 import com.zktony.manager.ui.components.SoftwareCard
 import com.zktony.manager.ui.utils.ContentType
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 // region HomeScreen
 @Composable
@@ -184,7 +175,7 @@ fun HomePageContent(
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(1.dp), color = Color.LightGray
+                        .height(1.dp), color = Color.Gray
                 )
                 FunctionCard(title = stringResource(id = R.string.page_shipping_history_title),
                     subtitle = stringResource(id = R.string.page_shipping_history_subtitle),
@@ -193,7 +184,7 @@ fun HomePageContent(
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(1.dp), color = Color.LightGray
+                        .height(1.dp), color = Color.Gray
                 )
                 FunctionCard(title = stringResource(id = R.string.page_after_sale_title),
                     subtitle = stringResource(id = R.string.page_after_sale_subtitle),
@@ -202,7 +193,7 @@ fun HomePageContent(
                 Divider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(1.dp), color = Color.LightGray
+                        .height(1.dp), color = Color.Gray
                 )
                 FunctionCard(
                     title = stringResource(id = R.string.page_after_sale_history_title),
@@ -301,34 +292,8 @@ fun ShippingPageContent(
         viewModel.navigateTo(HomePage.HOME)
     }
 
-    val context = LocalContext.current
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val localFocusManager = LocalFocusManager.current
-    val focusRequester = remember { FocusRequester() }
-    val qrCodeScanner =
-        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            if (it.resultCode == Activity.RESULT_OK) {
-                val result = it.data?.getStringExtra("SCAN_RESULT")
-                // result 是json字符串解析成software对象
-                try {
-                    val software = Gson().fromJson(result, Software::class.java)
-                    viewModel.setSoftware(software)
-                } catch (e: Exception) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            message = "无效的二维码",
-                            actionLabel = "关闭",
-                            duration = SnackbarDuration.Short
-                        )
-                    }
-                }
-            }
-        }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -354,54 +319,10 @@ fun ShippingPageContent(
                     .padding(horizontal = 16.dp)
                     .fillMaxSize(),
             ) {
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
+                QrCodeTextField(
                     value = uiState.software.id,
-                    label = { Text(text = "Android ID") },
                     onValueChange = { viewModel.setSoftware(uiState.software.copy(id = it)) },
-                    leadingIcon = {
-                        Icon(
-                            modifier = Modifier.size(16.dp),
-                            imageVector = Icons.Outlined.Key,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.outline
-                        )
-                    },
-                    trailingIcon = {
-                        Icon(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .absoluteOffset(x = (-8).dp)
-                                .clickable {
-                                    qrCodeScanner.launch(
-                                        Intent(
-                                            context, QrCodeActivity::class.java
-                                        )
-                                    )
-                                },
-                            imageVector = Icons.Outlined.QrCode,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    },
-                    shape = RoundedCornerShape(4.dp),
-                    colors = TextFieldDefaults.textFieldColors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    textStyle = MaterialTheme.typography.bodyMedium,
-                    maxLines = 1,
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Done, keyboardType = KeyboardType.Ascii
-                    ),
-                    keyboardActions = KeyboardActions(onDone = {
-                        keyboardController?.hide()
-                        localFocusManager.clearFocus()
-                    }),
-                    visualTransformation = VisualTransformation.None,
+                    onSoftwareChange = { viewModel.setSoftware(it) },
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 

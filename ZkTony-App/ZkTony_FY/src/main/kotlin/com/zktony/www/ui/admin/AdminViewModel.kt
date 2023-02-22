@@ -18,9 +18,9 @@ import com.zktony.common.http.download.DownloadManager
 import com.zktony.common.http.download.DownloadState
 import com.zktony.common.http.result.NetworkResult
 import com.zktony.common.utils.Constants
+import com.zktony.serialport.util.toSerial
 import com.zktony.www.BuildConfig
 import com.zktony.www.common.extension.toMotor
-import com.zktony.www.common.extension.toSerial
 import com.zktony.www.common.extension.toV1
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1

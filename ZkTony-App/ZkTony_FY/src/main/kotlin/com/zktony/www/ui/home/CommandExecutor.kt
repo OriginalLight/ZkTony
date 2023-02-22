@@ -40,7 +40,7 @@ class CommandExecutor constructor(
         waitForFree {
             // 设置温度
             serial.setTemp(
-                addr = (module + 1).toString(),
+                addr = module + 1,
                 temp = action.temperature.toString()
             )
             addLiquid(y = con.blockY, z = con.blockZ)
@@ -58,7 +58,7 @@ class CommandExecutor constructor(
         waitForFree {
             // 设置温度
             serial.setTemp(
-                addr = (module + 1).toString(),
+                addr = module + 1,
                 temp = action.temperature.toString()
             )
             addLiquid(y = con.oneY, z = con.oneZ)
@@ -89,7 +89,7 @@ class CommandExecutor constructor(
         waitForFree {
             // 设置温度
             serial.setTemp(
-                addr = (module + 1).toString(),
+                addr = module + 1,
                 temp = action.temperature.toString()
             )
             addLiquid(y = con.twoY, z = con.twoZ)
@@ -107,7 +107,7 @@ class CommandExecutor constructor(
         waitForFree {
             // 设置温度
             serial.setTemp(
-                addr = (module + 1).toString(),
+                addr = module + 1,
                 temp = action.temperature.toString()
             )
             // 主板运动

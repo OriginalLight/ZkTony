@@ -85,7 +85,7 @@ class HomeViewModel @Inject constructor(
                 // 设置和定时查询温控
                 for (i in 0..4) {
                     delay(500L)
-                    serial.setTemp(addr = i.toString(), temp = if (i == 0) "3" else "26")
+                    serial.setTemp(addr = i, temp = if (i == 0) "3" else appViewModel.settings.value.temp.toString().removeZero())
                 }
                 // 每十秒钟查询一次温度
                 while (true) {
@@ -279,19 +279,9 @@ class HomeViewModel @Inject constructor(
                 action = "/",
                 time = if (state.value.status != "已完成") Constants.ZERO_TIME else state.value.time,
             )
-            // 等待一下，当还有没有其他程序在运行中时
-            // 暂停摇床
             // 恢复到室温
-            // 复位
             delay(200L)
-            if (!serial.run.value) {
-                // 恢复到室温
-                for (i in 1..4) {
-                    delay(200L)
-                    serial.setTemp(addr = i.toString(), temp = "26")
-                }
-                serial.reset()
-            }
+            serial.setTemp(addr = module + 1, temp = "26")
         }
     }
 
@@ -342,7 +332,7 @@ class HomeViewModel @Inject constructor(
             // 发送设置温度命令 -> 更改按钮状态
             // 发送设置温度命令 如果当前是未保温状态发送设置中的温度，否则发送室温26度
             serial.setTemp(
-                addr = "0", temp = if (_buttonFlow.value.insulating) "26"
+                addr = 0, temp = if (_buttonFlow.value.insulating) "26"
                 else appViewModel.settings.value.temp.toString().removeZero()
             )
             // 更改按钮状态

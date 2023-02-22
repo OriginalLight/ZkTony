@@ -113,13 +113,8 @@ class MotorViewModel @Inject constructor(
                     }
                     SerialManager.instance.sendHex(
                         serial,
-                        V1(
-                            pa = "04",
-                            data = it.toHex()
-                        ).toHex()
+                        V1(pa = "04", data = it.toHex()).toHex()
                     )
-                    PopTip.show("更新成功")
-
                     PopTip.show("更新成功")
                 }
             }

@@ -9,13 +9,13 @@ class MutableSerial {
     var listener: (Serial, String) -> Unit = { _, _ -> }
 
     @Synchronized
-    fun init(portStr: Serial, baudRate: Int, sendDelay: Long = 30L, readDelay: Long = 30L): Int {
-        return init(portStr, baudRate, 1, 8, 0, 0, sendDelay, readDelay)
+    fun init(serial: Serial, baudRate: Int, sendDelay: Long = 30L, readDelay: Long = 30L): Int {
+        return init(serial, baudRate, 1, 8, 0, 0, sendDelay, readDelay)
     }
 
     @Synchronized
     fun init(
-        portStr: Serial,
+        serial: Serial,
         baudRate: Int,
         stopBits: Int,
         dataBits: Int,
@@ -25,25 +25,32 @@ class MutableSerial {
         readDelay: Long
     ): Int {
         require(baudRate != 0) { "Serial port and baud rate cannot be empty" }
-        val serial = serialMap[portStr]
-        if (serial != null && serial.isOpen) {
+
+        val currentSerial = serialMap[serial]
+        if (currentSerial != null && currentSerial.isOpen) {
             return 1
         }
-        val baseSerial: BaseSerial = object : BaseSerial(portStr, baudRate, sendDelay, readDelay) {}.apply {
+
+        val baseSerial = object : BaseSerial(serial, baudRate) {}.apply {
             this.onDataReceived = { data: String ->
-                listener.invoke(portStr, data)
+                listener.invoke(serial, data)
             }
             this.stopBits = stopBits
             this.dataBits = dataBits
             this.parity = parity
             this.flowCon = flowCon
+            this.readDelay = readDelay
+            this.sendDelay = sendDelay
         }
-        val openStatus = baseSerial.openSerial()
+
+        val openStatus = baseSerial.init()
+
         if (openStatus == 0) {
-            serialMap[portStr] = baseSerial
+            serialMap[serial] = baseSerial
         } else {
             baseSerial.close()
         }
+
         return openStatus
     }
 
@@ -51,19 +58,19 @@ class MutableSerial {
      * 串口是否已经打开
      * Serial port status (open/close)
      */
-    fun isOpenSerial(portStr: Serial): Boolean {
-        val serial = serialMap[portStr]
-        return serial != null && serial.isOpen
+    fun isOpenSerial(serial: Serial): Boolean {
+        val currentSerial = serialMap[serial]
+        return currentSerial != null && currentSerial.isOpen
     }
 
     /**
      * Close the serial port
      */
-    fun close(portStr: Serial) {
-        val serial = serialMap[portStr]
-        if (serial != null) {
-            serial.close()
-            serialMap.remove(portStr)
+    fun close(serial: Serial) {
+        val currentSerial = serialMap[serial]
+        if (currentSerial != null) {
+            currentSerial.close()
+            serialMap.remove(serial)
         } else {
             Log.e(TAG, "The serial port is closed or not initialized")
         }
@@ -72,14 +79,14 @@ class MutableSerial {
     /**
      * send data
      *
-     * @param portStr
+     * @param serial
      * @param hexData
      */
-    fun sendHex(portStr: Serial, hexData: String) {
-        val serial = serialMap[portStr]
-        if (serial != null && serial.isOpen) {
+    fun sendHex(serial: Serial, hexData: String) {
+        val currentSerial = serialMap[serial]
+        if (currentSerial != null && currentSerial.isOpen) {
             val dateTrim = hexData.trim { it <= ' ' }.replace(" ", "")
-            serial.sendHex(dateTrim)
+            currentSerial.sendHex(dateTrim)
         } else {
             Log.e(TAG, "The serial port is closed or not initialized")
         }
@@ -88,13 +95,13 @@ class MutableSerial {
     /**
      *  send data
      *
-     *  @param portStr
+     *  @param serial
      *  @param byteData
      */
-    fun sendByte(portStr: Serial, byteData: ByteArray) {
-        val serial = serialMap[portStr]
-        if (serial != null && serial.isOpen) {
-            serial.sendByteArray(byteData)
+    fun sendByte(serial: Serial, byteData: ByteArray) {
+        val currentSerial = serialMap[serial]
+        if (currentSerial != null && currentSerial.isOpen) {
+            currentSerial.sendByteArray(byteData)
         } else {
             Log.e(TAG, "The serial port is closed or not initialized")
         }
@@ -103,13 +110,13 @@ class MutableSerial {
     /**
      *  send data
      *
-     *  @param portStr
+     *  @param serial
      *  @param strData
      */
-    fun sendText(portStr: Serial, strData: String) {
-        val serial = serialMap[portStr]
-        if (serial != null && serial.isOpen) {
-            serial.sendText(strData)
+    fun sendText(serial: Serial, strData: String) {
+        val currentSerial = serialMap[serial]
+        if (currentSerial != null && currentSerial.isOpen) {
+            currentSerial.sendText(strData)
         } else {
             Log.e(TAG, "The serial port is closed or not initialized")
         }

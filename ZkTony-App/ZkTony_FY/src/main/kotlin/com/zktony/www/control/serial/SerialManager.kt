@@ -173,11 +173,16 @@ class SerialManager(
         }
         _lock.value = true
         lockTime = 0L
+        sendHex(
+            serial = TTYS0, hex = V1(
+                fn = "05", pa = "01", data = "0101302C302C302C302C"
+            ).toHex()
+        )
         sendHex(serial = TTYS0, hex = V1().toHex())
 
     }
 
-    fun setTemp(temp: String, addr: String) {
+    fun setTemp(temp: String, addr: Int) {
         scope.launch {
             sendText(TTYS3, "TC1:TCSW=0@$addr\r")
             delay(30 * 1000L)
