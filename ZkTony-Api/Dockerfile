@@ -20,7 +20,6 @@ COPY common common
 COPY config config
 COPY configs configs
 COPY database database
-COPY metrics metrics
 COPY service service
 COPY utils utils
 
@@ -39,7 +38,6 @@ COPY --from=builder /code/config config
 
 # indicate what port the server is running on
 EXPOSE 9765
-EXPOSE 9000
 
 # run server
 CMD [ "/app/zktony-api" ]

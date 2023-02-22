@@ -4,15 +4,10 @@ version = "0.1.0"
 # 服务器ip 端口
 address = "0.0.0.0:9765"
 # 是否开启 metrics
-metrics = false
 # 服务器ssl
 ssl = false
 # 响应数据压缩
 content_gzip = true
-
-[metrics]
-address = "0.0.0.0:9000"
-timeout = 3600
 
 [cert]
 cert = "config/cert/cert.pem"
