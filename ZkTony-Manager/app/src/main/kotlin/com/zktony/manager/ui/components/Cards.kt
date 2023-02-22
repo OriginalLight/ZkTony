@@ -39,9 +39,9 @@ fun FunctionCard(
         Box(modifier = Modifier.background(
             brush = Brush.horizontalGradient(
                 colors = listOf(
+                    Color.Blue.copy(alpha = 0.2f),
                     Color.Blue.copy(alpha = 0.1f),
-                    Color.Cyan.copy(alpha = 0.05f),
-                    Color.Red.copy(alpha = 0.1f),
+                    Color.Cyan.copy(alpha = 0.2f),
                 )
             )
         )) {
@@ -95,15 +95,15 @@ fun SoftwareCard(
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(4.dp),
-        onClick = { }
+        onClick = { onClick() }
     ) {
         Box(modifier = modifier
             .background(
             brush = Brush.verticalGradient(
                 colors = listOf(
                     Color.Blue.copy(alpha = 0.2f),
-                    Color.Yellow.copy(alpha = 0.1f),
-                    Color.Cyan.copy(alpha = 0.2f),
+                    Color.Cyan.copy(alpha = 0.1f),
+                    Color.Blue.copy(alpha = 0.2f),
                 )
             )
         )) {
@@ -167,19 +167,17 @@ fun SoftwareCard(
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
-                AnimatedVisibility(visible = software.remarks.isNotEmpty()) {
-                    Divider(modifier = Modifier.padding(vertical = 1.dp))
-                    Row {
-                        Text(
-                            modifier = Modifier.width(64.dp),
-                            text = "备注说明",
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                        Text(
-                            text = ":  ${software.remarks}",
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
+                Divider(modifier = Modifier.padding(vertical = 1.dp))
+                Row {
+                    Text(
+                        modifier = Modifier.width(64.dp),
+                        text = "备注说明",
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                    Text(
+                        text = ":  ${software.remarks.ifEmpty { "无" }}",
+                        style = MaterialTheme.typography.labelMedium,
+                    )
                 }
             }
         }

@@ -2,6 +2,7 @@ package com.zktony.manager.ui.components
 
 import android.app.Activity
 import android.content.Intent
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -19,6 +20,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
@@ -26,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
@@ -39,6 +43,7 @@ import com.zktony.manager.ui.QrCodeActivity
  * @date: 2023-02-22 15:34
  */
 
+// region QrCodeTextField
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun QrCodeTextField(
@@ -52,7 +57,7 @@ fun QrCodeTextField(
     val keyboardController = LocalSoftwareKeyboardController.current
     val localFocusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
-    var androidIdError by remember { mutableStateOf(false) }
+    var isError by remember { mutableStateOf(false) }
     val qrCodeScanner =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
@@ -60,9 +65,11 @@ fun QrCodeTextField(
                 // result 是json字符串解析成software对象
                 try {
                     val software = Gson().fromJson(result, Software::class.java)
+                    isError = false
                     onSoftwareChange(software)
                 } catch (e: Exception) {
-                    androidIdError = true
+                    isError = true
+                    Toast.makeText(context, "二维码格式错误", Toast.LENGTH_SHORT).show()
                 }
             }
         }
@@ -73,18 +80,21 @@ fun QrCodeTextField(
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
-                        Color.Cyan.copy(alpha = 0.4f),
-                        Color.Blue.copy(alpha = 0.1f),
-                        Color.Blue.copy(alpha = 0.2f),
+                        Color.Blue.copy(alpha = 0.3f),
+                        Color.Cyan.copy(alpha = 0.3f),
+                        Color.Blue.copy(alpha = 0.3f),
                     )
                 ),
                 shape = RoundedCornerShape(4.dp)
             )
             .focusRequester(focusRequester),
-        isError = androidIdError,
+        isError = isError,
         value = value,
         label = { Text(text = "Android ID") },
-        onValueChange = { onValueChange(it) },
+        onValueChange = {
+            isError = false
+            onValueChange(it)
+        },
         leadingIcon = {
             Icon(
                 modifier = Modifier.size(16.dp),
@@ -129,3 +139,6 @@ fun QrCodeTextField(
         visualTransformation = VisualTransformation.None,
     )
 }
+
+// endregion
+

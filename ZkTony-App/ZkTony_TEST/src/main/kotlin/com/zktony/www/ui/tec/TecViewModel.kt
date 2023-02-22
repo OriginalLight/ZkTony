@@ -8,7 +8,6 @@ import com.zktony.common.extension.removeZero
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.extension.extractTemp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -56,7 +55,7 @@ class TecViewModel @Inject constructor() : BaseViewModel() {
                         if (it.startsWith("TC1:TCACTUALTEMP=")) {
                             // 读取温度
                             val address = it.substring(it.length - 2, it.length - 1).toInt()
-                            val temp = it.extractTemp()
+                            val temp = it.replace("TC1:TCACTUALTEMP=", "").split("@")[0].removeZero()
                             val flow = flow(address)
                             flow.value = flow.value.copy(temp = temp.toFloatOrNull() ?: 0f)
                         }

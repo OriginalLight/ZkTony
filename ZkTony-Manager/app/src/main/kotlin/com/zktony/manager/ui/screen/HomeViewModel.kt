@@ -68,7 +68,12 @@ data class HomeUiState(
 )
 
 enum class HomePage {
-    HOME, SHIPPING, SHIPPING_HISTORY, AFTER_SALE, AFTER_SALE_HISTORY, MODIFY
+    HOME,
+    SHIPPING,
+    SHIPPING_HISTORY,
+    AFTER_SALE,
+    AFTER_SALE_HISTORY,
+    SOFTWARE_MODIFY,
 }
 
 data class ShippingState(

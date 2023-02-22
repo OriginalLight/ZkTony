@@ -120,6 +120,7 @@ dependencies {
 
     implementation(libs.accompanist.adaptive)
     implementation(libs.accompanist.permissions)
+    implementation(libs.accompanist.insets)
     implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
