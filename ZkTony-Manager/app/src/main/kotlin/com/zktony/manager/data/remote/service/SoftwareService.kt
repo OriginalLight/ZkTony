@@ -1,7 +1,6 @@
 package com.zktony.manager.data.remote.service
 
 import com.zktony.manager.data.remote.model.Software
-import com.zktony.manager.data.remote.model.SoftwareQueryDTO
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import retrofit2.http.*
@@ -13,14 +12,18 @@ import retrofit2.http.*
 interface SoftwareService {
 
     @POST("/software")
-    fun add(@Body softWare: Software) : Flow<Response<String>>
+    fun add(@Body softWare: Software): Flow<Response<String>>
 
     @PUT("/software")
-    fun update(@Body softWare: Software) : Flow<Response<String>>
+    fun update(@Body softWare: Software): Flow<Response<String>>
 
     @DELETE("/software")
-    fun delete(@Body id: String) : Flow<Response<String>>
+    fun delete(@Body id: String): Flow<Response<String>>
 
     @GET("/software")
-    fun get(@Body dto: SoftwareQueryDTO): Flow<Response<List<Software>>>
+    fun search(
+        @Query("id") id: String,
+        @Query("package") `package`: String,
+        @Query("build_type") build_type: String
+    ): Flow<Response<List<Software>>>
 }

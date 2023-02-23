@@ -3,7 +3,6 @@ package com.zktony.www.common.extension
 import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.math.floor
 
 /**
  * @author: 刘贺贺

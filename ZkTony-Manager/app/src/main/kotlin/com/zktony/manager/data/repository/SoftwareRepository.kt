@@ -16,7 +16,10 @@ class SoftwareRepository @Inject constructor(
     fun add(software: Software) = service.add(software).getNetworkResult()
     fun update(software: Software) = service.update(software).getNetworkResult()
     fun delete(id: String) = service.delete(id).getNetworkResult()
-    fun get(dto: SoftwareQueryDTO) = service.get(dto).getNetworkResult()
-
+    fun search(dto: SoftwareQueryDTO) = service.search(
+        dto.id,
+        dto.`package`,
+        dto.build_type
+    ).getNetworkResult()
 }
 

@@ -3,8 +3,7 @@ package com.zktony.manager.di
 import com.google.gson.GsonBuilder
 import com.zktony.manager.BuildConfig
 import com.zktony.manager.data.remote.adapter.FlowCallAdapterFactory
-import com.zktony.manager.data.remote.service.ApplicationService
-import com.zktony.manager.data.remote.service.SoftwareService
+import com.zktony.manager.data.remote.service.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,7 +26,8 @@ object RetrofitModule {
     fun getOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {
-                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BASIC
+                level =
+                    if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BASIC
             })
             .build()
     }
@@ -39,11 +39,13 @@ object RetrofitModule {
             .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addCallAdapterFactory(FlowCallAdapterFactory.createAsync())
-            .addConverterFactory(GsonConverterFactory.create(
-                GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd HH:mm:ss")
-                    .create()
-            ))
+            .addConverterFactory(
+                GsonConverterFactory.create(
+                    GsonBuilder()
+                        .setDateFormat("yyyy-MM-dd HH:mm:ss")
+                        .create()
+                )
+            )
             .build()
     }
 
@@ -57,6 +59,24 @@ object RetrofitModule {
     @Provides
     fun provideSoftwareService(retrofit: Retrofit): SoftwareService {
         return retrofit.create(SoftwareService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideCustomerService(retrofit: Retrofit): CustomerService {
+        return retrofit.create(CustomerService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideProductService(retrofit: Retrofit): ProductService {
+        return retrofit.create(ProductService::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideEquipmentService(retrofit: Retrofit): EquipmentService {
+        return retrofit.create(EquipmentService::class.java)
     }
 
 }

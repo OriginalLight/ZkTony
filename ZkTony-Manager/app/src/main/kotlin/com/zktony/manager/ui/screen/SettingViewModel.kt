@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.manager.data.local.model.User
 import com.zktony.manager.data.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -32,20 +31,9 @@ class SettingViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(page = page)
     }
 
-    fun onNameChanged(name: String) {
-        _uiState.value = _uiState.value.copy(user = _uiState.value.user.copy(name = name))
-    }
-
-    fun onPhoneChanged(phone: String) {
-        _uiState.value = _uiState.value.copy(user = _uiState.value.user.copy(phone = phone))
-    }
-
-    fun save() {
+    fun onUserChange(user: User) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(loading = true)
-            delay(1000)
-            userRepository.insert(_uiState.value.user)
-            _uiState.value = _uiState.value.copy(loading = false, page = SettingPage.SETTING)
+            userRepository.insert(user)
         }
     }
 
@@ -59,5 +47,5 @@ data class SettingUiState(
 )
 
 enum class SettingPage {
-    SETTING, USER_INFO
+    SETTING, USER_MODIFY
 }

@@ -1,4 +1,5 @@
 package com.zktony.manager.ui.theme
+
 import androidx.compose.ui.graphics.Color
 
 val light_primary = Color(0xFF3756BE)

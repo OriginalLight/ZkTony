@@ -1,7 +1,7 @@
 package com.zktony.manager.data.remote.model
 
 import com.zktony.www.common.extension.currentTime
-import java.util.UUID
+import java.util.*
 
 /**
  * @author: 刘贺贺
