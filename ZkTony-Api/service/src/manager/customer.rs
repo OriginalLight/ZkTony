@@ -92,19 +92,20 @@ pub async fn get(
 
     if let Some(x) = req.name {
         if !x.is_empty() {
-            query = query.filter(customer::Column::Name.like(&x));
+            query = query.filter(customer::Column::Name.like(&format!("%{}%", x)));
         }
     }
 
     if let Some(x) = req.address {
         if !x.is_empty() {
-            query = query.filter(customer::Column::Address.like(&x));
+            query = query.filter(customer::Column::Address.like(&format!("%{}%", x)));
         }
     }
 
     if let Some(x) = req.phone {
         if !x.is_empty() {
-            query = query.filter(customer::Column::Phone.like(&x));
+    
+            query = query.filter(customer::Column::Phone.like(&format!("%{}%", x)));
         }
     }
 
