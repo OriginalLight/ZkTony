@@ -44,5 +44,6 @@
     <string name="page_after_sale_history_subtitle">根据条件查询产品相关售后记录</string>
     <string name="screen_setting_title">设置</string>
     <string name="page_software_title">软件信息</string>
+    <string name="page_customer_title">客户信息</string>
 
 </resources>

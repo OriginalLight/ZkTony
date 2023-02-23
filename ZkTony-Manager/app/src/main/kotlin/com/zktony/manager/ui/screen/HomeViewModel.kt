@@ -9,6 +9,7 @@ import com.zktony.manager.data.repository.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,14 +27,14 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
+    private val _shippingUiState = MutableStateFlow(ShippingUiState())
+    val shippingUiState = _shippingUiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             userRepository.getAll().collect {
                 if (it.isNotEmpty()) {
-                    _uiState.value = _uiState.value.copy(
-                        shipping = _uiState.value.shipping.copy(user = it[0])
-                    )
+                    _shippingUiState.value = _shippingUiState.value.copy(user = it[0])
                 }
             }
         }
@@ -44,13 +45,12 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setSoftware(software: Software) {
-        _uiState.value = _uiState.value.copy(
-            shipping = _uiState.value.shipping.copy(software = software)
-        )
+        _shippingUiState.value = _shippingUiState.value.copy(software = software)
     }
 
-    fun searchCustomer(value: String) {
+    fun searchCustomer() {
         viewModelScope.launch {
+            val value = _shippingUiState.value.searchReq.customer
             if (value.isNotEmpty()) {
                 // 判断value是手机号还是姓名
                 var searchReq = CustomerQueryDTO()
@@ -63,19 +63,13 @@ class HomeViewModel @Inject constructor(
                     when (it) {
                         is NetworkResult.Success -> {
                             if (it.data != null && it.data.isNotEmpty()) {
-                                _uiState.value = _uiState.value.copy(
-                                    shipping = _uiState.value.shipping.copy(customer = it.data[0])
-                                )
+                                _shippingUiState.value = _shippingUiState.value.copy(customer = it.data[0])
                             } else {
-                                _uiState.value = _uiState.value.copy(
-                                    shipping = _uiState.value.shipping.copy(customer = null)
-                                )
+                                _shippingUiState.value = _shippingUiState.value.copy(customer = null)
                             }
                         }
                         is NetworkResult.Error -> {
-                            _uiState.value = _uiState.value.copy(
-                                shipping = _uiState.value.shipping.copy(customer = null)
-                            )
+                            _shippingUiState.value = _shippingUiState.value.copy(customer = null)
                         }
                         else -> {}
                     }
@@ -85,8 +79,40 @@ class HomeViewModel @Inject constructor(
 
     }
 
-    fun searchEquipment(value: String) {
+    fun addCustomer(customer: Customer) {
         viewModelScope.launch {
+            customerRepository.add(customer).collect {
+                when (it) {
+                    is NetworkResult.Loading -> {
+                        _shippingUiState.value = _shippingUiState.value.copy(customer = null)
+                    }
+                    is NetworkResult.Success -> {
+                        _shippingUiState.value = _shippingUiState.value.copy(customer = customer)
+                    }
+                    is NetworkResult.Error -> {
+                        _shippingUiState.value = _shippingUiState.value.copy(customer = null)
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateCustomer(customer: Customer) {
+        viewModelScope.launch {
+            customerRepository.update(customer).collect {
+                when (it) {
+                    is NetworkResult.Success -> {
+                        _shippingUiState.value = _shippingUiState.value.copy(customer = customer)
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    fun searchEquipment() {
+        viewModelScope.launch {
+            val value = _shippingUiState.value.searchReq.equipment
             if (value.isNotEmpty()) {
                 // 判断value是机器名还是机器型号
                 var searchReq = EquipmentQueryDTO()
@@ -100,19 +126,13 @@ class HomeViewModel @Inject constructor(
                     when (it) {
                         is NetworkResult.Success -> {
                             if (it.data != null && it.data.isNotEmpty()) {
-                                _uiState.value = _uiState.value.copy(
-                                    shipping = _uiState.value.shipping.copy(equipment = it.data[0])
-                                )
+                                _shippingUiState.value = _shippingUiState.value.copy(equipment = it.data[0])
                             } else {
-                                _uiState.value = _uiState.value.copy(
-                                    shipping = _uiState.value.shipping.copy(equipment = null)
-                                )
+                                _shippingUiState.value = _shippingUiState.value.copy(equipment = null)
                             }
                         }
                         is NetworkResult.Error -> {
-                            _uiState.value = _uiState.value.copy(
-                                shipping = _uiState.value.shipping.copy(equipment = null)
-                            )
+                            _shippingUiState.value = _shippingUiState.value.copy(equipment = null)
                         }
                         else -> {}
                     }
@@ -120,13 +140,47 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
+    fun addEquipment(equipment: Equipment) {
+        viewModelScope.launch {
+            equipmentRepository.add(equipment).collect {
+                when (it) {
+                    is NetworkResult.Loading -> {
+                        _shippingUiState.value = _shippingUiState.value.copy(equipment = null)
+                    }
+                    is NetworkResult.Success -> {
+                        _shippingUiState.value = _shippingUiState.value.copy(equipment = equipment)
+                    }
+                    is NetworkResult.Error -> {
+                        _shippingUiState.value = _shippingUiState.value.copy(equipment = null)
+                    }
+                }
+            }
+        }
+    }
+
+    fun updateEquipment(equipment: Equipment) {
+        viewModelScope.launch {
+            equipmentRepository.update(equipment).collect {
+                when (it) {
+                    is NetworkResult.Success -> {
+                        _shippingUiState.value = _shippingUiState.value.copy(equipment = equipment)
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    fun searchReqChange(req: SearchReq) {
+        _shippingUiState.value = _shippingUiState.value.copy(searchReq = req)
+    }
 }
 
 data class HomeUiState(
     val loading: Boolean = false,
     val error: String = "",
     val page: HomePage = HomePage.HOME,
-    val shipping: ShippingState = ShippingState()
 )
 
 enum class HomePage {
@@ -136,12 +190,20 @@ enum class HomePage {
     AFTER_SALE,
     AFTER_SALE_HISTORY,
     SOFTWARE_MODIFY,
+    CUSTOMER_MODIFY,
+    EQUIPMENT_MODIFY,
 }
 
-data class ShippingState(
+data class ShippingUiState(
     val user: User? = null,
     val product: Product? = null,
     val customer: Customer? = null,
     val software: Software = Software(),
     val equipment: Equipment? = null,
+    val searchReq: SearchReq = SearchReq(),
+)
+
+data class SearchReq(
+    val customer: String = "",
+    val equipment: String = "",
 )

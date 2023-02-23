@@ -417,7 +417,7 @@ fun EquipmentCard(
                 Row {
                     Text(
                         modifier = Modifier.width(64.dp),
-                        text = "设备备注",
+                        text = "备注说明",
                         style = MaterialTheme.typography.labelMedium,
                     )
                     Text(

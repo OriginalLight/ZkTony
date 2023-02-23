@@ -27,9 +27,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.layout.DisplayFeature
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
-import com.zktony.manager.ui.screen.page.HomePage
-import com.zktony.manager.ui.screen.page.ShippingPage
-import com.zktony.manager.ui.screen.page.SoftwareModifyPage
+import com.zktony.manager.data.remote.model.Customer
+import com.zktony.manager.data.remote.model.Equipment
+import com.zktony.manager.ui.screen.page.*
 import com.zktony.manager.ui.utils.ContentType
 
 // region HomeScreen
@@ -64,8 +64,10 @@ fun HomeScreenSinglePane(
     uiState: HomeUiState,
     viewModel: HomeViewModel,
 ) {
+    val shippingUiState by viewModel.shippingUiState.collectAsStateWithLifecycle()
+
     AnimatedVisibility(
-        visible = (uiState.page == HomePage.HOME),
+        visible = uiState.page == HomePage.HOME,
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
@@ -75,17 +77,18 @@ fun HomeScreenSinglePane(
         )
     }
     AnimatedVisibility(
-        visible = (uiState.page == HomePage.SHIPPING),
+        visible = uiState.page == HomePage.SHIPPING,
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
         ShippingPage(
             modifier = modifier,
-            uiState = uiState.shipping,
+            uiState = shippingUiState,
             navigateTo = viewModel::navigateTo,
-            onSoftwareChange = { viewModel.setSoftware(it) },
-            onSearchCustomer = { viewModel.searchCustomer(it) },
-            onSearchEquipment = { viewModel.searchEquipment(it) },
+            softwareChange = { viewModel.setSoftware(it) },
+            searchCustomer = { viewModel.searchCustomer() },
+            searchEquipment = { viewModel.searchEquipment() },
+            searchReqChange = { viewModel.searchReqChange(it) },
         )
     }
 
@@ -94,11 +97,48 @@ fun HomeScreenSinglePane(
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
-        SoftwareModifyPage(software = uiState.shipping.software,
+        SoftwareModifyPage(software = shippingUiState.software,
             navigateTo = viewModel::navigateTo,
-            onSoftwareChange = { viewModel.setSoftware(it) })
+            softwareChange = { viewModel.setSoftware(it) })
     }
 
+    AnimatedVisibility(
+        visible = uiState.page == HomePage.CUSTOMER_MODIFY,
+        enter = expandHorizontally(),
+        exit = shrinkHorizontally()
+    ) {
+        CustomerModifyPage(
+            customer = if (shippingUiState.customer == null) Customer(
+                create_by = shippingUiState.user?.name ?: ""
+            ) else shippingUiState.customer!!,
+            navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
+            isAdd = shippingUiState.customer == null,
+            onDone = {
+                if (shippingUiState.customer == null) viewModel.addCustomer(it) else viewModel.updateCustomer(
+                    it
+                )
+            }
+        )
+    }
+
+    AnimatedVisibility(
+        visible = uiState.page == HomePage.EQUIPMENT_MODIFY,
+        enter = expandHorizontally(),
+        exit = shrinkHorizontally()
+    ) {
+        EquipmentModifyPage(
+            equipment = if (shippingUiState.equipment == null) Equipment(
+                create_by = shippingUiState.user?.name ?: ""
+            ) else shippingUiState.equipment!!,
+            navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
+            isAdd = shippingUiState.equipment == null,
+            onDone = {
+                if (shippingUiState.equipment == null) viewModel.addEquipment(it) else viewModel.updateEquipment(
+                    it
+                )
+            }
+        )
+    }
 }
 // endregion
 

@@ -1,12 +1,10 @@
 package com.zktony.manager.ui.screen.page
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -21,7 +19,8 @@ import com.zktony.manager.R
 import com.zktony.manager.data.remote.model.Software
 import com.zktony.manager.ui.components.*
 import com.zktony.manager.ui.screen.HomePage
-import com.zktony.manager.ui.screen.ShippingState
+import com.zktony.manager.ui.screen.SearchReq
+import com.zktony.manager.ui.screen.ShippingUiState
 
 /**
  * @author: 刘贺贺
@@ -33,11 +32,12 @@ import com.zktony.manager.ui.screen.ShippingState
 @Composable
 fun ShippingPage(
     modifier: Modifier = Modifier,
-    uiState: ShippingState,
+    uiState: ShippingUiState,
     navigateTo: (HomePage) -> Unit,
-    onSoftwareChange: (Software) -> Unit,
-    onSearchCustomer: (String) -> Unit,
-    onSearchEquipment: (String) -> Unit,
+    softwareChange: (Software) -> Unit,
+    searchCustomer: () -> Unit,
+    searchEquipment: () -> Unit,
+    searchReqChange: (SearchReq) -> Unit,
 ) {
     BackHandler {
         navigateTo(HomePage.HOME)
@@ -52,7 +52,7 @@ fun ShippingPage(
 
         LazyColumn(
             modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .padding(horizontal = 16.dp)
                 .animateContentSize()
                 .fillMaxSize(),
             state = lazyListState,
@@ -62,69 +62,72 @@ fun ShippingPage(
                 QrCodeTextField(
                     value = uiState.software.id,
                     onValueChange = {
-                        onSoftwareChange(
+                        softwareChange(
                             uiState.software.copy(
                                 id = it,
                                 create_by = if (uiState.user != null) uiState.user.name else ""
                             )
                         )
                     },
-                    onSoftwareChange = { onSoftwareChange(it.copy(create_by = if (uiState.user != null) uiState.user.name else "")) },
+                    onSoftwareChange = { softwareChange(it.copy(create_by = if (uiState.user != null) uiState.user.name else "")) },
                 )
-            }
-            if(uiState.software.id.isNotEmpty()) {
-                item {
-                    SoftwareCard(
-                        software = uiState.software,
-                        onClick = { navigateTo(HomePage.SOFTWARE_MODIFY) })
+                AnimatedVisibility(visible = uiState.software.id.isNotEmpty()) {
+                    Column {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        SoftwareCard(
+                            software = uiState.software,
+                            onClick = { navigateTo(HomePage.SOFTWARE_MODIFY) }
+                        )
+                    }
                 }
             }
             item {
-                var customerSearch by remember { mutableStateOf("") }
-
                 SearchTextField(
                     label = "客户姓名/手机",
-                    value = customerSearch,
-                    onValueChange = { customerSearch = it },
+                    value = uiState.searchReq.customer,
+                    onValueChange = { searchReqChange(uiState.searchReq.copy(customer = it)) },
                     icon = Icons.Outlined.Person,
-                    onSearch = { onSearchCustomer(it) },
-                    onAdd = { }
+                    onSearch = { searchCustomer() },
+                    onAdd = { navigateTo(HomePage.CUSTOMER_MODIFY) }
                 )
-            }
-            if (uiState.customer != null) {
-                item {
-                    CustomerCard(
-                        customer = uiState.customer,
-                        onClick = { }
-                    )
+
+                AnimatedVisibility(visible = uiState.customer != null) {
+                    Column {
+                        if (uiState.customer != null) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            CustomerCard(
+                                customer = uiState.customer,
+                                onClick = { navigateTo(HomePage.CUSTOMER_MODIFY) }
+                            )
+                        }
+                    }
                 }
             }
 
             item {
-                var equipmentSearch by remember { mutableStateOf("") }
-
                 SearchTextField(
                     label = "机器名称/型号",
-                    value = equipmentSearch,
-                    onValueChange = { equipmentSearch = it },
+                    value = uiState.searchReq.equipment,
+                    onValueChange = { searchReqChange(uiState.searchReq.copy(equipment = it)) },
                     icon = Icons.Outlined.LaptopMac,
-                    onSearch = { onSearchEquipment(it) },
-                    onAdd = { }
+                    onSearch = { searchEquipment() },
+                    onAdd = { navigateTo(HomePage.EQUIPMENT_MODIFY) }
                 )
-            }
 
-            if (uiState.equipment != null) {
-                item {
-                    EquipmentCard(
-                        equipment = uiState.equipment,
-                        onClick = { }
-                    )
+                AnimatedVisibility(visible = uiState.equipment != null) {
+                    Column {
+                        if (uiState.equipment != null) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            EquipmentCard(
+                                equipment = uiState.equipment,
+                                onClick = { navigateTo(HomePage.EQUIPMENT_MODIFY) }
+                            )
+                        }
+                    }
                 }
             }
-
         }
     }
-
 }
 // endregion
 
@@ -133,11 +136,12 @@ fun ShippingPage(
 @Composable
 fun ShippingPagePreview() {
     ShippingPage(
-        uiState = ShippingState(),
+        uiState = ShippingUiState(),
         navigateTo = {},
-        onSoftwareChange = {},
-        onSearchCustomer = {},
-        onSearchEquipment = {},
+        softwareChange = {},
+        searchCustomer = {},
+        searchEquipment = {},
+        searchReqChange = {},
     )
 }
 // endregion
