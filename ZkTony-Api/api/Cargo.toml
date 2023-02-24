@@ -9,6 +9,6 @@ version = "0.1.0"
 
 [dependencies]
 actix-web = "4"
-entity = {path = "../entity"}
+entity = { path = "../entity" }
 serde = "1"
-zktony_core = {path = "../core"}
+zktony_core = { path = "../core" }

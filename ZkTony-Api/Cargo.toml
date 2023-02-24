@@ -6,16 +6,11 @@ publish = false
 version = "0.1.0"
 
 [workspace]
-members = [
-  ".",
-  "api",
-  "core",
-  "entity",
-]
+members = [".", "api", "core", "entity"]
 
 [dependencies]
 actix-web = "4"
 dotenvy = "0.15"
 serde = "1"
-tracing-subscriber = {version = "0.3", features = ["env-filter"]}
-zktony_api = {path = "api"}
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+zktony_api = { path = "api" }
