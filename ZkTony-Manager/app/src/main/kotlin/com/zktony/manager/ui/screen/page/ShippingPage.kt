@@ -43,6 +43,7 @@ fun ShippingPage(
     searchEquipment: () -> Unit,
     productChange: (Product) -> Unit,
     searchReqChange: (SearchReq) -> Unit,
+    saveShipping: () -> Unit,
 ) {
     BackHandler {
         navigateTo(HomePage.HOME)
@@ -61,7 +62,7 @@ fun ShippingPage(
                             && uiState.product.express_number.isNotEmpty()
                 ) {
                     FilledIconButton(
-                        onClick = { },
+                        onClick = { saveShipping() },
                         modifier = Modifier.padding(8.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.surface,
@@ -222,7 +223,8 @@ fun ShippingPagePreview() {
         searchCustomer = {},
         searchEquipment = {},
         searchReqChange = {},
-        productChange = {}
+        productChange = {},
+        saveShipping = {}
     )
 }
 // endregion

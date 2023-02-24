@@ -102,14 +102,14 @@ impl Query {
         if let Some(x) = req.begin_time {
             if !x.is_empty() {
                 let x = x + " 00:00:00";
-                let t = NaiveDateTime::parse_from_str(&x, "%Y-%m-%d %H:%M:%S").unwrap();
+                let t = NaiveDateTime::parse_from_str(&x, "%Y-%m-%d").unwrap();
                 query = query.filter(equipment::Column::CreateTime.gte(t));
             }
         }
         if let Some(x) = req.end_time {
             if !x.is_empty() {
                 let x = x + " 23:59:59";
-                let t = NaiveDateTime::parse_from_str(&x, "%Y-%m-%d %H:%M:%S").unwrap();
+                let t = NaiveDateTime::parse_from_str(&x, "%Y-%m-%d").unwrap();
                 query = query.filter(equipment::Column::CreateTime.lte(t));
             }
         }
@@ -188,14 +188,14 @@ impl Query {
         if let Some(x) = req.begin_time {
             if !x.is_empty() {
                 let x = x + " 00:00:00";
-                let t = NaiveDateTime::parse_from_str(&x, "%Y-%m-%d %H:%M:%S").unwrap();
+                let t = NaiveDateTime::parse_from_str(&x, "%Y-%m-%d").unwrap();
                 query = query.filter(product::Column::CreateTime.gte(t));
             }
         }
         if let Some(x) = req.end_time {
             if !x.is_empty() {
                 let x = x + " 23:59:59";
-                let t = NaiveDateTime::parse_from_str(&x, "%Y-%m-%d %H:%M:%S").unwrap();
+                let t = NaiveDateTime::parse_from_str(&x, "%Y-%m-%d").unwrap();
                 query = query.filter(product::Column::CreateTime.lte(t));
             }
         }

@@ -244,6 +244,32 @@ class HomeViewModel @Inject constructor(
     fun productChange(product: Product) {
         _shippingUiState.value = _shippingUiState.value.copy(product = product)
     }
+
+    fun saveShipping() {
+        viewModelScope.launch {
+           softWareRepository.add(_shippingUiState.value.software).collect {
+               when (it) {
+                   is NetworkResult.Success -> {
+                       productRepository.add(_shippingUiState.value.product).collect { it1 ->
+                           when (it1) {
+                               is NetworkResult.Success -> {
+                                   _shippingUiState.value = _shippingUiState.value.copy(
+                                       product = Product(),
+                                       customer = null,
+                                       equipment = null,
+                                       software = Software(),
+                                   )
+                                   _uiState.value = _uiState.value.copy(page = HomePage.HOME)
+                               }
+                               else -> {}
+                           }
+                       }
+                   }
+                   else -> {}
+               }
+           }
+        }
+    }
 }
 
 data class HomeUiState(

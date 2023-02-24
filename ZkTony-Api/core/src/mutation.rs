@@ -308,7 +308,7 @@ impl Mutation {
         let create_time =
             NaiveDateTime::parse_from_str(&req.create_time.unwrap(), "%Y-%m-%d %H:%M:%S").unwrap();
         let equipment_time =
-            NaiveDateTime::parse_from_str(&req.equipment_time, "%Y-%m-%d %H:%M:%S").unwrap();
+            NaiveDateTime::parse_from_str(&req.equipment_time, "%Y-%m-%d").unwrap();
         let add_data = product::ActiveModel {
             id: Set(req.id),
             software_id: Set(req.software_id),
@@ -341,7 +341,7 @@ impl Mutation {
 
     pub async fn update_product(db: &DbConn, req: ProductSaveReq) -> Result<String, DbErr> {
         let equipment_time =
-            NaiveDateTime::parse_from_str(&req.equipment_time, "%Y-%m-%d %H:%M:%S").unwrap();
+            NaiveDateTime::parse_from_str(&req.equipment_time, "%Y-%m-%d").unwrap();
         let update_data = product::ActiveModel {
             id: Set(req.id),
             software_id: Set(req.software_id),
