@@ -3,7 +3,7 @@ use actix_web::{delete, get, post, put, web, Error, HttpResponse, Result};
 use zktony_core::{
     ApplicationSearchReq, CustomerGetReq, CustomerSaveReq, DeleteReq, EquipmentGetReq,
     EquipmentSaveReq, LogAddReq, LogDetailAddReq, Mutation, ProductGetReq, ProductSaveReq,
-    ProgramAddReq, Query, SoftwareSaveReq, SoftwareGetReq,
+    ProgramAddReq, Query, SoftwareGetReq, SoftwareSaveReq,
 };
 
 // region: common

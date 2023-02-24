@@ -1,21 +1,21 @@
 [package]
-name = "zktony"
-version = "0.1.0"
 authors = ["刘贺贺 <15252114322@163.com>"]
 edition = "2021"
+name = "zktony"
 publish = false
+version = "0.1.0"
 
 [workspace]
 members = [
-    ".",
-    "api",
-    "core",
-    "entity",
+  ".",
+  "api",
+  "core",
+  "entity",
 ]
 
 [dependencies]
-zktony_api = { path = "api" }
 actix-web = "4"
 dotenvy = "0.15"
 serde = "1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-subscriber = {version = "0.3", features = ["env-filter"]}
+zktony_api = {path = "api"}

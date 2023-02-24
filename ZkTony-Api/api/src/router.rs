@@ -2,7 +2,6 @@ use actix_web::web;
 
 use super::handler;
 
-
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(handler::index);
     cfg.service(handler::get_application_by_id);
@@ -24,5 +23,4 @@ pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(handler::get_software);
     cfg.service(handler::create_software);
     cfg.service(handler::update_software);
-
 }
