@@ -240,7 +240,7 @@ fun SearchTextField(
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Search,
-            keyboardType = KeyboardType.Ascii
+            keyboardType = KeyboardType.Text
         ),
         keyboardActions = KeyboardActions(
             onSearch = {
@@ -261,6 +261,7 @@ fun CommonTextField(
     label: String,
     value: String,
     icon: ImageVector,
+    singleLine: Boolean = true,
     onValueChange: (String) -> Unit,
     isDone: Boolean = false,
     onDone : () -> Unit = {},
@@ -304,8 +305,8 @@ fun CommonTextField(
             containerColor = Color.Transparent,
         ),
         textStyle = MaterialTheme.typography.bodyMedium,
-        maxLines = 1,
-        singleLine = true,
+        maxLines = if (singleLine) 1 else Int.MAX_VALUE,
+        singleLine = singleLine,
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = if (isDone) ImeAction.Done else ImeAction.Next,
             keyboardType = KeyboardType.Text

@@ -64,7 +64,7 @@ fun HomeScreenSinglePane(
     uiState: HomeUiState,
     viewModel: HomeViewModel,
 ) {
-    val shippingUiState by viewModel.shippingUiState.collectAsStateWithLifecycle()
+    val shipping by viewModel.shipping.collectAsStateWithLifecycle()
 
     AnimatedVisibility(
         visible = uiState.page == HomePage.HOME,
@@ -83,7 +83,7 @@ fun HomeScreenSinglePane(
     ) {
         ShippingPage(
             modifier = modifier,
-            uiState = shippingUiState,
+            uiState = shipping,
             navigateTo = viewModel::navigateTo,
             softwareChange = { viewModel.setSoftware(it) },
             searchCustomer = { viewModel.searchCustomer() },
@@ -99,7 +99,7 @@ fun HomeScreenSinglePane(
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
-        SoftwareModifyPage(software = shippingUiState.software,
+        SoftwareModifyPage(software = shipping.software,
             navigateTo = viewModel::navigateTo,
             softwareChange = { viewModel.setSoftware(it) })
     }
@@ -110,13 +110,13 @@ fun HomeScreenSinglePane(
         exit = shrinkHorizontally()
     ) {
         CustomerModifyPage(
-            customer = if (shippingUiState.customer == null) Customer(
-                create_by = shippingUiState.user?.name ?: ""
-            ) else shippingUiState.customer!!,
+            customer = if (shipping.customer == null) Customer(
+                create_by = shipping.user?.name ?: ""
+            ) else shipping.customer!!,
             navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
-            isAdd = shippingUiState.customer == null,
+            isAdd = shipping.customer == null,
             onDone = {
-                if (shippingUiState.customer == null) viewModel.addCustomer(it) else viewModel.updateCustomer(
+                if (shipping.customer == null) viewModel.addCustomer(it) else viewModel.updateCustomer(
                     it
                 )
             }
@@ -129,13 +129,13 @@ fun HomeScreenSinglePane(
         exit = shrinkHorizontally()
     ) {
         EquipmentModifyPage(
-            equipment = if (shippingUiState.equipment == null) Equipment(
-                create_by = shippingUiState.user?.name ?: ""
-            ) else shippingUiState.equipment!!,
+            equipment = if (shipping.equipment == null) Equipment(
+                create_by = shipping.user?.name ?: ""
+            ) else shipping.equipment!!,
             navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
-            isAdd = shippingUiState.equipment == null,
+            isAdd = shipping.equipment == null,
             onDone = {
-                if (shippingUiState.equipment == null) viewModel.addEquipment(it) else viewModel.updateEquipment(
+                if (shipping.equipment == null) viewModel.addEquipment(it) else viewModel.updateEquipment(
                     it
                 )
             }
@@ -160,7 +160,7 @@ fun HomeScreenDualPane(
             )
         },
         second = {
-            val shippingUiState by viewModel.shippingUiState.collectAsStateWithLifecycle()
+            val shippingUiState by viewModel.shipping.collectAsStateWithLifecycle()
 
             AnimatedVisibility(
                 visible = (uiState.page == HomePage.SHIPPING || uiState.page == HomePage.HOME),

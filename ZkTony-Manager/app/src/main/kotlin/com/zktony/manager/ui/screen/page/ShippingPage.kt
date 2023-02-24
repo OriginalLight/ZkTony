@@ -207,6 +207,15 @@ fun ShippingPage(
                     onValueChange = { productChange(uiState.product.copy(express_company = it)) }
                 )
             }
+            item {
+                CommonTextField(
+                    label = "备注说明",
+                    value = uiState.product.remarks,
+                    icon = Icons.Outlined.Note,
+                    singleLine = false,
+                    onValueChange = { productChange(uiState.product.copy(remarks = it)) }
+                )
+            }
         }
     }
 }
