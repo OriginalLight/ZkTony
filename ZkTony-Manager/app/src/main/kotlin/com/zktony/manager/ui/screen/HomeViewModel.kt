@@ -34,7 +34,10 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.getAll().collect {
                 if (it.isNotEmpty()) {
-                    _shippingUiState.value = _shippingUiState.value.copy(user = it[0])
+                    _shippingUiState.value = _shippingUiState.value.copy(
+                        user = it[0],
+                        product = _shippingUiState.value.product.copy(create_by = it[0].name)
+                    )
                 }
             }
         }
@@ -45,7 +48,10 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setSoftware(software: Software) {
-        _shippingUiState.value = _shippingUiState.value.copy(software = software)
+        _shippingUiState.value = _shippingUiState.value.copy(
+            software = software,
+            product = _shippingUiState.value.product.copy(software_id = software.id)
+        )
     }
 
     fun searchCustomer() {
@@ -63,13 +69,24 @@ class HomeViewModel @Inject constructor(
                     when (it) {
                         is NetworkResult.Success -> {
                             if (it.data != null && it.data.isNotEmpty()) {
-                                _shippingUiState.value = _shippingUiState.value.copy(customer = it.data[0])
+                                _shippingUiState.value =
+                                    _shippingUiState.value.copy(
+                                        customer = it.data[0],
+                                        product = _shippingUiState.value.product.copy(customer_id = it.data[0].id)
+                                    )
                             } else {
-                                _shippingUiState.value = _shippingUiState.value.copy(customer = null)
+                                _shippingUiState.value =
+                                    _shippingUiState.value.copy(
+                                        customer = null,
+                                        product = _shippingUiState.value.product.copy(customer_id = "")
+                                    )
                             }
                         }
                         is NetworkResult.Error -> {
-                            _shippingUiState.value = _shippingUiState.value.copy(customer = null)
+                            _shippingUiState.value = _shippingUiState.value.copy(
+                                customer = null,
+                                product = _shippingUiState.value.product.copy(customer_id = "")
+                            )
                         }
                         else -> {}
                     }
@@ -84,13 +101,22 @@ class HomeViewModel @Inject constructor(
             customerRepository.add(customer).collect {
                 when (it) {
                     is NetworkResult.Loading -> {
-                        _shippingUiState.value = _shippingUiState.value.copy(customer = null)
+                        _shippingUiState.value = _shippingUiState.value.copy(
+                            customer = null,
+                            product = _shippingUiState.value.product.copy(customer_id = "")
+                        )
                     }
                     is NetworkResult.Success -> {
-                        _shippingUiState.value = _shippingUiState.value.copy(customer = customer)
+                        _shippingUiState.value = _shippingUiState.value.copy(
+                            customer = customer,
+                            product = _shippingUiState.value.product.copy(customer_id = customer.id)
+                        )
                     }
                     is NetworkResult.Error -> {
-                        _shippingUiState.value = _shippingUiState.value.copy(customer = null)
+                        _shippingUiState.value = _shippingUiState.value.copy(
+                            customer = null,
+                            product = _shippingUiState.value.product.copy(customer_id = "")
+                        )
                     }
                 }
             }
@@ -127,14 +153,33 @@ class HomeViewModel @Inject constructor(
                         is NetworkResult.Success -> {
                             Log.d("HomeViewModel", "searchEquipment: ${it.data}")
                             if (it.data != null && it.data.isNotEmpty()) {
-                                _shippingUiState.value = _shippingUiState.value.copy(equipment = it.data[0])
+                                _shippingUiState.value =
+                                    _shippingUiState.value.copy(
+                                        equipment = it.data[0],
+                                        product = _shippingUiState.value.product.copy(
+                                            equipment_id = it.data[0].id,
+                                            attachment = ""
+                                        )
+                                    )
                             } else {
-                                _shippingUiState.value = _shippingUiState.value.copy(equipment = null)
+                                _shippingUiState.value = _shippingUiState.value.copy(
+                                    equipment = null,
+                                    product = _shippingUiState.value.product.copy(
+                                        attachment = "",
+                                        equipment_id = ""
+                                    )
+                                )
                             }
                         }
                         is NetworkResult.Error -> {
                             Log.e("HomeViewModel", "searchEquipment: $it")
-                            _shippingUiState.value = _shippingUiState.value.copy(equipment = null)
+                            _shippingUiState.value = _shippingUiState.value.copy(
+                                equipment = null,
+                                product = _shippingUiState.value.product.copy(
+                                    attachment = "",
+                                    equipment_id = ""
+                                )
+                            )
                         }
                         else -> {}
                     }
@@ -148,13 +193,31 @@ class HomeViewModel @Inject constructor(
             equipmentRepository.add(equipment).collect {
                 when (it) {
                     is NetworkResult.Loading -> {
-                        _shippingUiState.value = _shippingUiState.value.copy(equipment = null)
+                        _shippingUiState.value = _shippingUiState.value.copy(
+                            equipment = null,
+                            product = _shippingUiState.value.product.copy(
+                                equipment_id = "",
+                                attachment = ""
+                            )
+                        )
                     }
                     is NetworkResult.Success -> {
-                        _shippingUiState.value = _shippingUiState.value.copy(equipment = equipment)
+                        _shippingUiState.value = _shippingUiState.value.copy(
+                            equipment = equipment,
+                            product = _shippingUiState.value.product.copy(
+                                equipment_id = equipment.id,
+                                attachment = ""
+                            )
+                        )
                     }
                     is NetworkResult.Error -> {
-                        _shippingUiState.value = _shippingUiState.value.copy(equipment = null)
+                        _shippingUiState.value = _shippingUiState.value.copy(
+                            equipment = null,
+                            product = _shippingUiState.value.product.copy(
+                                equipment_id = "",
+                                attachment = ""
+                            )
+                        )
                     }
                 }
             }
@@ -177,6 +240,10 @@ class HomeViewModel @Inject constructor(
     fun searchReqChange(req: SearchReq) {
         _shippingUiState.value = _shippingUiState.value.copy(searchReq = req)
     }
+
+    fun productChange(product: Product) {
+        _shippingUiState.value = _shippingUiState.value.copy(product = product)
+    }
 }
 
 data class HomeUiState(
@@ -198,7 +265,7 @@ enum class HomePage {
 
 data class ShippingUiState(
     val user: User? = null,
-    val product: Product? = null,
+    val product: Product = Product(),
     val customer: Customer? = null,
     val software: Software = Software(),
     val equipment: Equipment? = null,

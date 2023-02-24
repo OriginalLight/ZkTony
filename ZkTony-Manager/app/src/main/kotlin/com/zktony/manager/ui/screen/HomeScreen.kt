@@ -89,6 +89,7 @@ fun HomeScreenSinglePane(
             searchCustomer = { viewModel.searchCustomer() },
             searchEquipment = { viewModel.searchEquipment() },
             searchReqChange = { viewModel.searchReqChange(it) },
+            productChange = { viewModel.productChange(it) },
         )
     }
 

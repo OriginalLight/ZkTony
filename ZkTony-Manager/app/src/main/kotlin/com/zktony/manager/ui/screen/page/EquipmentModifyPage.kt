@@ -173,7 +173,7 @@ fun EquipmentModifyPage(
                                     onClick = {
                                         if (attachment.isNotEmpty()) {
                                             temp =
-                                                temp.copy(attachment = temp.attachment + attachment + ",")
+                                                temp.copy(attachment = temp.attachment + attachment + " ")
                                             attachment = ""
                                         }
                                     }
@@ -195,7 +195,7 @@ fun EquipmentModifyPage(
                         )
                         AnimatedVisibility(visible = temp.attachment.isNotEmpty()) {
                             Column {
-                                val list = temp.attachment.split(",")
+                                val list = temp.attachment.split(" ").map { it.trim() }
                                 list.forEachIndexed { index, it ->
                                     if (it.isNotEmpty()) {
                                         Row(
@@ -222,7 +222,7 @@ fun EquipmentModifyPage(
                                                 onClick = {
                                                     temp = temp.copy(
                                                         attachment = temp.attachment.replace(
-                                                            "$it,",
+                                                            "$it ",
                                                             ""
                                                         )
                                                     )

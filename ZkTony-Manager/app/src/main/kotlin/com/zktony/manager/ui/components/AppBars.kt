@@ -24,6 +24,7 @@ fun ManagerAppBar(
     title: String = "Title",
     isFullScreen: Boolean = false,
     onBack: () -> Unit = {},
+    actions : @Composable (() -> Unit)? = null,
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier,
@@ -42,8 +43,8 @@ fun ManagerAppBar(
                     onClick = onBack,
                     modifier = Modifier.padding(8.dp),
                     colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surface,
-                        contentColor = MaterialTheme.colorScheme.onSurface
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            contentColor = MaterialTheme.colorScheme.onSurface
                     )
                 ) {
                     Icon(
@@ -53,6 +54,9 @@ fun ManagerAppBar(
                     )
                 }
             }
+        },
+        actions = {
+            actions?.invoke()
         }
     )
 }

@@ -1,6 +1,7 @@
 package com.zktony.manager.ui.components
 
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -12,10 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Key
-import androidx.compose.material.icons.outlined.QrCode
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -36,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
 import com.zktony.manager.data.remote.model.Software
 import com.zktony.manager.ui.QrCodeActivity
+import java.util.*
 
 /**
  * @author: 刘贺贺
@@ -45,11 +44,13 @@ import com.zktony.manager.ui.QrCodeActivity
 // region QrCodeTextField
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun QrCodeTextField(
+fun CodeTextField(
     modifier: Modifier = Modifier,
+    label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    onSoftwareChange: (Software) -> Unit,
+    isQrCode : Boolean = true,
+    onSoftwareChange: (Software) -> Unit = {},
 ) {
 
     val context = LocalContext.current
@@ -62,14 +63,20 @@ fun QrCodeTextField(
             if (it.resultCode == Activity.RESULT_OK) {
                 val result = it.data?.getStringExtra("SCAN_RESULT")
                 // result 是json字符串解析成software对象
-                try {
-                    val software = Gson().fromJson(result, Software::class.java)
+                if (isQrCode) {
+                    try {
+                        val software = Gson().fromJson(result, Software::class.java)
+                        isError = false
+                        onSoftwareChange(software)
+                    } catch (e: Exception) {
+                        isError = true
+                        Toast.makeText(context, "二维码格式错误", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
                     isError = false
-                    onSoftwareChange(software)
-                } catch (e: Exception) {
-                    isError = true
-                    Toast.makeText(context, "二维码格式错误", Toast.LENGTH_SHORT).show()
+                    onValueChange(result ?: "")
                 }
+
             }
         }
 
@@ -89,7 +96,7 @@ fun QrCodeTextField(
             .focusRequester(focusRequester),
         isError = isError,
         value = value,
-        label = { Text(text = "软件编号") },
+        label = { Text(text = label) },
         onValueChange = {
             isError = false
             onValueChange(it)
@@ -143,7 +150,7 @@ fun QrCodeTextField(
 
 // endregion
 
-// region QrCodeTextField
+// region SearchTextField
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SearchTextField(
@@ -245,3 +252,170 @@ fun SearchTextField(
 }
 
 // endregion
+
+// region CommonTextField
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun CommonTextField(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: String,
+    icon: ImageVector,
+    onValueChange: (String) -> Unit,
+    isDone: Boolean = false,
+    onDone : () -> Unit = {},
+) {
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val localFocusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+
+    TextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.1f),
+                        Color.Blue.copy(alpha = 0.1f),
+                    )
+                ),
+                shape = RoundedCornerShape(4.dp)
+            )
+            .focusRequester(focusRequester),
+        value = value,
+        label = { Text(text = label) },
+        onValueChange = {
+            onValueChange(it)
+        },
+        leadingIcon = {
+            Icon(
+                modifier = Modifier.size(16.dp),
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.outline
+            )
+        },
+        shape = RoundedCornerShape(8.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            containerColor = Color.Transparent,
+        ),
+        textStyle = MaterialTheme.typography.bodyMedium,
+        maxLines = 1,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = if (isDone) ImeAction.Done else ImeAction.Next,
+            keyboardType = KeyboardType.Text
+        ),
+        keyboardActions = KeyboardActions(
+            onNext = {
+                localFocusManager.clearFocus()
+            },
+            onDone = {
+                onDone()
+                keyboardController?.hide()
+                localFocusManager.clearFocus()
+            }
+        ),
+    )
+}
+// endregion
+
+// region TimeTextField
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun TimeTextField(
+    modifier: Modifier = Modifier,
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    onDone : () -> Unit = {},
+) {
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val localFocusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
+    val context = LocalContext.current
+
+    val calendar = Calendar.getInstance()
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH)
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    val time = remember { mutableStateOf("") }
+
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _, y, mon, dayOfMonth ->
+            onValueChange("$y-${mon + 1}-$dayOfMonth")
+        },
+        year,
+        month,
+        day
+    )
+
+    TextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.1f),
+                        Color.Blue.copy(alpha = 0.1f),
+                    )
+                ),
+                shape = RoundedCornerShape(4.dp)
+            )
+            .focusRequester(focusRequester),
+        value = value,
+        label = { Text(text = label) },
+        onValueChange = {
+            onValueChange(it)
+        },
+        leadingIcon = {
+            Icon(
+                modifier = Modifier.size(16.dp),
+                imageVector = Icons.Outlined.Schedule,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.outline
+            )
+        },
+        trailingIcon = {
+            Icon(
+                modifier = Modifier
+                    .size(32.dp)
+                    .absoluteOffset(x = (-8).dp)
+                    .clickable {
+                        datePickerDialog.show()
+                    },
+                imageVector = Icons.Outlined.CalendarToday,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
+            )
+        },
+        shape = RoundedCornerShape(8.dp),
+        colors = TextFieldDefaults.textFieldColors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            containerColor = Color.Transparent,
+        ),
+        textStyle = MaterialTheme.typography.bodyMedium,
+        maxLines = 1,
+        singleLine = true,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Text
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onDone()
+                keyboardController?.hide()
+                localFocusManager.clearFocus()
+            }
+        ),
+    )
+}

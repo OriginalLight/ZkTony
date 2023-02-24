@@ -1,11 +1,14 @@
 package com.zktony.manager.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.outlined.ArrowForwardIos
+import androidx.compose.material.icons.outlined.RadioButtonChecked
+import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -431,6 +434,80 @@ fun EquipmentCard(
 }
 // endregion
 
+// region AttachmentCard
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AttachmentCard(
+    modifier: Modifier = Modifier,
+    attachment: String,
+    value: String,
+    onValueChange: (String) -> Unit = {},
+    onClick: () -> Unit = {},
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(4.dp),
+        onClick = { onClick() }
+    ) {
+        Box(
+            modifier = modifier
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Blue.copy(alpha = 0.1f),
+                            Color.Cyan.copy(alpha = 0.1f),
+                            Color.Blue.copy(alpha = 0.1f),
+                        )
+                    )
+                )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = "设备附件", style = MaterialTheme.typography.labelMedium)
+                Divider(
+                    modifier = Modifier.padding(vertical = 1.dp),
+                    color = Color.Gray.copy(alpha = 0.2f)
+                )
+                val list = attachment.split(" ").filter { it.isNotEmpty() }
+                list.forEachIndexed() { index, it ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(text = "${index + 1}.", style = MaterialTheme.typography.labelMedium)
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Text(text = it, style = MaterialTheme.typography.labelMedium)
+                        Spacer(modifier = Modifier.weight(1f))
+                        Icon(
+                            imageVector = if (value.contains(it)) Icons.Outlined.RadioButtonChecked else Icons.Outlined.RadioButtonUnchecked,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(16.dp)
+                                .clickable {
+                                    if (value.contains(it)) {
+                                        onValueChange(value.replace("$it ", ""))
+                                    } else {
+                                        onValueChange("${value + it} ")
+                                    }
+                                }
+                        )
+                    }
+                    Divider(
+                        modifier = Modifier.padding(vertical = 1.dp),
+                        color = Color.Gray.copy(alpha = 0.2f)
+                    )
+                }
+            }
+        }
+    }
+}
+
 // region preview
 @Preview
 @Composable
@@ -460,29 +537,31 @@ fun SoftwareCardPreview() {
 @Preview
 @Composable
 fun CustomerCardPreview() {
-    CustomerCard(customer = Customer(
-        id = "sdasfafewsd34",
-        name = "张三",
-        phone = "123456789",
-        address = "北京市海淀区",
-        remarks = "fuyfuyfuykfuyj"
-    )
+    CustomerCard(
+        customer = Customer(
+            id = "sdasfafewsd34",
+            name = "张三",
+            phone = "123456789",
+            address = "北京市海淀区",
+            remarks = "fuyfuyfuykfuyj"
+        )
     )
 }
 
 @Preview
 @Composable
 fun EquipmentCardPreview() {
-    EquipmentCard(equipment = Equipment(
-        id = "sdasfafewsd34",
-        name = "设备1",
-        model = "型号1",
-        voltage = "220V",
-        power = "100W",
-        frequency = "50Hz",
-        attachment = "无",
-        remarks = "fuyfuyfuykfuyj"
-    )
+    EquipmentCard(
+        equipment = Equipment(
+            id = "sdasfafewsd34",
+            name = "设备1",
+            model = "型号1",
+            voltage = "220V",
+            power = "100W",
+            frequency = "50Hz",
+            attachment = "无",
+            remarks = "fuyfuyfuykfuyj"
+        )
     )
 }
 
