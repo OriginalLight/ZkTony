@@ -3,25 +3,19 @@
 #################
 ## build stage ##
 #################
-FROM rust:1-slim-bullseye AS builder
+FROM rust AS builder
 WORKDIR /code
-
-# install system dependencies
-RUN apt-get update && apt-get install -y libssl-dev pkg-config
 
 # Download crates-io index and fetch dependency code.
 # This step avoids needing to spend time on every build downloading the index
 # which can take a long time within the docker context. Docker will cache it.
 RUN USER=root cargo init
-COPY Cargo.toml Cargo.toml
-COPY api api
-COPY bin bin
-COPY common common
-COPY config config
-COPY configs configs
-COPY database database
-COPY service service
-COPY utils utils
+COPY ./Cargo.toml Cargo.toml
+COPY ./.env .env
+COPY ./src src
+COPY ./api api
+COPY ./core core
+COPY ./entity entity
 
 # compile app
 RUN cargo build --release
@@ -33,11 +27,11 @@ FROM debian:bullseye-slim
 WORKDIR /app
 
 # copy server binary from build stage
-COPY --from=builder /code/target/release/zktony-api zktony-api
-COPY --from=builder /code/config config
+COPY --from=builder /code/target/release/zktony zktony
+COPY --from=builder /code/.env /.env
 
 # indicate what port the server is running on
 EXPOSE 9765
 
 # run server
-CMD [ "/app/zktony-api" ]
+CMD [ "/app/zktony" ]

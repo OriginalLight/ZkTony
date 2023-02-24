@@ -1,5 +1,6 @@
 package com.zktony.manager.ui.screen
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.manager.data.local.model.User
@@ -9,7 +10,6 @@ import com.zktony.manager.data.repository.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -125,6 +125,7 @@ class HomeViewModel @Inject constructor(
                 equipmentRepository.search(searchReq).collect {
                     when (it) {
                         is NetworkResult.Success -> {
+                            Log.d("HomeViewModel", "searchEquipment: ${it.data}")
                             if (it.data != null && it.data.isNotEmpty()) {
                                 _shippingUiState.value = _shippingUiState.value.copy(equipment = it.data[0])
                             } else {
@@ -132,6 +133,7 @@ class HomeViewModel @Inject constructor(
                             }
                         }
                         is NetworkResult.Error -> {
+                            Log.e("HomeViewModel", "searchEquipment: $it")
                             _shippingUiState.value = _shippingUiState.value.copy(equipment = null)
                         }
                         else -> {}
