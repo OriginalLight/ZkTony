@@ -16,30 +16,11 @@
 
 package com.zktony.manager.data.repository
 
-import com.zktony.manager.data.remote.result.NetworkResult
 import com.zktony.manager.data.remote.service.ApplicationService
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class ApplicationRepository @Inject constructor(
     private val service: ApplicationService
 ) {
-    fun getApplicationById(id: String = "com.zktony.www.zm.debug") = flow {
-        emit(NetworkResult.Loading)
-        service.getById(id)
-            .flowOn(Dispatchers.IO)
-            .catch { e ->
-                emit(NetworkResult.Error(e))
-            }.collect {
-                val body = it.body()
-                if (body != null) {
-                    emit(NetworkResult.Success(body))
-                } else {
-                    emit(NetworkResult.Success(null))
-                }
-            }
-    }
+    fun getById(id: String = "com.zktony.www.zm.debug") = service.getById(id)
 }

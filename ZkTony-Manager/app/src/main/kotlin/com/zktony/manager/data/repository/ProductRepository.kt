@@ -2,7 +2,6 @@ package com.zktony.manager.data.repository
 
 import com.zktony.manager.data.remote.model.Product
 import com.zktony.manager.data.remote.model.ProductQueryDTO
-import com.zktony.manager.data.remote.result.getNetworkResult
 import com.zktony.manager.data.remote.service.ProductService
 import javax.inject.Inject
 
@@ -14,9 +13,8 @@ class ProductRepository @Inject constructor(
     private val service: ProductService
 ) {
 
-    fun add(product: Product) = service.add(product).getNetworkResult()
-    fun update(product: Product) = service.update(product).getNetworkResult()
-    fun delete(id: String) = service.delete(id).getNetworkResult()
+    fun save(product: Product) = service.save(product)
+    fun delete(id: String) = service.delete(id)
     fun search(dto: ProductQueryDTO) = service.search(
         dto.id,
         dto.software_id,
@@ -28,6 +26,6 @@ class ProductRepository @Inject constructor(
         dto.create_by,
         dto.begin_time,
         dto.end_time
-    ).getNetworkResult()
+    )
 }
 

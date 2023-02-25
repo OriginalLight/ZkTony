@@ -1,5 +1,5 @@
 use super::state::AppState;
-use actix_web::{delete, get, post, put, web, Error, HttpResponse, Result};
+use actix_web::{delete, get, post, web, Error, HttpResponse, Result};
 use zktony_core::{
     ApplicationSearchReq, CustomerGetReq, CustomerSaveReq, DeleteReq, EquipmentGetReq,
     EquipmentSaveReq, LogAddReq, LogDetailAddReq, Mutation, ProductGetReq, ProductSaveReq,
@@ -49,26 +49,12 @@ async fn get_customer(
 }
 
 #[post("/customer")]
-async fn create_customer(
+async fn save_customer(
     data: web::Data<AppState>,
     req: web::Json<CustomerSaveReq>,
 ) -> Result<HttpResponse, Error> {
     let conn = &data.conn;
-    let res = Mutation::create_customer(conn, req.clone()).await;
-
-    match res {
-        Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
-    }
-}
-
-#[put("/customer")]
-async fn update_customer(
-    data: web::Data<AppState>,
-    req: web::Json<CustomerSaveReq>,
-) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::update_customer(conn, req.clone()).await;
+    let res = Mutation::save_customer(conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
@@ -108,26 +94,12 @@ async fn get_equipment(
 }
 
 #[post("/equipment")]
-async fn create_equipment(
+async fn save_equipment(
     data: web::Data<AppState>,
     req: web::Json<EquipmentSaveReq>,
 ) -> Result<HttpResponse, Error> {
     let conn = &data.conn;
-    let res = Mutation::create_equipment(conn, req.clone()).await;
-
-    match res {
-        Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
-    }
-}
-
-#[put("/equipment")]
-async fn update_equipment(
-    data: web::Data<AppState>,
-    req: web::Json<EquipmentSaveReq>,
-) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::update_equipment(conn, req.clone()).await;
+    let res = Mutation::save_equipment(conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
@@ -199,26 +171,12 @@ async fn get_product(
 }
 
 #[post("/product")]
-async fn create_product(
+async fn save_product(
     data: web::Data<AppState>,
     req: web::Json<ProductSaveReq>,
 ) -> Result<HttpResponse, Error> {
     let conn = &data.conn;
-    let res = Mutation::create_product(conn, req.clone()).await;
-
-    match res {
-        Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
-    }
-}
-
-#[put("/product")]
-async fn update_product(
-    data: web::Data<AppState>,
-    req: web::Json<ProductSaveReq>,
-) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::update_product(conn, req.clone()).await;
+    let res = Mutation::save_product(conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
@@ -274,26 +232,12 @@ async fn get_software(
 }
 
 #[post("/software")]
-async fn create_software(
+async fn save_software(
     data: web::Data<AppState>,
     req: web::Json<SoftwareSaveReq>,
 ) -> Result<HttpResponse, Error> {
     let conn = &data.conn;
-    let res = Mutation::create_software(conn, req.clone()).await;
-
-    match res {
-        Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
-    }
-}
-
-#[put("/software")]
-async fn update_software(
-    data: web::Data<AppState>,
-    req: web::Json<SoftwareSaveReq>,
-) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::update_software(conn, req.clone()).await;
+    let res = Mutation::save_software(conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),

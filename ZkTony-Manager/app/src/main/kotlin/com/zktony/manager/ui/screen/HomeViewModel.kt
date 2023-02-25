@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.manager.data.local.model.User
 import com.zktony.manager.data.remote.model.*
-import com.zktony.manager.data.remote.result.NetworkResult
 import com.zktony.manager.data.repository.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -64,74 +66,44 @@ class HomeViewModel @Inject constructor(
                 } else {
                     searchReq.copy(name = value)
                 }
-                customerRepository.search(searchReq).collect {
-                    when (it) {
-                        is NetworkResult.Success -> {
-                            if (it.data != null && it.data.isNotEmpty()) {
-                                _shipping.value =
-                                    _shipping.value.copy(
-                                        customer = it.data[0],
-                                        product = _shipping.value.product.copy(customer_id = it.data[0].id)
-                                    )
-                            } else {
-                                _shipping.value =
-                                    _shipping.value.copy(
-                                        customer = null,
-                                        product = _shipping.value.product.copy(customer_id = "")
-                                    )
-                            }
-                        }
-                        is NetworkResult.Error -> {
+                customerRepository.search(searchReq)
+                    .flowOn(Dispatchers.IO)
+                    .catch {
+                        _shipping.value = _shipping.value.copy(
+                            customer = null,
+                            product = _shipping.value.product.copy(customer_id = "")
+                        )
+                    }
+                    .collect {
+                        val data = it.body()
+                        if (data != null && data.isNotEmpty()) {
+                            _shipping.value = _shipping.value.copy(
+                                customer = data[0],
+                                product = _shipping.value.product.copy(customer_id = data[0].id)
+                            )
+                        } else {
                             _shipping.value = _shipping.value.copy(
                                 customer = null,
                                 product = _shipping.value.product.copy(customer_id = "")
                             )
                         }
-                        else -> {}
+
                     }
-                }
             }
         }
 
     }
 
-    fun addCustomer(customer: Customer) {
+    fun saveCustomer(customer: Customer) {
         viewModelScope.launch {
-            customerRepository.add(customer).collect {
-                when (it) {
-                    is NetworkResult.Loading -> {
-                        _shipping.value = _shipping.value.copy(
-                            customer = null,
-                            product = _shipping.value.product.copy(customer_id = "")
-                        )
-                    }
-                    is NetworkResult.Success -> {
-                        _shipping.value = _shipping.value.copy(
-                            customer = customer,
-                            product = _shipping.value.product.copy(customer_id = customer.id)
-                        )
-                    }
-                    is NetworkResult.Error -> {
-                        _shipping.value = _shipping.value.copy(
-                            customer = null,
-                            product = _shipping.value.product.copy(customer_id = "")
-                        )
-                    }
+            customerRepository.save(customer)
+                .flowOn(Dispatchers.IO)
+                .collect {
+                    _shipping.value = _shipping.value.copy(
+                        customer = customer,
+                        product = _shipping.value.product.copy(customer_id = customer.id)
+                    )
                 }
-            }
-        }
-    }
-
-    fun updateCustomer(customer: Customer) {
-        viewModelScope.launch {
-            customerRepository.update(customer).collect {
-                when (it) {
-                    is NetworkResult.Success -> {
-                        _shipping.value = _shipping.value.copy(customer = customer)
-                    }
-                    else -> {}
-                }
-            }
         }
     }
 
@@ -147,90 +119,54 @@ class HomeViewModel @Inject constructor(
                 } else {
                     searchReq.copy(model = value)
                 }
-                equipmentRepository.search(searchReq).collect {
-                    when (it) {
-                        is NetworkResult.Success -> {
-                            if (it.data != null && it.data.isNotEmpty()) {
-                                _shipping.value =
-                                    _shipping.value.copy(
-                                        equipment = it.data[0],
-                                        product = _shipping.value.product.copy(
-                                            equipment_id = it.data[0].id,
-                                            attachment = ""
-                                        )
-                                    )
-                            } else {
-                                _shipping.value = _shipping.value.copy(
-                                    equipment = null,
-                                    product = _shipping.value.product.copy(
-                                        attachment = "",
-                                        equipment_id = ""
-                                    )
+                equipmentRepository.search(searchReq)
+                    .flowOn(Dispatchers.IO)
+                    .catch {
+                        _shipping.value = _shipping.value.copy(
+                            equipment = null,
+                            product = _shipping.value.product.copy(
+                                equipment_id = "",
+                                attachment = ""
+                            )
+                        )
+                    }
+                    .collect {
+                        val data = it.body()
+                        if (data != null && data.isNotEmpty()) {
+                            _shipping.value = _shipping.value.copy(
+                                equipment = data[0],
+                                product = _shipping.value.product.copy(
+                                    equipment_id = data[0].id,
+                                    attachment = ""
                                 )
-                            }
-                        }
-                        is NetworkResult.Error -> {
+                            )
+                        } else {
                             _shipping.value = _shipping.value.copy(
                                 equipment = null,
                                 product = _shipping.value.product.copy(
-                                    attachment = "",
-                                    equipment_id = ""
+                                    equipment_id = "",
+                                    attachment = ""
                                 )
                             )
                         }
-                        else -> {}
                     }
-                }
             }
         }
     }
 
-    fun addEquipment(equipment: Equipment) {
+    fun saveEquipment(equipment: Equipment) {
         viewModelScope.launch {
-            equipmentRepository.add(equipment).collect {
-                when (it) {
-                    is NetworkResult.Loading -> {
-                        _shipping.value = _shipping.value.copy(
-                            equipment = null,
-                            product = _shipping.value.product.copy(
-                                equipment_id = "",
-                                attachment = ""
-                            )
+            equipmentRepository.save(equipment)
+                .flowOn(Dispatchers.IO)
+                .collect {
+                    _shipping.value = _shipping.value.copy(
+                        equipment = equipment,
+                        product = _shipping.value.product.copy(
+                            equipment_id = equipment.id,
+                            attachment = equipment.attachment
                         )
-                    }
-                    is NetworkResult.Success -> {
-                        _shipping.value = _shipping.value.copy(
-                            equipment = equipment,
-                            product = _shipping.value.product.copy(
-                                equipment_id = equipment.id,
-                                attachment = ""
-                            )
-                        )
-                    }
-                    is NetworkResult.Error -> {
-                        _shipping.value = _shipping.value.copy(
-                            equipment = null,
-                            product = _shipping.value.product.copy(
-                                equipment_id = "",
-                                attachment = ""
-                            )
-                        )
-                    }
+                    )
                 }
-            }
-        }
-    }
-
-    fun updateEquipment(equipment: Equipment) {
-        viewModelScope.launch {
-            equipmentRepository.update(equipment).collect {
-                when (it) {
-                    is NetworkResult.Success -> {
-                        _shipping.value = _shipping.value.copy(equipment = equipment)
-                    }
-                    else -> {}
-                }
-            }
         }
     }
 
@@ -244,22 +180,16 @@ class HomeViewModel @Inject constructor(
 
     fun saveShipping() {
         viewModelScope.launch {
-            softWareRepository.add(_shipping.value.software).collect {
-                when (it) {
-                    is NetworkResult.Success -> {
-                        productRepository.add(_shipping.value.product).collect { it1 ->
-                            when (it1) {
-                                is NetworkResult.Success -> {
-                                    _shipping.value = ShippingUiState()
-                                    _uiState.value = _uiState.value.copy(page = HomePage.HOME)
-                                }
-                                else -> {}
-                            }
+            softWareRepository.save(_shipping.value.software)
+                .flowOn(Dispatchers.IO)
+                .collect {
+                    productRepository.save(_shipping.value.product)
+                        .flowOn(Dispatchers.IO)
+                        .collect {
+                            _shipping.value = ShippingUiState()
+                            _uiState.value = _uiState.value.copy(page = HomePage.HOME)
                         }
-                    }
-                    else -> {}
                 }
-            }
         }
     }
 }

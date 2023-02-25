@@ -13,10 +13,7 @@ import retrofit2.http.*
 interface ProductService {
 
     @POST("/product")
-    fun add(@Body product: Product): Flow<Response<String>>
-
-    @PUT("/product")
-    fun update(@Body product: Product): Flow<Response<String>>
+    fun save(@Body product: Product): Flow<Response<String>>
 
     @DELETE("/product")
     fun delete(@Body id: String): Flow<Response<String>>

@@ -12,10 +12,7 @@ import retrofit2.http.*
 interface EquipmentService {
 
     @POST("/equipment")
-    fun add(@Body equipment: Equipment): Flow<Response<String>>
-
-    @PUT("/equipment")
-    fun update(@Body equipment: Equipment): Flow<Response<String>>
+    fun save(@Body equipment: Equipment): Flow<Response<String>>
 
     @DELETE("/equipment")
     fun delete(@Body id: String): Flow<Response<String>>

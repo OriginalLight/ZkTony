@@ -115,11 +115,7 @@ fun HomeScreenSinglePane(
             ) else shipping.customer!!,
             navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
             isAdd = shipping.customer == null,
-            onDone = {
-                if (shipping.customer == null) viewModel.addCustomer(it) else viewModel.updateCustomer(
-                    it
-                )
-            }
+            onDone = { viewModel.saveCustomer(it) }
         )
     }
 
@@ -134,11 +130,7 @@ fun HomeScreenSinglePane(
             ) else shipping.equipment!!,
             navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
             isAdd = shipping.equipment == null,
-            onDone = {
-                if (shipping.equipment == null) viewModel.addEquipment(it) else viewModel.updateEquipment(
-                    it
-                )
-            }
+            onDone = { viewModel.saveEquipment(it) }
         )
     }
 }
@@ -201,11 +193,7 @@ fun HomeScreenDualPane(
                     ) else shippingUiState.customer!!,
                     navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
                     isAdd = shippingUiState.customer == null,
-                    onDone = {
-                        if (shippingUiState.customer == null) viewModel.addCustomer(it) else viewModel.updateCustomer(
-                            it
-                        )
-                    }
+                    onDone = { viewModel.saveCustomer(it) }
                 )
             }
 
@@ -220,11 +208,7 @@ fun HomeScreenDualPane(
                     ) else shippingUiState.equipment!!,
                     navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
                     isAdd = shippingUiState.equipment == null,
-                    onDone = {
-                        if (shippingUiState.equipment == null) viewModel.addEquipment(it) else viewModel.updateEquipment(
-                            it
-                        )
-                    }
+                    onDone = { viewModel.saveEquipment(it) }
                 )
             }
         },
