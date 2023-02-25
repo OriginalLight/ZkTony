@@ -12,7 +12,8 @@ import javax.inject.Inject
 class CustomerRepository @Inject constructor(
     private val service: CustomerService
 ) {
-    fun save(customer: Customer) = service.save(customer)
+    fun add(customer: Customer) = service.add(customer)
+    fun update(customer: Customer) = service.update(customer)
     fun delete(id: String) = service.delete(id)
     fun search(dto: CustomerQueryDTO) = service.search(
         dto.id,

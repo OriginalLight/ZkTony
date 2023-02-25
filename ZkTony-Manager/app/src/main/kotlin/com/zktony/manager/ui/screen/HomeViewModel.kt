@@ -87,17 +87,20 @@ class HomeViewModel @Inject constructor(
                                 product = _shipping.value.product.copy(customer_id = "")
                             )
                         }
-
                     }
             }
         }
-
     }
 
-    fun saveCustomer(customer: Customer) {
+
+    fun saveCustomer(customer: Customer, add: Boolean) {
         viewModelScope.launch {
-            customerRepository.save(customer)
-                .flowOn(Dispatchers.IO)
+            val result = if (add) {
+                customerRepository.add(customer)
+            } else {
+                customerRepository.update(customer)
+            }
+            result.flowOn(Dispatchers.IO)
                 .collect {
                     _shipping.value = _shipping.value.copy(
                         customer = customer,
@@ -137,7 +140,7 @@ class HomeViewModel @Inject constructor(
                                 equipment = data[0],
                                 product = _shipping.value.product.copy(
                                     equipment_id = data[0].id,
-                                    attachment = ""
+                                    attachment = data[0].attachment
                                 )
                             )
                         } else {
@@ -154,10 +157,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun saveEquipment(equipment: Equipment) {
+    fun saveEquipment(equipment: Equipment, add: Boolean) {
         viewModelScope.launch {
-            equipmentRepository.save(equipment)
-                .flowOn(Dispatchers.IO)
+            val result = if (add) {
+                equipmentRepository.add(equipment)
+            } else {
+                equipmentRepository.update(equipment)
+            }
+            result.flowOn(Dispatchers.IO)
                 .collect {
                     _shipping.value = _shipping.value.copy(
                         equipment = equipment,
@@ -180,10 +187,10 @@ class HomeViewModel @Inject constructor(
 
     fun saveShipping() {
         viewModelScope.launch {
-            softWareRepository.save(_shipping.value.software)
+            softWareRepository.add(_shipping.value.software)
                 .flowOn(Dispatchers.IO)
                 .collect {
-                    productRepository.save(_shipping.value.product)
+                    productRepository.add(_shipping.value.product)
                         .flowOn(Dispatchers.IO)
                         .collect {
                             _shipping.value = ShippingUiState()

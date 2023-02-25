@@ -12,7 +12,8 @@ import javax.inject.Inject
 class EquipmentRepository @Inject constructor(
     private val service: EquipmentService
 ) {
-    fun save(equipment: Equipment) = service.save(equipment)
+    fun add(equipment: Equipment) = service.add(equipment)
+    fun update(equipment: Equipment) = service.update(equipment)
     fun delete(id: String) = service.delete(id)
     fun search(dto: EquipmentQueryDTO) = service.search(
         dto.id,

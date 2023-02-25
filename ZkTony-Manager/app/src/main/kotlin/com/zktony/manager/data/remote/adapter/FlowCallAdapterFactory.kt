@@ -35,10 +35,8 @@ class FlowCallAdapterFactory private constructor(private var isAsync: Boolean) :
         if (getRawType(returnType) != Flow::class.java) {
             return null
         }
-        val observableType = getParameterUpperBound(
-            0,
-            getParameterUpperBound(0, returnType as ParameterizedType) as ParameterizedType
-        )
+        var observableType = getParameterUpperBound(0, returnType as ParameterizedType)
+        observableType = getParameterUpperBound(0, observableType as ParameterizedType)
         return FlowCallAdapter<Any>(observableType, isAsync)
     }
 

@@ -115,7 +115,7 @@ fun HomeScreenSinglePane(
             ) else shipping.customer!!,
             navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
             isAdd = shipping.customer == null,
-            onDone = { viewModel.saveCustomer(it) }
+            onDone = { viewModel.saveCustomer(it, shipping.customer == null) }
         )
     }
 
@@ -130,7 +130,7 @@ fun HomeScreenSinglePane(
             ) else shipping.equipment!!,
             navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
             isAdd = shipping.equipment == null,
-            onDone = { viewModel.saveEquipment(it) }
+            onDone = { viewModel.saveEquipment(it, shipping.equipment == null) }
         )
     }
 }
@@ -152,7 +152,7 @@ fun HomeScreenDualPane(
             )
         },
         second = {
-            val shippingUiState by viewModel.shipping.collectAsStateWithLifecycle()
+            val shipping by viewModel.shipping.collectAsStateWithLifecycle()
 
             AnimatedVisibility(
                 visible = (uiState.page == HomePage.SHIPPING || uiState.page == HomePage.HOME),
@@ -161,7 +161,7 @@ fun HomeScreenDualPane(
             ) {
                 ShippingPage(
                     modifier = modifier,
-                    uiState = shippingUiState,
+                    uiState = shipping,
                     navigateTo = viewModel::navigateTo,
                     softwareChange = { viewModel.setSoftware(it) },
                     searchCustomer = { viewModel.searchCustomer() },
@@ -177,7 +177,7 @@ fun HomeScreenDualPane(
                 enter = expandHorizontally(),
                 exit = shrinkHorizontally()
             ) {
-                SoftwareModifyPage(software = shippingUiState.software,
+                SoftwareModifyPage(software = shipping.software,
                     navigateTo = viewModel::navigateTo,
                     softwareChange = { viewModel.setSoftware(it) })
             }
@@ -188,12 +188,12 @@ fun HomeScreenDualPane(
                 exit = shrinkHorizontally()
             ) {
                 CustomerModifyPage(
-                    customer = if (shippingUiState.customer == null) Customer(
-                        create_by = shippingUiState.user?.name ?: ""
-                    ) else shippingUiState.customer!!,
+                    customer = if (shipping.customer == null) Customer(
+                        create_by = shipping.user?.name ?: ""
+                    ) else shipping.customer!!,
                     navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
-                    isAdd = shippingUiState.customer == null,
-                    onDone = { viewModel.saveCustomer(it) }
+                    isAdd = shipping.customer == null,
+                    onDone = { viewModel.saveCustomer(it, shipping.customer == null) }
                 )
             }
 
@@ -203,12 +203,12 @@ fun HomeScreenDualPane(
                 exit = shrinkHorizontally()
             ) {
                 EquipmentModifyPage(
-                    equipment = if (shippingUiState.equipment == null) Equipment(
-                        create_by = shippingUiState.user?.name ?: ""
-                    ) else shippingUiState.equipment!!,
+                    equipment = if (shipping.equipment == null) Equipment(
+                        create_by = shipping.user?.name ?: ""
+                    ) else shipping.equipment!!,
                     navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
-                    isAdd = shippingUiState.equipment == null,
-                    onDone = { viewModel.saveEquipment(it) }
+                    isAdd = shipping.equipment == null,
+                    onDone = { viewModel.saveEquipment(it, shipping.customer == null) }
                 )
             }
         },

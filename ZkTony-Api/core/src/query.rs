@@ -60,12 +60,7 @@ impl Query {
             }
         }
 
-        let res = query
-            .clone()
-            .order_by_desc(customer::Column::CreateTime)
-            .limit(20)
-            .all(db)
-            .await;
+        let res = query.clone().all(db).await;
 
         match res {
             Ok(x) => {
@@ -119,12 +114,7 @@ impl Query {
             }
         }
 
-        let res = query
-            .clone()
-            .order_by_desc(equipment::Column::CreateTime)
-            .limit(20)
-            .all(db)
-            .await;
+        let res = query.clone().all(db).await;
 
         match res {
             Ok(x) => {
@@ -210,12 +200,7 @@ impl Query {
             }
         }
 
-        let res = query
-            .clone()
-            .order_by_desc(product::Column::CreateTime)
-            .limit(20)
-            .all(db)
-            .await;
+        let res = query.clone().all(db).await;
         match res {
             Ok(x) => {
                 if x.is_empty() {
@@ -254,12 +239,7 @@ impl Query {
             }
         }
 
-        let res = query
-            .clone()
-            .order_by_desc(software::Column::CreateTime)
-            .limit(20)
-            .all(db)
-            .await;
+        let res = query.clone().all(db).await;
         match res {
             Ok(x) => {
                 if x.is_empty() {

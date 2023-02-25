@@ -13,7 +13,8 @@ class ProductRepository @Inject constructor(
     private val service: ProductService
 ) {
 
-    fun save(product: Product) = service.save(product)
+    fun add(product: Product) = service.add(product)
+    fun update(product: Product) = service.update(product)
     fun delete(id: String) = service.delete(id)
     fun search(dto: ProductQueryDTO) = service.search(
         dto.id,

@@ -12,7 +12,9 @@ import retrofit2.http.*
 interface CustomerService {
 
     @POST("/customer")
-    fun save(@Body customer: Customer): Flow<Response<String>>
+    fun add(@Body customer: Customer): Flow<Response<String>>
+
+    fun update(@Body customer: Customer): Flow<Response<String>>
 
     @DELETE("/customer")
     fun delete(@Body id: String): Flow<Response<String>>
