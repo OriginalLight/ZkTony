@@ -140,7 +140,7 @@ class HomeViewModel @Inject constructor(
                                 equipment = data[0],
                                 product = _shipping.value.product.copy(
                                     equipment_id = data[0].id,
-                                    attachment = data[0].attachment
+                                    attachment = ""
                                 )
                             )
                         } else {
@@ -170,7 +170,7 @@ class HomeViewModel @Inject constructor(
                         equipment = equipment,
                         product = _shipping.value.product.copy(
                             equipment_id = equipment.id,
-                            attachment = equipment.attachment
+                            attachment = ""
                         )
                     )
                 }

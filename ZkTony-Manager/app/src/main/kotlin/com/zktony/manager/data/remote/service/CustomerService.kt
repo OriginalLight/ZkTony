@@ -14,6 +14,7 @@ interface CustomerService {
     @POST("/customer")
     fun add(@Body customer: Customer): Flow<Response<String>>
 
+    @PUT("/customer")
     fun update(@Body customer: Customer): Flow<Response<String>>
 
     @DELETE("/customer")
