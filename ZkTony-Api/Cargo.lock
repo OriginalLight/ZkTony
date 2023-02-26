@@ -246,6 +246,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "api"
+version = "0.1.0"
+dependencies = [
+ "actix-web",
+ "core",
+ "entity",
+ "serde",
+]
+
+[[package]]
 name = "arrayvec"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -520,6 +530,16 @@ dependencies = [
  "percent-encoding",
  "time 0.3.19",
  "version_check",
+]
+
+[[package]]
+name = "core"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "entity",
+ "sea-orm",
+ "serde",
 ]
 
 [[package]]
@@ -2562,34 +2582,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "447660ad36a13288b1db4d4248e857b510e8c3a225c822ba4fb748c0aafecffd"
 
 [[package]]
-name = "zktony"
+name = "zktony-api"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "api",
  "dotenvy",
  "serde",
  "tracing-subscriber",
- "zktony_api",
-]
-
-[[package]]
-name = "zktony_api"
-version = "0.1.0"
-dependencies = [
- "actix-web",
- "entity",
- "serde",
- "zktony_core",
-]
-
-[[package]]
-name = "zktony_core"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "entity",
- "sea-orm",
- "serde",
 ]
 
 [[package]]

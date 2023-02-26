@@ -1,14 +1,16 @@
 [package]
 authors = ["刘贺贺 <15252114322@163.com>"]
 edition = "2021"
-name = "zktony_api"
+name = "api"
 publish = false
 version = "0.1.0"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "api"
+path = "src/lib.rs"
 
 [dependencies]
 actix-web = "4"
 entity = { path = "../entity" }
 serde = "1"
-zktony_core = { path = "../core" }
+core = { path = "../core" }

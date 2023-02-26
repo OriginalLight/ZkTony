@@ -1,6 +1,6 @@
 use super::state::AppState;
 use actix_web::{delete, get, post, put, web, Error, HttpResponse, Result};
-use zktony_core::{
+use core::{
     ApplicationSearchReq, CustomerGetReq, CustomerSaveReq, DeleteReq, EquipmentGetReq,
     EquipmentSaveReq, LogAddReq, LogDetailAddReq, Mutation, ProductGetReq, ProductSaveReq,
     ProgramAddReq, Query, SoftwareGetReq, SoftwareSaveReq,

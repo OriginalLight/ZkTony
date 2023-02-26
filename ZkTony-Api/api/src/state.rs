@@ -1,4 +1,4 @@
-use zktony_core::sea_orm::DatabaseConnection;
+use core::sea_orm::DatabaseConnection;
 
 #[derive(Debug, Clone)]
 pub struct AppState {

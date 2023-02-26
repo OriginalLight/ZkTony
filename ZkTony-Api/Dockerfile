@@ -27,11 +27,11 @@ FROM debian:bullseye-slim
 WORKDIR /app
 
 # copy server binary from build stage
-COPY --from=builder /code/target/release/zktony zktony
+COPY --from=builder /code/target/release/zktony-api api
 COPY --from=builder /code/.env /.env
 
 # indicate what port the server is running on
 EXPOSE 9765
 
 # run server
-CMD [ "/app/zktony" ]
+CMD [ "/app/api" ]

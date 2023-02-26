@@ -1,5 +1,5 @@
 use actix_web::{middleware, web, App, HttpServer};
-use zktony_api::{handler::not_found, router, sea_orm::Database, state::AppState};
+use api::{handler::not_found, router, sea_orm::Database, state::AppState};
 
 use std::env;
 
@@ -15,14 +15,13 @@ async fn main() -> std::io::Result<()> {
     let port = env::var("PORT").expect("PORT is not set in .env file");
     let server_url = format!("{host}:{port}");
 
-    // establish connection to database and apply migrations
-    // -> create post table if not exists
     let conn = Database::connect(&db_url).await.unwrap();
 
     // build app state
     let state = AppState { conn };
 
-    println!("Starting server at {server_url}");
+    // log
+    show_log();
 
     HttpServer::new(move || {
         App::new()
@@ -34,4 +33,22 @@ async fn main() -> std::io::Result<()> {
     .bind(&server_url)?
     .run()
     .await
+}
+
+fn show_log() {
+    let logo = r#"
+    ████████ ██     ██████████                                      ██     ███████  ██
+    ░░░░░░██ ░██    ░░░░░██░░░                     ██   ██          ████   ░██░░░░██░██
+         ██  ░██  ██    ░██      ██████  ███████  ░░██ ██          ██░░██  ░██   ░██░██
+        ██   ░██ ██     ░██     ██░░░░██░░██░░░██  ░░███   █████  ██  ░░██ ░███████ ░██
+       ██    ░████      ░██    ░██   ░██ ░██  ░██   ░██   ░░░░░  ██████████░██░░░░  ░██
+      ██     ░██░██     ░██    ░██   ░██ ░██  ░██   ██          ░██░░░░░░██░██      ░██
+     ████████░██░░██    ░██    ░░██████  ███  ░██  ██           ░██     ░██░██      ░██
+    ░░░░░░░░ ░░  ░░     ░░      ░░░░░░  ░░░   ░░  ░░            ░░      ░░ ░░       ░░     
+       "#;
+    println!("{}", logo);
+    println!("编译器：{}", std::env::consts::DLL_EXTENSION);
+    println!("系统架构：{}", std::env::consts::OS);
+    println!("系统类型：{}", std::env::consts::ARCH);
+    println!("操作系统：{}", std::env::consts::FAMILY);
 }
