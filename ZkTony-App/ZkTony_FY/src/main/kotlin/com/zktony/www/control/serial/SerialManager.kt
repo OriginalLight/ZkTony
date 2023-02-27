@@ -32,6 +32,7 @@ class SerialManager(
 
     // 抽屉状态
     private val _drawer = MutableStateFlow(false)
+
     // 摇床状态
     private val _swing = MutableStateFlow(false)
 

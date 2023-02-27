@@ -18,8 +18,8 @@ package com.zktony.www.data.di
 
 import android.content.Context
 import androidx.room.Room
-import com.zktony.www.data.local.room.database.AppDatabase
 import com.zktony.www.data.local.room.dao.*
+import com.zktony.www.data.local.room.database.AppDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -18,5 +18,9 @@ data class Hole(
     val y: Int = 0,
     val xAxis: Float = 0f,
     val yAxis: Float = 0f,
+    val v1: Float = 0f,
+    val v2: Float = 0f,
+    val v3: Float = 0f,
+    val v4: Float = 0f,
     val checked: Boolean = false,
 )

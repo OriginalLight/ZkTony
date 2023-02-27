@@ -6,11 +6,11 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.zktony.www.data.remote.model.LogDTO
-import com.zktony.common.http.result.NetworkResult
 import com.zktony.www.data.repository.LogRecordRepository
 import com.zktony.www.data.repository.LogRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
@@ -49,17 +49,13 @@ class LogRecordWorker @AssistedInject constructor(
                         )
                     )
                 }
-                logRepository.uploadLogRecords(list).collect { res ->
-                    when (res) {
-                        is NetworkResult.Success -> {
-                            logRecordRepository.updateBatch(logs.map { it.copy(upload = 1) })
-                        }
-                        is NetworkResult.Error -> {
-                            Log.d("LogRecordWorker", "上传日志失败")
-                        }
-                        else -> {}
+                logRepository.uploadLogRecords(list)
+                    .catch {
+                        Log.d("LogRecordWorker", "上传日志失败")
                     }
-                }
+                    .collect {
+                        logRecordRepository.updateBatch(logs.map { it.copy(upload = 1) })
+                    }
             }
             return Result.success()
         } catch (e: Exception) {

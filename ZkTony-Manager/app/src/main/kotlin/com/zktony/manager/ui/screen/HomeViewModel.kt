@@ -49,9 +49,12 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setSoftware(software: Software) {
+        val product = _shipping.value.product.copy(
+            software_id = software.id,
+        )
         _shipping.value = _shipping.value.copy(
             software = software,
-            product = _shipping.value.product.copy(software_id = software.id)
+            product = product
         )
     }
 
@@ -69,9 +72,10 @@ class HomeViewModel @Inject constructor(
                 customerRepository.search(searchReq)
                     .flowOn(Dispatchers.IO)
                     .catch {
+                        val product = _shipping.value.product.copy(customer_id = "")
                         _shipping.value = _shipping.value.copy(
                             customer = null,
-                            product = _shipping.value.product.copy(customer_id = "")
+                            product = product
                         )
                     }
                     .collect {

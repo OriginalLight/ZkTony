@@ -21,4 +21,5 @@ data class WorkPlate(
     val v2: Float = 0f,
     val v3: Float = 0f,
     val v4: Float = 0f,
+    val custom: Int = 0,
 )

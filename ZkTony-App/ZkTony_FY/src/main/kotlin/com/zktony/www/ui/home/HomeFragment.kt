@@ -61,7 +61,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 text = if (it) "暂停摇床" else "继续摇床"
                                 setTextColor(
                                     ContextCompat.getColor(
-                                        context, if (it)  R.color.dark_outline else R.color.red
+                                        context, if (it) R.color.dark_outline else R.color.red
                                     )
                                 )
                             }

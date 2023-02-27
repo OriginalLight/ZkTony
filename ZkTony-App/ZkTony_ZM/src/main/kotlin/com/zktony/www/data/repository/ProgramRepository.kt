@@ -1,6 +1,5 @@
 package com.zktony.www.data.repository
 
-import com.zktony.common.http.result.getNetworkResult
 import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Program
 import com.zktony.www.data.remote.model.ProgramDTO
@@ -46,6 +45,6 @@ class ProgramRepository @Inject constructor(
     }
 
     fun uploadProgram(programs: List<ProgramDTO>) =
-        service.uploadProgram(programs).getNetworkResult()
+        service.uploadProgram(programs)
 
 }

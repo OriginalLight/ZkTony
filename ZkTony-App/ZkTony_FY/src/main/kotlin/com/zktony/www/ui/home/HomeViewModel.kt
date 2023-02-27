@@ -69,7 +69,8 @@ class HomeViewModel @Inject constructor(
                         if (it.startsWith("TC1:TCACTUALTEMP=")) {
                             // 读取温度
                             val address = it.substring(it.length - 2, it.length - 1).toInt()
-                            val temp = it.replace("TC1:TCACTUALTEMP=", "").split("@")[0].removeZero()
+                            val temp =
+                                it.replace("TC1:TCACTUALTEMP=", "").split("@")[0].removeZero()
                             when (address) {
                                 1 -> _aFlow.value = _aFlow.value.copy(temp = "$temp ℃")
                                 2 -> _bFlow.value = _bFlow.value.copy(temp = "$temp ℃")
@@ -85,7 +86,10 @@ class HomeViewModel @Inject constructor(
                 // 设置和定时查询温控
                 for (i in 0..4) {
                     delay(500L)
-                    serial.setTemp(addr = i, temp = if (i == 0) "3" else appViewModel.settings.value.temp.toString().removeZero())
+                    serial.setTemp(addr = i,
+                        temp = if (i == 0) "3" else appViewModel.settings.value.temp.toString()
+                            .removeZero()
+                    )
                 }
                 // 每十秒钟查询一次温度
                 while (true) {

@@ -46,7 +46,8 @@ class WorkHoleFragment :
                                 setData(it.holes)
                             }
                             selectAll.isEnabled = it.plate.count != it.plate.row * it.plate.column
-                            volume.text = "[ ${
+                            custom.text = "自定义：${if(it.plate.custom == 0) '关' else '开'}"
+                            volume.text = if(it.plate.custom == 0) "[ ${
                                 it.plate.v1.toString().removeZero()
                             } μL, ${
                                 it.plate.v2.toString().removeZero()
@@ -54,7 +55,7 @@ class WorkHoleFragment :
                                 it.plate.v3.toString().removeZero()
                             } μL, ${
                                 it.plate.v4.toString().removeZero()
-                            } μL ]"
+                            } μL ]" else "自定义,请单独设置每孔加液量！"
                         }
                     }
                 }
@@ -74,6 +75,7 @@ class WorkHoleFragment :
             dynamicPlate.setOnItemClick { x, y -> viewModel.select(x, y) }
             volume.setOnClickListener {
                 val plate = viewModel.uiState.value.plate
+                if (plate?.custom == 1) return@setOnClickListener
                 volumeDialog(
                     v1 = plate?.v1 ?: 0.0f,
                     v2 = plate?.v2 ?: 0.0f,
@@ -94,6 +96,12 @@ class WorkHoleFragment :
                 clickScale()
                 setOnClickListener {
                     viewModel.selectAll()
+                }
+            }
+            with(custom) {
+                clickScale()
+                setOnClickListener {
+                    viewModel.setCustom()
                 }
             }
         }

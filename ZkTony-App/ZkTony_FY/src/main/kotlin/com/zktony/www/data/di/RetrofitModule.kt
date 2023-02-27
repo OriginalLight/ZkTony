@@ -24,7 +24,8 @@ object RetrofitModule {
     fun getOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {
-                level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BASIC
+                level =
+                    if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BASIC
             })
             .build()
     }
@@ -38,10 +39,11 @@ object RetrofitModule {
             .addCallAdapterFactory(FlowCallAdapterFactory.createAsync())
             .addConverterFactory(
                 GsonConverterFactory.create(
-                GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd HH:mm:ss")
-                    .create()
-            ))
+                    GsonBuilder()
+                        .setDateFormat("yyyy-MM-dd HH:mm:ss")
+                        .create()
+                )
+            )
             .build()
     }
 

@@ -95,6 +95,20 @@
                     tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize" />
 
                 <com.google.android.material.button.MaterialButton
+                    android:id="@+id/custom"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/custom_disable"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="27dp"
+                    app:rippleColor="@color/purple_500"
+                    tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize" />
+
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/volume"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
@@ -109,6 +123,8 @@
                     app:cornerRadius="27dp"
                     app:rippleColor="@color/purple_700"
                     tools:ignore="TextContrastCheck,VisualLintButtonSize" />
+
+
 
             </LinearLayout>
 

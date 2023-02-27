@@ -107,8 +107,17 @@ fun ShippingPage(
                 AnimatedVisibility(visible = uiState.software.id.isNotEmpty()) {
                     Column {
                         Spacer(modifier = Modifier.height(16.dp))
-                        SoftwareCard(
-                            software = uiState.software,
+                        val s = uiState.software
+                        val textList = listOf(
+                            "软件编号" to s.id,
+                            "软件包名" to s.`package`,
+                            "软件版本" to s.version_name,
+                            "软件代号" to s.version_code.toString(),
+                            "构建类型" to s.build_type,
+                            "备注说明" to s.remarks.ifEmpty { "无" },
+                        )
+                        TextCard(
+                            textList = textList,
                             onClick = { navigateTo(HomePage.SOFTWARE_MODIFY) }
                         )
                     }
@@ -128,8 +137,18 @@ fun ShippingPage(
                     Column {
                         if (uiState.customer != null) {
                             Spacer(modifier = Modifier.height(16.dp))
-                            CustomerCard(
-                                customer = uiState.customer,
+                            val c = uiState.customer
+                            val textList = listOf(
+                                "客户编号" to c.id,
+                                "客户姓名" to c.name,
+                                "客户手机" to c.phone,
+                                "客户地址" to c.address,
+                                "信息来源" to c.source,
+                                "从事行业" to c.industry,
+                                "客户备注" to c.remarks.ifEmpty { "无" },
+                            )
+                            TextCard(
+                                textList = textList,
                                 onClick = { navigateTo(HomePage.CUSTOMER_MODIFY) }
                             )
                         }
@@ -150,8 +169,19 @@ fun ShippingPage(
                     Column {
                         if (uiState.equipment != null) {
                             Spacer(modifier = Modifier.height(16.dp))
-                            EquipmentCard(
-                                equipment = uiState.equipment,
+                            val e = uiState.equipment
+                            val textList = listOf(
+                                "机器编号" to e.id,
+                                "机器名称" to e.name,
+                                "机器型号" to e.model,
+                                "使用电压" to e.voltage,
+                                "使用功率" to e.power,
+                                "使用频率" to e.frequency,
+                                "机器附件" to e.attachment,
+                                "机器备注" to e.remarks.ifEmpty { "无" },
+                            )
+                            TextCard(
+                                textList = textList,
                                 onClick = { navigateTo(HomePage.EQUIPMENT_MODIFY) }
                             )
                         }

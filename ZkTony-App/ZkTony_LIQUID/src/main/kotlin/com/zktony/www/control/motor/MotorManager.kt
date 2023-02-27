@@ -31,7 +31,7 @@ class MotorManager(
             p2 = motorList.find { it.id == 3 } ?: Motor()
             p3 = motorList.find { it.id == 4 } ?: Motor()
             p4 = motorList.find { it.id == 5 } ?: Motor()
-            Log.d("MotorManager","initMotor")
+            Log.d("MotorManager", "initMotor")
         }
 
     }
@@ -39,7 +39,7 @@ class MotorManager(
     fun initCalibration(calibrationList: List<Calibration>) {
         scope.launch {
             calibration = calibrationList.find { it.enable == 1 } ?: Calibration()
-            Log.d("MotorManager","initCalibration")
+            Log.d("MotorManager", "initCalibration")
         }
     }
 

@@ -6,7 +6,7 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
-interface ApplicationService  {
+interface ApplicationService {
 
     @GET("/application")
     fun getById(@Query("application_id") id: String): Flow<Response<Application>>

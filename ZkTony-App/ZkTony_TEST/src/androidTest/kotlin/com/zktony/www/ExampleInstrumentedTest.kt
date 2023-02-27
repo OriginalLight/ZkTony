@@ -3,7 +3,6 @@ package com.zktony.www
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.zktony.common.extension.hexToAscii
-import com.zktony.www.common.extension.extractTemp
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,11 +27,6 @@ class ExampleInstrumentedTest {
         assertEquals("CMD:REPLY=2@0\r", str.hexToAscii())
     }
 
-    @Test
-    fun extractNumber() {
-        val str = "TC1:TCACTUALTEMP=25.6@2\r"
-        assertEquals("25.6", str.extractTemp())
-    }
 
 
 }
