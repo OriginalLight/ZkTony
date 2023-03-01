@@ -9,8 +9,8 @@ import com.zktony.common.extension.toHex
 data class V1(
     val header: String = "EE",
     val address: String = "01",
-    val function: String = "06",
-    val parameter: String = "0A",
+    val fn: String = "06",
+    val pa: String = "0A",
     val data: String = "",
     val end: String = "FFFCFFFF"
 ) {
@@ -19,7 +19,7 @@ data class V1(
      * @return 16进制字符串
      */
     fun toHex(): String {
-        return header.trim() + address.trim() + function.trim() + parameter.trim() + data.trim() + end.trim()
+        return header.trim() + address.trim() + fn.trim() + pa.trim() + data.trim() + end.trim()
     }
 
     companion object {
@@ -31,7 +31,7 @@ data class V1(
          */
         @JvmStatic
         fun singlePoint(data: String): String {
-            return V1(function = "05", parameter = "01", data = "0101" + data.toHex()).toHex()
+            return V1(fn = "05", pa = "01", data = "0101" + data.toHex()).toHex()
         }
 
         /**
@@ -41,7 +41,7 @@ data class V1(
          */
         @JvmStatic
         fun complex(data: String): String {
-            return V1(function = "05", parameter = "04", data = "0101" + data.toHex()).toHex()
+            return V1(fn = "05", pa = "04", data = "0101" + data.toHex()).toHex()
         }
 
     }

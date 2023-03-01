@@ -64,7 +64,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/con_1"
-                android:layout_width="100dp"
+                android:layout_width="125dp"
                 android:layout_height="25dp"
                 android:layout_marginStart="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/con_2"
@@ -82,7 +82,7 @@
                     tools:ignore="ContentDescription" />
 
                 <TextView
-                    android:layout_width="75dp"
+                    android:layout_width="105dp"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingStart="8dp"
@@ -98,7 +98,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/con_2"
-                android:layout_width="100dp"
+                android:layout_width="125dp"
                 android:layout_height="25dp"
                 android:layout_marginStart="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -116,7 +116,7 @@
                     tools:ignore="ContentDescription" />
 
                 <TextView
-                    android:layout_width="75dp"
+                    android:layout_width="105dp"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingStart="8dp"
@@ -132,7 +132,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/con_3"
-                android:layout_width="100dp"
+                android:layout_width="125dp"
                 android:layout_height="25dp"
                 android:layout_marginStart="8dp"
                 app:layout_constraintBottom_toTopOf="@+id/con_4"
@@ -150,11 +150,11 @@
                     tools:ignore="ContentDescription" />
 
                 <TextView
-                    android:layout_width="75dp"
+                    android:layout_width="105dp"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingStart="8dp"
-                    android:text='@{String.valueOf(action.liquidVolume) + " 毫升"}'
+                    android:text='@{String.valueOf(action.liquidVolume) + " 微升"}'
                     android:textColor="@color/black"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -164,7 +164,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/con_4"
-                android:layout_width="100dp"
+                android:layout_width="125dp"
                 android:layout_height="25dp"
                 android:layout_marginStart="8dp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -182,7 +182,7 @@
                     tools:ignore="ContentDescription" />
 
                 <TextView
-                    android:layout_width="75dp"
+                    android:layout_width="105dp"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
                     android:paddingStart="8dp"

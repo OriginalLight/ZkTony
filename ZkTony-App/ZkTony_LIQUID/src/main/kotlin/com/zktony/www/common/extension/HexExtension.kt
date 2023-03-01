@@ -29,8 +29,8 @@ fun String.toCommand(): V1 {
     return V1(
         header = this.substring(0, 2),
         address = this.substring(2, 4),
-        function = this.substring(4, 6),
-        parameter = this.substring(6, 8),
+        fn = this.substring(4, 6),
+        pa = this.substring(6, 8),
         data = this.substring(8, this.length - 8),
         end = this.substring(this.length - 8, this.length)
     )

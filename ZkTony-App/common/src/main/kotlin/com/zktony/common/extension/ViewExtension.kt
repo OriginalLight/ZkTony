@@ -61,7 +61,7 @@ inline fun EditText.afterTextChange(crossinline block: (String) -> Unit) {
 
 fun EditText.setEqualText(text: String) {
     val str = this.text.toString()
-    if (str == text) {
+    if (str == text || this.isFocused) {
         return
     } else {
         this.setText(text)

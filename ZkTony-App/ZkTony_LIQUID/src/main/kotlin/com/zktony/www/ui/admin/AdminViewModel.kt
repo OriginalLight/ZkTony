@@ -66,7 +66,7 @@ class AdminViewModel @Inject constructor(
                 }
             }
             launch {
-                serial.ttys2Flow.collect {
+                serial.ttys3Flow.collect {
                     it?.let {
                         onSerialThreeResponse(it)
                     }
@@ -86,7 +86,7 @@ class AdminViewModel @Inject constructor(
      */
     private fun onSerialOneResponse(hex: String) {
         hex.toCommand().run {
-            if (function == "03" && parameter == "04") {
+            if (fn == "03" && pa == "04") {
                 val motor = data.toMotor()
                 updateMotor(motor.copy(id = motor.address - 1))
             }
@@ -99,7 +99,7 @@ class AdminViewModel @Inject constructor(
      */
     private fun onSerialThreeResponse(hex: String) {
         hex.toCommand().run {
-            if (function == "03" && parameter == "04") {
+            if (fn == "03" && pa == "04") {
                 val motor = data.toMotor()
                 updateMotor(motor.copy(id = motor.address + 2))
             }
@@ -246,11 +246,11 @@ class AdminViewModel @Inject constructor(
                 for (j in 1..3) {
                     val serial = when (i) {
                         0 -> Serial.TTYS0
-                        else -> Serial.TTYS2
+                        else -> Serial.TTYS3
                     }
                     SerialManager.instance.sendHex(
                         serial = serial,
-                        hex = V1(function = "03", parameter = "04", data = j.int8ToHex()).toHex()
+                        hex = V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex()
                     )
                     delay(100L)
                 }

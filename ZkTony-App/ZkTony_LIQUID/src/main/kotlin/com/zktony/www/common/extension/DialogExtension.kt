@@ -26,6 +26,10 @@ import com.zktony.common.extension.removeZero
 import com.zktony.common.utils.Constants
 import com.zktony.www.R
 import com.zktony.www.data.remote.model.QrCode
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺
@@ -188,22 +192,35 @@ fun authDialog(block: () -> Unit) {
         .show()
 }
 
-fun selectDialog(block: () -> Unit) {
+fun washDialog(block: (Int) -> Unit, block1: () -> Unit) {
     CustomDialog.build()
-        .setCustomView(object :
-            OnBindView<CustomDialog>(R.layout.layout_function_select) {
+        .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_wash_dialog) {
             override fun onBind(dialog: CustomDialog, v: View) {
-                val motor = v.findViewById<MaterialButton>(R.id.motor)
-                val cancel = v.findViewById<MaterialButton>(R.id.cancel)
-                motor.setOnClickListener {
-                    block()
+                val input = v.findViewById<EditText>(R.id.input)
+                val btnStart = v.findViewById<MaterialButton>(R.id.start)
+                val btnStop = v.findViewById<MaterialButton>(R.id.stop)
+                val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
+                btnStart.setOnClickListener {
+                    val scope = CoroutineScope(Dispatchers.Main)
+                    val time = input.text.toString().toIntOrNull() ?: 30
+                    block(time)
+                    scope.launch {
+                        btnStart.isEnabled = false
+                        delay(time * 1000L)
+                        btnStart.isEnabled = true
+                    }
+                }
+                btnStop.setOnClickListener {
+                    block1()
+                    btnStart.isEnabled = true
+                }
+                btnCancel.setOnClickListener {
                     dialog.dismiss()
                 }
-                cancel.setOnClickListener { dialog.dismiss() }
             }
         })
-        .setMaskColor(Color.parseColor("#4D000000"))
-        .show()
+        .setCancelable(false)
+        .setMaskColor(Color.parseColor("#4D000000")).setWidth(500).show()
 }
 
 fun deviceDialog() {

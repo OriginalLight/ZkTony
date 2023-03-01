@@ -8,6 +8,7 @@ import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.TTYS0
 import com.zktony.serialport.util.Serial.TTYS2
 import com.zktony.www.common.extension.toCommand
+import com.zktony.www.control.serial.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -19,12 +20,12 @@ class SerialManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     private val _ttys0Flow = MutableStateFlow<String?>(null)
-    private val _ttys2Flow = MutableStateFlow<String?>(null)
+    private val _ttys3Flow = MutableStateFlow<String?>(null)
     private val _lock = MutableStateFlow(false)
     private val _work = MutableStateFlow(false)
 
     val ttys0Flow = _ttys0Flow.asStateFlow()
-    val ttys2Flow = _ttys2Flow.asStateFlow()
+    val ttys3Flow = _ttys3Flow.asStateFlow()
     val lock = _lock.asStateFlow()
     val work = _work.asStateFlow()
 
@@ -38,7 +39,7 @@ class SerialManager(
         scope.launch {
             launch {
                 MutableSerial.instance.init(TTYS0, 115200)
-                MutableSerial.instance.init(TTYS2, 115200)
+                MutableSerial.instance.init(Serial.TTYS3, 115200)
             }
             launch {
                 MutableSerial.instance.listener = { port, data ->
@@ -49,9 +50,9 @@ class SerialManager(
                                 //Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
                             }
                         }
-                        TTYS2 -> {
+                        Serial.TTYS3 -> {
                             data.verifyHex().forEach {
-                                _ttys2Flow.value = it
+                                _ttys3Flow.value = it
                                 //Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
                             }
                         }
@@ -63,9 +64,9 @@ class SerialManager(
                 ttys0Flow.collect {
                     it?.let {
                         val res = it.toCommand()
-                        when (res.function) {
+                        when (res.fn) {
                             "85" -> {
-                                if (res.parameter == "01") {
+                                if (res.pa == "01") {
                                     val total = res.data.substring(2, 4).hexToInt8()
                                     val current = res.data.substring(6, 8).hexToInt8()
                                     _lock.value = total != current
@@ -73,7 +74,7 @@ class SerialManager(
                                 }
                             }
                             "86" -> {
-                                if (res.parameter == "0A") {
+                                if (res.pa == "0A") {
                                     _lock.value = false
                                     lockTime = 0L
                                     PopTip.show("复位成功")
@@ -96,6 +97,21 @@ class SerialManager(
                 }
             }
         }
+    }
+
+    suspend fun reset() {
+        while (lock.value) {
+            delay(500L)
+        }
+        _lock.value = true
+        lockTime = 0L
+        sendHex(
+            serial = TTYS0, hex = V1(
+                fn = "05", pa = "01", data = "0101302C302C302C302C"
+            ).toHex()
+        )
+        sendHex(serial = TTYS0, hex = V1().toHex())
+
     }
 
     /**

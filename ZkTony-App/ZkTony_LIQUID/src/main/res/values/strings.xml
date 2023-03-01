@@ -125,4 +125,8 @@
     <string name="plate_four">四号板</string>
     <string name="device">设备信息</string>
     <string name="custom_disable">自定义：关</string>
+    <string name="wash">管路清洗</string>
+    <string name="fill">填充</string>
+    <string name="suck_back">回吸</string>
+    <string name="wash_time">清洗时间/秒</string>
 </resources>
