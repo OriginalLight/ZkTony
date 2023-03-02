@@ -11,6 +11,8 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.extension.addTouchEvent
 import com.zktony.common.extension.clickScale
+import com.zktony.common.extension.getTimeFormat
+import com.zktony.common.extension.removeZero
 import com.zktony.www.R
 import com.zktony.www.common.extension.washDialog
 import com.zktony.www.databinding.FragmentHomeBinding
@@ -36,6 +38,26 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         Log.d("HomeFragment", it.toString())
                         binding.apply {
                             operate.isVisible = it.job == null
+                            start.isEnabled = it.job == null && it.holeList.any { hole -> hole.checked }
+                            with(suspend) {
+                                isEnabled = it.job != null
+                                text = if (!it.suspend) "暂停" else "继续"
+                                alpha = if (it.job != null) 1f else 0.3f
+                            }
+                            if (it.work != null) {
+                                select.text = it.work.name
+                                holeNumber.text = it.holeList.filter { hole -> hole.checked }.size.toString()
+                            } else {
+                                select.text = "/"
+                                holeNumber.text = "/"
+                            }
+                            time.text = it.time.getTimeFormat()
+                            dynamicPlate.setRowAndColumn(it.info.plateSize.first, it.info.plateSize.second)
+                            dynamicPlate.setData(it.info.holeList)
+                            currentPlate.text = it.info.plate
+                            currentLiquid.text = it.info.liquid
+                            currentSpeed.text = it.info.speed.toString().removeZero()
+                            currentLastTime.text = it.info.lastTime.getTimeFormat()
                         }
                     }
                 }
@@ -46,6 +68,21 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun initView() {
 
         binding.apply {
+            holeNumber.setOnClickListener {
+                PopTip.show("已选孔位数 ${holeNumber.text}")
+            }
+            select.setOnClickListener {
+                viewModel.selectWork(it)
+            }
+            start.setOnClickListener {
+                viewModel.start()
+            }
+            stop.setOnClickListener {
+                viewModel.stop()
+            }
+            suspend.setOnClickListener {
+                viewModel.suspend()
+            }
             with(reset) {
                 clickScale()
                 setOnClickListener {
@@ -61,7 +98,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 setOnClickListener {
                     washDialog(
                         {
-                            viewModel.wash(time =  it, type = 0)
+                            viewModel.wash(time = it, type = 0)
                         },
                         {
                             viewModel.wash(type = 1)
@@ -87,9 +124,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 it.scaleY = 1f
                 viewModel.suckBack(1)
             })
+
         }
-
     }
-
-
 }

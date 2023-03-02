@@ -86,9 +86,9 @@ class HomeViewModel @Inject constructor(
                 // 设置和定时查询温控
                 for (i in 0..4) {
                     delay(500L)
-                    serial.setTemp(addr = i,
-                        temp = if (i == 0) "3" else appViewModel.settings.value.temp.toString()
-                            .removeZero()
+                    serial.setTemp(
+                        addr = i,
+                        temp = if (i == 0)  appViewModel.settings.value.temp.toString().removeZero() else "26"
                     )
                 }
                 // 每十秒钟查询一次温度

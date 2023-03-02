@@ -77,15 +77,15 @@ class DynamicPlate : View {
         val width = column * space
         val height = row * space
 
-        var vert = 0
-        var hort = 0
-        for (i in 0 until row) {
+        var vert: Int
+        var hort: Int
+        for (i in 1 until row) {
+            vert = i * space
             canvas.drawLine(0f, vert.toFloat(), width.toFloat(), vert.toFloat(), paint)
-            vert += space
         }
-        for (i in 0 until column) {
+        for (i in 1 until column) {
+            hort = i * space
             canvas.drawLine(hort.toFloat(), 0f, hort.toFloat(), height.toFloat(), paint)
-            hort += space
         }
         paint.color = Color.WHITE
 

@@ -1,15 +1,18 @@
 package com.zktony.www.ui.home
 
+import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
+import com.zktony.www.common.extension.spannerDialog
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate
 import com.zktony.www.data.local.room.entity.Work
+import com.zktony.www.data.local.room.entity.WorkPlate
 import com.zktony.www.data.repository.WorkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -35,9 +38,48 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             workRepository.getAllWork().collect {
-                _uiState.value = _uiState.value.copy(workList = it)
+                if (it.isNotEmpty()) {
+                    _uiState.value = _uiState.value.copy(workList = it, work = it[0])
+                    loadPlate(it[0].id)
+                }
             }
         }
+    }
+
+    private fun loadPlate(id: String) {
+        viewModelScope.launch {
+            launch {
+                workRepository.getWorkPlateByWorkId(id).collect {
+                    _uiState.value = _uiState.value.copy(plateList = it)
+                    var size: Pair<Int, Int> = Pair(8, 12)
+                    if (it.isNotEmpty()) {
+                        size = it[0].row to it[0].column
+                    }
+                    _uiState.value = _uiState.value.copy(
+                        info = _uiState.value.info.copy(
+                            plateSize = size
+                        )
+                    )
+                }
+            }
+            launch {
+                workRepository.getHoleByWorkId(id).collect {
+                    _uiState.value = _uiState.value.copy(holeList = it)
+                }
+            }
+        }
+    }
+
+    fun selectWork(view: View) {
+        val list = uiState.value.workList.map { it.name }
+        spannerDialog(
+            view = view,
+            menu = list,
+            block = { _, index ->
+                _uiState.value = _uiState.value.copy(work = uiState.value.workList[index])
+                loadPlate(uiState.value.workList[index].id)
+            }
+        )
     }
 
     fun reset() {
@@ -136,13 +178,60 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun start() {
+        val job = viewModelScope.launch {
+            launch {
+                while (true) {
+                    delay(1000L)
+                    if (!_uiState.value.suspend) {
+                        _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
+                    }
+                }
+            }
+        }
+        _uiState.value = _uiState.value.copy(job = job)
+    }
+
+    fun stop() {
+        _uiState.value.job?.cancel()
+        _uiState.value = _uiState.value.copy(
+            job = null,
+            time = 0L,
+            info = CurrentInfo().copy(
+                plateSize = if (_uiState.value.plateList.isNotEmpty()) {
+                    _uiState.value.plateList[0].row to _uiState.value.plateList[0].column
+                } else {
+                    Pair(8, 12)
+                },
+            )
+        )
+    }
+
+    fun suspend() {
+        _uiState.value = _uiState.value.copy(suspend = !_uiState.value.suspend)
+    }
+
 }
 
 data class HomeUiState(
     val workList: List<Work> = emptyList(),
+    val plateList: List<WorkPlate> = emptyList(),
+    val holeList: List<Hole> = emptyList(),
     val work: Work? = null,
     val job: Job? = null,
     val washJob: Job? = null,
     val plate: Plate? = null,
     val holes: List<Hole>? = null,
+    val suspend: Boolean = false,
+    val time: Long = 0L,
+    val info: CurrentInfo = CurrentInfo(),
+)
+
+data class CurrentInfo(
+    val plate: String = "/",
+    val plateSize : Pair<Int, Int> = Pair(8, 12),
+    val holeList: List<Hole> = emptyList(),
+    val liquid: String = "/",
+    val speed: Float = 0f,
+    val lastTime: Long = 0L,
 )
