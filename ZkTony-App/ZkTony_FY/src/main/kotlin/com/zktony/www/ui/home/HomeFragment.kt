@@ -136,12 +136,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         } else {
                             PopTip.show("已解锁")
                         }
-
                     }
                 }
             }
         }
-
     }
 
     /**

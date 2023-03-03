@@ -130,4 +130,5 @@
     <string name="suck_back">回吸</string>
     <string name="wash_time">清洗时间/秒</string>
     <string name="suspend">暂 停</string>
+    <string name="needle_space">针头间距</string>
 </resources>

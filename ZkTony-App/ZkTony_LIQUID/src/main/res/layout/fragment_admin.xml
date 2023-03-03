@@ -81,6 +81,48 @@
 
                     </RelativeLayout>
 
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_line_bottom"
+                        tools:ignore="UselessParent">
+
+                        <ImageView
+                            android:id="@+id/iv_needle"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/ic_needle"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toEndOf="@+id/iv_needle"
+                            android:text="@string/needle_space"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+                        <EditText
+                            android:id="@+id/needle_space"
+                            android:layout_width="100dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginEnd="16dp"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:minHeight="48dp"
+                            tools:ignore="Autofill,LabelFor" />
+
+                    </RelativeLayout>
+
                 </LinearLayout>
 
             </ScrollView>

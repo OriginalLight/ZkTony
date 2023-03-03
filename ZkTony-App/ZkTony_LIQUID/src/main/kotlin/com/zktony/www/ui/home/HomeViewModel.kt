@@ -1,5 +1,6 @@
 package com.zktony.www.ui.home
 
+import android.util.Log
 import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
@@ -179,17 +180,72 @@ class HomeViewModel @Inject constructor(
     }
 
     fun start() {
-        val job = viewModelScope.launch {
-            launch {
-                while (true) {
-                    delay(1000L)
-                    if (!_uiState.value.suspend) {
-                        _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
+        viewModelScope.launch {
+            val job = launch {
+                launch {
+                    while (true) {
+                        delay(1000L)
+                        if (!_uiState.value.suspend) {
+                            _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
+                        }
                     }
                 }
+                val executor = WorkExecutor(
+                    plateList = _uiState.value.plateList,
+                    holeList = _uiState.value.holeList,
+                    settings = appViewModel.settings.value,
+                )
+                executor.callBack = {
+                    when (it) {
+                        is ExecutorEvent.Plate -> {
+                            Log.d("WorkViewModel", "plate: ${it.plate}")
+                            _uiState.value = _uiState.value.copy(
+                                info = _uiState.value.info.copy(
+                                    plate = when(it.plate.sort) {
+                                        0 -> "一号板"
+                                        1 -> "二号板"
+                                        2 -> "三号板"
+                                        3 -> "四号板"
+                                        else -> "未知板"
+                                    },
+                                    plateSize = it.plate.row to it.plate.column,
+                                )
+                            )
+                        }
+                        is ExecutorEvent.Liquid -> {
+                            _uiState.value = _uiState.value.copy(
+                                info = _uiState.value.info.copy(
+                                    liquid = it.liquid
+                                )
+                            )
+                        }
+                        is ExecutorEvent.HoleList -> {
+                            _uiState.value = _uiState.value.copy(
+                                info = _uiState.value.info.copy(
+                                    holeList = it.hole
+                                )
+                            )
+                        }
+                        is ExecutorEvent.Progress -> {
+                            val time = _uiState.value.time + 1
+                            val lastTime = time / (1 - it.progress)
+                            _uiState.value = _uiState.value.copy(
+                                info = _uiState.value.info.copy(
+                                    speed = it.progress,
+                                    lastTime = lastTime.toLong(),
+                                )
+                            )
+
+                        }
+                        is ExecutorEvent.Finish -> {
+                            stop()
+                        }
+                    }
+                }
+                executor.execute()
             }
+            _uiState.value = _uiState.value.copy(job = job)
         }
-        _uiState.value = _uiState.value.copy(job = job)
     }
 
     fun stop() {
@@ -229,7 +285,7 @@ data class HomeUiState(
 
 data class CurrentInfo(
     val plate: String = "/",
-    val plateSize : Pair<Int, Int> = Pair(8, 12),
+    val plateSize: Pair<Int, Int> = Pair(8, 12),
     val holeList: List<Hole> = emptyList(),
     val liquid: String = "/",
     val speed: Float = 0f,
