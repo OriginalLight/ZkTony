@@ -66,7 +66,8 @@ keyword = get_keyword()
 
 
 def search(driver: WebDriver, key_ward):
-    retrieval = driver.find_element(By.XPATH, value='//input[@name="search-main-box"]')
+    retrieval = driver.find_element(
+        By.XPATH, value='//input[@name="search-main-box"]')
     retrieval.send_keys(key_ward)
     confirm = driver.find_element(By.XPATH, value='//button[@type="submit"]')
     confirm.send_keys(Keys.ENTER)
@@ -91,7 +92,8 @@ def scroll_(driver: WebDriver):
 
 def acc_cookie(driver: WebDriver):
     try:
-        cookie = driver.find_element(By.XPATH, value='//button[@id="onetrust-accept-btn-handler"]')
+        cookie = driver.find_element(
+            By.XPATH, value='//button[@id="onetrust-accept-btn-handler"]')
         if cookie:
             cookie.send_keys(Keys.ENTER)
     except Exception as e:
@@ -101,7 +103,8 @@ def acc_cookie(driver: WebDriver):
 
 def get_all_document(driver: WebDriver):
     driver = scroll_(acc_cookie(driver))
-    documents = driver.find_elements(By.XPATH, value='//app-summary-title/h3/a')
+    documents = driver.find_elements(
+        By.XPATH, value='//app-summary-title/h3/a')
     urls = []
     for document in documents:
         url = document.get_attribute("href")
@@ -109,13 +112,16 @@ def get_all_document(driver: WebDriver):
     return urls, driver
 
 
-def get_all_info(driver: WebDriver, key_word, start_page: int = None, end_page: int = None):
+def get_all_info(driver: WebDriver, key_word, start_page: int = None):
     driver = search(driver, key_word)
-    end_no = driver.find_elements(By.XPATH, value='//span[@class="end-page ng-star-inserted"]')[0].text
-    start_page = start_page if start_page else 0
-    end_page = end_page if end_page else int(end_no.replace(",", ""))
+    end_no = driver.find_elements(
+        By.XPATH, value='//span[@class="end-page ng-star-inserted"]')[0].text
+    start_page = start_page if start_page else 1
+    end_page = int(end_no.replace(",", ""))
+
     if start_page > 1:
-        next_page = driver.find_element(By.XPATH, value='//input[@id="snNextPageTop"]')
+        next_page = driver.find_element(
+            By.XPATH, value='//input[@id="snNextPageTop"]')
         next_page.clear()
         next_page.send_keys(str(start_page))
         next_page.send_keys(Keys.ENTER)
@@ -135,17 +141,18 @@ def get_all_info(driver: WebDriver, key_word, start_page: int = None, end_page: 
             start_page += 1
             if end_page and start_page >= end_page:
                 break
-            next_page_url = page_url.replace(f'/relevance/{start_page - 1}', f'/relevance/{start_page}')
+            next_page_url = page_url.replace(
+                f'/relevance/{start_page - 1}', f'/relevance/{start_page}')
             while True:
                 try:
                     driver.get(next_page_url)
                     break
                 except Exception as e:
-                    print(f'请求异常，休息1min重试: {next_page_url}')
-                    time.sleep(60)
+                    re_run(driver)
     except Exception as e:
         print(e)
         print('异常 or 查询结束')
+        unlock_keyword()
 
 
 def get_info_by_url(driver: WebDriver, url):
@@ -164,11 +171,14 @@ def get_info_by_url(driver: WebDriver, url):
     author = ''
     email_list = []
     try:
-        title = driver.find_elements(By.XPATH, value='//h2[@id="FullRTa-fullRecordtitle-0"]')[0].text
-        authors = driver.find_elements(By.XPATH, value='//span[starts-with(@id, "author-")]//span[@lang="en"]')
+        title = driver.find_elements(
+            By.XPATH, value='//h2[@id="FullRTa-fullRecordtitle-0"]')[0].text
+        authors = driver.find_elements(
+            By.XPATH, value='//span[starts-with(@id, "author-")]//span[@lang="en"]')
         authors = [author.text for author in authors]
         author = ','.join(authors)
-        address_list = driver.find_elements(By.XPATH, value='//a[starts-with(@id, "address")]/span[2]')
+        address_list = driver.find_elements(
+            By.XPATH, value='//a[starts-with(@id, "address")]/span[2]')
         address_list = [address_en.text for address_en in address_list]
         for i in range(0, 20):
             try:
@@ -180,7 +190,8 @@ def get_info_by_url(driver: WebDriver, url):
                 break
     except Exception as e:
         print(f'current_url: {current_url} 缺失部分信息')
-    print(f'title: {title}  \nauthors: {author}  \nurl: {current_url}  \nemail: {email_list}')
+    print(
+        f'title: {title}  \nauthors: {author}  \nurl: {current_url}  \nemail: {email_list}')
     if email_list is not None:
         for email in email_list:
             save_to_db([title, address_list, author, email, current_url])
@@ -190,12 +201,12 @@ def save_to_db(data: list):
     conn = db_connect()
     cursor = conn.cursor()
     # 如果不存在相同email的记录，则插入
-    sql = "select * from wof where email = %s"
+    sql = "select * from wos where email = %s"
     cursor.execute(sql, (data[3],))
     if cursor.fetchone():
         print(f'已存在相同email: {data[3]}')
         return
-    sql = "insert into wof(title, address_list, author, email, current_url) values(%s, %s, %s, %s, %s)"
+    sql = "insert into wos(title, address_list, author, email, url) values(%s, %s, %s, %s, %s)"
     cursor.execute(sql, data)
     conn.commit()
     cursor.close()
@@ -231,6 +242,7 @@ def lock_keyword():
     conn.commit()
     cursor.close()
     conn.close()
+    print(f'{keyword} 关键词已加锁')
 
 
 def unlock_keyword():
@@ -241,12 +253,14 @@ def unlock_keyword():
     conn.commit()
     cursor.close()
     conn.close()
+    print(f'{keyword} 关键词已解锁')
 
 
 def run():
     lock_keyword()
     start = get_latest_page()
-    driver = webdriver.Chrome(ChromeDriverManager().install(), chrome_options=chrome_options)
+    driver = webdriver.Chrome(
+        ChromeDriverManager().install(), chrome_options=chrome_options)
     driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
         "source": """
             Object.defineProperty(navigator, 'webdriver', {
@@ -260,8 +274,13 @@ def run():
     start_page = 'https://www.webofscience.com/wos/alldb/basic-search'
     driver.get(start_page)
     acc_cookie(driver)
-    get_all_info(driver, keyword, start, start + 10)
+    get_all_info(driver, keyword, start)
+
+
+def re_run(driver: WebDriver):
+    print(f'重新启动')
     driver.close()
+    time.sleep(60)
     run()
 
 
