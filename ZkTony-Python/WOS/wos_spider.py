@@ -112,12 +112,12 @@ def get_all_document(driver: WebDriver):
     return urls, driver
 
 
-def get_all_info(driver: WebDriver, key_word, start_page: int = None):
+def get_all_info(driver: WebDriver, key_word, start_page: int = None, end_page: int = None):
     driver = search(driver, key_word)
     end_no = driver.find_elements(
         By.XPATH, value='//span[@class="end-page ng-star-inserted"]')[0].text
     start_page = start_page if start_page else 1
-    end_page = int(end_no.replace(",", ""))
+    end_page = end_page if end_page else int(end_no.replace(",", ""))
 
     if start_page > 1:
         next_page = driver.find_element(
@@ -148,11 +148,10 @@ def get_all_info(driver: WebDriver, key_word, start_page: int = None):
                     driver.get(next_page_url)
                     break
                 except Exception as e:
-                    re_run(driver)
+                    time.sleep(60)
     except Exception as e:
         print(e)
         print('异常 or 查询结束')
-        unlock_keyword()
 
 
 def get_info_by_url(driver: WebDriver, url):
@@ -274,13 +273,8 @@ def run():
     start_page = 'https://www.webofscience.com/wos/alldb/basic-search'
     driver.get(start_page)
     acc_cookie(driver)
-    get_all_info(driver, keyword, start)
-
-
-def re_run(driver: WebDriver):
-    print(f'重新启动')
+    get_all_info(driver, keyword, start, start + 10)
     driver.close()
-    time.sleep(60)
     run()
 
 
