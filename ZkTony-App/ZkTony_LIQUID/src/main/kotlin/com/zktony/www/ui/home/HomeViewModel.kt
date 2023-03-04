@@ -228,7 +228,7 @@ class HomeViewModel @Inject constructor(
                         }
                         is ExecutorEvent.Progress -> {
                             val time = _uiState.value.time + 1
-                            val lastTime = time / (1 - it.progress)
+                            val lastTime = time / it.progress - time
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
                                     speed = it.progress,

@@ -35,6 +35,11 @@ async fn main() -> std::io::Result<()> {
     .await
 }
 
+// The following code is used to display the logo and system information of the program
+// std::env::consts::DLL_EXTENSION: The extension of the compiler
+// std::env::consts::OS: System architecture
+// std::env::consts::ARCH: System type
+// std::env::consts::FAMILY: Operating system
 fn show_log() {
     let logo = r#"
     ████████ ██     ██████████                                      ██     ███████  ██

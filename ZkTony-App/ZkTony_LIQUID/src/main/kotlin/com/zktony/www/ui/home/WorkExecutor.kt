@@ -95,6 +95,10 @@ class WorkExecutor constructor(
                                        v4 = if (e == 3) hole.v4 else 0f
                                    ),
                                )
+                               delay(100L)
+                               while (serial.lock.value) {
+                                   delay(100)
+                               }
                                mutableList.add(Hole(x = i, y = j, checked = true))
                                complete += 1
                                callBack(ExecutorEvent.HoleList(mutableList))

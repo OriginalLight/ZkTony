@@ -12,7 +12,7 @@ import com.zktony.common.base.BaseFragment
 import com.zktony.common.extension.addTouchEvent
 import com.zktony.common.extension.clickScale
 import com.zktony.common.extension.getTimeFormat
-import com.zktony.common.extension.removeZero
+import com.zktony.common.extension.toPercent
 import com.zktony.www.R
 import com.zktony.www.common.extension.washDialog
 import com.zktony.www.databinding.FragmentHomeBinding
@@ -61,7 +61,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             dynamicPlate.setData(it.info.holeList)
                             currentPlate.text = it.info.plate
                             currentLiquid.text = it.info.liquid
-                            currentSpeed.text = it.info.speed.toString().removeZero()
+                            currentSpeed.text = it.info.speed.toPercent()
                             currentLastTime.text = it.info.lastTime.getTimeFormat()
                         }
                     }
