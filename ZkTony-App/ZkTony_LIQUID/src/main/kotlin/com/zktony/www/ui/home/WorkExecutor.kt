@@ -22,7 +22,7 @@ class WorkExecutor constructor(
     private val settings: Settings,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
-    var callBack: (ExecutorEvent) -> Unit = {}
+    var event: (ExecutorEvent) -> Unit = {}
     private val motion = MotionManager.instance
     private val serial = SerialManager.instance
     private var total: Int = 0
@@ -63,10 +63,10 @@ class WorkExecutor constructor(
     private suspend fun doExecute() {
        if (total > 0) {
            plateList.forEach { plate ->
-               callBack(ExecutorEvent.Plate(plate))
+               event(ExecutorEvent.Plate(plate))
                for (e in 0..3) {
-                   val mutableList = mutableListOf<Hole>()
-                   callBack(ExecutorEvent.Liquid(liquid(e)))
+                   val mutableList = emptyList<Hole>().toMutableList()
+                   event(ExecutorEvent.Liquid(liquid(e)))
                    forEachHole(plate.row, plate.column) { i, j ->
                        val hole = holeList.find { it.x == i && it.y == j && it.plateId == plate.id }
                        if (hole != null) {
@@ -78,7 +78,7 @@ class WorkExecutor constructor(
                                else -> 0f
                            }
                            if (hole.checked && volume > 0f) {
-                               while (serial.lock.value) {
+                               while (serial.lock.value || serial.pause.value) {
                                    delay(100)
                                }
                                motion.executor(
@@ -101,15 +101,16 @@ class WorkExecutor constructor(
                                }
                                mutableList.add(Hole(x = i, y = j, checked = true))
                                complete += 1
-                               callBack(ExecutorEvent.HoleList(mutableList))
-                               callBack(ExecutorEvent.Progress(complete.toFloat() / total.toFloat()))
+                               event(ExecutorEvent.HoleList(mutableList))
+                               event(ExecutorEvent.Progress(complete.toFloat() / total.toFloat()))
                            }
                        }
                    }
+                   event(ExecutorEvent.HoleList(emptyList()))
                }
            }
        }
-        callBack(ExecutorEvent.Finish)
+        event(ExecutorEvent.Finish)
     }
 
     // 遍历孔位

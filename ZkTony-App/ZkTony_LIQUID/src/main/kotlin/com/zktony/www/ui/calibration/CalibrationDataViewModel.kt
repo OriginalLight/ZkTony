@@ -40,7 +40,7 @@ class CalibrationDataViewModel @Inject constructor(
                 }
             }
             launch {
-                SerialManager.instance.work.collect {
+                SerialManager.instance.pause.collect {
                     _uiState.value = _uiState.value.copy(work = it)
                 }
             }

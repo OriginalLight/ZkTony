@@ -6,7 +6,6 @@ import com.zktony.common.extension.verifyHex
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.TTYS0
-import com.zktony.serialport.util.Serial.TTYS2
 import com.zktony.www.common.extension.toCommand
 import com.zktony.www.control.serial.protocol.V1
 import kotlinx.coroutines.CoroutineScope
@@ -22,12 +21,12 @@ class SerialManager(
     private val _ttys0Flow = MutableStateFlow<String?>(null)
     private val _ttys3Flow = MutableStateFlow<String?>(null)
     private val _lock = MutableStateFlow(false)
-    private val _work = MutableStateFlow(false)
+    private val _pause = MutableStateFlow(false)
 
     val ttys0Flow = _ttys0Flow.asStateFlow()
     val ttys3Flow = _ttys3Flow.asStateFlow()
     val lock = _lock.asStateFlow()
-    val work = _work.asStateFlow()
+    val pause = _pause.asStateFlow()
 
     // 机构运行已经等待的时间
     private var lockTime = 0L
@@ -112,6 +111,10 @@ class SerialManager(
         )
         sendHex(serial = TTYS0, hex = V1().toHex())
 
+    }
+
+    fun pause(pause: Boolean) {
+        _pause.value = pause
     }
 
     /**

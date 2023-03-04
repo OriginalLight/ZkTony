@@ -40,7 +40,7 @@ class PlateTwoViewModel @Inject constructor(
 
     fun move(x: Float, y: Float) {
         val serial = SerialManager.instance
-        if (serial.lock.value || serial.work.value) {
+        if (serial.lock.value || serial.pause.value) {
             PopTip.show("机器正在运行中")
             return
         }

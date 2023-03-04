@@ -86,7 +86,7 @@ class HomeViewModel @Inject constructor(
     fun reset() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (!serial.work.value) {
+            if (!serial.pause.value) {
                 if (serial.lock.value) {
                     PopTip.show("运动中禁止复位")
                 } else {
@@ -185,8 +185,16 @@ class HomeViewModel @Inject constructor(
                 launch {
                     while (true) {
                         delay(1000L)
-                        if (!_uiState.value.suspend) {
+                        if (!_uiState.value.pause) {
                             _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
+                            val lastTime = _uiState.value.info.lastTime
+                            if (lastTime > 0) {
+                                _uiState.value = _uiState.value.copy(
+                                    info = _uiState.value.info.copy(
+                                        lastTime = lastTime - 1
+                                    )
+                                )
+                            }
                         }
                     }
                 }
@@ -195,13 +203,13 @@ class HomeViewModel @Inject constructor(
                     holeList = _uiState.value.holeList,
                     settings = appViewModel.settings.value,
                 )
-                executor.callBack = {
+                executor.event = {
                     when (it) {
                         is ExecutorEvent.Plate -> {
                             Log.d("WorkViewModel", "plate: ${it.plate}")
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
-                                    plate = when(it.plate.sort) {
+                                    plate = when (it.plate.sort) {
                                         0 -> "一号板"
                                         1 -> "二号板"
                                         2 -> "三号板"
@@ -259,12 +267,14 @@ class HomeViewModel @Inject constructor(
                 } else {
                     Pair(8, 12)
                 },
+                holeList = emptyList()
             )
         )
     }
 
-    fun suspend() {
-        _uiState.value = _uiState.value.copy(suspend = !_uiState.value.suspend)
+    fun pause() {
+        _uiState.value = _uiState.value.copy(pause = !_uiState.value.pause)
+        serial.pause(_uiState.value.pause)
     }
 
 }
@@ -278,7 +288,7 @@ data class HomeUiState(
     val washJob: Job? = null,
     val plate: Plate? = null,
     val holes: List<Hole>? = null,
-    val suspend: Boolean = false,
+    val pause: Boolean = false,
     val time: Long = 0L,
     val info: CurrentInfo = CurrentInfo(),
 )

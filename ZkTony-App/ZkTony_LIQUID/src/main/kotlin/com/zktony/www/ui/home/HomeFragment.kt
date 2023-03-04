@@ -40,9 +40,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             operate.isVisible = it.job == null
                             start.isEnabled =
                                 it.job == null && it.holeList.any { hole -> hole.checked }
-                            with(suspend) {
+                            with(pause) {
                                 isEnabled = it.job != null
-                                text = if (!it.suspend) "暂停" else "继续"
+                                text = if (!it.pause) "暂停" else "继续"
                                 alpha = if (it.job != null) 1f else 0.3f
                             }
                             if (it.work != null) {
@@ -84,8 +84,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             stop.setOnClickListener {
                 viewModel.stop()
             }
-            suspend.setOnClickListener {
-                viewModel.suspend()
+            pause.setOnClickListener {
+                viewModel.pause()
             }
             with(reset) {
                 clickScale()
