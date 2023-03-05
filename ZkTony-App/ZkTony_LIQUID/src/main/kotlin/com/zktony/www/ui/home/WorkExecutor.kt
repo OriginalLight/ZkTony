@@ -66,7 +66,7 @@ class WorkExecutor constructor(
                event(ExecutorEvent.Plate(plate))
                for (e in 0..3) {
                    val mutableList = emptyList<Hole>().toMutableList()
-                   event(ExecutorEvent.Liquid(liquid(e)))
+                   event(ExecutorEvent.Liquid(e))
                    forEachHole(plate.row, plate.column) { i, j ->
                        val hole = holeList.find { it.x == i && it.y == j && it.plateId == plate.id }
                        if (hole != null) {
@@ -102,7 +102,7 @@ class WorkExecutor constructor(
                                mutableList.add(Hole(x = i, y = j, checked = true))
                                complete += 1
                                event(ExecutorEvent.HoleList(mutableList))
-                               event(ExecutorEvent.Progress(complete.toFloat() / total.toFloat()))
+                               event(ExecutorEvent.Progress(total, complete))
                            }
                        }
                    }
@@ -127,22 +127,12 @@ class WorkExecutor constructor(
             }
         }
     }
-
-    private fun liquid(e: Int): String {
-        return when (e) {
-            0 -> "一号泵"
-            1 -> "二号泵"
-            2 -> "三号泵"
-            3 -> "四号泵"
-            else -> "一号泵"
-        }
-    }
 }
 
 sealed class ExecutorEvent {
     data class Plate(val plate: WorkPlate) : ExecutorEvent()
-    data class Liquid(val liquid: String) : ExecutorEvent()
+    data class Liquid(val liquid: Int) : ExecutorEvent()
     data class HoleList(val hole: List<Hole>) : ExecutorEvent()
-    data class Progress(val progress: Float) : ExecutorEvent()
+    data class Progress(val total: Int, val complete: Int) : ExecutorEvent()
     object Finish : ExecutorEvent()
 }

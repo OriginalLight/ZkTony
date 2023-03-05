@@ -42,7 +42,7 @@ class WorkHoleFragment :
                                 else -> "孔板"
                             }
                             dynamicPlate.run {
-                                setRowAndColumn(it.plate.row, it.plate.column)
+                                setXY(it.plate.column, it.plate.row)
                                 setData(it.holes)
                             }
                             selectAll.isEnabled = it.plate.count != it.plate.row * it.plate.column

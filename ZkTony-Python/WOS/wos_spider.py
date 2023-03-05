@@ -129,7 +129,6 @@ def get_all_info(driver: WebDriver, key_word, start_page: int = None, end_page: 
     try:
         while True:
             print(f'抓取关键词: {key_word}, 当前抓取第{start_page}页，共{end_no}页')
-            save_page_db(start_page)
             page_url = driver.current_url
             print(f'当前页面地址: {page_url}')
             urls, driver = get_all_document(driver)
@@ -141,6 +140,7 @@ def get_all_info(driver: WebDriver, key_word, start_page: int = None, end_page: 
             start_page += 1
             if end_page and start_page >= end_page:
                 break
+            save_page_db(start_page)
             next_page_url = page_url.replace(
                 f'/relevance/{start_page - 1}', f'/relevance/{start_page}')
             while True:

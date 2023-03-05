@@ -36,7 +36,7 @@ class PlateThreeFragment :
                     viewModel.uiState.collect {
                         if (it != null) {
                             binding.apply {
-                                dynamicPlate.setRowAndColumn(it.row, it.column)
+                                dynamicPlate.setXY(it.column, it.row)
                                 rowColumn.text = "${it.row} X ${it.column}"
                                 positionOne.text = "( ${
                                     it.x1.toString().removeZero()

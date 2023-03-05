@@ -21,31 +21,38 @@ class DynamicPlate : View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
             super(context, attrs, defStyleAttr, defStyleRes)
 
-    private var row = 0
-    private var column = 0
-    private var space = 40
+    private var x = 12
+    private var y = 8
     private var color = Color.GREEN
-
-    // 显示定位
     private var showLocation = false
     private var onItemClick: (Int, Int) -> Unit = { _, _ -> }
     private var data = listOf<Hole>()
+    private var spacex: Float = 0f
+    private var spacey: Float = 0f
 
-    fun getRow() = row
+    fun setX(x: Int) {
+        this.x = x
+        invalidate()
+    }
 
-    fun getColumn() = column
+    fun setY(y: Int) {
+        this.y = y
+        invalidate()
+    }
 
-    fun setRowAndColumn(row: Int, column: Int) {
-        this.row = row
-        this.column = column
-        space = minOf(480 / column, 320 / row)
-        requestLayout()
+    fun setXY(x: Int, y: Int) {
+        this.x = x
+        this.y = y
+        invalidate()
+    }
+
+    fun setColor(color: Int) {
+        this.color = color
         invalidate()
     }
 
     fun setShowLocation(showLocation: Boolean) {
         this.showLocation = showLocation
-        requestLayout()
         invalidate()
     }
 
@@ -58,86 +65,85 @@ class DynamicPlate : View {
         invalidate()
     }
 
-    fun setColor(color: Int) {
-        this.color = color
-        invalidate()
-    }
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        // 绘制核心方法
+        spacex = width.toFloat() / x
+        spacey = height.toFloat() / y
+
+        // 画内边框
         val paint = Paint()
-        paint.color = Color.WHITE
-        paint.strokeJoin = Paint.Join.ROUND
-        paint.strokeCap = Paint.Cap.ROUND
+        paint.style = Paint.Style.STROKE
+        paint.color = Color.BLACK
         paint.strokeWidth = 2f
+        paint.isAntiAlias = true
+        canvas?.drawRect(2f, 2f, width.toFloat() - 2f, height.toFloat() - 2f, paint)
 
-        canvas!!.drawColor(Color.LTGRAY)
-        val width = column * space
-        val height = row * space
 
-        var vert: Int
-        var hort: Int
-        for (i in 1 until row) {
-            vert = i * space
-            canvas.drawLine(0f, vert.toFloat(), width.toFloat(), vert.toFloat(), paint)
-        }
-        for (i in 1 until column) {
-            hort = i * space
-            canvas.drawLine(hort.toFloat(), 0f, hort.toFloat(), height.toFloat(), paint)
-        }
-        paint.color = Color.WHITE
+        // 画空心圆
+        paint.style = Paint.Style.STROKE
+        paint.color = Color.BLACK
+        paint.strokeWidth = 2f
+        paint.isAntiAlias = true
 
-        for (i in 0 until row) {
-            for (j in 0 until column) {
-                val hole = data.find { it.x == j && it.y == i }
-                if (hole != null) {
-                    if (hole.checked) {
-                        paint.color = color
-                    } else {
-                        paint.color = Color.WHITE
-                    }
-                } else {
-                    paint.color = Color.WHITE
-                }
-                canvas.drawCircle(
-                    (j * space + space / 2).toFloat(),
-                    (row * space - i * space - space / 2).toFloat(),
-                    space / 3f,
+        for (i in 0 until x) {
+            for (j in 0 until y) {
+                canvas?.drawCircle(
+                    (i + 0.5f) * spacex,
+                    (y - j - 0.5f) * spacey,
+                    minOf(spacex, spacey) / 3f,
                     paint
                 )
+            }
+        }
 
+        // 画实心圆 从左下角绘制
+        paint.style = Paint.Style.FILL
+        paint.color = color
+        paint.strokeWidth = 1f
+        paint.isAntiAlias = true
+
+        for (i in 0 until x) {
+            for (j in 0 until y) {
+                val hole = data.find { it.x == i && it.y == j && it.checked }
+                if (hole != null) {
+                    canvas?.drawCircle(
+                        (i + 0.5f) * spacex,
+                        (y - j - 0.5f) * spacey,
+                        minOf(spacex, spacey) / 3f,
+                        paint
+                    )
+                }
             }
         }
 
         if (showLocation) {
             paint.color = Color.BLUE
-            canvas.drawCircle(
-                (space / 2).toFloat(),
-                (space * (row - 1) + space / 2).toFloat(),
-                space / 3f,
+            canvas?.drawCircle(
+                0.5f * spacex,
+                (y - 0.5f) * spacey,
+                minOf(spacex, spacey) / 3f,
                 paint
             )
             paint.color = Color.GREEN
-            canvas.drawCircle(
-                (space * (column - 1) + space / 2).toFloat(),
-                (space / 2).toFloat(),
-                space / 3f,
+            canvas?.drawCircle(
+                (x - 0.5f) * spacex,
+                0.5f * spacey,
+                minOf(spacex, spacey) / 3f,
                 paint
             )
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event!!.action) {
             MotionEvent.ACTION_DOWN -> {
-                val x = event.x.toInt()
-                val y = event.y.toInt()
-                val i = x / space
-                val j = y / space
-                onItemClick(i, (row - j - 1))
+                val xAxis = event.x.toInt()
+                val yAxis = event.y.toInt()
+                val i = (xAxis / spacex).toInt()
+                val j = (yAxis / spacey).toInt()
+                onItemClick(i, (y - j - 1))
             }
         }
         return super.onTouchEvent(event)
@@ -145,8 +151,8 @@ class DynamicPlate : View {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        // 设置宽高
-        setMeasuredDimension(column * space, row * space)
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val height = MeasureSpec.getSize(heightMeasureSpec)
+        setMeasuredDimension(width, height)
     }
-
 }

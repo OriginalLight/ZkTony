@@ -12,7 +12,6 @@ import com.zktony.common.base.BaseFragment
 import com.zktony.common.extension.addTouchEvent
 import com.zktony.common.extension.clickScale
 import com.zktony.common.extension.getTimeFormat
-import com.zktony.common.extension.toPercent
 import com.zktony.www.R
 import com.zktony.www.common.extension.washDialog
 import com.zktony.www.databinding.FragmentHomeBinding
@@ -54,14 +53,15 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 holeNumber.text = "/"
                             }
                             time.text = it.time.getTimeFormat()
-                            dynamicPlate.setRowAndColumn(
+                            dynamicPlate.setXY(
+                                it.info.plateSize.second,
                                 it.info.plateSize.first,
-                                it.info.plateSize.second
                             )
                             dynamicPlate.setData(it.info.holeList)
+                            dynamicPlate.setColor(it.info.color)
                             currentPlate.text = it.info.plate
                             currentLiquid.text = it.info.liquid
-                            currentSpeed.text = it.info.speed.toPercent()
+                            currentSpeed.text = String.format("%.2f", it.info.speed)
                             currentLastTime.text = it.info.lastTime.getTimeFormat()
                         }
                     }

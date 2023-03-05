@@ -1,5 +1,6 @@
 package com.zktony.www.ui.home
 
+import android.graphics.Color
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.viewModelScope
@@ -223,7 +224,20 @@ class HomeViewModel @Inject constructor(
                         is ExecutorEvent.Liquid -> {
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
-                                    liquid = it.liquid
+                                    liquid = when (it.liquid) {
+                                        0 -> "一号泵"
+                                        1 -> "二号泵"
+                                        2 -> "三号泵"
+                                        3 -> "四号泵"
+                                        else -> "一号泵"
+                                    },
+                                    color = when(it.liquid) {
+                                        0 -> Color.BLUE
+                                        1 -> Color.CYAN
+                                        2 -> Color.YELLOW
+                                        3 -> Color.GREEN
+                                        else -> Color.RED
+                                    }
                                 )
                             )
                         }
@@ -236,10 +250,12 @@ class HomeViewModel @Inject constructor(
                         }
                         is ExecutorEvent.Progress -> {
                             val time = _uiState.value.time + 1
-                            val lastTime = time / it.progress - time
+                            val percent = it.complete.toFloat() / it.total.toFloat()
+                            val lastTime = time.toFloat() / percent - time.toFloat()
+                            val speed = it.complete / time.toFloat() * 60
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
-                                    speed = it.progress,
+                                    speed = speed,
                                     lastTime = lastTime.toLong(),
                                 )
                             )
@@ -300,4 +316,5 @@ data class CurrentInfo(
     val liquid: String = "/",
     val speed: Float = 0f,
     val lastTime: Long = 0L,
+    val color: Int = Color.GREEN
 )
