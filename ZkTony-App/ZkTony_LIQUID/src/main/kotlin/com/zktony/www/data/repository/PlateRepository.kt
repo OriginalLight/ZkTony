@@ -29,6 +29,10 @@ class PlateRepository @Inject constructor(
         return plateDao.getPlateBySort(id)
     }
 
+    fun getAllPlate(): Flow<List<Plate>> {
+        return plateDao.getAllPlate()
+    }
+
     fun getHoleByPlateId(plateId: String): Flow<List<Hole>> {
         return holeDao.getByPlateId(plateId)
     }
@@ -61,8 +65,8 @@ class PlateRepository @Inject constructor(
         return flow {
             plateDao.getAllPlate().distinctUntilChanged().collect {
                 it.filter { plate -> plate.sort != 4 }.forEach { plate ->
-                    val pores = holeDao.getByPlateId(plate.id).firstOrNull()
-                    pores?.let { plate.holes = pores }
+                    val holes = holeDao.getByPlateId(plate.id).firstOrNull()
+                    holes?.let { plate.holes = holes }
                 }
                 emit(it)
             }
