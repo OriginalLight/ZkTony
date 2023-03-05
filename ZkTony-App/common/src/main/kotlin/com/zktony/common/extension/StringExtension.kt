@@ -45,11 +45,3 @@ fun String.simpleDateFormat(format: String): Date? {
     val sdf = SimpleDateFormat(format)
     return sdf.parse(this)
 }
-
-/**
- * 将Float转化为百分比两位小数
- * @return [String]
- */
-fun Float.toPercent(): String {
-    return String.format("%.2f", this * 100) + " %"
-}

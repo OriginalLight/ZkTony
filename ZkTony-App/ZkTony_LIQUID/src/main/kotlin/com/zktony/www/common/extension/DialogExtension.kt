@@ -19,10 +19,7 @@ import com.kongzue.dialogx.interfaces.OnBindView
 import com.kongzue.dialogx.util.InputInfo
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.app.CommonApplicationProxy
-import com.zktony.common.extension.createQRCodeBitmap
-import com.zktony.common.extension.isFastClick
-import com.zktony.common.extension.isNetworkAvailable
-import com.zktony.common.extension.removeZero
+import com.zktony.common.extension.*
 import com.zktony.common.utils.Constants
 import com.zktony.www.R
 import com.zktony.www.data.remote.model.QrCode
@@ -55,12 +52,10 @@ fun positionDialog(
                 title.text = "设置坐标"
                 inputX.setText(textX.toString().removeZero())
                 inputY.setText(textY.toString().removeZero())
-                move.setOnClickListener {
+                move.clickNoRepeat {
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                    if (isFastClick().not()) {
-                        block1(x, y)
-                    }
+                    block1(x, y)
                 }
                 save.setOnClickListener {
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
@@ -258,11 +253,9 @@ fun aboutDialog() {
             override fun onBind(dialog: CustomDialog, v: View) {
                 val btnWeb = v.findViewById<MaterialButton>(R.id.btn_web)
                 btnWeb.isVisible = CommonApplicationProxy.application.isNetworkAvailable()
-                btnWeb.setOnClickListener {
-                    if (isFastClick().not()) {
-                        dialog.dismiss()
-                        webDialog()
-                    }
+                btnWeb.clickNoRepeat {
+                    dialog.dismiss()
+                    webDialog()
                 }
             }
         })

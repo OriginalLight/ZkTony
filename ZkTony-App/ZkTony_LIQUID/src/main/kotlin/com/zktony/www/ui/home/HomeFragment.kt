@@ -13,6 +13,7 @@ import com.zktony.common.extension.addTouchEvent
 import com.zktony.common.extension.clickScale
 import com.zktony.common.extension.getTimeFormat
 import com.zktony.www.R
+import com.zktony.www.common.extension.total
 import com.zktony.www.common.extension.washDialog
 import com.zktony.www.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,7 +39,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         binding.apply {
                             operate.isVisible = it.job == null
                             start.isEnabled =
-                                it.job == null && it.holeList.any { hole -> hole.checked }
+                                it.job == null && it.holeList.total() > 0
                             with(pause) {
                                 isEnabled = it.job != null
                                 text = if (!it.pause) "暂停" else "继续"
@@ -46,8 +47,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             }
                             if (it.work != null) {
                                 select.text = it.work.name
-                                holeNumber.text =
-                                    it.holeList.filter { hole -> hole.checked }.size.toString()
+                                holeNumber.text = it.holeList.total().toString()
                             } else {
                                 select.text = "/"
                                 holeNumber.text = "/"
@@ -73,7 +73,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun initView() {
         binding.apply {
             holeNumber.setOnClickListener {
-                PopTip.show("已选孔位数 ${holeNumber.text}")
+                PopTip.show("加液总数: ${holeNumber.text}")
             }
             select.setOnClickListener {
                 viewModel.selectWork(it)

@@ -10,10 +10,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.extension.afterTextChange
-import com.zktony.common.extension.clickScale
-import com.zktony.common.extension.isFastClick
-import com.zktony.common.extension.removeZero
+import com.zktony.common.extension.*
 import com.zktony.common.utils.Constants.MAX_TIME
 import com.zktony.common.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.www.R
@@ -76,17 +73,14 @@ class RsFragment : BaseFragment<RsViewModel, FragmentRsBinding>(R.layout.fragmen
     private fun initButton() {
         binding.back.run {
             clickScale()
-            setOnClickListener {
-                if (isFastClick()) return@setOnClickListener
+            clickNoRepeat {
                 findNavController().navigateUp()
             }
         }
-        binding.cancel.setOnClickListener {
-            if (isFastClick()) return@setOnClickListener
+        binding.cancel.clickNoRepeat {
             findNavController().navigateUp()
         }
-        binding.save.setOnClickListener {
-            if (isFastClick()) return@setOnClickListener
+        binding.save.clickNoRepeat {
             viewModel.save {
                 PopTip.show("保存成功")
                 findNavController().navigateUp()

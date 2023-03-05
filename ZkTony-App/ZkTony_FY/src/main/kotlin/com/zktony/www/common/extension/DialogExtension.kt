@@ -18,8 +18,8 @@ import com.kongzue.dialogx.interfaces.OnBindView
 import com.kongzue.dialogx.util.InputInfo
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.app.CommonApplicationProxy
+import com.zktony.common.extension.clickNoRepeat
 import com.zktony.common.extension.createQRCodeBitmap
-import com.zktony.common.extension.isFastClick
 import com.zktony.common.extension.isNetworkAvailable
 import com.zktony.common.utils.Constants
 import com.zktony.www.R
@@ -133,11 +133,9 @@ fun aboutDialog() {
             override fun onBind(dialog: CustomDialog, v: View) {
                 val btnWeb = v.findViewById<MaterialButton>(R.id.btn_web)
                 btnWeb.isVisible = CommonApplicationProxy.application.isNetworkAvailable()
-                btnWeb.setOnClickListener {
-                    if (isFastClick().not()) {
-                        dialog.dismiss()
-                        webDialog()
-                    }
+                btnWeb.clickNoRepeat {
+                    dialog.dismiss()
+                    webDialog()
                 }
             }
         })

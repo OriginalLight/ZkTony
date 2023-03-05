@@ -74,6 +74,10 @@ class HomeViewModel @Inject constructor(
 
     fun selectWork(view: View) {
         val list = uiState.value.workList.map { it.name }
+        if (_uiState.value.job != null) {
+            PopTip.show("请先停止当前程序")
+            return
+        }
         spannerDialog(
             view = view,
             menu = list,

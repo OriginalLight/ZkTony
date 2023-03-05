@@ -1,6 +1,7 @@
 package com.zktony.www.ui.home
 
 import com.zktony.www.common.app.Settings
+import com.zktony.www.common.extension.total
 import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.data.local.room.entity.Hole
@@ -25,92 +26,62 @@ class WorkExecutor constructor(
     var event: (ExecutorEvent) -> Unit = {}
     private val motion = MotionManager.instance
     private val serial = SerialManager.instance
-    private var total: Int = 0
     private var complete: Int = 0
 
     suspend fun execute() {
         scope.launch {
-            totalHole()
-        }.invokeOnCompletion {
-            scope.launch {
-                doExecute()
-            }
-        }
-    }
-
-    private suspend fun totalHole() {
-        plateList.forEach { plate ->
-            for (e in 0..3) {
-                forEachHole(plate.row, plate.column) { i, j ->
-                    val hole = holeList.find { it.x == i && it.y == j && it.plateId == plate.id }
-                    if (hole != null) {
-                        val volume = when (e) {
-                            0 -> hole.v1
-                            1 -> hole.v2
-                            2 -> hole.v3
-                            3 -> hole.v4
-                            else -> 0f
+            val total = holeList.total()
+            if (total > 0) {
+                plateList.forEach { plate ->
+                    event(ExecutorEvent.Plate(plate))
+                    for (e in 0..3) {
+                        val mutableList = emptyList<Hole>().toMutableList()
+                        event(ExecutorEvent.Liquid(e))
+                        forEachHole(plate.row, plate.column) { i, j ->
+                            val hole = holeList.find { it.x == i && it.y == j && it.plateId == plate.id }
+                            if (hole != null) {
+                                val volume = when (e) {
+                                    0 -> hole.v1
+                                    1 -> hole.v2
+                                    2 -> hole.v3
+                                    3 -> hole.v4
+                                    else -> 0f
+                                }
+                                if (hole.checked && volume > 0f) {
+                                    while (serial.lock.value || serial.pause.value) {
+                                        delay(100)
+                                    }
+                                    motion.executor(
+                                        motion.generator(
+                                            x = hole.xAxis,
+                                            y = hole.yAxis + settings.needleSpace * e
+                                        ),
+                                        motion.generator(
+                                            x = hole.xAxis,
+                                            y = hole.yAxis + settings.needleSpace * e,
+                                            v1 = if (e == 0) hole.v1 else 0f,
+                                            v2 = if (e == 1) hole.v2 else 0f,
+                                            v3 = if (e == 2) hole.v3 else 0f,
+                                            v4 = if (e == 3) hole.v4 else 0f
+                                        ),
+                                    )
+                                    delay(100L)
+                                    while (serial.lock.value) {
+                                        delay(100)
+                                    }
+                                    mutableList.add(Hole(x = i, y = j, checked = true))
+                                    complete += 1
+                                    event(ExecutorEvent.HoleList(mutableList))
+                                    event(ExecutorEvent.Progress(total, complete))
+                                }
+                            }
                         }
-                        if (hole.checked && volume > 0f) {
-                            total++
-                        }
+                        event(ExecutorEvent.HoleList(emptyList()))
                     }
                 }
             }
+            event(ExecutorEvent.Finish)
         }
-    }
-
-    private suspend fun doExecute() {
-       if (total > 0) {
-           plateList.forEach { plate ->
-               event(ExecutorEvent.Plate(plate))
-               for (e in 0..3) {
-                   val mutableList = emptyList<Hole>().toMutableList()
-                   event(ExecutorEvent.Liquid(e))
-                   forEachHole(plate.row, plate.column) { i, j ->
-                       val hole = holeList.find { it.x == i && it.y == j && it.plateId == plate.id }
-                       if (hole != null) {
-                           val volume = when (e) {
-                               0 -> hole.v1
-                               1 -> hole.v2
-                               2 -> hole.v3
-                               3 -> hole.v4
-                               else -> 0f
-                           }
-                           if (hole.checked && volume > 0f) {
-                               while (serial.lock.value || serial.pause.value) {
-                                   delay(100)
-                               }
-                               motion.executor(
-                                   motion.generator(
-                                       x = hole.xAxis,
-                                       y = hole.yAxis + settings.needleSpace * e
-                                   ),
-                                   motion.generator(
-                                       x = hole.xAxis,
-                                       y = hole.yAxis + settings.needleSpace * e,
-                                       v1 = if (e == 0) hole.v1 else 0f,
-                                       v2 = if (e == 1) hole.v2 else 0f,
-                                       v3 = if (e == 2) hole.v3 else 0f,
-                                       v4 = if (e == 3) hole.v4 else 0f
-                                   ),
-                               )
-                               delay(100L)
-                               while (serial.lock.value) {
-                                   delay(100)
-                               }
-                               mutableList.add(Hole(x = i, y = j, checked = true))
-                               complete += 1
-                               event(ExecutorEvent.HoleList(mutableList))
-                               event(ExecutorEvent.Progress(total, complete))
-                           }
-                       }
-                   }
-                   event(ExecutorEvent.HoleList(emptyList()))
-               }
-           }
-       }
-        event(ExecutorEvent.Finish)
     }
 
     // 遍历孔位

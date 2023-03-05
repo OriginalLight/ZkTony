@@ -13,8 +13,8 @@ import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.extension.clickNoRepeat
 import com.zktony.common.extension.clickScale
-import com.zktony.common.extension.isFastClick
 import com.zktony.www.R
 import com.zktony.www.adapter.ProgramAdapter
 import com.zktony.www.common.extension.deleteDialog
@@ -82,17 +82,13 @@ class ProgramFragment :
                                 val zm = v.findViewById<MaterialButton>(R.id.zm)
                                 val rs = v.findViewById<MaterialButton>(R.id.rs)
                                 val cancel = v.findViewById<MaterialButton>(R.id.cancel)
-                                zm.setOnClickListener {
-                                    if (isFastClick().not()) {
-                                        dialog.dismiss()
-                                        findNavController().navigate(R.id.action_navigation_program_to_navigation_zm)
-                                    }
+                                zm.clickNoRepeat {
+                                    dialog.dismiss()
+                                    findNavController().navigate(R.id.action_navigation_program_to_navigation_zm)
                                 }
-                                rs.setOnClickListener {
-                                    if (isFastClick().not()) {
-                                        dialog.dismiss()
-                                        findNavController().navigate(R.id.action_navigation_program_to_navigation_rs)
-                                    }
+                                rs.clickNoRepeat {
+                                    dialog.dismiss()
+                                    findNavController().navigate(R.id.action_navigation_program_to_navigation_rs)
                                 }
                                 cancel.setOnClickListener { dialog.dismiss() }
                             }
