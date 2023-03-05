@@ -23,4 +23,5 @@ pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(handler::get_software);
     cfg.service(handler::create_software);
     cfg.service(handler::update_software);
+    cfg.service(handler::delete_software);
 }
