@@ -23,12 +23,11 @@ async fn get_application_by_id(
     data: web::Data<AppState>,
     req: web::Query<ApplicationSearchReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Query::get_application_by_id(conn, req.application_id.clone()).await;
+    let res = Query::get_application_by_id(&data.conn, req.application_id.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 // endregion
@@ -39,12 +38,11 @@ async fn get_customer(
     data: web::Data<AppState>,
     req: web::Query<CustomerGetReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Query::get_customer(conn, req.0).await;
+    let res = Query::get_customer(&data.conn, req.0).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -53,12 +51,11 @@ async fn create_customer(
     data: web::Data<AppState>,
     req: web::Json<CustomerSaveReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::create_customer(conn, req.clone()).await;
+    let res = Mutation::create_customer(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -67,12 +64,11 @@ async fn update_customer(
     data: web::Data<AppState>,
     req: web::Json<CustomerSaveReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::update_customer(conn, req.clone()).await;
+    let res = Mutation::update_customer(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -81,12 +77,11 @@ async fn delete_customer(
     data: web::Data<AppState>,
     req: web::Json<DeleteReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::delete_customer(conn, req.clone()).await;
+    let res = Mutation::delete_customer(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -98,12 +93,11 @@ async fn get_equipment(
     data: web::Data<AppState>,
     req: web::Query<EquipmentGetReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Query::get_equipment(conn, req.0).await;
+    let res = Query::get_equipment(&data.conn, req.0).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -112,12 +106,11 @@ async fn create_equipment(
     data: web::Data<AppState>,
     req: web::Json<EquipmentSaveReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::create_equipment(conn, req.clone()).await;
+    let res = Mutation::create_equipment(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -126,12 +119,11 @@ async fn update_equipment(
     data: web::Data<AppState>,
     req: web::Json<EquipmentSaveReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::update_equipment(conn, req.clone()).await;
+    let res = Mutation::update_equipment(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -140,12 +132,11 @@ async fn delete_equipment(
     data: web::Data<AppState>,
     req: web::Json<DeleteReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::delete_equipment(conn, req.clone()).await;
+    let res = Mutation::delete_equipment(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -157,12 +148,11 @@ async fn create_log(
     data: web::Data<AppState>,
     req: web::Json<Vec<LogAddReq>>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::create_log(conn, req.clone()).await;
+    let res = Mutation::create_log(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 // endregion
@@ -173,12 +163,11 @@ async fn create_log_detail(
     data: web::Data<AppState>,
     req: web::Json<Vec<LogDetailAddReq>>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::create_log_detail(conn, req.clone()).await;
+    let res = Mutation::create_log_detail(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 // endregion
@@ -189,12 +178,11 @@ async fn get_product(
     data: web::Data<AppState>,
     req: web::Query<ProductGetReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Query::get_product(conn, req.0).await;
+    let res = Query::get_product(&data.conn, req.0).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -203,12 +191,11 @@ async fn create_product(
     data: web::Data<AppState>,
     req: web::Json<ProductSaveReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::create_product(conn, req.clone()).await;
+    let res = Mutation::create_product(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -217,12 +204,11 @@ async fn update_product(
     data: web::Data<AppState>,
     req: web::Json<ProductSaveReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::update_product(conn, req.clone()).await;
+    let res = Mutation::update_product(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -231,12 +217,11 @@ async fn delete_product(
     data: web::Data<AppState>,
     req: web::Json<DeleteReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::delete_product(conn, req.clone()).await;
+    let res = Mutation::delete_product(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -248,12 +233,11 @@ async fn create_program(
     data: web::Data<AppState>,
     req: web::Json<Vec<ProgramAddReq>>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::create_program(conn, req.clone()).await;
+    let res = Mutation::create_program(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 // endregion
@@ -264,12 +248,11 @@ async fn get_software(
     data: web::Data<AppState>,
     req: web::Query<SoftwareGetReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Query::get_software(conn, req.0).await;
+    let res = Query::get_software(&data.conn, req.0).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -278,12 +261,11 @@ async fn create_software(
     data: web::Data<AppState>,
     req: web::Json<SoftwareSaveReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::create_software(conn, req.clone()).await;
+    let res = Mutation::create_software(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -292,12 +274,11 @@ async fn update_software(
     data: web::Data<AppState>,
     req: web::Json<SoftwareSaveReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::update_software(conn, req.clone()).await;
+    let res = Mutation::update_software(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 
@@ -306,12 +287,11 @@ async fn delete_software(
     data: web::Data<AppState>,
     req: web::Json<DeleteReq>,
 ) -> Result<HttpResponse, Error> {
-    let conn = &data.conn;
-    let res = Mutation::delete_software(conn, req.clone()).await;
+    let res = Mutation::delete_software(&data.conn, req.clone()).await;
 
     match res {
         Ok(s) => Ok(HttpResponse::Ok().json(s)),
-        Err(e) => Ok(HttpResponse::ExpectationFailed().json(e.to_string())),
+        Err(e) => Ok(HttpResponse::InternalServerError().json(e.to_string())),
     }
 }
 // endregion
