@@ -5,6 +5,7 @@ import com.zktony.www.common.extension.total
 import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.data.local.room.entity.Hole
+import com.zktony.www.data.local.room.entity.Plate
 import com.zktony.www.data.local.room.entity.WorkPlate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,17 +28,17 @@ class WorkExecutor constructor(
     private val motion = MotionManager.instance
     private val serial = SerialManager.instance
     private var complete: Int = 0
+    private val currentHoleList: MutableList<Hole> = mutableListOf()
 
     suspend fun execute() {
         scope.launch {
             val total = holeList.total()
             if (total > 0) {
-                plateList.forEach { plate ->
-                    event(ExecutorEvent.Plate(plate))
-                    for (e in 0..3) {
-                        val mutableList = emptyList<Hole>().toMutableList()
-                        event(ExecutorEvent.Liquid(e))
-                        forEachHole(plate.row, plate.column) { i, j ->
+                for (e in 0..3) {
+                    event(ExecutorEvent.Liquid(e))
+                    plateList.forEach { plate ->
+                        event(ExecutorEvent.Plate(plate))
+                        forEachHole(plate.column, plate.row) { i, j ->
                             val hole = holeList.find { it.x == i && it.y == j && it.plateId == plate.id }
                             if (hole != null) {
                                 val volume = when (e) {
@@ -48,6 +49,8 @@ class WorkExecutor constructor(
                                     else -> 0f
                                 }
                                 if (hole.checked && volume > 0f) {
+                                    currentHoleList.add(Hole(x = i, y = j, checked = true))
+                                    event(ExecutorEvent.HoleList(currentHoleList))
                                     while (serial.lock.value || serial.pause.value) {
                                         delay(100)
                                     }
@@ -69,14 +72,13 @@ class WorkExecutor constructor(
                                     while (serial.lock.value) {
                                         delay(100)
                                     }
-                                    mutableList.add(Hole(x = i, y = j, checked = true))
                                     complete += 1
-                                    event(ExecutorEvent.HoleList(mutableList))
                                     event(ExecutorEvent.Progress(total, complete))
                                 }
                             }
                         }
-                        event(ExecutorEvent.HoleList(emptyList()))
+                        currentHoleList.clear()
+                        event(ExecutorEvent.HoleList(currentHoleList))
                     }
                 }
             }
@@ -85,14 +87,14 @@ class WorkExecutor constructor(
     }
 
     // 遍历孔位
-    private suspend fun forEachHole(row: Int, column: Int, block: suspend (Int, Int) -> Unit) {
-        for (i in 0 until row) {
+    private suspend fun forEachHole(x: Int, y: Int, block: suspend (Int, Int) -> Unit) {
+        for (i in 0 until x) {
             if (i % 2 == 0) {
-                for (j in 0 until column) {
+                for (j in 0 until y) {
                     block(i, j)
                 }
             } else {
-                for (j in column - 1 downTo 0) {
+                for (j in y - 1 downTo 0) {
                     block(i, j)
                 }
             }

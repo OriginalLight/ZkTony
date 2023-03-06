@@ -1,13 +1,14 @@
 package com.zktony.www.ui.home
 
 import android.graphics.Color
-import android.util.Log
 import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
+import com.zktony.common.extension.getTimeFormat
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
+import com.zktony.www.common.extension.completeDialog
 import com.zktony.www.common.extension.spannerDialog
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
@@ -15,6 +16,7 @@ import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate
 import com.zktony.www.data.local.room.entity.Work
 import com.zktony.www.data.local.room.entity.WorkPlate
+import com.zktony.www.data.repository.PlateRepository
 import com.zktony.www.data.repository.WorkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -27,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val workRepository: WorkRepository,
+    private val plateRepository: PlateRepository
 ) : BaseViewModel() {
 
     @Inject
@@ -39,10 +42,17 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            workRepository.getAllWork().collect {
-                if (it.isNotEmpty()) {
-                    _uiState.value = _uiState.value.copy(workList = it, work = it[0])
-                    loadPlate(it[0].id)
+            launch {
+                workRepository.getAllWork().collect {
+                    if (it.isNotEmpty()) {
+                        _uiState.value = _uiState.value.copy(workList = it, work = it[0])
+                        loadPlate(it[0].id)
+                    }
+                }
+            }
+            launch {
+                plateRepository.getPlateBySort(4).collect {
+                    _uiState.value = _uiState.value.copy(washPlate = it)
                 }
             }
         }
@@ -207,11 +217,11 @@ class HomeViewModel @Inject constructor(
                     plateList = _uiState.value.plateList,
                     holeList = _uiState.value.holeList,
                     settings = appViewModel.settings.value,
+                    scope = this,
                 )
                 executor.event = {
                     when (it) {
                         is ExecutorEvent.Plate -> {
-                            Log.d("WorkViewModel", "plate: ${it.plate}")
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
                                     plate = when (it.plate.sort) {
@@ -235,7 +245,7 @@ class HomeViewModel @Inject constructor(
                                         3 -> "四号泵"
                                         else -> "一号泵"
                                     },
-                                    color = when(it.liquid) {
+                                    color = when (it.liquid) {
                                         0 -> Color.BLUE
                                         1 -> Color.CYAN
                                         2 -> Color.YELLOW
@@ -266,7 +276,16 @@ class HomeViewModel @Inject constructor(
 
                         }
                         is ExecutorEvent.Finish -> {
-                            stop()
+                            reset()
+                            completeDialog(
+                                name = _uiState.value.work?.name ?: "错误",
+                                time = _uiState.value.time.getTimeFormat(),
+                                speed = "${String.format("%.2f", _uiState.value.info.speed)} 孔/分钟",
+                            )
+                            launch {
+                                delay(1000L)
+                                stop()
+                            }
                         }
                     }
                 }
@@ -286,10 +305,10 @@ class HomeViewModel @Inject constructor(
                     _uiState.value.plateList[0].row to _uiState.value.plateList[0].column
                 } else {
                     Pair(8, 12)
-                },
-                holeList = emptyList()
+                }
             )
         )
+        serial.pause(false)
     }
 
     fun pause() {
@@ -302,12 +321,11 @@ class HomeViewModel @Inject constructor(
 data class HomeUiState(
     val workList: List<Work> = emptyList(),
     val plateList: List<WorkPlate> = emptyList(),
+    val washPlate: Plate = Plate(),
     val holeList: List<Hole> = emptyList(),
     val work: Work? = null,
     val job: Job? = null,
     val washJob: Job? = null,
-    val plate: Plate? = null,
-    val holes: List<Hole>? = null,
     val pause: Boolean = false,
     val time: Long = 0L,
     val info: CurrentInfo = CurrentInfo(),

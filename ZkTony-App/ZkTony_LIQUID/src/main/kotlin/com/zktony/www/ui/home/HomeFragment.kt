@@ -1,7 +1,6 @@
 package com.zktony.www.ui.home
 
 import android.os.Bundle
-import android.util.Log
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
@@ -35,15 +34,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.uiState.collect {
-                        Log.d("HomeFragment", it.info.toString())
                         binding.apply {
                             operate.isVisible = it.job == null
-                            start.isEnabled =
+                            start.isVisible =
                                 it.job == null && it.holeList.total() > 0
                             with(pause) {
-                                isEnabled = it.job != null
+                                isVisible = it.job != null
                                 text = if (!it.pause) "暂停" else "继续"
-                                alpha = if (it.job != null) 1f else 0.3f
                             }
                             if (it.work != null) {
                                 select.text = it.work.name

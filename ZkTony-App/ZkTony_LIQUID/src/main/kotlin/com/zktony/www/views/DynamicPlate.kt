@@ -18,9 +18,6 @@ class DynamicPlate : View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
             super(context, attrs, defStyleAttr)
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
-            super(context, attrs, defStyleAttr, defStyleRes)
-
     private var x = 12
     private var y = 8
     private var color = Color.GREEN
@@ -30,15 +27,6 @@ class DynamicPlate : View {
     private var spacex: Float = 0f
     private var spacey: Float = 0f
 
-    fun setX(x: Int) {
-        this.x = x
-        invalidate()
-    }
-
-    fun setY(y: Int) {
-        this.y = y
-        invalidate()
-    }
 
     fun setXY(x: Int, y: Int) {
         this.x = x
@@ -78,7 +66,7 @@ class DynamicPlate : View {
         paint.color = Color.BLACK
         paint.strokeWidth = 2f
         paint.isAntiAlias = true
-        canvas?.drawRect(2f, 2f, width.toFloat() - 2f, height.toFloat() - 2f, paint)
+        canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
 
 
         // 画空心圆
@@ -136,6 +124,7 @@ class DynamicPlate : View {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event!!.action) {
             MotionEvent.ACTION_DOWN -> {

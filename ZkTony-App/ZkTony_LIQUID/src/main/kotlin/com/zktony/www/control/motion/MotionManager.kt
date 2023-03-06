@@ -46,11 +46,11 @@ class MotionManager(
             serial.sendHex(
                 serial = Serial.TTYS0,
                 hex = V1.complex(data = str1),
-                lock = true
             )
             serial.sendHex(
                 serial = Serial.TTYS3,
-                hex = V1.complex(data = str2)
+                hex = V1.complex(data = str2),
+                lock = true
             )
         }
     }

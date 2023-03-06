@@ -1,8 +1,10 @@
 package com.zktony.www.control.serial
 
 import com.kongzue.dialogx.dialogs.PopTip
+import com.zktony.common.extension.hexFormat
 import com.zktony.common.extension.hexToInt8
 import com.zktony.common.extension.verifyHex
+import com.zktony.common.utils.logd
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.TTYS0
@@ -46,13 +48,13 @@ class SerialManager(
                         TTYS0 -> {
                             data.verifyHex().forEach {
                                 _ttys0Flow.value = it
-                                //Logger.d(msg = "串口一 receivedHex: ${it.hexFormat()}")
+                               it.hexFormat().logd("串口一 receivedHex: ")
                             }
                         }
                         Serial.TTYS3 -> {
                             data.verifyHex().forEach {
                                 _ttys3Flow.value = it
-                                //Logger.d(msg = "串口三 receivedHex: ${it.hexFormat()}")
+                                it.hexFormat().logd("串口三 receivedHex: ")
                             }
                         }
                         else -> {}
@@ -125,6 +127,7 @@ class SerialManager(
     fun sendHex(serial: Serial, hex: String, lock: Boolean = false) {
         scope.launch {
             MutableSerial.instance.sendHex(serial, hex)
+            hex.hexFormat().logd("${serial.device} sendHex: ")
             if (lock) {
                 _lock.value = true
                 lockTime = 0L

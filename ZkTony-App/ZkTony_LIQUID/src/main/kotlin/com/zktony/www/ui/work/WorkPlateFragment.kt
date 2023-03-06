@@ -35,61 +35,65 @@ class WorkPlateFragment :
                         threeCheck.isChecked = it.workPlates.find { plate -> plate.sort == 2 } != null
                         fourCheck.isChecked = it.workPlates.find { plate -> plate.sort == 3 } != null
                         with(dynamicPlateOne) {
-                            val plate = it.plates.find { plate -> plate.sort == 0 }
                             val workPlate = it.workPlates.find { workPlate -> workPlate.sort == 0 }
                             val holes = it.holes.filter { hole -> hole.plateId == workPlate?.id }
-                            if (plate != null) {
-                                setXY(plate.column, plate.row)
-                            }
                             if (workPlate != null) {
+                                setXY(workPlate.column, workPlate.row)
                                 setData(holes)
                                 holeOne.text = holes.filter { hole -> hole.checked }.size.toString()
                             } else {
+                                val plate = it.plates.find { plate -> plate.sort == 0 }
+                                if (plate != null) {
+                                    setXY(plate.column, plate.row)
+                                }
                                 setData(emptyList())
                                 holeOne.text = ""
                             }
                         }
                         with(dynamicPlateTwo) {
-                            val plate = it.plates.find { plate -> plate.sort == 1 }
                             val workPlate = it.workPlates.find { workPlate -> workPlate.sort == 1 }
                             val holes = it.holes.filter { hole -> hole.plateId == workPlate?.id }
-                            if (plate != null) {
-                                setXY(plate.column, plate.row)
-                            }
                             if (workPlate != null) {
+                                setXY(workPlate.column, workPlate.row)
                                 setData(holes)
                                 holeTwo.text = holes.filter { hole -> hole.checked }.size.toString()
                             } else {
+                                val plate = it.plates.find { plate -> plate.sort == 1 }
+                                if (plate != null) {
+                                    setXY(plate.column, plate.row)
+                                }
                                 setData(emptyList())
                                 holeTwo.text = ""
                             }
                         }
                         with(dynamicPlateThree) {
-                            val plate = it.plates.find { plate -> plate.sort == 2 }
                             val workPlate = it.workPlates.find { workPlate -> workPlate.sort == 2 }
                             val holes = it.holes.filter { hole -> hole.plateId == workPlate?.id }
-                            if (plate != null) {
-                                setXY(plate.column, plate.row)
-                            }
                             if (workPlate != null) {
+                                setXY(workPlate.column, workPlate.row)
                                 setData(holes)
                                 holeThree.text = holes.filter { hole -> hole.checked }.size.toString()
                             } else {
+                                val plate = it.plates.find { plate -> plate.sort == 2 }
+                                if (plate != null) {
+                                    setXY(plate.column, plate.row)
+                                }
                                 setData(emptyList())
                                 holeThree.text = ""
                             }
                         }
                         with(dynamicPlateFour) {
-                            val plate = it.plates.find { plate -> plate.sort == 3 }
                             val workPlate = it.workPlates.find { workPlate -> workPlate.sort == 3 }
                             val holes = it.holes.filter { hole -> hole.plateId == workPlate?.id }
-                            if (plate != null) {
-                                setXY(plate.column, plate.row)
-                            }
                             if (workPlate != null) {
+                                setXY(workPlate.column, workPlate.row)
                                 setData(holes)
                                 holeFour.text = holes.filter { hole -> hole.checked }.size.toString()
                             } else {
+                                val plate = it.plates.find { plate -> plate.sort == 3 }
+                                if (plate != null) {
+                                    setXY(plate.column, plate.row)
+                                }
                                 setData(emptyList())
                                 holeFour.text = ""
                             }
