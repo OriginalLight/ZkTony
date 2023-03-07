@@ -11,13 +11,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.dialog.deleteDialog
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.getDayEnd
 import com.zktony.common.ext.getDayStart
 import com.zktony.common.ext.simpleDateFormat
 import com.zktony.www.R
 import com.zktony.www.adapter.LogAdapter
-import com.zktony.www.common.extension.*
 import com.zktony.www.databinding.FragmentLogBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

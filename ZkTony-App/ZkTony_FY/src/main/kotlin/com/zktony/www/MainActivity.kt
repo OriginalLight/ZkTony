@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.zktony.common.base.BaseActivity
-import com.zktony.www.common.extension.noticeDialog
+import com.zktony.common.dialog.noticeDialog
 import com.zktony.www.common.worker.WorkerManager
 import com.zktony.www.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,7 +20,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
         WorkerManager.instance.createWorker()
 
-        noticeDialog()
+        noticeDialog(resources.getString(R.string.notice_content))
     }
 
 

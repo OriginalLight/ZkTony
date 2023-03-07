@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.simpleDateFormat
-import com.zktony.www.R
+import com.zktony.common.R
 import com.zktony.www.data.local.room.entity.Log
 import com.zktony.www.databinding.ItemLogBinding
 
@@ -75,10 +75,10 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
                     setOnClickListener {
                         if (content.visibility == View.GONE) {
                             content.visibility = View.VISIBLE
-                            ivSpacer.setImageResource(R.mipmap.item_up)
+                            ivSpacer.setImageResource(R.mipmap.up)
                         } else {
                             content.visibility = View.GONE
-                            ivSpacer.setImageResource(R.mipmap.item_down)
+                            ivSpacer.setImageResource(R.mipmap.down)
                         }
                     }
                 }

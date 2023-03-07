@@ -15,7 +15,7 @@
         <ImageView
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:background="@mipmap/complete" />
+            android:background="@mipmap/ic_complete" />
 
         <LinearLayout
             android:layout_width="0dp"

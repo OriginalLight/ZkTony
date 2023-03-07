@@ -67,7 +67,7 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
-                android:background="@mipmap/item_edit"
+                android:background="@mipmap/edit"
                 tools:ignore="ContentDescription" />
 
         </LinearLayout>

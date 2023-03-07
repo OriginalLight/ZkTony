@@ -70,7 +70,7 @@ class TecFragment : BaseFragment<TecViewModel, FragmentTecBinding>(R.layout.frag
         bind.count.run {
             text = uiState.count.toString()
             if (uiState.error != null) {
-                setTextColor(resources.getColor(R.color.red, null))
+                setTextColor(Color.parseColor("#FF0000"))
             } else {
                 setTextColor(Color.parseColor("#6200EA"))
             }

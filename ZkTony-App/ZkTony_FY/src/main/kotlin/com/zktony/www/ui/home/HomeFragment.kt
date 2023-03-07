@@ -14,6 +14,7 @@ import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnIconChangeCallBack
 import com.kongzue.dialogx.util.TextInfo
+import com.zktony.common.R.color
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
@@ -61,7 +62,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 text = if (it) "暂停摇床" else "继续摇床"
                                 setTextColor(
                                     ContextCompat.getColor(
-                                        context, if (it) R.color.dark_outline else R.color.red
+                                        context, if (it) color.dark_outline else color.red
                                     )
                                 )
                             }
@@ -104,7 +105,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             e.apply {
                 with(reset) {
                     clickScale()
-                    setOnClickListener { PopTip.show(R.mipmap.ic_reset, "长按复位") }
+                    setOnClickListener { PopTip.show("长按复位") }
                     setOnLongClickListener {
                         viewModel.reset()
                         true
@@ -193,7 +194,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 text = if (state.insulating) "保温中 ${state.temp}" else "抗体保温"
                 setTextColor(
                     ContextCompat.getColor(
-                        context, if (state.insulating) R.color.red else R.color.dark_outline
+                        context, if (state.insulating) color.red else color.dark_outline
                     )
                 )
             }
@@ -202,7 +203,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 lock.setBackgroundResource(if (state.lock) R.mipmap.btn_lock else R.mipmap.btn_unlock)
                 setTextColor(
                     ContextCompat.getColor(
-                        context, if (state.lock) R.color.dark_outline else R.color.green
+                        context, if (state.lock) color.dark_outline else color.green
                     )
                 )
             }

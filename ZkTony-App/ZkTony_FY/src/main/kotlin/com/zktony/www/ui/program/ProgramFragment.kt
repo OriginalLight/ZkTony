@@ -8,11 +8,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.dialog.deleteDialog
+import com.zktony.common.dialog.inputDialog
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.adapter.ProgramAdapter
-import com.zktony.www.common.extension.deleteDialog
-import com.zktony.www.common.extension.inputDialog
 import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

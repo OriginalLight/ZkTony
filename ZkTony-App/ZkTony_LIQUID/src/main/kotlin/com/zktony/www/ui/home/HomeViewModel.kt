@@ -5,11 +5,11 @@ import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
+import com.zktony.common.dialog.spannerDialog
 import com.zktony.common.ext.getTimeFormat
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.completeDialog
-import com.zktony.www.common.extension.spannerDialog
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
 import com.zktony.www.data.local.room.entity.Hole

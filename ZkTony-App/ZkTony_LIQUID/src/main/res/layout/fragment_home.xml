@@ -363,7 +363,7 @@
                 <ImageView
                     android:layout_width="96dp"
                     android:layout_height="96dp"
-                    android:background="@mipmap/wash"
+                    android:background="@mipmap/ic_wash"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
                 <TextView
@@ -387,7 +387,7 @@
                 <ImageView
                     android:layout_width="96dp"
                     android:layout_height="96dp"
-                    android:background="@mipmap/fill"
+                    android:background="@mipmap/ic_fill"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
                 <TextView
@@ -411,7 +411,7 @@
                 <ImageView
                     android:layout_width="96dp"
                     android:layout_height="96dp"
-                    android:background="@mipmap/suck_back"
+                    android:background="@mipmap/ic_suck_back"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
                 <TextView

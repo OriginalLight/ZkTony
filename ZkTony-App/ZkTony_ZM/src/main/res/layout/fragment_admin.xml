@@ -53,7 +53,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_bar"
+                            android:src="@mipmap/bar"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -65,7 +65,7 @@
                             android:text="@string/navigation"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="RelativeOverlap" />
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/navigation_bar"
@@ -78,7 +78,8 @@
                             android:textOff="@string/hide"
                             android:textOn="@string/show"
                             app:thumbTint="@color/light_primary"
-                            app:trackTint="@color/dark_surfaceTint" />
+                            app:trackTint="@color/dark_surfaceTint"
+                            tools:ignore="TouchTargetSizeCheck" />
 
                     </RelativeLayout>
 
@@ -108,7 +109,7 @@
                             android:text="@string/audio"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="RelativeOverlap" />
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/audio"
@@ -118,7 +119,8 @@
                             android:layout_marginEnd="35dp"
                             android:checked="true"
                             app:thumbTint="@color/light_primary"
-                            app:trackTint="@color/dark_surfaceTint" />
+                            app:trackTint="@color/dark_surfaceTint"
+                            tools:ignore="DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
                     </RelativeLayout>
 
@@ -148,7 +150,7 @@
                             android:text="@string/detect"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="RelativeOverlap" />
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/detect"
@@ -159,7 +161,8 @@
                             android:layout_marginEnd="35dp"
                             android:checked="true"
                             app:thumbTint="@color/light_primary"
-                            app:trackTint="@color/dark_surfaceTint" />
+                            app:trackTint="@color/dark_surfaceTint"
+                            tools:ignore="TouchTargetSizeCheck" />
 
                     </RelativeLayout>
 
@@ -188,7 +191,8 @@
                             android:layout_toEndOf="@+id/iv_interval"
                             android:text="废液清理间隔（分钟）"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            tools:ignore="HardcodedText,VisualLintOverlap" />
 
                         <EditText
                             android:id="@+id/interval"
@@ -199,7 +203,7 @@
                             android:gravity="center"
                             android:inputType="number"
                             android:minHeight="48dp"
-                            tools:ignore="Autofill,LabelFor" />
+                            tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -227,7 +231,8 @@
                             android:layout_toEndOf="@+id/iv_duration"
                             android:text="废液清理时长（秒）"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            tools:ignore="HardcodedText,VisualLintOverlap" />
 
                         <EditText
                             android:id="@+id/duration"
@@ -239,7 +244,7 @@
                             android:gravity="center"
                             android:inputType="number"
                             android:minHeight="48dp"
-                            tools:ignore="Autofill,LabelFor" />
+                            tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -267,7 +272,8 @@
                             android:layout_toEndOf="@+id/iv_motor"
                             android:text="填充/回吸转速（转/分）"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            tools:ignore="HardcodedText,VisualLintOverlap" />
 
                         <EditText
                             android:id="@+id/motor_speed"
@@ -279,7 +285,7 @@
                             android:gravity="center"
                             android:inputType="number"
                             android:minHeight="48dp"
-                            tools:ignore="Autofill,LabelFor" />
+                            tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck" />
                     </RelativeLayout>
 
                 </LinearLayout>
@@ -314,7 +320,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_version"
+                            android:src="@mipmap/version"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -325,7 +331,8 @@
                             android:layout_toEndOf="@+id/iv_version"
                             android:text="当前软件版本"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            tools:ignore="HardcodedText,VisualLintOverlap" />
 
                         <TextView
                             android:id="@+id/tv_version_name"
@@ -355,7 +362,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_device"
+                            android:src="@mipmap/device"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -366,7 +373,8 @@
                             android:layout_toEndOf="@+id/iv_device"
                             android:text="设备信息"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            tools:ignore="HardcodedText,VisualLintOverlap" />
 
                         <TextView
                             android:id="@+id/tv_device_name"
@@ -396,7 +404,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_about"
+                            android:src="@mipmap/about"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -454,7 +462,7 @@
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
-                    android:background="@mipmap/ic_reset"
+                    android:background="@mipmap/reset"
                     tools:ignore="ContentDescription" />
 
                 <TextView
@@ -464,7 +472,8 @@
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:text="复位"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
 
             </RelativeLayout>
 
@@ -480,7 +489,7 @@
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
                     android:background="@mipmap/ic_motor"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -489,7 +498,8 @@
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:text="手动抽水"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -502,8 +512,8 @@
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@mipmap/ic_wifi"
-                    tools:ignore="ContentDescription" />
+                    android:background="@mipmap/wifi"
+                    tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -512,7 +522,8 @@
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:text="WIFI设置"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
             </RelativeLayout>
 
             <RelativeLayout
@@ -525,8 +536,8 @@
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
-                    android:background="@mipmap/ic_update"
-                    tools:ignore="ContentDescription" />
+                    android:background="@mipmap/update"
+                    tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
                 <TextView
                     android:id="@+id/tv_update"
@@ -536,7 +547,8 @@
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:text="检查更新"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    tools:ignore="HardcodedText" />
             </RelativeLayout>
 
         </LinearLayout>

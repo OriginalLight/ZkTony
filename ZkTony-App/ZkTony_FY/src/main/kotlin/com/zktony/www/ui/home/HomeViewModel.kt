@@ -9,7 +9,6 @@ import com.zktony.common.utils.Constants
 import com.zktony.common.utils.Queue
 import com.zktony.serialport.util.Serial.TTYS0
 import com.zktony.serialport.util.Serial.TTYS3
-import com.zktony.www.R
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
@@ -300,7 +299,7 @@ class HomeViewModel @Inject constructor(
                     PopTip.show("运动中禁止复位")
                 } else {
                     serial.reset()
-                    PopTip.show(R.mipmap.ic_reset, "复位-已下发")
+                    PopTip.show("复位-已下发")
                 }
             } else {
                 PopTip.show("请中止所有运行中程序")

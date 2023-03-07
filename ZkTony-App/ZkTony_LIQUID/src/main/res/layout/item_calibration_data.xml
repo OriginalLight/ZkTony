@@ -93,7 +93,7 @@
                 <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:background="@mipmap/item_delete"
+                    android:background="@mipmap/delete"
                     tools:ignore="ContentDescription" />
 
             </LinearLayout>

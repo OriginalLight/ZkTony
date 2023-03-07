@@ -52,7 +52,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_bar"
+                            android:src="@mipmap/bar"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -64,7 +64,7 @@
                             android:text="@string/bar"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="RelativeOverlap" />
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                         <androidx.appcompat.widget.SwitchCompat
                             android:id="@+id/sw_bar"
@@ -75,7 +75,8 @@
                             android:layout_marginEnd="35dp"
                             android:checked="true"
                             app:thumbTint="@color/light_primary"
-                            app:trackTint="@color/dark_surfaceTint" />
+                            app:trackTint="@color/dark_surfaceTint"
+                            tools:ignore="TouchTargetSizeCheck" />
 
                     </RelativeLayout>
 
@@ -105,7 +106,7 @@
                             android:text="@string/antibody_holding_temperature"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="RelativeOverlap" />
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                         <EditText
                             android:id="@+id/et_temp"
@@ -117,7 +118,7 @@
                             android:gravity="center"
                             android:inputType="number"
                             android:minHeight="48dp"
-                            tools:ignore="Autofill,LabelFor" />
+                            tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck" />
                     </RelativeLayout>
 
                 </LinearLayout>
@@ -151,7 +152,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_version"
+                            android:src="@mipmap/version"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -163,7 +164,7 @@
                             android:text="@string/current_version"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="RelativeOverlap" />
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                         <TextView
                             android:id="@+id/tv_version_name"
@@ -193,7 +194,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_device"
+                            android:src="@mipmap/device"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -204,7 +205,8 @@
                             android:layout_toEndOf="@+id/iv_device"
                             android:text="设备信息"
                             android:textColor="@color/black"
-                            android:textSize="16sp" />
+                            android:textSize="16sp"
+                            tools:ignore="HardcodedText,VisualLintOverlap" />
 
                         <TextView
                             android:id="@+id/tv_device_name"
@@ -234,7 +236,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_about"
+                            android:src="@mipmap/about"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -292,7 +294,7 @@
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
-                    android:background="@mipmap/ic_setting"
+                    android:background="@mipmap/settings"
                     tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
                 <TextView
@@ -317,7 +319,7 @@
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
-                    android:background="@mipmap/ic_wifi"
+                    android:background="@mipmap/wifi"
                     tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
                 <TextView
@@ -342,7 +344,7 @@
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
-                    android:background="@mipmap/ic_update"
+                    android:background="@mipmap/update"
                     tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
                 <TextView

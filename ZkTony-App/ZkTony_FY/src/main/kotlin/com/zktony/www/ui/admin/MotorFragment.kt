@@ -7,12 +7,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.dialog.spannerDialog
 import com.zktony.common.ext.afterTextChange
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.setEqualText
 import com.zktony.www.R
 import com.zktony.www.adapter.MotorAdapter
-import com.zktony.www.common.extension.spannerDialog
 import com.zktony.www.databinding.FragmentMotorBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

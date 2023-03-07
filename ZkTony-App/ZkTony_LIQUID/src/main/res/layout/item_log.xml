@@ -101,7 +101,7 @@
                         android:layout_width="29dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center"
-                        android:background="@mipmap/item_delete"
+                        android:background="@mipmap/delete"
                         tools:ignore="ContentDescription" />
 
 
@@ -122,7 +122,7 @@
                         android:layout_width="32dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center"
-                        app:srcCompat="@mipmap/item_down"
+                        app:srcCompat="@mipmap/down"
                         tools:ignore="ContentDescription" />
 
                 </LinearLayout>

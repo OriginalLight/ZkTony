@@ -12,7 +12,7 @@
             android:id="@+id/reset"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:background="@mipmap/btn_reset"
+            android:background="@mipmap/reset"
             app:layout_constraintBottom_toTopOf="@+id/pause"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

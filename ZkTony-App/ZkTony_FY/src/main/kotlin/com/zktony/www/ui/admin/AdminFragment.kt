@@ -2,6 +2,7 @@ package com.zktony.www.ui.admin
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
@@ -9,13 +10,21 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.*
+import com.zktony.common.R.color
+import com.zktony.common.app.CommonApplicationProxy
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.dialog.aboutDialog
+import com.zktony.common.dialog.authDialog
+import com.zktony.common.dialog.deviceDialog
+import com.zktony.common.dialog.updateDialog
 import com.zktony.common.ext.*
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.*
+import com.zktony.www.data.remote.model.QrCode
 import com.zktony.www.databinding.FragmentAdminBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -91,7 +100,7 @@ class AdminFragment :
                                     setTextColor(
                                         ContextCompat.getColor(
                                             context,
-                                            R.color.dark_outline
+                                            color.dark_outline
                                         )
                                     )
                                 } else {
@@ -99,7 +108,7 @@ class AdminFragment :
                                     setTextColor(
                                         ContextCompat.getColor(
                                             context,
-                                            R.color.light_primary
+                                            color.light_primary
                                         )
                                     )
                                 }
@@ -116,6 +125,7 @@ class AdminFragment :
         }
     }
 
+    @SuppressLint("HardwareIds")
     private fun initView() {
         binding.apply {
             tvVersionName.text = BuildConfig.VERSION_NAME
@@ -167,7 +177,7 @@ class AdminFragment :
             with(version) {
                 clickScale()
                 setOnClickListener {
-                    PopTip.show(R.mipmap.ic_version, "当前软件版本号 ${BuildConfig.VERSION_NAME}")
+                    PopTip.show("当前软件版本号 ${BuildConfig.VERSION_NAME}")
                 }
             }
             with(about) {
@@ -179,7 +189,12 @@ class AdminFragment :
             with(device) {
                 clickScale()
                 setOnClickListener {
-                    deviceDialog()
+                    val id = Settings.Secure.getString(
+                        CommonApplicationProxy.application.contentResolver, Settings.Secure.ANDROID_ID
+                    )
+                    deviceDialog(Gson().toJson(QrCode(
+                        id = id,
+                    )))
                 }
             }
         }

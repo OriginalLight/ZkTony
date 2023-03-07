@@ -13,11 +13,11 @@ import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.dialog.deleteDialog
 import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.adapter.ProgramAdapter
-import com.zktony.www.common.extension.deleteDialog
 import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
