@@ -10,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.extension.*
+import com.zktony.common.ext.*
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.common.app.AppViewModel

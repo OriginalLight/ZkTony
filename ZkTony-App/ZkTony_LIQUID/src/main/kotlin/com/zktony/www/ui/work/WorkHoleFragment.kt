@@ -8,8 +8,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.extension.clickScale
-import com.zktony.common.extension.removeZero
+import com.zktony.common.ext.clickScale
+import com.zktony.common.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.common.extension.volumeDialog
 import com.zktony.www.databinding.FragmentWorkHoleBinding

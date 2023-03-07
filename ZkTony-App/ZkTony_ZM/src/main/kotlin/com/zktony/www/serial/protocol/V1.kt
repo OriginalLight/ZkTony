@@ -5,7 +5,7 @@
  */
 package com.zktony.www.serial.protocol
 
-import com.zktony.common.extension.*
+import com.zktony.common.ext.*
 
 /**
  * @author 刘贺贺

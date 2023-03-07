@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.zktony.common.extension.clickScale
+import com.zktony.common.ext.clickScale
 import com.zktony.www.data.local.room.entity.WorkPlate
 import com.zktony.www.databinding.ItemWorkPlateBinding
 

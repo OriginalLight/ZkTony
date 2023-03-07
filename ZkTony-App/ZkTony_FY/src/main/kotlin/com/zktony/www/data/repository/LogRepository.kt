@@ -21,20 +21,12 @@ class LogRepository @Inject constructor(
         dao.update(log)
     }
 
-    suspend fun updateBatch(logList: List<Log>) {
-        dao.updateBatch(logList)
-    }
-
     suspend fun delete(log: Log) {
         dao.delete(log)
     }
 
     suspend fun deleteByDate() {
         dao.deleteByDate()
-    }
-
-    fun withoutUpload(): Flow<List<Log>> {
-        return dao.withoutUpload()
     }
 
     fun getAll(): Flow<List<Log>> {

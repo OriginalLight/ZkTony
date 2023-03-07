@@ -9,17 +9,7 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-13 11:49
  */
 @Dao
-interface WorkDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(work: Work)
-
-    @Delete
-    suspend fun delete(work: Work)
-
-    @Update
-    suspend fun update(work: Work)
-
+interface WorkDao : BaseDao<Work> {
     @Query("SELECT * FROM work")
     fun getAll(): Flow<List<Work>>
 

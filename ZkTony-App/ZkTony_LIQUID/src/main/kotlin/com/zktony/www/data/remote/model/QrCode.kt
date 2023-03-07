@@ -1,6 +1,6 @@
 package com.zktony.www.data.remote.model
 
-import com.zktony.common.extension.currentTime
+import com.zktony.common.ext.currentTime
 import com.zktony.www.BuildConfig
 
 /**

@@ -35,12 +35,4 @@ class ProgramRepository @Inject constructor(
     suspend fun update(program: Program) {
         dao.update(program)
     }
-
-    suspend fun updateBatch(programs: List<Program>) {
-        dao.updateBatch(programs)
-    }
-
-    fun withoutUpload(): Flow<List<Program>> {
-        return dao.withoutUpload()
-    }
 }

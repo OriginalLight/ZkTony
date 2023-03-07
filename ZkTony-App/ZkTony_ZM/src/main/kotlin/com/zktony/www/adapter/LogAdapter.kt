@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.zktony.common.extension.clickScale
-import com.zktony.common.extension.removeZero
-import com.zktony.common.extension.simpleDateFormat
+import com.zktony.common.ext.clickScale
+import com.zktony.common.ext.removeZero
+import com.zktony.common.ext.simpleDateFormat
 import com.zktony.www.data.local.room.entity.LogRecord
 import com.zktony.www.databinding.ItemLogBinding
 

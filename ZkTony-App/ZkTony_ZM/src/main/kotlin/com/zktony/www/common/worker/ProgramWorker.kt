@@ -54,7 +54,7 @@ class ProgramWorker @AssistedInject constructor(
                         Log.d("ProgramWorker", "上传程序失败")
                     }
                     .collect {
-                        programRepository.updateBatch(programs.map { it.copy(upload = 1) })
+                        programRepository.updateAll(programs.map { it.copy(upload = 1) })
                     }
             }
             return Result.success()

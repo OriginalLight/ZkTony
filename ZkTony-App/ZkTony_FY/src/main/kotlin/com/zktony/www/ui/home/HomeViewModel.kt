@@ -4,7 +4,7 @@ import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
-import com.zktony.common.extension.removeZero
+import com.zktony.common.ext.removeZero
 import com.zktony.common.utils.Constants
 import com.zktony.common.utils.Queue
 import com.zktony.serialport.util.Serial.TTYS0

@@ -51,7 +51,7 @@ class AppViewModel @Inject constructor(
             }
             launch {
                 dataStore.data.map {
-                    it[floatPreferencesKey(Constants.NEEDLE_SPACE)] ?: 10.0f
+                    it[floatPreferencesKey(Constants.NEEDLE_SPACE)] ?: 7.3f
                 }.collect {
                     _settings.value = _settings.value.copy(needleSpace = it)
                 }
@@ -77,6 +77,6 @@ class AppViewModel @Inject constructor(
 
 data class Settings(
     val bar: Boolean = false,
-    val needleSpace: Float = 10.0f,
+    val needleSpace: Float = 7.3f,
     val plate: List<Plate> = emptyList()
 )

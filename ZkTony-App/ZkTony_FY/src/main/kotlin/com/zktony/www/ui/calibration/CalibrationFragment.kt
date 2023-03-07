@@ -7,7 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.extension.clickScale
+import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.adapter.CalibrationAdapter
 import com.zktony.www.common.extension.deleteDialog

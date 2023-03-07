@@ -11,10 +11,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.extension.clickScale
-import com.zktony.common.extension.getDayEnd
-import com.zktony.common.extension.getDayStart
-import com.zktony.common.extension.simpleDateFormat
+import com.zktony.common.ext.clickScale
+import com.zktony.common.ext.getDayEnd
+import com.zktony.common.ext.getDayStart
+import com.zktony.common.ext.simpleDateFormat
 import com.zktony.www.R
 import com.zktony.www.adapter.LogAdapter
 import com.zktony.www.common.extension.*

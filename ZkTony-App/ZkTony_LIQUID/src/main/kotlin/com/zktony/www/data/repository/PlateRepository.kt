@@ -30,7 +30,7 @@ class PlateRepository @Inject constructor(
     }
 
     fun getAllPlate(): Flow<List<Plate>> {
-        return plateDao.getAllPlate()
+        return plateDao.getAll()
     }
 
     fun getHoleByPlateId(plateId: String): Flow<List<Hole>> {
@@ -38,14 +38,14 @@ class PlateRepository @Inject constructor(
     }
 
     suspend fun init() {
-        val plates = plateDao.getAllPlate().firstOrNull()
+        val plates = plateDao.getAll().firstOrNull()
         if (plates.isNullOrEmpty()) {
             val plate1 = Plate(sort = 0)
             val plate2 = Plate(sort = 1)
             val plate3 = Plate(sort = 2)
             val plate4 = Plate(sort = 3)
             val plate5 = Plate(sort = 4)
-            plateDao.insertBatch(
+            plateDao.insertAll(
                 listOf(
                     plate1,
                     plate2,
@@ -63,7 +63,7 @@ class PlateRepository @Inject constructor(
 
     suspend fun load(): Flow<List<Plate>> {
         return flow {
-            plateDao.getAllPlate().distinctUntilChanged().collect {
+            plateDao.getAll().distinctUntilChanged().collect {
                 it.filter { plate -> plate.sort != 4 }.forEach { plate ->
                     val holes = holeDao.getByPlateId(plate.id).firstOrNull()
                     holes?.let { plate.holes = holes }
@@ -96,6 +96,6 @@ class PlateRepository @Inject constructor(
             }
         }
         holeDao.deleteByPlateId(plate.id)
-        holeDao.insertBatch(holeList)
+        holeDao.insertAll(holeList)
     }
 }

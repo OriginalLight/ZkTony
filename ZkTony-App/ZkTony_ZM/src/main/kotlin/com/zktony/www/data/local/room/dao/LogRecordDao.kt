@@ -25,19 +25,7 @@ import java.util.*
  * Data access object to query the database.
  */
 @Dao
-interface LogRecordDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(logRecord: LogRecord)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(logRecord: LogRecord)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun updateBatch(logRecords: List<LogRecord>)
-
-    @Delete
-    suspend fun delete(logRecord: LogRecord)
+interface LogRecordDao : BaseDao<LogRecord> {
 
     @Query("DELETE FROM log_record WHERE julianday('now') - julianday(createTime) >= '180'")
     suspend fun deleteByDate()

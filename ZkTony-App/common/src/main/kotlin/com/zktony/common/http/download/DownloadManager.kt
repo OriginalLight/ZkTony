@@ -1,6 +1,6 @@
 package com.zktony.common.http.download
 
-import com.zktony.common.extension.copyTo
+import com.zktony.common.ext.copyTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

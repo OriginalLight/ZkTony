@@ -28,10 +28,6 @@ class ActionRepository @Inject constructor(
         dao.update(action)
     }
 
-    suspend fun updateBatch(actions: List<Action>) {
-        dao.updateBatch(actions)
-    }
-
     fun getByProgramId(programId: String): Flow<List<Action>> {
         return dao.getByProgramId(programId)
     }

@@ -53,7 +53,7 @@ class LogDataWorker @AssistedInject constructor(
                         Log.d("LogDataWorker", "上传日志数据失败")
                     }
                     .collect {
-                        logDataRepository.updateBatch(logs.map { it.copy(upload = 1) })
+                        logDataRepository.updateAll(logs.map { it.copy(upload = 1) })
                     }
             }
             return Result.success()

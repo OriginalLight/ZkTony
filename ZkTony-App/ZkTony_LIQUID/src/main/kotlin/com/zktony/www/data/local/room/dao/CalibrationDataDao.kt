@@ -9,13 +9,7 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-25 11:09
  */
 @Dao
-interface CalibrationDataDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(data: CalibrationData)
-
-    @Delete
-    suspend fun delete(data: CalibrationData)
+interface CalibrationDataDao : BaseDao<CalibrationData> {
 
     @Query("DELETE FROM calibration_data WHERE calibrationId = :calibrationId")
     suspend fun deleteByCalibrationId(calibrationId: String)

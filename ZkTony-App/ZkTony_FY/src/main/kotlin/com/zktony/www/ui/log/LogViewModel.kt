@@ -2,9 +2,9 @@ package com.zktony.www.ui.log
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
-import com.zktony.common.extension.getDayEnd
-import com.zktony.common.extension.getDayStart
-import com.zktony.common.extension.simpleDateFormat
+import com.zktony.common.ext.getDayEnd
+import com.zktony.common.ext.getDayStart
+import com.zktony.common.ext.simpleDateFormat
 import com.zktony.www.data.local.room.entity.Log
 import com.zktony.www.data.repository.LogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

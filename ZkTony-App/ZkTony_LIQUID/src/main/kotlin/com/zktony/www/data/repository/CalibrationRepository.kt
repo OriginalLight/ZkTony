@@ -25,7 +25,7 @@ class CalibrationRepository @Inject constructor(
     }
 
     suspend fun updateBatch(calibrations: List<Calibration>) {
-        dao.updateBatch(calibrations)
+        dao.updateAll(calibrations)
     }
 
     suspend fun delete(calibration: Calibration) {

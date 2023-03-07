@@ -9,19 +9,9 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-13 11:49
  */
 @Dao
-interface WorkPlateDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(workPlate: WorkPlate)
-
-    @Delete
-    suspend fun delete(workPlate: WorkPlate)
-
+interface WorkPlateDao : BaseDao<WorkPlate> {
     @Query("DELETE FROM work_plate WHERE id = :id")
     suspend fun deleteById(id: String)
-
-    @Update
-    suspend fun update(workPlate: WorkPlate)
 
     @Query("SELECT * FROM work_plate WHERE workId = :id ORDER BY sort ASC")
     fun getByWorkId(id: String): Flow<List<WorkPlate>>

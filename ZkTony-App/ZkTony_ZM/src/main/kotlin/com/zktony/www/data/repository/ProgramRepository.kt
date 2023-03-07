@@ -27,7 +27,6 @@ class ProgramRepository @Inject constructor(
         return dao.getById(id)
     }
 
-
     suspend fun delete(program: Program) {
         dao.delete(program)
     }
@@ -36,8 +35,8 @@ class ProgramRepository @Inject constructor(
         dao.update(program)
     }
 
-    suspend fun updateBatch(programs: List<Program>) {
-        dao.updateBatch(programs)
+    suspend fun updateAll(list: List<Program>) {
+        dao.updateAll(list)
     }
 
     fun withoutUpload(): Flow<List<Program>> {

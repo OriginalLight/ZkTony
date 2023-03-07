@@ -55,10 +55,6 @@ class WorkRepository @Inject constructor(
         return holeDao.getByPlateId(id)
     }
 
-    suspend fun updateWork(work: Work) {
-        workDao.update(work)
-    }
-
     suspend fun updatePlate(workPlate: WorkPlate) {
         workPlateDao.update(workPlate)
     }
@@ -68,7 +64,7 @@ class WorkRepository @Inject constructor(
     }
 
     suspend fun updateHoleBatch(holes: List<Hole>) {
-        holeDao.updateBatch(holes)
+        holeDao.updateAll(holes)
     }
 
     suspend fun removePlate(plate: WorkPlate) {
@@ -98,7 +94,7 @@ class WorkRepository @Inject constructor(
                 )
             )
         }
-        holeDao.insertBatch(holes)
+        holeDao.insertAll(holes)
     }
 
 }

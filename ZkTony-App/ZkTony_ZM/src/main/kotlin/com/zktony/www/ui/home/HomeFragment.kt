@@ -11,7 +11,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.tabs.TabLayout
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.extension.*
+import com.zktony.common.ext.*
 import com.zktony.common.utils.Constants
 import com.zktony.common.utils.Constants.MAX_MOTOR
 import com.zktony.common.utils.Constants.MAX_TIME

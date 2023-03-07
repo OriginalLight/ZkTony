@@ -9,17 +9,7 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-13 11:49
  */
 @Dao
-interface MotorDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(motor: Motor)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBatch(motors: List<Motor>)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(motor: Motor)
-
+interface MotorDao : BaseDao<Motor> {
     @Query("SELECT * FROM motor")
     fun getAll(): Flow<List<Motor>>
 

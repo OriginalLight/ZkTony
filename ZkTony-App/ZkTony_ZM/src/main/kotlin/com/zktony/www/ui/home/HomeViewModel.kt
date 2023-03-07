@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.MessageDialog
 import com.zktony.common.audio.AudioPlayer
 import com.zktony.common.base.BaseViewModel
-import com.zktony.common.extension.getTimeFormat
+import com.zktony.common.ext.getTimeFormat
 import com.zktony.common.utils.Constants.ERROR_CURRENT
 import com.zktony.common.utils.Constants.MAX_MOTOR
 import com.zktony.common.utils.Constants.MAX_TIME

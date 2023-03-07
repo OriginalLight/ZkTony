@@ -2,11 +2,14 @@ package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.zktony.common.extension.simpleDateFormat
+import com.zktony.common.ext.clickScale
+import com.zktony.common.ext.simpleDateFormat
+import com.zktony.www.R
 import com.zktony.www.data.local.room.entity.Log
 import com.zktony.www.databinding.ItemLogBinding
 
@@ -16,6 +19,7 @@ import com.zktony.www.databinding.ItemLogBinding
  */
 class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
 
+    private var onDeleteButtonClick: (Log) -> Unit = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
@@ -23,7 +27,8 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ),
+            onDeleteButtonClick
         )
     }
 
@@ -31,38 +36,52 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
         holder.bind(getItem(position))
     }
 
-    class ViewHolder(
-        private val binding: ItemLogBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+    fun setOnDeleteButtonClick(onDeleteButtonClick: (Log) -> Unit) {
+        this.onDeleteButtonClick = onDeleteButtonClick
+    }
 
+    class ViewHolder(
+        private val binding: ItemLogBinding,
+        private val onDeleteButtonClick: (Log) -> Unit
+    ) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
         fun bind(item: Log) {
             binding.apply {
                 log = item
                 order.text = (layoutPosition + 1).toString()
-                module.setTextColor(
-                    when (item.module) {
-                        0 -> root.context.getColorStateList(android.R.color.holo_red_dark)
-                        1 -> root.context.getColorStateList(android.R.color.holo_blue_dark)
-                        2 -> root.context.getColorStateList(android.R.color.holo_green_dark)
-                        3 -> root.context.getColorStateList(android.R.color.holo_orange_dark)
-                        else -> root.context.getColorStateList(android.R.color.holo_red_dark)
-                    }
-                )
+                name.text = item.workName
+                time.text = item.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 status.text = when (item.status) {
                     0 -> "未完成"
-                    1 -> "已完成"
+                    1 -> "完成"
                     else -> "未完成"
                 }
                 status.setTextColor(
                     when (item.status) {
-                        0 -> root.context.getColorStateList(android.R.color.holo_blue_dark)
-                        1 -> root.context.getColorStateList(android.R.color.holo_green_dark)
-                        2 -> root.context.getColorStateList(android.R.color.holo_red_dark)
-                        else -> root.context.getColorStateList(android.R.color.holo_blue_dark)
+                        0 -> R.color.red
+                        1 -> R.color.green
+                        else -> R.color.red
                     }
                 )
-                time.text = item.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                text.text = item.content
+                with(delete) {
+                    clickScale()
+                    setOnClickListener {
+                        onDeleteButtonClick(item)
+                    }
+                }
+                with(spacer) {
+                    clickScale()
+                    setOnClickListener {
+                        if (content.visibility == View.GONE) {
+                            content.visibility = View.VISIBLE
+                            ivSpacer.setImageResource(R.mipmap.item_up)
+                        } else {
+                            content.visibility = View.GONE
+                            ivSpacer.setImageResource(R.mipmap.item_down)
+                        }
+                    }
+                }
                 executePendingBindings()
             }
         }

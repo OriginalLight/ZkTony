@@ -1,7 +1,7 @@
 package com.zktony.www.common.extension
 
-import com.zktony.common.extension.hex2ToInt16
-import com.zktony.common.extension.hexToInt8
+import com.zktony.common.ext.hex2ToInt16
+import com.zktony.common.ext.hexToInt8
 import com.zktony.www.control.serial.protocol.V1
 import com.zktony.www.data.local.room.entity.Motor
 

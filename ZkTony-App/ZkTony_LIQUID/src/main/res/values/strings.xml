@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="ExtraTranslation">
     <string name="about">使用说明</string>
     <string name="actions">程序流程</string>
     <string name="add">添加</string>
@@ -85,15 +85,8 @@
     <string name="wifi_setting">WIFI设置</string>
     <string name="y_motor">Y轴</string>
     <string name="z_motor">Z轴</string>
-    <string name="zero_move">TO 原点</string>
-    <string name="notice">注意事项</string>
     <string name="notice_content">1. 运动机构运行时请不要打开抽屉，以免损坏针头。\n2. 执行程序前请确认有充足的洗涤液。\n3. 程序结束后请及时清理容器，避免滋生微生物等问题。\n4. 请阅读说明书后使用，避免误操作。</string>
     <string name="title_container">容器管理</string>
-    <string name="sample_zone">样品区</string>
-    <string name="wash_zone">洗涤区</string>
-    <string name="elution_zone">洗脱区</string>
-    <string name="row">行</string>
-    <string name="column">列</string>
     <string name="size">规格:</string>
     <string name="move">移动</string>
     <string name="save">保存</string>
@@ -131,4 +124,5 @@
     <string name="wash_time">清洗时间/秒</string>
     <string name="suspend">暂 停</string>
     <string name="needle_space">针头间距</string>
+    <string name="start_time">开始时间</string>
 </resources>

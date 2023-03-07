@@ -8,7 +8,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.extension.removeZero
+import com.zktony.common.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentTecBinding
 import dagger.hilt.android.AndroidEntryPoint

@@ -9,11 +9,7 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-12-15 9:21
  */
 @Dao
-interface ContainerDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(container: Container)
-
+interface ContainerDao : BaseDao<Container> {
     @Query("SELECT * FROM container")
     fun getAll(): Flow<List<Container>>
 

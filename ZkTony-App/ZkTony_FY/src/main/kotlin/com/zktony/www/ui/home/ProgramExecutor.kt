@@ -1,6 +1,6 @@
 package com.zktony.www.ui.home
 
-import com.zktony.common.extension.getTimeFormat
+import com.zktony.common.ext.getTimeFormat
 import com.zktony.common.utils.Queue
 import com.zktony.www.common.app.Settings
 import com.zktony.www.data.local.room.entity.Action

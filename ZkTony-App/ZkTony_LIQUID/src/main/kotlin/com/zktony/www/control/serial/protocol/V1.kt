@@ -1,6 +1,6 @@
 package com.zktony.www.control.serial.protocol
 
-import com.zktony.common.extension.toHex
+import com.zktony.common.ext.toHex
 
 /**
  * @author: 刘贺贺

@@ -11,10 +11,10 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.*
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.extension.afterTextChange
-import com.zktony.common.extension.clickScale
-import com.zktony.common.extension.installApk
-import com.zktony.common.extension.removeZero
+import com.zktony.common.ext.afterTextChange
+import com.zktony.common.ext.clickScale
+import com.zktony.common.ext.installApk
+import com.zktony.common.ext.removeZero
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.common.app.AppViewModel
@@ -124,7 +124,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             with(needleSpace) {
                 setText(appViewModel.settings.value.needleSpace.toString().removeZero())
                 afterTextChange {
-                    viewModel.setNeedleSpace(it.toFloatOrNull() ?: 10f)
+                    viewModel.setNeedleSpace(it.toFloatOrNull() ?: 7.3f)
                 }
             }
             with(setting) {

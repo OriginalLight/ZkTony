@@ -14,7 +14,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.extension.clickScale
+import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.data.local.room.entity.LogData
 import com.zktony.www.databinding.FragmentLogChartBinding

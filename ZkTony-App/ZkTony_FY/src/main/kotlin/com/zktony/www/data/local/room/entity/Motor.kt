@@ -2,8 +2,8 @@ package com.zktony.www.data.local.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.zktony.common.extension.int16ToHex2
-import com.zktony.common.extension.int8ToHex
+import com.zktony.common.ext.int16ToHex2
+import com.zktony.common.ext.int8ToHex
 
 /**
  * @author: 刘贺贺

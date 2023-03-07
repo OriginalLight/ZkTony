@@ -32,7 +32,7 @@ class MotorRepository @Inject constructor(
     suspend fun init() {
         val motors = dao.getAll().firstOrNull()
         if (motors.isNullOrEmpty()) {
-            dao.insertBatch(
+            dao.insertAll(
                 listOf(
                     Motor(id = 0, name = "X轴", address = 1),
                     Motor(id = 1, name = "Y轴", address = 2),

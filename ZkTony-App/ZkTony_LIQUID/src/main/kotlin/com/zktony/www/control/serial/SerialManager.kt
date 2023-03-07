@@ -1,9 +1,9 @@
 package com.zktony.www.control.serial
 
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.extension.hexFormat
-import com.zktony.common.extension.hexToInt8
-import com.zktony.common.extension.verifyHex
+import com.zktony.common.ext.hexFormat
+import com.zktony.common.ext.hexToInt8
+import com.zktony.common.ext.verifyHex
 import com.zktony.common.utils.logd
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial

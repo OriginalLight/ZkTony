@@ -8,7 +8,7 @@ import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.zktony.common.extension.simpleDateFormat
+import com.zktony.common.ext.simpleDateFormat
 import com.zktony.www.data.local.room.entity.Log
 import com.zktony.www.databinding.ItemLogBinding
 

@@ -5,7 +5,7 @@ import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
-import com.zktony.common.extension.getTimeFormat
+import com.zktony.common.ext.getTimeFormat
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.completeDialog
@@ -13,10 +13,10 @@ import com.zktony.www.common.extension.spannerDialog
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
 import com.zktony.www.data.local.room.entity.Hole
-import com.zktony.www.data.local.room.entity.Plate
+import com.zktony.www.data.local.room.entity.Log
 import com.zktony.www.data.local.room.entity.Work
 import com.zktony.www.data.local.room.entity.WorkPlate
-import com.zktony.www.data.repository.PlateRepository
+import com.zktony.www.data.repository.LogRepository
 import com.zktony.www.data.repository.WorkRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -29,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val workRepository: WorkRepository,
-    private val plateRepository: PlateRepository
+    private val logRepository: LogRepository
 ) : BaseViewModel() {
 
     @Inject
@@ -48,11 +48,6 @@ class HomeViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(workList = it, work = it[0])
                         loadPlate(it[0].id)
                     }
-                }
-            }
-            launch {
-                plateRepository.getPlateBySort(4).collect {
-                    _uiState.value = _uiState.value.copy(washPlate = it)
                 }
             }
         }
@@ -213,6 +208,9 @@ class HomeViewModel @Inject constructor(
                         }
                     }
                 }
+                launch {
+                    updateLog(Log(workName = _uiState.value.work?.name ?: "未知程序"))
+                }
                 val executor = WorkExecutor(
                     plateList = _uiState.value.plateList,
                     holeList = _uiState.value.holeList,
@@ -275,6 +273,11 @@ class HomeViewModel @Inject constructor(
                             )
 
                         }
+                        is ExecutorEvent.Log -> {
+                            _uiState.value.log?.let { l ->
+                                updateLog(l.copy(content = l.content + it.log))
+                            }
+                        }
                         is ExecutorEvent.Finish -> {
                             reset()
                             completeDialog(
@@ -283,6 +286,9 @@ class HomeViewModel @Inject constructor(
                                 speed = "${String.format("%.2f", _uiState.value.info.speed)} 孔/分钟",
                             )
                             launch {
+                                _uiState.value.log?.let { l ->
+                                    updateLog(l.copy(status = 1))
+                                }
                                 delay(1000L)
                                 stop()
                             }
@@ -299,6 +305,7 @@ class HomeViewModel @Inject constructor(
         _uiState.value.job?.cancel()
         _uiState.value = _uiState.value.copy(
             job = null,
+            log = null,
             time = 0L,
             info = CurrentInfo().copy(
                 plateSize = if (_uiState.value.plateList.isNotEmpty()) {
@@ -316,13 +323,20 @@ class HomeViewModel @Inject constructor(
         serial.pause(_uiState.value.pause)
     }
 
+    private fun updateLog(log: Log) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(log = log)
+            logRepository.insert(log)
+        }
+    }
+
 }
 
 data class HomeUiState(
     val workList: List<Work> = emptyList(),
     val plateList: List<WorkPlate> = emptyList(),
-    val washPlate: Plate = Plate(),
     val holeList: List<Hole> = emptyList(),
+    val log: Log? = null,
     val work: Work? = null,
     val job: Job? = null,
     val washJob: Job? = null,

@@ -8,9 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.extension.addTouchEvent
-import com.zktony.common.extension.clickScale
-import com.zktony.common.extension.getTimeFormat
+import com.zktony.common.ext.addTouchEvent
+import com.zktony.common.ext.clickScale
+import com.zktony.common.ext.getTimeFormat
 import com.zktony.www.R
 import com.zktony.www.common.extension.total
 import com.zktony.www.common.extension.washDialog

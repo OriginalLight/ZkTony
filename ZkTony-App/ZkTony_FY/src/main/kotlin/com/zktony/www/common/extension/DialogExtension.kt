@@ -18,9 +18,9 @@ import com.kongzue.dialogx.interfaces.OnBindView
 import com.kongzue.dialogx.util.InputInfo
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.app.CommonApplicationProxy
-import com.zktony.common.extension.clickNoRepeat
-import com.zktony.common.extension.createQRCodeBitmap
-import com.zktony.common.extension.isNetworkAvailable
+import com.zktony.common.ext.clickNoRepeat
+import com.zktony.common.ext.createQRCodeBitmap
+import com.zktony.common.ext.isNetworkAvailable
 import com.zktony.common.utils.Constants
 import com.zktony.www.R
 import com.zktony.www.data.remote.model.QrCode

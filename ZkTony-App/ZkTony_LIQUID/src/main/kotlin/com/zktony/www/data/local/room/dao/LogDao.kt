@@ -25,29 +25,10 @@ import java.util.*
  * Data access object to query the database.
  */
 @Dao
-interface LogDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(logRecord: Log)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(log: Log)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun updateBatch(logRecords: List<Log>)
-
+interface LogDao : BaseDao<Log> {
     @Query("DELETE FROM log WHERE julianday('now') - julianday(createTime) >= '180'")
     suspend fun deleteByDate()
 
-    @Delete
-    suspend fun delete(log: Log)
-
-    @Query("SELECT * FROM log ORDER BY createTime DESC LIMIT 20")
+    @Query("SELECT * FROM log ORDER BY createTime DESC LIMIT 40")
     fun getAll(): Flow<List<Log>>
-
-    @Query("SELECT * FROM log WHERE createTime BETWEEN :start AND :end ORDER BY createTime DESC")
-    fun getByDate(start: Date, end: Date): Flow<List<Log>>
-
-    @Query("SELECT * FROM log WHERE upload = 0 LIMIT 20")
-    fun withoutUpload(): Flow<List<Log>>
 }

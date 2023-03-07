@@ -57,7 +57,7 @@ class CalibrationViewModel @Inject constructor(
                 calibrationRepository.update(calibration.copy(enable = 1))
             } else {
                 if (cali.id != calibration.id) {
-                    calibrationRepository.updateBatch(
+                    calibrationRepository.updateAll(
                         listOf(
                             cali.copy(enable = 0),
                             calibration.copy(enable = 1)

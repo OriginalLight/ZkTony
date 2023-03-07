@@ -14,8 +14,8 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnIconChangeCallBack
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.extension.afterTextChange
-import com.zktony.common.extension.clickScale
+import com.zktony.common.ext.afterTextChange
+import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.adapter.ActionAdapter
 import com.zktony.www.data.local.room.entity.ActionEnum

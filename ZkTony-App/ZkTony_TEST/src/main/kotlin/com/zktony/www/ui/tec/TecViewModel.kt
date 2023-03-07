@@ -3,8 +3,8 @@ package com.zktony.www.ui.tec
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
-import com.zktony.common.extension.hexToAscii
-import com.zktony.common.extension.removeZero
+import com.zktony.common.ext.hexToAscii
+import com.zktony.common.ext.removeZero
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel

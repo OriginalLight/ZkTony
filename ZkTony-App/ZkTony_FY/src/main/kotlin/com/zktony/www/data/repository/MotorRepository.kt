@@ -17,10 +17,6 @@ class MotorRepository @Inject constructor(
         dao.insert(motor)
     }
 
-    suspend fun insertBatch(motors: List<Motor>) {
-        dao.insertBatch(motors)
-    }
-
     suspend fun update(motor: Motor) {
         dao.update(motor)
     }
@@ -48,7 +44,7 @@ class MotorRepository @Inject constructor(
                     )
                     motorList.add(motor)
                 }
-                dao.insertBatch(motorList)
+                dao.insertAll(motorList)
             }
         }
     }

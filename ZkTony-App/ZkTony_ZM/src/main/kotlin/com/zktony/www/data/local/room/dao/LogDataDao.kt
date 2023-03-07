@@ -24,10 +24,8 @@ import kotlinx.coroutines.flow.Flow
  * Data access object to query the database.
  */
 @Dao
-interface LogDataDao {
+interface LogDataDao : BaseDao<LogData> {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(logData: LogData)
 
     @Query("DELETE FROM log_data WHERE logId = :id")
     suspend fun deleteByRecordId(id: String)
@@ -43,7 +41,4 @@ interface LogDataDao {
 
     @Query("SELECT * FROM log_data WHERE upload = 0 LIMIT 200")
     fun withoutUpload(): Flow<List<LogData>>
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun updateBatch(logDatas: List<LogData>)
 }

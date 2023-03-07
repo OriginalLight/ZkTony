@@ -11,9 +11,9 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.app.CommonApplicationProxy
 import com.zktony.common.base.BaseViewModel
-import com.zktony.common.extension.installApk
-import com.zktony.common.extension.int8ToHex
-import com.zktony.common.extension.isNetworkAvailable
+import com.zktony.common.ext.installApk
+import com.zktony.common.ext.int8ToHex
+import com.zktony.common.ext.isNetworkAvailable
 import com.zktony.common.http.download.DownloadManager
 import com.zktony.common.http.download.DownloadState
 import com.zktony.common.utils.Constants
