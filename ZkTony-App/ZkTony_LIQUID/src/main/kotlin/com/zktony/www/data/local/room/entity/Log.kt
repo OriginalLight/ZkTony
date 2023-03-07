@@ -27,12 +27,9 @@ import java.util.*
 data class Log(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val programName: String = "",
-    val module: Int = 0,
-    val actions: String = "",
-    // 0: running, 1: success, 2: failed
+    val workName: String = "",
+    val content: String = "",
     val status: Int = 0,
-    // 0: not upload, 1: uploaded
     val upload: Int = 0,
     val createTime: Date = Date(System.currentTimeMillis())
 )
