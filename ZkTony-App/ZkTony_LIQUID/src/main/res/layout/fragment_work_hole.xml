@@ -61,7 +61,7 @@
                 android:layout_weight="1"
                 tools:ignore="MissingConstraints,NestedWeights">
 
-                <com.zktony.www.views.DynamicPlate
+                <com.zktony.common.widget.DynamicPlate
                     android:id="@+id/dynamic_plate"
                     android:layout_width="600dp"
                     android:layout_height="400dp"

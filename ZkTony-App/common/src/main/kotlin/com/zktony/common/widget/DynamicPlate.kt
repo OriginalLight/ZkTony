@@ -1,4 +1,4 @@
-package com.zktony.www.views
+package com.zktony.common.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -8,7 +8,6 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.zktony.www.data.local.room.entity.Hole
 
 
 class DynamicPlate : View {
@@ -23,7 +22,7 @@ class DynamicPlate : View {
     private var color = Color.GREEN
     private var showLocation = false
     private var onItemClick: (Int, Int) -> Unit = { _, _ -> }
-    private var data = listOf<Hole>()
+    private var data = listOf<Triple<Int, Int, Boolean>>()
     private var spacex: Float = 0f
     private var spacey: Float = 0f
 
@@ -48,7 +47,7 @@ class DynamicPlate : View {
         this.onItemClick = onItemClick
     }
 
-    fun setData(data: List<Hole>) {
+    fun setData(data: List<Triple<Int, Int, Boolean>>) {
         this.data = data
         invalidate()
     }
@@ -94,7 +93,7 @@ class DynamicPlate : View {
 
         for (i in 0 until x) {
             for (j in 0 until y) {
-                val hole = data.find { it.x == i && it.y == j && it.checked }
+                val hole = data.find { it.first == i && it.second == j && it.third }
                 if (hole != null) {
                     canvas?.drawCircle(
                         (i + 0.5f) * spacex,

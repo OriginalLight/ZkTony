@@ -46,7 +46,7 @@
             android:textSize="16sp"
             android:layout_weight="2" />
 
-        <com.zktony.common.views.MarqueTextView
+        <com.zktony.common.widget.MarqueTextView
             android:id="@+id/actions"
             android:layout_width="0dp"
             android:layout_height="match_parent"

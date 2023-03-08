@@ -43,7 +43,7 @@ class WorkHoleFragment :
                             }
                             dynamicPlate.run {
                                 setXY(it.plate.column, it.plate.row)
-                                setData(it.holes)
+                                setData(it.holes.map { h -> Triple(h.x, h.y, h.checked)})
                             }
                             selectAll.isEnabled = it.plate.count != it.plate.row * it.plate.column
                             custom.text = "自定义：${if(it.plate.custom == 0) '关' else '开'}"

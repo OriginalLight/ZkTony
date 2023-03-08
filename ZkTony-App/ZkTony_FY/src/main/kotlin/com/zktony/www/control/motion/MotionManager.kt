@@ -55,8 +55,7 @@ class MotionManager(
             }
             serial.sendHex(
                 serial = Serial.TTYS0,
-                hex = V1.complex(data = str1),
-                lock = true
+                hex = V1.complex(data = str1)
             )
             serial.sendHex(
                 serial = Serial.TTYS1,
@@ -64,7 +63,8 @@ class MotionManager(
             )
             serial.sendHex(
                 serial = Serial.TTYS2,
-                hex = V1.complex(data = str3)
+                hex = V1.complex(data = str3),
+                lock = true
             )
         }
     }

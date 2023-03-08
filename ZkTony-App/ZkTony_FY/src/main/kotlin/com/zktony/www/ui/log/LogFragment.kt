@@ -1,6 +1,5 @@
 package com.zktony.www.ui.log
 
-import android.app.DatePickerDialog
 import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -8,16 +7,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.ext.clickScale
-import com.zktony.common.ext.getDayEnd
-import com.zktony.common.ext.getDayStart
-import com.zktony.common.ext.simpleDateFormat
 import com.zktony.www.R
 import com.zktony.www.adapter.LogAdapter
 import com.zktony.www.databinding.FragmentLogBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.util.*
 
 
 @AndroidEntryPoint
@@ -48,46 +42,18 @@ class LogFragment :
                         }
                     }
                 }
-                launch {
-                    viewModel.data.collect {
-                        binding.time.text = it
-                    }
-                }
             }
         }
     }
 
     private fun initView() {
+        adapter.setOnDeleteButtonClick {
+            viewModel.delete(it)
+        }
         binding.apply {
             recycleView.adapter = adapter
-
-            with(time) {
-                clickScale()
-                setOnClickListener {
-                    showDatePickerDialog(Calendar.getInstance())
-                }
-            }
         }
 
-    }
-
-    /**
-     * 日期选择
-     * @param calendar
-     */
-    private fun showDatePickerDialog(calendar: Calendar) {
-        DatePickerDialog(
-            requireActivity(),
-            0,
-            { _, year, monthOfYear, dayOfMonth ->
-                val dateStr = year.toString() + "-" + (monthOfYear + 1) + "-" + dayOfMonth
-                val date = dateStr.simpleDateFormat("yyyy-MM-dd")
-                date?.run { viewModel.changeLogRecord(date.getDayStart(), date.getDayEnd()) }
-            },
-            calendar[Calendar.YEAR],
-            calendar[Calendar.MONTH],
-            calendar[Calendar.DAY_OF_MONTH]
-        ).show()
     }
 
 }

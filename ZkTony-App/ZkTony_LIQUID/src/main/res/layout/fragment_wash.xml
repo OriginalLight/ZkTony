@@ -17,7 +17,7 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <com.zktony.common.views.WashPlate
+            <com.zktony.common.widget.WashPlate
                 android:id="@+id/wash_plate"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

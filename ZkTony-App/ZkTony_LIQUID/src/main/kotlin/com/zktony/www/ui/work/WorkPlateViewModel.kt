@@ -70,5 +70,6 @@ data class WorkPlateUiState(
     val work: Work? = null,
     val plates: List<Plate> = emptyList(),
     val workPlates: List<WorkPlate> = emptyList(),
-    val holes: List<Hole> = emptyList()
+    val holes: List<Hole> = emptyList(),
+    val holeList: List<Triple<Int, Int, Boolean>> = holes.map { Triple(it.x, it.y, it.checked) }
 )

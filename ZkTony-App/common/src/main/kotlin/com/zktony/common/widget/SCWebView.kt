@@ -1,4 +1,4 @@
-package com.zktony.common.views
+package com.zktony.common.widget
 
 import android.annotation.SuppressLint
 import android.content.Context

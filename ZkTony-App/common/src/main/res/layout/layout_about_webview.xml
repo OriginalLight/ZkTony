@@ -27,7 +27,7 @@
 
     </LinearLayout>
 
-    <com.zktony.common.views.SCWebView
+    <com.zktony.common.widget.SCWebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

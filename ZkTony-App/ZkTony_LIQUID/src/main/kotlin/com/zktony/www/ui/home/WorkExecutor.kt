@@ -28,19 +28,19 @@ class WorkExecutor constructor(
     private val motion = MotionManager.instance
     private val serial = SerialManager.instance
     private var complete: Int = 0
-    private val currentHoleList: MutableList<Hole> = mutableListOf()
+    private val currentHoleList: MutableList<Triple<Int, Int, Boolean>> = mutableListOf()
 
     suspend fun execute() {
         scope.launch {
             delay(100L)
-            event(ExecutorEvent.Log("[${currentTime()}]------------- 开始执行任务\n"))
+            event(ExecutorEvent.Log("[ ${currentTime()} ]\t 开始执行任务\n"))
             val total = holeList.total()
             if (total > 0) {
                 for (e in 0..3) {
                     event(ExecutorEvent.Liquid(e))
                     plateList.forEach { plate ->
                         event(ExecutorEvent.Plate(plate))
-                        event(ExecutorEvent.Log("[${currentTime()}]---- ${e + 1}号液体,${plate.sort + 1}号板开始加液\n"))
+                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${e + 1}号液体,${plate.sort + 1}号板开始加液\n"))
                         forEachHole(plate.column, plate.row) { i, j ->
                             val hole =
                                 holeList.find { it.x == i && it.y == j && it.plateId == plate.id }
@@ -53,7 +53,7 @@ class WorkExecutor constructor(
                                     else -> 0f
                                 }
                                 if (hole.checked && volume > 0f) {
-                                    currentHoleList.add(Hole(x = i, y = j, checked = true))
+                                    currentHoleList.add(Triple(i, j, true))
                                     event(ExecutorEvent.HoleList(currentHoleList))
                                     while (serial.lock.value || serial.pause.value) {
                                         delay(100)
@@ -87,7 +87,7 @@ class WorkExecutor constructor(
                 }
             }
             event(ExecutorEvent.Finish)
-            event(ExecutorEvent.Log("[${currentTime()}]------------- 任务执行完毕"))
+            event(ExecutorEvent.Log("[ ${currentTime()} ]\t 任务执行完毕"))
         }
     }
 
@@ -110,7 +110,7 @@ class WorkExecutor constructor(
 sealed class ExecutorEvent {
     data class Plate(val plate: WorkPlate) : ExecutorEvent()
     data class Liquid(val liquid: Int) : ExecutorEvent()
-    data class HoleList(val hole: List<Hole>) : ExecutorEvent()
+    data class HoleList(val hole: List<Triple<Int, Int, Boolean>>) : ExecutorEvent()
     data class Progress(val total: Int, val complete: Int) : ExecutorEvent()
     data class Log(val log: String) : ExecutorEvent()
     object Finish : ExecutorEvent()

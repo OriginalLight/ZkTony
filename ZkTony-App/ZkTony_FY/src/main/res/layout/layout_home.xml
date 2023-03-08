@@ -43,7 +43,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:rippleColor="@color/purple_700" />
 
-            <com.zktony.common.views.MarqueTextView
+            <com.zktony.common.widget.MarqueTextView
                 android:id="@+id/actions"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

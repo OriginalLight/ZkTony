@@ -17,7 +17,7 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <com.zktony.www.views.DynamicPlate
+            <com.zktony.common.widget.DynamicPlate
                 android:id="@+id/dynamic_plate"
                 android:layout_width="600dp"
                 android:layout_height="400dp"

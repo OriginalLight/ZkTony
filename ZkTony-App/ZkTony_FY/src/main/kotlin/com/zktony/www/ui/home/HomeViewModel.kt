@@ -191,45 +191,53 @@ class HomeViewModel @Inject constructor(
                     actionQueue.enqueue(it)
                 }
                 // 创建程序执行者
-                val runner = ProgramExecutor(
+                val executor = ProgramExecutor(
                     queue = actionQueue, module = module, settings = appViewModel.settings.value
                 )
                 // 收集执行者的状态
-                launch {
-                    runner.event.collect {
-                        when (it) {
-                            is ActionEvent.CurrentAction -> {
-                                state.value = state.value.copy(
-                                    action = getActionEnum(it.action.mode).value
-                                )
+                executor.event = {
+                    when (it) {
+                        is ExecutorEvent.CurrentAction -> {
+                            state.value = state.value.copy(
+                                action = getActionEnum(it.action.mode).value
+                            )
+                        }
+                        is ExecutorEvent.Time -> {
+                            state.value = state.value.copy(time = it.time)
+                        }
+                        is ExecutorEvent.Finish -> {
+                            state.value.log?.let { log ->
+                                updateLog(module, log.copy(status = 1))
                             }
-                            is ActionEvent.Time -> {
-                                state.value = state.value.copy(time = it.time)
-                            }
-                            is ActionEvent.Finish -> {
-                                state.value.log?.let { log ->
-                                    logRepository.update(log.copy(status = 1))
-                                }
+                            launch {
+                                delay(500L)
                                 state.value = state.value.copy(
                                     status = "已完成", time = "已完成", log = null
                                 )
+                                delay(100L)
                                 stop(it.module)
                             }
-                            is ActionEvent.Count -> {
-                                state.value = state.value.copy(
-                                    action = if (state.value.action.startsWith(
-                                            "洗涤"
-                                        )
-                                    ) "洗涤 X${it.count}" else state.value.action
-                                )
-                            }
-                            is ActionEvent.Wait -> {
-                                state.value = state.value.copy(time = it.msg)
+                        }
+                        is ExecutorEvent.Count -> {
+                            state.value = state.value.copy(
+                                action = if (state.value.action.startsWith(
+                                        "洗涤"
+                                    )
+                                ) "洗涤 X${it.count}" else state.value.action
+                            )
+                        }
+                        is ExecutorEvent.Wait -> {
+                            state.value = state.value.copy(time = it.msg)
+                        }
+                        is ExecutorEvent.Log -> {
+                            val log = state.value.log
+                            log?.let {l ->
+                                updateLog(module, l.copy(content = l.content + it.msg))
                             }
                         }
                     }
                 }
-                runner.run()
+                executor.executor()
             }
             // 更新状态中的job
             launch {
@@ -237,9 +245,8 @@ class HomeViewModel @Inject constructor(
                 state.value.job?.cancel()
                 // 创建日志
                 val log = Log(
-                    programName = state.value.program!!.name,
+                    programName = state.value.program?.name ?: "None",
                     module = module,
-                    actions = state.value.program!!.actions,
                 )
                 logRepository.insert(log)
                 // 更新状态中的job和日志
@@ -264,14 +271,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             // 获取对应模块的状态
             val state = flow(module)
-            state.value.run {
-                // 取消协程
-                job?.cancel()
-                // 非正常停止删除日志
-                log?.let { log ->
-                    logRepository.delete(log)
-                }
-            }
+            state.value.job?.cancel()
             // 更新状态
             state.value = state.value.copy(
                 job = null,
@@ -360,6 +360,14 @@ class HomeViewModel @Inject constructor(
             serial.sendHex(
                 serial = TTYS0, hex = V1.closeLock()
             )
+        }
+    }
+
+    private fun updateLog(module: Int, log: Log) {
+        viewModelScope.launch {
+            val state = flow(module)
+            state.value = state.value.copy(log = log)
+            logRepository.insert(log)
         }
     }
 }

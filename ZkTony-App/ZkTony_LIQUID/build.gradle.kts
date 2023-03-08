@@ -75,7 +75,6 @@ android {
 }
 
 dependencies {
-    implementation(fileTree("dir" to "libs", "include" to listOf("*.jar", "*.aar")))
     implementation(project(mapOf("path" to ":common")))
     implementation(project(mapOf("path" to ":serialport")))
     implementation(libs.androidx.activity.ktx)
@@ -91,7 +90,6 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.datastore.preferences)
     implementation(libs.dialogx)
-    implementation(libs.gson)
     implementation(libs.hilt.android)
     implementation(libs.hilt.work)
     implementation(libs.material)

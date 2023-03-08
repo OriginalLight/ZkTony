@@ -115,5 +115,5 @@ class WorkHoleViewModel @Inject constructor(
 
 data class WorkHoleUiState(
     val plate: WorkPlate? = null,
-    val holes: List<Hole> = emptyList()
+    val holes: List<Hole> = emptyList(),
 )

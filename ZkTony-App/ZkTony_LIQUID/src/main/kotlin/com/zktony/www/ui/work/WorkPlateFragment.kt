@@ -39,7 +39,7 @@ class WorkPlateFragment :
                             val holes = it.holes.filter { hole -> hole.plateId == workPlate?.id }
                             if (workPlate != null) {
                                 setXY(workPlate.column, workPlate.row)
-                                setData(holes)
+                                setData(holes.map { h -> Triple(h.x, h.y, h.checked)})
                                 holeOne.text = holes.filter { hole -> hole.checked }.size.toString()
                             } else {
                                 val plate = it.plates.find { plate -> plate.sort == 0 }
@@ -55,7 +55,7 @@ class WorkPlateFragment :
                             val holes = it.holes.filter { hole -> hole.plateId == workPlate?.id }
                             if (workPlate != null) {
                                 setXY(workPlate.column, workPlate.row)
-                                setData(holes)
+                                setData(holes.map { h -> Triple(h.x, h.y, h.checked)})
                                 holeTwo.text = holes.filter { hole -> hole.checked }.size.toString()
                             } else {
                                 val plate = it.plates.find { plate -> plate.sort == 1 }
@@ -71,7 +71,7 @@ class WorkPlateFragment :
                             val holes = it.holes.filter { hole -> hole.plateId == workPlate?.id }
                             if (workPlate != null) {
                                 setXY(workPlate.column, workPlate.row)
-                                setData(holes)
+                                setData(holes.map { h -> Triple(h.x, h.y, h.checked)})
                                 holeThree.text = holes.filter { hole -> hole.checked }.size.toString()
                             } else {
                                 val plate = it.plates.find { plate -> plate.sort == 2 }
@@ -87,7 +87,7 @@ class WorkPlateFragment :
                             val holes = it.holes.filter { hole -> hole.plateId == workPlate?.id }
                             if (workPlate != null) {
                                 setXY(workPlate.column, workPlate.row)
-                                setData(holes)
+                                setData(holes.map { h -> Triple(h.x, h.y, h.checked)})
                                 holeFour.text = holes.filter { hole -> hole.checked }.size.toString()
                             } else {
                                 val plate = it.plates.find { plate -> plate.sort == 3 }

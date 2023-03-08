@@ -118,4 +118,5 @@
     <string name="y_motor">Y轴</string>
     <string name="z_motor">Z轴</string>
     <string name="a">A</string>
+    <string name="start_time">开始时间</string>
 </resources>

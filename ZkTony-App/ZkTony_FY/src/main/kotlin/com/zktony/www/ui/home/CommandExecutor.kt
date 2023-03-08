@@ -7,8 +7,6 @@ import com.zktony.www.control.serial.protocol.V1
 import com.zktony.www.data.local.room.entity.Action
 import com.zktony.www.data.local.room.entity.Container
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * @author: 刘贺贺
@@ -19,12 +17,9 @@ class CommandExecutor constructor(
     private val manager: MotionManager = MotionManager.instance,
     private val module: Int,
     private val con: Container,
+    private val event: (String) -> Unit = { }
 ) {
     private lateinit var action: Action
-
-
-    private val _wait = MutableStateFlow("等待中")
-    val wait = _wait.asStateFlow()
 
     fun initAction(action: Action) {
         this.action = action
@@ -44,6 +39,11 @@ class CommandExecutor constructor(
                 temp = action.temperature.toString()
             )
             addLiquid(y = con.blockY, z = con.blockZ)
+            event("加液中")
+            delay(100L)
+            while (serial.lock.value) {
+                delay(20L)
+            }
             block.invoke()
         }
     }
@@ -62,6 +62,11 @@ class CommandExecutor constructor(
                 temp = action.temperature.toString()
             )
             addLiquid(y = con.oneY, z = con.oneZ)
+            event("加液中")
+            delay(100L)
+            while (serial.lock.value) {
+                delay(20L)
+            }
             block.invoke()
         }
     }
@@ -75,6 +80,11 @@ class CommandExecutor constructor(
         delay(500L)
         waitForFree {
             recycleLiquid(y = con.oneY, z = con.recycleOneZ)
+            event("回收中")
+            delay(100L)
+            while (serial.lock.value) {
+                delay(20L)
+            }
             block.invoke()
         }
     }
@@ -93,6 +103,11 @@ class CommandExecutor constructor(
                 temp = action.temperature.toString()
             )
             addLiquid(y = con.twoY, z = con.twoZ)
+            event("加液中")
+            delay(100L)
+            while (serial.lock.value) {
+                delay(20L)
+            }
             block.invoke()
         }
     }
@@ -112,6 +127,11 @@ class CommandExecutor constructor(
             )
             // 主板运动
             addLiquid(y = con.washY, z = con.washZ)
+            event("加液中")
+            delay(100L)
+            while (serial.lock.value) {
+                delay(20L)
+            }
             block.invoke()
         }
     }
@@ -126,6 +146,11 @@ class CommandExecutor constructor(
         delay(500L)
         waitForFree {
             recycleLiquid(y = con.washY, z = con.wasteZ)
+            event("清理中")
+            delay(100L)
+            while (serial.lock.value) {
+                delay(20L)
+            }
             block.invoke()
         }
     }
@@ -181,18 +206,18 @@ class CommandExecutor constructor(
      * @param block suspend () -> Unit 代码块
      */
     private suspend fun waitForFree(block: suspend () -> Unit) {
-        if (!serial.lock.value) {
-            if (!serial.drawer.value) {
-                block.invoke()
-            } else {
-                _wait.value = "抽屉未关闭"
-                delay(300L)
-                waitForFree(block)
-            }
-        } else {
-            _wait.value = "等待加液"
-            delay(300L)
+        if (serial.drawer.value) {
+            event("抽屉未关闭")
+            delay(1000L)
             waitForFree(block)
+        } else {
+            if (serial.lock.value) {
+                event("等待中")
+                delay(1000L)
+                waitForFree(block)
+            } else {
+                block.invoke()
+            }
         }
     }
 }

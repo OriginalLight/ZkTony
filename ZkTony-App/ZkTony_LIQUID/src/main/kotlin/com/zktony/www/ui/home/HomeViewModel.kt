@@ -348,7 +348,7 @@ data class HomeUiState(
 data class CurrentInfo(
     val plate: String = "/",
     val plateSize: Pair<Int, Int> = Pair(8, 12),
-    val holeList: List<Hole> = emptyList(),
+    val holeList: List<Triple<Int, Int, Boolean>> = emptyList(),
     val liquid: String = "/",
     val speed: Float = 0f,
     val lastTime: Long = 0L,
