@@ -1,76 +1,53 @@
 package com.zktony.common.http.download
 
-import android.annotation.SuppressLint
-import android.app.DownloadManager
-import android.content.Context.DOWNLOAD_SERVICE
-import androidx.core.net.toUri
-import com.zktony.common.app.CommonApplicationProxy
+import com.zktony.common.ext.copyTo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import java.io.File
-import java.util.concurrent.Executors
-
+import java.io.IOException
 
 /**
- * A class that manages downloads.
+ * @author: 刘贺贺
+ * @date: 2022-09-22 17:20
  */
 object DownloadManager {
+    fun download(url: String, file: File): Flow<DownloadState> {
+        return flow {
+            val request = Request.Builder().url(url).get().build()
+            val response = OkHttpClient.Builder().build().newCall(request).execute()
+            if (response.isSuccessful) {
+                response.body.let { body ->
+                    //文件大小
+                    val totalLength = body.contentLength().toDouble()
+                    //写文件
+                    file.outputStream().run {
+                        val input = body.byteStream()
+                        input.copyTo(this) { currentLength ->
+                            //当前下载进度
+                            val process = currentLength / totalLength * 100
+                            emit(DownloadState.Progress(process.toInt()))
+                        }
+                    }
 
-    private val fixedThreadPool = Executors.newFixedThreadPool(3)
-
-    /**
-     * Starts a download.
-     *
-     * @param url the URL to download
-     * @param listener a listener to receive notifications about the download
-     */
-    @SuppressLint("ServiceCast", "Range")
-    fun startDownload(url: String, listener: DownloadListener) {
-        // get the download manager
-        val downloadManager =
-            CommonApplicationProxy.application.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
-
-        // create a request for the download
-        val request = DownloadManager.Request(url.toUri())
-        val fileName = url.substring(url.lastIndexOf("/") + 1)
-        // if exists, overwrite
-        request.setDestinationInExternalFilesDir(
-            CommonApplicationProxy.application,
-            null,
-            fileName
-        )
-        val downloadId = downloadManager.enqueue(request)
-
-        fixedThreadPool.execute {
-            var downloading = true
-            while (downloading) {
-                val query = DownloadManager.Query()
-                query.setFilterById(downloadId)
-                val cursor = downloadManager.query(query)
-                cursor.moveToFirst()
-                val bytesDownloaded =
-                    cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
-                val bytesTotal =
-                    cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
-                listener.onProgress(bytesDownloaded, bytesTotal)
-
-                val status = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS))
-
-                if (status == DownloadManager.STATUS_FAILED) {
-                    downloading = false
-                    downloadManager.remove(downloadId)
-                    listener.onError(Exception("Download failed"))
+                    emit(DownloadState.Success(file))
                 }
-
-                if (status == DownloadManager.STATUS_SUCCESSFUL) {
-                    downloading = false
-                    listener.onComplete(
-                        File(
-                            CommonApplicationProxy.application.getExternalFilesDir(null),
-                            fileName
-                        )
-                    )
-                }
-                cursor.close()
+            } else {
+                throw IOException(response.toString())
             }
-        }
+        }.catch {
+            file.delete()
+            emit(DownloadState.Err(it))
+        }.flowOn(Dispatchers.IO)
     }
+}
+
+sealed class DownloadState {
+    data class Progress(val progress: Int) : DownloadState()
+    data class Err(val t: Throwable) : DownloadState()
+    data class Success(val file: File) : DownloadState()
 }
