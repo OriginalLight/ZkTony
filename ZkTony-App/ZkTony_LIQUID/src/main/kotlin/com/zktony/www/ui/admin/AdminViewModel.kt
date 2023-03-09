@@ -14,8 +14,8 @@ import com.zktony.common.base.BaseViewModel
 import com.zktony.common.ext.installApk
 import com.zktony.common.ext.int8ToHex
 import com.zktony.common.ext.isNetworkAvailable
+import com.zktony.common.http.download.DownloadListener
 import com.zktony.common.http.download.DownloadManager
-import com.zktony.common.http.download.DownloadState
 import com.zktony.common.utils.Constants
 import com.zktony.serialport.util.Serial
 import com.zktony.www.BuildConfig
@@ -153,28 +153,25 @@ class AdminViewModel @Inject constructor(
     fun doRemoteUpdate(application: Application) {
         viewModelScope.launch {
             PopTip.show("开始下载")
-            DownloadManager.download(
-                application.download_url,
-                File(CommonApplicationProxy.application.getExternalFilesDir(null), "update.apk")
-            ).collect {
-                when (it) {
-                    is DownloadState.Success -> {
-                        _progress.value = 0
-                        CommonApplicationProxy.application.installApk(it.file)
+            DownloadManager.startDownload(
+                url = application.download_url,
+                listener = object : DownloadListener {
+                    override fun onProgress(bytesDownloaded: Int, bytesTotal: Int) {
+                        _progress.value = (bytesDownloaded * 100 / bytesTotal)
                     }
 
-                    is DownloadState.Err -> {
+                    override fun onComplete(file: File) {
+                        _progress.value = 0
+                        CommonApplicationProxy.application.installApk(file)
+                    }
+
+                    override fun onError(e: Exception) {
                         _progress.value = 0
                         PopTip.show("下载失败,请重试!").showLong()
                     }
-
-                    is DownloadState.Progress -> {
-                        _progress.value = it.progress
-                    }
                 }
-            }
+            )
         }
-
     }
 
     /**
