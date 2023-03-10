@@ -16,11 +16,12 @@
 
 package com.zktony.manager.data.repository
 
+import com.zktony.manager.BuildConfig
 import com.zktony.manager.data.remote.service.ApplicationService
 import javax.inject.Inject
 
 class ApplicationRepository @Inject constructor(
     private val service: ApplicationService
 ) {
-    fun getById(id: String = "com.zktony.www.zm.debug") = service.getById(id)
+    fun getById(id: String = BuildConfig.APPLICATION_ID) = service.getById(id)
 }

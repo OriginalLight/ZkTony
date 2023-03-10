@@ -23,13 +23,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.layout.DisplayFeature
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
-import com.zktony.manager.data.remote.model.Customer
-import com.zktony.manager.data.remote.model.Equipment
-import com.zktony.manager.ui.screen.page.*
+import com.zktony.manager.ui.screen.page.HomePage
+import com.zktony.manager.ui.screen.viewmodel.HomePageEnum
+import com.zktony.manager.ui.screen.viewmodel.HomeUiState
+import com.zktony.manager.ui.screen.viewmodel.HomeViewModel
 import com.zktony.manager.ui.utils.ContentType
 
 // region HomeScreen
@@ -44,13 +46,14 @@ fun HomeScreen(
 
     if (contentType == ContentType.SINGLE_PANE) {
         HomeScreenSinglePane(
-            uiState = uiState, viewModel = viewModel
+            uiState = uiState,
+            navigateTo = viewModel::navigateTo,
         )
     } else {
         HomeScreenDualPane(
             uiState = uiState,
-            viewModel = viewModel,
             displayFeatures = displayFeatures,
+            navigateTo = viewModel::navigateTo,
         )
     }
 
@@ -62,75 +65,36 @@ fun HomeScreen(
 fun HomeScreenSinglePane(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
-    viewModel: HomeViewModel,
+    navigateTo: (HomePageEnum) -> Unit,
 ) {
-    val shipping by viewModel.shipping.collectAsStateWithLifecycle()
 
     AnimatedVisibility(
-        visible = uiState.page == HomePage.HOME,
+        visible = uiState.page == HomePageEnum.HOME,
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
         HomePage(
-            modifier = modifier,
-            navigateTo = viewModel::navigateTo
-        )
-    }
-    AnimatedVisibility(
-        visible = uiState.page == HomePage.SHIPPING,
-        enter = expandHorizontally(),
-        exit = shrinkHorizontally()
-    ) {
-        ShippingPage(
-            modifier = modifier,
-            uiState = shipping,
-            navigateTo = viewModel::navigateTo,
-            softwareChange = { viewModel.setSoftware(it) },
-            searchCustomer = { viewModel.searchCustomer() },
-            searchEquipment = { viewModel.searchEquipment() },
-            searchReqChange = { viewModel.searchReqChange(it) },
-            productChange = { viewModel.productChange(it) },
-            saveShipping = { viewModel.saveShipping() },
+            modifier = modifier, navigateTo = navigateTo
         )
     }
 
     AnimatedVisibility(
-        visible = (uiState.page == HomePage.SOFTWARE_MODIFY),
+        visible = uiState.page == HomePageEnum.SHIPPING,
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
-        SoftwareModifyPage(software = shipping.software,
-            navigateTo = viewModel::navigateTo,
-            softwareChange = { viewModel.setSoftware(it) })
-    }
-
-    AnimatedVisibility(
-        visible = uiState.page == HomePage.CUSTOMER_MODIFY,
-        enter = expandHorizontally(),
-        exit = shrinkHorizontally()
-    ) {
-        CustomerModifyPage(
-            customer = if (shipping.customer == null) Customer(
-                create_by = shipping.user?.name ?: ""
-            ) else shipping.customer!!,
-            navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
-            isAdd = shipping.customer == null,
-            onDone = { viewModel.saveCustomer(it, shipping.customer == null) }
+        ShippingScreen(
+            navigateTo = navigateTo, viewModel = hiltViewModel()
         )
     }
 
     AnimatedVisibility(
-        visible = uiState.page == HomePage.EQUIPMENT_MODIFY,
+        visible = uiState.page == HomePageEnum.SHIPPING_HISTORY,
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
-        EquipmentModifyPage(
-            equipment = if (shipping.equipment == null) Equipment(
-                create_by = shipping.user?.name ?: ""
-            ) else shipping.equipment!!,
-            navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
-            isAdd = shipping.equipment == null,
-            onDone = { viewModel.saveEquipment(it, shipping.equipment == null) }
+        ShippingHistoryScreen(
+            navigateTo = navigateTo, viewModel = hiltViewModel()
         )
     }
 }
@@ -142,73 +106,32 @@ fun HomeScreenDualPane(
     modifier: Modifier = Modifier,
     displayFeatures: List<DisplayFeature>,
     uiState: HomeUiState,
-    viewModel: HomeViewModel
+    navigateTo: (HomePageEnum) -> Unit,
 ) {
     TwoPane(
         first = {
             HomePage(
-                modifier = modifier,
-                navigateTo = viewModel::navigateTo
+                modifier = modifier, navigateTo = navigateTo
             )
         },
         second = {
-            val shipping by viewModel.shipping.collectAsStateWithLifecycle()
-
             AnimatedVisibility(
-                visible = (uiState.page == HomePage.SHIPPING || uiState.page == HomePage.HOME),
+                visible = (uiState.page == HomePageEnum.SHIPPING || uiState.page == HomePageEnum.HOME),
                 enter = expandHorizontally(),
                 exit = shrinkHorizontally()
             ) {
-                ShippingPage(
-                    modifier = modifier,
-                    uiState = shipping,
-                    navigateTo = viewModel::navigateTo,
-                    softwareChange = { viewModel.setSoftware(it) },
-                    searchCustomer = { viewModel.searchCustomer() },
-                    searchEquipment = { viewModel.searchEquipment() },
-                    searchReqChange = { viewModel.searchReqChange(it) },
-                    productChange = { viewModel.productChange(it) },
-                    saveShipping = { viewModel.saveShipping() },
+                ShippingScreen(
+                    navigateTo = navigateTo, viewModel = hiltViewModel(), isDualPane = true
                 )
             }
 
             AnimatedVisibility(
-                visible = (uiState.page == HomePage.SOFTWARE_MODIFY),
+                visible = (uiState.page == HomePageEnum.SHIPPING_HISTORY),
                 enter = expandHorizontally(),
                 exit = shrinkHorizontally()
             ) {
-                SoftwareModifyPage(software = shipping.software,
-                    navigateTo = viewModel::navigateTo,
-                    softwareChange = { viewModel.setSoftware(it) })
-            }
-
-            AnimatedVisibility(
-                visible = uiState.page == HomePage.CUSTOMER_MODIFY,
-                enter = expandHorizontally(),
-                exit = shrinkHorizontally()
-            ) {
-                CustomerModifyPage(
-                    customer = if (shipping.customer == null) Customer(
-                        create_by = shipping.user?.name ?: ""
-                    ) else shipping.customer!!,
-                    navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
-                    isAdd = shipping.customer == null,
-                    onDone = { viewModel.saveCustomer(it, shipping.customer == null) }
-                )
-            }
-
-            AnimatedVisibility(
-                visible = uiState.page == HomePage.EQUIPMENT_MODIFY,
-                enter = expandHorizontally(),
-                exit = shrinkHorizontally()
-            ) {
-                EquipmentModifyPage(
-                    equipment = if (shipping.equipment == null) Equipment(
-                        create_by = shipping.user?.name ?: ""
-                    ) else shipping.equipment!!,
-                    navigateTo = { viewModel.navigateTo(HomePage.SHIPPING) },
-                    isAdd = shipping.equipment == null,
-                    onDone = { viewModel.saveEquipment(it, shipping.customer == null) }
+                ShippingHistoryScreen(
+                    navigateTo = navigateTo, viewModel = hiltViewModel(), isDualPane = true
                 )
             }
         },

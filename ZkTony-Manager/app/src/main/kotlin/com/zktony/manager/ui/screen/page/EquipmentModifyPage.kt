@@ -40,12 +40,12 @@ import com.zktony.manager.ui.components.ManagerAppBar
 fun EquipmentModifyPage(
     modifier: Modifier = Modifier,
     equipment: Equipment,
-    navigateTo: () -> Unit,
     isAdd: Boolean,
     onDone: (Equipment) -> Unit,
+    onBack: () -> Unit,
 ) {
     BackHandler {
-        navigateTo()
+        onBack()
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -56,7 +56,7 @@ fun EquipmentModifyPage(
     Column {
         ManagerAppBar(title = stringResource(id = R.string.page_customer_title),
             isFullScreen = true,
-            onBack = { navigateTo() })
+            onBack = { onBack() })
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -252,7 +252,7 @@ fun EquipmentModifyPage(
                             ),
                             keyboardActions = KeyboardActions(onDone = {
                                 keyboardController?.hide()
-                                navigateTo()
+                                onBack()
                                 onDone(temp)
                             }),
                             maxLines = 10,
@@ -265,7 +265,7 @@ fun EquipmentModifyPage(
                             .fillMaxWidth()
                             .padding(top = 16.dp),
                             onClick = {
-                                navigateTo()
+                                onBack()
                                 onDone(temp)
                             }) {
                             Text(text = if (isAdd) "添加" else "修改")
@@ -287,6 +287,6 @@ fun EquipmentModifyPagePreview() {
         equipment = Equipment(),
         isAdd = true,
         onDone = {},
-        navigateTo = {},
+        onBack = {},
     )
 }

@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.zktony.manager.R
 import com.zktony.manager.data.remote.model.Software
 import com.zktony.manager.ui.components.ManagerAppBar
-import com.zktony.manager.ui.screen.HomePage
 
 /**
  * @author: 刘贺贺
@@ -36,11 +35,11 @@ import com.zktony.manager.ui.screen.HomePage
 fun SoftwareModifyPage(
     modifier: Modifier = Modifier,
     software: Software,
-    navigateTo: (HomePage) -> Unit,
     softwareChange: (Software) -> Unit,
+    onBack: () -> Unit,
 ) {
     BackHandler {
-        navigateTo(HomePage.SHIPPING)
+        onBack()
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -50,7 +49,8 @@ fun SoftwareModifyPage(
     Column {
         ManagerAppBar(title = stringResource(id = R.string.page_software_title),
             isFullScreen = true,
-            onBack = { navigateTo(HomePage.SHIPPING) })
+            onBack = { onBack() }
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -143,7 +143,7 @@ fun SoftwareModifyPage(
                 ),
                 keyboardActions = KeyboardActions(onDone = {
                     keyboardController?.hide()
-                    navigateTo(HomePage.SHIPPING)
+                    onBack()
                 }),
                 maxLines = 10,
                 singleLine = false,
@@ -173,7 +173,7 @@ fun SoftwareModifyPage(
                 Button(modifier = Modifier
                     .weight(1f)
                     .padding(top = 16.dp), onClick = {
-                    navigateTo(HomePage.SHIPPING)
+                    onBack()
                 }) {
                     Text(text = "完成")
                 }
@@ -196,7 +196,7 @@ fun SoftwareModifyPagePreview() {
             build_type = "debug",
             remarks = "备注说明"
         ),
-        navigateTo = {},
-        softwareChange = {}
+        softwareChange = {},
+        onBack = {}
     )
 }

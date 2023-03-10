@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.zktony.manager.R
 import com.zktony.manager.ui.components.FunctionCard
 import com.zktony.manager.ui.components.ManagerAppBar
-import com.zktony.manager.ui.screen.HomePage
+import com.zktony.manager.ui.screen.viewmodel.HomePageEnum
 
 /**
  * @author: 刘贺贺
@@ -28,7 +28,7 @@ import com.zktony.manager.ui.screen.HomePage
 @Composable
 fun HomePage(
     modifier: Modifier = Modifier,
-    navigateTo: (HomePage) -> Unit
+    navigateTo: (HomePageEnum) -> Unit
 ) {
     ManagerAppBar(
         title = stringResource(id = R.string.screen_home_title),
@@ -45,7 +45,7 @@ fun HomePage(
             title = stringResource(id = R.string.page_shipping_title),
             subtitle = stringResource(id = R.string.page_shipping_subtitle),
             icon = Icons.Outlined.LocalShipping,
-            onClick = { navigateTo(HomePage.SHIPPING) },
+            onClick = { navigateTo(HomePageEnum.SHIPPING) },
             shape = RoundedCornerShape(
                 topStart = 16.dp, topEnd = 16.dp, bottomStart = 0.dp, bottomEnd = 0.dp
             ),
@@ -58,7 +58,7 @@ fun HomePage(
         FunctionCard(title = stringResource(id = R.string.page_shipping_history_title),
             subtitle = stringResource(id = R.string.page_shipping_history_subtitle),
             icon = Icons.Outlined.History,
-            onClick = { navigateTo(HomePage.SHIPPING_HISTORY) })
+            onClick = { navigateTo(HomePageEnum.SHIPPING_HISTORY) })
         Divider(
             modifier = Modifier
                 .fillMaxWidth()
@@ -67,7 +67,7 @@ fun HomePage(
         FunctionCard(title = stringResource(id = R.string.page_after_sale_title),
             subtitle = stringResource(id = R.string.page_after_sale_subtitle),
             icon = Icons.Outlined.Shop,
-            onClick = { navigateTo(HomePage.AFTER_SALE) })
+            onClick = { navigateTo(HomePageEnum.AFTER_SALE) })
         Divider(
             modifier = Modifier
                 .fillMaxWidth()
@@ -77,7 +77,7 @@ fun HomePage(
             title = stringResource(id = R.string.page_after_sale_history_title),
             subtitle = stringResource(id = R.string.page_after_sale_history_subtitle),
             icon = Icons.Outlined.History,
-            onClick = { navigateTo(HomePage.AFTER_SALE_HISTORY) },
+            onClick = { navigateTo(HomePageEnum.AFTER_SALE_HISTORY) },
             shape = RoundedCornerShape(
                 topStart = 0.dp, topEnd = 0.dp, bottomStart = 16.dp, bottomEnd = 16.dp
             ),

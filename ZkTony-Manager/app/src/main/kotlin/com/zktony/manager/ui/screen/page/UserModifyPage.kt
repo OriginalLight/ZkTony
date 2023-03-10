@@ -23,8 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zktony.manager.data.local.model.User
 import com.zktony.manager.ui.components.ManagerAppBar
-import com.zktony.manager.ui.screen.SettingPage
-import com.zktony.manager.ui.screen.SettingUiState
+import com.zktony.manager.ui.screen.viewmodel.SettingPage
+import com.zktony.manager.ui.screen.viewmodel.SettingUiState
 
 /**
  * @author: 刘贺贺
@@ -39,6 +39,7 @@ fun UserModifyPage(
     uiState: SettingUiState,
     navigateTo: (SettingPage) -> Unit,
     onUserChange: (User) -> Unit,
+    onSaveUser: () -> Unit,
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -141,8 +142,6 @@ fun UserModifyPage(
         ) {
             Text(text = "完成")
         }
-
-
     }
 }
 // endregion
@@ -155,6 +154,7 @@ fun UserModifyPagePreview() {
         uiState = SettingUiState(),
         navigateTo = {},
         onUserChange = {},
+        onSaveUser = {},
     )
 }
 // endregion

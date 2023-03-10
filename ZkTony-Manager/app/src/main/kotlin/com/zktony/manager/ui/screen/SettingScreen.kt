@@ -28,6 +28,8 @@ import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
 import com.zktony.manager.ui.screen.page.SettingPage
 import com.zktony.manager.ui.screen.page.UserModifyPage
+import com.zktony.manager.ui.screen.viewmodel.SettingUiState
+import com.zktony.manager.ui.screen.viewmodel.SettingViewModel
 import com.zktony.manager.ui.utils.ContentType
 
 // region: SettingScreen
@@ -66,7 +68,7 @@ fun SettingScreenSinglePane(
     viewModel: SettingViewModel,
 ) {
     AnimatedVisibility(
-        visible = uiState.page == SettingPage.SETTING,
+        visible = uiState.page == com.zktony.manager.ui.screen.viewmodel.SettingPage.SETTING,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = shrinkHorizontally { it }
     ) {
@@ -74,10 +76,11 @@ fun SettingScreenSinglePane(
             modifier = modifier,
             uiState = uiState,
             navigateTo = viewModel::navigateTo,
+            doUpdate = viewModel::update,
         )
     }
     AnimatedVisibility(
-        visible = uiState.page == SettingPage.USER_MODIFY,
+        visible = uiState.page == com.zktony.manager.ui.screen.viewmodel.SettingPage.USER_MODIFY,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = shrinkHorizontally { it }
     ) {
@@ -85,8 +88,8 @@ fun SettingScreenSinglePane(
             uiState = uiState,
             navigateTo = viewModel::navigateTo,
             onUserChange = viewModel::onUserChange,
+            onSaveUser = viewModel::saveUser,
         )
-
     }
 
 }
@@ -113,6 +116,7 @@ fun SettingScreenDualPane(
                 uiState = uiState,
                 navigateTo = viewModel::navigateTo,
                 onUserChange = viewModel::onUserChange,
+                onSaveUser = viewModel::saveUser,
             )
         },
         strategy = HorizontalTwoPaneStrategy(splitFraction = 0.5f, gapWidth = 16.dp),

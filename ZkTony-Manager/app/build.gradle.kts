@@ -29,8 +29,8 @@ android {
         applicationId = "com.zktony.manager"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0.1"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -91,6 +91,13 @@ android {
     }
 
     ndkVersion = "21.4.7075529"
+
+    applicationVariants.all {
+        outputs.all {
+            (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
+                "zktony-manager-${versionName}-${name}.apk"
+        }
+    }
 
     kotlin {
         jvmToolchain {

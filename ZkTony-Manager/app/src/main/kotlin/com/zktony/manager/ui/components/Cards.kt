@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.Upgrade
 import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.RadioButtonChecked
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
@@ -18,6 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.room.Update
+import com.zktony.manager.data.remote.model.Product
 
 // region FunctionCard
 @OptIn(ExperimentalMaterial3Api::class)
@@ -135,6 +138,7 @@ fun TextCard(
         }
     }
 }
+// endregion
 
 // region AttachmentCard
 @OptIn(ExperimentalMaterial3Api::class)
@@ -211,6 +215,124 @@ fun AttachmentCard(
 }
 // endregion
 
+// region ProductCard
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProductCard(
+    modifier: Modifier = Modifier,
+    product: Product,
+    onClick: () -> Unit = {},
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(4.dp),
+        onClick = { onClick() }
+    ) {
+        Box(
+            modifier = modifier
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color.Blue.copy(alpha = 0.1f),
+                            Color.Cyan.copy(alpha = 0.1f),
+                            Color.Blue.copy(alpha = 0.1f),
+                        )
+                    )
+                )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+            ) {
+                Text(text = "编号: ${product.id}", style = MaterialTheme.typography.labelMedium)
+                Text(
+                    text = "快递: ${product.express_number}",
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Text(
+                    text = "时间: ${product.create_time.replace("T", " ")}",
+                    style = MaterialTheme.typography.labelMedium
+                )
+                if (product.create_by.isNotEmpty()) {
+                    Text(
+                        text = "创建人: ${product.create_by}",
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+// endregion
+
+// region UpdateCard
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UpdateCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    subtitle: String,
+    progress: Int,
+    onClick: () -> Unit = {},
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(4.dp),
+        onClick = { onClick() }
+    ) {
+        Box(
+            modifier = modifier
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            Color.Blue.copy(alpha = 0.2f),
+                            Color.Blue.copy(alpha = 0.1f),
+                            Color.Cyan.copy(alpha = 0.2f),
+                        )
+                    )
+                )
+        ) {
+            Row(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    imageVector = Icons.Default.Upgrade,
+                    contentDescription = null,
+                    tint = Color.Unspecified
+                )
+                Column(
+                    modifier = Modifier.padding(start = 16.dp)
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.outline
+                    )
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                if (progress > 0) {
+                    Text(
+                        color = MaterialTheme.colorScheme.primary,
+                        text = "$progress %"
+                    )
+                }
+            }
+        }
+    }
+}
+// endregion
+
 // region preview
 @Preview
 @Composable
@@ -234,4 +356,34 @@ fun TextCardPreview() {
     )
 }
 
+@Preview
+@Composable
+fun AttachmentCardPreview() {
+    AttachmentCard(
+        attachment = "att1 att2 att3",
+        value = "att1 att2 att3",
+        onClick = { },
+        onValueChange = { }
+    )
+}
+
+@Preview
+@Composable
+fun ProductCardPreview() {
+    ProductCard(
+        product = Product(),
+        onClick = { }
+    )
+}
+
+@Preview
+@Composable
+fun UpdateCardPreview() {
+    UpdateCard(
+        title = "title",
+        subtitle = "subtitle",
+        progress = 10,
+        onClick = { }
+    )
+}
 // endregion

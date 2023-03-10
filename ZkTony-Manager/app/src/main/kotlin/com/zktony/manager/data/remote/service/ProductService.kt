@@ -1,6 +1,5 @@
 package com.zktony.manager.data.remote.service
 
-import com.zktony.manager.data.remote.model.Equipment
 import com.zktony.manager.data.remote.model.Product
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
@@ -33,5 +32,5 @@ interface ProductService {
         @Query("create_by") create_by: String,
         @Query("begin_time") begin_time: String,
         @Query("end_time") end_time: String
-    ): Flow<Response<List<Equipment>>>
+    ): Flow<Response<List<Product>>>
 }

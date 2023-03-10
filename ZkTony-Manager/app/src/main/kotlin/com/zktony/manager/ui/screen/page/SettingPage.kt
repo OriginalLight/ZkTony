@@ -1,23 +1,26 @@
 package com.zktony.manager.ui.screen.page
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import android.content.Context
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Upgrade
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.room.Update
+import com.zktony.manager.BuildConfig
 import com.zktony.manager.R
 import com.zktony.manager.ui.components.FunctionCard
 import com.zktony.manager.ui.components.ManagerAppBar
-import com.zktony.manager.ui.screen.SettingPage
-import com.zktony.manager.ui.screen.SettingUiState
+import com.zktony.manager.ui.components.UpdateCard
+import com.zktony.manager.ui.screen.viewmodel.SettingPage
+import com.zktony.manager.ui.screen.viewmodel.SettingUiState
 
 /**
  * @author: 刘贺贺
@@ -30,11 +33,14 @@ fun SettingPage(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
     navigateTo: (SettingPage) -> Unit,
+    doUpdate: (Context) -> Unit = {},
 ) {
 
     ManagerAppBar(
         title = stringResource(id = R.string.screen_setting_title),
     )
+
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -50,6 +56,17 @@ fun SettingPage(
             onClick = { navigateTo(SettingPage.USER_MODIFY) },
             shape = RoundedCornerShape(8.dp),
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (uiState.application != null && uiState.application.version_code > BuildConfig.VERSION_CODE) {
+            UpdateCard(
+                title = "有更新",
+                subtitle = uiState.application.description,
+                progress = uiState.progress,
+                onClick = { doUpdate(context) },
+            )
+        }
     }
 }
 // endregion

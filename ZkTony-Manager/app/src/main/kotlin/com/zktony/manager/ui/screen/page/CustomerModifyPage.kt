@@ -36,12 +36,12 @@ import com.zktony.manager.ui.components.ManagerAppBar
 fun CustomerModifyPage(
     modifier: Modifier = Modifier,
     customer: Customer,
-    navigateTo: () -> Unit,
     isAdd: Boolean,
     onDone: (Customer) -> Unit,
+    onBack: () -> Unit,
 ) {
     BackHandler {
-        navigateTo()
+        onBack()
     }
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -52,7 +52,7 @@ fun CustomerModifyPage(
     Column {
         ManagerAppBar(title = stringResource(id = R.string.page_customer_title),
             isFullScreen = true,
-            onBack = { navigateTo() })
+            onBack = { onBack() })
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -153,7 +153,7 @@ fun CustomerModifyPage(
                 ),
                 keyboardActions = KeyboardActions(onDone = {
                     keyboardController?.hide()
-                    navigateTo()
+                    onBack()
                     onDone(tempCustomer)
                 }),
                 maxLines = 10,
@@ -164,7 +164,7 @@ fun CustomerModifyPage(
                 .fillMaxWidth()
                 .padding(top = 16.dp),
                 onClick = {
-                    navigateTo()
+                    onBack()
                     onDone(tempCustomer)
                 }) {
                 Text(text = if (isAdd) "添加" else "修改")
@@ -181,8 +181,8 @@ fun CustomerModifyPage(
 fun CustomerModifyPagePreview() {
     CustomerModifyPage(
         customer = Customer(),
-        navigateTo = {},
         isAdd = true,
         onDone = {},
+        onBack = {},
     )
 }

@@ -22,9 +22,10 @@ import com.zktony.manager.R
 import com.zktony.manager.data.remote.model.Product
 import com.zktony.manager.data.remote.model.Software
 import com.zktony.manager.ui.components.*
-import com.zktony.manager.ui.screen.HomePage
-import com.zktony.manager.ui.screen.SearchReq
-import com.zktony.manager.ui.screen.ShippingUiState
+import com.zktony.manager.ui.screen.viewmodel.HomePageEnum
+import com.zktony.manager.ui.screen.viewmodel.SearchReq
+import com.zktony.manager.ui.screen.viewmodel.ShippingPageEnum
+import com.zktony.manager.ui.screen.viewmodel.ShippingUiState
 
 /**
  * @author: 刘贺贺
@@ -32,27 +33,28 @@ import com.zktony.manager.ui.screen.ShippingUiState
  */
 
 // region ShippingPage
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ShippingPage(
     modifier: Modifier = Modifier,
     uiState: ShippingUiState,
-    navigateTo: (HomePage) -> Unit,
+    navigateTo: (ShippingPageEnum) -> Unit,
+    isDualPane: Boolean = false,
     softwareChange: (Software) -> Unit,
     searchCustomer: () -> Unit,
     searchEquipment: () -> Unit,
     productChange: (Product) -> Unit,
     searchReqChange: (SearchReq) -> Unit,
     saveShipping: () -> Unit,
+    onBack: () -> Unit,
 ) {
     BackHandler {
-        navigateTo(HomePage.HOME)
+        onBack()
     }
 
     Column {
         ManagerAppBar(title = stringResource(id = R.string.page_shipping_title),
-            isFullScreen = true,
-            onBack = { navigateTo(HomePage.HOME) },
+            isFullScreen = !isDualPane,
+            onBack = { onBack() },
             actions = {
                 AnimatedVisibility(
                     visible = uiState.software.id.isNotEmpty()
@@ -118,7 +120,7 @@ fun ShippingPage(
                         )
                         TextCard(
                             textList = textList,
-                            onClick = { navigateTo(HomePage.SOFTWARE_MODIFY) }
+                            onClick = { navigateTo(ShippingPageEnum.SOFTWARE_MODIFY) }
                         )
                     }
                 }
@@ -130,7 +132,7 @@ fun ShippingPage(
                     onValueChange = { searchReqChange(uiState.searchReq.copy(customer = it)) },
                     icon = Icons.Outlined.Person,
                     onSearch = { searchCustomer() },
-                    onAdd = { navigateTo(HomePage.CUSTOMER_MODIFY) }
+                    onAdd = { navigateTo(ShippingPageEnum.CUSTOMER_MODIFY) }
                 )
 
                 AnimatedVisibility(visible = uiState.customer != null) {
@@ -149,7 +151,7 @@ fun ShippingPage(
                             )
                             TextCard(
                                 textList = textList,
-                                onClick = { navigateTo(HomePage.CUSTOMER_MODIFY) }
+                                onClick = { navigateTo(ShippingPageEnum.CUSTOMER_MODIFY) }
                             )
                         }
                     }
@@ -162,7 +164,7 @@ fun ShippingPage(
                     onValueChange = { searchReqChange(uiState.searchReq.copy(equipment = it)) },
                     icon = Icons.Outlined.LaptopMac,
                     onSearch = { searchEquipment() },
-                    onAdd = { navigateTo(HomePage.EQUIPMENT_MODIFY) }
+                    onAdd = { navigateTo(ShippingPageEnum.EQUIPMENT_MODIFY) }
                 )
 
                 AnimatedVisibility(visible = uiState.equipment != null) {
@@ -182,7 +184,7 @@ fun ShippingPage(
                             )
                             TextCard(
                                 textList = textList,
-                                onClick = { navigateTo(HomePage.EQUIPMENT_MODIFY) }
+                                onClick = { navigateTo(ShippingPageEnum.EQUIPMENT_MODIFY) }
                             )
                         }
                     }
@@ -263,7 +265,8 @@ fun ShippingPagePreview() {
         searchEquipment = {},
         searchReqChange = {},
         productChange = {},
-        saveShipping = {}
+        saveShipping = {},
+        onBack = {},
     )
 }
 // endregion

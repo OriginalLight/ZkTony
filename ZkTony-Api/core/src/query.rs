@@ -60,6 +60,8 @@ impl Query {
             }
         }
 
+        query = query.order_by_desc(customer::Column::CreateTime);
+
         let res = query.clone().all(db).await;
 
         match res {
@@ -113,6 +115,7 @@ impl Query {
                 query = query.filter(equipment::Column::CreateTime.lte(t));
             }
         }
+        query = query.order_by_desc(equipment::Column::CreateTime);
 
         let res = query.clone().all(db).await;
 
@@ -200,6 +203,8 @@ impl Query {
             }
         }
 
+        query = query.order_by_desc(product::Column::CreateTime);
+
         let res = query.clone().all(db).await;
         match res {
             Ok(x) => {
@@ -238,6 +243,8 @@ impl Query {
                 query = query.filter(software::Column::BuildType.eq(x));
             }
         }
+
+        query = query.order_by_desc(software::Column::CreateTime);
 
         let res = query.clone().all(db).await;
         match res {
