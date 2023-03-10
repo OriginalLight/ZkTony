@@ -55,6 +55,7 @@ fun ShippingHistoryScreen(
         exit = shrinkHorizontally()
     ) {
         ProductDetailPage(
+            modifier = Modifier,
             product = uiState.product,
             software = uiState.software,
             equipment = uiState.equipment,
