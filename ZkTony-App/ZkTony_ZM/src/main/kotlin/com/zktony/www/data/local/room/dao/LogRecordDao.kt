@@ -27,18 +27,50 @@ import java.util.*
 @Dao
 interface LogRecordDao : BaseDao<LogRecord> {
 
-    @Query("DELETE FROM log_record WHERE julianday('now') - julianday(createTime) >= '180'")
+    @Query(
+        """
+            DELETE FROM log_record
+            WHERE julianday('now') - julianday(createTime) >= '180'
+        """
+    )
     suspend fun deleteByDate()
 
-    @Query("DELETE FROM log_record WHERE  julianday('now') - julianday(createTime) <= '1' AND id NOT IN (SELECT da.logId FROM log_data AS da WHERE  julianday('now') - julianday(da.createTime) <= '1')")
+    @Query(
+        """
+            DELETE FROM log_record
+            WHERE julianday('now') - julianday(createTime) <= '1'
+            AND id NOT IN (
+                SELECT da.logId FROM log_data AS da
+                WHERE  julianday('now') - julianday(da.createTime) <= '1'
+                )
+        """
+    )
     suspend fun deleteInvaliedLog()
 
-    @Query("SELECT * FROM log_record WHERE createTime BETWEEN :start AND :end ORDER BY createTime DESC")
+    @Query(
+        """
+            SELECT * FROM log_record
+            WHERE createTime BETWEEN :start AND :end
+            ORDER BY createTime DESC
+        """
+    )
     fun getByDate(start: Date, end: Date): Flow<List<LogRecord>>
 
-    @Query("SELECT * FROM log_record ORDER BY createTime DESC LIMIT 20")
+    @Query(
+        """
+            SELECT * FROM log_record
+            ORDER BY createTime DESC
+            LIMIT 20
+        """
+    )
     fun getAll(): Flow<List<LogRecord>>
 
-    @Query("SELECT * FROM log_record WHERE upload = 0 LIMIT 20")
+    @Query(
+        """
+            SELECT * FROM log_record
+            WHERE upload = 0
+            LIMIT 20
+        """
+    )
     fun withoutUpload(): Flow<List<LogRecord>>
 }

@@ -66,29 +66,15 @@ class CalibrationRepository @Inject constructor(
     private suspend fun calculateActual(id: String) {
         val cali = dao.getById(id).firstOrNull()
         val dataList = dataDao.getByCalibrationId(id).firstOrNull()
-        var v1 = 1000f
-        var v2 = 1000f
-        var v3 = 1000f
-        var v4 = 1000f
-        if (dataList != null) {
-            if (dataList.isNotEmpty()) {
-                val list1 = dataList.filter { it.pumpId == 0 }
-                val list2 = dataList.filter { it.pumpId == 1 }
-                val list3 = dataList.filter { it.pumpId == 2 }
-                val list4 = dataList.filter { it.pumpId == 3 }
-                if (list1.isNotEmpty()) {
-                    v1 = list1.map { it.percent * 1000f }.average().toFloat()
-                }
-                if (list2.isNotEmpty()) {
-                    v2 = list2.map { it.percent * 1000f }.average().toFloat()
-                }
-                if (list3.isNotEmpty()) {
-                    v3 = list3.map { it.percent * 1000f }.average().toFloat()
-                }
-                if (list4.isNotEmpty()) {
-                    v4 = list4.map { it.percent * 1000f }.average().toFloat()
-                }
-            }
+        var v1 = 200f
+        var v2 = 200f
+        var v3 = 200f
+        var v4 = 200f
+        if (!dataList.isNullOrEmpty()) {
+            dataList.filter { it.pumpId == 0 }.forEach{ v1 *= it.percent }
+            dataList.filter { it.pumpId == 1 }.forEach{ v2 *= it.percent }
+            dataList.filter { it.pumpId == 2 }.forEach{ v3 *= it.percent }
+            dataList.filter { it.pumpId == 3 }.forEach{ v4 *= it.percent }
         }
         dao.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3, v4 = v4))
     }

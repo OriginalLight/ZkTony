@@ -15,9 +15,9 @@ data class CalibrationData(
     val calibrationId: String,
     val pumpId: Int = 0,
     // 预计
-    val expect: Float = 1000f,
+    val expect: Float = 200f,
     // 实际
-    val actual: Float = 1000f,
+    val actual: Float = 200f,
     // 百分比 = 实际/预计
     val percent: Float = actual / expect,
     // 校准时间

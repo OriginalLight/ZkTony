@@ -10,7 +10,11 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface ContainerDao : BaseDao<Container> {
-    @Query("SELECT * FROM container")
+    @Query(
+        """
+        SELECT * FROM container
+        """
+    )
     fun getAll(): Flow<List<Container>>
 
 }

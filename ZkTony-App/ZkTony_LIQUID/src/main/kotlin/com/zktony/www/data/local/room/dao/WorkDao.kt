@@ -10,10 +10,20 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface WorkDao : BaseDao<Work> {
-    @Query("SELECT * FROM work")
+    @Query(
+        """
+        SELECT * FROM work
+        """
+    )
     fun getAll(): Flow<List<Work>>
 
-    @Query("SELECT * FROM work WHERE id = :id Limit 1")
+    @Query(
+        """
+        SELECT * FROM work
+        WHERE id = :id
+        Limit 1
+        """
+    )
     fun getById(id: String): Flow<Work>
 
 }

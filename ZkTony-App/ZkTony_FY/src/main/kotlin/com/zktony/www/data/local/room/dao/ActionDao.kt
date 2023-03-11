@@ -10,9 +10,20 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface ActionDao : BaseDao<Action> {
-    @Query("DELETE FROM `action` WHERE programId = :programId")
+    @Query(
+        """
+        DELETE FROM `action`
+        WHERE programId = :programId
+        """
+    )
     suspend fun deleteByProgramId(programId: String)
 
-    @Query("SELECT * FROM `action` WHERE programId = :programId ORDER BY `order` ASC")
+    @Query(
+        """
+        SELECT * FROM `action`
+        WHERE programId = :programId
+        ORDER BY `order` ASC
+        """
+    )
     fun getByProgramId(programId: String): Flow<List<Action>>
 }

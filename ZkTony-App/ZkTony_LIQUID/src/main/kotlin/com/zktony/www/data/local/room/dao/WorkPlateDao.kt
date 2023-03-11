@@ -10,16 +10,37 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface WorkPlateDao : BaseDao<WorkPlate> {
-    @Query("DELETE FROM work_plate WHERE id = :id")
+    @Query(
+        """
+        DELETE FROM work_plate
+        WHERE id = :id
+        """
+    )
     suspend fun deleteById(id: String)
 
-    @Query("SELECT * FROM work_plate WHERE workId = :id ORDER BY sort ASC")
+    @Query(
+        """
+        SELECT * FROM work_plate
+        WHERE workId = :id
+        ORDER BY sort ASC
+        """
+    )
     fun getByWorkId(id: String): Flow<List<WorkPlate>>
 
-    @Query("DELETE FROM work_plate WHERE workId = :id")
+    @Query(
+        """
+        DELETE FROM work_plate
+        WHERE workId = :id
+        """
+    )
     suspend fun deleteByWorkId(id: String)
 
-    @Query("SELECT * FROM work_plate WHERE id = :id")
+    @Query(
+        """
+        SELECT * FROM work_plate
+        WHERE id = :id
+        """
+    )
     fun getById(id: String): Flow<WorkPlate>
 
 }

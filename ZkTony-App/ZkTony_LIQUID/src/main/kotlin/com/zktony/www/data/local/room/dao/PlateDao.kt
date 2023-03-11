@@ -10,9 +10,19 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface PlateDao : BaseDao<Plate> {
-    @Query("SELECT * FROM plate WHERE sort = :id LIMIT 1")
+    @Query(
+        """
+        SELECT * FROM plate
+        WHERE sort = :id
+        LIMIT 1
+        """
+    )
     fun getPlateBySort(id: Int): Flow<Plate>
 
-    @Query("SELECT * FROM plate")
+    @Query(
+        """
+        SELECT * FROM plate
+        """
+    )
     fun getAll(): Flow<List<Plate>>
 }

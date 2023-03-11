@@ -10,16 +10,36 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface HoleDao : BaseDao<Hole> {
-    @Query("SELECT * FROM hole WHERE plateId = :plateId")
+    @Query(
+        """
+        SELECT * FROM hole
+        WHERE plateId = :plateId
+        """
+    )
     fun getByPlateId(plateId: String): Flow<List<Hole>>
 
-    @Query("DELETE FROM hole WHERE plateId = :plateId")
+    @Query(
+        """
+        DELETE FROM hole
+        WHERE plateId = :plateId
+        """
+    )
     suspend fun deleteByPlateId(plateId: String)
 
-    @Query("DELETE FROM hole WHERE workId = :workId")
+    @Query(
+        """
+        DELETE FROM hole
+        WHERE workId = :workId
+        """
+    )
     suspend fun deleteByWorkId(workId: String)
 
-    @Query("SELECT * FROM hole WHERE workId = :workId")
+    @Query(
+        """
+        SELECT * FROM hole
+        WHERE workId = :workId
+        """
+    )
     fun getByWorkId(workId: String): Flow<List<Hole>>
 
 }

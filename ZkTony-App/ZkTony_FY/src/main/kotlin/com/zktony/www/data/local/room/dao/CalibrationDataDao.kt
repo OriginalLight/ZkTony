@@ -10,10 +10,20 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface CalibrationDataDao : BaseDao<CalibrationData> {
-    @Query("DELETE FROM calibration_data WHERE calibrationId = :calibrationId")
+    @Query(
+        """
+        DELETE FROM calibration_data
+        WHERE calibrationId = :calibrationId
+        """
+    )
     suspend fun deleteByCalibrationId(calibrationId: String)
 
-    @Query("SELECT * FROM calibration_data WHERE calibrationId = :calibrationId ORDER BY pumpId ASC")
+    @Query(
+        """
+        SELECT * FROM calibration_data
+        WHERE calibrationId = :calibrationId
+        ORDER BY pumpId ASC , createTime ASC
+        """
+    )
     fun getByCalibrationId(calibrationId: String): Flow<List<CalibrationData>>
-
 }

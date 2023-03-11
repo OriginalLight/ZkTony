@@ -72,33 +72,13 @@ class CalibrationRepository @Inject constructor(
         var v4 = 180f
         var v5 = 180f
         var v6 = 180f
-        if (dataList != null) {
-            if (dataList.isNotEmpty()) {
-                val list1 = dataList.filter { it.pumpId == 0 }
-                val list2 = dataList.filter { it.pumpId == 1 }
-                val list3 = dataList.filter { it.pumpId == 2 }
-                val list4 = dataList.filter { it.pumpId == 3 }
-                val list5 = dataList.filter { it.pumpId == 4 }
-                val list6 = dataList.filter { it.pumpId == 5 }
-                if (list1.isNotEmpty()) {
-                    v1 = list1.map { it.percent * 180f }.average().toFloat()
-                }
-                if (list2.isNotEmpty()) {
-                    v2 = list2.map { it.percent * 180f }.average().toFloat()
-                }
-                if (list3.isNotEmpty()) {
-                    v3 = list3.map { it.percent * 180f }.average().toFloat()
-                }
-                if (list4.isNotEmpty()) {
-                    v4 = list4.map { it.percent * 180f }.average().toFloat()
-                }
-                if (list5.isNotEmpty()) {
-                    v5 = list5.map { it.percent * 180f }.average().toFloat()
-                }
-                if (list6.isNotEmpty()) {
-                    v6 = list6.map { it.percent * 180f }.average().toFloat()
-                }
-            }
+        if (!dataList.isNullOrEmpty()) {
+            dataList.filter { it.pumpId == 0 }.forEach { v1 *= it.percent }
+            dataList.filter { it.pumpId == 1 }.forEach { v2 *= it.percent }
+            dataList.filter { it.pumpId == 2 }.forEach { v3 *= it.percent }
+            dataList.filter { it.pumpId == 3 }.forEach { v4 *= it.percent }
+            dataList.filter { it.pumpId == 4 }.forEach { v5 *= it.percent }
+            dataList.filter { it.pumpId == 5 }.forEach { v6 *= it.percent }
         }
         dao.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3, v4 = v4, v5 = v5, v6 = v6))
     }

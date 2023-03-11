@@ -10,9 +10,18 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface CalibrationDao : BaseDao<Calibration> {
-    @Query("SELECT * FROM calibration")
+    @Query(
+        """
+        SELECT * FROM calibration
+        """
+    )
     fun getAll(): Flow<List<Calibration>>
 
-    @Query("SELECT * FROM calibration WHERE id = :id")
+    @Query(
+        """
+        SELECT * FROM calibration
+        WHERE id = :id
+        """
+    )
     fun getById(id: String): Flow<Calibration>
 }

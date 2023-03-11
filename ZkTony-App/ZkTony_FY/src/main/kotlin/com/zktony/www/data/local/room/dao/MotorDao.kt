@@ -10,9 +10,20 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface MotorDao : BaseDao<Motor> {
-    @Query("SELECT * FROM motor ORDER BY id ASC")
+    @Query(
+        """
+        SELECT * FROM motor
+        ORDER BY id ASC
+        """
+    )
     fun getAll(): Flow<List<Motor>>
 
-    @Query("SELECT * FROM motor WHERE id = :id LIMIT 1")
+    @Query(
+        """
+        SELECT * FROM motor
+        WHERE id = :id
+        LIMIT 1
+        """
+    )
     fun getById(id: Int): Flow<Motor>
 }

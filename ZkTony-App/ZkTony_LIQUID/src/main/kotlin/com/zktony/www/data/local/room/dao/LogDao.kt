@@ -26,9 +26,20 @@ import java.util.*
  */
 @Dao
 interface LogDao : BaseDao<Log> {
-    @Query("DELETE FROM log WHERE julianday('now') - julianday(createTime) >= '180'")
+    @Query(
+        """
+        DELETE FROM log
+        WHERE julianday('now') - julianday(createTime) >= '180'
+        """
+    )
     suspend fun deleteByDate()
 
-    @Query("SELECT * FROM log ORDER BY createTime DESC LIMIT 40")
+    @Query(
+        """
+        SELECT * FROM log
+        ORDER BY createTime DESC 
+        LIMIT 40
+        """
+    )
     fun getAll(): Flow<List<Log>>
 }

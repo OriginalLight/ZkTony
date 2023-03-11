@@ -27,18 +27,50 @@ import kotlinx.coroutines.flow.Flow
 interface LogDataDao : BaseDao<LogData> {
 
 
-    @Query("DELETE FROM log_data WHERE logId = :id")
+    @Query(
+        """
+            DELETE FROM log_data
+            WHERE logId = :id
+        """
+    )
     suspend fun deleteByRecordId(id: String)
 
-    @Query("DELETE FROM log_data WHERE julianday('now') - julianday(createTime) >= '180'")
+    @Query(
+        """
+            DELETE FROM log_data
+            WHERE julianday('now') - julianday(createTime) >= '180'
+        """
+    )
     suspend fun deleteByDate()
 
-    @Query("SELECT * FROM log_data WHERE logId == :id ORDER BY createTime ASC")
+    @Query(
+        """
+            SELECT * FROM log_data
+            WHERE logId == :id
+            ORDER BY createTime ASC
+        """
+    )
     fun getByLogId(id: String): Flow<List<LogData>>
 
-    @Query("DELETE FROM log_data WHERE  julianday('now') - julianday(createTime) <= '1' AND logId IN (SELECT logId FROM log_data GROUP BY logId HAVING count(*) < 12) ")
+    @Query(
+        """
+            DELETE FROM log_data
+            WHERE  julianday('now') - julianday(createTime) <= '1'
+            AND logId IN (
+                SELECT logId FROM log_data
+                GROUP BY logId
+                HAVING count(*) < 12
+                ) 
+        """
+    )
     suspend fun deleteDataLessThanTen()
 
-    @Query("SELECT * FROM log_data WHERE upload = 0 LIMIT 200")
+    @Query(
+        """
+            SELECT * FROM log_data
+            WHERE upload = 0
+            LIMIT 200
+        """
+    )
     fun withoutUpload(): Flow<List<LogData>>
 }
