@@ -1,9 +1,11 @@
 package com.zktony.www.control.motor
 
+import com.zktony.common.utils.logi
 import com.zktony.www.data.local.room.entity.Calibration
 import com.zktony.www.data.local.room.entity.Motor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺
@@ -25,19 +27,24 @@ class MotorManager(
     private var cali: Calibration = Calibration()
 
     fun initMotor(motor: List<Motor>) {
-        this.x = motor.find { it.id == 0 } ?: Motor()
-        this.y = motor.find { it.id == 1 } ?: Motor()
-        this.z = motor.find { it.id == 2 } ?: Motor()
-        this.p1 = motor.find { it.id == 3 } ?: Motor()
-        this.p2 = motor.find { it.id == 4 } ?: Motor()
-        this.p3 = motor.find { it.id == 5 } ?: Motor()
-        this.p4 = motor.find { it.id == 6 } ?: Motor()
-        this.p5 = motor.find { it.id == 7 } ?: Motor()
-        this.p6 = motor.find { it.id == 8 } ?: Motor()
+        scope.launch {
+            x = motor.find { it.id == 0 } ?: Motor()
+            y = motor.find { it.id == 1 } ?: Motor()
+            z = motor.find { it.id == 2 } ?: Motor()
+            p1 = motor.find { it.id == 3 } ?: Motor()
+            p2 = motor.find { it.id == 4 } ?: Motor()
+            p3 = motor.find { it.id == 5 } ?: Motor()
+            p4 = motor.find { it.id == 6 } ?: Motor()
+            p5 = motor.find { it.id == 7 } ?: Motor()
+            p6 = motor.find { it.id == 8 } ?: Motor()
+        }
     }
 
     fun initCali(calibration: List<Calibration>) {
-        this.cali = calibration.find { it.enable == 1 } ?: Calibration()
+        scope.launch {
+            cali = calibration.find { it.enable == 1 } ?: Calibration()
+            cali.toString().logi()
+        }
     }
 
     fun move(distanceY: Float, distanceZ: Float): Pair<Int, Int> {

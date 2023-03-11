@@ -71,10 +71,26 @@ class CalibrationRepository @Inject constructor(
         var v3 = 200f
         var v4 = 200f
         if (!dataList.isNullOrEmpty()) {
-            dataList.filter { it.pumpId == 0 }.forEach{ v1 *= it.percent }
-            dataList.filter { it.pumpId == 1 }.forEach{ v2 *= it.percent }
-            dataList.filter { it.pumpId == 2 }.forEach{ v3 *= it.percent }
-            dataList.filter { it.pumpId == 3 }.forEach{ v4 *= it.percent }
+            dataList.filter { it.pumpId == 0 }.let {
+                if (it.isNotEmpty()) {
+                    v1 *= it.map { data -> data.percent }.average().toFloat()
+                }
+            }
+            dataList.filter { it.pumpId == 1 }.let {
+                if (it.isNotEmpty()) {
+                    v2 *= it.map { data -> data.percent }.average().toFloat()
+                }
+            }
+            dataList.filter { it.pumpId == 2 }.let {
+                if (it.isNotEmpty()) {
+                    v3 *= it.map { data -> data.percent }.average().toFloat()
+                }
+            }
+            dataList.filter { it.pumpId == 3 }.let {
+                if (it.isNotEmpty()) {
+                    v4 *= it.map { data -> data.percent }.average().toFloat()
+                }
+            }
         }
         dao.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3, v4 = v4))
     }
