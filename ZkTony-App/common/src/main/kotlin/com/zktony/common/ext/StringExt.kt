@@ -1,9 +1,5 @@
 package com.zktony.common.ext
 
-import android.annotation.SuppressLint
-import java.text.SimpleDateFormat
-import java.util.*
-
 /**
  * @author: 刘贺贺
  * @date: 2022-09-26 9:07
@@ -26,22 +22,4 @@ fun String.removeZero(): String {
         str = str.replace("^0+(?!$)".toRegex(), "")
     }
     return str
-}
-
-/**
- * 将秒数转化为分秒格式
- */
-fun Long.getTimeFormat(): String {
-    val temp = this.toInt()
-    val hh = temp / 3600
-    val mm = temp % 3600 / 60
-    val ss = temp % 3600 % 60
-    return String.format("%02d:%02d:%02d", hh, mm, ss)
-}
-
-
-@SuppressLint("SimpleDateFormat")
-fun String.simpleDateFormat(format: String): Date? {
-    val sdf = SimpleDateFormat(format)
-    return sdf.parse(this)
 }

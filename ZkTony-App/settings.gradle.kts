@@ -20,9 +20,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "ZkTony-App"
 include(":ZkTony_FY")
-include(":ZkTony_LIQUID")
+include(":ZkTony_LIQUID_FOUR")
 include(":ZkTony_TEST")
 include(":ZkTony_ZM")
+include(":ZkTony_MIX_AUTO")
 include(":common")
 include(":gpio")
 include(":serialport")

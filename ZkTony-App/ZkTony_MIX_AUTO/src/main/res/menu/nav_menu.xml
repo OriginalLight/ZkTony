@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:id="@+id/g_home">
+        <item
+            android:id="@+id/navigation_home"
+            android:icon="@drawable/ic_home"
+            android:title="@string/title_home" />
+    </group>
+
+    <group android:id="@+id/g_work">
+        <item
+            android:id="@+id/navigation_work"
+            android:icon="@drawable/ic_program"
+            android:title="@string/title_program" />
+    </group>
+
+    <group android:id="@+id/g_container">
+        <item
+            android:id="@+id/navigation_container"
+            android:icon="@drawable/ic_container"
+            android:title="@string/title_container" />
+    </group>
+
+    <group android:id="@+id/g_calibration">
+        <item
+            android:id="@+id/navigation_calibration"
+            android:icon="@drawable/ic_cali"
+            android:title="@string/title_calibration" />
+    </group>
+
+    <group android:id="@+id/g_log">
+        <item
+            android:id="@+id/navigation_log"
+            android:icon="@drawable/ic_log"
+            android:title="@string/title_log" />
+    </group>
+
+    <group android:id="@+id/g_admin">
+        <item
+            android:id="@+id/navigation_admin"
+            android:icon="@drawable/ic_admin"
+            android:title="@string/title_admin" />
+    </group>
+
+</menu>

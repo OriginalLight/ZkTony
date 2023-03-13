@@ -50,7 +50,7 @@ fun ShippingScreen(
             searchEquipment = { viewModel.searchEquipment() },
             searchReqChange = { viewModel.searchReqChange(it) },
             productChange = { viewModel.productChange(it) },
-            saveShipping = { viewModel.saveShipping() },
+            saveShipping = { viewModel.saveShipping { navigateTo(HomePageEnum.HOME) } },
             onBack = { navigateTo(HomePageEnum.HOME) })
     }
 

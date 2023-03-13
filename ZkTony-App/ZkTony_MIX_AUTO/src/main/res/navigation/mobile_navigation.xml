@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.zktony.www.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_container"
+        android:name="com.zktony.www.ui.container.ContainerFragment"
+        android:label="@string/title_container"
+        tools:layout="@layout/fragment_container" />
+
+    <fragment
+        android:id="@+id/navigation_work"
+        android:name="com.zktony.www.ui.work.WorkFragment"
+        android:label="@string/title_program"
+        tools:layout="@layout/fragment_work">
+        <action
+            android:id="@+id/action_navigation_work_to_navigation_work_plate"
+            app:destination="@id/navigation_work_plate"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
+            <argument android:name="id" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_work_plate"
+        android:name="com.zktony.www.ui.work.WorkPlateFragment"
+        android:label="@string/title_program"
+        tools:layout="@layout/fragment_work_plate">
+        <action
+            android:id="@+id/action_navigation_work_plate_to_navigation_work"
+            app:destination="@id/navigation_work"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_navigation_work_plate_to_navigation_work_hole"
+            app:destination="@id/navigation_work_hole"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
+            <argument android:name="id" />
+        </action>
+        <argument
+            android:name="id"
+            android:defaultValue="None"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_work_hole"
+        android:name="com.zktony.www.ui.work.WorkHoleFragment"
+        android:label="@string/title_program"
+        tools:layout="@layout/fragment_work_hole">
+        <action
+            android:id="@+id/action_navigation_work_hole_to_navigation_work_plate"
+            app:destination="@id/navigation_work_plate"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <argument
+            android:name="id"
+            android:defaultValue="None"
+            app:argType="string" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/navigation_log"
+        android:name="com.zktony.www.ui.log.LogFragment"
+        android:label="@string/title_log"
+        tools:layout="@layout/fragment_log" />
+
+    <fragment
+        android:id="@+id/navigation_admin"
+        android:name="com.zktony.www.ui.admin.AdminFragment"
+        android:label="@string/title_admin"
+        tools:layout="@layout/fragment_admin">
+        <action
+            android:id="@+id/action_navigation_admin_to_navigation_motor"
+            app:destination="@id/navigation_motor"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_motor"
+        android:name="com.zktony.www.ui.admin.MotorFragment"
+        android:label="@string/title_adjust"
+        tools:layout="@layout/fragment_motor">
+        <action
+            android:id="@+id/action_navigation_motor_to_navigation_admin"
+            app:destination="@id/navigation_admin"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_calibration"
+        android:name="com.zktony.www.ui.calibration.CalibrationFragment"
+        android:label="@string/title_calibration"
+        tools:layout="@layout/fragment_calibration">
+        <action
+            android:id="@+id/action_navigation_calibration_to_navigation_calibration_data"
+            app:destination="@id/navigation_calibration_data"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right">
+            <argument android:name="id" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_calibration_data"
+        android:name="com.zktony.www.ui.calibration.CalibrationDataFragment"
+        android:label="@string/title_calibration_data"
+        tools:layout="@layout/fragment_calibration_data">
+        <action
+            android:id="@+id/action_navigation_calibration_data_to_navigation_calibration"
+            app:destination="@id/navigation_calibration"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <argument
+            android:name="id"
+            android:defaultValue="None"
+            app:argType="string" />
+    </fragment>
+
+</navigation>

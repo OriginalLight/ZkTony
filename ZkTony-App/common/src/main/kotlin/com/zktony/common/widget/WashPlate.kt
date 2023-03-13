@@ -32,18 +32,19 @@ class WashPlate : View {
         paint.strokeCap = Paint.Cap.ROUND
         paint.strokeWidth = 2f
 
-        val rect = Rect(0, 0, 576, 188)
+        val rect = Rect(0, 0, width, height)
         canvas?.drawRect(rect, paint)
 
         paint.color = Color.WHITE
-        val rect1 = Rect(20, 20, 556, 168)
+        val rect1 = Rect(20, 20, width - 20, height - 20)
         canvas?.drawRect(rect1, paint)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        // 设置宽高
-        setMeasuredDimension(576, 188)
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val height = MeasureSpec.getSize(heightMeasureSpec)
+        setMeasuredDimension(width, height)
     }
 
 }

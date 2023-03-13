@@ -187,7 +187,7 @@ class ShippingViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(product = product)
     }
 
-    fun saveShipping() {
+    fun saveShipping(block: () -> Unit) {
         viewModelScope.launch {
             softWareRepository.add(_uiState.value.software)
                 .flowOn(Dispatchers.IO)
@@ -196,6 +196,7 @@ class ShippingViewModel @Inject constructor(
                         .flowOn(Dispatchers.IO)
                         .collect {
                             _uiState.value = ShippingUiState()
+                            block()
                         }
                 }
         }

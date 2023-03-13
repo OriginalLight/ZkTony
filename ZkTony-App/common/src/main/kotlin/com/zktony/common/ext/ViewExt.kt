@@ -6,15 +6,18 @@ import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.ImageView
+import android.widget.HorizontalScrollView
+import android.widget.ScrollView
+import androidx.core.widget.NestedScrollView
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
+import com.zktony.common.utils.logw
 
 /**
  * 设置view显示
@@ -63,50 +66,75 @@ fun View.gone() {
 /**
  * 将view转为bitmap
  */
-@Deprecated("use View.drawToBitmap()")
-fun View.toBitmap(scale: Float = 1f, config: Bitmap.Config = Bitmap.Config.ARGB_8888): Bitmap? {
-    if (this is ImageView) {
-        if (drawable is BitmapDrawable) return (drawable as BitmapDrawable).bitmap
+/**
+ * 获取View的截图, 支持获取整个RecyclerView列表的长截图
+ * 注意：调用该方法时，请确保View已经测量完毕，如果宽高为0，则将抛出异常
+ */
+fun View.toBitmap(): Bitmap {
+    if (measuredWidth == 0 || measuredHeight == 0) {
+        "⚠️警告！View.toBitmap()：调用该方法时，请确保View已经测量完毕，当前View宽或高为0，直接Return!".logw()
+        return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     }
-    this.clearFocus()
-    val bitmap = createBitmapSafely(
-        (width * scale).toInt(),
-        (height * scale).toInt(),
-        config,
-        1
-    )
-    if (bitmap != null) {
-        Canvas().run {
-            setBitmap(bitmap)
-            save()
-            drawColor(Color.WHITE)
-            scale(scale, scale)
-            this@toBitmap.draw(this)
-            restore()
-            setBitmap(null)
-        }
-    }
-    return bitmap
-}
+    return when (this) {
+        is RecyclerView -> {
+            this.scrollToPosition(0)
+            this.measure(
+                View.MeasureSpec.makeMeasureSpec(measuredWidth, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
 
-fun createBitmapSafely(width: Int, height: Int, config: Bitmap.Config, retryCount: Int): Bitmap? {
-    try {
-        return Bitmap.createBitmap(width, height, config)
-    } catch (e: OutOfMemoryError) {
-        e.printStackTrace()
-        if (retryCount > 0) {
-            System.gc()
-            return createBitmapSafely(width, height, config, retryCount - 1)
+            val bmp = Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bmp)
+
+            //draw default bg, otherwise will be black
+            if (background != null) {
+                background.setBounds(0, 0, measuredWidth, measuredHeight)
+                background.draw(canvas)
+            } else {
+                canvas.drawColor(Color.WHITE)
+            }
+            this.draw(canvas)
+            //恢复高度
+            this.measure(
+                View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.AT_MOST)
+            )
+            bmp //return
         }
-        return null
+        is ScrollView, is HorizontalScrollView, is NestedScrollView -> {
+            //draw first child
+            val child = (this as ViewGroup).getChildAt(0)
+            val screenshot =
+                Bitmap.createBitmap(child.measuredWidth, child.measuredHeight, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(screenshot)
+            if (child.background != null) {
+                child.background.setBounds(0, 0, child.measuredWidth, child.measuredHeight)
+                child.background.draw(canvas)
+            } else {
+                canvas.drawColor(Color.WHITE)
+            }
+            child.draw(canvas)// 将 view 画到画布上
+            screenshot //return
+        }
+        else -> {
+            val screenshot =
+                Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(screenshot)
+            if (background != null) {
+                background.setBounds(0, 0, width, measuredHeight)
+                background.draw(canvas)
+            } else {
+                canvas.drawColor(Color.WHITE)
+            }
+            draw(canvas)// 将 view 画到画布上
+            screenshot //return
+        }
     }
 }
 
 
 /**
  * 防止重复点击事件 默认0.5秒内不可重复点击
- * @param interval 时间间隔 默认0.5秒
- * @param action 执行方法
  */
 var lastClickTime = 0L
 fun View.clickNoRepeat(interval: Long = 500, action: (view: View) -> Unit) {
