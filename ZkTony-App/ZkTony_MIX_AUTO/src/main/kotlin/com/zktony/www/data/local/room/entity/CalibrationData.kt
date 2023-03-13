@@ -2,6 +2,7 @@ package com.zktony.www.data.local.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.zktony.common.utils.Snowflake
 import java.util.*
 
 /**
@@ -11,8 +12,10 @@ import java.util.*
 @Entity(tableName = "calibration_data")
 data class CalibrationData(
     @PrimaryKey
-    val id: String = UUID.randomUUID().toString(),
-    val calibrationId: String,
+    val id: Long = Snowflake(1).nextId(),
+    // 校准id
+    val subId: Long = 0L,
+    // 泵号
     val pumpId: Int = 0,
     // 预计
     val expect: Float = 200f,

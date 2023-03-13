@@ -4,9 +4,9 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
 import com.zktony.common.ext.getDayEnd
 import com.zktony.common.ext.getDayStart
+import com.zktony.www.data.local.room.dao.LogDataDao
+import com.zktony.www.data.local.room.dao.LogRecordDao
 import com.zktony.www.data.local.room.entity.LogRecord
-import com.zktony.www.data.repository.LogDataRepository
-import com.zktony.www.data.repository.LogRecordRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,8 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LogViewModel @Inject constructor(
-    private val logRecordRepository: LogRecordRepository,
-    private val logDataRepository: LogDataRepository
+    private val logRecordDao: LogRecordDao,
+    private val logDataDao: LogDataDao
 ) : BaseViewModel() {
 
     private val _logList = MutableStateFlow(emptyList<LogRecord>())
@@ -28,7 +28,7 @@ class LogViewModel @Inject constructor(
      */
     init {
         viewModelScope.launch {
-            logRecordRepository.getAll().collect {
+            logRecordDao.getAll().collect {
                     _logList.value = it
                 }
         }
@@ -41,7 +41,7 @@ class LogViewModel @Inject constructor(
      */
     fun changeLogRecord(start: Date, end: Date) {
         viewModelScope.launch {
-            logRecordRepository.getByDate(start.getDayStart(), end.getDayEnd())
+            logRecordDao.getByDate(start.getDayStart(), end.getDayEnd())
                 .collect {
                     _logList.value = it
                 }
@@ -54,8 +54,8 @@ class LogViewModel @Inject constructor(
      */
     fun delete(logRecord: LogRecord) {
         viewModelScope.launch {
-            logRecordRepository.delete(logRecord)
-            logDataRepository.deleteByRecordId(logRecord.id)
+            logRecordDao.delete(logRecord)
+            logDataDao.deleteByRecordId(logRecord.id)
         }
     }
 }

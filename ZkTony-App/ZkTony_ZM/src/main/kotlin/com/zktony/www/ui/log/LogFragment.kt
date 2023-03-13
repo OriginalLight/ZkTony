@@ -59,7 +59,8 @@ class LogFragment :
         }
         adapter.setOnChartButtonClick {
             findNavController().navigate(
-                directions = LogFragmentDirections.actionNavigationLogToNavigationLogChart(it.id)
+                R.id.action_navigation_log_to_navigation_log_chart,
+                Bundle().apply { putString("id", it.id) }
             )
         }
         binding.apply {

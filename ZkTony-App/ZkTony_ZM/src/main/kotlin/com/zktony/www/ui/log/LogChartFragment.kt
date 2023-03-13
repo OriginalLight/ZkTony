@@ -27,10 +27,8 @@ class LogChartFragment :
 
     override val viewModel: LogChartViewModel by viewModels()
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initArguments()
-        initButton()
-        initChart()
         initFlowCollector()
+        initView()
     }
 
     /**
@@ -49,7 +47,19 @@ class LogChartFragment :
     /**
      * initChart
      */
-    private fun initChart() {
+    private fun initView() {
+        arguments?.let {
+            val id = it.getString("id") ?: ""
+            if (id.isNotEmpty()) {
+                viewModel.loadData(id)
+            }
+        }
+        binding.back.run {
+            clickScale()
+            setOnClickListener {
+                findNavController().navigateUp()
+            }
+        }
         val chart = binding.lineChart
         chart.description = Description().apply {
             text = "X轴为时间，左Y轴为电压，右Y轴为电流"
@@ -102,31 +112,6 @@ class LogChartFragment :
     }
 
     /**
-     * initButton
-     */
-    private fun initButton() {
-        binding.back.run {
-            clickScale()
-            setOnClickListener {
-                findNavController().navigateUp()
-            }
-        }
-    }
-
-    /**
-     * initArguments
-     */
-    private fun initArguments() {
-        arguments?.let {
-            LogChartFragmentArgs.fromBundle(it).id.run {
-                if (this != "None") {
-                    viewModel.loadData(this)
-                }
-            }
-        }
-    }
-
-    /**
      * init xy
      *
      * @param chart 图表
@@ -159,6 +144,4 @@ class LogChartFragment :
         xAxis.axisMinimum = 0f
         xAxis.position = XAxis.XAxisPosition.BOTTOM
     }
-
-
 }

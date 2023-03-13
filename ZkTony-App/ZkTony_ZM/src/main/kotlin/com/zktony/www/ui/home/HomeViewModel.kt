@@ -12,12 +12,12 @@ import com.zktony.common.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.common.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.www.R
 import com.zktony.www.common.app.AppViewModel
+import com.zktony.www.data.local.room.dao.LogDataDao
+import com.zktony.www.data.local.room.dao.LogRecordDao
+import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.LogData
 import com.zktony.www.data.local.room.entity.LogRecord
 import com.zktony.www.data.local.room.entity.Program
-import com.zktony.www.data.repository.LogDataRepository
-import com.zktony.www.data.repository.LogRecordRepository
-import com.zktony.www.data.repository.ProgramRepository
 import com.zktony.www.serial.SerialManager
 import com.zktony.www.serial.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,9 +30,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val programRepo: ProgramRepository,
-    private val logRecordRepo: LogRecordRepository,
-    private val logDataRepo: LogDataRepository
+    private val programDao: ProgramDao,
+    private val logRecordDao: LogRecordDao,
+    private val logDataDao: LogDataDao
 ) : BaseViewModel() {
 
 
@@ -60,7 +60,7 @@ class HomeViewModel @Inject constructor(
                 }
             }
             launch {
-                programRepo.getAll().collect {
+                programDao.getAll().collect {
                     _programList.value = listOf(
                         Program(
                             name = "洗涤",
@@ -276,10 +276,10 @@ class HomeViewModel @Inject constructor(
                     voltage = state.value.voltage,
                     time = state.value.time,
                 )
-                logRecordRepo.insert(log)
+                logRecordDao.insert(log)
                 for (i in 0..(state.value.time * 60).toInt() step 5) {
                     val rec = appViewModel.received.value
-                    logDataRepo.insert(
+                    logDataDao.insert(
                         LogData().copy(
                             logId = log.id,
                             time = i,
@@ -339,15 +339,6 @@ class HomeViewModel @Inject constructor(
                 cleanJob = null
             }
         }
-    }
-
-    /**
-     * 更新时间
-     * @param xy 模块
-     */
-    fun setCurrentTime(xy: Int) {
-        val state = getUiState(xy)
-        state.value = state.value.copy(currentTime = "00:00")
     }
 
     /**
@@ -477,7 +468,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val state = getUiState(xy = xy)
             state.value.program?.let {
-                programRepo.update(
+                programDao.update(
                     it.copy(
                         count = it.count + 1,
                         upload = 0

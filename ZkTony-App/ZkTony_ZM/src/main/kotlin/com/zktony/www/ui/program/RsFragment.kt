@@ -1,6 +1,5 @@
 package com.zktony.www.ui.program
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -24,27 +23,46 @@ class RsFragment : BaseFragment<RsViewModel, FragmentRsBinding>(R.layout.fragmen
     override val viewModel: RsViewModel by viewModels()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-        initProgram()
+        initView()
         initFlowCollector()
-        initButton()
-        initEditText()
     }
 
     /**
      * 初始化程序拿到传过来的id
      * 如果不是‘None’就是修改不然是添加
      */
-    private fun initProgram() {
+    private fun initView() {
         arguments?.let {
-            RsFragmentArgs.fromBundle(it).id.run {
-                if (this != "None") {
-                    viewModel.loadProgram(this) { program ->
-                        binding.run {
-                            name.setText(program.name)
-                            voltage.setText(program.voltage.toString().removeZero())
-                            time.setText(program.time.toString().removeZero())
-                        }
-                    }
+            val id = it.getString("id") ?: ""
+            if (id.isNotEmpty()) {
+                viewModel.load(id)
+            }
+        }
+        binding.apply {
+            name.afterTextChange {
+                viewModel.setName(it)
+            }
+            voltage.afterTextChange {
+                viewModel.setVoltage(voltage = it.toFloatOrNull() ?: 0f, block = {
+                    binding.voltage.setText(MAX_VOLTAGE_RS.toString().removeZero())
+                })
+            }
+            time.afterTextChange {
+                viewModel.setTime(time = it.toFloatOrNull() ?: 0f, block = {
+                    binding.time.setText(MAX_TIME.toString().removeZero())
+                })
+            }
+            cancel.clickNoRepeat { findNavController().navigateUp() }
+            save.clickNoRepeat {
+                viewModel.save {
+                    PopTip.show("保存成功")
+                    findNavController().navigateUp()
+                }
+            }
+            with(back) {
+                clickScale()
+                clickNoRepeat {
+                    findNavController().navigateUp()
                 }
             }
         }
@@ -62,50 +80,16 @@ class RsFragment : BaseFragment<RsViewModel, FragmentRsBinding>(R.layout.fragmen
                     } else {
                         binding.save.visibility = View.GONE
                     }
+                    binding.apply {
+                        name.setEqualText(it.name)
+                        if (it.voltage > 0f) {
+                            voltage.setEqualText(it.voltage.toString().removeZero())
+                        }
+                        if (it.time > 0f) {
+                            time.setEqualText(it.time.toString().removeZero())
+                        }
+                    }
                 }
-            }
-        }
-    }
-
-    /**
-     * 初始化按钮
-     */
-    private fun initButton() {
-        binding.back.run {
-            clickScale()
-            clickNoRepeat {
-                findNavController().navigateUp()
-            }
-        }
-        binding.cancel.clickNoRepeat {
-            findNavController().navigateUp()
-        }
-        binding.save.clickNoRepeat {
-            viewModel.save {
-                PopTip.show("保存成功")
-                findNavController().navigateUp()
-            }
-        }
-    }
-
-    /**
-     * 初始化输入框
-     */
-    @SuppressLint("SetTextI18n")
-    private fun initEditText() {
-        binding.run {
-            name.afterTextChange {
-                viewModel.setName(it)
-            }
-            voltage.afterTextChange {
-                viewModel.setVoltage(voltage = it.toFloatOrNull() ?: 0f, block = {
-                    binding.voltage.setText(MAX_VOLTAGE_RS.toString().removeZero())
-                })
-            }
-            time.afterTextChange {
-                viewModel.setTime(time = it.toFloatOrNull() ?: 0f, block = {
-                    binding.time.setText(MAX_TIME.toString().removeZero())
-                })
             }
         }
     }

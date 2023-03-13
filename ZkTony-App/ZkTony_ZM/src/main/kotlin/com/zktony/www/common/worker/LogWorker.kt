@@ -4,8 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.www.data.repository.LogDataRepository
-import com.zktony.www.data.repository.LogRecordRepository
+import com.zktony.www.data.local.room.dao.LogRecordDao
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import javax.inject.Inject
@@ -21,17 +20,17 @@ class LogWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     @Inject
-    lateinit var logRecordRepository: LogRecordRepository
+    lateinit var logRecordDao: LogRecordDao
 
     @Inject
-    lateinit var logDataRepository: LogDataRepository
+    lateinit var logDataDao: LogRecordDao
 
     override suspend fun doWork(): Result {
         return try {
-            logRecordRepository.deleteByDate()
-            logDataRepository.deleteByDate()
-            logDataRepository.deleteDataLessThanTen()
-            logRecordRepository.deleteInvalidedLog()
+            logRecordDao.deleteByDate()
+            logDataDao.deleteByDate()
+            logDataDao.deleteInvaliedLog()
+            logRecordDao.deleteInvaliedLog()
             Result.success()
         } catch (e: Exception) {
             Result.failure()

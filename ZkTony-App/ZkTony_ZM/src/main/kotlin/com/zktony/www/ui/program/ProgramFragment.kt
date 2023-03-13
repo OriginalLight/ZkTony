@@ -63,11 +63,12 @@ class ProgramFragment :
         }
         adapter.setOnEditButtonClick {
             findNavController().navigate(
-                directions = if (it.model == 0) {
-                    ProgramFragmentDirections.actionNavigationProgramToNavigationZm(it.id)
+                if (it.model == 0) {
+                    R.id.action_navigation_program_to_navigation_zm
                 } else {
-                    ProgramFragmentDirections.actionNavigationProgramToNavigationRs(it.id)
-                }
+                    R.id.action_navigation_program_to_navigation_rs
+                },
+                Bundle().apply { putString("id", it.id) }
             )
         }
         binding.apply {

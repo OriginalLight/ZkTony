@@ -1,6 +1,5 @@
 package com.zktony.www.ui.program
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -26,10 +25,7 @@ class ZmFragment : BaseFragment<ZmViewModel, FragmentZmBinding>(R.layout.fragmen
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
-        initProgram()
-        initButton()
-        initEditText()
-        initRadioGroup()
+        initView()
     }
 
     /**
@@ -38,21 +34,95 @@ class ZmFragment : BaseFragment<ZmViewModel, FragmentZmBinding>(R.layout.fragmen
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { uiState ->
-                    if (uiState.name.isNotEmpty()
-                        && uiState.danbaiName.isNotEmpty()
-                        && uiState.danbaiMin > 0f
-                        && uiState.danbaiMax > 0f
-                        && ((uiState.jiaoKind == 0 && uiState.jiaoNormalSize > 0f) || (uiState.jiaoKind == 1 && uiState.jiaoMax > 0f && uiState.jiaoMin > 0f))
-                        && uiState.jiaoHoudu.isNotEmpty()
-                        && uiState.waterKind.isNotEmpty()
-                        && uiState.voltage > 0f
-                        && uiState.motor > 0f
-                        && uiState.time > 0f
+                viewModel.uiState.collect {
+                    if (it.name.isNotEmpty()
+                        && it.danbaiName.isNotEmpty()
+                        && it.danbaiMin > 0f
+                        && it.danbaiMax > 0f
+                        && ((it.jiaoKind == 0 && it.jiaoNormalSize > 0f) || (it.jiaoKind == 1 && it.jiaoMax > 0f && it.jiaoMin > 0f))
+                        && it.jiaoHoudu.isNotEmpty()
+                        && it.waterKind.isNotEmpty()
+                        && it.voltage > 0f
+                        && it.motor > 0f
+                        && it.time > 0f
                     ) {
                         binding.save.visibility = View.VISIBLE
                     } else {
                         binding.save.visibility = View.GONE
+                    }
+                    binding.apply {
+                        name.setEqualText(it.name)
+                        danbaiName.setEqualText(it.danbaiName)
+                        if (it.danbaiMin > 0f) {
+                            danbaiMin.setEqualText(it.danbaiMin.toString().removeZero())
+                        }
+                        if (it.danbaiMax > 0f) {
+                            danbaiMax.setEqualText(it.danbaiMax.toString().removeZero())
+                        }
+                        if (it.jiaoKind == 0) {
+                            radioJiaoNormal.isChecked = true
+                            radioJiaoSpecial.isChecked = false
+                            jiaoNormal.visibility = View.VISIBLE
+                            jiaoMaxMin.visibility = View.GONE
+                            if (it.jiaoNormalSize > 0f) {
+                                jiaoNormalSize.setEqualText(
+                                    it.jiaoNormalSize.toString().removeZero()
+                                )
+                            }
+                        }
+                        if (it.jiaoKind == 1) {
+                            radioJiaoNormal.isChecked = false
+                            radioJiaoSpecial.isChecked = true
+                            jiaoNormal.visibility = View.GONE
+                            jiaoMaxMin.visibility = View.VISIBLE
+                            if (it.jiaoMax > 0f) {
+                                jiaoMax.setEqualText(it.jiaoMax.toString().removeZero())
+                            }
+                            if (it.jiaoMin > 0f) {
+                                jiaoMin.setEqualText(it.jiaoMin.toString().removeZero())
+                            }
+                        }
+                        if (it.jiaoHoudu == "0.75") {
+                            radioJiao075.isChecked = true
+                        }
+                        if (it.jiaoHoudu == "1.0") {
+                            radioJiao10.isChecked = true
+                        }
+                        if (it.jiaoHoudu == "1.5") {
+                            radioJiao15.isChecked = true
+                        }
+                        if (it.waterKind == "厂家") {
+                            factory.isChecked = true
+                            otherWaterInfo.visibility = View.GONE
+                        } else {
+                            other.isChecked = true
+                            otherWaterInfo.visibility = View.VISIBLE
+                            otherWater.setEqualText(it.waterKind)
+                        }
+                        if (it.voltage > 0f) {
+                            voltage.setEqualText(it.voltage.toString().removeZero())
+                        }
+                        if (it.motor > 0f) {
+                            motor.setEqualText(it.motor.toString().removeZero())
+                        }
+                        if (it.time > 0f) {
+                            time.setEqualText(it.time.toString().removeZero())
+                        }
+                        if (it.name.isNotEmpty()
+                            && it.danbaiName.isNotEmpty()
+                            && it.danbaiMin > 0f
+                            && it.danbaiMax > 0f
+                            && ((it.jiaoKind == 0 && it.jiaoNormalSize > 0f) || (it.jiaoKind == 1 && it.jiaoMax > 0f && it.jiaoMin > 0f))
+                            && it.jiaoHoudu.isNotEmpty()
+                            && it.waterKind.isNotEmpty()
+                            && it.voltage > 0f
+                            && it.motor > 0f
+                            && it.time > 0f
+                        ) {
+                            save.visibility = View.VISIBLE
+                        } else {
+                            save.visibility = View.GONE
+                        }
                     }
                 }
             }
@@ -63,100 +133,29 @@ class ZmFragment : BaseFragment<ZmViewModel, FragmentZmBinding>(R.layout.fragmen
      * 初始化程序拿到传过来的id
      * 如果不是‘None’就是修改不然是添加
      */
-    private fun initProgram() {
+    private fun initView() {
         arguments?.let {
-            RsFragmentArgs.fromBundle(it).id.run {
-                if (this != "None") {
-                    viewModel.loadProgram(this) { uiState ->
-                        binding.run {
-                            name.setText(uiState.name)
-                            danbaiName.setText(uiState.danbaiName)
-                            danbaiMin.setText(uiState.danbaiMin.toString().removeZero())
-                            danbaiMax.setText(uiState.danbaiMax.toString().removeZero())
-                            if (uiState.jiaoKind == 0) {
-                                radioJiaoNormal.isChecked = true
-                                jiaoNormal.visibility = View.VISIBLE
-                                jiaoMaxMin.visibility = View.GONE
-                                jiaoNormalSize.setText(
-                                    uiState.jiaoNormalSize.toString().removeZero()
-                                )
-                            }
-                            if (uiState.jiaoKind == 1) {
-                                radioJiaoNormal.isChecked = false
-                                jiaoNormal.visibility = View.GONE
-                                jiaoMaxMin.visibility = View.VISIBLE
-                                jiaoMax.setText(uiState.jiaoMax.toString().removeZero())
-                                jiaoMin.setText(uiState.jiaoMin.toString().removeZero())
-                            }
-                            if (uiState.jiaoHoudu == "0.75") {
-                                radioJiao075.isChecked = true
-                            }
-                            if (uiState.jiaoHoudu == "1.0") {
-                                radioJiao10.isChecked = true
-                            }
-                            if (uiState.jiaoHoudu == "1.5") {
-                                radioJiao15.isChecked = true
-                            }
-                            if (uiState.waterKind == "厂家") {
-                                factory.isChecked = true
-                                otherWaterInfo.visibility = View.GONE
-                            } else {
-                                other.isChecked = true
-                                otherWaterInfo.visibility = View.VISIBLE
-                                otherWater.setText(uiState.waterKind)
-                            }
-                            voltage.setText(uiState.voltage.toString().removeZero())
-                            motor.setText(uiState.motor.toString().removeZero())
-                            time.setText(uiState.time.toString().removeZero())
-                            if (uiState.name.isNotEmpty()
-                                && uiState.danbaiName.isNotEmpty()
-                                && uiState.danbaiMin > 0f
-                                && uiState.danbaiMax > 0f
-                                && ((uiState.jiaoKind == 0 && uiState.jiaoNormalSize > 0f) || (uiState.jiaoKind == 1 && uiState.jiaoMax > 0f && uiState.jiaoMin > 0f))
-                                && uiState.jiaoHoudu.isNotEmpty()
-                                && uiState.waterKind.isNotEmpty()
-                                && uiState.voltage > 0f
-                                && uiState.motor > 0f
-                                && uiState.time > 0f
-                            ) {
-                                save.visibility = View.VISIBLE
-                            } else {
-                                save.visibility = View.GONE
-                            }
-                        }
-                    }
+            val id = it.getString("id") ?: ""
+            if (id.isNotEmpty()) {
+                viewModel.load(id)
+            }
+        }
+        binding.apply {
+            cancel.clickNoRepeat {
+                findNavController().navigateUp()
+            }
+            save.clickNoRepeat {
+                viewModel.save {
+                    PopTip.show("保存成功")
+                    findNavController().navigateUp()
                 }
             }
-        }
-    }
-
-    /**
-     * 初始化按钮
-     */
-    private fun initButton() {
-        binding.back.run {
-            clickScale()
-            clickNoRepeat {
-                findNavController().navigateUp()
+            with(back) {
+                clickScale()
+                clickNoRepeat {
+                    findNavController().navigateUp()
+                }
             }
-        }
-        binding.cancel.clickNoRepeat {
-            findNavController().navigateUp()
-        }
-        binding.save.clickNoRepeat {
-            viewModel.save {
-                PopTip.show("保存成功")
-                findNavController().navigateUp()
-            }
-        }
-    }
-
-    /**
-     * 初始化EditText
-     */
-    @SuppressLint("SetTextI18n")
-    private fun initEditText() {
-        binding.run {
             name.afterTextChange { viewModel.setName(it) }
             danbaiName.afterTextChange { viewModel.setDanbaiName(it) }
             danbaiMin.afterTextChange { viewModel.setDanbaiMin(it.toFloatOrNull() ?: 0f) }
@@ -180,14 +179,7 @@ class ZmFragment : BaseFragment<ZmViewModel, FragmentZmBinding>(R.layout.fragmen
                     binding.motor.setText(MAX_MOTOR.toString().removeZero())
                 })
             }
-        }
-    }
 
-    /**
-     * 初始化RadioGroup
-     */
-    private fun initRadioGroup() {
-        binding.run {
             radioGroupJiaoKind.setOnCheckedChangeListener { _, checkedId ->
                 when (checkedId) {
                     R.id.radio_jiao_normal -> {

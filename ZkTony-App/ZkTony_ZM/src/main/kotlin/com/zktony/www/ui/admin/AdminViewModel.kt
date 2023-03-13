@@ -20,7 +20,7 @@ import com.zktony.gpio.Gpio
 import com.zktony.www.BuildConfig
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.data.remote.model.Application
-import com.zktony.www.data.repository.ApplicationRepository
+import com.zktony.www.data.remote.service.ApplicationService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,7 +32,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AdminViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
-    private val applicationRepository: ApplicationRepository,
+    private val service: ApplicationService,
 ) : BaseViewModel() {
 
     @Inject
@@ -223,7 +223,7 @@ class AdminViewModel @Inject constructor(
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (CommonApplicationProxy.application.isNetworkAvailable()) {
-                applicationRepository.getById()
+                service.getById(BuildConfig.APPLICATION_ID)
                     .catch {
                         PopTip.show("升级接口异常请联系管理员")
                     }

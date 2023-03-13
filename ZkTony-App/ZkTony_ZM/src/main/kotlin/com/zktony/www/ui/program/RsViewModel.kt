@@ -5,8 +5,8 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.common.utils.Constants.MAX_TIME
 import com.zktony.common.utils.Constants.MAX_VOLTAGE_RS
+import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Program
-import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RsViewModel @Inject constructor(
-    private val repo: ProgramRepository
+    private val programDao: ProgramDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(RsUiState())
@@ -23,22 +23,21 @@ class RsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repo.getAll().collect {
+            programDao.getAll().collect {
                 _uiState.value = _uiState.value.copy(programList = it)
             }
         }
     }
 
-    fun loadProgram(id: String, block: (RsUiState) -> Unit) {
+    fun load(id: String) {
         viewModelScope.launch {
-            repo.getById(id).collect {
+            programDao.getById(id).collect {
                 _uiState.value = _uiState.value.copy(
                     program = it,
                     name = it.name,
                     voltage = it.voltage,
                     time = it.time
                 )
-                block(_uiState.value)
             }
         }
     }
@@ -51,7 +50,7 @@ class RsViewModel @Inject constructor(
                     PopTip.show("名称已存在")
                     return@launch
                 }
-                repo.insert(
+                programDao.insert(
                     Program(
                         name = _uiState.value.name,
                         voltage = _uiState.value.voltage,
@@ -64,7 +63,7 @@ class RsViewModel @Inject constructor(
                     PopTip.show("名称已存在")
                     return@launch
                 }
-                repo.update(
+                programDao.update(
                     _uiState.value.program!!.copy(
                         name = _uiState.value.name,
                         voltage = _uiState.value.voltage,

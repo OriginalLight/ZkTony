@@ -5,9 +5,9 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.zktony.www.data.local.room.dao.LogDataDao
 import com.zktony.www.data.remote.model.LogDetailDTO
-import com.zktony.www.data.repository.LogDataRepository
-import com.zktony.www.data.repository.LogRepository
+import com.zktony.www.data.remote.service.LogService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.catch
@@ -25,14 +25,14 @@ class LogDataWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     @Inject
-    lateinit var logDataRepository: LogDataRepository
+    lateinit var dao: LogDataDao
 
     @Inject
-    lateinit var logRepository: LogRepository
+    lateinit var service: LogService
 
     override suspend fun doWork(): Result {
         try {
-            logDataRepository.withoutUpload().first().let { logs ->
+            dao.withoutUpload().first().let { logs ->
                 if (logs.isEmpty()) {
                     Log.d("LogDataWorker", "上传日志数据为空")
                     return Result.success()
@@ -48,12 +48,12 @@ class LogDataWorker @AssistedInject constructor(
                         )
                     )
                 }
-                logRepository.uploadLogData(list)
+                service.uploadLogDetail(list)
                     .catch {
                         Log.d("LogDataWorker", "上传日志数据失败")
                     }
                     .collect {
-                        logDataRepository.updateAll(logs.map { it.copy(upload = 1) })
+                        dao.updateAll(logs.map { it.copy(upload = 1) })
                     }
             }
             return Result.success()

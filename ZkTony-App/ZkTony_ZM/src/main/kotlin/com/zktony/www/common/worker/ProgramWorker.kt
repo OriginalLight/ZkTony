@@ -5,8 +5,9 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.remote.model.ProgramDTO
-import com.zktony.www.data.repository.ProgramRepository
+import com.zktony.www.data.remote.service.ProgramService
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.catch
@@ -24,11 +25,14 @@ class ProgramWorker @AssistedInject constructor(
 ) : CoroutineWorker(appContext, workerParams) {
 
     @Inject
-    lateinit var programRepository: ProgramRepository
+    lateinit var dao: ProgramDao
+
+    @Inject
+    lateinit var service: ProgramService
 
     override suspend fun doWork(): Result {
         try {
-            programRepository.withoutUpload().first().let { programs ->
+            dao.withoutUpload().first().let { programs ->
                 if (programs.isEmpty()) {
                     Log.d("ProgramWorker", "上传程序为空")
                     return Result.success()
@@ -49,12 +53,12 @@ class ProgramWorker @AssistedInject constructor(
                         )
                     )
                 }
-                programRepository.uploadProgram(list)
+                service.uploadProgram(list)
                     .catch {
                         Log.d("ProgramWorker", "上传程序失败")
                     }
                     .collect {
-                        programRepository.updateAll(programs.map { it.copy(upload = 1) })
+                        dao.updateAll(programs.map { it.copy(upload = 1) })
                     }
             }
             return Result.success()

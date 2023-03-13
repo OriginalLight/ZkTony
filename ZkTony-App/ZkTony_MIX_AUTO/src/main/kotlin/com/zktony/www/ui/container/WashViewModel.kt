@@ -5,8 +5,8 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.data.local.room.dao.ContainerDao
 import com.zktony.www.data.local.room.entity.Plate
-import com.zktony.www.data.repository.PlateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WashViewModel @Inject constructor(
-    private val plateRepository: PlateRepository
+    private val containerDao: ContainerDao,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow<Plate?>(null)

@@ -1,7 +1,6 @@
 package com.zktony.www.data.local.room.entity
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.zktony.common.utils.Snowflake
 import java.util.*
@@ -12,14 +11,10 @@ import java.util.*
  */
 @Entity(tableName = "plate")
 data class Plate(
-    @PrimaryKey
-    val id: Long = Snowflake(1).nextId(),
+    @PrimaryKey val id: Long = Snowflake(1).nextId(),
     val subId: Long = 0L,
     val x: Int = 0,
     val y: Int = 0,
     val index: Int = 0,
     val createTime: Date = Date(System.currentTimeMillis()),
-) {
-    @Ignore
-    val holeList: List<Hole> = listOf()
-}
+)

@@ -14,18 +14,18 @@ interface CalibrationDataDao : BaseDao<CalibrationData> {
     @Query(
         """
         DELETE FROM calibration_data
-        WHERE calibrationId = :calibrationId
+        WHERE subId = :id
         """
     )
-    suspend fun deleteByCalibrationId(calibrationId: String)
+    suspend fun deleteBySubId(id: Long)
 
     @Query(
         """
         SELECT * FROM calibration_data
-        WHERE calibrationId = :calibrationId
+        WHERE subId = :id
         ORDER BY pumpId ASC , createTime ASC
         """
     )
-    fun getByCalibrationId(calibrationId: String): Flow<List<CalibrationData>>
+    fun getBySubId(id: Long): Flow<List<CalibrationData>>
 
 }

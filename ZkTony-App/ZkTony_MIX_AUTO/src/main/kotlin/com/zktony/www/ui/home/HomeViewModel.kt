@@ -9,10 +9,10 @@ import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.data.local.room.dao.LogDao
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Log
 import com.zktony.www.data.local.room.entity.Work
-import com.zktony.www.data.repository.LogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val logRepository: LogRepository
+    private val logDao: LogDao,
 ) : BaseViewModel() {
 
     @Inject
@@ -162,7 +162,7 @@ class HomeViewModel @Inject constructor(
     private fun updateLog(log: Log) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(log = log)
-            logRepository.insert(log)
+            logDao.insert(log)
         }
     }
 

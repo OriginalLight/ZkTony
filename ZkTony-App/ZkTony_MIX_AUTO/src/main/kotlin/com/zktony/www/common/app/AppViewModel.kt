@@ -9,13 +9,18 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.utils.Constants
 import com.zktony.www.control.motor.MotorManager
+import com.zktony.www.data.local.room.dao.CalibrationDao
+import com.zktony.www.data.local.room.dao.ContainerDao
+import com.zktony.www.data.local.room.dao.MotorDao
+import com.zktony.www.data.local.room.dao.PlateDao
+import com.zktony.www.data.local.room.entity.Calibration
 import com.zktony.www.data.local.room.entity.Container
-import com.zktony.www.data.repository.CalibrationRepository
-import com.zktony.www.data.repository.ContainerRepository
-import com.zktony.www.data.repository.MotorRepository
+import com.zktony.www.data.local.room.entity.Motor
+import com.zktony.www.data.local.room.entity.Plate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,9 +32,10 @@ import javax.inject.Inject
 class AppViewModel @Inject constructor(
     application: Application,
     private val dataStore: DataStore<Preferences>,
-    private val motorRepository: MotorRepository,
-    private val calibrationRepository: CalibrationRepository,
-    private val containerRepository: ContainerRepository
+    private val motor: MotorDao,
+    private val calibration: CalibrationDao,
+    private val container: ContainerDao,
+    private val plate: PlateDao,
 ) : AndroidViewModel(application) {
 
     private val _settings = MutableStateFlow(Settings())
@@ -38,9 +44,7 @@ class AppViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                //containerRepository.init()
-                motorRepository.init()
-                calibrationRepository.init()
+                init()
             }
             launch {
                 dataStore.data.map {
@@ -57,20 +61,54 @@ class AppViewModel @Inject constructor(
                 }
             }
             launch {
-                containerRepository.getById(1).collect {
-                    _settings.value = _settings.value.copy(container = it)
-                }
-            }
-            launch {
-                motorRepository.getAll().collect {
+                motor.getAll().collect {
                     MotorManager.instance.initMotor(it)
                 }
             }
             launch {
-                calibrationRepository.getAll().collect {
+                calibration.getAll().collect {
                     MotorManager.instance.initCalibration(it)
                 }
             }
+        }
+    }
+
+    suspend fun init() {
+        // 初始化电机
+        val motors = motor.getAll().firstOrNull() ?: emptyList()
+        if (motors.isEmpty()) {
+            motor.insertAll(
+                listOf(
+                    Motor(id = 0, name = "X轴", address = 1),
+                    Motor(id = 1, name = "Z轴", address = 3),
+                    Motor(id = 2, name = "泵一", address = 3),
+                    Motor(id = 3, name = "泵二", address = 1),
+                    Motor(id = 4, name = "泵三", address = 2),
+                )
+            )
+        }
+        // 初始化容器
+        val con = container.getAll().firstOrNull() ?: emptyList()
+        if (con.isEmpty()) {
+            container.insert(
+                Container(
+                    id = 1L,
+                    name = "默认容器",
+                )
+            )
+            plate.insert(
+                Plate(
+                    id = 1L,
+                    subId = 1L,
+                    x = 10,
+                    y = 1,
+                )
+            )
+        }
+        // 初始化标定
+        val cal = calibration.getAll().firstOrNull() ?: emptyList()
+        if (cal.isEmpty()) {
+            calibration.insert(Calibration(enable = 1))
         }
     }
 }
@@ -78,5 +116,4 @@ class AppViewModel @Inject constructor(
 data class Settings(
     val bar: Boolean = false,
     val needleSpace: Float = 7.3f,
-    val container: Container = Container(),
 )

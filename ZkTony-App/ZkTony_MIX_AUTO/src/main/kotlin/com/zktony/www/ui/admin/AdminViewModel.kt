@@ -24,10 +24,10 @@ import com.zktony.www.common.extension.toCommand
 import com.zktony.www.common.extension.toMotor
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.data.local.room.dao.MotorDao
 import com.zktony.www.data.local.room.entity.Motor
 import com.zktony.www.data.remote.model.Application
-import com.zktony.www.data.repository.ApplicationRepository
-import com.zktony.www.data.repository.MotorRepository
+import com.zktony.www.data.remote.service.ApplicationService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,8 +41,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AdminViewModel @Inject constructor(
     private val dataStore: DataStore<Preferences>,
-    private val motorRepository: MotorRepository,
-    private val applicationRepository: ApplicationRepository,
+    private val dao: MotorDao,
+    private val service: ApplicationService,
 ) : BaseViewModel() {
 
     @Inject
@@ -183,7 +183,7 @@ class AdminViewModel @Inject constructor(
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (CommonApplicationProxy.application.isNetworkAvailable()) {
-                applicationRepository.getById()
+                service.getById(BuildConfig.APPLICATION_ID)
                     .catch {
                         PopTip.show("升级接口异常请联系管理员")
                     }
@@ -273,8 +273,8 @@ class AdminViewModel @Inject constructor(
      */
     private fun updateMotor(motor: Motor) {
         viewModelScope.launch {
-            motorRepository.getById(motor.id).firstOrNull()?.let {
-                motorRepository.update(
+            dao.getById(motor.id).firstOrNull()?.let {
+                dao.update(
                     it.copy(
                         subdivision = motor.subdivision,
                         speed = motor.speed,

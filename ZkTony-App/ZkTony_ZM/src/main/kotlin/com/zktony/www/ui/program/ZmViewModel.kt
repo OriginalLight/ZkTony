@@ -6,8 +6,8 @@ import com.zktony.common.base.BaseViewModel
 import com.zktony.common.utils.Constants.MAX_MOTOR
 import com.zktony.common.utils.Constants.MAX_TIME
 import com.zktony.common.utils.Constants.MAX_VOLTAGE_ZM
+import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Program
-import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ZmViewModel @Inject constructor(
-    private val repo: ProgramRepository
+    private val programDao: ProgramDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(ZmUiState())
@@ -24,15 +24,15 @@ class ZmViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repo.getAll().collect {
+            programDao.getAll().collect {
                 _uiState.value = _uiState.value.copy(programList = it)
             }
         }
     }
 
-    fun loadProgram(id: String, block: (ZmUiState) -> Unit) {
+    fun load(id: String) {
         viewModelScope.launch {
-            repo.getById(id).collect {
+            programDao.getById(id).collect {
                 _uiState.value = _uiState.value.copy(
                     program = it,
                     name = it.name,
@@ -49,7 +49,6 @@ class ZmViewModel @Inject constructor(
                     motor = it.motor,
                     time = it.time
                 )
-                block(_uiState.value)
             }
         }
     }
@@ -62,7 +61,7 @@ class ZmViewModel @Inject constructor(
                     PopTip.show("名称已存在")
                     return@launch
                 }
-                repo.insert(
+                programDao.insert(
                     Program(
                         name = _uiState.value.name,
                         proteinName = _uiState.value.danbaiName,
@@ -84,7 +83,7 @@ class ZmViewModel @Inject constructor(
                     PopTip.show("名称已存在")
                     return@launch
                 }
-                repo.update(
+                programDao.update(
                     _uiState.value.program!!.copy(
                         name = _uiState.value.name,
                         proteinName = _uiState.value.danbaiName,

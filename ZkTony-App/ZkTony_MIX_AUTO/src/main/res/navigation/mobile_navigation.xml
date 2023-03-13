@@ -22,60 +22,6 @@
         android:name="com.zktony.www.ui.work.WorkFragment"
         android:label="@string/title_program"
         tools:layout="@layout/fragment_work">
-        <action
-            android:id="@+id/action_navigation_work_to_navigation_work_plate"
-            app:destination="@id/navigation_work_plate"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right">
-            <argument android:name="id" />
-        </action>
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_work_plate"
-        android:name="com.zktony.www.ui.work.WorkPlateFragment"
-        android:label="@string/title_program"
-        tools:layout="@layout/fragment_work_plate">
-        <action
-            android:id="@+id/action_navigation_work_plate_to_navigation_work"
-            app:destination="@id/navigation_work"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/action_navigation_work_plate_to_navigation_work_hole"
-            app:destination="@id/navigation_work_hole"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right">
-            <argument android:name="id" />
-        </action>
-        <argument
-            android:name="id"
-            android:defaultValue="None"
-            app:argType="string" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_work_hole"
-        android:name="com.zktony.www.ui.work.WorkHoleFragment"
-        android:label="@string/title_program"
-        tools:layout="@layout/fragment_work_hole">
-        <action
-            android:id="@+id/action_navigation_work_hole_to_navigation_work_plate"
-            app:destination="@id/navigation_work_plate"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
-        <argument
-            android:name="id"
-            android:defaultValue="None"
-            app:argType="string" />
     </fragment>
 
 
@@ -125,7 +71,6 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right">
-            <argument android:name="id" />
         </action>
     </fragment>
 
@@ -141,10 +86,6 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
-        <argument
-            android:name="id"
-            android:defaultValue="None"
-            app:argType="string" />
     </fragment>
 
 </navigation>
