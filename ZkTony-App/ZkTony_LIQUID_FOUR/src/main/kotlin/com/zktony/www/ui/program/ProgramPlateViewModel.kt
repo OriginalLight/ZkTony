@@ -10,6 +10,7 @@ import com.zktony.www.data.local.room.entity.Plate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,11 +30,6 @@ class WorkPlateViewModel @Inject constructor(
             launch {
                 dao.getByIdList(listOf(1L, 2L, 3L, 4L)).collect {
                     _uiState.value = _uiState.value.copy(plates = it)
-                }
-            }
-            launch {
-                holeDao.getBySudIdList(listOf(1L, 2L, 3L, 4L)).collect {
-                    _uiState.value = _uiState.value.copy(holes = it)
                 }
             }
             launch {
@@ -58,8 +54,8 @@ class WorkPlateViewModel @Inject constructor(
                 dao.delete(p1)
                 holeDao.deleteBySubId(p1.id)
             } else {
-                val p0 = _uiState.value.plates.find { plate -> plate.index == index }!!
-                val h0 = _uiState.value.holes.filter { hole -> hole.subId == p0.id }
+                val p0 = dao.getById((index + 1).toLong()).firstOrNull() ?: return@launch
+                val h0 = holeDao.getBySubId(p0.id).firstOrNull() ?: return@launch
                 val p2 = Plate(subId = _uiState.value.id, index = p0.index, x = p0.x, y = p0.y)
                 dao.insert(p2)
                 val snowflake = Snowflake(2)
@@ -76,7 +72,6 @@ class WorkPlateViewModel @Inject constructor(
 data class WorkPlateUiState(
     val id: Long = 0L,
     val plates: List<Plate> = emptyList(),
-    val holes: List<Hole> = emptyList(),
     val holeList: List<Hole> = emptyList(),
     val plateList: List<Plate> = emptyList(),
 )

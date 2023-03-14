@@ -52,28 +52,26 @@ class ProgramHoleViewModel @Inject constructor(
                 val hole = _uiState.value.holes.find { it.x == x && it.y == y }!!
                 holeDao.update(hole.copy(enable = !hole.enable))
             } else {
-                val hole = _uiState.value.holes.find { it.x == x && it.y == y }
-                if (hole != null) {
-                    if (hole.enable) {
-                        holeDao.update(hole.copy(enable = false))
-                    } else {
-                        volumeDialog(
-                            v1 = hole.v1,
-                            v2 = hole.v2,
-                            v3 = hole.v3,
-                            v4 = hole.v4,
-                        ) { v1, v2, v3, v4 ->
-                            launch {
-                                holeDao.update(
-                                    hole.copy(
-                                        enable = true,
-                                        v1 = v1,
-                                        v2 = v2,
-                                        v3 = v3,
-                                        v4 = v4
-                                    )
+                val hole = _uiState.value.holes.find { it.x == x && it.y == y }!!
+                if (hole.enable) {
+                    holeDao.update(hole.copy(enable = false))
+                } else {
+                    volumeDialog(
+                        v1 = hole.v1,
+                        v2 = hole.v2,
+                        v3 = hole.v3,
+                        v4 = hole.v4,
+                    ) { v1, v2, v3, v4 ->
+                        viewModelScope.launch {
+                            holeDao.update(
+                                hole.copy(
+                                    enable = true,
+                                    v1 = v1,
+                                    v2 = v2,
+                                    v3 = v3,
+                                    v4 = v4
                                 )
-                            }
+                            )
                         }
                     }
                 }

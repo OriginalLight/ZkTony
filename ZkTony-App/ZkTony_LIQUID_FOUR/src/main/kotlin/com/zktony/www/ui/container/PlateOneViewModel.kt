@@ -50,8 +50,8 @@ class PlateOneViewModel @Inject constructor(
                     holeDao.deleteBySubId(it.id)
                     val snowflake = Snowflake(2)
                     val holes = mutableListOf<Hole>()
-                    for (i in 0 until  it.x) {
-                        for (j in 0 until it.y) {
+                    for (i in 0 until  x) {
+                        for (j in 0 until y) {
                             holes.add(Hole(id = snowflake.nextId(), subId = it.id, x = i, y = j))
                         }
                     }

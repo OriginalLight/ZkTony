@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
@@ -113,38 +114,46 @@ class ProgramPlateFragment :
         binding.apply {
             dynamicPlateOne.setOnClickListener {
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 0 }
-                plate?.let {
+                if (plate != null) {
                     findNavController().navigate(
                         R.id.action_navigation_program_plate_to_navigation_program_hole,
-                        Bundle().apply { putLong("id", it.id) }
+                        Bundle().apply { putLong("id", plate.id) }
                     )
+                } else {
+                    PopTip.show("请先选中")
                 }
             }
             dynamicPlateTwo.setOnClickListener {
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 1 }
-                plate?.let {
+                if (plate != null) {
                     findNavController().navigate(
                         R.id.action_navigation_program_plate_to_navigation_program_hole,
-                        Bundle().apply { putLong("id", it.id) }
+                        Bundle().apply { putLong("id", plate.id) }
                     )
+                } else {
+                    PopTip.show("请先选中")
                 }
             }
             dynamicPlateThree.setOnClickListener {
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 2 }
-                plate?.let {
+                if (plate != null) {
                     findNavController().navigate(
                         R.id.action_navigation_program_plate_to_navigation_program_hole,
-                        Bundle().apply { putLong("id", it.id) }
+                        Bundle().apply { putLong("id", plate.id) }
                     )
+                } else {
+                    PopTip.show("请先选中")
                 }
             }
             dynamicPlateFour.setOnClickListener {
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 3 }
-                plate?.let {
+                if (plate != null) {
                     findNavController().navigate(
                         R.id.action_navigation_program_plate_to_navigation_program_hole,
-                        Bundle().apply { putLong("id", it.id) }
+                        Bundle().apply { putLong("id", plate.id) }
                     )
+                } else {
+                    PopTip.show("请先选中")
                 }
             }
             with(back) {
