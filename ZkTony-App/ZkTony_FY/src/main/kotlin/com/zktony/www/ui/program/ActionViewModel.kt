@@ -2,11 +2,11 @@ package com.zktony.www.ui.program
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
+import com.zktony.www.data.local.room.dao.ActionDao
+import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Action
 import com.zktony.www.data.local.room.entity.ActionEnum
 import com.zktony.www.data.local.room.entity.getActionEnum
-import com.zktony.www.data.repository.ActionRepository
-import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,8 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ActionViewModel @Inject constructor(
-    private val programRepo: ProgramRepository,
-    private val actionRepo: ActionRepository
+    private val programDao: ProgramDao,
+    private val actionDao: ActionDao
 ) : BaseViewModel() {
 
     private val _actionList = MutableStateFlow(emptyList<Action>())
@@ -35,7 +35,7 @@ class ActionViewModel @Inject constructor(
         viewModelScope.launch {
             programId.collect {
                 if (it != "None") {
-                    actionRepo.getByProgramId(it).collect { actionList ->
+                    actionDao.getByProgramId(it).collect { actionList ->
                         _actionList.value = actionList
                     }
                 }
@@ -45,11 +45,11 @@ class ActionViewModel @Inject constructor(
 
     /**
      * 加载程序列表
-     * @param programId [String] 程序ID
+     * @param id [String] 程序ID
      */
-    fun init(programId: String) {
+    fun load(id: String) {
         viewModelScope.launch {
-            _programId.value = programId
+            _programId.value = id
         }
     }
 
@@ -58,7 +58,7 @@ class ActionViewModel @Inject constructor(
      */
     fun insert() {
         viewModelScope.launch {
-            actionRepo.insert(
+            actionDao.insert(
                 _action.value.copy(
                     id = UUID.randomUUID().toString(),
                     programId = programId.value
@@ -75,7 +75,7 @@ class ActionViewModel @Inject constructor(
      */
     fun delete(action: Action) {
         viewModelScope.launch {
-            actionRepo.delete(action)
+            actionDao.delete(action)
             delay(500L)
             updateActions()
         }
@@ -86,7 +86,7 @@ class ActionViewModel @Inject constructor(
      */
     private fun updateActions() {
         viewModelScope.launch {
-            actionRepo.getByProgramId(programId.value).firstOrNull()?.let {
+            actionDao.getByProgramId(programId.value).firstOrNull()?.let {
                 val str = StringBuilder()
                 if (it.isNotEmpty()) {
                     it.forEachIndexed { index, action ->
@@ -98,8 +98,8 @@ class ActionViewModel @Inject constructor(
                 } else {
                     str.append("没有任何操作，去添加吧...")
                 }
-                programRepo.getById(programId.value).firstOrNull()?.let { program ->
-                    programRepo.update(
+                programDao.getById(programId.value).firstOrNull()?.let { program ->
+                    programDao.update(
                         program.copy(
                             actions = str.toString(),
                             actionCount = it.size

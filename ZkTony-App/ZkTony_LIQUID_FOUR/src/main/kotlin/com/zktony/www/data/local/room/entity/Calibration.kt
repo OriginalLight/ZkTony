@@ -2,6 +2,7 @@ package com.zktony.www.data.local.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.zktony.common.utils.Snowflake
 import java.util.*
 
 /**
@@ -11,7 +12,7 @@ import java.util.*
 @Entity(tableName = "calibration")
 data class Calibration(
     @PrimaryKey
-    val id: String = UUID.randomUUID().toString(),
+    val id: Long = Snowflake(1).nextId(),
     // 校准名称
     val name: String = "默认",
     // x轴电机一圈走的距离

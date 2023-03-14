@@ -13,33 +13,24 @@ interface HoleDao : BaseDao<Hole> {
     @Query(
         """
         SELECT * FROM hole
-        WHERE plateId = :plateId
+        WHERE subId = :id
         """
     )
-    fun getByPlateId(plateId: String): Flow<List<Hole>>
-
-    @Query(
-        """
-        DELETE FROM hole
-        WHERE plateId = :plateId
-        """
-    )
-    suspend fun deleteByPlateId(plateId: String)
-
-    @Query(
-        """
-        DELETE FROM hole
-        WHERE workId = :workId
-        """
-    )
-    suspend fun deleteByWorkId(workId: String)
+    fun getBySubId(id: Long): Flow<List<Hole>>
 
     @Query(
         """
         SELECT * FROM hole
-        WHERE workId = :workId
+        WHERE subId IN (:idList)
         """
     )
-    fun getByWorkId(workId: String): Flow<List<Hole>>
+    fun getBySudIdList(idList: List<Long>): Flow<List<Hole>>
 
+    @Query(
+        """
+        DELETE FROM hole
+        WHERE subId = :id
+        """
+    )
+    suspend fun deleteBySubId(id: Long)
 }

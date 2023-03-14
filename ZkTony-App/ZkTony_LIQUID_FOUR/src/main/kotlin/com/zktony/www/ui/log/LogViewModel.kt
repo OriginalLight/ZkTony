@@ -2,8 +2,8 @@ package com.zktony.www.ui.log
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
+import com.zktony.www.data.local.room.dao.LogDao
 import com.zktony.www.data.local.room.entity.Log
-import com.zktony.www.data.repository.LogRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LogViewModel @Inject constructor(
-    private val logRepository: LogRepository
+    private val dao: LogDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow<List<Log>>(emptyList())
@@ -20,7 +20,7 @@ class LogViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            logRepository.getAll().collect {
+            dao.getAll().collect {
                 _uiState.value = it
             }
         }
@@ -28,7 +28,7 @@ class LogViewModel @Inject constructor(
 
     fun delete(log: Log) {
         viewModelScope.launch {
-            logRepository.delete(log)
+            dao.delete(log)
         }
     }
 

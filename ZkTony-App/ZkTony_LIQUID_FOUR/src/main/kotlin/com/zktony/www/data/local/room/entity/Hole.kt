@@ -2,7 +2,7 @@ package com.zktony.www.data.local.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.*
+import com.zktony.common.utils.Snowflake
 
 /**
  * @author: 刘贺贺
@@ -11,9 +11,8 @@ import java.util.*
 @Entity(tableName = "hole")
 data class Hole(
     @PrimaryKey
-    val id: String = UUID.randomUUID().toString(),
-    val plateId: String = "",
-    val workId: String = "",
+    val id: Long = Snowflake(1).nextId(),
+    val subId: Long = 0L,
     val x: Int = 0,
     val y: Int = 0,
     val xAxis: Float = 0f,
@@ -22,5 +21,5 @@ data class Hole(
     val v2: Float = 0f,
     val v3: Float = 0f,
     val v4: Float = 0f,
-    val checked: Boolean = false,
+    val enable: Boolean = false,
 )

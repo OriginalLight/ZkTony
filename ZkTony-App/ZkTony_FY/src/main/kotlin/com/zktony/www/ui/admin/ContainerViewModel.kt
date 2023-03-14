@@ -4,8 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.control.motion.MotionManager
+import com.zktony.www.data.local.room.dao.ContainerDao
 import com.zktony.www.data.local.room.entity.Container
-import com.zktony.www.data.repository.ContainerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ContainerViewModel @Inject constructor(
-    private val containerRepository: ContainerRepository
+    private val dao: ContainerDao
 ) : BaseViewModel() {
 
     @Inject
@@ -27,7 +27,7 @@ class ContainerViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            containerRepository.getAll().collect {
+            dao.getAll().collect {
                 if (it.isNotEmpty()) {
                     _container.value = it.first()
                 }
@@ -41,7 +41,7 @@ class ContainerViewModel @Inject constructor(
      */
     fun update(container: Container) {
         viewModelScope.launch {
-            containerRepository.insert(container)
+            dao.insert(container)
         }
     }
 

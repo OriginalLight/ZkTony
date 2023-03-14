@@ -12,13 +12,13 @@ import com.zktony.serialport.util.Serial.TTYS3
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.data.local.room.dao.ActionDao
+import com.zktony.www.data.local.room.dao.LogDao
+import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Action
 import com.zktony.www.data.local.room.entity.Log
 import com.zktony.www.data.local.room.entity.Program
 import com.zktony.www.data.local.room.entity.getActionEnum
-import com.zktony.www.data.repository.ActionRepository
-import com.zktony.www.data.repository.LogRepository
-import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -30,9 +30,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val programRepository: ProgramRepository,
-    private val actionRepository: ActionRepository,
-    private val logRepository: LogRepository,
+    private val programDao: ProgramDao,
+    private val actionDao: ActionDao,
+    private val logDao: LogDao,
 ) : BaseViewModel() {
 
     @Inject
@@ -56,7 +56,7 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                programRepository.getAll().collect {
+                programDao.getAll().collect {
                     _programFlow.value = it
                     onProgramChange(it)
                 }
@@ -187,7 +187,7 @@ class HomeViewModel @Inject constructor(
             val job = launch {
                 // 将程序中的所有步骤排序放入队列
                 val actionQueue = Queue<Action>()
-                actionRepository.getByProgramId(state.value.program!!.id).first().forEach {
+                actionDao.getByProgramId(state.value.program!!.id).first().forEach {
                     actionQueue.enqueue(it)
                 }
                 // 创建程序执行者
@@ -215,7 +215,7 @@ class HomeViewModel @Inject constructor(
                                     status = "已完成", time = "已完成", log = null
                                 )
                                 delay(100L)
-                                stop(it.module)
+                                stop(it.module, appViewModel.settings.value.temp.toString().removeZero())
                             }
                         }
                         is ExecutorEvent.Count -> {
@@ -248,13 +248,13 @@ class HomeViewModel @Inject constructor(
                     programName = state.value.program?.name ?: "None",
                     module = module,
                 )
-                logRepository.insert(log)
+                logDao.insert(log)
                 // 更新状态中的job和日志
                 state.value = state.value.copy(
                     job = job, log = log
                 )
                 // 更新当前程序的运行次数
-                programRepository.update(
+                programDao.update(
                     state.value.program!!.copy(
                         runCount = state.value.program!!.runCount + 1
                     )
@@ -267,7 +267,7 @@ class HomeViewModel @Inject constructor(
      * 停止执行程序
      * @param module [Int] 模块
      */
-    fun stop(module: Int) {
+    fun stop(module: Int, temp: String = "26") {
         viewModelScope.launch {
             // 获取对应模块的状态
             val state = flow(module)
@@ -284,7 +284,7 @@ class HomeViewModel @Inject constructor(
             )
             // 恢复到室温
             delay(200L)
-            serial.setTemp(addr = module + 1, temp = "26")
+            serial.setTemp(addr = module + 1, temp = temp)
         }
     }
 
@@ -367,7 +367,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             val state = flow(module)
             state.value = state.value.copy(log = log)
-            logRepository.insert(log)
+            logDao.insert(log)
         }
     }
 }

@@ -1,7 +1,7 @@
 package com.zktony.www.data.local.room.dao
 
 import androidx.room.*
-import com.zktony.www.data.local.room.entity.Work
+import com.zktony.www.data.local.room.entity.Program
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -9,21 +9,21 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-13 11:49
  */
 @Dao
-interface WorkDao : BaseDao<Work> {
+interface ProgramDao : BaseDao<Program> {
     @Query(
         """
-        SELECT * FROM work
+        SELECT * FROM program
         """
     )
-    fun getAll(): Flow<List<Work>>
+    fun getAll(): Flow<List<Program>>
 
     @Query(
         """
-        SELECT * FROM work
+        SELECT * FROM program
         WHERE id = :id
         Limit 1
         """
     )
-    fun getById(id: String): Flow<Work>
+    fun getById(id: Long): Flow<Program>
 
 }

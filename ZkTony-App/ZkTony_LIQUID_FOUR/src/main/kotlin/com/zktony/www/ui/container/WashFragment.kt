@@ -27,8 +27,8 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
     private fun initView() {
         binding.position.setOnClickListener {
             positionDialog(
-                textX = viewModel.uiState.value!!.x1,
-                textY = viewModel.uiState.value!!.y1,
+                textX = viewModel.uiState.value!!.wasteX,
+                textY = viewModel.uiState.value!!.wasteY,
                 block1 = { x1, y1 -> viewModel.move(x1, y1) },
                 block2 = { x2, y2 -> viewModel.save(x2, y2) }
             )
@@ -42,8 +42,8 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
                 viewModel.uiState.collect {
                     if (it != null) {
                         binding.position.text =
-                            "( ${it.x1.toString().removeZero()} , ${
-                                it.y1.toString().removeZero()
+                            "( ${it.wasteX.toString().removeZero()} , ${
+                                it.wasteY.toString().removeZero()
                             } )"
                     }
                 }

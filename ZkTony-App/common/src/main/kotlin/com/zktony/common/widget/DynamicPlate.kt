@@ -28,8 +28,8 @@ class DynamicPlate : View {
 
 
     fun setXY(x: Int, y: Int) {
-        this.x = x
-        this.y = y
+        this.x = y
+        this.y = x
         invalidate()
     }
 
@@ -93,7 +93,7 @@ class DynamicPlate : View {
 
         for (i in 0 until x) {
             for (j in 0 until y) {
-                val hole = data.find { it.first == i && it.second == j && it.third }
+                val hole = data.find { it.first == j && it.second == i && it.third }
                 if (hole != null) {
                     canvas?.drawCircle(
                         (i + 0.5f) * spacex,
@@ -131,7 +131,7 @@ class DynamicPlate : View {
                 val yAxis = event.y.toInt()
                 val i = (xAxis / spacex).toInt()
                 val j = (yAxis / spacey).toInt()
-                onItemClick(i, (y - j - 1))
+                onItemClick((y - j - 1), i)
             }
         }
         return super.onTouchEvent(event)

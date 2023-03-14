@@ -22,8 +22,8 @@
     <string name="input_v2">泵二加液量 μL</string>
     <string name="input_v3">泵三加液量 μL</string>
     <string name="input_v4">泵四加液量 μL</string>
-    <string name="input_x">X轴坐标</string>
-    <string name="input_y">Y轴坐标</string>
+    <string name="input_x">横坐标</string>
+    <string name="input_y">纵坐标</string>
     <string name="mode">模式</string>
     <string name="motor_distance">移动距离/转</string>
     <string name="motor_setting">电机设置</string>

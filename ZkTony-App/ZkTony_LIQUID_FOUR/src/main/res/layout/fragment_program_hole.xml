@@ -11,7 +11,7 @@
         android:animateLayoutChanges="true"
         android:background="@color/dark_onBackground"
         android:orientation="vertical"
-        tools:context=".ui.work.WorkHoleFragment">
+        tools:context=".ui.program.ProgramHoleFragment">
 
         <RelativeLayout
             android:layout_width="match_parent"

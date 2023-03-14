@@ -11,7 +11,7 @@
         android:animateLayoutChanges="true"
         android:background="@color/dark_onBackground"
         android:orientation="vertical"
-        tools:context=".ui.work.WorkFragment">
+        tools:context=".ui.program.ProgramFragment">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -73,7 +73,7 @@
             android:layout_weight="1"
             android:background="@color/dark_onBackground"
             app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-            tools:listitem="@layout/item_work" />
+            tools:listitem="@layout/item_program" />
 
     </LinearLayout>
 

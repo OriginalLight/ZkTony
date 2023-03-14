@@ -6,7 +6,7 @@ import com.zktony.www.common.extension.total
 import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.data.local.room.entity.Hole
-import com.zktony.www.data.local.room.entity.WorkPlate
+import com.zktony.www.data.local.room.entity.Plate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -18,8 +18,8 @@ import kotlinx.coroutines.launch
  * 任务执行器
  * @param scope 协程作用域
  */
-class WorkExecutor constructor(
-    private val plateList: List<WorkPlate>,
+class ProgramExecutor constructor(
+    private val plateList: List<Plate>,
     private val holeList: List<Hole>,
     private val settings: Settings,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
@@ -39,11 +39,11 @@ class WorkExecutor constructor(
                 for (e in 0..3) {
                     event(ExecutorEvent.Liquid(e))
                     plateList.forEach { plate ->
-                        event(ExecutorEvent.Plate(plate))
-                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${e + 1}号液体,${plate.sort + 1}号板开始加液\n"))
-                        forEachHole(plate.column, plate.row) { i, j ->
+                        event(ExecutorEvent.CurrentPlate(plate))
+                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${e + 1}号液体,${plate.index + 1}号板开始加液\n"))
+                        forEachHole(plate.x, plate.y) { i, j ->
                             val hole =
-                                holeList.find { it.x == i && it.y == j && it.plateId == plate.id }
+                                holeList.find { it.x == i && it.y == j && it.subId == plate.id }
                             if (hole != null) {
                                 val volume = when (e) {
                                     0 -> hole.v1
@@ -52,7 +52,7 @@ class WorkExecutor constructor(
                                     3 -> hole.v4
                                     else -> 0f
                                 }
-                                if (hole.checked && volume > 0f) {
+                                if (hole.enable && volume > 0f) {
                                     currentHoleList.add(Triple(i, j, true))
                                     event(ExecutorEvent.HoleList(currentHoleList))
                                     while (serial.lock.value || serial.pause.value) {
@@ -108,7 +108,7 @@ class WorkExecutor constructor(
 }
 
 sealed class ExecutorEvent {
-    data class Plate(val plate: WorkPlate) : ExecutorEvent()
+    data class CurrentPlate(val plate: Plate) : ExecutorEvent()
     data class Liquid(val liquid: Int) : ExecutorEvent()
     data class HoleList(val hole: List<Triple<Int, Int, Boolean>>) : ExecutorEvent()
     data class Progress(val total: Int, val complete: Int) : ExecutorEvent()

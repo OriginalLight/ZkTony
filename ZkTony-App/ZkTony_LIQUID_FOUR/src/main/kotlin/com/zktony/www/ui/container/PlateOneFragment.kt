@@ -34,16 +34,23 @@ class PlateOneFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.uiState.collect {
-                        if (it != null) {
+                        val plate = it.plate
+                        if (plate != null) {
+                            val x0y0 = it.holes.find { hole -> hole.x == 0 && hole.y == 0 }
+                            val x1y1 = it.holes.find { hole -> hole.x == plate.x - 1 && hole.y == plate.y - 1 }
                             binding.apply {
-                                dynamicPlate.setXY(it.column, it.row)
-                                rowColumn.text = "${it.row} X ${it.column}"
-                                positionOne.text = "( ${
-                                    it.x1.toString().removeZero()
-                                } , ${it.y1.toString().removeZero()} )"
-                                positionTwo.text = "( ${
-                                    it.x2.toString().removeZero()
-                                } , ${it.y2.toString().removeZero()} )"
+                                dynamicPlate.setXY(plate.x, plate.y)
+                                rowColumn.text = "${plate.x} X ${plate.y}"
+                                if (x0y0 != null) {
+                                    positionOne.text = "( ${
+                                        x0y0.xAxis.toString().removeZero()
+                                    } , ${x0y0.yAxis.toString().removeZero()} )"
+                                }
+                                if (x1y1 != null) {
+                                    positionTwo.text = "( ${
+                                        x1y1.xAxis.toString().removeZero()
+                                    } , ${x1y1.yAxis.toString().removeZero()} )"
+                                }
                             }
                         }
                     }
@@ -59,24 +66,28 @@ class PlateOneFragment :
         binding.apply {
             dynamicPlate.setShowLocation(true)
             rowColumn.setOnClickListener {
+                val plate = viewModel.uiState.value.plate!!
                 sizeDialog(
-                    textRow = viewModel.uiState.value!!.row,
-                    textColumn = viewModel.uiState.value!!.column,
-                    block1 = { row, column -> viewModel.setRowAndColumn(row, column) }
+                    textRow = plate.x,
+                    textColumn = plate.y,
+                    block1 = { row, column -> viewModel.setXY(row, column) }
                 )
             }
             positionOne.setOnClickListener {
+                val hole = viewModel.uiState.value.holes.find { hole -> hole.x == 0 && hole.y == 0 }
                 positionDialog(
-                    textX = viewModel.uiState.value!!.x1,
-                    textY = viewModel.uiState.value!!.y1,
+                    textX = hole?.xAxis ?: 0f,
+                    textY = hole?.yAxis ?: 0f,
                     block1 = { x, y -> viewModel.move(x, y) },
                     block2 = { x, y -> viewModel.save(x, y, 0) }
                 )
             }
             positionTwo.setOnClickListener {
+                val plate = viewModel.uiState.value.plate!!
+                val hole = viewModel.uiState.value.holes.find { hole -> hole.x == plate.x - 1 && hole.y == plate.y - 1 }
                 positionDialog(
-                    textX = viewModel.uiState.value!!.x2,
-                    textY = viewModel.uiState.value!!.y2,
+                    textX = hole?.xAxis ?: 0f,
+                    textY = hole?.yAxis ?: 0f,
                     block1 = { x, y -> viewModel.move(x, y) },
                     block2 = { x, y -> viewModel.save(x, y, 1) }
                 )

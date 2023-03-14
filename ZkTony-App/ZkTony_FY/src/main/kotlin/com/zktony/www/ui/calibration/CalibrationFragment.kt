@@ -56,9 +56,8 @@ class CalibrationFragment :
             }
             setOnEditButtonClick {
                 findNavController().navigate(
-                    directions = CalibrationFragmentDirections.actionNavigationCalibrationToNavigationCalibrationData(
-                        it.id
-                    )
+                    R.id.action_navigation_calibration_to_navigation_calibration_data,
+                    Bundle().apply { putString("id", it.id) }
                 )
             }
         }

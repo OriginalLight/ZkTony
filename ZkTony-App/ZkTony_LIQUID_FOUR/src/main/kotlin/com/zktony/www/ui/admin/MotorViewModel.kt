@@ -6,8 +6,8 @@ import com.zktony.common.base.BaseViewModel
 import com.zktony.serialport.util.Serial
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.data.local.room.dao.MotorDao
 import com.zktony.www.data.local.room.entity.Motor
-import com.zktony.www.data.repository.MotorRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MotorViewModel @Inject constructor(
-    private val motorRepository: MotorRepository
+    private val dao: MotorDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(MotorUiState())
@@ -25,7 +25,7 @@ class MotorViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            motorRepository.getAll().distinctUntilChanged().collect {
+            dao.getAll().distinctUntilChanged().collect {
                 _uiState.value = _uiState.value.copy(motorList = it)
                 if (it.isNotEmpty() && _uiState.value.motor == null) {
                     _uiState.value = _uiState.value.copy(motor = it[0])
@@ -99,7 +99,7 @@ class MotorViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value.motor?.let {
                 if (validateMotor(it)) {
-                    motorRepository.update(it)
+                    dao.update(it)
                     val serial = when (it.id) {
                         in 0..2 -> {
                             Serial.TTYS0

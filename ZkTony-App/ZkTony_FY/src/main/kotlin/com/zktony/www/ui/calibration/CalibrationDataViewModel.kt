@@ -5,20 +5,23 @@ import com.zktony.common.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.data.local.room.dao.CalibrationDao
+import com.zktony.www.data.local.room.dao.CalibrationDataDao
 import com.zktony.www.data.local.room.entity.Calibration
 import com.zktony.www.data.local.room.entity.CalibrationData
-import com.zktony.www.data.repository.CalibrationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class CalibrationDataViewModel @Inject constructor(
-    private val calibrationRepository: CalibrationRepository
-) : BaseViewModel() {
+    private val dao: CalibrationDao,
+    private val dataDao: CalibrationDataDao
+    ) : BaseViewModel() {
 
 
     @Inject
@@ -27,15 +30,15 @@ class CalibrationDataViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CalibrationDataUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun init(id: String) {
+    fun load(id: String) {
         viewModelScope.launch {
             launch {
-                calibrationRepository.getById(id).distinctUntilChanged().collect {
+                dao.getById(id).distinctUntilChanged().collect {
                     _uiState.value = _uiState.value.copy(cali = it)
                 }
             }
             launch {
-                calibrationRepository.getDataById(id).distinctUntilChanged().collect {
+                dataDao.getBySubId(id).distinctUntilChanged().collect {
                     _uiState.value = _uiState.value.copy(caliData = it)
                 }
             }
@@ -53,7 +56,8 @@ class CalibrationDataViewModel @Inject constructor(
 
     fun delete(data: CalibrationData) {
         viewModelScope.launch {
-            calibrationRepository.deleteData(data)
+            dataDao.delete(data)
+            calculateActual(data.calibrationId)
         }
     }
 
@@ -89,14 +93,14 @@ class CalibrationDataViewModel @Inject constructor(
 
     fun save() {
         viewModelScope.launch {
-            calibrationRepository.insertData(
-                CalibrationData(
-                    pumpId = _uiState.value.pumpId,
-                    calibrationId = _uiState.value.cali?.id ?: "",
-                    expect = _uiState.value.expect,
-                    actual = _uiState.value.actual,
-                )
+            val data = CalibrationData(
+                pumpId = _uiState.value.pumpId,
+                calibrationId = _uiState.value.cali?.id ?: "",
+                expect = _uiState.value.expect,
+                actual = _uiState.value.actual,
             )
+            dataDao.insert(data)
+            calculateActual(data.calibrationId)
         }
     }
 
@@ -110,6 +114,50 @@ class CalibrationDataViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(actual = fl)
         }
+    }
+
+    private suspend fun calculateActual(id: String) {
+        val cali = dao.getById(id).firstOrNull()
+        val dataList = dataDao.getBySubId(id).firstOrNull()
+        var v1 = 180f
+        var v2 = 180f
+        var v3 = 180f
+        var v4 = 180f
+        var v5 = 180f
+        var v6 = 180f
+        if (!dataList.isNullOrEmpty()) {
+            dataList.filter { it.pumpId == 0 }.let {
+                if (it.isNotEmpty()) {
+                    v1 *= it.map { data -> data.percent }.average().toFloat()
+                }
+            }
+            dataList.filter { it.pumpId == 1 }.let {
+                if (it.isNotEmpty()) {
+                    v2 *= it.map { data -> data.percent }.average().toFloat()
+                }
+            }
+            dataList.filter { it.pumpId == 2 }.let {
+                if (it.isNotEmpty()) {
+                    v3 *= it.map { data -> data.percent }.average().toFloat()
+                }
+            }
+            dataList.filter { it.pumpId == 3 }.let {
+                if (it.isNotEmpty()) {
+                    v4 *= it.map { data -> data.percent }.average().toFloat()
+                }
+            }
+            dataList.filter { it.pumpId == 4 }.let {
+                if (it.isNotEmpty()) {
+                    v5 *= it.map { data -> data.percent }.average().toFloat()
+                }
+            }
+            dataList.filter { it.pumpId == 5 }.let {
+                if (it.isNotEmpty()) {
+                    v6 *= it.map { data -> data.percent }.average().toFloat()
+                }
+            }
+        }
+        dao.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3, v4 = v4, v5 = v5, v6 = v6))
     }
 
 }

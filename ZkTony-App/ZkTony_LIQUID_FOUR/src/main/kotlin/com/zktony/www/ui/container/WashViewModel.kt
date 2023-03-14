@@ -5,8 +5,8 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.control.serial.SerialManager
-import com.zktony.www.data.local.room.entity.Plate
-import com.zktony.www.data.repository.PlateRepository
+import com.zktony.www.data.local.room.dao.ContainerDao
+import com.zktony.www.data.local.room.entity.Container
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,16 +16,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WashViewModel @Inject constructor(
-    private val plateRepository: PlateRepository
+    private val dao: ContainerDao
 ) : BaseViewModel() {
 
-    private val _uiState = MutableStateFlow<Plate?>(null)
+    private val _uiState = MutableStateFlow<Container?>(null)
     val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            plateRepository.getPlateBySort(4).distinctUntilChanged().collect {
-                _uiState.value = it
+            dao.getAll().distinctUntilChanged().collect {
+                if (it.isNotEmpty()) {
+                    _uiState.value = it[0]
+                }
             }
         }
     }
@@ -43,7 +45,7 @@ class WashViewModel @Inject constructor(
     fun save(x: Float, y: Float) {
         viewModelScope.launch {
             _uiState.value?.let {
-                plateRepository.updatePlate(it.copy(x1 = x, y1 = y), calculate = false)
+                dao.update(it.copy(wasteX = x, wasteY = y))
             }
         }
     }

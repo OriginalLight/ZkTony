@@ -1,4 +1,4 @@
-package com.zktony.www.ui.work
+package com.zktony.www.ui.program
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -12,15 +12,15 @@ import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.common.extension.volumeDialog
-import com.zktony.www.databinding.FragmentWorkHoleBinding
-import com.zktony.www.ui.calibration.CalibrationDataFragmentArgs
+import com.zktony.www.data.local.room.entity.Hole
+import com.zktony.www.databinding.FragmentProgramHoleBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class WorkHoleFragment :
-    BaseFragment<WorkHoleViewModel, FragmentWorkHoleBinding>(R.layout.fragment_work_hole) {
-    override val viewModel: WorkHoleViewModel by viewModels()
+class ProgramHoleFragment :
+    BaseFragment<ProgramHoleViewModel, FragmentProgramHoleBinding>(R.layout.fragment_program_hole) {
+    override val viewModel: ProgramHoleViewModel by viewModels()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -34,7 +34,7 @@ class WorkHoleFragment :
                 viewModel.uiState.collect {
                     if (it.plate != null) {
                         binding.apply {
-                            title.text = when (it.plate.sort) {
+                            title.text = when (it.plate.index) {
                                 0 -> "一号孔板"
                                 1 -> "二号孔板"
                                 2 -> "三号孔板"
@@ -42,19 +42,21 @@ class WorkHoleFragment :
                                 else -> "孔板"
                             }
                             dynamicPlate.run {
-                                setXY(it.plate.column, it.plate.row)
-                                setData(it.holes.map { h -> Triple(h.x, h.y, h.checked)})
+                                setXY(it.plate.x, it.plate.y)
+                                setData(it.holes.map { h -> Triple(h.x, h.y, h.enable) })
                             }
-                            selectAll.isEnabled = it.plate.count != it.plate.row * it.plate.column
-                            custom.text = "自定义：${if(it.plate.custom == 0) '关' else '开'}"
-                            volume.text = if(it.plate.custom == 0) "[ ${
-                                it.plate.v1.toString().removeZero()
+                            val holeList = it.holes.filter { hole -> hole.enable }
+                            selectAll.isEnabled = holeList.size != it.plate.x * it.plate.y
+                            custom.text = "自定义：${if (it.plate.custom == 0) '关' else '开'}"
+                            val h0 = if (it.holes.isNotEmpty()) it.holes[0] else Hole()
+                            volume.text = if (it.plate.custom == 0) "[ ${
+                                h0.v1.toString().removeZero()
                             } μL, ${
-                                it.plate.v2.toString().removeZero()
+                                h0.v2.toString().removeZero()
                             } μL, ${
-                                it.plate.v3.toString().removeZero()
+                                h0.v3.toString().removeZero()
                             } μL, ${
-                                it.plate.v4.toString().removeZero()
+                                h0.v4.toString().removeZero()
                             } μL ]" else "自定义,请单独设置每孔加液量！"
                         }
                     }
@@ -65,22 +67,22 @@ class WorkHoleFragment :
 
     private fun initView() {
         arguments?.let {
-            CalibrationDataFragmentArgs.fromBundle(it).id.run {
-                if (this != "None") {
-                    viewModel.init(this)
-                }
+            val id = it.getLong("id")
+            if (id != 0L) {
+                viewModel.init(id)
             }
         }
         binding.apply {
             dynamicPlate.setOnItemClick { x, y -> viewModel.select(x, y) }
             volume.setOnClickListener {
+                val holes = viewModel.uiState.value.holes[0]
                 val plate = viewModel.uiState.value.plate
                 if (plate?.custom == 1) return@setOnClickListener
                 volumeDialog(
-                    v1 = plate?.v1 ?: 0.0f,
-                    v2 = plate?.v2 ?: 0.0f,
-                    v3 = plate?.v3 ?: 0.0f,
-                    v4 = plate?.v4 ?: 0.0f
+                    v1 = holes.v1,
+                    v2 = holes.v2,
+                    v3 = holes.v3,
+                    v4 = holes.v4
                 ) { v1, v2, v3, v4 ->
                     viewModel.setVolume(v1, v2, v3, v4)
                 }

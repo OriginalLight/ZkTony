@@ -3,9 +3,9 @@ package com.zktony.www.ui.program
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
+import com.zktony.www.data.local.room.dao.ActionDao
+import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Program
-import com.zktony.www.data.repository.ActionRepository
-import com.zktony.www.data.repository.ProgramRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,15 +15,15 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProgramViewModel @Inject constructor(
-    private val programRepo: ProgramRepository,
-    private val actionRepo: ActionRepository
+    private val programDao: ProgramDao,
+    private val actionDao: ActionDao
 ) : BaseViewModel() {
     private val _programList = MutableStateFlow(emptyList<Program>())
     val programList = _programList.asStateFlow()
 
     init {
         viewModelScope.launch {
-            programRepo.getAll().collect {
+            programDao.getAll().collect {
                 _programList.value = it
             }
         }
@@ -35,11 +35,11 @@ class ProgramViewModel @Inject constructor(
      */
     fun insert(programName: String) {
         viewModelScope.launch {
-            programRepo.getByName(programName).firstOrNull()?.let {
+            programDao.getByName(programName).firstOrNull()?.let {
                 PopTip.show("程序名已存在")
                 return@launch
             }
-            programRepo.insert(Program(name = programName))
+            programDao.insert(Program(name = programName))
         }
     }
 
@@ -49,8 +49,8 @@ class ProgramViewModel @Inject constructor(
      */
     fun delete(program: Program) {
         viewModelScope.launch {
-            programRepo.delete(program)
-            actionRepo.deleteByProgramId(program.id)
+            programDao.delete(program)
+            actionDao.deleteByProgramId(program.id)
         }
     }
 }

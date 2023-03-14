@@ -8,9 +8,9 @@
             android:title="@string/title_home" />
     </group>
 
-    <group android:id="@+id/g_work">
+    <group android:id="@+id/g_program">
         <item
-            android:id="@+id/navigation_work"
+            android:id="@+id/navigation_program"
             android:icon="@drawable/ic_program"
             android:title="@string/title_program" />
     </group>

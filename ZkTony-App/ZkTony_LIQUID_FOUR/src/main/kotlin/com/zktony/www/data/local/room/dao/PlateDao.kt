@@ -13,11 +13,11 @@ interface PlateDao : BaseDao<Plate> {
     @Query(
         """
         SELECT * FROM plate
-        WHERE sort = :id
+        WHERE id = :id
         LIMIT 1
         """
     )
-    fun getPlateBySort(id: Int): Flow<Plate>
+    fun getById(id: Long): Flow<Plate>
 
     @Query(
         """
@@ -25,4 +25,21 @@ interface PlateDao : BaseDao<Plate> {
         """
     )
     fun getAll(): Flow<List<Plate>>
+
+    @Query(
+        """
+        SELECT * FROM plate
+        WHERE subId = :id
+        """
+    )
+    fun getBySubId(id: Long): Flow<List<Plate>>
+
+
+    @Query(
+        """
+        SELECT * FROM plate
+        WHERE id IN (:idList)
+        """
+    )
+    fun getByIdList(idList: List<Long>): Flow<List<Plate>>
 }

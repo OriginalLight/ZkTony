@@ -42,8 +42,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 isVisible = it.job != null
                                 text = if (!it.pause) "暂停" else "继续"
                             }
-                            if (it.work != null) {
-                                select.text = it.work.name
+                            if (it.program != null) {
+                                select.text = it.program.name
                                 holeNumber.text = it.holeList.total().toString()
                             } else {
                                 select.text = "/"
@@ -51,8 +51,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             }
                             time.text = it.time.getTimeFormat()
                             dynamicPlate.setXY(
-                                it.info.plateSize.second,
                                 it.info.plateSize.first,
+                                it.info.plateSize.second,
                             )
                             dynamicPlate.setData(it.info.holeList)
                             dynamicPlate.setColor(it.info.color)

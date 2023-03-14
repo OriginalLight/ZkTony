@@ -1,9 +1,8 @@
 package com.zktony.www.data.local.room.entity
 
 import androidx.room.Entity
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import java.util.*
+import com.zktony.common.utils.Snowflake
 
 /**
  * @author: 刘贺贺
@@ -12,15 +11,10 @@ import java.util.*
 @Entity(tableName = "plate")
 data class Plate(
     @PrimaryKey
-    val id: String = UUID.randomUUID().toString(),
-    val sort: Int = 0,
-    val row: Int = 8,
-    val column: Int = 12,
-    val x1: Float = 0f,
-    val y1: Float = 0f,
-    val x2: Float = 0f,
-    val y2: Float = 0f,
-) {
-    @Ignore
-    var holes: List<Hole> = emptyList()
-}
+    val id: Long = Snowflake(1).nextId(),
+    val subId : Long = 0L,
+    val index: Int = 0,
+    val x: Int = 8,
+    val y: Int = 12,
+    val custom: Int = 0,
+)

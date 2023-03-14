@@ -12,12 +12,14 @@ import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.completeDialog
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.data.local.room.dao.HoleDao
+import com.zktony.www.data.local.room.dao.LogDao
+import com.zktony.www.data.local.room.dao.PlateDao
+import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Log
-import com.zktony.www.data.local.room.entity.Work
-import com.zktony.www.data.local.room.entity.WorkPlate
-import com.zktony.www.data.repository.LogRepository
-import com.zktony.www.data.repository.WorkRepository
+import com.zktony.www.data.local.room.entity.Plate
+import com.zktony.www.data.local.room.entity.Program
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -28,8 +30,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val workRepository: WorkRepository,
-    private val logRepository: LogRepository
+    private val programDao: ProgramDao,
+    private val plateDao: PlateDao,
+    private val holeDao: HoleDao,
+    private val logDao: LogDao
 ) : BaseViewModel() {
 
     @Inject
@@ -43,9 +47,9 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                workRepository.getAllWork().collect {
+                programDao.getAll().collect {
                     if (it.isNotEmpty()) {
-                        _uiState.value = _uiState.value.copy(workList = it, work = it[0])
+                        _uiState.value = _uiState.value.copy(programList = it, program = it[0])
                         loadPlate(it[0].id)
                     }
                 }
@@ -53,24 +57,30 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun loadPlate(id: String) {
+    private fun loadPlate(id: Long) {
         viewModelScope.launch {
             launch {
-                workRepository.getWorkPlateByWorkId(id).collect {
+                plateDao.getBySubId(id).collect {
                     _uiState.value = _uiState.value.copy(plateList = it)
                     var size: Pair<Int, Int> = Pair(8, 12)
                     if (it.isNotEmpty()) {
-                        size = it[0].row to it[0].column
+                        size = it[0].x to it[0].y
                     }
                     _uiState.value = _uiState.value.copy(
                         info = _uiState.value.info.copy(
                             plateSize = size
                         )
                     )
+                    loadHole(it.map { it.id })
                 }
             }
+        }
+    }
+
+    private fun loadHole(idList: List<Long>) {
+        viewModelScope.launch {
             launch {
-                workRepository.getHoleByWorkId(id).collect {
+                holeDao.getBySudIdList(idList).collect {
                     _uiState.value = _uiState.value.copy(holeList = it)
                 }
             }
@@ -78,7 +88,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun selectWork(view: View) {
-        val list = uiState.value.workList.map { it.name }
+        val list = uiState.value.programList.map { it.name }
         if (_uiState.value.job != null) {
             PopTip.show("请先停止当前程序")
             return
@@ -87,8 +97,8 @@ class HomeViewModel @Inject constructor(
             view = view,
             menu = list,
             block = { _, index ->
-                _uiState.value = _uiState.value.copy(work = uiState.value.workList[index])
-                loadPlate(uiState.value.workList[index].id)
+                _uiState.value = _uiState.value.copy(program = uiState.value.programList[index])
+                loadPlate(uiState.value.programList[index].id)
             }
         )
     }
@@ -209,9 +219,9 @@ class HomeViewModel @Inject constructor(
                     }
                 }
                 launch {
-                    updateLog(Log(workName = _uiState.value.work?.name ?: "未知程序"))
+                    updateLog(Log(workName = _uiState.value.program?.name ?: "未知程序"))
                 }
-                val executor = WorkExecutor(
+                val executor = ProgramExecutor(
                     plateList = _uiState.value.plateList,
                     holeList = _uiState.value.holeList,
                     settings = appViewModel.settings.value,
@@ -219,17 +229,17 @@ class HomeViewModel @Inject constructor(
                 )
                 executor.event = {
                     when (it) {
-                        is ExecutorEvent.Plate -> {
+                        is ExecutorEvent.CurrentPlate -> {
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
-                                    plate = when (it.plate.sort) {
+                                    plate = when (it.plate.index) {
                                         0 -> "一号板"
                                         1 -> "二号板"
                                         2 -> "三号板"
                                         3 -> "四号板"
                                         else -> "未知板"
                                     },
-                                    plateSize = it.plate.row to it.plate.column,
+                                    plateSize = it.plate.x to it.plate.y,
                                 )
                             )
                         }
@@ -281,7 +291,7 @@ class HomeViewModel @Inject constructor(
                         is ExecutorEvent.Finish -> {
                             reset()
                             completeDialog(
-                                name = _uiState.value.work?.name ?: "错误",
+                                name = _uiState.value.program?.name ?: "错误",
                                 time = _uiState.value.time.getTimeFormat(),
                                 speed = "${String.format("%.2f", _uiState.value.info.speed)} 孔/分钟",
                             )
@@ -309,7 +319,7 @@ class HomeViewModel @Inject constructor(
             time = 0L,
             info = CurrentInfo().copy(
                 plateSize = if (_uiState.value.plateList.isNotEmpty()) {
-                    _uiState.value.plateList[0].row to _uiState.value.plateList[0].column
+                    _uiState.value.plateList[0].x to _uiState.value.plateList[0].y
                 } else {
                     Pair(8, 12)
                 }
@@ -326,18 +336,18 @@ class HomeViewModel @Inject constructor(
     private fun updateLog(log: Log) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(log = log)
-            logRepository.insert(log)
+            logDao.insert(log)
         }
     }
 
 }
 
 data class HomeUiState(
-    val workList: List<Work> = emptyList(),
-    val plateList: List<WorkPlate> = emptyList(),
+    val programList: List<Program> = emptyList(),
+    val plateList: List<Plate> = emptyList(),
     val holeList: List<Hole> = emptyList(),
     val log: Log? = null,
-    val work: Work? = null,
+    val program: Program? = null,
     val job: Job? = null,
     val washJob: Job? = null,
     val pause: Boolean = false,

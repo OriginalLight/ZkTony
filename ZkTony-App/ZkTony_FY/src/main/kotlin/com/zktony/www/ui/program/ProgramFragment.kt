@@ -51,7 +51,8 @@ class ProgramFragment :
     private fun initView() {
         adapter.setOnEditButtonClick {
             findNavController().navigate(
-                directions = ProgramFragmentDirections.actionNavigationProgramToNavigationAction(it.id)
+                R.id.action_navigation_program_to_navigation_action,
+                Bundle().apply { putString("id", it.id) }
             )
         }
 

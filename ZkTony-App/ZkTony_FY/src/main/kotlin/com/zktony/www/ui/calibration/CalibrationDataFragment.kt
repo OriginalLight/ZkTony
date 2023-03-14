@@ -56,10 +56,9 @@ class CalibrationDataFragment :
 
     private fun initView() {
         arguments?.let {
-            CalibrationDataFragmentArgs.fromBundle(it).id.run {
-                if (this != "None") {
-                    viewModel.init(this)
-                }
+            val id = it.getString("id") ?: ""
+            if (id.isNotEmpty()) {
+                viewModel.load(id)
             }
         }
         adapter.setOnDeleteButtonClick { viewModel.delete(it) }
