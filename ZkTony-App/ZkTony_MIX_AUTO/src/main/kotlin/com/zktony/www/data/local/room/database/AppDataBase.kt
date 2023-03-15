@@ -19,7 +19,7 @@ import com.zktony.www.data.local.room.entity.*
         CalibrationData::class,
         Plate::class,
         Hole::class,
-        Work::class,
+        Program::class,
         Container::class,
     ],
     version = 1,
@@ -33,6 +33,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun calibrationDataDao(): CalibrationDataDao
     abstract fun plateDao(): PlateDao
     abstract fun holeDao(): HoleDao
-    abstract fun workDao(): WorkDao
+    abstract fun programDao(): ProgramDao
     abstract fun containerDao(): ContainerDao
 }

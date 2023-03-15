@@ -53,7 +53,21 @@
                 tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/position_z"
+                android:id="@+id/move_z"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:text="@string/button"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="27dp"
+                app:rippleColor="@color/purple_700"
+                tools:ignore="VisualLintButtonSize" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/add_z"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginStart="8dp"

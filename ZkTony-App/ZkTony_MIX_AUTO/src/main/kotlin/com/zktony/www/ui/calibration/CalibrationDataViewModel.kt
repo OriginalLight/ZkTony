@@ -70,7 +70,6 @@ class CalibrationDataViewModel @Inject constructor(
             0 -> manager.generator(v1 = state.expect)
             1 -> manager.generator(v2 = state.expect)
             2 -> manager.generator(v3 = state.expect)
-            3 -> manager.generator(v4 = state.expect)
             else -> return
         }
         manager.executor(gen)
@@ -110,7 +109,6 @@ class CalibrationDataViewModel @Inject constructor(
         var v1 = 200f
         var v2 = 200f
         var v3 = 200f
-        var v4 = 200f
         if (!dataList.isNullOrEmpty()) {
             dataList.filter { it.pumpId == 0 }.let {
                 if (it.isNotEmpty()) {
@@ -127,13 +125,8 @@ class CalibrationDataViewModel @Inject constructor(
                     v3 *= it.map { data -> data.percent }.average().toFloat()
                 }
             }
-            dataList.filter { it.pumpId == 3 }.let {
-                if (it.isNotEmpty()) {
-                    v4 *= it.map { data -> data.percent }.average().toFloat()
-                }
-            }
         }
-        calibrationDao.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3, v4 = v4))
+        calibrationDao.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3))
     }
 
 }

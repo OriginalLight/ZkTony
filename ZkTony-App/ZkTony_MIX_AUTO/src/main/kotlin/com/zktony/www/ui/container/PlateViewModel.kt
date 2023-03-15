@@ -3,15 +3,18 @@ package com.zktony.www.ui.container
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
+import com.zktony.common.utils.Snowflake
 import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.data.local.room.dao.ContainerDao
 import com.zktony.www.data.local.room.dao.HoleDao
 import com.zktony.www.data.local.room.dao.PlateDao
+import com.zktony.www.data.local.room.entity.Container
+import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,38 +25,98 @@ class PlateViewModel @Inject constructor(
     private val holeDao: HoleDao
 ) : BaseViewModel() {
 
-    private val _uiState = MutableStateFlow<Plate?>(null)
+    private val _uiState = MutableStateFlow(PlateUiState())
     val uiState = _uiState
 
     init {
         viewModelScope.launch {
             launch {
-
+                containerDao.getById(1L).collect {
+                    _uiState.value = _uiState.value.copy(container = it)
+                }
+            }
+            launch {
+                plateDao.getById(1L).collect {
+                    _uiState.value = _uiState.value.copy(plate = it)
+                }
+            }
+            launch {
+                holeDao.getBySubId(1L).collect {
+                    _uiState.value = _uiState.value.copy(holeList = it)
+                }
             }
         }
     }
 
+    fun reSize(size: Int) {
+        viewModelScope.launch{
+            _uiState.value.plate?.let {
+                if (it.x != size) {
+                    plateDao.update(it.copy(x = size))
+                    holeDao.deleteBySubId(it.id)
+                    val holeList = mutableListOf<Hole>()
+                    val snowflake = Snowflake(1)
+                    for (i in 0 until size) {
+                        holeList.add(
+                            Hole(
+                                id = snowflake.nextId(),
+                                subId = it.id,
+                                x = i,
+                            )
+                        )
+                    }
+                    holeDao.insertAll(holeList)
+                }
+            }
+        }
+    }
 
-    fun move(x: Float, y: Float) {
+    fun setHolePosition(index: Int, axis: Float) {
+        viewModelScope.launch {
+            val hole = _uiState.value.holeList.find { it.x == index }
+            hole?.let {
+                holeDao.update(it.copy(xAxis = axis))
+                delay(500L)
+                calculateCoordinate()
+            }
+        }
+    }
+
+    fun moveZ(z: Float) {
         val serial = SerialManager.instance
         if (serial.lock.value || serial.pause.value) {
             PopTip.show("机器正在运行中")
             return
         }
         val manager = MotionManager.instance
-        manager.executor(manager.generator(x = x, y = y))
+        manager.executor(manager.generator(z = z))
     }
 
-    fun save(z1: Float, z2: Float) {
-        viewModelScope.launch {
-            _uiState.value?.let {
+    fun moveX(x: Float) {
+        val serial = SerialManager.instance
+        if (serial.lock.value || serial.pause.value) {
+            PopTip.show("机器正在运行中")
+            return
+        }
+        val manager = MotionManager.instance
+        manager.executor(manager.generator(x = x))
+    }
 
-            }
+    fun setBottom(z: Float) {
+        viewModelScope.launch {
+            containerDao.update(_uiState.value.container?.copy(bottom = z) ?: return@launch)
         }
     }
 
-    private suspend fun calculateCoordinate(plate: Plate) {
-        val holeList = holeDao.getBySubId(plate.id).firstOrNull() ?: emptyList()
+    fun setTop(z: Float) {
+        viewModelScope.launch {
+            containerDao.update(_uiState.value.container?.copy(top = z) ?: return@launch)
+        }
+    }
+
+
+    private suspend fun calculateCoordinate() {
+        val holeList = _uiState.value.holeList
         val min = holeList.filter { it.xAxis != 0f }.minByOrNull { it.x }
         val max = holeList.filter { it.xAxis != 0f }.maxByOrNull { it.x }
         if (min == null || max == null) {
@@ -65,17 +128,21 @@ class PlateViewModel @Inject constructor(
                 val minAxis = min.xAxis
                 val maxAxis = max.xAxis
                 val distance = (maxAxis - minAxis) / (maxIndex - minIndex)
+                val holes = mutableListOf<Hole>()
                 for (i in minIndex + 1 until maxIndex) {
                     val hole = holeList.find { it.x == i && it.xAxis == 0f }
                     hole?.let {
-                        holeDao.update(
-                            it.copy(
-                                xAxis = minAxis + (i - minIndex) * distance
-                            )
-                        )
+                        holes.add(it.copy(xAxis = minAxis + (i - minIndex) * distance))
                     }
                 }
+                holeDao.updateAll(holes)
             }
         }
     }
 }
+
+data class PlateUiState(
+    val container: Container? = null,
+    val plate: Plate? = null,
+    val holeList: List<Hole> = emptyList()
+)

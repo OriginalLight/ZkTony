@@ -7,23 +7,23 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.common.ext.clickScale
-import com.zktony.www.data.local.room.entity.Work
-import com.zktony.www.databinding.ItemWorkBinding
+import com.zktony.www.data.local.room.entity.Program
+import com.zktony.www.databinding.ItemProgramBinding
 
 /**
  * @author: 刘贺贺
  * @date: 2022-09-21 11:27
  */
 class WorkAdapter :
-    ListAdapter<Work, WorkAdapter.ViewHolder>(WorkDiffCallback()) {
+    ListAdapter<Program, WorkAdapter.ViewHolder>(WorkDiffCallback()) {
 
-    private var onDeleteButtonClick: (Work) -> Unit = {}
-    private var onEditButtonClick: (Work) -> Unit = {}
+    private var onDeleteButtonClick: (Program) -> Unit = {}
+    private var onEditButtonClick: (Program) -> Unit = {}
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
-            ItemWorkBinding.inflate(
+            ItemProgramBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -37,21 +37,21 @@ class WorkAdapter :
         holder.bind(getItem(position))
     }
 
-    fun setOnDeleteButtonClick(onDeleteButtonClick: (Work) -> Unit) {
+    fun setOnDeleteButtonClick(onDeleteButtonClick: (Program) -> Unit) {
         this.onDeleteButtonClick = onDeleteButtonClick
     }
 
-    fun setOnEditButtonClick(onEditButtonClick: (Work) -> Unit) {
+    fun setOnEditButtonClick(onEditButtonClick: (Program) -> Unit) {
         this.onEditButtonClick = onEditButtonClick
     }
 
     class ViewHolder(
-        private val binding: ItemWorkBinding,
-        private val onDeleteButtonClick: (Work) -> Unit,
-        private val onEditButtonClick: (Work) -> Unit,
+        private val binding: ItemProgramBinding,
+        private val onDeleteButtonClick: (Program) -> Unit,
+        private val onEditButtonClick: (Program) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
-        fun bind(item: Work) {
+        fun bind(item: Program) {
             binding.apply {
                 work = item
                 order.text = (layoutPosition + 1).toString()
@@ -73,17 +73,17 @@ class WorkAdapter :
     }
 }
 
-private class WorkDiffCallback : DiffUtil.ItemCallback<Work>() {
+private class WorkDiffCallback : DiffUtil.ItemCallback<Program>() {
     override fun areItemsTheSame(
-        oldItem: Work,
-        newItem: Work
+        oldItem: Program,
+        newItem: Program
     ): Boolean {
         return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(
-        oldItem: Work,
-        newItem: Work
+        oldItem: Program,
+        newItem: Program
     ): Boolean {
         return oldItem == newItem
     }

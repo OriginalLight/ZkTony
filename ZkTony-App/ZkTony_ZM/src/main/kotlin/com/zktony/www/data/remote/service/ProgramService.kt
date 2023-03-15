@@ -7,6 +7,6 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface ProgramService {
-    @POST("/program")
+    @POST("program")
     fun uploadProgram(@Body programs: List<ProgramDTO>): Flow<Response<String>>
 }

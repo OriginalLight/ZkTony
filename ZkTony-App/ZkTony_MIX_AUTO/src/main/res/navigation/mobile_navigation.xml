@@ -18,10 +18,10 @@
         tools:layout="@layout/fragment_container" />
 
     <fragment
-        android:id="@+id/navigation_work"
-        android:name="com.zktony.www.ui.work.WorkFragment"
+        android:id="@+id/navigation_program"
+        android:name="com.zktony.www.ui.program.ProgramFragment"
         android:label="@string/title_program"
-        tools:layout="@layout/fragment_work">
+        tools:layout="@layout/fragment_program">
     </fragment>
 
 

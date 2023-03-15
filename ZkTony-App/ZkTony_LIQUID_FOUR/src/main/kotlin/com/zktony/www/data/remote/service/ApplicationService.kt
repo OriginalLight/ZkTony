@@ -8,6 +8,6 @@ import retrofit2.http.Query
 
 interface ApplicationService {
 
-    @GET("/application")
+    @GET("application")
     fun getById(@Query("application_id") id: String): Flow<Response<Application>>
 }

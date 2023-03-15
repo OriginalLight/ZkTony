@@ -72,8 +72,8 @@ object RoomModule {
     }
 
     @Provides
-    fun provideWorkDao(database: AppDatabase): WorkDao {
-        return database.workDao()
+    fun provideProgramDao(database: AppDatabase): ProgramDao {
+        return database.programDao()
     }
 
     @Provides

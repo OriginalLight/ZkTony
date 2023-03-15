@@ -9,9 +9,9 @@ import retrofit2.http.POST
 
 interface LogService {
 
-    @POST("/log")
+    @POST("log")
     fun uploadLog(@Body logList: List<LogDTO>): Flow<Response<String>>
 
-    @POST("/log/detail")
+    @POST("log/detail")
     fun uploadLogDetail(@Body logList: List<LogDetailDTO>): Flow<Response<String>>
 }

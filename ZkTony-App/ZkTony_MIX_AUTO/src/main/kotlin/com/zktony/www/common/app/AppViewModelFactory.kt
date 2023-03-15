@@ -6,10 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
-import com.zktony.www.data.local.room.dao.CalibrationDao
-import com.zktony.www.data.local.room.dao.ContainerDao
-import com.zktony.www.data.local.room.dao.MotorDao
-import com.zktony.www.data.local.room.dao.PlateDao
+import com.zktony.www.data.local.room.dao.*
 import javax.inject.Inject
 
 /**
@@ -22,6 +19,7 @@ class AppViewModelFactory @Inject constructor(
     private val calibration: CalibrationDao,
     private val container: ContainerDao,
     private val plate: PlateDao,
+    private val hole: HoleDao,
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -34,6 +32,7 @@ class AppViewModelFactory @Inject constructor(
                 calibration = calibration,
                 container = container,
                 plate = plate,
+                hole = hole,
             )
             else -> throw IllegalArgumentException("Unknown class $modelClass")
         } as T

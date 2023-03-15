@@ -9,8 +9,8 @@ import java.util.*
  * @author: 刘贺贺
  * @date: 2023-02-02 10:56
  */
-@Entity(tableName = "work")
-data class Work(
+@Entity(tableName = "program")
+data class Program(
     @PrimaryKey
     val id: Long = Snowflake(1).nextId(),
     val name: String = "",

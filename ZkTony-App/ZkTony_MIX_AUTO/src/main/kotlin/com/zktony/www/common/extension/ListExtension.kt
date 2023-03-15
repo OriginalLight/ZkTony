@@ -9,7 +9,6 @@ fun List<Hole>.total(): Int {
             if (it.v1 > 0f) total += 1
             if (it.v2 > 0f) total += 1
             if (it.v3 > 0f) total += 1
-            if (it.v4 > 0f) total += 1
         }
     }
     return total

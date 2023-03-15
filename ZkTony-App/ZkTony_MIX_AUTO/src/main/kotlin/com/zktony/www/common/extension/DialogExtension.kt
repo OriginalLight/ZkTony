@@ -36,7 +36,7 @@ fun positionDialog(
                 val move = v.findViewById<MaterialButton>(R.id.move)
                 val save = v.findViewById<MaterialButton>(R.id.save)
                 val cancel = v.findViewById<MaterialButton>(R.id.cancel)
-                title.text = "设置坐标"
+                title.text = "设置移动/加液高度"
                 inputX.setText(textX.toString().removeZero())
                 inputY.setText(textY.toString().removeZero())
                 move.clickNoRepeat {
@@ -48,33 +48,6 @@ fun positionDialog(
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
                     block2(x, y)
-                    dialog.dismiss()
-                }
-                cancel.setOnClickListener { dialog.dismiss() }
-            }
-        })
-        .setCancelable(false)
-        .setMaskColor(Color.parseColor("#4D000000"))
-        .show()
-}
-
-fun sizeDialog(textRow: Int, textColumn: Int, block1: (Int, Int) -> Unit) {
-    CustomDialog.build()
-        .setCustomView(object :
-            OnBindView<CustomDialog>(R.layout.layout_size_input_dialog) {
-            override fun onBind(dialog: CustomDialog, v: View) {
-                val title = v.findViewById<TextView>(R.id.title)
-                val row = v.findViewById<EditText>(R.id.row)
-                val column = v.findViewById<EditText>(R.id.column)
-                val save = v.findViewById<MaterialButton>(R.id.save)
-                val cancel = v.findViewById<MaterialButton>(R.id.cancel)
-                title.text = "设置孔板规格"
-                row.setText(textRow.toString())
-                column.setText(textColumn.toString())
-                save.setOnClickListener {
-                    val x = row.text.toString().toIntOrNull() ?: 4
-                    val y = column.text.toString().toIntOrNull() ?: 4
-                    block1(x, y)
                     dialog.dismiss()
                 }
                 cancel.setOnClickListener { dialog.dismiss() }

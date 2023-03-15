@@ -60,12 +60,12 @@ class ProgramExecutor constructor(
                                     }
                                     motion.executor(
                                         motion.generator(
-                                            x = hole.xAxis,
-                                            y = hole.yAxis + settings.needleSpace * e
+                                            x = hole.xAxis + settings.needleSpace * e,
+                                            y = hole.yAxis
                                         ),
                                         motion.generator(
-                                            x = hole.xAxis,
-                                            y = hole.yAxis + settings.needleSpace * e,
+                                            x = hole.xAxis + settings.needleSpace * e,
+                                            y = hole.yAxis,
                                             v1 = if (e == 0) hole.v1 else 0f,
                                             v2 = if (e == 1) hole.v2 else 0f,
                                             v3 = if (e == 2) hole.v3 else 0f,
@@ -93,14 +93,14 @@ class ProgramExecutor constructor(
 
     // 遍历孔位
     private suspend fun forEachHole(x: Int, y: Int, block: suspend (Int, Int) -> Unit) {
-        for (i in 0 until x) {
+        for (i in 0 until y) {
             if (i % 2 == 0) {
-                for (j in 0 until y) {
-                    block(i, j)
+                for (j in 0 until x) {
+                    block(j, i)
                 }
             } else {
-                for (j in y - 1 downTo 0) {
-                    block(i, j)
+                for (j in x - 1 downTo 0) {
+                    block(j, i)
                 }
             }
         }

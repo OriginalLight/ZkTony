@@ -16,21 +16,19 @@ class MotorManager(
 ) {
 
     private var x: Motor = Motor()
-    private var y: Motor = Motor()
+    private var z: Motor = Motor()
     private var p1: Motor = Motor()
     private var p2: Motor = Motor()
     private var p3: Motor = Motor()
-    private var p4: Motor = Motor()
     private var calibration: Calibration = Calibration()
 
     fun initMotor(motorList: List<Motor>) {
         scope.launch {
             x = motorList.find { it.id == 0 } ?: Motor()
-            y = motorList.find { it.id == 1 } ?: Motor()
+            z = motorList.find { it.id == 1 } ?: Motor()
             p1 = motorList.find { it.id == 2 } ?: Motor()
             p2 = motorList.find { it.id == 3 } ?: Motor()
             p3 = motorList.find { it.id == 4 } ?: Motor()
-            p4 = motorList.find { it.id == 5 } ?: Motor()
             Log.d("MotorManager", "initMotor")
         }
 
@@ -43,9 +41,9 @@ class MotorManager(
         }
     }
 
-    fun move(distanceX: Float, distanceY: Float): Pair<Int, Int> {
+    fun move(distanceX: Float, distanceZ: Float): Pair<Int, Int> {
         val mx = x.pulseCount(distanceX, calibration.x)
-        val my = y.pulseCount(distanceY, calibration.y)
+        val my = z.pulseCount(distanceZ, calibration.z)
         return Pair(mx, my)
     }
 
@@ -54,7 +52,6 @@ class MotorManager(
             0 -> p1.pulseCount(volume, calibration.v1)
             1 -> p2.pulseCount(volume, calibration.v2)
             2 -> p3.pulseCount(volume, calibration.v3)
-            3 -> p4.pulseCount(volume, calibration.v4)
             else -> 0
         }
     }

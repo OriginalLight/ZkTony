@@ -6,7 +6,7 @@ import com.zktony.common.base.BaseViewModel
 import com.zktony.www.control.motion.MotionManager
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.data.local.room.dao.ContainerDao
-import com.zktony.www.data.local.room.entity.Plate
+import com.zktony.www.data.local.room.entity.Container
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,29 +15,35 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WashViewModel @Inject constructor(
-    private val containerDao: ContainerDao,
+    private val dao: ContainerDao,
 ) : BaseViewModel() {
 
-    private val _uiState = MutableStateFlow<Plate?>(null)
+    private val _uiState = MutableStateFlow<Container?>(null)
     val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
+            dao.getById(1L).collect {
+                _uiState.value = it
+            }
         }
     }
 
-    fun move(x: Float, y: Float) {
+    fun move(x: Float) {
         val serial = SerialManager.instance
         if (serial.lock.value || serial.pause.value) {
             PopTip.show("机器正在运行中")
             return
         }
         val m = MotionManager.instance
-        m.executor(m.generator(x = x, y = y))
+        m.executor(m.generator(x = x))
     }
 
-    fun save(x: Float, y: Float) {
+    fun save(x: Float) {
         viewModelScope.launch {
+            _uiState.value?.let {
+                dao.update(it.copy(wasteX = x))
+            }
         }
     }
 }

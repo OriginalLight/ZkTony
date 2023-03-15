@@ -23,3 +23,17 @@ fun String.removeZero(): String {
     }
     return str
 }
+
+fun Float.removeZero(): String {
+    // 去除小数点后面的0
+    var str = this.toString()
+    if (str.indexOf(".") > 0) {
+        str = str.replace("0+?$".toRegex(), "") // 去掉多余的0
+        str = str.replace("[.]$".toRegex(), "") // 如最后一位是.则去掉
+    }
+    // 去除左边的0
+    if (!str.startsWith("0.") && str.startsWith("0")) {
+        str = str.replace("^0+(?!$)".toRegex(), "")
+    }
+    return str
+}

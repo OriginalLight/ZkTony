@@ -21,20 +21,18 @@ class MotionManager(
     // 生成器
     fun generator(
         x: Float = 0f,
-        y: Float = 0f,
+        z: Float = 0f,
         v1: Float = 0f,
         v2: Float = 0f,
         v3: Float = 0f,
-        v4: Float = 0f
     ): Pair<String, String> {
-        val (mx, my) = motor.move(x, y)
+        val (mx, mz) = motor.move(x, z)
         val mv1 = motor.liquid(v1, 0)
         val mv2 = motor.liquid(v2, 1)
         val mv3 = motor.liquid(v3, 2)
-        val mv4 = motor.liquid(v4, 3)
         return Pair(
-            "$mx,$my,$mv1,",
-            "$mv2,$mv3,$mv4,"
+            "$mx,0,$mz,",
+            "$mv1,$mv2,$mv3,"
         )
     }
 

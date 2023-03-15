@@ -8,15 +8,10 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.utils.Constants
+import com.zktony.common.utils.Snowflake
 import com.zktony.www.control.motor.MotorManager
-import com.zktony.www.data.local.room.dao.CalibrationDao
-import com.zktony.www.data.local.room.dao.ContainerDao
-import com.zktony.www.data.local.room.dao.MotorDao
-import com.zktony.www.data.local.room.dao.PlateDao
-import com.zktony.www.data.local.room.entity.Calibration
-import com.zktony.www.data.local.room.entity.Container
-import com.zktony.www.data.local.room.entity.Motor
-import com.zktony.www.data.local.room.entity.Plate
+import com.zktony.www.data.local.room.dao.*
+import com.zktony.www.data.local.room.entity.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +31,7 @@ class AppViewModel @Inject constructor(
     private val calibration: CalibrationDao,
     private val container: ContainerDao,
     private val plate: PlateDao,
+    private val hole: HoleDao,
 ) : AndroidViewModel(application) {
 
     private val _settings = MutableStateFlow(Settings())
@@ -101,9 +97,20 @@ class AppViewModel @Inject constructor(
                     id = 1L,
                     subId = 1L,
                     x = 10,
-                    y = 1,
                 )
             )
+            val holes = mutableListOf<Hole>()
+            val snowflake = Snowflake(1)
+            for (i in 0 until 10) {
+                holes.add(
+                    Hole(
+                        id = snowflake.nextId(),
+                        subId = 1L,
+                        x = i,
+                    )
+                )
+            }
+            hole.insertAll(holes)
         }
         // 初始化标定
         val cal = calibration.getAll().firstOrNull() ?: emptyList()

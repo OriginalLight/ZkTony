@@ -12,7 +12,7 @@ import com.zktony.www.control.serial.protocol.V1
 import com.zktony.www.data.local.room.dao.LogDao
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Log
-import com.zktony.www.data.local.room.entity.Work
+import com.zktony.www.data.local.room.entity.Program
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -42,7 +42,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun selectWork(view: View) {
-        val list = uiState.value.workList.map { it.name }
+        val list = uiState.value.programList.map { it.name }
         if (_uiState.value.job != null) {
             PopTip.show("请先停止当前程序")
             return
@@ -169,10 +169,10 @@ class HomeViewModel @Inject constructor(
 }
 
 data class HomeUiState(
-    val workList: List<Work> = emptyList(),
+    val programList: List<Program> = emptyList(),
     val holeList: List<Hole> = emptyList(),
     val log: Log? = null,
-    val work: Work? = null,
+    val program: Program? = null,
     val job: Job? = null,
     val washJob: Job? = null,
     val pause: Boolean = false,

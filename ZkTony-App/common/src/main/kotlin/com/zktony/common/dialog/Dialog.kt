@@ -20,6 +20,7 @@ import com.zktony.common.app.CommonApplicationProxy
 import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.createQRCodeBitmap
 import com.zktony.common.ext.isNetworkAvailable
+import com.zktony.common.ext.removeZero
 import com.zktony.common.utils.Constants
 
 
@@ -135,15 +136,45 @@ fun webDialog() {
     }).setMaxWidth(1920).show()
 }
 
-fun inputDialog(block: (String) -> Unit) {
-    InputDialog("添加", "请输入程序/操作名", "确定", "取消").setCancelable(false)
+fun inputDialog(message: String = "请输入程序/操作名", block: (String) -> Unit) {
+    InputDialog("添加", message, "确定", "取消").setCancelable(false)
         .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL))
         .setOkButton { _, _, inputStr ->
             if (inputStr.trim().isEmpty()) {
-                PopTip.show("程序/操作不能为空")
+                PopTip.show("不能为空")
                 return@setOkButton false
             }
             block(inputStr.trim())
+            false
+        }.show()
+}
+
+fun inputNumberDialog(message: String = "请输入程序/操作名",value:Int, block: (Int) -> Unit) {
+    InputDialog("修改", message, "确定", "取消", value.toString())
+        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL))
+        .setOkButton { _, _, inputStr ->
+            if (inputStr.trim().isEmpty()) {
+                PopTip.show("不能为空")
+                return@setOkButton false
+            }
+            block(inputStr.trim().toIntOrNull() ?: 0)
+            false
+        }.show()
+}
+
+fun inputDecimalDialog(message: String = "请输入程序/操作名", value: Float,move:(Float) -> Unit, block: (Float) -> Unit) {
+    InputDialog("修改", message, "确定", "取消", value.removeZero())
+        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL))
+        .setOtherButton("移动") { _, _, str ->
+            move(str.toFloatOrNull() ?: 0f)
+            true
+        }
+        .setOkButton { _, _, inputStr ->
+            if (inputStr.trim().isEmpty()) {
+                PopTip.show("不能为空")
+                return@setOkButton false
+            }
+            block(inputStr.trim().toFloatOrNull() ?: 0f)
             false
         }.show()
 }

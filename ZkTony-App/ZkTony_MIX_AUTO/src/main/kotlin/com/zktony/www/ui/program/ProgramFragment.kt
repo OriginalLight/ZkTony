@@ -1,4 +1,4 @@
-package com.zktony.www.ui.work
+package com.zktony.www.ui.program
 
 import android.os.Bundle
 import androidx.fragment.app.viewModels
@@ -11,13 +11,13 @@ import com.zktony.common.dialog.inputDialog
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.adapter.WorkAdapter
-import com.zktony.www.databinding.FragmentWorkBinding
+import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class WorkFragment : BaseFragment<WorkViewModel, FragmentWorkBinding>(R.layout.fragment_work) {
-    override val viewModel: WorkViewModel by viewModels()
+class ProgramFragment : BaseFragment<ProgramViewModel, FragmentProgramBinding>(R.layout.fragment_program) {
+    override val viewModel: ProgramViewModel by viewModels()
 
     private val adapter by lazy { WorkAdapter() }
 

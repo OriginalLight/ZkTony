@@ -88,4 +88,7 @@
     <string name="y_motor">Y轴</string>
     <string name="z_motor">Z轴</string>
     <string name="about">使用说明</string>
+    <string name="heigh_move">移动高度</string>
+    <string name="heigh_add">加液高度</string>
+    <string name="position_input">坐标调整</string>
 </resources>

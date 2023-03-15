@@ -7,6 +7,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.dialog.inputDecimalDialog
+import com.zktony.common.ext.clickNoRepeat
+import com.zktony.common.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentWashBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,7 +26,13 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
     }
 
     private fun initView() {
-        binding.position.setOnClickListener {
+        binding.position.clickNoRepeat {
+            inputDecimalDialog(
+                message = "请输入横坐标",
+                value = viewModel.uiState.value?.wasteX ?: 0f,
+                move = { viewModel.move(it) },
+                block = { viewModel.save(it)  }
+            )
         }
     }
 
@@ -32,7 +41,9 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
-
+                    binding.apply {
+                        position.text = "当前位置: ${(it?.wasteX ?: 0f).removeZero()}"
+                    }
                 }
             }
         }

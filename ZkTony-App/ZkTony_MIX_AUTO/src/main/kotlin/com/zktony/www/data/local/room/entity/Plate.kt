@@ -14,7 +14,6 @@ data class Plate(
     @PrimaryKey val id: Long = Snowflake(1).nextId(),
     val subId: Long = 0L,
     val x: Int = 0,
-    val y: Int = 0,
     val index: Int = 0,
     val createTime: Date = Date(System.currentTimeMillis()),
 )
