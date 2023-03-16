@@ -19,10 +19,8 @@ import com.zktony.common.dialog.aboutDialog
 import com.zktony.common.dialog.authDialog
 import com.zktony.common.dialog.deviceDialog
 import com.zktony.common.dialog.updateDialog
-import com.zktony.common.ext.afterTextChange
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.installApk
-import com.zktony.common.ext.removeZero
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.common.app.AppViewModel
@@ -129,12 +127,6 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 isChecked = appViewModel.settings.value.bar
                 setOnCheckedChangeListener { _, isChecked ->
                     viewModel.toggleNavigationBar(isChecked)
-                }
-            }
-            with(needleSpace) {
-                setText(appViewModel.settings.value.needleSpace.toString().removeZero())
-                afterTextChange {
-                    viewModel.setNeedleSpace(it.toFloatOrNull() ?: 7.3f)
                 }
             }
             with(setting) {

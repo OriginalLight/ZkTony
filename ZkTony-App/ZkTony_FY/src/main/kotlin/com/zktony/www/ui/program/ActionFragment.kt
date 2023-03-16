@@ -11,7 +11,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.dialogs.PopTip
-import com.kongzue.dialogx.interfaces.OnIconChangeCallBack
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.ext.afterTextChange
@@ -66,13 +65,15 @@ class ActionFragment :
                     viewModel.action.collect {
                         if (getActionEnum(it.mode) == ActionEnum.WASHING) {
                             binding.apply {
-                                inputCount.visibility = View.VISIBLE
-                                inputTime.hint = resources.getString(R.string.hint_time_min)
+                                llCount.visibility = View.VISIBLE
+                                dividerCount.visibility = View.VISIBLE
+                                tvTime.text = resources.getString(R.string.hint_time_min)
                             }
                         } else {
                             binding.apply {
-                                inputCount.visibility = View.GONE
-                                inputTime.hint = resources.getString(R.string.hint_time_hour)
+                                llCount.visibility = View.GONE
+                                dividerCount.visibility = View.GONE
+                                tvTime.text = resources.getString(R.string.hint_time_hour)
                             }
                         }
                     }
@@ -144,21 +145,6 @@ class ActionFragment :
                             fontSize = 16
                         })
                         .setOverlayBaseView(false)
-                        .setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
-                            override fun getIcon(
-                                dialog: PopMenu?,
-                                index: Int,
-                                menuText: String?
-                            ): Int {
-                                return when (menuText) {
-                                    ActionEnum.BLOCKING_LIQUID.value -> R.mipmap.ic_blocking_liquid
-                                    ActionEnum.ANTIBODY_ONE.value -> R.mipmap.ic_antibody
-                                    ActionEnum.ANTIBODY_TWO.value -> R.mipmap.ic_antibody
-                                    ActionEnum.WASHING.value -> R.mipmap.ic_washing
-                                    else -> R.mipmap.ic_blocking_liquid
-                                }
-                            }
-                        })
                         .setOnMenuItemClickListener { _, text, index ->
                             binding.btnAction.text = text
                             viewModel.switchAction(getActionEnum(index))

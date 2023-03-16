@@ -81,10 +81,10 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
                     setOnClickListener {
                         if (content.visibility == android.view.View.GONE) {
                             content.visibility = android.view.View.VISIBLE
-                            ivSpacer.setImageResource(R.mipmap.up)
+                            ivSpacer.setImageResource(R.mipmap.collapse_arrow)
                         } else {
                             content.visibility = android.view.View.GONE
-                            ivSpacer.setImageResource(R.mipmap.down)
+                            ivSpacer.setImageResource(R.mipmap.expand_arrow)
                         }
                     }
                 }

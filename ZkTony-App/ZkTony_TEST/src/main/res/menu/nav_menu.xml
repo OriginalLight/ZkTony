@@ -4,7 +4,7 @@
     <group android:id="@+id/g_home">
         <item
             android:id="@+id/navigation_tec"
-            android:icon="@drawable/ic_dashboard"
+            android:icon="@mipmap/program"
             android:title="@string/title_tec" />
     </group>
 

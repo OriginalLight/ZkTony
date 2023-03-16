@@ -37,29 +37,29 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@color/dark_onBackground">
+                        android:layout_height="wrap_content">
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/select"
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="240dp"
                             android:layout_height="wrap_content"
-                            android:backgroundTint="@color/light_primary"
                             android:ellipsize="end"
                             android:gravity="center"
                             android:insetTop="0dp"
                             android:insetBottom="0dp"
                             android:singleLine="true"
                             android:textAllCaps="false"
-                            android:textColor="@color/light_onPrimary"
-                            android:textSize="16sp"
-                            app:cornerRadius="2dp"
-                            app:elevation="0dp"
-                            app:icon="@drawable/ic_drop"
-                            app:iconTint="@color/light_onPrimary"
+                            android:textColor="@color/black"
+                            android:textSize="18sp"
+                            app:cornerRadius="0dp"
+                            app:icon="@mipmap/program"
                             app:rippleColor="@color/purple_700"
-                            tools:ignore="SpeakableTextPresentCheck" />
+                            app:iconPadding="0dp"
+                            app:iconSize="32dp"
+                            app:strokeColor="@color/light_primary"
+                            app:strokeWidth="2dp"
+                            tools:ignore="NestedWeights,SpeakableTextPresentCheck" />
 
                         <TextView
                             android:id="@+id/hole_number"
@@ -72,9 +72,10 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="478dp"
+                        android:layout_width="480dp"
                         android:layout_height="0dp"
                         android:layout_weight="1"
+                        android:background="#F4F4F4"
                         tools:ignore="TextSizeCheck">
 
                         <TextView
@@ -186,7 +187,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="VisualLintBounds">
 
-                    <com.zktony.common.widget.DynamicPlate
+                    <com.zktony.common.widget.GradientPlate
                         android:id="@+id/dynamic_plate"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -363,7 +364,7 @@
                 <ImageView
                     android:layout_width="96dp"
                     android:layout_height="96dp"
-                    android:background="@mipmap/ic_wash"
+                    android:background="@mipmap/pipeline"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
                 <TextView
@@ -387,7 +388,7 @@
                 <ImageView
                     android:layout_width="96dp"
                     android:layout_height="96dp"
-                    android:background="@mipmap/ic_fill"
+                    android:background="@mipmap/right"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
                 <TextView
@@ -411,7 +412,7 @@
                 <ImageView
                     android:layout_width="96dp"
                     android:layout_height="96dp"
-                    android:background="@mipmap/ic_suck_back"
+                    android:background="@mipmap/left"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
                 <TextView

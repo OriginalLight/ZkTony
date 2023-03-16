@@ -92,7 +92,7 @@
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:layout_gravity="center"
-                    android:background="@mipmap/edit"
+                    android:background="@mipmap/forward"
                     tools:ignore="ContentDescription" />
 
             </LinearLayout>

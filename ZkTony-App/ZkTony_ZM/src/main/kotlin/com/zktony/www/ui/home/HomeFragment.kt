@@ -166,7 +166,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
         // 程序选择部分
         bind.apply {
-            programName.text = uiState.programName
+            selector.text = uiState.programName
+            selector.iconTint = null
             if (uiState.model == 0) {
                 if (motor.isFocused.not()) {
                     if (uiState.motor > 0) {

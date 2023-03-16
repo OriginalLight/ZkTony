@@ -15,7 +15,7 @@
             android:layout_height="50dp"
             android:layout_marginStart="2dp"
             android:layout_marginEnd="2dp"
-            android:background="@color/dark_onSurface"
+            android:background="#51DAD1DD"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -33,11 +33,11 @@
                 android:singleLine="true"
                 android:textAllCaps="false"
                 android:textColor="@color/light_onPrimary"
-                android:textSize="16sp"
                 app:cornerRadius="2dp"
                 app:elevation="0dp"
-                app:icon="@drawable/ic_drop"
-                app:iconTint="@color/light_onPrimary"
+                android:textSize="18sp"
+                app:icon="@mipmap/program"
+                app:iconSize="32dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -85,7 +85,6 @@
             android:layout_marginStart="2dp"
             android:layout_marginEnd="102dp"
             android:layout_marginBottom="2dp"
-            android:background="@color/light_surface"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -104,7 +103,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:background="#287DF133"
+                    android:background="#DAD1DD"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -112,8 +111,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginStart="8dp"
-                        android:background="@drawable/ic_check"
-                        android:backgroundTint="@color/light_onSurface"
+                        android:background="@mipmap/done"
                         tools:ignore="ContentDescription" />
 
                     <TextView
@@ -130,7 +128,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:background="#597DF133"
+                    android:background="#B4DAD1DD"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -138,8 +136,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginStart="8dp"
-                        android:background="@drawable/ic_program"
-                        android:backgroundTint="@color/light_onSurface"
+                        android:background="@mipmap/flow"
                         tools:ignore="ContentDescription" />
 
                     <TextView
@@ -156,7 +153,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="1"
-                    android:background="#9A7DF133"
+                    android:background="#51DAD1DD"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
@@ -164,8 +161,7 @@
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginStart="8dp"
-                        android:background="@mipmap/ic_temp"
-                        android:backgroundTint="@color/light_onSurface"
+                        android:background="@mipmap/temperature"
                         tools:ignore="ContentDescription" />
 
                     <TextView

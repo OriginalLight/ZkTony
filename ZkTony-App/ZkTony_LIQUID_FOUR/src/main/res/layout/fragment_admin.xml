@@ -96,7 +96,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_needle"
+                            android:src="@mipmap/syringe"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -238,7 +238,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/about"
+                            android:src="@mipmap/help"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -260,7 +260,7 @@
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="16dp"
                             android:layout_marginBottom="8dp"
-                            android:src="@drawable/ic_to"
+                            android:src="@mipmap/forward"
                             tools:ignore="ContentDescription" />
 
                     </RelativeLayout>

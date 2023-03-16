@@ -19,6 +19,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val navigationView = binding.navView
+        navigationView.itemIconTintList = null
+
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         binding.navView.setupWithNavController(navController)
 

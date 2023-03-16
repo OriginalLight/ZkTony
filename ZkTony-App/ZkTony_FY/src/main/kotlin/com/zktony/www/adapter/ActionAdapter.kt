@@ -1,5 +1,6 @@
 package com.zktony.www.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,8 +8,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.kongzue.dialogx.dialogs.PopTip
+import com.zktony.common.R
 import com.zktony.common.ext.clickScale
-import com.zktony.www.R
+import com.zktony.common.ext.removeZero
 import com.zktony.www.data.local.room.entity.Action
 import com.zktony.www.data.local.room.entity.getActionEnum
 import com.zktony.www.databinding.ItemActionBinding
@@ -40,24 +42,29 @@ class ActionAdapter : ListAdapter<Action, ActionAdapter.ViewHolder>(ActionDiffCa
     class ViewHolder(
         private val binding: ItemActionBinding, private val onDeleteButtonClick: (Action) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("SetTextI18n")
         fun bind(item: Action) {
             binding.apply {
                 action = item
                 when (item.mode) {
                     0 -> {
-                        icon.setBackgroundResource(R.mipmap.ic_blocking_liquid)
+                        icon.setBackgroundResource(R.mipmap.box)
                         con4.visibility = View.GONE
                     }
                     3 -> {
-                        icon.setBackgroundResource(R.mipmap.ic_washing)
+                        icon.setBackgroundResource(R.mipmap.clean)
                         con4.visibility = View.VISIBLE
                     }
                     else -> {
-                        icon.setBackgroundResource(R.mipmap.ic_antibody)
+                        icon.setBackgroundResource(R.mipmap.virus)
                         con4.visibility = View.GONE
                     }
                 }
                 model.text = getActionEnum(item.mode).value
+                time.text = item.time.removeZero() + if (item.mode == 3) " 分钟" else " 小时"
+                temperature.text = item.temperature.removeZero() + " ℃"
+                water.text = item.liquidVolume.removeZero() + " 微升"
+                counter.text = item.count.toString() + " 次"
                 cardView.setOnClickListener {
                     PopTip.show("点击右侧图标删除")
                 }

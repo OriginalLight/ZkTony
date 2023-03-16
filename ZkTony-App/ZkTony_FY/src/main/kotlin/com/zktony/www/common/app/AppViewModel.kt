@@ -88,7 +88,7 @@ class AppViewModel @Inject constructor(
         }
 
         val motors = motor.getAll().firstOrNull() ?: emptyList()
-        if (motors.isNotEmpty()) {
+        if (motors.isEmpty()) {
             val motorList = mutableListOf<Motor>()
             motorList.add(Motor(id = 0, name = "X轴", address = 1))
             motorList.add(Motor(id = 1, name = "Y轴", address = 2))

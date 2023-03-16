@@ -8,7 +8,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import com.kongzue.dialogx.dialogs.PopMenu
-import com.kongzue.dialogx.interfaces.OnIconChangeCallBack
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.ext.afterTextChange
@@ -84,17 +83,14 @@ class CalibrationDataFragment :
 
             select.setOnClickListener {
                 val menuList = listOf("泵一", "泵二", "泵三", "泵四", "泵五", "泵六")
-                PopMenu.show(menuList).setMenuTextInfo(TextInfo().apply {
+                PopMenu.show(it, menuList).setMenuTextInfo(TextInfo().apply {
                     gravity = Gravity.CENTER
                     fontSize = 16
-                }).setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
-                    override fun getIcon(dialog: PopMenu?, index: Int, menuText: String?): Int {
-                        return R.mipmap.ic_pump
-                    }
                 }).setOnMenuItemClickListener { _, _, index ->
                     viewModel.selectPump(index)
                     false
-                }.width = 300
+                }.setOverlayBaseView(false).setRadius(0f).alignGravity =
+                    Gravity.TOP or Gravity.CENTER_HORIZONTAL
             }
 
             with(back) {

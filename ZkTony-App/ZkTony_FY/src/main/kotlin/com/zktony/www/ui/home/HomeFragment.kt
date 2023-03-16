@@ -12,9 +12,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.dialogs.PopTip
-import com.kongzue.dialogx.interfaces.OnIconChangeCallBack
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.R.color
+import com.zktony.common.R.mipmap
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
@@ -57,7 +57,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 launch {
                     SerialManager.instance.swing.collect {
                         binding.e.apply {
-                            pause.setBackgroundResource(if (it) R.mipmap.btn_pause else R.mipmap.btn_continue)
+                            pause.setBackgroundResource(if (it) mipmap.pause else mipmap.play)
                             with(tvPause) {
                                 text = if (it) "暂停摇床" else "继续摇床"
                                 setTextColor(
@@ -79,9 +79,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             bind.apply {
                 actions.setOnClickListener { PopTip.show((it as TextView).text) }
                 start.setOnClickListener { viewModel.start(i) }
-                select.setOnClickListener { selectDialog(i) }
+                with(select) {
+                    iconTint = null
+                    setOnClickListener { selectDialog(i) }
+                }
                 with(stop) {
-                    setOnClickListener { PopTip.show(R.mipmap.ic_stop, "长按停止") }
+                    setOnClickListener { PopTip.show("长按停止") }
                     setOnLongClickListener {
                         viewModel.stop(i)
                         true
@@ -200,7 +203,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
             with(tvLock) {
                 text = if (state.lock) "已上锁" else "已开锁"
-                lock.setBackgroundResource(if (state.lock) R.mipmap.btn_lock else R.mipmap.btn_unlock)
+                lock.setBackgroundResource(if (state.lock) mipmap.lock else mipmap.unlock)
                 setTextColor(
                     ContextCompat.getColor(
                         context, if (state.lock) color.dark_outline else color.green
@@ -223,10 +226,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         PopMenu.show(menuList).setMenuTextInfo(TextInfo().apply {
             gravity = Gravity.CENTER
             fontSize = 16
-        }).setOnIconChangeCallBack(object : OnIconChangeCallBack<PopMenu>(true) {
-            override fun getIcon(dialog: PopMenu?, index: Int, menuText: String?): Int {
-                return R.mipmap.ic_program
-            }
         }).setOnMenuItemClickListener { _, _, index ->
             viewModel.selectProgram(index, module)
             false

@@ -57,35 +57,28 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <LinearLayout
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/selector"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:layout_marginEnd="1dp"
+                    android:backgroundTint="@color/light_onPrimary"
                     android:layout_weight="1"
-                    android:background="@color/light_onPrimary"
-                    android:orientation="horizontal"
-                    tools:ignore="NestedWeights">
-
-                    <TextView
-                        android:id="@+id/program_name"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:textColor="@color/black"
-                        android:textSize="20sp" />
-
-                    <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="8dp"
-                        android:src="@drawable/ic_drop"
-                        tools:ignore="ContentDescription" />
-
-                </LinearLayout>
+                    android:ellipsize="end"
+                    app:elevation="0dp"
+                    android:gravity="center"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:singleLine="true"
+                    android:textAllCaps="false"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    app:cornerRadius="0dp"
+                    app:icon="@mipmap/program"
+                    app:rippleColor="@color/purple_700"
+                    app:iconPadding="0dp"
+                    app:iconSize="32dp"
+                    tools:ignore="NestedWeights,SpeakableTextPresentCheck" />
 
                 <EditText
                     android:id="@+id/motor"

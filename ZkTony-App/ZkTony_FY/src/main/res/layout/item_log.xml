@@ -135,7 +135,7 @@
                         android:layout_width="32dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center"
-                        app:srcCompat="@mipmap/down"
+                        app:srcCompat="@mipmap/expand_arrow"
                         tools:ignore="ContentDescription" />
 
                 </LinearLayout>

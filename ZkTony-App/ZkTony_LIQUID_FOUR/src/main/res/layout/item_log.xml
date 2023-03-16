@@ -113,7 +113,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginStart="1dp"
                     android:layout_weight="1"
-                    android:background="@color/light_onPrimary"
+                    android:background="@color/dark_secondary"
                     android:gravity="center"
                     android:orientation="vertical">
 
@@ -122,7 +122,7 @@
                         android:layout_width="32dp"
                         android:layout_height="30dp"
                         android:layout_gravity="center"
-                        app:srcCompat="@mipmap/down"
+                        app:srcCompat="@mipmap/expand_arrow"
                         tools:ignore="ContentDescription" />
 
                 </LinearLayout>

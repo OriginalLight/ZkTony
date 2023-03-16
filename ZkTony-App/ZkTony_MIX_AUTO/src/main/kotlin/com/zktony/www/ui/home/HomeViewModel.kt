@@ -5,11 +5,13 @@ import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
+import com.zktony.common.dialog.spannerDialog
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.control.serial.SerialManager
 import com.zktony.www.control.serial.protocol.V1
 import com.zktony.www.data.local.room.dao.LogDao
+import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Log
 import com.zktony.www.data.local.room.entity.Program
@@ -24,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val logDao: LogDao,
+    private val programDao: ProgramDao
 ) : BaseViewModel() {
 
     @Inject
@@ -37,16 +40,30 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
+                programDao.getAll().collect {
+                    _uiState.value = _uiState.value.copy(programList = it)
+                }
             }
         }
     }
 
-    fun selectWork(view: View) {
+    fun select(view: View) {
         val list = uiState.value.programList.map { it.name }
         if (_uiState.value.job != null) {
             PopTip.show("请先停止当前程序")
             return
         }
+        if (list.isEmpty()) {
+            PopTip.show("请先添加程序")
+            return
+        }
+        spannerDialog(
+            view = view,
+            menu = list,
+            block = { _, index ->
+                _uiState.value = _uiState.value.copy(program = uiState.value.programList[index])
+            }
+        )
     }
 
     fun reset() {

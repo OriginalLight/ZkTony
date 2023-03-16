@@ -80,7 +80,8 @@
                 android:text="@string/add"
                 android:textColor="@color/light_onPrimary"
                 android:textSize="16sp"
-                app:icon="@drawable/ic_add"
+                app:icon="@mipmap/plus"
+                app:iconSize="24dp"
                 app:iconGravity="textStart"
                 app:rippleColor="#7B1FA2" />
 

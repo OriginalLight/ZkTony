@@ -28,7 +28,7 @@
                 android:id="@+id/back"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:background="@drawable/ic_back"
+                android:background="@mipmap/left"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
@@ -142,8 +142,7 @@
                                 android:layout_marginStart="8dp"
                                 android:layout_marginTop="8dp"
                                 android:layout_marginBottom="8dp"
-                                android:background="@mipmap/ic_mode"
-                                android:backgroundTint="@color/dark_surfaceVariant"
+                                android:background="@mipmap/model"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -181,7 +180,8 @@
                                 android:textSize="16sp"
                                 app:cornerRadius="0dp"
                                 app:elevation="2dp"
-                                app:icon="@drawable/ic_drop"
+                                app:icon="@mipmap/expand_arrow"
+                                app:iconSize="16dp"
                                 app:iconGravity="end"
                                 app:iconPadding="0dp"
                                 app:iconTint="@color/black"
@@ -211,8 +211,7 @@
                                 android:layout_width="32dp"
                                 android:layout_height="32dp"
                                 android:layout_marginStart="8dp"
-                                android:background="@mipmap/ic_subdivision"
-                                android:backgroundTint="@color/dark_surfaceVariant"
+                                android:background="@mipmap/subdivision"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -250,7 +249,8 @@
                                 android:textSize="16sp"
                                 app:cornerRadius="0dp"
                                 app:elevation="2dp"
-                                app:icon="@drawable/ic_drop"
+                                app:icon="@mipmap/expand_arrow"
+                                app:iconSize="16dp"
                                 app:iconGravity="end"
                                 app:iconPadding="0dp"
                                 app:iconTint="@color/black"
@@ -268,105 +268,213 @@
 
                         </androidx.constraintlayout.widget.ConstraintLayout>
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/input_speed"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                        <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="32dp"
                             android:layout_marginTop="16dp"
-                            android:layout_marginEnd="32dp"
-                            android:elevation="2dp"
-                            android:hint="@string/hint_speed"
-                            app:boxBackgroundColor="@color/light_onPrimary"
-                            app:startIconDrawable="@mipmap/ic_speed">
+                            android:layout_marginEnd="32dp">
 
-                            <com.google.android.material.textfield.TextInputEditText
+                            <ImageView
+                                android:id="@+id/icon_speed"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_marginStart="8dp"
+                                android:background="@mipmap/speed"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="ContentDescription" />
+
+                            <TextView
+                                android:id="@+id/tv_speed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="@string/hint_speed"
+                                android:textSize="16sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/icon_speed"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <EditText
                                 android:id="@+id/speed"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="48dp"
+                                android:layout_marginStart="128dp"
+                                android:layout_marginBottom="2dp"
                                 android:cursorVisible="true"
+                                android:background="@color/light_onPrimary"
                                 android:inputType="number"
+                                android:gravity="center"
                                 android:maxLength="50"
                                 android:singleLine="true"
-                                android:textSize="16sp" />
+                                android:textSize="16sp"
+                                tools:ignore="MissingConstraints" />
 
-                        </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/input_wait_time"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/dark_outline"
+                                app:layout_constraintBottom_toBottomOf="parent" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="32dp"
                             android:layout_marginTop="16dp"
-                            android:layout_marginEnd="32dp"
-                            android:elevation="2dp"
-                            android:hint="@string/hint_wait_time"
-                            app:boxBackgroundColor="@color/light_onPrimary"
-                            app:startIconDrawable="@mipmap/ic_time">
+                            android:layout_marginEnd="32dp">
 
-                            <com.google.android.material.textfield.TextInputEditText
+                            <ImageView
+                                android:id="@+id/icon_wait_time"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_marginStart="8dp"
+                                android:background="@mipmap/time"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="ContentDescription" />
+
+                            <TextView
+                                android:id="@+id/tv_wait_time"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="@string/hint_wait_time"
+                                android:textSize="16sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/icon_wait_time"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <EditText
                                 android:id="@+id/wait_time"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="48dp"
+                                android:layout_marginStart="128dp"
+                                android:layout_marginBottom="2dp"
                                 android:cursorVisible="true"
+                                android:background="@color/light_onPrimary"
                                 android:inputType="number"
+                                android:gravity="center"
                                 android:maxLength="50"
                                 android:singleLine="true"
-                                android:textSize="16sp" />
+                                android:textSize="16sp"
+                                tools:ignore="MissingConstraints" />
 
-                        </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/input_acceleration"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/dark_outline"
+                                app:layout_constraintBottom_toBottomOf="parent" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="32dp"
                             android:layout_marginTop="16dp"
-                            android:layout_marginEnd="32dp"
-                            android:elevation="2dp"
-                            android:hint="@string/hint_acceleration"
-                            app:boxBackgroundColor="@color/light_onPrimary"
-                            app:startIconDrawable="@mipmap/ic_acceleration">
+                            android:layout_marginEnd="32dp">
 
-                            <com.google.android.material.textfield.TextInputEditText
+                            <ImageView
+                                android:id="@+id/icon_acceleration"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_marginStart="8dp"
+                                android:background="@mipmap/acceleration"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="ContentDescription" />
+
+                            <TextView
+                                android:id="@+id/tv_acceleration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="@string/hint_acceleration"
+                                android:textSize="16sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/icon_acceleration"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <EditText
                                 android:id="@+id/acceleration"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="48dp"
+                                android:layout_marginStart="128dp"
+                                android:layout_marginBottom="2dp"
                                 android:cursorVisible="true"
+                                android:background="@color/light_onPrimary"
                                 android:inputType="number"
+                                android:gravity="center"
                                 android:maxLength="50"
                                 android:singleLine="true"
-                                android:textSize="16sp" />
+                                android:textSize="16sp"
+                                tools:ignore="MissingConstraints" />
 
-                        </com.google.android.material.textfield.TextInputLayout>
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/input_deceleration"
-                            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/dark_outline"
+                                app:layout_constraintBottom_toBottomOf="parent" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="32dp"
                             android:layout_marginTop="16dp"
-                            android:layout_marginEnd="32dp"
-                            android:elevation="2dp"
-                            android:hint="@string/hint_deceleration"
-                            app:boxBackgroundColor="@color/light_onPrimary"
-                            app:startIconDrawable="@mipmap/ic_deceleration">
+                            android:layout_marginEnd="32dp">
 
-                            <com.google.android.material.textfield.TextInputEditText
+                            <ImageView
+                                android:id="@+id/icon_deceleration"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_marginStart="8dp"
+                                android:background="@mipmap/deceleration"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="ContentDescription" />
+
+                            <TextView
+                                android:id="@+id/tv_deceleration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:text="@string/hint_deceleration"
+                                android:textSize="16sp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toEndOf="@+id/icon_deceleration"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <EditText
                                 android:id="@+id/deceleration"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"
+                                android:layout_height="48dp"
+                                android:layout_marginStart="128dp"
+                                android:layout_marginBottom="2dp"
                                 android:cursorVisible="true"
+                                android:background="@color/light_onPrimary"
                                 android:inputType="number"
+                                android:gravity="center"
                                 android:maxLength="50"
                                 android:singleLine="true"
-                                android:textSize="16sp" />
+                                android:textSize="16sp"
+                                tools:ignore="MissingConstraints" />
 
-                        </com.google.android.material.textfield.TextInputLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:background="@color/dark_outline"
+                                app:layout_constraintBottom_toBottomOf="parent" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/update"
@@ -380,7 +488,7 @@
                             android:text="@string/save_config"
                             android:textColor="@color/light_onPrimary"
                             android:textSize="20sp"
-                            app:cornerRadius="10dp"
+                            app:cornerRadius="24dp"
                             app:rippleColor="@color/light_error" />
 
                     </LinearLayout>

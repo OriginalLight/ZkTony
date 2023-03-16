@@ -50,12 +50,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 holeNumber.text = "/"
                             }
                             time.text = it.time.getTimeFormat()
-                            dynamicPlate.setXY(
-                                it.info.plateSize.second,
-                                it.info.plateSize.first,
-                            )
-                            dynamicPlate.setData(it.info.holeList)
-                            dynamicPlate.setColor(it.info.color)
                             currentPlate.text = it.info.plate
                             currentLiquid.text = it.info.liquid
                             currentSpeed.text = String.format("%.2f", it.info.speed)
@@ -72,8 +66,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             holeNumber.setOnClickListener {
                 PopTip.show("加液总数: ${holeNumber.text}")
             }
-            select.setOnClickListener {
-                viewModel.selectWork(it)
+            with(select) {
+                iconTint = null
+                setOnClickListener {
+                    viewModel.select(it)
+                }
             }
             start.setOnClickListener {
                 viewModel.start()

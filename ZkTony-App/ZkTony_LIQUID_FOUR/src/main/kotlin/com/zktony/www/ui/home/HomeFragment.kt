@@ -72,8 +72,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             holeNumber.setOnClickListener {
                 PopTip.show("加液总数: ${holeNumber.text}")
             }
-            select.setOnClickListener {
-                viewModel.selectWork(it)
+            with(select) {
+                iconTint = null
+                setOnClickListener {
+                    viewModel.select(it)
+                }
             }
             start.setOnClickListener {
                 viewModel.start()

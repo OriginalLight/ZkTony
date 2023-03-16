@@ -14,10 +14,10 @@
     <string name="device">设备信息</string>
     <string name="drainage">排液</string>
     <string name="fill">填充</string>
-    <string name="hint_acceleration">加速（10–100）</string>
-    <string name="hint_deceleration">减速（10–100）</string>
-    <string name="hint_speed">转速（r/min）</string>
-    <string name="hint_wait_time">等待时间（ms）</string>
+    <string name="hint_acceleration">加速度</string>
+    <string name="hint_deceleration">减速度</string>
+    <string name="hint_speed">转速</string>
+    <string name="hint_wait_time">等待时间</string>
     <string name="input_v1">泵一加液量 μL</string>
     <string name="input_v2">泵二加液量 μL</string>
     <string name="input_v3">泵三加液量 μL</string>

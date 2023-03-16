@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.zktony.www.R
+import com.zktony.common.R
 import com.zktony.www.data.local.room.entity.Motor
 import com.zktony.www.databinding.ItemMotorBinding
 
@@ -47,7 +47,7 @@ class MotorAdapter : ListAdapter<Motor, MotorAdapter.ViewHolder>(MotorDiffCallba
         fun bind(item: Motor) {
             binding.apply {
                 motor = item
-                icon.setImageResource(if (item.id < 2) R.mipmap.ic_motor else R.mipmap.ic_pump)
+                icon.setImageResource(if (item.id < 2) R.mipmap.motor else R.mipmap.pump)
                 cardView.setOnClickListener { onEditButtonClick(item) }
                 executePendingBindings()
             }

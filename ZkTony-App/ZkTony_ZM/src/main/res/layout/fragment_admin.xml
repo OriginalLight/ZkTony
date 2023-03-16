@@ -97,7 +97,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_audio"
+                            android:src="@mipmap/audio"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -138,7 +138,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_detect"
+                            android:src="@mipmap/safe"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -180,7 +180,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_time"
+                            android:src="@mipmap/time"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -220,7 +220,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_time"
+                            android:src="@mipmap/time"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -261,7 +261,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/ic_motor"
+                            android:src="@mipmap/pump"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -404,7 +404,7 @@
                             android:layout_height="36dp"
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
-                            android:src="@mipmap/about"
+                            android:src="@mipmap/help"
                             tools:ignore="ContentDescription" />
 
                         <TextView
@@ -426,7 +426,7 @@
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="16dp"
                             android:layout_marginBottom="8dp"
-                            android:src="@drawable/ic_to"
+                            android:src="@mipmap/forward"
                             tools:ignore="ContentDescription" />
 
                     </RelativeLayout>
@@ -488,7 +488,7 @@
                     android:layout_height="96dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
-                    android:background="@mipmap/ic_motor"
+                    android:background="@mipmap/pump"
                     tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
                 <TextView

@@ -10,7 +10,7 @@ import com.zktony.common.dialog.deleteDialog
 import com.zktony.common.dialog.inputDialog
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
-import com.zktony.www.adapter.WorkAdapter
+import com.zktony.www.adapter.ProgramAdapter
 import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 class ProgramFragment : BaseFragment<ProgramViewModel, FragmentProgramBinding>(R.layout.fragment_program) {
     override val viewModel: ProgramViewModel by viewModels()
 
-    private val adapter by lazy { WorkAdapter() }
+    private val adapter by lazy { ProgramAdapter() }
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()

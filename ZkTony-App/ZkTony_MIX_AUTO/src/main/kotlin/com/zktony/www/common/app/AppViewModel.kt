@@ -4,7 +4,6 @@ import android.app.Application
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.utils.Constants
@@ -47,13 +46,6 @@ class AppViewModel @Inject constructor(
                     it[booleanPreferencesKey(Constants.BAR)] ?: false
                 }.collect {
                     _settings.value = _settings.value.copy(bar = it)
-                }
-            }
-            launch {
-                dataStore.data.map {
-                    it[floatPreferencesKey(Constants.NEEDLE_SPACE)] ?: 7.3f
-                }.collect {
-                    _settings.value = _settings.value.copy(needleSpace = it)
                 }
             }
             launch {
@@ -122,5 +114,4 @@ class AppViewModel @Inject constructor(
 
 data class Settings(
     val bar: Boolean = false,
-    val needleSpace: Float = 7.3f,
 )

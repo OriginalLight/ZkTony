@@ -27,7 +27,7 @@
                 android:layout_height="48dp"
                 android:layout_alignParentStart="true"
                 android:layout_centerVertical="true"
-                android:background="@drawable/ic_back"
+                android:background="@mipmap/left"
                 tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
             <TextView
@@ -56,7 +56,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
-                android:src="@mipmap/ic_name"
+                android:src="@mipmap/name"
                 tools:ignore="ContentDescription" />
 
             <TextView
@@ -96,7 +96,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
-                android:src="@mipmap/ic_vol"
+                android:src="@mipmap/voltage"
                 tools:ignore="ContentDescription" />
 
             <TextView
@@ -136,7 +136,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
-                android:src="@mipmap/ic_time"
+                android:src="@mipmap/time"
                 tools:ignore="ContentDescription" />
 
             <TextView
