@@ -3,6 +3,7 @@ package com.zktony.www.ui.program
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
+import com.zktony.common.utils.Snowflake
 import com.zktony.www.data.local.room.dao.HoleDao
 import com.zktony.www.data.local.room.dao.PlateDao
 import com.zktony.www.data.local.room.dao.ProgramDao
@@ -10,6 +11,7 @@ import com.zktony.www.data.local.room.entity.Program
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -49,7 +51,28 @@ class ProgramViewModel @Inject constructor(
             if (work != null) {
                 PopTip.show("已存在相同名称的程序")
             } else {
-                dao.insert(Program(name = name))
+                val snowflake = Snowflake(1)
+                val program = Program(id = snowflake.nextId(), name = name)
+                dao.insert(program)
+                val plate = plateDao.getById(1L).firstOrNull()
+                val holeList = holeDao.getBySubId(1L).firstOrNull()
+                val newPlate = plate?.copy(
+                    id = snowflake.nextId(),
+                    subId = program.id,
+                )
+                val newHoleList = holeList?.map {
+                    it.copy(
+                        id = snowflake.nextId(),
+                        subId = newPlate?.id ?: 0L
+                    )
+                }
+                newPlate?.let {
+                    plateDao.insert(it)
+                    newHoleList?.let { list ->
+                        holeDao.insertAll(list)
+                    }
+                }
+
             }
         }
     }

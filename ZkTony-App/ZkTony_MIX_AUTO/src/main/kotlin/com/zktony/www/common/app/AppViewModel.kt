@@ -8,9 +8,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.utils.Constants
 import com.zktony.common.utils.Snowflake
-import com.zktony.www.manager.MotorManager
 import com.zktony.www.data.local.room.dao.*
 import com.zktony.www.data.local.room.entity.*
+import com.zktony.www.manager.MotorManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -69,9 +69,9 @@ class AppViewModel @Inject constructor(
                 listOf(
                     Motor(id = 0, name = "X轴", address = 1),
                     Motor(id = 1, name = "Z轴", address = 3),
-                    Motor(id = 2, name = "泵一", address = 3),
-                    Motor(id = 3, name = "泵二", address = 1),
-                    Motor(id = 4, name = "泵三", address = 2),
+                    Motor(id = 2, name = "泵一", address = 1),
+                    Motor(id = 3, name = "泵二", address = 2),
+                    Motor(id = 4, name = "泵三", address = 3),
                 )
             )
         }

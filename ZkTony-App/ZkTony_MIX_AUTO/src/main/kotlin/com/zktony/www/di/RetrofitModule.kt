@@ -1,4 +1,4 @@
-package com.zktony.www.data.di
+package com.zktony.www.di
 
 import com.google.gson.GsonBuilder
 import com.zktony.common.http.adapter.FlowCallAdapterFactory

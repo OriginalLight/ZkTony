@@ -1,4 +1,4 @@
-package com.zktony.www.data.di
+package com.zktony.www.di
 
 import androidx.lifecycle.ViewModelProvider
 import com.zktony.common.app.CommonApplicationProxy

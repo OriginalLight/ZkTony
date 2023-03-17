@@ -7,13 +7,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.PopTip
+import com.zktony.common.R.mipmap
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.ext.addTouchEvent
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.getTimeFormat
 import com.zktony.www.R
 import com.zktony.www.common.extension.total
-import com.zktony.www.common.extension.washDialog
 import com.zktony.www.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -41,6 +40,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             with(pause) {
                                 isVisible = it.job != null
                                 text = if (!it.pause) "暂停" else "继续"
+                                setIconResource(if (!it.pause) mipmap.pause else mipmap.play)
                             }
                             if (it.program != null) {
                                 select.text = it.program.name
@@ -91,37 +91,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            with(wash) {
-                clickScale()
-                setOnClickListener {
-                    washDialog(
-                        {
-                            viewModel.wash(time = it, type = 0)
-                        },
-                        {
-                            viewModel.wash(type = 1)
-                        }
-                    )
-                }
-            }
-            fill.addTouchEvent({
-                it.scaleX = 0.8f
-                it.scaleY = 0.8f
-                viewModel.fill(0)
-            }, {
-                it.scaleX = 1f
-                it.scaleY = 1f
-                viewModel.fill(1)
-            })
-            suckBack.addTouchEvent({
-                it.scaleX = 0.8f
-                it.scaleY = 0.8f
-                viewModel.suckBack(0)
-            }, {
-                it.scaleX = 1f
-                it.scaleY = 1f
-                viewModel.suckBack(1)
-            })
+            fillCoagulant.clickScale()
+            fillColloid.clickScale()
+            recaptureCoagulant.clickScale()
+            recaptureColloid.clickScale()
         }
     }
 }

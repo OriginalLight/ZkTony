@@ -33,6 +33,7 @@
                     android:layout_width="480dp"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
+                    android:background="#F4F4F4"
                     tools:ignore="VisualLintBounds">
 
                     <LinearLayout
@@ -51,6 +52,7 @@
                             android:singleLine="true"
                             android:textAllCaps="false"
                             android:textColor="@color/black"
+                            android:backgroundTint="@color/light_onPrimary"
                             android:textSize="18sp"
                             app:cornerRadius="0dp"
                             app:icon="@mipmap/program"
@@ -75,7 +77,6 @@
                         android:layout_width="480dp"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:background="#F4F4F4"
                         tools:ignore="TextSizeCheck">
 
                         <TextView
@@ -100,13 +101,6 @@
                     android:layout_weight="1"
                     tools:ignore="VisualLintBounds">
 
-                    <com.google.android.material.divider.MaterialDivider
-                        android:layout_width="2dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/dark_onPrimaryContainer"
-                        app:layout_constraintStart_toStartOf="parent"
-                        tools:ignore="VisualLintBounds" />
-
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/start"
                         android:layout_width="0dp"
@@ -123,6 +117,9 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:rippleColor="@color/purple_700"
+                        app:icon="@mipmap/play"
+                        app:iconSize="24dp"
+                        app:iconGravity="textStart"
                         tools:ignore="VisualLintButtonSize" />
 
                     <com.google.android.material.button.MaterialButton
@@ -142,6 +139,9 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/start"
                         app:rippleColor="@color/purple_700"
+                        app:icon="@mipmap/pause"
+                        app:iconSize="24dp"
+                        app:iconGravity="textStart"
                         tools:ignore="TextContrastCheck,VisualLintButtonSize" />
 
                     <com.google.android.material.button.MaterialButton
@@ -161,6 +161,9 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/pause"
                         app:rippleColor="@color/purple_700"
+                        app:icon="@mipmap/close"
+                        app:iconSize="24dp"
+                        app:iconGravity="textStart"
                         tools:ignore="VisualLintButtonSize" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

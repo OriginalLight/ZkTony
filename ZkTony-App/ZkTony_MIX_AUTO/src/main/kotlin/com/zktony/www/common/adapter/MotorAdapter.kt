@@ -1,4 +1,4 @@
-package com.zktony.www.adapter
+package com.zktony.www.common.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

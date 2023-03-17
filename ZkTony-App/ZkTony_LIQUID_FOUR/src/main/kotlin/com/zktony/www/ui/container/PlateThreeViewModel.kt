@@ -5,11 +5,11 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.common.utils.Snowflake
 import com.zktony.www.common.extension.calculateCoordinate
-import com.zktony.www.manager.ExecutionManager
-import com.zktony.www.manager.SerialManager
 import com.zktony.www.data.local.room.dao.HoleDao
 import com.zktony.www.data.local.room.dao.PlateDao
 import com.zktony.www.data.local.room.entity.Hole
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,17 +46,15 @@ class PlateThreeViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value.plate?.let {
                 dao.update(it.copy(x = x, y = y))
-                if (_uiState.value.holes.size != x * y) {
-                    holeDao.deleteBySubId(it.id)
-                    val snowflake = Snowflake(2)
-                    val holes = mutableListOf<Hole>()
-                    for (i in 0 until  it.x) {
-                        for (j in 0 until it.y) {
-                            holes.add(Hole(id = snowflake.nextId(), subId = it.id, x = i, y = j))
-                        }
+                holeDao.deleteBySubId(it.id)
+                val snowflake = Snowflake(2)
+                val holes = mutableListOf<Hole>()
+                for (i in 0 until  x) {
+                    for (j in 0 until y) {
+                        holes.add(Hole(id = snowflake.nextId(), subId = it.id, x = i, y = j))
                     }
-                    holeDao.insertAll(holes)
                 }
+                holeDao.insertAll(holes)
             }
         }
     }

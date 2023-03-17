@@ -32,6 +32,7 @@
                 <LinearLayout
                     android:layout_width="480dp"
                     android:layout_height="match_parent"
+                    android:background="#F4F4F4"
                     android:orientation="vertical"
                     tools:ignore="VisualLintBounds">
 
@@ -51,6 +52,7 @@
                             android:singleLine="true"
                             android:textAllCaps="false"
                             android:textColor="@color/black"
+                            android:backgroundTint="@color/light_onPrimary"
                             android:textSize="18sp"
                             app:cornerRadius="0dp"
                             app:icon="@mipmap/program"
@@ -75,7 +77,6 @@
                         android:layout_width="480dp"
                         android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:background="#F4F4F4"
                         tools:ignore="TextSizeCheck">
 
                         <TextView
@@ -100,13 +101,6 @@
                     android:layout_weight="1"
                     tools:ignore="VisualLintBounds">
 
-                    <com.google.android.material.divider.MaterialDivider
-                        android:layout_width="2dp"
-                        android:layout_height="match_parent"
-                        android:background="@color/dark_onPrimaryContainer"
-                        app:layout_constraintStart_toStartOf="parent"
-                        tools:ignore="VisualLintBounds" />
-
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/start"
                         android:layout_width="0dp"
@@ -123,6 +117,9 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:rippleColor="@color/purple_700"
+                        app:icon="@mipmap/play"
+                        app:iconSize="24dp"
+                        app:iconGravity="textStart"
                         tools:ignore="VisualLintButtonSize" />
 
                     <com.google.android.material.button.MaterialButton
@@ -142,6 +139,9 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/start"
                         app:rippleColor="@color/purple_700"
+                        app:icon="@mipmap/pause"
+                        app:iconSize="24dp"
+                        app:iconGravity="textStart"
                         tools:ignore="TextContrastCheck,VisualLintButtonSize" />
 
                     <com.google.android.material.button.MaterialButton
@@ -161,6 +161,9 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/pause"
                         app:rippleColor="@color/purple_700"
+                        app:icon="@mipmap/close"
+                        app:iconSize="24dp"
+                        app:iconGravity="textStart"
                         tools:ignore="VisualLintButtonSize" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -338,8 +341,8 @@
                 tools:ignore="NestedWeights,UseCompoundDrawables">
 
                 <ImageView
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:background="@mipmap/reset"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
@@ -348,12 +351,12 @@
                     android:layout_height="wrap_content"
                     android:text="@string/reset"
                     android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/wash"
+                android:id="@+id/fill_coagulant"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -362,46 +365,24 @@
                 tools:ignore="NestedWeights,UseCompoundDrawables">
 
                 <ImageView
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
-                    android:background="@mipmap/pipeline"
-                    tools:ignore="ContentDescription,VisualLintBounds" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/wash"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/fill"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical"
-                tools:ignore="NestedWeights,UseCompoundDrawables">
-
-                <ImageView
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
+                    android:id="@+id/fill_coagulant_image"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:background="@mipmap/right"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
                 <TextView
+                    android:id="@+id/fill_coagulant_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/fill"
+                    android:text="@string/fill_coagulant"
                     android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
 
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/suck_back"
+                android:id="@+id/recapture_coagulant"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
@@ -410,17 +391,71 @@
                 tools:ignore="NestedWeights,UseCompoundDrawables">
 
                 <ImageView
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
+                    android:id="@+id/recapture_coagulant_image"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:background="@mipmap/left"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
                 <TextView
+                    android:id="@+id/recapture_coagulant_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/suck_back"
+                    android:text="@string/recapture_coagulant"
                     android:textColor="@color/black"
-                    android:textSize="16sp" />
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/fill_colloid"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:ignore="NestedWeights,UseCompoundDrawables">
+
+                <ImageView
+                    android:id="@+id/fill_colloid_image"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@mipmap/right"
+                    tools:ignore="ContentDescription,VisualLintBounds" />
+
+                <TextView
+                    android:id="@+id/fill_colloid_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/fill_colloid"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/recapture_colloid"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:ignore="NestedWeights,UseCompoundDrawables">
+
+                <ImageView
+                    android:id="@+id/recapture_colloid_image"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@mipmap/left"
+                    tools:ignore="ContentDescription,VisualLintBounds" />
+
+                <TextView
+                    android:id="@+id/recapture_colloid_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/recapture_colloid"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
 
             </LinearLayout>
 

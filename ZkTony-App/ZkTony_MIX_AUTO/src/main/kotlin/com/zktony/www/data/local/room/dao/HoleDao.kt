@@ -20,6 +20,14 @@ interface HoleDao : BaseDao<Hole> {
 
     @Query(
         """
+        SELECT * FROM hole
+        WHERE subId IN (:map)
+        """
+    )
+    fun getBySudIdList(map: List<Long>): Flow<List<Hole>>
+
+    @Query(
+        """
         DELETE FROM hole
         WHERE subId = :id
         """

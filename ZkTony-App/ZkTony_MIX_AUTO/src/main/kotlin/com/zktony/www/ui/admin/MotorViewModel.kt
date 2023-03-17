@@ -4,10 +4,10 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.serialport.util.Serial
-import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
 import com.zktony.www.data.local.room.dao.MotorDao
 import com.zktony.www.data.local.room.entity.Motor
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -101,14 +101,14 @@ class MotorViewModel @Inject constructor(
                 if (validateMotor(it)) {
                     motorDao.update(it)
                     val serial = when (it.id) {
-                        in 0..2 -> {
+                        in 0..1 -> {
                             Serial.TTYS0
                         }
-                        in 3..5 -> {
-                            Serial.TTYS1
+                        in 2..4 -> {
+                            Serial.TTYS3
                         }
                         else -> {
-                            Serial.TTYS2
+                            Serial.TTYS0
                         }
                     }
                     SerialManager.instance.sendHex(

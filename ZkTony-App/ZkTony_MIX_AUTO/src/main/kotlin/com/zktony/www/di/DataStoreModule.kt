@@ -1,4 +1,4 @@
-package com.zktony.www.data.di
+package com.zktony.www.di
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

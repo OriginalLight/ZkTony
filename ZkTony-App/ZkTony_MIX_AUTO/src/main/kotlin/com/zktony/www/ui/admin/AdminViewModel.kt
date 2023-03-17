@@ -22,12 +22,12 @@ import com.zktony.www.BuildConfig
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.toCommand
 import com.zktony.www.common.extension.toMotor
-import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
 import com.zktony.www.data.local.room.dao.MotorDao
 import com.zktony.www.data.local.room.entity.Motor
 import com.zktony.www.data.remote.model.Application
 import com.zktony.www.data.remote.service.ApplicationService
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -253,14 +253,16 @@ class AdminViewModel @Inject constructor(
         viewModelScope.launch {
             for (i in 0..1) {
                 for (j in 1..3) {
-                    val serial = when (i) {
-                        0 -> Serial.TTYS0
-                        else -> Serial.TTYS3
+                    if (i != 0 && j != 2) {
+                        val serial = when (i) {
+                            0 -> Serial.TTYS0
+                            else -> Serial.TTYS3
+                        }
+                        SerialManager.instance.sendHex(
+                            serial = serial,
+                            hex = V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex()
+                        )
                     }
-                    SerialManager.instance.sendHex(
-                        serial = serial,
-                        hex = V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex()
-                    )
                     delay(100L)
                 }
             }

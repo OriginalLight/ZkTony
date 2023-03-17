@@ -10,8 +10,6 @@ import com.zktony.common.ext.getTimeFormat
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.completeDialog
-import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
 import com.zktony.www.data.local.room.dao.HoleDao
 import com.zktony.www.data.local.room.dao.LogDao
 import com.zktony.www.data.local.room.dao.PlateDao
@@ -20,6 +18,8 @@ import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Log
 import com.zktony.www.data.local.room.entity.Plate
 import com.zktony.www.data.local.room.entity.Program
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -46,12 +46,12 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            launch {
-                programDao.getAll().collect {
-                    if (it.isNotEmpty()) {
-                        _uiState.value = _uiState.value.copy(programList = it, program = it[0])
-                        loadPlate(it[0].id)
-                    }
+            programDao.getAll().collect {
+                if (it.isEmpty()) {
+                    _uiState.value = _uiState.value.copy(programList = it, program = null)
+                } else {
+                    _uiState.value = _uiState.value.copy(programList = it, program = it[0])
+                    loadPlate(it[0].id)
                 }
             }
         }
@@ -59,20 +59,18 @@ class HomeViewModel @Inject constructor(
 
     private fun loadPlate(id: Long) {
         viewModelScope.launch {
-            launch {
-                plateDao.getBySubId(id).collect {
-                    _uiState.value = _uiState.value.copy(plateList = it)
-                    var size: Pair<Int, Int> = Pair(8, 12)
-                    if (it.isNotEmpty()) {
-                        size = it[0].x to it[0].y
-                    }
-                    _uiState.value = _uiState.value.copy(
-                        info = _uiState.value.info.copy(
-                            plateSize = size
-                        )
-                    )
-                    loadHole(it.map { it.id })
+            plateDao.getBySubId(id).collect {
+                _uiState.value = _uiState.value.copy(plateList = it)
+                var size: Pair<Int, Int> = Pair(8, 12)
+                if (it.isNotEmpty()) {
+                    size = it[0].x to it[0].y
                 }
+                _uiState.value = _uiState.value.copy(
+                    info = _uiState.value.info.copy(
+                        plateSize = size
+                    )
+                )
+                loadHole(it.map { hole -> hole.id })
             }
         }
     }

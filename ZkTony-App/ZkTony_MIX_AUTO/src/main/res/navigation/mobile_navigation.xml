@@ -22,6 +22,27 @@
         android:name="com.zktony.www.ui.program.ProgramFragment"
         android:label="@string/title_program"
         tools:layout="@layout/fragment_program">
+        <action
+            android:id="@+id/action_navigation_program_to_navigation_program_plate"
+            app:destination="@id/navigation_program_plate"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_program_plate"
+        android:name="com.zktony.www.ui.program.ProgramPlateFragment"
+        android:label="@string/title_program"
+        tools:layout="@layout/fragment_program_plate">
+        <action
+            android:id="@+id/action_navigation_program_plate_to_navigation_program"
+            app:destination="@id/navigation_program"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
 

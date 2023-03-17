@@ -18,9 +18,9 @@
     <string name="hint_deceleration">减速度</string>
     <string name="hint_speed">转速</string>
     <string name="hint_wait_time">等待时间</string>
-    <string name="input_v1">泵一加液量 μL</string>
-    <string name="input_v2">泵二加液量 μL</string>
-    <string name="input_v3">泵三加液量 μL</string>
+    <string name="input_v1">促凝剂加液量 μL</string>
+    <string name="input_v2">胶体加液量 μL</string>
+    <string name="input_v3">泵转速 rpm</string>
     <string name="input_v4">泵四加液量 μL</string>
     <string name="input_x">X轴坐标</string>
     <string name="input_y">Y轴坐标</string>
@@ -84,4 +84,9 @@
     <string name="heigh_move">移动高度</string>
     <string name="heigh_add">加液高度</string>
     <string name="position_input">坐标调整</string>
+    <string name="title_program_plate">加液板编辑</string>
+    <string name="fill_coagulant">填充(促凝剂)</string>
+    <string name="recapture_coagulant">回吸(促凝剂)</string>
+    <string name="fill_colloid">填充(胶体)</string>
+    <string name="recapture_colloid">回吸(胶体)</string>
 </resources>

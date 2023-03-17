@@ -8,16 +8,18 @@ import com.zktony.common.base.BaseViewModel
 import com.zktony.common.dialog.spannerDialog
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
+import com.zktony.www.data.local.room.dao.HoleDao
 import com.zktony.www.data.local.room.dao.LogDao
+import com.zktony.www.data.local.room.dao.PlateDao
 import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Log
+import com.zktony.www.data.local.room.entity.Plate
 import com.zktony.www.data.local.room.entity.Program
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -26,7 +28,9 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val logDao: LogDao,
-    private val programDao: ProgramDao
+    private val programDao: ProgramDao,
+    private val plateDao: PlateDao,
+    private val holeDao: HoleDao,
 ) : BaseViewModel() {
 
     @Inject
@@ -41,7 +45,40 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             launch {
                 programDao.getAll().collect {
-                    _uiState.value = _uiState.value.copy(programList = it)
+                    if (it.isEmpty()) {
+                        _uiState.value = _uiState.value.copy(programList = it, program = null)
+                    } else {
+                        _uiState.value = _uiState.value.copy(programList = it, program = it[0])
+                        loadPlate(it[0].id)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun loadPlate(id: Long) {
+        viewModelScope.launch {
+            plateDao.getBySubId(id).collect {
+                _uiState.value = _uiState.value.copy(plateList = it)
+                var size = 10
+                if (it.isNotEmpty()) {
+                    size = it[0].x
+                }
+                _uiState.value = _uiState.value.copy(
+                    info = _uiState.value.info.copy(
+                        plateSize = size
+                    )
+                )
+                loadHole(it.map { hole -> hole.id })
+            }
+        }
+    }
+
+    private fun loadHole(idList: List<Long>) {
+        viewModelScope.launch {
+            launch {
+                holeDao.getBySudIdList(idList).collect {
+                    _uiState.value = _uiState.value.copy(holeList = it)
                 }
             }
         }
@@ -78,38 +115,6 @@ class HomeViewModel @Inject constructor(
                 }
             } else {
                 PopTip.show("请中止所有运行中程序")
-            }
-        }
-    }
-
-    fun wash(time: Int = 30, type: Int) {
-        viewModelScope.launch {
-            if (type == 0) {
-                val washJob = launch {
-                    serial.sendHex(
-                        serial = Serial.TTYS0,
-                        hex = V1(pa = "0B", data = "0301").toHex()
-                    )
-                    serial.sendHex(
-                        serial = Serial.TTYS3,
-                        hex = V1(pa = "0B", data = "0401").toHex()
-                    )
-                    delay(time * 1000L)
-                    wash(type = 1)
-                }
-                _uiState.value = _uiState.value.copy(washJob = washJob)
-                washJob.start()
-            } else {
-                _uiState.value.washJob?.cancel()
-                _uiState.value = _uiState.value.copy(washJob = null)
-                serial.sendHex(
-                    serial = Serial.TTYS0,
-                    hex = V1(pa = "0B", data = "0300").toHex()
-                )
-                serial.sendHex(
-                    serial = Serial.TTYS3,
-                    hex = V1(pa = "0B", data = "0400").toHex()
-                )
             }
         }
     }
@@ -187,6 +192,7 @@ class HomeViewModel @Inject constructor(
 
 data class HomeUiState(
     val programList: List<Program> = emptyList(),
+    val plateList: List<Plate> = emptyList(),
     val holeList: List<Hole> = emptyList(),
     val log: Log? = null,
     val program: Program? = null,
@@ -199,8 +205,8 @@ data class HomeUiState(
 
 data class CurrentInfo(
     val plate: String = "/",
-    val plateSize: Pair<Int, Int> = Pair(8, 12),
-    val holeList: List<Triple<Int, Int, Boolean>> = emptyList(),
+    val plateSize: Int = 10,
+    val holeList: List<Pair<Int, Boolean>> = emptyList(),
     val liquid: String = "/",
     val speed: Float = 0f,
     val lastTime: Long = 0L,
