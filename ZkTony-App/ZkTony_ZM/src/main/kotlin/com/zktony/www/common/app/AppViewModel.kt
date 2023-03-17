@@ -9,8 +9,8 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.utils.Constants
-import com.zktony.www.serial.SerialManager
-import com.zktony.www.serial.protocol.V1
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

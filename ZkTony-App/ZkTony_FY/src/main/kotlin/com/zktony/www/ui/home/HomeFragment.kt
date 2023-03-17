@@ -18,7 +18,7 @@ import com.zktony.common.R.mipmap
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
-import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.manager.SerialManager
 import com.zktony.www.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

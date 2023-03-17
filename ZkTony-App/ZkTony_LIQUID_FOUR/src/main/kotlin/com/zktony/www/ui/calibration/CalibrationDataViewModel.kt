@@ -2,8 +2,8 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.control.motion.MotionManager
-import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import com.zktony.www.data.local.room.dao.CalibrationDao
 import com.zktony.www.data.local.room.dao.CalibrationDataDao
 import com.zktony.www.data.local.room.entity.Calibration
@@ -62,7 +62,7 @@ class CalibrationDataViewModel @Inject constructor(
     }
 
     fun addLiquid() {
-        val manager = MotionManager.instance
+        val manager = ExecutionManager.instance
         val state = _uiState.value
         val gen = when (state.pumpId) {
             0 -> manager.generator(v1 = state.expect)

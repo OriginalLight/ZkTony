@@ -3,8 +3,8 @@ package com.zktony.www.ui.container
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.control.motion.MotionManager
-import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import com.zktony.www.data.local.room.dao.ContainerDao
 import com.zktony.www.data.local.room.entity.Container
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,7 +38,7 @@ class WashViewModel @Inject constructor(
             PopTip.show("机器正在运行中")
             return
         }
-        val m = MotionManager.instance
+        val m = ExecutionManager.instance
         m.executor(m.generator(x = x, y = y))
     }
 

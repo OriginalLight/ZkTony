@@ -12,7 +12,7 @@ import com.zktony.common.dialog.deleteDialog
 import com.zktony.common.dialog.inputDialog
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
-import com.zktony.www.adapter.ProgramAdapter
+import com.zktony.www.common.adapter.ProgramAdapter
 import com.zktony.www.databinding.FragmentProgramBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

@@ -8,8 +8,8 @@ import com.zktony.common.base.BaseViewModel
 import com.zktony.common.dialog.spannerDialog
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.control.serial.SerialManager
-import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import com.zktony.www.data.local.room.dao.LogDao
 import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Hole

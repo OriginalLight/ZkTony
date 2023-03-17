@@ -22,8 +22,8 @@ import com.zktony.www.BuildConfig
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.toCommand
 import com.zktony.www.common.extension.toMotor
-import com.zktony.www.control.serial.SerialManager
-import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import com.zktony.www.data.local.room.dao.MotorDao
 import com.zktony.www.data.local.room.entity.Motor
 import com.zktony.www.data.remote.model.Application

@@ -1,9 +1,9 @@
 package com.zktony.www.ui.home
 
 import com.zktony.serialport.util.Serial.TTYS0
-import com.zktony.www.control.motion.MotionManager
-import com.zktony.www.control.serial.SerialManager
-import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import com.zktony.www.data.local.room.entity.Action
 import com.zktony.www.data.local.room.entity.Container
 import kotlinx.coroutines.delay
@@ -14,7 +14,7 @@ import kotlinx.coroutines.delay
  */
 class CommandExecutor constructor(
     private val serial: SerialManager = SerialManager.instance,
-    private val manager: MotionManager = MotionManager.instance,
+    private val manager: ExecutionManager = ExecutionManager.instance,
     private val module: Int,
     private val con: Container,
     private val event: (String) -> Unit = { }

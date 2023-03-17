@@ -8,7 +8,7 @@ import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.utils.Constants
-import com.zktony.www.control.motor.MotorManager
+import com.zktony.www.manager.MotorManager
 import com.zktony.www.data.local.room.dao.CalibrationDao
 import com.zktony.www.data.local.room.dao.ContainerDao
 import com.zktony.www.data.local.room.dao.MotorDao

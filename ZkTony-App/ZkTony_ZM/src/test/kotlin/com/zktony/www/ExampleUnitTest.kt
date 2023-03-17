@@ -1,6 +1,6 @@
 package com.zktony.www
 
-import com.zktony.www.serial.protocol.V1
+import com.zktony.www.manager.protocol.V1
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

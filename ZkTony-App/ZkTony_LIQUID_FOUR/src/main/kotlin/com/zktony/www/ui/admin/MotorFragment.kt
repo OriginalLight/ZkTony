@@ -12,7 +12,7 @@ import com.zktony.common.ext.afterTextChange
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.setEqualText
 import com.zktony.www.R
-import com.zktony.www.adapter.MotorAdapter
+import com.zktony.www.common.adapter.MotorAdapter
 import com.zktony.www.databinding.FragmentMotorBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

@@ -3,7 +3,7 @@ package com.zktony.www.ui.admin
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.control.motion.MotionManager
+import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.data.local.room.dao.ContainerDao
 import com.zktony.www.data.local.room.entity.Container
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,7 @@ class ContainerViewModel @Inject constructor(
     @Inject
     lateinit var appViewModel: AppViewModel
 
-    private val manager = MotionManager.instance
+    private val manager = ExecutionManager.instance
 
     private val _container: MutableStateFlow<Container> = MutableStateFlow(Container())
     val container = _container.asStateFlow()

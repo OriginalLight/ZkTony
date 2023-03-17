@@ -17,7 +17,7 @@ import com.zktony.common.ext.getDayEnd
 import com.zktony.common.ext.getDayStart
 import com.zktony.common.ext.simpleDateFormat
 import com.zktony.www.R
-import com.zktony.www.adapter.LogAdapter
+import com.zktony.www.common.adapter.LogAdapter
 import com.zktony.www.databinding.FragmentLogBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

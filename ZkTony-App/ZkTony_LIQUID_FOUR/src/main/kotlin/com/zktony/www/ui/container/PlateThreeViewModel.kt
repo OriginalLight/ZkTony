@@ -5,8 +5,8 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.common.utils.Snowflake
 import com.zktony.www.common.extension.calculateCoordinate
-import com.zktony.www.control.motion.MotionManager
-import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import com.zktony.www.data.local.room.dao.HoleDao
 import com.zktony.www.data.local.room.dao.PlateDao
 import com.zktony.www.data.local.room.entity.Hole
@@ -67,7 +67,7 @@ class PlateThreeViewModel @Inject constructor(
             PopTip.show("机器正在运行中")
             return
         }
-        val manager = MotionManager.instance
+        val manager = ExecutionManager.instance
         manager.executor(manager.generator(x = x, y = y))
     }
 

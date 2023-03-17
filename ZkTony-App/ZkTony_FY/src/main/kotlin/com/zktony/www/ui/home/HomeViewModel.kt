@@ -10,8 +10,8 @@ import com.zktony.common.utils.Queue
 import com.zktony.serialport.util.Serial.TTYS0
 import com.zktony.serialport.util.Serial.TTYS3
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.control.serial.SerialManager
-import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import com.zktony.www.data.local.room.dao.ActionDao
 import com.zktony.www.data.local.room.dao.LogDao
 import com.zktony.www.data.local.room.dao.ProgramDao

@@ -10,8 +10,8 @@ import com.zktony.common.ext.getTimeFormat
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.completeDialog
-import com.zktony.www.control.serial.SerialManager
-import com.zktony.www.control.serial.protocol.V1
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import com.zktony.www.data.local.room.dao.HoleDao
 import com.zktony.www.data.local.room.dao.LogDao
 import com.zktony.www.data.local.room.dao.PlateDao

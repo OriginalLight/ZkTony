@@ -11,7 +11,7 @@ import com.zktony.common.dialog.deleteDialog
 import com.zktony.common.dialog.inputDialog
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
-import com.zktony.www.adapter.CalibrationAdapter
+import com.zktony.www.common.adapter.CalibrationAdapter
 import com.zktony.www.databinding.FragmentCalibrationBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

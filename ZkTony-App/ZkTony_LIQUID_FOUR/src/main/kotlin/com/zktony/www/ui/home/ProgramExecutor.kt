@@ -3,8 +3,8 @@ package com.zktony.www.ui.home
 import com.zktony.common.ext.currentTime
 import com.zktony.www.common.app.Settings
 import com.zktony.www.common.extension.total
-import com.zktony.www.control.motion.MotionManager
-import com.zktony.www.control.serial.SerialManager
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +25,7 @@ class ProgramExecutor constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var event: (ExecutorEvent) -> Unit = {}
-    private val motion = MotionManager.instance
+    private val motion = ExecutionManager.instance
     private val serial = SerialManager.instance
     private var complete: Int = 0
     private val currentHoleList: MutableList<Triple<Int, Int, Boolean>> = mutableListOf()

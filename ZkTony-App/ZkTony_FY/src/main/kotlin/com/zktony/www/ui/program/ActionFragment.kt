@@ -16,7 +16,7 @@ import com.zktony.common.base.BaseFragment
 import com.zktony.common.ext.afterTextChange
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
-import com.zktony.www.adapter.ActionAdapter
+import com.zktony.www.common.adapter.ActionAdapter
 import com.zktony.www.data.local.room.entity.ActionEnum
 import com.zktony.www.data.local.room.entity.getActionEnum
 import com.zktony.www.databinding.FragmentActionBinding

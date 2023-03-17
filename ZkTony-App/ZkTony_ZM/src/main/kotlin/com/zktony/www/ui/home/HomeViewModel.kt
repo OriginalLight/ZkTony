@@ -18,8 +18,8 @@ import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.LogData
 import com.zktony.www.data.local.room.entity.LogRecord
 import com.zktony.www.data.local.room.entity.Program
-import com.zktony.www.serial.SerialManager
-import com.zktony.www.serial.protocol.V1
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
