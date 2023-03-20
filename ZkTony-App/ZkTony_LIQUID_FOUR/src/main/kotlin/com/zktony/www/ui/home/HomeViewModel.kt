@@ -10,14 +10,9 @@ import com.zktony.common.ext.getTimeFormat
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.extension.completeDialog
-import com.zktony.www.data.local.room.dao.HoleDao
-import com.zktony.www.data.local.room.dao.LogDao
-import com.zktony.www.data.local.room.dao.PlateDao
-import com.zktony.www.data.local.room.dao.ProgramDao
-import com.zktony.www.data.local.room.entity.Hole
-import com.zktony.www.data.local.room.entity.Log
-import com.zktony.www.data.local.room.entity.Plate
-import com.zktony.www.data.local.room.entity.Program
+import com.zktony.www.data.local.room.dao.*
+import com.zktony.www.data.local.room.entity.*
+import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val programDao: ProgramDao,
+    private val containerDao: ContainerDao,
     private val plateDao: PlateDao,
     private val holeDao: HoleDao,
     private val logDao: LogDao
@@ -46,12 +42,25 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            programDao.getAll().collect {
-                if (it.isEmpty()) {
-                    _uiState.value = _uiState.value.copy(programList = it, program = null)
-                } else {
-                    _uiState.value = _uiState.value.copy(programList = it, program = it[0])
-                    loadPlate(it[0].id)
+            launch {
+                delay(1000L)
+                waste()
+            }
+            launch {
+                programDao.getAll().collect {
+                    if (it.isEmpty()) {
+                        _uiState.value = _uiState.value.copy(programList = it, program = null)
+                    } else {
+                        _uiState.value = _uiState.value.copy(programList = it, program = it[0])
+                        loadPlate(it[0].id)
+                    }
+                }
+            }
+            launch {
+                containerDao.getById(1L).collect {
+                    _uiState.value = _uiState.value.copy(
+                        container = it
+                    )
                 }
             }
         }
@@ -117,6 +126,23 @@ class HomeViewModel @Inject constructor(
                 }
             } else {
                 PopTip.show("请中止所有运行中程序")
+            }
+        }
+    }
+
+    fun waste() {
+        viewModelScope.launch {
+            // 如果有正在执行的程序，提示用户
+            if (serial.lock.value) {
+                PopTip.show("运动中")
+            } else {
+                _uiState.value.container?.let {
+                    val ex = ExecutionManager.instance
+                    ex.executor(ex.generator(
+                        x = it.wasteX,
+                        y = it.wasteY,
+                    ))
+                }
             }
         }
     }
@@ -301,7 +327,12 @@ class HomeViewModel @Inject constructor(
                                 _uiState.value.log?.let { l ->
                                     updateLog(l.copy(status = 1))
                                 }
-                                delay(1000L)
+                                delay(500L)
+                                while (serial.lock.value) {
+                                    delay(100L)
+                                }
+                                waste()
+                                delay(500L)
                                 stop()
                             }
                         }
@@ -349,6 +380,7 @@ data class HomeUiState(
     val plateList: List<Plate> = emptyList(),
     val holeList: List<Hole> = emptyList(),
     val log: Log? = null,
+    val container: Container? = null,
     val program: Program? = null,
     val job: Job? = null,
     val washJob: Job? = null,

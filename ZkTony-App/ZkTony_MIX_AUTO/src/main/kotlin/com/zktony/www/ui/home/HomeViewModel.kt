@@ -16,10 +16,12 @@ import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Log
 import com.zktony.www.data.local.room.entity.Plate
 import com.zktony.www.data.local.room.entity.Program
+import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -37,6 +39,7 @@ class HomeViewModel @Inject constructor(
     lateinit var appViewModel: AppViewModel
 
     private val serial = SerialManager.instance
+    private val ex = ExecutionManager.instance
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
@@ -119,54 +122,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun fill(type: Int) {
-        viewModelScope.launch {
-            if (type == 0) {
-                serial.sendHex(
-                    serial = Serial.TTYS0,
-                    hex = V1(pa = "0B", data = "0301").toHex()
-                )
-                serial.sendHex(
-                    serial = Serial.TTYS3,
-                    hex = V1(pa = "0B", data = "0401").toHex()
-                )
-            } else {
-                serial.sendHex(
-                    serial = Serial.TTYS0,
-                    hex = V1(pa = "0B", data = "0300").toHex()
-                )
-                serial.sendHex(
-                    serial = Serial.TTYS3,
-                    hex = V1(pa = "0B", data = "0400").toHex()
-                )
-            }
-        }
-    }
-
-    fun suckBack(type: Int) {
-        viewModelScope.launch {
-            if (type == 0) {
-                serial.sendHex(
-                    serial = Serial.TTYS0,
-                    hex = V1(pa = "0B", data = "0302").toHex()
-                )
-                serial.sendHex(
-                    serial = Serial.TTYS3,
-                    hex = V1(pa = "0B", data = "0402").toHex()
-                )
-            } else {
-                serial.sendHex(
-                    serial = Serial.TTYS0,
-                    hex = V1(pa = "0B", data = "0300").toHex()
-                )
-                serial.sendHex(
-                    serial = Serial.TTYS3,
-                    hex = V1(pa = "0B", data = "0400").toHex()
-                )
-            }
-        }
-    }
-
     fun start() {
 
     }
@@ -188,6 +143,147 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 填充促凝剂
+     */
+    fun fillCoagulant() {
+        viewModelScope.launch {
+            if (_uiState.value.fillCoagulant) {
+                _uiState.value = _uiState.value.copy(
+                    upOrDown = true,
+                    fillCoagulant = false,
+                )
+                serial.sendHex(
+                    serial = Serial.TTYS0,
+                    hex = V1(pa = "0B", data = "0300").toHex()
+                )
+                delay(100L)
+                reset()
+            } else {
+                if (serial.reset.value) {
+                    if (_uiState.value.recaptureCoagulant) {
+                        PopTip.show("请先停止回吸")
+                        return@launch
+                    }
+                    _uiState.value = _uiState.value.copy(
+                        upOrDown = true,
+                        fillCoagulant = true,
+                    )
+                    delay(100L)
+                    while (_uiState.value.fillCoagulant) {
+                        if(_uiState.value.upOrDown) {
+                            _uiState.value = _uiState.value.copy(upOrDown = false)
+                            serial.sendHex(
+                                serial = Serial.TTYS0,
+                                hex = V1(pa = "0B", data = "0301").toHex()
+                            )
+                            delay(7000L)
+                        } else {
+                            _uiState.value = _uiState.value.copy(upOrDown = true)
+                            serial.sendHex(
+                                serial = Serial.TTYS0,
+                                hex = V1(pa = "0B", data = "0305").toHex()
+                            )
+                            delay(6500L)
+                        }
+                    }
+
+                } else {
+                    PopTip.show("请先复位")
+                }
+            }
+        }
+    }
+
+    /**
+     * 回吸促凝剂
+     */
+    fun recaptureCoagulant() {
+        viewModelScope.launch {
+            if (_uiState.value.recaptureCoagulant) {
+                _uiState.value = _uiState.value.copy(
+                    upOrDown = true,
+                    recaptureCoagulant = false,
+                )
+                serial.sendHex(
+                    serial = Serial.TTYS0,
+                    hex = V1(pa = "0B", data = "0300").toHex()
+                )
+                delay(100L)
+                reset()
+            } else {
+                if (serial.reset.value) {
+                    if (_uiState.value.fillCoagulant) {
+                        PopTip.show("请先停止填充")
+                        return@launch
+                    }
+                    _uiState.value = _uiState.value.copy(
+                        upOrDown = true,
+                        recaptureCoagulant = true,
+                    )
+                    delay(100L)
+                    while (_uiState.value.recaptureCoagulant) {
+                        if(_uiState.value.upOrDown) {
+                            _uiState.value = _uiState.value.copy(upOrDown = false)
+                            serial.sendHex(
+                                serial = Serial.TTYS0,
+                                hex = V1(pa = "0B", data = "0303").toHex()
+                            )
+                            delay(6500L)
+                        } else {
+                            _uiState.value = _uiState.value.copy(upOrDown = true)
+                            serial.sendHex(
+                                serial = Serial.TTYS0,
+                                hex = V1(pa = "0B", data = "0305").toHex()
+                            )
+                            delay(6500L)
+                        }
+                    }
+
+                } else {
+                    PopTip.show("请先复位")
+                }
+            }
+        }
+    }
+
+    /**
+     * 填充胶体
+     */
+    fun fillColloid() {
+        viewModelScope.launch {
+            serial.sendHex(
+                serial = Serial.TTYS0,
+                hex = V1(pa = "0B", data = "0401").toHex()
+            )
+        }
+    }
+
+    /**
+     * 回吸胶体
+     */
+    fun recaptureColloid() {
+        viewModelScope.launch {
+            serial.sendHex(
+                serial = Serial.TTYS0,
+                hex = V1(pa = "0B", data = "0402").toHex()
+            )
+        }
+    }
+
+    /**
+     * 停止填充和回吸
+     */
+    fun stopFillAndRecapture() {
+        viewModelScope.launch {
+            serial.sendHex(
+                serial = Serial.TTYS0,
+                hex = V1(pa = "0B", data = "0400").toHex()
+            )
+        }
+    }
+
+
 }
 
 data class HomeUiState(
@@ -201,6 +297,9 @@ data class HomeUiState(
     val pause: Boolean = false,
     val time: Long = 0L,
     val info: CurrentInfo = CurrentInfo(),
+    val fillCoagulant: Boolean = false,
+    val recaptureCoagulant: Boolean = false,
+    val upOrDown: Boolean = true,
 )
 
 data class CurrentInfo(

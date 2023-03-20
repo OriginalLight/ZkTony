@@ -88,4 +88,5 @@
     <string name="y_motor">Y轴</string>
     <string name="z_motor">Z轴</string>
     <string name="about">使用说明</string>
+    <string name="waste">废液槽</string>
 </resources>

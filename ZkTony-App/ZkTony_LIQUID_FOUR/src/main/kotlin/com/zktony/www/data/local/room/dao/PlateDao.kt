@@ -30,6 +30,7 @@ interface PlateDao : BaseDao<Plate> {
         """
         SELECT * FROM plate
         WHERE subId = :id
+        ORDER BY `index` ASC
         """
     )
     fun getBySubId(id: Long): Flow<List<Plate>>

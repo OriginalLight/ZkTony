@@ -99,6 +99,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
+            with(waste) {
+                clickScale()
+                setOnClickListener {
+                    viewModel.waste()
+                }
+            }
             with(wash) {
                 clickScale()
                 setOnClickListener {

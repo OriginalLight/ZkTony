@@ -341,8 +341,8 @@
                 tools:ignore="NestedWeights,UseCompoundDrawables">
 
                 <ImageView
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:background="@mipmap/reset"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
@@ -350,6 +350,30 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/reset"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/waste"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:ignore="NestedWeights,UseCompoundDrawables">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@mipmap/square"
+                    tools:ignore="ContentDescription,VisualLintBounds" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/waste"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
@@ -365,8 +389,8 @@
                 tools:ignore="NestedWeights,UseCompoundDrawables">
 
                 <ImageView
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:background="@mipmap/pipeline"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
@@ -389,8 +413,8 @@
                 tools:ignore="NestedWeights,UseCompoundDrawables">
 
                 <ImageView
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:background="@mipmap/right"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 
@@ -413,8 +437,8 @@
                 tools:ignore="NestedWeights,UseCompoundDrawables">
 
                 <ImageView
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:background="@mipmap/left"
                     tools:ignore="ContentDescription,VisualLintBounds" />
 

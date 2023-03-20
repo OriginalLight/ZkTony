@@ -24,11 +24,13 @@ class SerialManager(
     private val _ttys3Flow = MutableStateFlow<String?>(null)
     private val _lock = MutableStateFlow(false)
     private val _pause = MutableStateFlow(false)
+    private val _reset = MutableStateFlow(true)
 
     val ttys0Flow = _ttys0Flow.asStateFlow()
     val ttys3Flow = _ttys3Flow.asStateFlow()
     val lock = _lock.asStateFlow()
     val pause = _pause.asStateFlow()
+    val reset = _reset.asStateFlow()
 
     // 机构运行已经等待的时间
     private var lockTime = 0L
@@ -78,6 +80,7 @@ class SerialManager(
                                 if (res.pa == "0A") {
                                     _lock.value = false
                                     lockTime = 0L
+                                    _reset.value = true
                                     PopTip.show("复位成功")
                                 }
                             }
@@ -106,17 +109,16 @@ class SerialManager(
         }
         _lock.value = true
         lockTime = 0L
-        sendHex(
-            serial = TTYS0, hex = V1(
-                fn = "05", pa = "01", data = "0101302C302C302C302C"
-            ).toHex()
-        )
         sendHex(serial = TTYS0, hex = V1().toHex())
-
+        sendHex(serial = TTYS0, hex = V1(pa = "0B", data = "0305").toHex())
     }
 
     fun pause(pause: Boolean) {
         _pause.value = pause
+    }
+
+    fun reset(reset: Boolean) {
+        _reset.value = reset
     }
 
     /**
