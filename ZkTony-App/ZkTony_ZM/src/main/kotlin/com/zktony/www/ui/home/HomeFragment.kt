@@ -60,8 +60,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             for (i in 0..1) {
                 val bind = if (i == 0) binding.x else binding.y
                 bind.apply {
-                    stop.setOnClickListener { viewModel.stop(i) }
-                    start.setOnClickListener { viewModel.start(i) }
+                    stop.clickNoRepeat { viewModel.stop(i) }
+                    start.clickNoRepeat { viewModel.start(i) }
                     pumpUp.addTouchEvent({
                         it.scaleX = 0.9f
                         it.scaleY = 0.9f
@@ -96,9 +96,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
                     with(selector) {
                         clickScale()
-                        setOnClickListener {
+                        clickNoRepeat {
                             val uiState = if (i == 0) viewModel.uiStateX else viewModel.uiStateY
-                            if (uiState.value.job != null) return@setOnClickListener
+                            if (uiState.value.job != null) return@clickNoRepeat
                             val programList = viewModel.programList.value
                             val model = uiState.value.model
                             val menuList = programList.filter { it.model == model }.map { it.name }

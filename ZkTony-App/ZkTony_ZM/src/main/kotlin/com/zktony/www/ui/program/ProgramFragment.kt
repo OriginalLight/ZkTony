@@ -75,7 +75,7 @@ class ProgramFragment :
             recyclerView.adapter = adapter
             with(add) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     CustomDialog.build()
                         .setCustomView(object :
                             OnBindView<CustomDialog>(R.layout.layout_model_select) {

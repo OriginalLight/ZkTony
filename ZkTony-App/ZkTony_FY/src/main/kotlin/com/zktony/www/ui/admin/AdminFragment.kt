@@ -23,7 +23,7 @@ import com.zktony.common.ext.*
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.extension.*
+import com.zktony.www.common.ext.*
 import com.zktony.www.data.remote.model.QrCode
 import com.zktony.www.databinding.FragmentAdminBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -143,7 +143,7 @@ class AdminFragment :
             }
             with(setting) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     authDialog {
                         selectDialog(
                             block = {
@@ -158,7 +158,7 @@ class AdminFragment :
             }
             with(wifi) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     swBar.isChecked = true
                     viewModel.toggleNavigationBar(true)
                     viewModel.wifiSetting()
@@ -166,7 +166,7 @@ class AdminFragment :
             }
             with(update) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     if (viewModel.progress.value > 0) {
                         PopTip.show("正在更新中")
                     } else {
@@ -176,19 +176,19 @@ class AdminFragment :
             }
             with(version) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     PopTip.show("当前软件版本号 ${BuildConfig.VERSION_NAME}")
                 }
             }
             with(about) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     aboutDialog()
                 }
             }
             with(device) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     val id = Settings.Secure.getString(
                         CommonApplicationProxy.application.contentResolver, Settings.Secure.ANDROID_ID
                     )

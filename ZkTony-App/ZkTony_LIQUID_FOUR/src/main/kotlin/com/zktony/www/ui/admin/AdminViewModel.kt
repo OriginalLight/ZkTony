@@ -20,8 +20,8 @@ import com.zktony.common.utils.Constants
 import com.zktony.serialport.util.Serial
 import com.zktony.www.BuildConfig
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.extension.toCommand
-import com.zktony.www.common.extension.toMotor
+import com.zktony.www.common.ext.toCommand
+import com.zktony.www.common.ext.toMotor
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import com.zktony.www.data.local.room.dao.MotorDao

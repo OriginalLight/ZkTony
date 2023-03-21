@@ -8,10 +8,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.removeZero
 import com.zktony.www.R
-import com.zktony.www.common.extension.volumeDialog
+import com.zktony.www.common.ext.volumeDialog
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.databinding.FragmentProgramHoleBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -74,10 +75,10 @@ class ProgramHoleFragment :
         }
         binding.apply {
             dynamicPlate.setOnItemClick { x, y -> viewModel.select(x, y) }
-            volume.setOnClickListener {
+            volume.clickNoRepeat {
                 val holes = viewModel.uiState.value.holes[0]
                 val plate = viewModel.uiState.value.plate
-                if (plate?.custom == 1) return@setOnClickListener
+                if (plate?.custom == 1) return@clickNoRepeat
                 volumeDialog(
                     v1 = holes.v1,
                     v2 = holes.v2,
@@ -90,19 +91,19 @@ class ProgramHoleFragment :
 
             with(back) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     findNavController().navigateUp()
                 }
             }
             with(selectAll) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     viewModel.selectAll()
                 }
             }
             with(custom) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     viewModel.setCustom()
                 }
             }

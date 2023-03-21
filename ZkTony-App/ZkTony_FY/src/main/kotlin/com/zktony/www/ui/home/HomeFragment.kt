@@ -16,10 +16,11 @@ import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.R.color
 import com.zktony.common.R.mipmap
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
-import com.zktony.www.manager.SerialManager
 import com.zktony.www.databinding.FragmentHomeBinding
+import com.zktony.www.manager.SerialManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -77,14 +78,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         for (i in 0..3) {
             val bind = getBind(i)
             bind.apply {
-                actions.setOnClickListener { PopTip.show((it as TextView).text) }
-                start.setOnClickListener { viewModel.start(i) }
+                actions.clickNoRepeat { PopTip.show((it as TextView).text) }
+                start.clickNoRepeat { viewModel.start(i) }
                 with(select) {
                     iconTint = null
-                    setOnClickListener { selectDialog(i) }
+                    clickNoRepeat { selectDialog(i) }
                 }
                 with(stop) {
-                    setOnClickListener { PopTip.show("长按停止") }
+                    clickNoRepeat { PopTip.show("长按停止") }
                     setOnLongClickListener {
                         viewModel.stop(i)
                         true
@@ -108,7 +109,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             e.apply {
                 with(reset) {
                     clickScale()
-                    setOnClickListener { PopTip.show("长按复位") }
+                    clickNoRepeat { PopTip.show("长按复位") }
                     setOnLongClickListener {
                         viewModel.reset()
                         true
@@ -116,13 +117,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
                 with(pause) {
                     clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         viewModel.shakeBed()
                     }
                 }
                 with(insulating) {
                     clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         if (viewModel.buttonFlow.value.insulating) {
                             PopTip.show("已取消保温，再次点击开启")
                         } else {
@@ -133,7 +134,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
                 with(lock) {
                     clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         if (viewModel.buttonFlow.value.lock) {
                             PopTip.show("已解锁，10秒后上锁")
                             viewModel.unlock()

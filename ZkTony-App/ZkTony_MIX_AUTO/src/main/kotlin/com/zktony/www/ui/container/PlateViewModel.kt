@@ -4,14 +4,14 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.common.utils.Snowflake
-import com.zktony.www.manager.ExecutionManager
-import com.zktony.www.manager.SerialManager
 import com.zktony.www.data.local.room.dao.ContainerDao
 import com.zktony.www.data.local.room.dao.HoleDao
 import com.zktony.www.data.local.room.dao.PlateDao
 import com.zktony.www.data.local.room.entity.Container
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -88,8 +88,12 @@ class PlateViewModel @Inject constructor(
             PopTip.show("机器正在运行中")
             return
         }
-        val manager = ExecutionManager.instance
-        manager.executor(manager.generator(z = z))
+        val ex = ExecutionManager.instance
+        val hole = _uiState.value.holeList.find { it.x == 0 }
+        ex.executor(
+            ex.generator(x = hole?.xAxis ?: 0f),
+            ex.generator(x = hole?.xAxis ?: 0f, z = z)
+        )
     }
 
     fun moveX(x: Float) {
@@ -98,8 +102,8 @@ class PlateViewModel @Inject constructor(
             PopTip.show("机器正在运行中")
             return
         }
-        val manager = ExecutionManager.instance
-        manager.executor(manager.generator(x = x))
+        val ex = ExecutionManager.instance
+        ex.executor(ex.generator(x = x))
     }
 
     fun setBottom(z: Float) {

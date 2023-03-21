@@ -19,14 +19,11 @@ import com.zktony.common.dialog.aboutDialog
 import com.zktony.common.dialog.authDialog
 import com.zktony.common.dialog.deviceDialog
 import com.zktony.common.dialog.updateDialog
-import com.zktony.common.ext.afterTextChange
-import com.zktony.common.ext.clickScale
-import com.zktony.common.ext.installApk
-import com.zktony.common.ext.removeZero
+import com.zktony.common.ext.*
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.common.extension.*
+import com.zktony.www.common.ext.*
 import com.zktony.www.data.remote.model.QrCode
 import com.zktony.www.databinding.FragmentAdminBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -139,19 +136,19 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             }
             with(setting) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     authDialog { findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor) }
                 }
             }
             with(wifi) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     viewModel.wifiSetting()
                 }
             }
             with(update) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     if (viewModel.progress.value > 0) {
                         PopTip.show("正在更新中")
                     } else {
@@ -161,19 +158,19 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             }
             with(version) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     PopTip.show("当前软件版本号 ${BuildConfig.VERSION_NAME}")
                 }
             }
             with(about) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     aboutDialog()
                 }
             }
             with(device) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     val id = Settings.Secure.getString(
                         CommonApplicationProxy.application.contentResolver, Settings.Secure.ANDROID_ID
                     )

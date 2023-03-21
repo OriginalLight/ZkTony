@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.removeZero
 import com.zktony.www.data.local.room.entity.Program
@@ -69,11 +70,11 @@ class ProgramAdapter : ListAdapter<Program, ProgramAdapter.ViewHolder>(ProgramDi
                 parameter.text = str.toString()
                 delete.run {
                     clickScale()
-                    setOnClickListener { onDeleteButtonClick(item) }
+                    clickNoRepeat { onDeleteButtonClick(item) }
                 }
                 edit.run {
                     clickScale()
-                    setOnClickListener { onEditButtonClick(item) }
+                    clickNoRepeat { onEditButtonClick(item) }
                 }
                 if (layoutPosition % 2 == 0) {
                     order.setBackgroundColor(Color.parseColor("#F5F5F5"))

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.removeZero
 import com.zktony.common.ext.simpleDateFormat
@@ -78,13 +79,13 @@ class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback
                 }
                 delete.run {
                     this.clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         onDeleteButtonClick(item)
                     }
                 }
                 chart.run {
                     this.clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         onChartButtonClick(item)
                     }
                 }

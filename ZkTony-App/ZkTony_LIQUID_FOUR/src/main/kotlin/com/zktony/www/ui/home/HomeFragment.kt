@@ -10,11 +10,12 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.R.mipmap
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.ext.addTouchEvent
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.getTimeFormat
 import com.zktony.www.R
-import com.zktony.www.common.extension.total
-import com.zktony.www.common.extension.washDialog
+import com.zktony.www.common.ext.total
+import com.zktony.www.common.ext.washDialog
 import com.zktony.www.databinding.FragmentHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -71,27 +72,27 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     private fun initView() {
         binding.apply {
-            holeNumber.setOnClickListener {
+            holeNumber.clickNoRepeat {
                 PopTip.show("加液总数: ${holeNumber.text}")
             }
             with(select) {
                 iconTint = null
-                setOnClickListener {
+                clickNoRepeat {
                     viewModel.select(it)
                 }
             }
-            start.setOnClickListener {
+            start.clickNoRepeat {
                 viewModel.start()
             }
-            stop.setOnClickListener {
+            stop.clickNoRepeat {
                 viewModel.stop()
             }
-            pause.setOnClickListener {
+            pause.clickNoRepeat {
                 viewModel.pause()
             }
             with(reset) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     PopTip.show("长按复位")
                 }
                 setOnLongClickListener {
@@ -101,13 +102,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
             with(waste) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     viewModel.waste()
                 }
             }
             with(wash) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     washDialog(
                         {
                             viewModel.wash(time = it, type = 0)

@@ -187,17 +187,17 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
 
             with(reset) {
                 clickScale()
-                setOnClickListener { viewModel.lowerComputerReset() }
+                clickNoRepeat { viewModel.lowerComputerReset() }
             }
 
             with(wifi) {
                 clickScale()
-                setOnClickListener { viewModel.wifiSetting() }
+                clickNoRepeat { viewModel.wifiSetting() }
             }
 
             with(update) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     if (viewModel.progress.value > 0) {
                         PopTip.show("正在更新中")
                     } else {
@@ -208,21 +208,21 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
 
             with(version) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     PopTip.show("当前软件版本号 ${BuildConfig.VERSION_NAME}")
                 }
             }
 
             with(about) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     aboutDialog()
                 }
             }
 
             with(device) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     val id = Settings.Secure.getString(
                         CommonApplicationProxy.application.contentResolver, Settings.Secure.ANDROID_ID
                     )

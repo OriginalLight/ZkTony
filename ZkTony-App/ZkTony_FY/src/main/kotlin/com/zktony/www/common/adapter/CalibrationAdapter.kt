@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.www.data.local.room.entity.Calibration
 import com.zktony.www.databinding.ItemCalibrationBinding
@@ -65,19 +66,19 @@ class CalibrationAdapter :
                 order.text = (layoutPosition + 1).toString()
                 with(select) {
                     clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         onCheckedClick.invoke(item)
                     }
                 }
                 with(edit) {
                     clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         onEditButtonClick.invoke(item)
                     }
                 }
                 with(delete) {
                     clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         onDeleteButtonClick.invoke(item)
                     }
                 }

@@ -8,7 +8,7 @@ import com.zktony.common.utils.logd
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.TTYS0
-import com.zktony.www.common.extension.toCommand
+import com.zktony.www.common.ext.toCommand
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -125,13 +125,11 @@ class SerialManager(
      * @param hex 命令
      */
     fun sendHex(serial: Serial, hex: String, lock: Boolean = false) {
-        scope.launch {
-            MutableSerial.instance.sendHex(serial, hex)
-            hex.hexFormat().logd("${serial.device} sendHex: ")
-            if (lock) {
-                _lock.value = true
-                lockTime = 0L
-            }
+        MutableSerial.instance.sendHex(serial, hex)
+        hex.hexFormat().logd("${serial.device} sendHex: ")
+        if (lock) {
+            _lock.value = true
+            lockTime = 0L
         }
     }
 

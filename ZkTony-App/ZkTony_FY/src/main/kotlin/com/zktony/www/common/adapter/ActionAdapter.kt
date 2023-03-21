@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.R
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.removeZero
 import com.zktony.www.data.local.room.entity.Action
@@ -65,12 +66,12 @@ class ActionAdapter : ListAdapter<Action, ActionAdapter.ViewHolder>(ActionDiffCa
                 temperature.text = item.temperature.removeZero() + " ℃"
                 water.text = item.liquidVolume.removeZero() + " 微升"
                 counter.text = item.count.toString() + " 次"
-                cardView.setOnClickListener {
+                cardView.clickNoRepeat {
                     PopTip.show("点击右侧图标删除")
                 }
                 with(delete) {
                     clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         onDeleteButtonClick.invoke(item)
                     }
                 }

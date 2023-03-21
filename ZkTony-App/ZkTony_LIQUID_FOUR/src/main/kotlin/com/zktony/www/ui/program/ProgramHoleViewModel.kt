@@ -2,7 +2,7 @@ package com.zktony.www.ui.program
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.common.extension.volumeDialog
+import com.zktony.www.common.ext.volumeDialog
 import com.zktony.www.data.local.room.dao.HoleDao
 import com.zktony.www.data.local.room.dao.PlateDao
 import com.zktony.www.data.local.room.entity.Hole

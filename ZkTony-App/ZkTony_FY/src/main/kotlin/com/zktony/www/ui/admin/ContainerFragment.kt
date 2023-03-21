@@ -7,6 +7,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.removeZero
 import com.zktony.common.ext.setEqualText
@@ -60,23 +61,23 @@ class ContainerFragment :
         binding.apply {
             with(back) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     findNavController().navigateUp()
                 }
             }
-            toWashY.setOnClickListener { viewModel.toWashY() }
-            toWashZ.setOnClickListener { viewModel.toWashZ() }
-            toWasteY.setOnClickListener { viewModel.toWasteY() }
-            toWasteZ.setOnClickListener { viewModel.toWasteZ() }
-            toBlockY.setOnClickListener { viewModel.toBlockY() }
-            toBlockZ.setOnClickListener { viewModel.toBlockZ() }
-            toOneY.setOnClickListener { viewModel.toOneY() }
-            toOneZ.setOnClickListener { viewModel.toOneZ() }
-            toRecycleOneZ.setOnClickListener { viewModel.toRecycleOneZ() }
-            toTwoY.setOnClickListener { viewModel.toTwoY() }
-            toTwoZ.setOnClickListener { viewModel.toTwoZ() }
-            toZero.setOnClickListener { viewModel.toZero() }
-            update.setOnClickListener {
+            toWashY.clickNoRepeat { viewModel.toWashY() }
+            toWashZ.clickNoRepeat { viewModel.toWashZ() }
+            toWasteY.clickNoRepeat { viewModel.toWasteY() }
+            toWasteZ.clickNoRepeat { viewModel.toWasteZ() }
+            toBlockY.clickNoRepeat { viewModel.toBlockY() }
+            toBlockZ.clickNoRepeat { viewModel.toBlockZ() }
+            toOneY.clickNoRepeat { viewModel.toOneY() }
+            toOneZ.clickNoRepeat { viewModel.toOneZ() }
+            toRecycleOneZ.clickNoRepeat { viewModel.toRecycleOneZ() }
+            toTwoY.clickNoRepeat { viewModel.toTwoY() }
+            toTwoZ.clickNoRepeat { viewModel.toTwoZ() }
+            toZero.clickNoRepeat { viewModel.toZero() }
+            update.clickNoRepeat {
                 viewModel.update(
                     Container().copy(
                         wasteY = binding.wasteY.text.toString().toFloat(),

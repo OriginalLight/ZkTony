@@ -7,10 +7,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.removeZero
 import com.zktony.www.R
-import com.zktony.www.common.extension.positionDialog
-import com.zktony.www.common.extension.sizeDialog
+import com.zktony.www.common.ext.positionDialog
+import com.zktony.www.common.ext.sizeDialog
 import com.zktony.www.databinding.FragmentPlateBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -65,7 +66,7 @@ class PlateFourFragment :
     private fun initView() {
         binding.apply {
             dynamicPlate.setShowLocation(true)
-            rowColumn.setOnClickListener {
+            rowColumn.clickNoRepeat {
                 val plate = viewModel.uiState.value.plate!!
                 sizeDialog(
                     textRow = plate.x,
@@ -73,7 +74,7 @@ class PlateFourFragment :
                     block1 = { row, column -> viewModel.setXY(row, column) }
                 )
             }
-            positionOne.setOnClickListener {
+            positionOne.clickNoRepeat {
                 val hole = viewModel.uiState.value.holes.find { hole -> hole.x == 0 && hole.y == 0 }
                 positionDialog(
                     textX = hole?.xAxis ?: 0f,
@@ -82,7 +83,7 @@ class PlateFourFragment :
                     block2 = { x, y -> viewModel.save(x, y, 0) }
                 )
             }
-            positionTwo.setOnClickListener {
+            positionTwo.clickNoRepeat {
                 val plate = viewModel.uiState.value.plate!!
                 val hole = viewModel.uiState.value.holes.find { hole -> hole.x == plate.x - 1 && hole.y == plate.y - 1 }
                 positionDialog(

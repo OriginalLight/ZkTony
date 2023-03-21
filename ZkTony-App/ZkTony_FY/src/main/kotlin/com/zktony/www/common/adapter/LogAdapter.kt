@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.common.R
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.simpleDateFormat
 import com.zktony.www.data.local.room.entity.Log
@@ -72,13 +73,13 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
                 text.text = item.content
                 with(delete) {
                     clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         onDeleteButtonClick(item)
                     }
                 }
                 with(spacer) {
                     clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         if (content.visibility == android.view.View.GONE) {
                             content.visibility = android.view.View.VISIBLE
                             ivSpacer.setImageResource(R.mipmap.collapse_arrow)

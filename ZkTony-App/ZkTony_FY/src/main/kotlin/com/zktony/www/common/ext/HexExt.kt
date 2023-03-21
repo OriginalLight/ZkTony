@@ -1,4 +1,4 @@
-package com.zktony.www.common.extension
+package com.zktony.www.common.ext
 
 import com.zktony.common.ext.hex2ToInt16
 import com.zktony.common.ext.hexToInt8
@@ -25,10 +25,10 @@ fun String.toMotor(): Motor {
  * 解析十六进制字符串为Command
  * @return [V1]
  */
-fun String.toCommand(): V1 {
+fun String.toV1(): V1 {
     return V1(
-        header = this.substring(0, 2),
-        address = this.substring(2, 4),
+        head = this.substring(0, 2),
+        addr = this.substring(2, 4),
         fn = this.substring(4, 6),
         pa = this.substring(6, 8),
         data = this.substring(8, this.length - 8),

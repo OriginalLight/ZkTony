@@ -1,4 +1,4 @@
-package com.zktony.www.common.extension
+package com.zktony.www.common.ext
 
 import com.zktony.common.ext.hex2ToInt16
 import com.zktony.common.ext.hexToInt8

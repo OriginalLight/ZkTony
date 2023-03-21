@@ -191,7 +191,7 @@
                     tools:ignore="VisualLintBounds">
 
                     <com.zktony.common.widget.GradientPlate
-                        android:id="@+id/dynamic_plate"
+                        android:id="@+id/gradient_plate"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -221,11 +221,11 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginBottom="2dp"
-                        android:text="当前加液板"
+                        android:text="促凝剂体积/μL"
                         tools:ignore="HardcodedText,TextContrastCheck,VisualLintBounds" />
 
                     <TextView
-                        android:id="@+id/current_plate"
+                        android:id="@+id/current_coagulant_volume"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_marginStart="16dp"
@@ -233,7 +233,7 @@
                         android:layout_weight="1"
                         android:background="@color/light_onPrimary"
                         android:gravity="center"
-                        android:text="一号板"
+                        android:text="促凝剂体积"
                         android:textAlignment="center"
                         android:textColor="@color/black"
                         android:textSize="22sp"
@@ -246,11 +246,11 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginBottom="2dp"
-                        android:text="当前加液泵"
+                        android:text="胶体体积/μL"
                         tools:ignore="HardcodedText,TextContrastCheck,VisualLintBounds" />
 
                     <TextView
-                        android:id="@+id/current_liquid"
+                        android:id="@+id/current_colloid_volume"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_marginStart="16dp"
@@ -258,7 +258,7 @@
                         android:layout_weight="1"
                         android:background="@color/light_onPrimary"
                         android:gravity="center"
-                        android:text="一号泵"
+                        android:text="胶体体积"
                         android:textAlignment="center"
                         android:textColor="@color/black"
                         android:textSize="22sp"

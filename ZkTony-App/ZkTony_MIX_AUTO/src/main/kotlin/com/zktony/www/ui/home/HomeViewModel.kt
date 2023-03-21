@@ -1,21 +1,16 @@
 package com.zktony.www.ui.home
 
-import android.graphics.Color
 import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.common.dialog.spannerDialog
+import com.zktony.common.ext.getTimeFormat
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.data.local.room.dao.HoleDao
-import com.zktony.www.data.local.room.dao.LogDao
-import com.zktony.www.data.local.room.dao.PlateDao
-import com.zktony.www.data.local.room.dao.ProgramDao
-import com.zktony.www.data.local.room.entity.Hole
-import com.zktony.www.data.local.room.entity.Log
-import com.zktony.www.data.local.room.entity.Plate
-import com.zktony.www.data.local.room.entity.Program
+import com.zktony.www.common.ext.completeDialog
+import com.zktony.www.data.local.room.dao.*
+import com.zktony.www.data.local.room.entity.*
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
@@ -30,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val logDao: LogDao,
+    private val containerDao: ContainerDao,
     private val programDao: ProgramDao,
     private val plateDao: PlateDao,
     private val holeDao: HoleDao,
@@ -54,6 +50,11 @@ class HomeViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(programList = it, program = it[0])
                         loadPlate(it[0].id)
                     }
+                }
+            }
+            launch {
+                containerDao.getById(1L).collect {
+                    _uiState.value = _uiState.value.copy(container = it)
                 }
             }
         }
@@ -123,12 +124,114 @@ class HomeViewModel @Inject constructor(
     }
 
     fun start() {
+        viewModelScope.launch {
+            val job = launch {
+                launch {
+                    while (true) {
+                        delay(1000L)
+                        if (!_uiState.value.pause) {
+                            _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
+                            val lastTime = _uiState.value.info.lastTime
+                            if (lastTime > 0) {
+                                _uiState.value = _uiState.value.copy(
+                                    info = _uiState.value.info.copy(
+                                        lastTime = lastTime - 1
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
+                launch {
+                    updateLog(Log(name = _uiState.value.program?.name ?: "未知程序"))
+                }
+                val executor = ProgramExecutor(
+                    container = _uiState.value.container!!,
+                    plateList = _uiState.value.plateList,
+                    holeList = _uiState.value.holeList,
+                    scope = this,
+                )
+                serial.reset(false)
+                executor.event = {
+                    when(it) {
+                        is ExecutorEvent.CurrentHole -> {
+                            _uiState.value = _uiState.value.copy(
+                                info = _uiState.value.info.copy(
+                                    hole = it.hole
+                                )
+                            )
+                        }
+                        is ExecutorEvent.HoleList -> {
+                            _uiState.value = _uiState.value.copy(
+                                info = _uiState.value.info.copy(
+                                    holeList = it.hole
+                                )
+                            )
+                        }
+                        is ExecutorEvent.Progress -> {
+                            val time = _uiState.value.time + 1
+                            val percent = it.complete.toFloat() / it.total.toFloat()
+                            val lastTime = time.toFloat() / percent - time.toFloat()
+                            val speed = it.complete / time.toFloat() * 60
+                            _uiState.value = _uiState.value.copy(
+                                info = _uiState.value.info.copy(
+                                    speed = speed,
+                                    lastTime = lastTime.toLong(),
+                                )
+                            )
 
+                        }
+                        is ExecutorEvent.Log -> {
+                            _uiState.value.log?.let { l ->
+                                updateLog(l.copy(content = l.content + it.log))
+                            }
+                        }
+                        is ExecutorEvent.Finish -> {
+                            completeDialog(
+                                name = _uiState.value.program?.name ?: "错误",
+                                time = _uiState.value.time.getTimeFormat(),
+                                speed = "${String.format("%.2f", _uiState.value.info.speed)} 孔/分钟",
+                            )
+                            launch {
+                                _uiState.value.log?.let { l ->
+                                    updateLog(l.copy(status = 1))
+                                }
+                                delay(500L)
+                                stop()
+                            }
+                        }
+                    }
+                }
+                executor.execute()
+            }
+            _uiState.value = _uiState.value.copy(job = job)
+        }
     }
 
     fun stop() {
-        _uiState.value.job?.cancel()
-        serial.pause(false)
+        viewModelScope.launch {
+            _uiState.value.job?.cancel()
+            _uiState.value = _uiState.value.copy(
+                job = null,
+                log = null,
+                time = 0L,
+                info = CurrentInfo().copy(
+                    plateSize = if (_uiState.value.plateList.isNotEmpty()) {
+                        _uiState.value.plateList[0].x
+                    } else {
+                        10
+                    },
+                    holeList = emptyList()
+                )
+            )
+            serial.pause(false)
+            serial.sendHex(
+                serial = Serial.TTYS0,
+                hex = V1(pa = "10").toHex()
+            )
+            delay(300L)
+            reset()
+        }
     }
 
     fun pause() {
@@ -154,7 +257,7 @@ class HomeViewModel @Inject constructor(
                     fillCoagulant = false,
                 )
                 serial.sendHex(
-                    serial = Serial.TTYS0,
+                    serial = Serial.TTYS3,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
                 delay(100L)
@@ -174,14 +277,14 @@ class HomeViewModel @Inject constructor(
                         if(_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
                             serial.sendHex(
-                                serial = Serial.TTYS0,
+                                serial = Serial.TTYS3,
                                 hex = V1(pa = "0B", data = "0301").toHex()
                             )
                             delay(7000L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
                             serial.sendHex(
-                                serial = Serial.TTYS0,
+                                serial = Serial.TTYS3,
                                 hex = V1(pa = "0B", data = "0305").toHex()
                             )
                             delay(6500L)
@@ -206,7 +309,7 @@ class HomeViewModel @Inject constructor(
                     recaptureCoagulant = false,
                 )
                 serial.sendHex(
-                    serial = Serial.TTYS0,
+                    serial = Serial.TTYS3,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
                 delay(100L)
@@ -226,14 +329,14 @@ class HomeViewModel @Inject constructor(
                         if(_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
                             serial.sendHex(
-                                serial = Serial.TTYS0,
+                                serial = Serial.TTYS3,
                                 hex = V1(pa = "0B", data = "0303").toHex()
                             )
                             delay(6500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
                             serial.sendHex(
-                                serial = Serial.TTYS0,
+                                serial = Serial.TTYS3,
                                 hex = V1(pa = "0B", data = "0305").toHex()
                             )
                             delay(6500L)
@@ -253,7 +356,7 @@ class HomeViewModel @Inject constructor(
     fun fillColloid() {
         viewModelScope.launch {
             serial.sendHex(
-                serial = Serial.TTYS0,
+                serial = Serial.TTYS3,
                 hex = V1(pa = "0B", data = "0401").toHex()
             )
         }
@@ -265,7 +368,7 @@ class HomeViewModel @Inject constructor(
     fun recaptureColloid() {
         viewModelScope.launch {
             serial.sendHex(
-                serial = Serial.TTYS0,
+                serial = Serial.TTYS3,
                 hex = V1(pa = "0B", data = "0402").toHex()
             )
         }
@@ -277,23 +380,21 @@ class HomeViewModel @Inject constructor(
     fun stopFillAndRecapture() {
         viewModelScope.launch {
             serial.sendHex(
-                serial = Serial.TTYS0,
+                serial = Serial.TTYS3,
                 hex = V1(pa = "0B", data = "0400").toHex()
             )
         }
     }
-
-
 }
 
 data class HomeUiState(
     val programList: List<Program> = emptyList(),
     val plateList: List<Plate> = emptyList(),
     val holeList: List<Hole> = emptyList(),
+    val container: Container? = null,
     val log: Log? = null,
     val program: Program? = null,
     val job: Job? = null,
-    val washJob: Job? = null,
     val pause: Boolean = false,
     val time: Long = 0L,
     val info: CurrentInfo = CurrentInfo(),
@@ -301,13 +402,10 @@ data class HomeUiState(
     val recaptureCoagulant: Boolean = false,
     val upOrDown: Boolean = true,
 )
-
 data class CurrentInfo(
-    val plate: String = "/",
     val plateSize: Int = 10,
+    val hole: Hole = Hole(),
     val holeList: List<Pair<Int, Boolean>> = emptyList(),
-    val liquid: String = "/",
     val speed: Float = 0f,
     val lastTime: Long = 0L,
-    val color: Int = Color.GREEN
 )

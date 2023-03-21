@@ -1,4 +1,4 @@
-package com.zktony.www.common.extension
+package com.zktony.www.common.ext
 
 import android.graphics.Color
 import android.view.View
@@ -18,8 +18,7 @@ import com.zktony.www.R
 fun volumeDialog(
     v1: Float,
     v2: Float,
-    v3: Float,
-    block: (Float, Float, Float) -> Unit,
+    block: (Float, Float) -> Unit,
 ) {
     CustomDialog.build()
         .setCustomView(object :
@@ -27,18 +26,15 @@ fun volumeDialog(
             override fun onBind(dialog: CustomDialog, v: View) {
                 val inputV1 = v.findViewById<EditText>(R.id.input_v1)
                 val inputV2 = v.findViewById<EditText>(R.id.input_v2)
-                val inputV3 = v.findViewById<EditText>(R.id.input_v3)
                 val save = v.findViewById<MaterialButton>(R.id.save)
                 val cancel = v.findViewById<MaterialButton>(R.id.cancel)
                 if (v1 != 0f) inputV1.setText(v1.toString().removeZero())
                 if (v2 != 0f) inputV2.setText(v2.toString().removeZero())
-                if (v3 != 0f) inputV3.setText(v3.toString().removeZero())
 
                 save.setOnClickListener {
                     block(
                         inputV1.text.toString().toFloatOrNull() ?: 0f,
                         inputV2.text.toString().toFloatOrNull() ?: 0f,
-                        inputV3.text.toString().toFloatOrNull() ?: 0f,
                     )
                     dialog.dismiss()
                 }
@@ -47,7 +43,7 @@ fun volumeDialog(
         })
         .setCancelable(false)
         .setMaskColor(Color.parseColor("#4D000000"))
-        .setWidth(600)
+        .setWidth(500)
         .show()
 }
 

@@ -9,6 +9,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentProgramPlateBinding
@@ -112,7 +113,7 @@ class ProgramPlateFragment :
             }
         }
         binding.apply {
-            dynamicPlateOne.setOnClickListener {
+            dynamicPlateOne.clickNoRepeat {
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 0 }
                 if (plate != null) {
                     findNavController().navigate(
@@ -123,7 +124,7 @@ class ProgramPlateFragment :
                     PopTip.show("请先选中")
                 }
             }
-            dynamicPlateTwo.setOnClickListener {
+            dynamicPlateTwo.clickNoRepeat {
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 1 }
                 if (plate != null) {
                     findNavController().navigate(
@@ -134,7 +135,7 @@ class ProgramPlateFragment :
                     PopTip.show("请先选中")
                 }
             }
-            dynamicPlateThree.setOnClickListener {
+            dynamicPlateThree.clickNoRepeat {
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 2 }
                 if (plate != null) {
                     findNavController().navigate(
@@ -145,7 +146,7 @@ class ProgramPlateFragment :
                     PopTip.show("请先选中")
                 }
             }
-            dynamicPlateFour.setOnClickListener {
+            dynamicPlateFour.clickNoRepeat {
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 3 }
                 if (plate != null) {
                     findNavController().navigate(
@@ -158,19 +159,19 @@ class ProgramPlateFragment :
             }
             with(back) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     findNavController().navigateUp()
                 }
-                oneCheck.setOnClickListener {
+                oneCheck.clickNoRepeat {
                     viewModel.selectPlate(0)
                 }
-                twoCheck.setOnClickListener {
+                twoCheck.clickNoRepeat {
                     viewModel.selectPlate(1)
                 }
-                threeCheck.setOnClickListener {
+                threeCheck.clickNoRepeat {
                     viewModel.selectPlate(2)
                 }
-                fourCheck.setOnClickListener {
+                fourCheck.clickNoRepeat {
                     viewModel.selectPlate(3)
                 }
             }

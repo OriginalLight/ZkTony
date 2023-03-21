@@ -14,6 +14,7 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.ext.afterTextChange
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.common.adapter.ActionAdapter
@@ -125,19 +126,19 @@ class ActionFragment :
 
             with(btnBack) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     findNavController().navigateUp()
                 }
             }
             with(btnAdd) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     viewModel.insert()
                 }
             }
             with(btnAction) {
                 text = getActionEnum(viewModel.action.value.mode).value
-                setOnClickListener {
+                clickNoRepeat {
                     val menuList = ActionEnum.values().map { it.value }
                     PopMenu.show(binding.btnAction, menuList)
                         .setMenuTextInfo(TextInfo().apply {

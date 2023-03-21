@@ -2,11 +2,11 @@ package com.zktony.www.ui.home
 
 import com.zktony.common.ext.currentTime
 import com.zktony.www.common.app.Settings
-import com.zktony.www.common.extension.total
-import com.zktony.www.manager.ExecutionManager
-import com.zktony.www.manager.SerialManager
+import com.zktony.www.common.ext.total
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -25,7 +25,7 @@ class ProgramExecutor constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var event: (ExecutorEvent) -> Unit = {}
-    private val motion = ExecutionManager.instance
+    private val ex = ExecutionManager.instance
     private val serial = SerialManager.instance
     private var complete: Int = 0
     private val currentHoleList: MutableList<Triple<Int, Int, Boolean>> = mutableListOf()
@@ -58,12 +58,12 @@ class ProgramExecutor constructor(
                                     while (serial.lock.value || serial.pause.value) {
                                         delay(100)
                                     }
-                                    motion.executor(
-                                        motion.generator(
+                                    ex.executor(
+                                        ex.generator(
                                             x = hole.xAxis + settings.needleSpace * e,
                                             y = hole.yAxis
                                         ),
-                                        motion.generator(
+                                        ex.generator(
                                             x = hole.xAxis + settings.needleSpace * e,
                                             y = hole.yAxis,
                                             v1 = if (e == 0) hole.v1 else 0f,

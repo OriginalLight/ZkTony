@@ -14,6 +14,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.data.local.room.entity.LogData
@@ -56,7 +57,7 @@ class LogChartFragment :
         }
         binding.back.run {
             clickScale()
-            setOnClickListener {
+            clickNoRepeat {
                 findNavController().navigateUp()
             }
         }

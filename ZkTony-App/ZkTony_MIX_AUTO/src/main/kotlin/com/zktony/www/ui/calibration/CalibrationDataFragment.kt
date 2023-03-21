@@ -10,10 +10,7 @@ import androidx.navigation.findNavController
 import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.ext.afterTextChange
-import com.zktony.common.ext.clickScale
-import com.zktony.common.ext.removeZero
-import com.zktony.common.ext.setEqualText
+import com.zktony.common.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.adapter.CalibrationDataAdapter
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
@@ -65,11 +62,11 @@ class CalibrationDataFragment :
         binding.apply {
             recycleView.adapter = adapter
 
-            addLiquid.setOnClickListener {
+            addLiquid.clickNoRepeat {
                 viewModel.addLiquid()
             }
 
-            save.setOnClickListener {
+            save.clickNoRepeat {
                 viewModel.save()
             }
 
@@ -81,7 +78,7 @@ class CalibrationDataFragment :
                 viewModel.actual(it.toFloatOrNull() ?: 0f)
             }
 
-            select.setOnClickListener {
+            select.clickNoRepeat {
                 val menuList = listOf("泵一", "泵二", "泵三")
                 PopMenu.show(it, menuList).setMenuTextInfo(TextInfo().apply {
                     gravity = Gravity.CENTER

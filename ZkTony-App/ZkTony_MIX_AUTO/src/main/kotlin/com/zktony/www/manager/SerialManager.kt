@@ -8,7 +8,8 @@ import com.zktony.common.utils.logd
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.TTYS0
-import com.zktony.www.common.extension.toCommand
+import com.zktony.serialport.util.Serial.TTYS3
+import com.zktony.www.common.ext.toCommand
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,13 +37,13 @@ class SerialManager(
     private var lockTime = 0L
 
     // 机构运行小步骤等待时间
-    private val waitTime = 30L
+    private val waitTime = 10L
 
     init {
         scope.launch {
             launch {
                 MutableSerial.instance.init(TTYS0, 115200)
-                MutableSerial.instance.init(Serial.TTYS3, 115200)
+                MutableSerial.instance.init(TTYS3, 115200)
             }
             launch {
                 MutableSerial.instance.listener = { port, data ->
@@ -53,7 +54,7 @@ class SerialManager(
                                it.hexFormat().logd("串口一 receivedHex: ")
                             }
                         }
-                        Serial.TTYS3 -> {
+                        TTYS3 -> {
                             data.verifyHex().forEach {
                                 _ttys3Flow.value = it
                                 it.hexFormat().logd("串口三 receivedHex: ")
@@ -110,7 +111,7 @@ class SerialManager(
         _lock.value = true
         lockTime = 0L
         sendHex(serial = TTYS0, hex = V1().toHex())
-        sendHex(serial = TTYS0, hex = V1(pa = "0B", data = "0305").toHex())
+        sendHex(serial = TTYS3, hex = V1(pa = "0B", data = "0305").toHex())
     }
 
     fun pause(pause: Boolean) {
@@ -127,13 +128,11 @@ class SerialManager(
      * @param hex 命令
      */
     fun sendHex(serial: Serial, hex: String, lock: Boolean = false) {
-        scope.launch {
-            MutableSerial.instance.sendHex(serial, hex)
-            hex.hexFormat().logd("${serial.device} sendHex: ")
-            if (lock) {
-                _lock.value = true
-                lockTime = 0L
-            }
+        MutableSerial.instance.sendHex(serial, hex)
+        hex.hexFormat().logd("${serial.device} sendHex: ")
+        if (lock) {
+            _lock.value = true
+            lockTime = 0L
         }
     }
 

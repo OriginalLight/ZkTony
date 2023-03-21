@@ -27,7 +27,7 @@ import java.util.*
 data class Log(
     @PrimaryKey
     val id: String = UUID.randomUUID().toString(),
-    val workName: String = "",
+    val name: String = "",
     val content: String = "",
     val status: Int = 0,
     val upload: Int = 0,

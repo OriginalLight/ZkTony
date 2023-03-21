@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.removeZero
 import com.zktony.www.data.local.room.entity.CalibrationData
@@ -62,7 +63,7 @@ class CalibrationDataAdapter :
                 actual.text = item.actual.toString().removeZero()
                 with(delete) {
                     clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         onDeleteButtonClick.invoke(item)
                     }
                 }

@@ -56,7 +56,6 @@
                 android:hint="@string/input_v2"
                 android:imeOptions="actionNext"
                 android:inputType="numberDecimal"
-                android:nextFocusForward="@id/input_v3"
                 android:textColor="@color/black"
                 android:textSize="18sp" />
 
@@ -66,28 +65,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/input_v3"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="32dp"
-                android:layout_marginEnd="16dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:hint="@string/input_v3"
-                android:imeOptions="actionDone"
-                android:inputType="numberDecimal"
-                android:textColor="@color/black"
-                android:textSize="18sp" />
-
-        </LinearLayout>
+            android:orientation="horizontal"/>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="32dp"
             android:orientation="horizontal">
 

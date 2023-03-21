@@ -12,10 +12,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.dialog.deleteDialog
-import com.zktony.common.ext.clickScale
-import com.zktony.common.ext.getDayEnd
-import com.zktony.common.ext.getDayStart
-import com.zktony.common.ext.simpleDateFormat
+import com.zktony.common.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.adapter.LogAdapter
 import com.zktony.www.databinding.FragmentLogBinding
@@ -68,7 +65,7 @@ class LogFragment :
             with(datePicker) {
                 clickScale()
                 text = Date(System.currentTimeMillis()).simpleDateFormat("MM 月 dd 日")
-                setOnClickListener {
+                clickNoRepeat {
                     showDatePickerDialog(0, binding.datePicker, Calendar.getInstance())
                 }
             }

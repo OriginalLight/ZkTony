@@ -55,12 +55,11 @@ class WorkPlateViewModel @Inject constructor(
         }
     }
 
-    fun updateVolume(v1: Float, v2: Float, s1: Float) {
+    fun updateVolume(v1: Float, v2: Float) {
         viewModelScope.launch {
             holeDao.updateAll(_uiState.value.holeList.map { it.copy(
                 v1 = v1,
                 v2 = v2,
-                s1 = s1
             ) })
         }
     }

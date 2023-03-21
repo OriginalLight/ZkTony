@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.dialog.deleteDialog
 import com.zktony.common.dialog.inputDialog
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.common.adapter.ProgramAdapter
@@ -54,7 +55,7 @@ class ProgramFragment : BaseFragment<ProgramViewModel, FragmentProgramBinding>(R
                 recyclerView.adapter = adapter
                 with(add) {
                     clickScale()
-                    setOnClickListener {
+                    clickNoRepeat {
                         inputDialog { viewModel.insert(it) }
                     }
                 }

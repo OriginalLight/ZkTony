@@ -1,4 +1,4 @@
-package com.zktony.www.common.extension
+package com.zktony.www.common.ext
 
 import android.graphics.Color
 import android.view.View

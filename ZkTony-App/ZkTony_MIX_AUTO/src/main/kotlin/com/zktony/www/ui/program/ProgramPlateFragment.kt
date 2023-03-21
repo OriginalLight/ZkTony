@@ -12,7 +12,7 @@ import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.removeZero
 import com.zktony.www.R
-import com.zktony.www.common.extension.volumeDialog
+import com.zktony.www.common.ext.volumeDialog
 import com.zktony.www.databinding.FragmentProgramPlateBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -39,7 +39,7 @@ class ProgramPlateFragment :
                             selectAll.isEnabled = it.holeList.any { hole -> !hole.enable }
                             if (it.holeList.isNotEmpty()) {
                                 volume.text =
-                                    "[ 促凝剂:${it.holeList[0].v1.removeZero()} μL, 胶体:${it.holeList[0].v2.removeZero()} μL, 速度:${it.holeList[0].s1.removeZero()} rpm ]"
+                                    "[ 促凝剂: ${it.holeList[0].v1.removeZero()} μL, 胶体: ${it.holeList[0].v2.removeZero()} μL ]"
                             }
                         }
                     }
@@ -58,7 +58,7 @@ class ProgramPlateFragment :
         binding.apply {
             with(back) {
                 clickScale()
-                setOnClickListener {
+                clickNoRepeat {
                     findNavController().navigateUp()
                 }
             }
@@ -73,9 +73,8 @@ class ProgramPlateFragment :
                 volumeDialog(
                     hole.v1,
                     hole.v2,
-                    hole.s1
-                ) { v1, v2, s1 ->
-                    viewModel.updateVolume(v1, v2, s1)
+                ) { v1, v2 ->
+                    viewModel.updateVolume(v1, v2)
                 }
             }
         }

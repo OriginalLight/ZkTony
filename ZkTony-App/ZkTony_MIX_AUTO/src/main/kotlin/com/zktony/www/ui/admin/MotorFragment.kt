@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.dialog.spannerDialog
 import com.zktony.common.ext.afterTextChange
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.setEqualText
 import com.zktony.www.R
@@ -64,7 +65,7 @@ class MotorFragment : BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layou
         binding.apply {
             recycleView.adapter = adapter
 
-            mode.setOnClickListener {
+            mode.clickNoRepeat {
                 spannerDialog(
                     view = it,
                     menu = listOf("增量模式", "坐标模式"),
@@ -73,7 +74,7 @@ class MotorFragment : BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layou
                 )
             }
 
-            subdivision.setOnClickListener {
+            subdivision.clickNoRepeat {
                 spannerDialog(
                     view = it,
                     menu = listOf("2", "4", "8", "16", "32"),
@@ -81,7 +82,7 @@ class MotorFragment : BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layou
                 )
             }
 
-            update.setOnClickListener {
+            update.clickNoRepeat {
                 viewModel.update()
             }
 
@@ -103,7 +104,7 @@ class MotorFragment : BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layou
 
             with(back) {
                 clickScale()
-                setOnClickListener { findNavController().navigateUp() }
+                clickNoRepeat { findNavController().navigateUp() }
             }
         }
     }

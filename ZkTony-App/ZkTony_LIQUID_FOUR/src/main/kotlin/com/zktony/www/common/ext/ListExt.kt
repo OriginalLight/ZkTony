@@ -1,4 +1,4 @@
-package com.zktony.www.common.extension
+package com.zktony.www.common.ext
 
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate

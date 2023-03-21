@@ -18,8 +18,6 @@ data class Hole(
     val xAxis: Float = 0f,
     val v1: Float = 0f,
     val v2: Float = 0f,
-    val v3: Float = 0f,
-    val s1: Float = 0f,
     val enable: Boolean = false,
     val createTime: Date = Date(System.currentTimeMillis()),
 )

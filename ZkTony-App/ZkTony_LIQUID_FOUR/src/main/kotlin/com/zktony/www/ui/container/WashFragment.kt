@@ -7,9 +7,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.removeZero
 import com.zktony.www.R
-import com.zktony.www.common.extension.positionDialog
+import com.zktony.www.common.ext.positionDialog
 import com.zktony.www.databinding.FragmentWashBinding
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -25,7 +26,7 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
     }
 
     private fun initView() {
-        binding.position.setOnClickListener {
+        binding.position.clickNoRepeat {
             positionDialog(
                 textX = viewModel.uiState.value!!.wasteX,
                 textY = viewModel.uiState.value!!.wasteY,

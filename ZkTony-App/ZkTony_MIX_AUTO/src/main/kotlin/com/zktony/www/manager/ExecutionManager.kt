@@ -13,24 +13,26 @@ import kotlinx.coroutines.launch
 class ExecutionManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
-    private val serialManager = SerialManager.instance
-    private val motorManager = MotorManager.instance
+    private val sm = SerialManager.instance
+    private val mm = MotorManager.instance
 
     // 生成器
     fun generator(
         x: Float = 0f,
         z: Float = 0f,
+        p: Float = 0f,
         v1: Float = 0f,
         v2: Float = 0f,
         v3: Float = 0f,
     ): Pair<String, String> {
-        val mx = motorManager.move(x, 0)
-        val mz = motorManager.move(z, 1)
-        val mv1 = motorManager.liquid(v1, 0)
-        val mv2 = motorManager.liquid(v2, 1)
-        val mv3 = motorManager.liquid(v3, 2)
+        val mx = mm.move(x, 0)
+        val mz = mm.move(z, 1)
+        val mp = mm.liquid(p, 2)
+        val mv1 = mm.liquid(v1, 0)
+        val mv2 = mm.liquid(v2, 1)
+        val mv3 = mm.liquid(v3, 2)
         return Pair(
-            "$mx,0,$mz,",
+            "$mz,$mx,$mp,",
             "$mv1,$mv2,$mv3,"
         )
     }
@@ -40,11 +42,11 @@ class ExecutionManager(
         scope.launch {
             val str1 = gen.joinToString("") { it.first }
             val str2 = gen.joinToString("") { it.second }
-            serialManager.sendHex(
+            sm.sendHex(
                 serial = Serial.TTYS0,
                 hex = V1.complex(data = str1),
             )
-            serialManager.sendHex(
+            sm.sendHex(
                 serial = Serial.TTYS3,
                 hex = V1.complex(data = str2),
                 lock = true
@@ -56,11 +58,11 @@ class ExecutionManager(
         scope.launch {
             val str1 = gen.joinToString("") { it.first }
             val str2 = gen.joinToString("") { it.second }
-            serialManager.sendHex(
+            sm.sendHex(
                 serial = Serial.TTYS0,
                 hex = V1.complex(data = str1),
             )
-            serialManager.sendHex(
+            sm.sendHex(
                 serial = Serial.TTYS3,
                 hex = V1.complex(data = str2),
                 lock = true
