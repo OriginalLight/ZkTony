@@ -2,7 +2,6 @@ package com.zktony.www.ui.container
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -12,13 +11,12 @@ import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentWashBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.fragment_wash) {
 
-    override val viewModel: WashViewModel by viewModels()
+    override val viewModel: WashViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initView()

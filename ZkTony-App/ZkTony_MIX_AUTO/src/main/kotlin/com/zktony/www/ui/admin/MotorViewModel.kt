@@ -8,15 +8,12 @@ import com.zktony.www.data.local.room.dao.MotorDao
 import com.zktony.www.data.local.room.entity.Motor
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class MotorViewModel @Inject constructor(
+class MotorViewModel constructor(
     private val motorDao: MotorDao
 ) : BaseViewModel() {
 

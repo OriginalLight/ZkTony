@@ -2,7 +2,6 @@ package com.zktony.www.ui.program
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,13 +13,13 @@ import com.zktony.common.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.common.ext.volumeDialog
 import com.zktony.www.databinding.FragmentProgramPlateBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class ProgramPlateFragment :
-    BaseFragment<WorkPlateViewModel, FragmentProgramPlateBinding>(R.layout.fragment_program_plate) {
-    override val viewModel: WorkPlateViewModel by viewModels()
+    BaseFragment<ProgramPlateViewModel, FragmentProgramPlateBinding>(R.layout.fragment_program_plate) {
+
+    override val viewModel: ProgramPlateViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()

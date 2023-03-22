@@ -3,18 +3,15 @@ package com.zktony.www.ui.container
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.manager.ExecutionManager
-import com.zktony.www.manager.SerialManager
 import com.zktony.www.data.local.room.dao.ContainerDao
 import com.zktony.www.data.local.room.entity.Container
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class WashViewModel @Inject constructor(
+class WashViewModel constructor(
     private val dao: ContainerDao,
 ) : BaseViewModel() {
 

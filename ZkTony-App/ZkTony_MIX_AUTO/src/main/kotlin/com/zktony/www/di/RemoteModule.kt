@@ -5,37 +5,25 @@ import com.zktony.common.http.adapter.FlowCallAdapterFactory
 import com.zktony.common.utils.Constants
 import com.zktony.www.BuildConfig
 import com.zktony.www.data.remote.service.ApplicationService
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import javax.inject.Singleton
 
-@InstallIn(SingletonComponent::class)
-@Module
-object RetrofitModule {
-
-    @Singleton
-    @Provides
-    fun getOkHttpClient(): OkHttpClient {
-        return OkHttpClient.Builder()
+val remoteModule = module {
+    single {
+        OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level =
                     if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BASIC
             })
             .build()
     }
-
-    @Singleton
-    @Provides
-    fun getRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        return Retrofit.Builder()
+    single {
+        Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
-            .client(okHttpClient)
+            .client(get())
             .addCallAdapterFactory(FlowCallAdapterFactory.createAsync())
             .addConverterFactory(
                 GsonConverterFactory.create(
@@ -46,11 +34,5 @@ object RetrofitModule {
             )
             .build()
     }
-
-    @Singleton
-    @Provides
-    fun provideApplicationService(retrofit: Retrofit): ApplicationService {
-        return retrofit.create(ApplicationService::class.java)
-    }
-
+    single { get<Retrofit>().create(ApplicationService::class.java) }
 }

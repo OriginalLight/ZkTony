@@ -2,19 +2,17 @@ package com.zktony.www.ui.container
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
 import com.zktony.common.base.BaseFragment
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentContainerBinding
-import dagger.hilt.android.AndroidEntryPoint
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class ContainerFragment :
     BaseFragment<ContainerViewModel, FragmentContainerBinding>(R.layout.fragment_container) {
 
-    override val viewModel: ContainerViewModel by viewModels()
+    override val viewModel: ContainerViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initView()

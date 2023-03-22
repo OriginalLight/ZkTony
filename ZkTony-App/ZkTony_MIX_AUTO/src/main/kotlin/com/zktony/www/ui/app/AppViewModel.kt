@@ -1,4 +1,4 @@
-package com.zktony.www.common.app
+package com.zktony.www.ui.app
 
 import android.app.Application
 import androidx.datastore.core.DataStore
@@ -11,19 +11,17 @@ import com.zktony.common.utils.Snowflake
 import com.zktony.www.data.local.room.dao.*
 import com.zktony.www.data.local.room.entity.*
 import com.zktony.www.manager.MotorManager
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * [Application] 生命周期内的 [AndroidViewModel]
  */
-@HiltViewModel
-class AppViewModel @Inject constructor(
+
+class AppViewModel  constructor(
     application: Application,
     private val dataStore: DataStore<Preferences>,
     private val motor: MotorDao,

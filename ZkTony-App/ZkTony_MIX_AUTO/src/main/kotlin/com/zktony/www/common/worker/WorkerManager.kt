@@ -4,7 +4,7 @@ import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.zktony.common.app.CommonApplicationProxy
+import com.zktony.common.ext.Ext
 import com.zktony.common.utils.Constants
 import java.util.concurrent.TimeUnit
 
@@ -21,7 +21,7 @@ class WorkerManager {
     }
 
     fun createWorker() {
-        WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
+        WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
             Constants.BACKGROUND_WORKER_NAME_LOG,
             ExistingPeriodicWorkPolicy.UPDATE,
             logRequest

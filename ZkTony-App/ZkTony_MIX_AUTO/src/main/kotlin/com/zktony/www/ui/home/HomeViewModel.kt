@@ -7,23 +7,19 @@ import com.zktony.common.base.BaseViewModel
 import com.zktony.common.dialog.spannerDialog
 import com.zktony.common.ext.getTimeFormat
 import com.zktony.serialport.util.Serial
-import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.data.local.room.dao.*
 import com.zktony.www.data.local.room.entity.*
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel constructor(
     private val logDao: LogDao,
     private val containerDao: ContainerDao,
     private val programDao: ProgramDao,
@@ -31,8 +27,6 @@ class HomeViewModel @Inject constructor(
     private val holeDao: HoleDao,
 ) : BaseViewModel() {
 
-    @Inject
-    lateinit var appViewModel: AppViewModel
 
     private val serial = SerialManager.instance
     private val ex = ExecutionManager.instance

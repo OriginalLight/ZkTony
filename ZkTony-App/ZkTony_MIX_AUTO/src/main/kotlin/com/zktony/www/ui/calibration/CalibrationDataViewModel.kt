@@ -2,23 +2,20 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.manager.ExecutionManager
-import com.zktony.www.manager.SerialManager
 import com.zktony.www.data.local.room.dao.CalibrationDao
 import com.zktony.www.data.local.room.dao.CalibrationDataDao
 import com.zktony.www.data.local.room.entity.Calibration
 import com.zktony.www.data.local.room.entity.CalibrationData
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class CalibrationDataViewModel @Inject constructor(
+class CalibrationDataViewModel constructor(
     private val calibrationDao: CalibrationDao,
     private val calibrationDataDao: CalibrationDataDao
 ) : BaseViewModel() {

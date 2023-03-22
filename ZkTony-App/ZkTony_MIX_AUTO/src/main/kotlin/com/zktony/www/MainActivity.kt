@@ -5,17 +5,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.zktony.common.base.BaseActivity
 import com.zktony.common.dialog.noticeDialog
-import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.worker.WorkerManager
 import com.zktony.www.databinding.ActivityMainBinding
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
-
-    @Inject
-    lateinit var appViewModel: AppViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

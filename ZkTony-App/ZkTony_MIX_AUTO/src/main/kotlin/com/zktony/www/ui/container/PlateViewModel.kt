@@ -12,14 +12,11 @@ import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class PlateViewModel @Inject constructor(
+class PlateViewModel constructor(
     private val containerDao: ContainerDao,
     private val plateDao: PlateDao,
     private val holeDao: HoleDao

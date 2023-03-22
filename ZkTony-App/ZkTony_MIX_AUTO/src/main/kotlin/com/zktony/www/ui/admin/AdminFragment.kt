@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -13,33 +12,30 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.*
 import com.zktony.common.R.color
-import com.zktony.common.app.CommonApplicationProxy
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.dialog.aboutDialog
 import com.zktony.common.dialog.authDialog
 import com.zktony.common.dialog.deviceDialog
 import com.zktony.common.dialog.updateDialog
+import com.zktony.common.ext.Ext
 import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.installApk
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
-import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.ext.*
 import com.zktony.www.data.remote.model.QrCode
 import com.zktony.www.databinding.FragmentAdminBinding
-import dagger.hilt.android.AndroidEntryPoint
+import com.zktony.www.ui.app.AppViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-@AndroidEntryPoint
 class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layout.fragment_admin) {
 
-    override val viewModel: AdminViewModel by viewModels()
+    override val viewModel: AdminViewModel by viewModel()
 
-    @Inject
-    lateinit var appViewModel: AppViewModel
+    private val appViewModel: AppViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -168,7 +164,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 clickScale()
                 clickNoRepeat {
                     val id = Settings.Secure.getString(
-                        CommonApplicationProxy.application.contentResolver, Settings.Secure.ANDROID_ID
+                        Ext.ctx.contentResolver, Settings.Secure.ANDROID_ID
                     )
                     deviceDialog(Gson().toJson(QrCode(
                         id = id,

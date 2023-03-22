@@ -1,7 +1,6 @@
 package com.zktony.www.ui.calibration
 
 import android.os.Bundle
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,14 +13,13 @@ import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.common.adapter.CalibrationAdapter
 import com.zktony.www.databinding.FragmentCalibrationBinding
-import dagger.hilt.android.AndroidEntryPoint
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint
 class CalibrationFragment :
     BaseFragment<CalibrationViewModel, FragmentCalibrationBinding>(R.layout.fragment_calibration) {
 
-    override val viewModel: CalibrationViewModel by viewModels()
+    override val viewModel: CalibrationViewModel by viewModel()
 
     private val adapter by lazy { CalibrationAdapter() }
 
