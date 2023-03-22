@@ -307,6 +307,7 @@ class HomeViewModel @Inject constructor(
                                 info = _uiState.value.info.copy(
                                     speed = speed,
                                     lastTime = lastTime.toLong(),
+                                    process = ((it.complete / it.total.toFloat()) * 100).toInt(),
                                 )
                             )
 
@@ -355,7 +356,8 @@ class HomeViewModel @Inject constructor(
                     _uiState.value.plateList[0].x to _uiState.value.plateList[0].y
                 } else {
                     Pair(8, 12)
-                }
+                },
+                process = 0
             )
         )
         serial.pause(false)
@@ -396,5 +398,6 @@ data class CurrentInfo(
     val liquid: String = "/",
     val speed: Float = 0f,
     val lastTime: Long = 0L,
-    val color: Int = Color.GREEN
+    val color: Int = Color.GREEN,
+    val process: Int = 0,
 )

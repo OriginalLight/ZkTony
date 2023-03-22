@@ -177,6 +177,7 @@ class HomeViewModel @Inject constructor(
                                 info = _uiState.value.info.copy(
                                     speed = speed,
                                     lastTime = lastTime.toLong(),
+                                    process = ((it.complete / it.total.toFloat()) * 100).toInt(),
                                 )
                             )
 
@@ -221,7 +222,8 @@ class HomeViewModel @Inject constructor(
                     } else {
                         10
                     },
-                    holeList = emptyList()
+                    holeList = emptyList(),
+                    process = 0
                 )
             )
             serial.pause(false)
@@ -408,4 +410,5 @@ data class CurrentInfo(
     val holeList: List<Pair<Int, Boolean>> = emptyList(),
     val speed: Float = 0f,
     val lastTime: Long = 0L,
+    val process: Int = 0,
 )

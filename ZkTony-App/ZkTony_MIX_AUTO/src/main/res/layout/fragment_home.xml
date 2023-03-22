@@ -73,7 +73,7 @@
                             android:textSize="20sp" />
                     </LinearLayout>
 
-                    <LinearLayout
+                    <androidx.constraintlayout.widget.ConstraintLayout
                         android:layout_width="480dp"
                         android:layout_height="0dp"
                         android:layout_weight="1"
@@ -89,9 +89,24 @@
                             android:textColor="@color/black"
                             android:textSize="100sp"
                             android:textStyle="bold"
-                            tools:ignore="HardcodedText" />
+                            tools:ignore="HardcodedText"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
 
-                    </LinearLayout>
+                        <ProgressBar
+                            android:id="@+id/progress"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="16dp"
+                            android:max="100"
+                            android:progressDrawable="@drawable/bg_progress"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
 
                 </LinearLayout>
 

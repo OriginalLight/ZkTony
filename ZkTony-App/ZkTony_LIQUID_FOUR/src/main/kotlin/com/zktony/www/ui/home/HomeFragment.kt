@@ -63,6 +63,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             currentLiquid.text = it.info.liquid
                             currentSpeed.text = String.format("%.2f", it.info.speed)
                             currentLastTime.text = it.info.lastTime.getTimeFormat()
+                            progress.progress = it.info.process
                         }
                     }
                 }

@@ -56,6 +56,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         currentColloidVolume.text = String.format("%.2f", it.info.hole.v2)
                         currentSpeed.text = String.format("%.2f", it.info.speed)
                         currentLastTime.text = it.info.lastTime.getTimeFormat()
+                        progress.progress = it.info.process
                         fillCoagulantImage.setBackgroundResource(if (it.fillCoagulant) mipmap.close else mipmap.right)
                         recaptureCoagulantImage.setBackgroundResource(if (it.recaptureCoagulant) mipmap.close else mipmap.left)
                         fillCoagulantText.text = if (it.fillCoagulant) "停止" else "填充(促凝剂)"
