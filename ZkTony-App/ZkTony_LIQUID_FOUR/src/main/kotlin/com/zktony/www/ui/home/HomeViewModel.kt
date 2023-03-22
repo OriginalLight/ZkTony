@@ -8,34 +8,30 @@ import com.zktony.common.base.BaseViewModel
 import com.zktony.common.dialog.spannerDialog
 import com.zktony.common.ext.getTimeFormat
 import com.zktony.serialport.util.Serial
-import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.data.local.room.dao.*
 import com.zktony.www.data.local.room.entity.*
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.StateManager
 import com.zktony.www.manager.protocol.V1
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel constructor(
     private val programDao: ProgramDao,
     private val containerDao: ContainerDao,
     private val plateDao: PlateDao,
     private val holeDao: HoleDao,
-    private val logDao: LogDao
+    private val logDao: LogDao,
+    private val serialManager: SerialManager,
+    private val executionManager: ExecutionManager,
+    private val stateManager: StateManager
 ) : BaseViewModel() {
 
-    @Inject
-    lateinit var appViewModel: AppViewModel
-
-    private val serial = SerialManager.instance
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
@@ -117,11 +113,11 @@ class HomeViewModel @Inject constructor(
     fun reset() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (!serial.pause.value) {
-                if (serial.lock.value) {
+            if (!serialManager.pause.value) {
+                if (serialManager.lock.value) {
                     PopTip.show("运动中禁止复位")
                 } else {
-                    serial.reset()
+                    serialManager.reset()
                     PopTip.show("复位-已下发")
                 }
             } else {
@@ -133,15 +129,16 @@ class HomeViewModel @Inject constructor(
     fun waste() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (serial.lock.value) {
+            if (serialManager.lock.value) {
                 PopTip.show("运动中")
             } else {
                 _uiState.value.container?.let {
-                    val ex = ExecutionManager.instance
-                    ex.executor(ex.generator(
-                        x = it.wasteX,
-                        y = it.wasteY,
-                    ))
+                    executionManager.executor(
+                        executionManager.generator(
+                            x = it.wasteX,
+                            y = it.wasteY,
+                        )
+                    )
                 }
             }
         }
@@ -151,11 +148,11 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             if (type == 0) {
                 val washJob = launch {
-                    serial.sendHex(
+                    serialManager.sendHex(
                         serial = Serial.TTYS0,
                         hex = V1(pa = "0B", data = "0301").toHex()
                     )
-                    serial.sendHex(
+                    serialManager.sendHex(
                         serial = Serial.TTYS3,
                         hex = V1(pa = "0B", data = "0401").toHex()
                     )
@@ -167,11 +164,11 @@ class HomeViewModel @Inject constructor(
             } else {
                 _uiState.value.washJob?.cancel()
                 _uiState.value = _uiState.value.copy(washJob = null)
-                serial.sendHex(
+                serialManager.sendHex(
                     serial = Serial.TTYS0,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
-                serial.sendHex(
+                serialManager.sendHex(
                     serial = Serial.TTYS3,
                     hex = V1(pa = "0B", data = "0400").toHex()
                 )
@@ -182,20 +179,20 @@ class HomeViewModel @Inject constructor(
     fun fill(type: Int) {
         viewModelScope.launch {
             if (type == 0) {
-                serial.sendHex(
+                serialManager.sendHex(
                     serial = Serial.TTYS0,
                     hex = V1(pa = "0B", data = "0301").toHex()
                 )
-                serial.sendHex(
+                serialManager.sendHex(
                     serial = Serial.TTYS3,
                     hex = V1(pa = "0B", data = "0401").toHex()
                 )
             } else {
-                serial.sendHex(
+                serialManager.sendHex(
                     serial = Serial.TTYS0,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
-                serial.sendHex(
+                serialManager.sendHex(
                     serial = Serial.TTYS3,
                     hex = V1(pa = "0B", data = "0400").toHex()
                 )
@@ -206,20 +203,20 @@ class HomeViewModel @Inject constructor(
     fun suckBack(type: Int) {
         viewModelScope.launch {
             if (type == 0) {
-                serial.sendHex(
+                serialManager.sendHex(
                     serial = Serial.TTYS0,
                     hex = V1(pa = "0B", data = "0302").toHex()
                 )
-                serial.sendHex(
+                serialManager.sendHex(
                     serial = Serial.TTYS3,
                     hex = V1(pa = "0B", data = "0402").toHex()
                 )
             } else {
-                serial.sendHex(
+                serialManager.sendHex(
                     serial = Serial.TTYS0,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
-                serial.sendHex(
+                serialManager.sendHex(
                     serial = Serial.TTYS3,
                     hex = V1(pa = "0B", data = "0400").toHex()
                 )
@@ -252,7 +249,7 @@ class HomeViewModel @Inject constructor(
                 val executor = ProgramExecutor(
                     plateList = _uiState.value.plateList,
                     holeList = _uiState.value.holeList,
-                    settings = appViewModel.settings.value,
+                    settings = stateManager.settings.value,
                     scope = this,
                 )
                 executor.event = {
@@ -329,7 +326,7 @@ class HomeViewModel @Inject constructor(
                                     updateLog(l.copy(status = 1))
                                 }
                                 delay(500L)
-                                while (serial.lock.value) {
+                                while (serialManager.lock.value) {
                                     delay(100L)
                                 }
                                 waste()
@@ -360,12 +357,12 @@ class HomeViewModel @Inject constructor(
                 process = 0
             )
         )
-        serial.pause(false)
+        serialManager.pause(false)
     }
 
     fun pause() {
         _uiState.value = _uiState.value.copy(pause = !_uiState.value.pause)
-        serial.pause(_uiState.value.pause)
+        serialManager.pause(_uiState.value.pause)
     }
 
     private fun updateLog(log: Log) {

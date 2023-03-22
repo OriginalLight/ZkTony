@@ -7,17 +7,14 @@ import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Action
 import com.zktony.www.data.local.room.entity.ActionEnum
 import com.zktony.www.data.local.room.entity.getActionEnum
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.util.*
-import javax.inject.Inject
 
-@HiltViewModel
-class ActionViewModel @Inject constructor(
+class ActionViewModel constructor(
     private val programDao: ProgramDao,
     private val actionDao: ActionDao
 ) : BaseViewModel() {

@@ -1,7 +1,6 @@
 package com.zktony.www.ui.admin
 
 import android.os.Bundle
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -15,13 +14,12 @@ import com.zktony.common.ext.setEqualText
 import com.zktony.www.R
 import com.zktony.www.common.adapter.MotorAdapter
 import com.zktony.www.databinding.FragmentMotorBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class MotorFragment : BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layout.fragment_motor) {
 
-    override val viewModel: MotorViewModel by viewModels()
+    override val viewModel: MotorViewModel by viewModel()
 
     private val adapter by lazy { MotorAdapter() }
 

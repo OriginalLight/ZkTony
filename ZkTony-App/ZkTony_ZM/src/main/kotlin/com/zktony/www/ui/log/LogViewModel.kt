@@ -26,8 +26,8 @@ class LogViewModel constructor(
     init {
         viewModelScope.launch {
             logRecordDao.getAll().collect {
-                    _logList.value = it
-                }
+                _logList.value = it
+            }
         }
     }
 

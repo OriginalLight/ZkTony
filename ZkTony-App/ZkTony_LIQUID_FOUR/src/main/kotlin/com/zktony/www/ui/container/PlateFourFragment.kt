@@ -2,7 +2,6 @@ package com.zktony.www.ui.container
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -13,13 +12,12 @@ import com.zktony.www.R
 import com.zktony.www.common.ext.positionDialog
 import com.zktony.www.common.ext.sizeDialog
 import com.zktony.www.databinding.FragmentPlateBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class PlateFourFragment :
     BaseFragment<PlateFourViewModel, FragmentPlateBinding>(R.layout.fragment_plate) {
-    override val viewModel: PlateFourViewModel by viewModels()
+    override val viewModel: PlateFourViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -38,7 +36,8 @@ class PlateFourFragment :
                         val plate = it.plate
                         if (plate != null) {
                             val x0y0 = it.holes.find { hole -> hole.x == 0 && hole.y == 0 }
-                            val x1y1 = it.holes.find { hole -> hole.x == plate.x - 1 && hole.y == plate.y - 1 }
+                            val x1y1 =
+                                it.holes.find { hole -> hole.x == plate.x - 1 && hole.y == plate.y - 1 }
                             binding.apply {
                                 dynamicPlate.setXY(plate.x, plate.y)
                                 rowColumn.text = "${plate.x} X ${plate.y}"
@@ -85,7 +84,8 @@ class PlateFourFragment :
             }
             positionTwo.clickNoRepeat {
                 val plate = viewModel.uiState.value.plate!!
-                val hole = viewModel.uiState.value.holes.find { hole -> hole.x == plate.x - 1 && hole.y == plate.y - 1 }
+                val hole =
+                    viewModel.uiState.value.holes.find { hole -> hole.x == plate.x - 1 && hole.y == plate.y - 1 }
                 positionDialog(
                     textX = hole?.xAxis ?: 0f,
                     textY = hole?.yAxis ?: 0f,

@@ -17,7 +17,7 @@ class MotorManager constructor(
     private val motorDao: MotorDao,
     private val calibrationDao: CalibrationDao,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-){
+) {
     private var x: Motor = Motor()
     private var z: Motor = Motor()
     private var p1: Motor = Motor()

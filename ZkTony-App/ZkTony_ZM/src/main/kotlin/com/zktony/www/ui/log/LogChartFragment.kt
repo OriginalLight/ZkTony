@@ -2,7 +2,6 @@ package com.zktony.www.ui.log
 
 import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle

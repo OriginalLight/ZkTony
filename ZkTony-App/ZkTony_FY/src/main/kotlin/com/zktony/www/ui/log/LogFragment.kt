@@ -2,7 +2,6 @@ package com.zktony.www.ui.log
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -10,15 +9,13 @@ import com.zktony.common.base.BaseFragment
 import com.zktony.www.R
 import com.zktony.www.common.adapter.LogAdapter
 import com.zktony.www.databinding.FragmentLogBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-
-@AndroidEntryPoint
 class LogFragment :
     BaseFragment<LogViewModel, FragmentLogBinding>(R.layout.fragment_log) {
 
-    override val viewModel: LogViewModel by viewModels()
+    override val viewModel: LogViewModel by viewModel()
 
     private val adapter by lazy { LogAdapter() }
 

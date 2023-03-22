@@ -2,25 +2,17 @@ package com.zktony.www.ui.admin
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.data.local.room.dao.ContainerDao
 import com.zktony.www.data.local.room.entity.Container
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.zktony.www.manager.ExecutionManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ContainerViewModel @Inject constructor(
-    private val dao: ContainerDao
+class ContainerViewModel constructor(
+    private val dao: ContainerDao,
+    private val executionManager: ExecutionManager
 ) : BaseViewModel() {
-
-    @Inject
-    lateinit var appViewModel: AppViewModel
-
-    private val manager = ExecutionManager.instance
 
     private val _container: MutableStateFlow<Container> = MutableStateFlow(Container())
     val container = _container.asStateFlow()
@@ -50,8 +42,8 @@ class ContainerViewModel @Inject constructor(
      */
     fun toWasteY() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator(y = container.value.wasteY)
+            executionManager.executor(
+                executionManager.generator(y = container.value.wasteY)
             )
         }
     }
@@ -61,9 +53,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toWasteZ() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator(y = container.value.wasteY),
-                manager.generator(y = container.value.wasteY, z = container.value.wasteZ)
+            executionManager.executor(
+                executionManager.generator(y = container.value.wasteY),
+                executionManager.generator(y = container.value.wasteY, z = container.value.wasteZ)
             )
         }
     }
@@ -74,8 +66,8 @@ class ContainerViewModel @Inject constructor(
      */
     fun toWashY() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator(y = container.value.washY)
+            executionManager.executor(
+                executionManager.generator(y = container.value.washY)
             )
         }
     }
@@ -85,9 +77,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toWashZ() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator(y = container.value.washY),
-                manager.generator(y = container.value.washY, z = container.value.washZ)
+            executionManager.executor(
+                executionManager.generator(y = container.value.washY),
+                executionManager.generator(y = container.value.washY, z = container.value.washZ)
             )
         }
     }
@@ -97,8 +89,8 @@ class ContainerViewModel @Inject constructor(
      */
     fun toBlockY() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator(y = container.value.blockY)
+            executionManager.executor(
+                executionManager.generator(y = container.value.blockY)
             )
         }
     }
@@ -108,9 +100,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toBlockZ() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator(y = container.value.blockY),
-                manager.generator(y = container.value.blockY, z = container.value.blockZ)
+            executionManager.executor(
+                executionManager.generator(y = container.value.blockY),
+                executionManager.generator(y = container.value.blockY, z = container.value.blockZ)
             )
         }
     }
@@ -120,8 +112,8 @@ class ContainerViewModel @Inject constructor(
      */
     fun toOneY() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator(y = container.value.oneY)
+            executionManager.executor(
+                executionManager.generator(y = container.value.oneY)
             )
         }
     }
@@ -131,9 +123,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toOneZ() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator(y = container.value.oneY),
-                manager.generator(y = container.value.oneY, z = container.value.oneZ)
+            executionManager.executor(
+                executionManager.generator(y = container.value.oneY),
+                executionManager.generator(y = container.value.oneY, z = container.value.oneZ)
             )
         }
     }
@@ -143,9 +135,12 @@ class ContainerViewModel @Inject constructor(
      */
     fun toRecycleOneZ() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator(y = container.value.oneY),
-                manager.generator(y = container.value.oneY, z = container.value.recycleOneZ)
+            executionManager.executor(
+                executionManager.generator(y = container.value.oneY),
+                executionManager.generator(
+                    y = container.value.oneY,
+                    z = container.value.recycleOneZ
+                )
             )
         }
     }
@@ -155,8 +150,8 @@ class ContainerViewModel @Inject constructor(
      */
     fun toTwoY() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator(y = container.value.twoY)
+            executionManager.executor(
+                executionManager.generator(y = container.value.twoY)
             )
         }
     }
@@ -166,9 +161,9 @@ class ContainerViewModel @Inject constructor(
      */
     fun toTwoZ() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator(y = container.value.twoY),
-                manager.generator(y = container.value.twoY, z = container.value.twoZ)
+            executionManager.executor(
+                executionManager.generator(y = container.value.twoY),
+                executionManager.generator(y = container.value.twoY, z = container.value.twoZ)
             )
         }
     }
@@ -178,8 +173,8 @@ class ContainerViewModel @Inject constructor(
      */
     fun toZero() {
         viewModelScope.launch {
-            manager.executor(
-                manager.generator()
+            executionManager.executor(
+                executionManager.generator()
             )
         }
 

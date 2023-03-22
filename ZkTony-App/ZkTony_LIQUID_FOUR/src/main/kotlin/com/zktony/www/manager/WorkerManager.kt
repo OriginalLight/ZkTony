@@ -1,11 +1,12 @@
-package com.zktony.www.common.worker
+package com.zktony.www.manager
 
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.zktony.common.app.CommonApplicationProxy
-import com.zktony.common.utils.Constants
+import com.zktony.common.ext.Ext
+import com.zktony.www.common.worker.LogWorker
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -21,17 +22,10 @@ class WorkerManager {
     }
 
     fun createWorker() {
-        WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
-            Constants.BACKGROUND_WORKER_NAME_LOG,
+        WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
+            UUID.randomUUID().toString(),
             ExistingPeriodicWorkPolicy.UPDATE,
             logRequest
         )
-    }
-
-    companion object {
-        @JvmStatic
-        val instance: WorkerManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            WorkerManager()
-        }
     }
 }

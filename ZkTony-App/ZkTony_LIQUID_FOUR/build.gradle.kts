@@ -1,10 +1,10 @@
 @file:Suppress("UnstableApiUsage")
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -94,8 +94,9 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.datastore.preferences)
     implementation(libs.dialogx)
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.work)
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.workmanager)
     implementation(libs.material)
     implementation(libs.okhttp3)
     implementation(libs.okhttp3.logging.interceptor)
@@ -103,9 +104,7 @@ dependencies {
     implementation(libs.retrofit2.converter.gson)
     implementation(libs.zxing)
 
-    kapt(libs.androidx.room.compiler)
-    kapt(libs.hilt.android.compiler)
-    kapt(libs.hilt.compiler)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
 

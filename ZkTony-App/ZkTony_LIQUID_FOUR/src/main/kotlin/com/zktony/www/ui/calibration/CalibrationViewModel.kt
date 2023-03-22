@@ -6,15 +6,12 @@ import com.zktony.common.base.BaseViewModel
 import com.zktony.www.data.local.room.dao.CalibrationDao
 import com.zktony.www.data.local.room.dao.CalibrationDataDao
 import com.zktony.www.data.local.room.entity.Calibration
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class CalibrationViewModel @Inject constructor(
+class CalibrationViewModel constructor(
     private val dao: CalibrationDao,
     private val dataDao: CalibrationDataDao
 ) : BaseViewModel() {

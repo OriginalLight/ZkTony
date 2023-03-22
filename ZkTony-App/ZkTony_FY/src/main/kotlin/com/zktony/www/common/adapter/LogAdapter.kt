@@ -56,7 +56,7 @@ class LogAdapter : ListAdapter<Log, LogAdapter.ViewHolder>(LogDiffCallback()) {
                     1 -> "完成"
                     else -> "未完成"
                 }
-                module.text = when(item.module) {
+                module.text = when (item.module) {
                     0 -> "A"
                     1 -> "B"
                     2 -> "C"

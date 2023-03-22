@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -13,7 +12,6 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.*
 import com.zktony.common.R.color
-import com.zktony.common.app.CommonApplicationProxy
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.dialog.aboutDialog
 import com.zktony.common.dialog.authDialog
@@ -22,22 +20,20 @@ import com.zktony.common.dialog.updateDialog
 import com.zktony.common.ext.*
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
-import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.common.ext.*
 import com.zktony.www.data.remote.model.QrCode
 import com.zktony.www.databinding.FragmentAdminBinding
-import dagger.hilt.android.AndroidEntryPoint
+import com.zktony.www.manager.StateManager
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-@AndroidEntryPoint
 class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layout.fragment_admin) {
 
-    override val viewModel: AdminViewModel by viewModels()
+    override val viewModel: AdminViewModel by viewModel()
 
-    @Inject
-    lateinit var appViewModel: AppViewModel
+    private val stateManager: StateManager by inject()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -123,13 +119,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             tvDeviceName.text = BuildConfig.BUILD_TYPE
 
             with(swBar) {
-                isChecked = appViewModel.settings.value.bar
+                isChecked = stateManager.settings.value.bar
                 setOnCheckedChangeListener { _, isChecked ->
                     viewModel.toggleNavigationBar(isChecked)
                 }
             }
             with(needleSpace) {
-                setText(appViewModel.settings.value.needleSpace.toString().removeZero())
+                setText(stateManager.settings.value.needleSpace.toString().removeZero())
                 afterTextChange {
                     viewModel.setNeedleSpace(it.toFloatOrNull() ?: 7.3f)
                 }
@@ -172,7 +168,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 clickScale()
                 clickNoRepeat {
                     val id = Settings.Secure.getString(
-                        CommonApplicationProxy.application.contentResolver, Settings.Secure.ANDROID_ID
+                        Ext.ctx.contentResolver, Settings.Secure.ANDROID_ID
                     )
                     deviceDialog(Gson().toJson(QrCode(
                         id = id,

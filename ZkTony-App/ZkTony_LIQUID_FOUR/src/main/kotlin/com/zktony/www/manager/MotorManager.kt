@@ -1,6 +1,8 @@
 package com.zktony.www.manager
 
-import android.util.Log
+import com.zktony.common.utils.logi
+import com.zktony.www.data.local.room.dao.CalibrationDao
+import com.zktony.www.data.local.room.dao.MotorDao
 import com.zktony.www.data.local.room.entity.Calibration
 import com.zktony.www.data.local.room.entity.Motor
 import kotlinx.coroutines.CoroutineScope
@@ -12,6 +14,8 @@ import kotlinx.coroutines.launch
  * @date: 2023-01-30 14:27
  */
 class MotorManager(
+    private val motorDao: MotorDao,
+    private val calibrationDao: CalibrationDao,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
 
@@ -23,23 +27,40 @@ class MotorManager(
     private var p4: Motor = Motor()
     private var calibration: Calibration = Calibration()
 
-    fun initMotor(motorList: List<Motor>) {
+    init {
         scope.launch {
-            x = motorList.find { it.id == 0 } ?: Motor()
-            y = motorList.find { it.id == 1 } ?: Motor()
-            p1 = motorList.find { it.id == 2 } ?: Motor()
-            p2 = motorList.find { it.id == 3 } ?: Motor()
-            p3 = motorList.find { it.id == 4 } ?: Motor()
-            p4 = motorList.find { it.id == 5 } ?: Motor()
-            Log.d("MotorManager", "initMotor")
-        }
-
-    }
-
-    fun initCalibration(calibrationList: List<Calibration>) {
-        scope.launch {
-            calibration = calibrationList.find { it.enable == 1 } ?: Calibration()
-            Log.d("MotorManager", "initCalibration")
+            launch {
+                motorDao.getAll().collect {
+                    if (it.isNotEmpty()) {
+                        x = it.find { m -> m.id == 0 } ?: Motor()
+                        y = it.find { m -> m.id == 1 } ?: Motor()
+                        p1 = it.find { m -> m.id == 2 } ?: Motor()
+                        p2 = it.find { m -> m.id == 3 } ?: Motor()
+                        p3 = it.find { m -> m.id == 4 } ?: Motor()
+                        p4 = it.find { m -> m.id == 5 } ?: Motor()
+                    } else {
+                        motorDao.insertAll(
+                            listOf(
+                                Motor(id = 0, name = "X轴", address = 1),
+                                Motor(id = 1, name = "Y轴", address = 2),
+                                Motor(id = 2, name = "泵一", address = 3),
+                                Motor(id = 3, name = "泵二", address = 1),
+                                Motor(id = 4, name = "泵三", address = 2),
+                                Motor(id = 5, name = "泵四", address = 3)
+                            )
+                        )
+                    }
+                }
+            }
+            launch {
+                calibrationDao.getAll().collect {
+                    if (it.isNotEmpty()) {
+                        calibration = it.find { c -> c.enable == 1 } ?: Calibration()
+                    } else {
+                        calibrationDao.insert(Calibration(enable = 1))
+                    }
+                }
+            }
         }
     }
 
@@ -61,11 +82,7 @@ class MotorManager(
         }
     }
 
-
-    companion object {
-        @JvmStatic
-        val instance: MotorManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            MotorManager()
-        }
+    fun test() {
+        scope.launch { "MotorManager test".logi() }
     }
 }

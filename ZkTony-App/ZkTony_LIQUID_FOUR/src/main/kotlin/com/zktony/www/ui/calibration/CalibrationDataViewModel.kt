@@ -2,24 +2,23 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.manager.ExecutionManager
-import com.zktony.www.manager.SerialManager
 import com.zktony.www.data.local.room.dao.CalibrationDao
 import com.zktony.www.data.local.room.dao.CalibrationDataDao
 import com.zktony.www.data.local.room.entity.Calibration
 import com.zktony.www.data.local.room.entity.CalibrationData
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class CalibrationDataViewModel @Inject constructor(
+class CalibrationDataViewModel constructor(
     private val dao: CalibrationDao,
-    private val dataDao: CalibrationDataDao
+    private val dataDao: CalibrationDataDao,
+    private val serialManager: SerialManager,
+    private val executionManager: ExecutionManager
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(CalibrationDataUiState())
@@ -38,12 +37,12 @@ class CalibrationDataViewModel @Inject constructor(
                 }
             }
             launch {
-                SerialManager.instance.lock.collect {
+                serialManager.lock.collect {
                     _uiState.value = _uiState.value.copy(lock = it)
                 }
             }
             launch {
-                SerialManager.instance.pause.collect {
+                serialManager.pause.collect {
                     _uiState.value = _uiState.value.copy(work = it)
                 }
             }
@@ -62,16 +61,15 @@ class CalibrationDataViewModel @Inject constructor(
     }
 
     fun addLiquid() {
-        val manager = ExecutionManager.instance
         val state = _uiState.value
         val gen = when (state.pumpId) {
-            0 -> manager.generator(v1 = state.expect)
-            1 -> manager.generator(v2 = state.expect)
-            2 -> manager.generator(v3 = state.expect)
-            3 -> manager.generator(v4 = state.expect)
+            0 -> executionManager.generator(v1 = state.expect)
+            1 -> executionManager.generator(v2 = state.expect)
+            2 -> executionManager.generator(v3 = state.expect)
+            3 -> executionManager.generator(v4 = state.expect)
             else -> return
         }
-        manager.executor(gen)
+        executionManager.executor(gen)
     }
 
     fun save() {

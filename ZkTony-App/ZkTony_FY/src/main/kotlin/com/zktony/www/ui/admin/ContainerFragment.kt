@@ -1,7 +1,6 @@
 package com.zktony.www.ui.admin
 
 import android.os.Bundle
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,13 +13,12 @@ import com.zktony.common.ext.setEqualText
 import com.zktony.www.R
 import com.zktony.www.data.local.room.entity.Container
 import com.zktony.www.databinding.FragmentContainerBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class ContainerFragment :
     BaseFragment<ContainerViewModel, FragmentContainerBinding>(R.layout.fragment_container) {
-    override val viewModel: ContainerViewModel by viewModels()
+    override val viewModel: ContainerViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()

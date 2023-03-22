@@ -20,9 +20,6 @@ androidx-test-ext = "1.1.5"
 androidx-work = "2.8.0"
 chart = "v3.1.0"
 dialogx = "0.0.47"
-gson = "2.10.1"
-hilt = "2.45"
-hiltExt = "1.0.0"
 junit = "4.13.2"
 koin = "3.3.3"
 kotlin = "1.8.10"
@@ -50,11 +47,6 @@ androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version
 chart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "chart" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-dataStore" }
 dialogx = { module = "com.github.kongzue.DialogX:DialogX", version.ref = "dialogx" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltExt" }
-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltExt" }
 junit = { module = "junit:junit", version.ref = "junit" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
@@ -69,7 +61,6 @@ zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
-hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }

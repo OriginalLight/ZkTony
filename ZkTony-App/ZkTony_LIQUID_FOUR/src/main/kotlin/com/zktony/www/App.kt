@@ -1,47 +1,34 @@
 package com.zktony.www
 
 import android.app.Application
-import android.content.Context
-import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
-import com.zktony.common.app.ApplicationProxy
-import com.zktony.common.app.CommonApplicationProxy
 import com.zktony.common.dialog.DialogXManager
+import com.zktony.common.ext.Ext
 import com.zktony.www.data.local.datastore.DataStoreFactory
-import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
+import com.zktony.www.di.*
+import org.koin.android.ext.koin.androidContext
+import org.koin.androidx.workmanager.koin.workManagerFactory
+import org.koin.core.component.KoinComponent
+import org.koin.core.context.startKoin
 
-/**
- * @author: 刘贺贺
- * @date: 2022-09-14 17:25
- */
-@HiltAndroidApp
-class App : Application(), Configuration.Provider {
 
-    companion object {
-        lateinit var appContext: Context
-    }
-
-    @Inject
-    lateinit var workerFactory: HiltWorkerFactory
-    private val proxies = listOf<ApplicationProxy>(CommonApplicationProxy)
-
+class App : Application(), KoinComponent {
     override fun onCreate() {
-        appContext = applicationContext
         super.onCreate()
+        Ext.with(this)
         DataStoreFactory.init(this)
-        proxies.forEach { it.onCreate(this) }
         DialogXManager(this).init()
+
+        startKoin {
+            androidContext(this@App)
+            workManagerFactory()
+            modules(
+                localModule,
+                remoteModule,
+                workerModule,
+                managerModule,
+                viewModule
+            )
+        }
     }
 
-    override fun onTerminate() {
-        super.onTerminate()
-        proxies.forEach { it.onTerminate() }
-    }
-
-    override fun getWorkManagerConfiguration(): Configuration =
-        Configuration.Builder()
-            .setMinimumLoggingLevel(android.util.Log.INFO)
-            .setWorkerFactory(workerFactory)
-            .build()
 }

@@ -9,8 +9,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.app.CommonApplicationProxy
 import com.zktony.common.base.BaseViewModel
+import com.zktony.common.ext.Ext
 import com.zktony.common.ext.installApk
 import com.zktony.common.ext.int8ToHex
 import com.zktony.common.ext.isNetworkAvailable
@@ -21,13 +21,12 @@ import com.zktony.serialport.util.toSerial
 import com.zktony.www.BuildConfig
 import com.zktony.www.common.ext.toMotor
 import com.zktony.www.common.ext.toV1
-import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
 import com.zktony.www.data.local.room.dao.MotorDao
 import com.zktony.www.data.local.room.entity.Motor
 import com.zktony.www.data.remote.model.Application
 import com.zktony.www.data.remote.service.ApplicationService
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,13 +34,12 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.io.File
-import javax.inject.Inject
 
-@HiltViewModel
-class AdminViewModel @Inject constructor(
+class AdminViewModel constructor(
     private val dataStore: DataStore<Preferences>,
     private val dao: MotorDao,
     private val service: ApplicationService,
+    private val serialManager: SerialManager,
 ) : BaseViewModel() {
 
     private val _file = MutableStateFlow<File?>(null)
@@ -54,7 +52,7 @@ class AdminViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                SerialManager.instance.ttys0Flow.collect {
+                serialManager.ttys0Flow.collect {
                     it?.let {
                         it.toV1().run {
                             if (fn == "03" && pa == "04") {
@@ -66,7 +64,7 @@ class AdminViewModel @Inject constructor(
                 }
             }
             launch {
-                SerialManager.instance.ttys1Flow.collect {
+                serialManager.ttys1Flow.collect {
                     it?.let {
                         it.toV1().run {
                             if (fn == "03" && pa == "04") {
@@ -78,7 +76,7 @@ class AdminViewModel @Inject constructor(
                 }
             }
             launch {
-                SerialManager.instance.ttys2Flow.collect {
+                serialManager.ttys2Flow.collect {
                     it?.let {
                         it.toV1().run {
                             if (fn == "03" && pa == "04") {
@@ -90,7 +88,7 @@ class AdminViewModel @Inject constructor(
                 }
             }
             launch {
-                if (!SerialManager.instance.lock.value) {
+                if (!serialManager.lock.value) {
                     syncMotor()
                 }
             }
@@ -109,7 +107,7 @@ class AdminViewModel @Inject constructor(
                 putExtra("extra_prefs_set_next_text", "完成")
                 putExtra("extra_prefs_set_back_text", "返回")
             }
-            CommonApplicationProxy.application.startActivity(intent)
+            Ext.ctx.startActivity(intent)
         }
     }
 
@@ -145,12 +143,12 @@ class AdminViewModel @Inject constructor(
             PopTip.show("开始下载")
             DownloadManager.download(
                 application.download_url,
-                File(CommonApplicationProxy.application.getExternalFilesDir(null), "update.apk")
+                File(Ext.ctx.getExternalFilesDir(null), "update.apk")
             ).collect {
                 when (it) {
                     is DownloadState.Success -> {
                         _progress.value = 0
-                        CommonApplicationProxy.application.installApk(it.file)
+                        Ext.ctx.installApk(it.file)
                     }
 
                     is DownloadState.Err -> {
@@ -172,7 +170,7 @@ class AdminViewModel @Inject constructor(
      */
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
-            if (CommonApplicationProxy.application.isNetworkAvailable()) {
+            if (Ext.ctx.isNetworkAvailable()) {
                 service.getById(BuildConfig.APPLICATION_ID)
                     .catch {
                         PopTip.show("升级接口异常请联系管理员")
@@ -224,7 +222,7 @@ class AdminViewModel @Inject constructor(
             action = "ACTION_SHOW_NAVBAR"
             putExtra("cmd", if (bar) "show" else "hide")
         }
-        CommonApplicationProxy.application.sendBroadcast(intent)
+        Ext.ctx.sendBroadcast(intent)
     }
 
     /**
@@ -246,7 +244,7 @@ class AdminViewModel @Inject constructor(
         viewModelScope.launch {
             for (i in 0..2) {
                 for (j in 1..3) {
-                    SerialManager.instance.sendHex(
+                    serialManager.sendHex(
                         i.toSerial(), V1(
                             fn = "03", pa = "04", data = j.int8ToHex()
                         ).toHex()

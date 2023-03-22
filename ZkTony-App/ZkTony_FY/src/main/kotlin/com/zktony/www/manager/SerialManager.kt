@@ -4,6 +4,7 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.ext.hexToAscii
 import com.zktony.common.ext.hexToInt8
 import com.zktony.common.ext.verifyHex
+import com.zktony.common.utils.logi
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.*
@@ -214,10 +215,7 @@ class SerialManager(
     }
 
 
-    companion object {
-        @JvmStatic
-        val instance: SerialManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            SerialManager()
-        }
+    fun test() {
+        scope.launch { "SerialManager test".logi() }
     }
 }

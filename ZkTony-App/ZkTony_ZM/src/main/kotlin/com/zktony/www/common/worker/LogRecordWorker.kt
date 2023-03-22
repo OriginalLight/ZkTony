@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
 
 
-class LogRecordWorker  constructor(
+class LogRecordWorker constructor(
     private val dao: LogRecordDao,
     private val service: LogService,
     appContext: Context,

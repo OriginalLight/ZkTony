@@ -2,7 +2,6 @@ package com.zktony.www.ui.calibration
 
 import android.os.Bundle
 import android.view.Gravity
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,13 +13,11 @@ import com.zktony.common.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.adapter.CalibrationDataAdapter
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-
-@AndroidEntryPoint
+import org.koin.androidx.viewmodel.ext.android.viewModel
 class CalibrationDataFragment :
     BaseFragment<CalibrationDataViewModel, FragmentCalibrationDataBinding>(R.layout.fragment_calibration_data) {
-    override val viewModel: CalibrationDataViewModel by viewModels()
+    override val viewModel: CalibrationDataViewModel by viewModel()
 
     private val adapter by lazy { CalibrationDataAdapter() }
 

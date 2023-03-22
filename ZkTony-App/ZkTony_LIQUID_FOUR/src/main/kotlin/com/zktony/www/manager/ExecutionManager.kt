@@ -1,5 +1,6 @@
 package com.zktony.www.manager
 
+import com.zktony.common.utils.logi
 import com.zktony.serialport.util.Serial
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.CoroutineScope
@@ -11,10 +12,10 @@ import kotlinx.coroutines.launch
  * @date: 2023-02-01 10:28
  */
 class ExecutionManager(
+    private val serialManager : SerialManager,
+    private val motorManager : MotorManager,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
-    private val serialManager = SerialManager.instance
-    private val motorManager = MotorManager.instance
 
     // 生成器
     fun generator(
@@ -70,10 +71,7 @@ class ExecutionManager(
         }
     }
 
-    companion object {
-        @JvmStatic
-        val instance: ExecutionManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            ExecutionManager()
-        }
+    fun test() {
+        scope.launch { "ExecutionManager test".logi() }
     }
 }

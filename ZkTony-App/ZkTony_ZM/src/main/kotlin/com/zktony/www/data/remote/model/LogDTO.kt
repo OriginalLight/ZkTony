@@ -1,6 +1,6 @@
 package com.zktony.www.data.remote.model
 
-import java.util.Date
+import java.util.*
 
 /**
  * @author: 刘贺贺

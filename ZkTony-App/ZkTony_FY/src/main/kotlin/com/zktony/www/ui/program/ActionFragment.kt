@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,14 +20,13 @@ import com.zktony.www.common.adapter.ActionAdapter
 import com.zktony.www.data.local.room.entity.ActionEnum
 import com.zktony.www.data.local.room.entity.getActionEnum
 import com.zktony.www.databinding.FragmentActionBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class ActionFragment :
     BaseFragment<ActionViewModel, FragmentActionBinding>(R.layout.fragment_action) {
 
-    override val viewModel: ActionViewModel by viewModels()
+    override val viewModel: ActionViewModel by viewModel()
 
     private val adapter by lazy { ActionAdapter() }
 

@@ -16,7 +16,6 @@ class ProgramPlateViewModel constructor(
 ) : BaseViewModel() {
 
 
-
     private val _uiState = MutableStateFlow(WorkPlateUiState())
     val uiState = _uiState.asStateFlow()
 

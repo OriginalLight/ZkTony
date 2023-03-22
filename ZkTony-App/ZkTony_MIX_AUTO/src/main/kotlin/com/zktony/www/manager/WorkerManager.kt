@@ -5,8 +5,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.zktony.common.ext.Ext
-import com.zktony.common.utils.Constants
 import com.zktony.www.common.worker.LogWorker
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -22,7 +22,7 @@ class WorkerManager {
 
     fun createWorker() {
         WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
-            Constants.BACKGROUND_WORKER_NAME_LOG,
+            UUID.randomUUID().toString(),
             ExistingPeriodicWorkPolicy.UPDATE,
             logRequest
         )

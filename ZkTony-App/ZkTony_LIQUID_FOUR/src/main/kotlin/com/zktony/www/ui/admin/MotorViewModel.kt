@@ -8,16 +8,14 @@ import com.zktony.www.data.local.room.dao.MotorDao
 import com.zktony.www.data.local.room.entity.Motor
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class MotorViewModel @Inject constructor(
-    private val dao: MotorDao
+class MotorViewModel constructor(
+    private val dao: MotorDao,
+    private val serialManager: SerialManager
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(MotorUiState())
@@ -111,7 +109,7 @@ class MotorViewModel @Inject constructor(
                             Serial.TTYS0
                         }
                     }
-                    SerialManager.instance.sendHex(
+                    serialManager.sendHex(
                         serial = serial,
                         hex = V1(pa = "04", data = it.toHex()).toHex()
                     )

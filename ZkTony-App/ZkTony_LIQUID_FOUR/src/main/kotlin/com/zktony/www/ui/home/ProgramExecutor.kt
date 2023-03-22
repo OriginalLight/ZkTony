@@ -1,16 +1,17 @@
 package com.zktony.www.ui.home
 
 import com.zktony.common.ext.currentTime
-import com.zktony.www.common.app.Settings
 import com.zktony.www.common.ext.total
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.Settings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 
 /**
  * @author: 刘贺贺
@@ -25,8 +26,8 @@ class ProgramExecutor constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var event: (ExecutorEvent) -> Unit = {}
-    private val ex = ExecutionManager.instance
-    private val serial = SerialManager.instance
+    private val executionManager: ExecutionManager by inject(ExecutionManager::class.java)
+    private val serialManager: SerialManager by inject(SerialManager::class.java)
     private var complete: Int = 0
     private val currentHoleList: MutableList<Triple<Int, Int, Boolean>> = mutableListOf()
 
@@ -55,15 +56,15 @@ class ProgramExecutor constructor(
                                 if (hole.enable && volume > 0f) {
                                     currentHoleList.add(Triple(i, j, true))
                                     event(ExecutorEvent.HoleList(currentHoleList))
-                                    while (serial.lock.value || serial.pause.value) {
+                                    while (serialManager.lock.value || serialManager.pause.value) {
                                         delay(100)
                                     }
-                                    ex.executor(
-                                        ex.generator(
+                                    executionManager.executor(
+                                        executionManager.generator(
                                             x = hole.xAxis + settings.needleSpace * e,
                                             y = hole.yAxis
                                         ),
-                                        ex.generator(
+                                        executionManager.generator(
                                             x = hole.xAxis + settings.needleSpace * e,
                                             y = hole.yAxis,
                                             v1 = if (e == 0) hole.v1 else 0f,
@@ -73,7 +74,7 @@ class ProgramExecutor constructor(
                                         ),
                                     )
                                     delay(100L)
-                                    while (serial.lock.value) {
+                                    while (serialManager.lock.value) {
                                         delay(100)
                                     }
                                     complete += 1

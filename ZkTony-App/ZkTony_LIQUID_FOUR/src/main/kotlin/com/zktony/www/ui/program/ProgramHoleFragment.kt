@@ -2,7 +2,6 @@ package com.zktony.www.ui.program
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -15,13 +14,12 @@ import com.zktony.www.R
 import com.zktony.www.common.ext.volumeDialog
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.databinding.FragmentProgramHoleBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class ProgramHoleFragment :
     BaseFragment<ProgramHoleViewModel, FragmentProgramHoleBinding>(R.layout.fragment_program_hole) {
-    override val viewModel: ProgramHoleViewModel by viewModels()
+    override val viewModel: ProgramHoleViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()

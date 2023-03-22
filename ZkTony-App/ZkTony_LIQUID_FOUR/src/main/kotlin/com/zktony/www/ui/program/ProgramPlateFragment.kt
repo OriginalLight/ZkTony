@@ -1,7 +1,6 @@
 package com.zktony.www.ui.program
 
 import android.os.Bundle
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -13,13 +12,12 @@ import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentProgramPlateBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class ProgramPlateFragment :
-    BaseFragment<WorkPlateViewModel, FragmentProgramPlateBinding>(R.layout.fragment_program_plate) {
-    override val viewModel: WorkPlateViewModel by viewModels()
+    BaseFragment<ProgramPlateViewModel, FragmentProgramPlateBinding>(R.layout.fragment_program_plate) {
+    override val viewModel: ProgramPlateViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -33,14 +31,16 @@ class ProgramPlateFragment :
                     binding.apply {
                         oneCheck.isChecked = it.plateList.find { plate -> plate.index == 0 } != null
                         twoCheck.isChecked = it.plateList.find { plate -> plate.index == 1 } != null
-                        threeCheck.isChecked = it.plateList.find { plate -> plate.index == 2 } != null
-                        fourCheck.isChecked = it.plateList.find { plate -> plate.index == 3 } != null
+                        threeCheck.isChecked =
+                            it.plateList.find { plate -> plate.index == 2 } != null
+                        fourCheck.isChecked =
+                            it.plateList.find { plate -> plate.index == 3 } != null
                         with(dynamicPlateOne) {
                             val plate = it.plateList.find { plate -> plate.index == 0 }
                             val holes = it.holeList.filter { hole -> hole.subId == plate?.id }
                             if (plate != null) {
                                 setXY(plate.x, plate.y)
-                                setData(holes.map { h -> Triple(h.x, h.y, h.enable)})
+                                setData(holes.map { h -> Triple(h.x, h.y, h.enable) })
                                 holeOne.text = holes.filter { hole -> hole.enable }.size.toString()
                             } else {
                                 val p0 = it.plates.find { p -> p.index == 0 }
@@ -56,7 +56,7 @@ class ProgramPlateFragment :
                             val holes = it.holeList.filter { hole -> hole.subId == plate?.id }
                             if (plate != null) {
                                 setXY(plate.x, plate.y)
-                                setData(holes.map { h -> Triple(h.x, h.y, h.enable)})
+                                setData(holes.map { h -> Triple(h.x, h.y, h.enable) })
                                 holeTwo.text = holes.filter { hole -> hole.enable }.size.toString()
                             } else {
                                 val p1 = it.plates.find { p -> p.index == 1 }
@@ -72,8 +72,9 @@ class ProgramPlateFragment :
                             val holes = it.holeList.filter { hole -> hole.subId == plate?.id }
                             if (plate != null) {
                                 setXY(plate.x, plate.y)
-                                setData(holes.map { h -> Triple(h.x, h.y, h.enable)})
-                                holeThree.text = holes.filter { hole -> hole.enable }.size.toString()
+                                setData(holes.map { h -> Triple(h.x, h.y, h.enable) })
+                                holeThree.text =
+                                    holes.filter { hole -> hole.enable }.size.toString()
                             } else {
                                 val p2 = it.plates.find { p -> p.index == 2 }
                                 if (p2 != null) {
@@ -88,7 +89,7 @@ class ProgramPlateFragment :
                             val holes = it.holeList.filter { hole -> hole.subId == plate?.id }
                             if (plate != null) {
                                 setXY(plate.x, plate.y)
-                                setData(holes.map { h -> Triple(h.x, h.y, h.enable)})
+                                setData(holes.map { h -> Triple(h.x, h.y, h.enable) })
                                 holeFour.text = holes.filter { hole -> hole.enable }.size.toString()
                             } else {
                                 val p3 = it.plates.find { p -> p.index == 3 }

@@ -10,18 +10,17 @@ import com.zktony.www.data.local.room.dao.PlateDao
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class PlateThreeViewModel @Inject constructor(
+class PlateThreeViewModel constructor(
     private val dao: PlateDao,
     private val holeDao: HoleDao,
+    private val serialManager: SerialManager,
+    private val executionManager: ExecutionManager
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(PlateUiState())
@@ -60,13 +59,11 @@ class PlateThreeViewModel @Inject constructor(
     }
 
     fun move(x: Float, y: Float) {
-        val serial = SerialManager.instance
-        if (serial.lock.value || serial.pause.value) {
+        if (serialManager.lock.value || serialManager.pause.value) {
             PopTip.show("机器正在运行中")
             return
         }
-        val manager = ExecutionManager.instance
-        manager.executor(manager.generator(x = x, y = y))
+        executionManager.executor(executionManager.generator(x = x, y = y))
     }
 
     fun save(x: Float, y: Float, flag: Int) {

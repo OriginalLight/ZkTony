@@ -23,7 +23,6 @@ class CalibrationDataViewModel constructor(
 ) : BaseViewModel() {
 
 
-
     private val _uiState = MutableStateFlow(CalibrationDataUiState())
     val uiState = _uiState.asStateFlow()
 

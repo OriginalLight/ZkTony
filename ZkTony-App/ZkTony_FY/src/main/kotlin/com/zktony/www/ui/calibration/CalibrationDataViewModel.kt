@@ -2,33 +2,47 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.common.app.AppViewModel
-import com.zktony.www.manager.ExecutionManager
-import com.zktony.www.manager.SerialManager
 import com.zktony.www.data.local.room.dao.CalibrationDao
 import com.zktony.www.data.local.room.dao.CalibrationDataDao
+import com.zktony.www.data.local.room.dao.ContainerDao
 import com.zktony.www.data.local.room.entity.Calibration
 import com.zktony.www.data.local.room.entity.CalibrationData
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.zktony.www.data.local.room.entity.Container
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class CalibrationDataViewModel @Inject constructor(
+class CalibrationDataViewModel constructor(
     private val dao: CalibrationDao,
-    private val dataDao: CalibrationDataDao
-    ) : BaseViewModel() {
-
-
-    @Inject
-    lateinit var appViewModel: AppViewModel
+    private val dataDao: CalibrationDataDao,
+    private val containerDao: ContainerDao,
+    private val serialManager: SerialManager,
+    private val executionManager: ExecutionManager,
+) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(CalibrationDataUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            launch {
+                containerDao.getAll().distinctUntilChanged().collect {
+                    if (it.isNotEmpty()) {
+                        _uiState.value = _uiState.value.copy(container = it.first())
+                    }
+                }
+            }
+            launch {
+                serialManager.lock.collect {
+                    _uiState.value = _uiState.value.copy(lock = it)
+                }
+            }
+        }
+    }
 
     fun load(id: String) {
         viewModelScope.launch {
@@ -40,11 +54,6 @@ class CalibrationDataViewModel @Inject constructor(
             launch {
                 dataDao.getBySubId(id).distinctUntilChanged().collect {
                     _uiState.value = _uiState.value.copy(caliData = it)
-                }
-            }
-            launch {
-                SerialManager.instance.lock.collect {
-                    _uiState.value = _uiState.value.copy(lock = it)
                 }
             }
         }
@@ -62,13 +71,12 @@ class CalibrationDataViewModel @Inject constructor(
     }
 
     fun addLiquid() {
-        val manager = ExecutionManager.instance
-        val con = appViewModel.settings.value.container
+        val con = _uiState.value.container
         val liquid = _uiState.value.expect
         val motorId = _uiState.value.pumpId
-        manager.executor(
-            manager.generator(y = con.washY),
-            manager.generator(
+        executionManager.executor(
+            executionManager.generator(y = con.washY),
+            executionManager.generator(
                 y = con.washY,
                 z = con.washZ,
                 v1 = if (motorId == 0) liquid else 0f,
@@ -78,7 +86,7 @@ class CalibrationDataViewModel @Inject constructor(
                 v5 = if (motorId == 4) liquid else 0f,
                 v6 = if (motorId == 5) liquid else 0f
             ),
-            manager.generator(
+            executionManager.generator(
                 y = con.washY,
                 v1 = if (motorId == 0) 15000f else 0f,
                 v2 = if (motorId == 1) 15000f else 0f,
@@ -87,7 +95,7 @@ class CalibrationDataViewModel @Inject constructor(
                 v5 = if (motorId == 4) 15000f else 0f,
                 v6 = if (motorId == 5) 15000f else 0f
             ),
-            manager.generator()
+            executionManager.generator()
         )
     }
 
@@ -165,6 +173,7 @@ class CalibrationDataViewModel @Inject constructor(
 data class CalibrationDataUiState(
     val pumpId: Int = 0,
     val cali: Calibration? = null,
+    val container: Container = Container(),
     val caliData: List<CalibrationData> = emptyList(),
     val expect: Float = 0f,
     val actual: Float = 0f,

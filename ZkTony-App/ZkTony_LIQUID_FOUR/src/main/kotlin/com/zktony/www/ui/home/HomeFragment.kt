@@ -2,7 +2,6 @@ package com.zktony.www.ui.home
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,13 +16,12 @@ import com.zktony.www.R
 import com.zktony.www.common.ext.total
 import com.zktony.www.common.ext.washDialog
 import com.zktony.www.databinding.FragmentHomeBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
 
-    override val viewModel: HomeViewModel by viewModels()
+    override val viewModel: HomeViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()

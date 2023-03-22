@@ -3,9 +3,9 @@ package com.zktony.www.ui.home
 import com.zktony.common.ext.currentTime
 import com.zktony.common.ext.getTimeFormat
 import com.zktony.common.utils.Queue
-import com.zktony.www.common.app.Settings
 import com.zktony.www.data.local.room.entity.Action
 import com.zktony.www.data.local.room.entity.ActionEnum
+import com.zktony.www.data.local.room.entity.Container
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,14 +22,14 @@ import kotlinx.coroutines.delay
 class ProgramExecutor constructor(
     val queue: Queue<Action>,
     val module: Int,
-    val settings: Settings,
+    val container: Container,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var event: (ExecutorEvent) -> Unit = {}
     private val commandExecutor by lazy {
         CommandExecutor(
             module = module,
-            con = settings.container,
+            con = container,
             event = { event(ExecutorEvent.Wait(module, it)) }
         )
     }
@@ -130,17 +130,37 @@ class ProgramExecutor constructor(
     private suspend fun executeWashing(action: Action, count: Int) {
         commandExecutor.run {
             event(ExecutorEvent.Count(module, action.count - count + 1))
-            event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程开始执行\n"))
+            event(
+                ExecutorEvent.Log(
+                    module,
+                    "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程开始执行\n"
+                )
+            )
             initAction(action)
             addWashingLiquid {
                 countDown(
                     time = (action.time * 60).toLong(),
                     onTick = { event(ExecutorEvent.Time(module, it.getTimeFormat())) },
                     onFinish = {
-                        event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程执行完毕\n"))
-                        event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程废液清理开始\n"))
+                        event(
+                            ExecutorEvent.Log(
+                                module,
+                                "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程执行完毕\n"
+                            )
+                        )
+                        event(
+                            ExecutorEvent.Log(
+                                module,
+                                "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程废液清理开始\n"
+                            )
+                        )
                         wasteLiquid {
-                            event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程废液清理完毕\n"))
+                            event(
+                                ExecutorEvent.Log(
+                                    module,
+                                    "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程废液清理完毕\n"
+                                )
+                            )
                             if (count - 1 > 0) {
                                 executeWashing(action, count - 1)
                             } else {

@@ -6,7 +6,6 @@ import android.view.Gravity
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -21,13 +20,15 @@ import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentHomeBinding
 import com.zktony.www.manager.SerialManager
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
 
-    override val viewModel: HomeViewModel by viewModels()
+    override val viewModel: HomeViewModel by viewModel()
+
+    private val serialManager: SerialManager by inject()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -46,7 +47,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 launch { viewModel.dFlow.collect { onUiChange(3, it) } }
                 launch { viewModel.buttonFlow.collect { onUiChange(it) } }
                 launch {
-                    SerialManager.instance.lock.collect {
+                    serialManager.lock.collect {
                         binding.e.apply {
                             pause.isVisible = !it
                             tvPause.isVisible = !it
@@ -56,7 +57,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }
                 }
                 launch {
-                    SerialManager.instance.swing.collect {
+                    serialManager.swing.collect {
                         binding.e.apply {
                             pause.setBackgroundResource(if (it) mipmap.pause else mipmap.play)
                             with(tvPause) {
@@ -156,7 +157,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         // 正在执行的个数等于job不为null的个数
         val flag =
             viewModel.aFlow.value.job != null || viewModel.bFlow.value.job != null || viewModel.cFlow.value.job != null || viewModel.dFlow.value.job != null
-        SerialManager.instance.run(flag)
+        serialManager.run(flag)
 
         val bind = getBind(module)
 

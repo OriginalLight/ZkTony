@@ -223,9 +223,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     val id = Settings.Secure.getString(
                         Ext.ctx.contentResolver, Settings.Secure.ANDROID_ID
                     )
-                    deviceDialog(Gson().toJson(QrCode(
-                        id = id,
-                    )))
+                    deviceDialog(
+                        Gson().toJson(
+                            QrCode(
+                                id = id,
+                            )
+                        )
+                    )
                 }
             }
         }

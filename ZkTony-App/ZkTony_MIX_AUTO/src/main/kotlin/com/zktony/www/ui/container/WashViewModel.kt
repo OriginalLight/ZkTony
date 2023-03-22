@@ -18,7 +18,6 @@ class WashViewModel constructor(
 ) : BaseViewModel() {
 
 
-
     private val _uiState = MutableStateFlow<Container?>(null)
     val uiState = _uiState.asStateFlow()
 

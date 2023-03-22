@@ -16,9 +16,8 @@ class ContainerManager constructor(
     private val containerDao: ContainerDao,
     private val plateDao: PlateDao,
     private val holeDao: HoleDao,
-) {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-
+) {
     init {
         scope.launch {
             containerDao.getAll().collect {

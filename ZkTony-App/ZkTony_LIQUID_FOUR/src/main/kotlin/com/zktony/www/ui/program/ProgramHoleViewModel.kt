@@ -7,15 +7,12 @@ import com.zktony.www.data.local.room.dao.HoleDao
 import com.zktony.www.data.local.room.dao.PlateDao
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ProgramHoleViewModel @Inject constructor(
+class ProgramHoleViewModel constructor(
     private val dao: PlateDao,
     private val holeDao: HoleDao,
 ) : BaseViewModel() {

@@ -12,10 +12,10 @@ import kotlinx.coroutines.launch
  * @date: 2023-02-01 10:28
  */
 class ExecutionManager constructor(
-    private val serialManager : SerialManager,
-    private val motorManager : MotorManager,
+    private val serialManager: SerialManager,
+    private val motorManager: MotorManager,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-){
+) {
     // 生成器
     fun generator(
         x: Float = 0f,

@@ -92,7 +92,6 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.datastore.preferences)
     implementation(libs.dialogx)
-    implementation(libs.gson)
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.material)

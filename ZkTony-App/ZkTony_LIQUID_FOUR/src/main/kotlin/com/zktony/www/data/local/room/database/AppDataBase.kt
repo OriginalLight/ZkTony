@@ -37,7 +37,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun holeDao(): HoleDao
 
-    abstract fun workDao(): ProgramDao
+    abstract fun programDao(): ProgramDao
 
     abstract fun containerDao(): ContainerDao
 }
