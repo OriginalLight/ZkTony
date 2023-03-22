@@ -9,8 +9,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.app.CommonApplicationProxy
 import com.zktony.common.base.BaseViewModel
+import com.zktony.common.ext.Ext
 import com.zktony.common.ext.installApk
 import com.zktony.common.ext.isNetworkAvailable
 import com.zktony.common.http.download.DownloadManager
@@ -18,25 +18,21 @@ import com.zktony.common.http.download.DownloadState
 import com.zktony.common.utils.Constants
 import com.zktony.gpio.Gpio
 import com.zktony.www.BuildConfig
-import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.data.remote.model.Application
 import com.zktony.www.data.remote.service.ApplicationService
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.zktony.www.manager.StateManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 import java.io.File
-import javax.inject.Inject
 
-@HiltViewModel
-class AdminViewModel @Inject constructor(
+class AdminViewModel constructor(
     private val dataStore: DataStore<Preferences>,
     private val service: ApplicationService,
+    private val stateManager: StateManager
 ) : BaseViewModel() {
 
-    @Inject
-    lateinit var appViewModel: AppViewModel
 
     private val _file = MutableStateFlow<File?>(null)
     private val _application = MutableStateFlow<Application?>(null)
@@ -59,7 +55,7 @@ class AdminViewModel @Inject constructor(
      * @param pump [Boolean] true 开 false 关
      */
     fun touchPump(pump: Boolean) {
-        val cmd = appViewModel.send.value
+        val cmd = stateManager.send.value
         if (pump) {
             cmd.motorX = 1
             cmd.motorY = 1
@@ -67,7 +63,7 @@ class AdminViewModel @Inject constructor(
             cmd.motorX = 0
             cmd.motorY = 0
         }
-        appViewModel.send(cmd)
+        stateManager.send(cmd)
     }
 
     /**
@@ -82,7 +78,7 @@ class AdminViewModel @Inject constructor(
                 putExtra("extra_prefs_set_next_text", "完成")
                 putExtra("extra_prefs_set_back_text", "返回")
             }
-            CommonApplicationProxy.application.startActivity(intent)
+            Ext.ctx.startActivity(intent)
         }
     }
 
@@ -100,7 +96,7 @@ class AdminViewModel @Inject constructor(
             action = "ACTION_SHOW_NAVBAR"
             putExtra("cmd", if (bar) "show" else "hide")
         }
-        CommonApplicationProxy.application.sendBroadcast(intent)
+        Ext.ctx.sendBroadcast(intent)
     }
 
     /**
@@ -195,12 +191,12 @@ class AdminViewModel @Inject constructor(
             PopTip.show("开始下载")
             DownloadManager.download(
                 application.download_url,
-                File(CommonApplicationProxy.application.getExternalFilesDir(null), "update.apk")
+                File(Ext.ctx.getExternalFilesDir(null), "update.apk")
             ).collect {
                 when (it) {
                     is DownloadState.Success -> {
                         _progress.value = 0
-                        CommonApplicationProxy.application.installApk(it.file)
+                        Ext.ctx.installApk(it.file)
                     }
 
                     is DownloadState.Err -> {
@@ -222,7 +218,7 @@ class AdminViewModel @Inject constructor(
      */
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
-            if (CommonApplicationProxy.application.isNetworkAvailable()) {
+            if (Ext.ctx.isNetworkAvailable()) {
                 service.getById(BuildConfig.APPLICATION_ID)
                     .catch {
                         PopTip.show("升级接口异常请联系管理员")

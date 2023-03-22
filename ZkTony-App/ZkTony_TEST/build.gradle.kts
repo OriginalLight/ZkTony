@@ -3,8 +3,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -91,17 +90,14 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.datastore.preferences)
     implementation(libs.dialogx)
     implementation(libs.gson)
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.work)
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
     implementation(libs.material)
 
-    kapt(libs.androidx.room.compiler)
-    kapt(libs.hilt.android.compiler)
-    kapt(libs.hilt.compiler)
+    ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
 

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -18,14 +17,13 @@ import com.zktony.common.utils.Constants.MAX_MOTOR
 import com.zktony.common.utils.Constants.MAX_TIME
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentHomeBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
 
-    override val viewModel: HomeViewModel by viewModels()
+    override val viewModel: HomeViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()

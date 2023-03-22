@@ -16,7 +16,8 @@ import com.zktony.www.databinding.FragmentProgramBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class ProgramFragment : BaseFragment<ProgramViewModel, FragmentProgramBinding>(R.layout.fragment_program) {
+class ProgramFragment :
+    BaseFragment<ProgramViewModel, FragmentProgramBinding>(R.layout.fragment_program) {
 
     override val viewModel: ProgramViewModel by viewModel()
 

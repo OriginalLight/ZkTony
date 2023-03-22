@@ -29,7 +29,7 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
                 message = "请输入横坐标",
                 value = viewModel.uiState.value?.wasteX ?: 0f,
                 move = { viewModel.move(it) },
-                block = { viewModel.save(it)  }
+                block = { viewModel.save(it) }
             )
         }
     }

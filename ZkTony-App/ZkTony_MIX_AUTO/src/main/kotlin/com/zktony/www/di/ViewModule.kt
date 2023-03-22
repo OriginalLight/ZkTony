@@ -2,7 +2,6 @@ package com.zktony.www.di
 
 import com.zktony.www.ui.admin.AdminViewModel
 import com.zktony.www.ui.admin.MotorViewModel
-import com.zktony.www.ui.app.AppViewModel
 import com.zktony.www.ui.calibration.CalibrationDataViewModel
 import com.zktony.www.ui.calibration.CalibrationViewModel
 import com.zktony.www.ui.container.ContainerViewModel
@@ -16,9 +15,8 @@ import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
 
 val viewModule = module {
-    viewModelOf(::AppViewModel)
-    viewModelOf(::HomeViewModel)
     viewModelOf(::AdminViewModel)
+    viewModelOf(::HomeViewModel)
     viewModelOf(::MotorViewModel)
     viewModelOf(::CalibrationViewModel)
     viewModelOf(::CalibrationDataViewModel)

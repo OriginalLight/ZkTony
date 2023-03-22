@@ -17,6 +17,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PlateFragment :
     BaseFragment<PlateViewModel, FragmentPlateBinding>(R.layout.fragment_plate) {
+
     override val viewModel: PlateViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
@@ -78,7 +79,7 @@ class PlateFragment :
                     message = "请输入 ${'A' + index} 横坐标",
                     value = viewModel.uiState.value.holeList.find { it.x == index }?.xAxis ?: 0f,
                     move = { viewModel.moveX(it) },
-                    block = { viewModel.setHolePosition(index, it)  }
+                    block = { viewModel.setHolePosition(index, it) }
                 )
             }
         }

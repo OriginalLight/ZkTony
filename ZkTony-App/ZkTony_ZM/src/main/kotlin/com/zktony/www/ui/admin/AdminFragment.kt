@@ -5,14 +5,12 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.R.color
-import com.zktony.common.app.CommonApplicationProxy
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.dialog.aboutDialog
 import com.zktony.common.dialog.deviceDialog
@@ -20,20 +18,19 @@ import com.zktony.common.dialog.updateDialog
 import com.zktony.common.ext.*
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
-import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.data.remote.model.QrCode
 import com.zktony.www.databinding.FragmentAdminBinding
-import dagger.hilt.android.AndroidEntryPoint
+import com.zktony.www.manager.StateManager
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layout.fragment_admin) {
 
-    override val viewModel: AdminViewModel by viewModels()
+    override val viewModel: AdminViewModel by viewModel()
 
-    @Inject
-    lateinit var appViewModel: AppViewModel
+    private val stateManager: StateManager by inject()
+
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -112,7 +109,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     }
                 }
                 launch {
-                    appViewModel.setting.collect {
+                    stateManager.setting.collect {
                         binding.apply {
                             if (it.interval > 0) interval.setEqualText(
                                 it.interval.toString().removeZero()
@@ -165,21 +162,21 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             }
 
             with(navigationBar) {
-                isChecked = appViewModel.setting.value.bar
+                isChecked = stateManager.setting.value.bar
                 setOnCheckedChangeListener { _, isChecked ->
                     viewModel.toggleNavigationBar(isChecked)
                 }
             }
 
             with(audio) {
-                isChecked = appViewModel.setting.value.audio
+                isChecked = stateManager.setting.value.audio
                 setOnCheckedChangeListener { _, isChecked ->
                     viewModel.toggleAudio(isChecked)
                 }
             }
 
             with(detect) {
-                isChecked = appViewModel.setting.value.detect
+                isChecked = stateManager.setting.value.detect
                 setOnCheckedChangeListener { _, isChecked ->
                     viewModel.toggleDetect(isChecked)
                 }
@@ -224,7 +221,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 clickScale()
                 clickNoRepeat {
                     val id = Settings.Secure.getString(
-                        CommonApplicationProxy.application.contentResolver, Settings.Secure.ANDROID_ID
+                        Ext.ctx.contentResolver, Settings.Secure.ANDROID_ID
                     )
                     deviceDialog(Gson().toJson(QrCode(
                         id = id,

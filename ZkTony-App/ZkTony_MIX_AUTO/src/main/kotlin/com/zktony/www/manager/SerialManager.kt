@@ -5,6 +5,7 @@ import com.zktony.common.ext.hexFormat
 import com.zktony.common.ext.hexToInt8
 import com.zktony.common.ext.verifyHex
 import com.zktony.common.utils.logd
+import com.zktony.common.utils.logi
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.TTYS0
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class SerialManager(
+class SerialManager constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     private val _ttys0Flow = MutableStateFlow<String?>(null)
@@ -51,7 +52,7 @@ class SerialManager(
                         TTYS0 -> {
                             data.verifyHex().forEach {
                                 _ttys0Flow.value = it
-                               it.hexFormat().logd("串口一 receivedHex: ")
+                                it.hexFormat().logd("串口一 receivedHex: ")
                             }
                         }
                         TTYS3 -> {
@@ -136,11 +137,7 @@ class SerialManager(
         }
     }
 
-
-    companion object {
-        @JvmStatic
-        val instance: SerialManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            SerialManager()
-        }
+    fun test() {
+        scope.launch { "SerialManager test".logi() }
     }
 }

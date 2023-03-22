@@ -16,21 +16,12 @@
 
 package com.zktony.www.common.room.dao
 
-import androidx.room.*
+import androidx.room.Dao
 import com.zktony.www.common.room.entity.Test
 
 /**
  * Data access object to query the database.
  */
 @Dao
-interface TestDao {
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(testRecord: Test)
-
-    @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(test: Test)
-
-    @Delete
-    suspend fun delete(test: Test)
+interface TestDao: BaseDao<Test> {
 }

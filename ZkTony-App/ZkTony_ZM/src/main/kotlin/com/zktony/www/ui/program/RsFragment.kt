@@ -2,7 +2,6 @@ package com.zktony.www.ui.program
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -14,13 +13,12 @@ import com.zktony.common.utils.Constants.MAX_TIME
 import com.zktony.common.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentRsBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class RsFragment : BaseFragment<RsViewModel, FragmentRsBinding>(R.layout.fragment_rs) {
 
-    override val viewModel: RsViewModel by viewModels()
+    override val viewModel: RsViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initView()

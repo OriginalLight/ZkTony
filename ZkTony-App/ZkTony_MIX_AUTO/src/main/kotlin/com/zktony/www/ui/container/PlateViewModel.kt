@@ -19,8 +19,11 @@ import kotlinx.coroutines.launch
 class PlateViewModel constructor(
     private val containerDao: ContainerDao,
     private val plateDao: PlateDao,
-    private val holeDao: HoleDao
+    private val holeDao: HoleDao,
+    private val serialManager: SerialManager,
+    private val executionManager: ExecutionManager,
 ) : BaseViewModel() {
+
 
     private val _uiState = MutableStateFlow(PlateUiState())
     val uiState = _uiState
@@ -46,7 +49,7 @@ class PlateViewModel constructor(
     }
 
     fun reSize(size: Int) {
-        viewModelScope.launch{
+        viewModelScope.launch {
             _uiState.value.plate?.let {
                 if (it.x != size) {
                     plateDao.update(it.copy(x = size))
@@ -80,27 +83,23 @@ class PlateViewModel constructor(
     }
 
     fun moveZ(z: Float) {
-        val serial = SerialManager.instance
-        if (serial.lock.value || serial.pause.value) {
+        if (serialManager.lock.value || serialManager.pause.value) {
             PopTip.show("机器正在运行中")
             return
         }
-        val ex = ExecutionManager.instance
         val hole = _uiState.value.holeList.find { it.x == 0 }
-        ex.executor(
-            ex.generator(x = hole?.xAxis ?: 0f),
-            ex.generator(x = hole?.xAxis ?: 0f, z = z)
+        executionManager.executor(
+            executionManager.generator(x = hole?.xAxis ?: 0f),
+            executionManager.generator(x = hole?.xAxis ?: 0f, z = z)
         )
     }
 
     fun moveX(x: Float) {
-        val serial = SerialManager.instance
-        if (serial.lock.value || serial.pause.value) {
+        if (serialManager.lock.value || serialManager.pause.value) {
             PopTip.show("机器正在运行中")
             return
         }
-        val ex = ExecutionManager.instance
-        ex.executor(ex.generator(x = x))
+        executionManager.executor(executionManager.generator(x = x))
     }
 
     fun setBottom(z: Float) {

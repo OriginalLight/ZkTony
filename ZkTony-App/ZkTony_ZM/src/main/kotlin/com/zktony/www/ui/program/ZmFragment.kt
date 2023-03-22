@@ -2,7 +2,6 @@ package com.zktony.www.ui.program
 
 import android.os.Bundle
 import android.view.View
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -15,13 +14,12 @@ import com.zktony.common.utils.Constants.MAX_TIME
 import com.zktony.common.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentZmBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class ZmFragment : BaseFragment<ZmViewModel, FragmentZmBinding>(R.layout.fragment_zm) {
 
-    override val viewModel: ZmViewModel by viewModels()
+    override val viewModel: ZmViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()

@@ -14,7 +14,8 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class MotorViewModel constructor(
-    private val motorDao: MotorDao
+    private val dao: MotorDao,
+    private val serial: SerialManager
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(MotorUiState())
@@ -22,7 +23,7 @@ class MotorViewModel constructor(
 
     init {
         viewModelScope.launch {
-            motorDao.getAll().distinctUntilChanged().collect {
+            dao.getAll().distinctUntilChanged().collect {
                 _uiState.value = _uiState.value.copy(motorList = it)
                 if (it.isNotEmpty() && _uiState.value.motor == null) {
                     _uiState.value = _uiState.value.copy(motor = it[0])
@@ -96,8 +97,8 @@ class MotorViewModel constructor(
         viewModelScope.launch {
             _uiState.value.motor?.let {
                 if (validateMotor(it)) {
-                    motorDao.update(it)
-                    val serial = when (it.id) {
+                    dao.update(it)
+                    val port = when (it.id) {
                         in 0..1 -> {
                             Serial.TTYS0
                         }
@@ -108,8 +109,8 @@ class MotorViewModel constructor(
                             Serial.TTYS0
                         }
                     }
-                    SerialManager.instance.sendHex(
-                        serial = serial,
+                    serial.sendHex(
+                        serial = port,
                         hex = V1(pa = "04", data = it.toHex()).toHex()
                     )
                     PopTip.show("更新成功")

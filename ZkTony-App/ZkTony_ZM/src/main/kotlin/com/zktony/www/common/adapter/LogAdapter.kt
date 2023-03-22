@@ -1,7 +1,6 @@
 package com.zktony.www.common.adapter
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -89,13 +88,6 @@ class LogAdapter : ListAdapter<LogRecord, LogAdapter.ViewHolder>(LogDiffCallback
                         onChartButtonClick(item)
                     }
                 }
-                if (layoutPosition % 2 == 0) {
-                    order.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    experimentTime.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    model.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                    parameter.setBackgroundColor(Color.parseColor("#F5F5F5"))
-                }
-
                 executePendingBindings()
             }
         }

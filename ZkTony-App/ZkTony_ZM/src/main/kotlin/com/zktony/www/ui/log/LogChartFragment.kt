@@ -19,14 +19,13 @@ import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.data.local.room.entity.LogData
 import com.zktony.www.databinding.FragmentLogChartBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class LogChartFragment :
     BaseFragment<LogChartViewModel, FragmentLogChartBinding>(R.layout.fragment_log_chart) {
 
-    override val viewModel: LogChartViewModel by viewModels()
+    override val viewModel: LogChartViewModel by viewModel()
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
         initView()

@@ -37,8 +37,10 @@ import java.io.File
 class AdminViewModel constructor(
     private val dataStore: DataStore<Preferences>,
     private val dao: MotorDao,
-    private val service: ApplicationService
+    private val service: ApplicationService,
+    private val serial: SerialManager
 ) : BaseViewModel() {
+
 
     private val _file = MutableStateFlow<File?>(null)
     private val _version = MutableStateFlow<Application?>(null)
@@ -46,8 +48,6 @@ class AdminViewModel constructor(
     val file = _file.asStateFlow()
     val version = _version.asStateFlow()
     val progress = _progress.asStateFlow()
-
-    private val serial = SerialManager.instance
 
     init {
         viewModelScope.launch {
@@ -237,12 +237,12 @@ class AdminViewModel constructor(
         viewModelScope.launch {
             for (i in 0..1) {
                 for (j in 1..3) {
-                    val serial = when (i) {
+                    val port = when (i) {
                         0 -> Serial.TTYS0
                         else -> Serial.TTYS3
                     }
-                    SerialManager.instance.sendHex(
-                        serial = serial,
+                    serial.sendHex(
+                        serial = port,
                         hex = V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex()
                     )
                     delay(100L)

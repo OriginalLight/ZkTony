@@ -13,7 +13,11 @@ import kotlinx.coroutines.launch
 
 class WashViewModel constructor(
     private val dao: ContainerDao,
+    private val serialManager: SerialManager,
+    private val executionManager: ExecutionManager,
 ) : BaseViewModel() {
+
+
 
     private val _uiState = MutableStateFlow<Container?>(null)
     val uiState = _uiState.asStateFlow()
@@ -27,13 +31,11 @@ class WashViewModel constructor(
     }
 
     fun move(x: Float) {
-        val serial = SerialManager.instance
-        if (serial.lock.value || serial.pause.value) {
+        if (serialManager.lock.value || serialManager.pause.value) {
             PopTip.show("机器正在运行中")
             return
         }
-        val m = ExecutionManager.instance
-        m.executor(m.generator(x = x))
+        executionManager.executor(executionManager.generator(x = x))
     }
 
     fun save(x: Float) {

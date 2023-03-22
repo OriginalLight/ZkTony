@@ -7,15 +7,12 @@ import com.zktony.common.utils.Constants.MAX_TIME
 import com.zktony.common.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Program
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class RsViewModel @Inject constructor(
-    private val programDao: ProgramDao
+class RsViewModel constructor(
+    private val dao: ProgramDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(RsUiState())
@@ -23,7 +20,7 @@ class RsViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            programDao.getAll().collect {
+            dao.getAll().collect {
                 _uiState.value = _uiState.value.copy(programList = it)
             }
         }
@@ -31,7 +28,7 @@ class RsViewModel @Inject constructor(
 
     fun load(id: String) {
         viewModelScope.launch {
-            programDao.getById(id).collect {
+            dao.getById(id).collect {
                 _uiState.value = _uiState.value.copy(
                     program = it,
                     name = it.name,
@@ -50,7 +47,7 @@ class RsViewModel @Inject constructor(
                     PopTip.show("名称已存在")
                     return@launch
                 }
-                programDao.insert(
+                dao.insert(
                     Program(
                         name = _uiState.value.name,
                         voltage = _uiState.value.voltage,
@@ -63,7 +60,7 @@ class RsViewModel @Inject constructor(
                     PopTip.show("名称已存在")
                     return@launch
                 }
-                programDao.update(
+                dao.update(
                     _uiState.value.program!!.copy(
                         name = _uiState.value.name,
                         voltage = _uiState.value.voltage,

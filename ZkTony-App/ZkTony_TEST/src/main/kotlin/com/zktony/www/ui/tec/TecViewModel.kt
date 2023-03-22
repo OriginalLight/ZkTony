@@ -7,20 +7,14 @@ import com.zktony.common.ext.hexToAscii
 import com.zktony.common.ext.removeZero
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
-import com.zktony.www.common.app.AppViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class TecViewModel @Inject constructor() : BaseViewModel() {
+class TecViewModel : BaseViewModel() {
 
-    @Inject
-    lateinit var appViewModel: AppViewModel
 
     private val _serialFlow = MutableStateFlow<String?>(null)
     private val _uiState0 = MutableStateFlow(TecUiState(title = "Tec 0"))
@@ -28,7 +22,7 @@ class TecViewModel @Inject constructor() : BaseViewModel() {
     private val _uiState2 = MutableStateFlow(TecUiState(title = "Tec 2"))
     private val _uiState3 = MutableStateFlow(TecUiState(title = "Tec 3"))
     private val _uiState4 = MutableStateFlow(TecUiState(title = "Tec 4"))
-    val serialFlow = _serialFlow.asStateFlow()
+    private val serialFlow = _serialFlow.asStateFlow()
     val uiState0 = _uiState0.asStateFlow()
     val uiState1 = _uiState1.asStateFlow()
     val uiState2 = _uiState2.asStateFlow()

@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 
 /**
  * @author: 刘贺贺
@@ -25,8 +26,8 @@ class ProgramExecutor constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var event: (ExecutorEvent) -> Unit = {}
-    private val ex = ExecutionManager.instance
-    private val serial = SerialManager.instance
+    private val executionManager: ExecutionManager by inject(ExecutionManager::class.java)
+    private val serialManager: SerialManager by inject(SerialManager::class.java)
     private var complete: Int = 0
     private val currentHoleList: MutableList<Pair<Int, Boolean>> = mutableListOf()
 
@@ -38,7 +39,7 @@ class ProgramExecutor constructor(
             if (total > 0) {
                 val plate = plateList[0]
                 for (i in 0 until plate.x) {
-                    while (serial.lock.value || serial.pause.value) {
+                    while (serialManager.lock.value || serialManager.pause.value) {
                         delay(100L)
                     }
                     val hole = holeList.find { it.x == i && it.enable }
@@ -47,12 +48,12 @@ class ProgramExecutor constructor(
                         currentHoleList.add(Pair(i, true))
                         event(ExecutorEvent.HoleList(currentHoleList))
                         event(ExecutorEvent.Log("[ ${currentTime()} ]\t 执行孔位：${hole.x} 号孔\n"))
-                        ex.executor(
-                            ex.generator(
+                        executionManager.executor(
+                            executionManager.generator(
                                 x = hole.xAxis,
                                 p = hole.v1,
                             ),
-                            ex.generator(
+                            executionManager.generator(
                                 x = hole.xAxis,
                                 z = container.top,
                                 p = hole.v1,
@@ -60,7 +61,7 @@ class ProgramExecutor constructor(
                                 v2 = hole.v1,
                                 v3 = hole.v2,
                             ),
-                            ex.generator(
+                            executionManager.generator(
                                 x = hole.xAxis,
                                 z = container.bottom,
                                 p = hole.v1,
@@ -68,7 +69,7 @@ class ProgramExecutor constructor(
                             ),
                         )
                         delay(500L)
-                        while (serial.lock.value) {
+                        while (serialManager.lock.value) {
                             delay(1000)
                         }
                         complete += 1

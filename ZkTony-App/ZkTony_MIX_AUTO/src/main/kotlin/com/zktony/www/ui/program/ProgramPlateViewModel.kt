@@ -15,6 +15,8 @@ class ProgramPlateViewModel constructor(
     private val holeDao: HoleDao,
 ) : BaseViewModel() {
 
+
+
     private val _uiState = MutableStateFlow(WorkPlateUiState())
     val uiState = _uiState.asStateFlow()
 
@@ -37,7 +39,7 @@ class ProgramPlateViewModel constructor(
         }
     }
 
-    fun selectHole(index : Int) {
+    fun selectHole(index: Int) {
         viewModelScope.launch {
             _uiState.value.holeList.find { it.x == index }?.let {
                 holeDao.update(it.copy(enable = !it.enable))
@@ -54,10 +56,12 @@ class ProgramPlateViewModel constructor(
 
     fun updateVolume(v1: Float, v2: Float) {
         viewModelScope.launch {
-            holeDao.updateAll(_uiState.value.holeList.map { it.copy(
-                v1 = v1,
-                v2 = v2,
-            ) })
+            holeDao.updateAll(_uiState.value.holeList.map {
+                it.copy(
+                    v1 = v1,
+                    v2 = v2,
+                )
+            })
         }
     }
 }

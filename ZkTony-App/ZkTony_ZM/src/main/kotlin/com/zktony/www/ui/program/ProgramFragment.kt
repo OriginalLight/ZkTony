@@ -4,7 +4,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -19,14 +18,13 @@ import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.common.adapter.ProgramAdapter
 import com.zktony.www.databinding.FragmentProgramBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class ProgramFragment :
     BaseFragment<ProgramViewModel, FragmentProgramBinding>(R.layout.fragment_program) {
 
-    override val viewModel: ProgramViewModel by viewModels()
+    override val viewModel: ProgramViewModel by viewModel()
 
     private val adapter by lazy { ProgramAdapter() }
 

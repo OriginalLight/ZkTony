@@ -4,15 +4,12 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
 import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.local.room.entity.Program
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ProgramViewModel @Inject constructor(
-    private val programDao: ProgramDao
+class ProgramViewModel constructor(
+    private val dao: ProgramDao
 ) : BaseViewModel() {
 
     private val _programList = MutableStateFlow(emptyList<Program>())
@@ -20,7 +17,7 @@ class ProgramViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            programDao.getAll().collect {
+            dao.getAll().collect {
                 _programList.value = it
             }
         }
@@ -32,7 +29,7 @@ class ProgramViewModel @Inject constructor(
      */
     fun delete(program: Program) {
         viewModelScope.launch {
-            programDao.delete(program)
+            dao.delete(program)
         }
     }
 

@@ -1,4 +1,4 @@
-package com.zktony.www.serialport
+package com.zktony.www.manager
 
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SerialPortManager(
+class SerialManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
 
@@ -45,8 +45,8 @@ class SerialPortManager(
 
     companion object {
         @JvmStatic
-        val instance: SerialPortManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            SerialPortManager()
+        val instance: SerialManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+            SerialManager()
         }
     }
 }

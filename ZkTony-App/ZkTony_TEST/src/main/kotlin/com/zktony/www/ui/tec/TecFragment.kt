@@ -3,7 +3,6 @@ package com.zktony.www.ui.tec
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -11,13 +10,12 @@ import com.zktony.common.base.BaseFragment
 import com.zktony.common.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentTecBinding
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
-@AndroidEntryPoint
 class TecFragment : BaseFragment<TecViewModel, FragmentTecBinding>(R.layout.fragment_tec) {
 
-    override val viewModel: TecViewModel by viewModels()
+    override val viewModel: TecViewModel by viewModel()
 
 
     override fun onViewCreated(savedInstanceState: Bundle?) {

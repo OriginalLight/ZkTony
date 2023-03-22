@@ -1,5 +1,6 @@
 package com.zktony.www.manager
 
+import com.zktony.common.utils.logi
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import kotlinx.coroutines.CoroutineScope
@@ -35,10 +36,9 @@ class SerialManager(
         MutableSerial.instance.sendHex(Serial.TTYS4, data)
     }
 
-    companion object {
-        @JvmStatic
-        val instance: SerialManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            SerialManager()
+    fun test() {
+        scope.launch {
+            "SerialManager test".logi()
         }
     }
 

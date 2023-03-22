@@ -11,14 +11,13 @@ import org.koin.core.component.KoinComponent
  * @date: 2022-09-20 14:47
  */
 class LogWorker constructor(
-    private val logDao: LogDao,
-    appContext: Context,
-    workerParams: WorkerParameters,
-) : CoroutineWorker(appContext, workerParams), KoinComponent {
-
+    private val dao: LogDao,
+    context: Context,
+    params: WorkerParameters,
+) : CoroutineWorker(context, params), KoinComponent {
     override suspend fun doWork(): Result {
         return try {
-            logDao.deleteByDate()
+            dao.deleteByDate()
             Result.success()
         } catch (e: Exception) {
             Result.failure()

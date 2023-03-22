@@ -1,8 +1,12 @@
-package com.zktony.www.common.worker
+package com.zktony.www.manager
 
 import androidx.work.*
-import com.zktony.common.app.CommonApplicationProxy
-import com.zktony.common.utils.Constants
+import com.zktony.common.ext.Ext
+import com.zktony.www.common.worker.LogDataWorker
+import com.zktony.www.common.worker.LogRecordWorker
+import com.zktony.www.common.worker.LogWorker
+import com.zktony.www.common.worker.ProgramWorker
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -47,32 +51,25 @@ class WorkerManager {
     }
 
     fun createWorker() {
-        WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
-            Constants.BACKGROUND_WORKER_NAME_PROGRAM,
+        WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
+            UUID.randomUUID().toString(),
             ExistingPeriodicWorkPolicy.UPDATE,
             programRequest
         )
-        WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
-            Constants.BACKGROUND_WORKER_NAME_LOG_RECORD,
+        WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
+            UUID.randomUUID().toString(),
             ExistingPeriodicWorkPolicy.UPDATE,
             logRecordRequest
         )
-        WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
-            Constants.BACKGROUND_WORKER_NAME_LOG_DATA,
+        WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
+            UUID.randomUUID().toString(),
             ExistingPeriodicWorkPolicy.UPDATE,
             logDataRequest
         )
-        WorkManager.getInstance(CommonApplicationProxy.application).enqueueUniquePeriodicWork(
-            Constants.BACKGROUND_WORKER_NAME_LOG,
+        WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
+            UUID.randomUUID().toString(),
             ExistingPeriodicWorkPolicy.UPDATE,
             logRequest
         )
-    }
-
-    companion object {
-        @JvmStatic
-        val instance: WorkerManager by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            WorkerManager()
-        }
     }
 }

@@ -26,8 +26,9 @@ import com.zktony.www.R
 import com.zktony.www.common.ext.*
 import com.zktony.www.data.remote.model.QrCode
 import com.zktony.www.databinding.FragmentAdminBinding
-import com.zktony.www.ui.app.AppViewModel
+import com.zktony.www.manager.StateManager
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
@@ -35,7 +36,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
 
     override val viewModel: AdminViewModel by viewModel()
 
-    private val appViewModel: AppViewModel by viewModel()
+    private val stateManager: StateManager by inject()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -121,7 +122,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             tvDeviceName.text = BuildConfig.BUILD_TYPE
 
             with(swBar) {
-                isChecked = appViewModel.settings.value.bar
+                isChecked = stateManager.settings.value.bar
                 setOnCheckedChangeListener { _, isChecked ->
                     viewModel.toggleNavigationBar(isChecked)
                 }
@@ -166,9 +167,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     val id = Settings.Secure.getString(
                         Ext.ctx.contentResolver, Settings.Secure.ANDROID_ID
                     )
-                    deviceDialog(Gson().toJson(QrCode(
-                        id = id,
-                    )))
+                    deviceDialog(
+                        Gson().toJson(
+                            QrCode(
+                                id = id,
+                            )
+                        )
+                    )
                 }
             }
         }

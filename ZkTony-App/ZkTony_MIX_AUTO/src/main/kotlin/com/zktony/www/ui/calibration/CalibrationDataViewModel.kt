@@ -17,8 +17,12 @@ import kotlinx.coroutines.launch
 
 class CalibrationDataViewModel constructor(
     private val calibrationDao: CalibrationDao,
-    private val calibrationDataDao: CalibrationDataDao
+    private val calibrationDataDao: CalibrationDataDao,
+    private val serialManager: SerialManager,
+    private val executionManager: ExecutionManager
 ) : BaseViewModel() {
+
+
 
     private val _uiState = MutableStateFlow(CalibrationDataUiState())
     val uiState = _uiState.asStateFlow()
@@ -36,12 +40,12 @@ class CalibrationDataViewModel constructor(
                 }
             }
             launch {
-                SerialManager.instance.lock.collect {
+                serialManager.lock.collect {
                     _uiState.value = _uiState.value.copy(lock = it)
                 }
             }
             launch {
-                SerialManager.instance.pause.collect {
+                serialManager.pause.collect {
                     _uiState.value = _uiState.value.copy(work = it)
                 }
             }
@@ -61,15 +65,14 @@ class CalibrationDataViewModel constructor(
     }
 
     fun addLiquid() {
-        val manager = ExecutionManager.instance
         val state = _uiState.value
         val gen = when (state.pumpId) {
-            0 -> manager.generator(v1 = state.expect)
-            1 -> manager.generator(v2 = state.expect)
-            2 -> manager.generator(v3 = state.expect)
+            0 -> executionManager.generator(v1 = state.expect)
+            1 -> executionManager.generator(v2 = state.expect)
+            2 -> executionManager.generator(v3 = state.expect)
             else -> return
         }
-        manager.executor(gen)
+        executionManager.executor(gen)
     }
 
     fun save() {

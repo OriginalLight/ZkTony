@@ -16,11 +16,7 @@ import com.kongzue.dialogx.interfaces.OnBindView
 import com.kongzue.dialogx.util.InputInfo
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.R
-import com.zktony.common.app.CommonApplicationProxy
-import com.zktony.common.ext.clickNoRepeat
-import com.zktony.common.ext.createQRCodeBitmap
-import com.zktony.common.ext.isNetworkAvailable
-import com.zktony.common.ext.removeZero
+import com.zktony.common.ext.*
 import com.zktony.common.utils.Constants
 
 
@@ -29,7 +25,7 @@ fun aboutDialog() {
         .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_about_dialog) {
             override fun onBind(dialog: CustomDialog, v: View) {
                 val btnWeb = v.findViewById<MaterialButton>(R.id.btn_web)
-                btnWeb.isVisible = CommonApplicationProxy.application.isNetworkAvailable()
+                btnWeb.isVisible = Ext.ctx.isNetworkAvailable()
                 btnWeb.clickNoRepeat {
                     dialog.dismiss()
                     webDialog()
@@ -149,7 +145,7 @@ fun inputDialog(message: String = "请输入程序/操作名", block: (String) -
         }.show()
 }
 
-fun inputNumberDialog(message: String = "请输入程序/操作名",value:Int, block: (Int) -> Unit) {
+fun inputNumberDialog(message: String = "请输入程序/操作名", value: Int, block: (Int) -> Unit) {
     InputDialog("修改", message, "确定", "取消", value.toString())
         .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER))
         .setOkButton { _, _, inputStr ->
@@ -162,7 +158,12 @@ fun inputNumberDialog(message: String = "请输入程序/操作名",value:Int, b
         }.show()
 }
 
-fun inputDecimalDialog(message: String = "请输入程序/操作名", value: Float,move:(Float) -> Unit, block: (Float) -> Unit) {
+fun inputDecimalDialog(
+    message: String = "请输入程序/操作名",
+    value: Float,
+    move: (Float) -> Unit,
+    block: (Float) -> Unit
+) {
     InputDialog("修改", message, "确定", "取消", value.removeZero())
         .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER))
         .setOtherButton("移动") { _, _, str ->

@@ -11,7 +11,6 @@ import com.zktony.common.utils.Constants.MAX_TIME
 import com.zktony.common.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.common.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.www.R
-import com.zktony.www.common.app.AppViewModel
 import com.zktony.www.data.local.room.dao.LogDataDao
 import com.zktony.www.data.local.room.dao.LogRecordDao
 import com.zktony.www.data.local.room.dao.ProgramDao
@@ -19,25 +18,21 @@ import com.zktony.www.data.local.room.entity.LogData
 import com.zktony.www.data.local.room.entity.LogRecord
 import com.zktony.www.data.local.room.entity.Program
 import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.StateManager
 import com.zktony.www.manager.protocol.V1
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel constructor(
     private val programDao: ProgramDao,
     private val logRecordDao: LogRecordDao,
-    private val logDataDao: LogDataDao
+    private val logDataDao: LogDataDao,
+    private val stateManager: StateManager,
+    private val serialManager: SerialManager,
 ) : BaseViewModel() {
-
-
-    @Inject
-    lateinit var appViewModel: AppViewModel
 
     private val _uiStateX = MutableStateFlow(HomeUiState())
     private val _uiStateY = MutableStateFlow(HomeUiState())
@@ -56,7 +51,7 @@ class HomeViewModel @Inject constructor(
                 delay(200L)
                 while (true) {
                     delay(1000L)
-                    SerialManager.instance.send(V1.QUERY_HEX)
+                    serialManager.send(V1.QUERY_HEX)
                 }
             }
             launch {
@@ -77,7 +72,7 @@ class HomeViewModel @Inject constructor(
             }
             launch {
                 delay(100)
-                appViewModel.received.collect {
+                stateManager.received.collect {
                     _uiStateX.value = _uiStateX.value.copy(
                         currentMotor = it.stepMotorX,
                         currentVoltage = it.getVoltageX,
@@ -201,8 +196,8 @@ class HomeViewModel @Inject constructor(
      * @param xy 模块
      */
     fun pumpUpOrBack(upOrBack: Int, start: Int, xy: Int) {
-        val latest = appViewModel.send.value
-        var speed = appViewModel.setting.value.motorSpeed
+        val latest = stateManager.send.value
+        var speed = stateManager.setting.value.motorSpeed
         if (upOrBack == 1) speed = -speed
         if (xy == 0) {
             if (start == 0) {
@@ -210,14 +205,14 @@ class HomeViewModel @Inject constructor(
             } else {
                 speed = _uiStateX.value.motorCache
             }
-            appViewModel.send(latest.apply { stepMotorX = speed })
+            stateManager.send(latest.apply { stepMotorX = speed })
         } else {
             if (start == 0) {
                 _uiStateY.value = _uiStateY.value.copy(motorCache = latest.stepMotorY)
             } else {
                 speed = _uiStateY.value.motorCache
             }
-            appViewModel.send(latest.apply { stepMotorY = speed })
+            stateManager.send(latest.apply { stepMotorY = speed })
         }
     }
 
@@ -235,8 +230,8 @@ class HomeViewModel @Inject constructor(
         // 开始计时
         val job = viewModelScope.launch {
             if (state.value.programName == "洗涤") {
-                val latest = appViewModel.send.value
-                appViewModel.send(latest.apply {
+                val latest = stateManager.send.value
+                stateManager.send(latest.apply {
                     stepMotorX = if (xy == 0) state.value.motor else latest.stepMotorX
                     stepMotorY = if (xy == 1) state.value.motor else latest.stepMotorY
                 })
@@ -253,8 +248,8 @@ class HomeViewModel @Inject constructor(
                 delay(1000)
                 state.value = state.value.copy(currentTime = i.getTimeFormat())
                 if (i == 20 && state.value.programName == "洗涤") {
-                    val latest = appViewModel.send.value
-                    appViewModel.send(latest.apply {
+                    val latest = stateManager.send.value
+                    stateManager.send(latest.apply {
                         stepMotorX = if (xy == 0) -state.value.motor else latest.stepMotorX
                         stepMotorY = if (xy == 1) -state.value.motor else latest.stepMotorY
                     })
@@ -278,7 +273,7 @@ class HomeViewModel @Inject constructor(
                 )
                 logRecordDao.insert(log)
                 for (i in 0..(state.value.time * 60).toInt() step 5) {
-                    val rec = appViewModel.received.value
+                    val rec = stateManager.received.value
                     logDataDao.insert(
                         LogData().copy(
                             logId = log.id,
@@ -313,8 +308,8 @@ class HomeViewModel @Inject constructor(
         if (state.value.programName != "洗涤") {
             startOrStop(false, xy)
         } else {
-            val latest = appViewModel.send.value
-            appViewModel.send(latest.apply {
+            val latest = stateManager.send.value
+            stateManager.send(latest.apply {
                 stepMotorX = if (xy == 0) 0 else latest.stepMotorX
                 stepMotorY = if (xy == 1) 0 else latest.stepMotorY
             })
@@ -347,10 +342,10 @@ class HomeViewModel @Inject constructor(
      * @param xy 模块
      */
     private fun startOrStop(start: Boolean, xy: Int) {
-        val latest = appViewModel.send.value
+        val latest = stateManager.send.value
         val state = getUiState(xy)
         if (start) {
-            appViewModel.send(latest.apply {
+            stateManager.send(latest.apply {
                 powerENX = if (xy == 0) 1 else latest.powerENX
                 powerENY = if (xy == 1) 1 else latest.powerENY
                 autoX = if (xy == 0) 1 else latest.autoX
@@ -361,7 +356,7 @@ class HomeViewModel @Inject constructor(
                 targetVoltageY = if (xy == 1) state.value.voltage else latest.targetVoltageY
             })
         } else {
-            appViewModel.send(latest.apply {
+            stateManager.send(latest.apply {
                 powerENX = if (xy == 0) 0 else latest.powerENX
                 powerENY = if (xy == 1) 0 else latest.powerENY
                 autoX = if (xy == 0) 0 else latest.autoX
@@ -378,11 +373,11 @@ class HomeViewModel @Inject constructor(
      * 设置哨兵
      */
     private fun sentinel() {
-        if (sentinelJob == null && appViewModel.setting.value.detect) {
+        if (sentinelJob == null && stateManager.setting.value.detect) {
             val job = viewModelScope.launch {
                 while (true) {
                     delay(5000L)
-                    val rec = appViewModel.received.value
+                    val rec = stateManager.received.value
                     var msg = ""
                     if (rec.powerENX == 1 && rec.powerENY == 0) {
                         if (rec.getCurrentX < ERROR_CURRENT) {
@@ -436,19 +431,19 @@ class HomeViewModel @Inject constructor(
     private fun autoClean() {
         if (cleanJob == null) {
             val job = viewModelScope.launch {
-                val interval = appViewModel.setting.value.interval
-                val duration = appViewModel.setting.value.duration
+                val interval = stateManager.setting.value.interval
+                val duration = stateManager.setting.value.duration
                 while (true) {
                     delay(interval * 60 * 1000L)
                     viewModelScope.launch {
                         // 开启直流泵
-                        appViewModel.send(appViewModel.send.value.apply {
+                        stateManager.send(stateManager.send.value.apply {
                             motorX = 1
                             motorY = 1
                         })
                         delay(duration * 1000L)
                         // 关闭直流泵
-                        appViewModel.send(appViewModel.send.value.apply {
+                        stateManager.send(stateManager.send.value.apply {
                             motorX = 0
                             motorY = 0
                         })
@@ -483,7 +478,7 @@ class HomeViewModel @Inject constructor(
      */
     private fun playAudio(id: Int) {
         viewModelScope.launch {
-            if (appViewModel.setting.value.audio) {
+            if (stateManager.setting.value.audio) {
                 AudioPlayer.instance.play(id)
             }
         }

@@ -13,8 +13,8 @@ import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.common.adapter.CalibrationAdapter
 import com.zktony.www.databinding.FragmentCalibrationBinding
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class CalibrationFragment :
     BaseFragment<CalibrationViewModel, FragmentCalibrationBinding>(R.layout.fragment_calibration) {

@@ -2,33 +2,22 @@ package com.zktony.www.common.worker
 
 import android.content.Context
 import android.util.Log
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.zktony.www.data.local.room.dao.ProgramDao
 import com.zktony.www.data.remote.model.ProgramDTO
 import com.zktony.www.data.remote.service.ProgramService
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
-import javax.inject.Inject
+import org.koin.core.component.KoinComponent
 
-/**
- * @author: 刘贺贺
- * @date: 2022-09-20 14:47
- */
-@HiltWorker
-class ProgramWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParams: WorkerParameters,
-) : CoroutineWorker(appContext, workerParams) {
 
-    @Inject
-    lateinit var dao: ProgramDao
-
-    @Inject
-    lateinit var service: ProgramService
+class ProgramWorker constructor(
+    private val dao: ProgramDao,
+    private val service: ProgramService,
+    appContext: Context,
+    workerParams: WorkerParameters,
+) : CoroutineWorker(appContext, workerParams), KoinComponent {
 
     override suspend fun doWork(): Result {
         try {
