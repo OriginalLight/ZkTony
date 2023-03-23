@@ -52,7 +52,7 @@
     <string name="to">~</string>
     <string name="vol">电压 V</string>
     <string name="voltage_rs">电压（0 ~ 30）V</string>
-    <string name="voltage_zm">电压（0 ~ 65）V</string>
+    <string name="voltage_zm">电压（0 ~ 50）V</string>
     <string name="water_kind">缓冲液种类</string>
     <string name="zm">转膜</string>
     <string name="app_name">转膜仪</string>
