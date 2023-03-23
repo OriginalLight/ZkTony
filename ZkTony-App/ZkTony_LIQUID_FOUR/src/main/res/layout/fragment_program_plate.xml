@@ -74,7 +74,8 @@
                     android:layout_marginStart="16dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_one"/>
+                    app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_one"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/hole_one"
@@ -92,7 +93,8 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/light_primary"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 
                 <com.zktony.common.widget.DynamicPlate
                     android:id="@+id/dynamic_plate_one"
@@ -131,7 +133,8 @@
                     android:layout_marginStart="16dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_two"/>
+                    app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_two"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/hole_two"
@@ -149,7 +152,8 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/light_primary"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <com.zktony.common.widget.DynamicPlate
                     android:id="@+id/dynamic_plate_two"
@@ -188,7 +192,8 @@
                     android:layout_marginStart="16dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_three"/>
+                    app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_three"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/hole_three"
@@ -206,7 +211,8 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/light_primary"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <com.zktony.common.widget.DynamicPlate
                     android:id="@+id/dynamic_plate_three"
@@ -245,7 +251,8 @@
                     android:layout_marginStart="16dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_four"/>
+                    app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_four"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/hole_four"
@@ -263,7 +270,8 @@
                     android:layout_height="wrap_content"
                     android:buttonTint="@color/light_primary"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <com.zktony.common.widget.DynamicPlate
                     android:id="@+id/dynamic_plate_four"

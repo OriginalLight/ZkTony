@@ -19,7 +19,8 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:background="@color/light_onPrimary">
+            android:background="@color/light_onPrimary"
+            tools:ignore="TextSizeCheck">
 
             <ImageButton
                 android:id="@+id/back"
@@ -50,7 +51,8 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            tools:ignore="DisableBaselineAlignment">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -63,7 +65,8 @@
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    tools:ignore="UselessParent">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -109,7 +112,7 @@
                                 android:inputType="numberDecimal"
                                 android:paddingStart="8dp"
                                 android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
+                                tools:ignore="RtlSymmetry,DuplicateSpeakableTextCheck,TextContrastCheck,TouchTargetSizeCheck" />
 
                             <EditText
                                 android:id="@+id/waste_z"
@@ -122,7 +125,7 @@
                                 android:inputType="numberDecimal"
                                 android:paddingStart="8dp"
                                 android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
+                                tools:ignore="RtlSymmetry,DuplicateSpeakableTextCheck,TextContrastCheck,TouchTargetSizeCheck" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -153,7 +156,7 @@
                                 android:inputType="numberDecimal"
                                 android:paddingStart="8dp"
                                 android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
+                                tools:ignore="RtlSymmetry,TextContrastCheck,TouchTargetSizeCheck" />
 
                             <EditText
                                 android:id="@+id/wash_z"
@@ -166,7 +169,7 @@
                                 android:inputType="numberDecimal"
                                 android:paddingStart="8dp"
                                 android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
+                                tools:ignore="RtlSymmetry,TextContrastCheck,TouchTargetSizeCheck" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -197,7 +200,7 @@
                                 android:inputType="numberDecimal"
                                 android:paddingStart="8dp"
                                 android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
+                                tools:ignore="RtlSymmetry,TextContrastCheck,TouchTargetSizeCheck" />
 
                             <EditText
                                 android:id="@+id/block_z"
@@ -210,7 +213,7 @@
                                 android:inputType="numberDecimal"
                                 android:paddingStart="8dp"
                                 android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
+                                tools:ignore="RtlSymmetry,TextContrastCheck,TouchTargetSizeCheck" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -241,7 +244,7 @@
                                 android:inputType="numberDecimal"
                                 android:paddingStart="8dp"
                                 android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
+                                tools:ignore="RtlSymmetry,TextContrastCheck,TouchTargetSizeCheck" />
 
                             <EditText
                                 android:id="@+id/two_z"
@@ -254,7 +257,7 @@
                                 android:inputType="numberDecimal"
                                 android:paddingStart="8dp"
                                 android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
+                                tools:ignore="RtlSymmetry,TextContrastCheck,TouchTargetSizeCheck" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -285,7 +288,7 @@
                                 android:inputType="numberDecimal"
                                 android:paddingStart="8dp"
                                 android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
+                                tools:ignore="RtlSymmetry,TextContrastCheck,TouchTargetSizeCheck" />
 
                             <EditText
                                 android:id="@+id/one_z"
@@ -298,7 +301,7 @@
                                 android:inputType="numberDecimal"
                                 android:paddingStart="8dp"
                                 android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
+                                tools:ignore="RtlSymmetry,TextContrastCheck,TouchTargetSizeCheck" />
 
                             <EditText
                                 android:id="@+id/recycle_one_z"
@@ -311,7 +314,7 @@
                                 android:inputType="numberDecimal"
                                 android:paddingStart="8dp"
                                 android:textSize="14sp"
-                                tools:ignore="RtlSymmetry" />
+                                tools:ignore="RtlSymmetry,TextContrastCheck,TouchTargetSizeCheck" />
 
                         </LinearLayout>
 
@@ -329,7 +332,8 @@
                             android:textColor="@color/light_onPrimary"
                             android:textSize="20sp"
                             app:cornerRadius="24dp"
-                            app:rippleColor="#7B1FA2" />
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
 
                     </LinearLayout>
 
@@ -349,7 +353,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_horizontal"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    tools:ignore="UselessParent">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -378,7 +383,8 @@
                             android:layout_weight="1"
                             android:text="@string/to_waste_y"
                             app:cornerRadius="24dp"
-                            app:rippleColor="#7B1FA2" />
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/to_waste_z"
@@ -388,7 +394,8 @@
                             android:layout_weight="1"
                             android:text="@string/to_waste_z"
                             app:cornerRadius="24dp"
-                            app:rippleColor="#7B1FA2" />
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
 
                     </LinearLayout>
 
@@ -409,7 +416,8 @@
                             android:layout_weight="1"
                             android:text="@string/to_wash_y"
                             app:cornerRadius="24dp"
-                            app:rippleColor="#7B1FA2" />
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/to_wash_z"
@@ -419,7 +427,8 @@
                             android:layout_weight="1"
                             android:text="@string/to_wash_z"
                             app:cornerRadius="24dp"
-                            app:rippleColor="#7B1FA2" />
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
 
                     </LinearLayout>
 
@@ -440,7 +449,8 @@
                             android:layout_weight="1"
                             android:text="@string/to_block_y"
                             app:cornerRadius="24dp"
-                            app:rippleColor="#7B1FA2" />
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/to_block_z"
@@ -450,7 +460,8 @@
                             android:layout_weight="1"
                             android:text="@string/to_block_z"
                             app:cornerRadius="24dp"
-                            app:rippleColor="#7B1FA2" />
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
 
                     </LinearLayout>
 
@@ -471,7 +482,8 @@
                             android:layout_weight="1"
                             android:text="@string/to_two_y"
                             app:cornerRadius="24dp"
-                            app:rippleColor="#7B1FA2" />
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/to_two_z"
@@ -481,7 +493,8 @@
                             android:layout_weight="1"
                             android:text="@string/to_two_z"
                             app:cornerRadius="24dp"
-                            app:rippleColor="#7B1FA2" />
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
 
                     </LinearLayout>
 
@@ -543,7 +556,8 @@
                             android:layout_weight="1"
                             android:text="@string/to_zero"
                             app:cornerRadius="24dp"
-                            app:rippleColor="#7B1FA2" />
+                            app:rippleColor="#7B1FA2"
+                            tools:ignore="VisualLintButtonSize" />
 
                     </LinearLayout>
 

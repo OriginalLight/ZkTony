@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="600dp"
     android:layout_height="wrap_content"
     app:cardBackgroundColor="@color/light_onPrimary"
@@ -51,7 +52,8 @@
                 android:imeOptions="actionDone"
                 android:inputType="number"
                 android:textColor="@color/black"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="Autofill,HardcodedText,LabelFor" />
 
         </LinearLayout>
 
@@ -82,11 +84,12 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:layout_weight="1"
+                android:backgroundTint="@color/light_error"
                 android:text="@string/stop"
                 android:textSize="16sp"
                 app:cornerRadius="18dp"
-                android:backgroundTint="@color/light_error"
-                app:rippleColor="@color/purple_700" />
+                app:rippleColor="@color/purple_700"
+                tools:ignore="TextContrastCheck" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/cancel"

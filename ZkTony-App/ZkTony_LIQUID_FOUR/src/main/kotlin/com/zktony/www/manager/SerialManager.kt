@@ -49,7 +49,7 @@ class SerialManager(
                         TTYS0 -> {
                             data.verifyHex().forEach {
                                 _ttys0Flow.value = it
-                               it.hexFormat().logd("串口一 receivedHex: ")
+                                it.hexFormat().logd("串口一 receivedHex: ")
                             }
                         }
                         Serial.TTYS3 -> {

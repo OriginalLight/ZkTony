@@ -12,7 +12,7 @@ import com.zktony.common.utils.Snowflake
 data class Plate(
     @PrimaryKey
     val id: Long = Snowflake(1).nextId(),
-    val subId : Long = 0L,
+    val subId: Long = 0L,
     val index: Int = 0,
     val x: Int = 8,
     val y: Int = 12,

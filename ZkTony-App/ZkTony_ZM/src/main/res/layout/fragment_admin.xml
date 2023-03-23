@@ -363,7 +363,7 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:src="@mipmap/device"
-                            tools:ignore="ContentDescription" />
+                            tools:ignore="ContentDescription,ImageContrastCheck" />
 
                         <TextView
                             android:layout_width="wrap_content"

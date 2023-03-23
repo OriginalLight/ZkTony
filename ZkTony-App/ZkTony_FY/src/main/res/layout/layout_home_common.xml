@@ -17,7 +17,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,ImageContrastCheck,SpeakableTextPresentCheck,VisualLintBounds" />
 
         <TextView
             android:id="@+id/tv_reset"
@@ -37,7 +37,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/reset"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,SpeakableTextPresentCheck,VisualLintBounds" />
 
         <TextView
             android:id="@+id/tv_pause"
@@ -46,7 +46,8 @@
             android:text="@string/pause"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pause" />
+            app:layout_constraintTop_toBottomOf="@+id/pause"
+            tools:ignore="TextContrastCheck" />
 
         <ImageButton
             android:id="@+id/insulating"
@@ -57,7 +58,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pause"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,ImageContrastCheck,SpeakableTextPresentCheck,VisualLintBounds" />
 
         <TextView
             android:id="@+id/tv_insulating"
@@ -77,7 +78,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/insulating"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,ImageContrastCheck,SpeakableTextPresentCheck,VisualLintBounds" />
 
         <TextView
             android:id="@+id/tv_lock"

@@ -19,7 +19,8 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:background="@color/light_onPrimary">
+            android:background="@color/light_onPrimary"
+            tools:ignore="TextSizeCheck">
 
             <ImageButton
                 android:id="@+id/btn_back"
@@ -69,7 +70,8 @@
                     android:layout_height="300dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="128dp"
-                    android:background="@mipmap/empty" />
+                    android:background="@mipmap/empty"
+                    tools:ignore="ContentDescription,ImageContrastCheck,VisualLintBounds" />
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycle_view"
@@ -134,7 +136,8 @@
                             app:elevation="2dp"
                             app:icon="@mipmap/expand_arrow"
                             app:iconSize="16dp"
-                            app:rippleColor="#6200EA" />
+                            app:rippleColor="#6200EA"
+                            tools:ignore="SpeakableTextPresentCheck,VisualLintButtonSize" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -148,7 +151,8 @@
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:layout_gravity="center_vertical"
-                                android:background="@mipmap/sorting" />
+                                android:background="@mipmap/sorting"
+                                tools:ignore="ContentDescription,ImageContrastCheck" />
 
                             <TextView
                                 android:layout_width="96dp"
@@ -163,14 +167,15 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:cursorVisible="true"
-                                android:inputType="number"
                                 android:background="@color/light_onPrimary"
+                                android:cursorVisible="true"
                                 android:gravity="center"
+                                android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textColor="@color/black"
-                                android:textSize="18sp" />
+                                android:textSize="18sp"
+                                tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
 
                         </LinearLayout>
@@ -193,7 +198,8 @@
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:layout_gravity="center_vertical"
-                                android:background="@mipmap/time" />
+                                android:background="@mipmap/time"
+                                tools:ignore="ContentDescription" />
 
                             <TextView
                                 android:id="@+id/tv_time"
@@ -202,21 +208,23 @@
                                 android:layout_marginStart="4dp"
                                 android:gravity="start|center_vertical"
                                 android:text="@string/hint_time_min"
-                                android:textSize="16sp" />
+                                android:textSize="16sp"
+                                tools:ignore="TextSizeCheck" />
 
                             <EditText
                                 android:id="@+id/time"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:cursorVisible="true"
                                 android:background="@color/light_onPrimary"
+                                android:cursorVisible="true"
                                 android:gravity="center"
                                 android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textColor="@color/black"
-                                android:textSize="18sp" />
+                                android:textSize="18sp"
+                                tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
 
                         </LinearLayout>
@@ -239,7 +247,8 @@
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:layout_gravity="center_vertical"
-                                android:background="@mipmap/temperature" />
+                                android:background="@mipmap/temperature"
+                                tools:ignore="ContentDescription,ImageContrastCheck" />
 
                             <TextView
                                 android:layout_width="96dp"
@@ -254,14 +263,15 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:cursorVisible="true"
                                 android:background="@color/light_onPrimary"
+                                android:cursorVisible="true"
                                 android:gravity="center"
                                 android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textColor="@color/black"
-                                android:textSize="18sp" />
+                                android:textSize="18sp"
+                                tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
 
                         </LinearLayout>
@@ -284,7 +294,8 @@
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:layout_gravity="center_vertical"
-                                android:background="@mipmap/water" />
+                                android:background="@mipmap/water"
+                                tools:ignore="ContentDescription,ImageContrastCheck" />
 
                             <TextView
                                 android:layout_width="96dp"
@@ -292,21 +303,23 @@
                                 android:layout_marginStart="4dp"
                                 android:gravity="start|center_vertical"
                                 android:text="@string/hint_liquid_volume"
-                                android:textSize="16sp" />
+                                android:textSize="16sp"
+                                tools:ignore="TextSizeCheck" />
 
                             <EditText
                                 android:id="@+id/liquid_volume"
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:cursorVisible="true"
                                 android:background="@color/light_onPrimary"
+                                android:cursorVisible="true"
                                 android:gravity="center"
                                 android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textColor="@color/black"
-                                android:textSize="18sp" />
+                                android:textSize="18sp"
+                                tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
 
                         </LinearLayout>
@@ -330,7 +343,8 @@
                                 android:layout_width="36dp"
                                 android:layout_height="36dp"
                                 android:layout_gravity="center_vertical"
-                                android:background="@mipmap/counter" />
+                                android:background="@mipmap/counter"
+                                tools:ignore="ContentDescription" />
 
                             <TextView
                                 android:layout_width="96dp"
@@ -345,14 +359,15 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:cursorVisible="true"
-                                android:inputType="number"
                                 android:background="@color/light_onPrimary"
-                                android:maxLength="50"
+                                android:cursorVisible="true"
                                 android:gravity="center"
+                                android:inputType="number"
+                                android:maxLength="50"
                                 android:singleLine="true"
                                 android:textColor="@color/black"
-                                android:textSize="18sp" />
+                                android:textSize="18sp"
+                                tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
                         </LinearLayout>
 
                         <com.google.android.material.divider.MaterialDivider
@@ -377,7 +392,8 @@
                             android:textSize="20sp"
                             app:cornerRadius="24dp"
                             app:iconTint="@color/light_onPrimary"
-                            app:rippleColor="@color/light_error" />
+                            app:rippleColor="@color/light_error"
+                            tools:ignore="VisualLintButtonSize" />
 
                     </LinearLayout>
 

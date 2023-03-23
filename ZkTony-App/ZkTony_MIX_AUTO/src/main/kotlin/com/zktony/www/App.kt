@@ -6,9 +6,11 @@ import com.zktony.common.ext.Ext
 import com.zktony.www.data.local.datastore.DataStoreFactory
 import com.zktony.www.di.*
 import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.component.KoinComponent
 import org.koin.core.context.startKoin
+import org.koin.core.logger.Level
 
 /**
  * @author: 刘贺贺
@@ -23,6 +25,7 @@ class App : Application(), KoinComponent {
 
         startKoin {
             androidContext(this@App)
+            androidLogger(Level.INFO)
             workManagerFactory()
             modules(
                 localModule,

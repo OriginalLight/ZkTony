@@ -25,7 +25,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="VisualLintBounds" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/position"
@@ -43,7 +44,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:rippleColor="@color/purple_700"
-                tools:ignore="VisualLintButtonSize" />
+                tools:ignore="VisualLintButtonSize,VisualLintBounds" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>

@@ -19,7 +19,8 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:background="@color/light_onPrimary">
+            android:background="@color/light_onPrimary"
+            tools:ignore="TextSizeCheck">
 
             <ImageButton
                 android:id="@+id/back"
@@ -93,7 +94,7 @@
                         android:inputType="text"
                         android:textColor="@color/black"
                         android:textSize="22sp"
-                        tools:ignore="LabelFor" />
+                        tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
                 </LinearLayout>
 
@@ -134,7 +135,7 @@
                         android:inputType="text"
                         android:textColor="@color/black"
                         android:textSize="22sp"
-                        tools:ignore="LabelFor" />
+                        tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
                 </LinearLayout>
 
@@ -153,7 +154,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="8dp"
                         android:src="@mipmap/size"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription,ImageContrastCheck" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -175,7 +176,7 @@
                         android:inputType="numberDecimal"
                         android:textColor="@color/black"
                         android:textSize="22sp"
-                        tools:ignore="LabelFor" />
+                        tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -197,7 +198,7 @@
                         android:inputType="numberDecimal"
                         android:textColor="@color/black"
                         android:textSize="22sp"
-                        tools:ignore="LabelFor" />
+                        tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
                 </LinearLayout>
 
@@ -216,7 +217,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="8dp"
                         android:src="@mipmap/sorting"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription,ImageContrastCheck" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -242,7 +243,8 @@
                             android:checked="true"
                             android:gravity="center"
                             android:text="@string/jiao_normal"
-                            android:textSize="22sp" />
+                            android:textSize="22sp"
+                            tools:ignore="VisualLintButtonSize" />
 
                         <RadioButton
                             android:id="@+id/radio_jiao_special"
@@ -251,7 +253,8 @@
                             android:layout_weight="1"
                             android:gravity="center"
                             android:text="@string/jiao_special"
-                            android:textSize="22sp" />
+                            android:textSize="22sp"
+                            tools:ignore="VisualLintButtonSize" />
 
                     </RadioGroup>
 
@@ -296,7 +299,7 @@
                         android:inputType="numberDecimal"
                         android:textColor="@color/black"
                         android:textSize="22sp"
-                        tools:ignore="LabelFor" />
+                        tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
                 </LinearLayout>
 
@@ -380,7 +383,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="8dp"
                         android:src="@mipmap/size_vertical"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription,ImageContrastCheck" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -406,7 +409,8 @@
                             android:checked="true"
                             android:gravity="center"
                             android:text="@string/jiao_075"
-                            android:textSize="22sp" />
+                            android:textSize="22sp"
+                            tools:ignore="VisualLintButtonSize" />
 
                         <RadioButton
                             android:id="@+id/radio_jiao_10"
@@ -415,7 +419,8 @@
                             android:layout_weight="1"
                             android:gravity="center"
                             android:text="@string/jiao_10"
-                            android:textSize="22sp" />
+                            android:textSize="22sp"
+                            tools:ignore="VisualLintButtonSize" />
 
                         <RadioButton
                             android:id="@+id/radio_jiao_15"
@@ -424,7 +429,8 @@
                             android:layout_weight="1"
                             android:gravity="center"
                             android:text="@string/jiao_15"
-                            android:textSize="22sp" />
+                            android:textSize="22sp"
+                            tools:ignore="VisualLintButtonSize" />
 
                     </RadioGroup>
 
@@ -446,7 +452,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="8dp"
                         android:src="@mipmap/water"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription,ImageContrastCheck" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -472,7 +478,8 @@
                             android:checked="true"
                             android:gravity="center"
                             android:text="@string/factory"
-                            android:textSize="22sp" />
+                            android:textSize="22sp"
+                            tools:ignore="VisualLintButtonSize" />
 
                         <RadioButton
                             android:id="@+id/other"
@@ -481,7 +488,8 @@
                             android:layout_weight="1"
                             android:gravity="center"
                             android:text="@string/other"
-                            android:textSize="22sp" />
+                            android:textSize="22sp"
+                            tools:ignore="VisualLintButtonSize" />
 
                     </RadioGroup>
 
@@ -546,7 +554,7 @@
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="8dp"
                         android:src="@mipmap/voltage"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription,ImageContrastCheck" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -568,7 +576,7 @@
                         android:inputType="numberDecimal"
                         android:textColor="@color/black"
                         android:textSize="22sp"
-                        tools:ignore="LabelFor" />
+                        tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
                 </LinearLayout>
 
@@ -609,7 +617,7 @@
                         android:inputType="number"
                         android:textColor="@color/black"
                         android:textSize="22sp"
-                        tools:ignore="LabelFor" />
+                        tools:ignore="LabelFor,SpeakableTextPresentCheck,VisualLintTextFieldSize" />
 
                 </LinearLayout>
 
@@ -650,7 +658,7 @@
                         android:inputType="numberDecimal"
                         android:textColor="@color/black"
                         android:textSize="22sp"
-                        tools:ignore="LabelFor" />
+                        tools:ignore="LabelFor,VisualLintTextFieldSize" />
 
                 </LinearLayout>
 
@@ -689,7 +697,8 @@
                         app:cornerRadius="32dp"
                         app:rippleColor="@color/purple_700"
                         app:strokeColor="@color/light_primary"
-                        app:strokeWidth="3dp" />
+                        app:strokeWidth="3dp"
+                        tools:ignore="VisualLintButtonSize" />
 
                 </LinearLayout>
 

@@ -86,7 +86,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="@mipmap/empty" />
+            android:background="@mipmap/empty"
+            tools:ignore="ContentDescription,ImageContrastCheck" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"

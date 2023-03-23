@@ -74,7 +74,7 @@ class CalibrationDataViewModel constructor(
 
     fun save() {
         viewModelScope.launch {
-            val cali =  CalibrationData(
+            val cali = CalibrationData(
                 pumpId = _uiState.value.pumpId,
                 subId = _uiState.value.cali?.id ?: 0L,
                 expect = _uiState.value.expect,

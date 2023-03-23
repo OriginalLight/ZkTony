@@ -34,9 +34,10 @@ class ProgramPlateViewModel constructor(
                     _uiState.value = _uiState.value.copy(plateList = it)
                     if (it.isNotEmpty()) {
                         launch {
-                            holeDao.getBySudIdList(it.map { plate -> plate.id }).collect { holeList ->
-                                _uiState.value = _uiState.value.copy(holeList = holeList)
-                            }
+                            holeDao.getBySudIdList(it.map { plate -> plate.id })
+                                .collect { holeList ->
+                                    _uiState.value = _uiState.value.copy(holeList = holeList)
+                                }
                         }
                     }
                 }

@@ -22,7 +22,8 @@
             app:layout_constraintEnd_toEndOf="parent"
 
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="TextSizeCheck">
 
             <ImageButton
                 android:id="@+id/back"
@@ -181,15 +182,16 @@
                                 app:cornerRadius="0dp"
                                 app:elevation="2dp"
                                 app:icon="@mipmap/expand_arrow"
-                                app:iconSize="16dp"
                                 app:iconGravity="end"
                                 app:iconPadding="0dp"
+                                app:iconSize="16dp"
                                 app:iconTint="@color/black"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/tv_mode"
                                 app:layout_constraintTop_toTopOf="parent"
-                                app:rippleColor="@color/light_primary" />
+                                app:rippleColor="@color/light_primary"
+                                tools:ignore="SpeakableTextPresentCheck,VisualLintButtonSize" />
 
                             <View
                                 android:layout_width="match_parent"
@@ -215,7 +217,7 @@
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
-                                tools:ignore="ContentDescription" />
+                                tools:ignore="ContentDescription,ImageContrastCheck" />
 
                             <TextView
                                 android:id="@+id/tv_subdivision"
@@ -250,15 +252,16 @@
                                 app:cornerRadius="0dp"
                                 app:elevation="2dp"
                                 app:icon="@mipmap/expand_arrow"
-                                app:iconSize="16dp"
                                 app:iconGravity="end"
                                 app:iconPadding="0dp"
+                                app:iconSize="16dp"
                                 app:iconTint="@color/black"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toEndOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/tv_subdivision"
                                 app:layout_constraintTop_toTopOf="parent"
-                                app:rippleColor="@color/light_primary" />
+                                app:rippleColor="@color/light_primary"
+                                tools:ignore="SpeakableTextPresentCheck,VisualLintButtonSize" />
 
                             <View
                                 android:layout_width="match_parent"
@@ -284,7 +287,7 @@
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
-                                tools:ignore="ContentDescription" />
+                                tools:ignore="ContentDescription,ImageContrastCheck" />
 
                             <TextView
                                 android:id="@+id/tv_speed"
@@ -295,22 +298,22 @@
                                 android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/icon_speed"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="VisualLintOverlap" />
 
                             <EditText
                                 android:id="@+id/speed"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
-                                android:layout_marginStart="128dp"
-                                android:layout_marginBottom="2dp"
-                                android:cursorVisible="true"
                                 android:background="@color/light_onPrimary"
-                                android:inputType="number"
+                                android:layout_marginStart="128dp"
                                 android:gravity="center"
+                                android:cursorVisible="true"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp"
-                                tools:ignore="MissingConstraints" />
+                                android:inputType="number"
+                                tools:ignore="Autofill,LabelFor,MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
 
                             <View
@@ -347,22 +350,22 @@
                                 android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/icon_wait_time"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="VisualLintOverlap" />
 
                             <EditText
                                 android:id="@+id/wait_time"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
                                 android:layout_marginStart="128dp"
-                                android:layout_marginBottom="2dp"
                                 android:cursorVisible="true"
-                                android:background="@color/light_onPrimary"
-                                android:inputType="number"
                                 android:gravity="center"
+                                android:background="@color/light_onPrimary"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp"
-                                tools:ignore="MissingConstraints" />
+                                android:inputType="number"
+                                tools:ignore="Autofill,LabelFor,MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
 
                             <View
@@ -388,7 +391,7 @@
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
-                                tools:ignore="ContentDescription" />
+                                tools:ignore="ContentDescription,ImageContrastCheck" />
 
                             <TextView
                                 android:id="@+id/tv_acceleration"
@@ -399,22 +402,22 @@
                                 android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/icon_acceleration"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="VisualLintOverlap" />
 
                             <EditText
                                 android:id="@+id/acceleration"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
-                                android:layout_marginStart="128dp"
-                                android:layout_marginBottom="2dp"
-                                android:cursorVisible="true"
                                 android:background="@color/light_onPrimary"
-                                android:inputType="number"
+                                android:layout_marginStart="128dp"
                                 android:gravity="center"
+                                android:cursorVisible="true"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp"
-                                tools:ignore="MissingConstraints" />
+                                android:inputType="number"
+                                tools:ignore="Autofill,LabelFor,MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
 
                             <View
@@ -440,7 +443,7 @@
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
-                                tools:ignore="ContentDescription" />
+                                tools:ignore="ContentDescription,ImageContrastCheck" />
 
                             <TextView
                                 android:id="@+id/tv_deceleration"
@@ -451,22 +454,22 @@
                                 android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/icon_deceleration"
-                                app:layout_constraintTop_toTopOf="parent" />
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:ignore="VisualLintOverlap" />
 
                             <EditText
                                 android:id="@+id/deceleration"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
                                 android:layout_marginStart="128dp"
-                                android:layout_marginBottom="2dp"
                                 android:cursorVisible="true"
                                 android:background="@color/light_onPrimary"
                                 android:inputType="number"
-                                android:gravity="center"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp"
-                                tools:ignore="MissingConstraints" />
+                                android:gravity="center"
+                                tools:ignore="Autofill,LabelFor,MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
 
                             <View
@@ -489,7 +492,8 @@
                             android:textColor="@color/light_onPrimary"
                             android:textSize="20sp"
                             app:cornerRadius="24dp"
-                            app:rippleColor="@color/light_error" />
+                            app:rippleColor="@color/light_error"
+                            tools:ignore="VisualLintButtonSize" />
 
                     </LinearLayout>
 

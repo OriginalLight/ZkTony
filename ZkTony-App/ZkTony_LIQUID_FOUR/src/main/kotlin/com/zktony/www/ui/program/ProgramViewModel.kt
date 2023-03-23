@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
-class ProgramViewModel  constructor(
+class ProgramViewModel constructor(
     private val dao: ProgramDao,
     private val plateDao: PlateDao,
     private val holeDao: HoleDao

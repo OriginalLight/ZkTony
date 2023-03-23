@@ -6,10 +6,6 @@ package com.zktony.common.utils
  */
 object Constants {
     const val AUDIO = "AUDIO"
-    const val BACKGROUND_WORKER_NAME_LOG = "BACKGROUND_WORKER_NAME_LOG"
-    const val BACKGROUND_WORKER_NAME_LOG_DATA = "BACKGROUND_WORKER_NAME_LOG_DATA"
-    const val BACKGROUND_WORKER_NAME_LOG_RECORD = "BACKGROUND_WORKER_NAME_LOG_RECORD"
-    const val BACKGROUND_WORKER_NAME_PROGRAM = "BACKGROUND_WORKER_NAME_PROGRAM"
     const val BAR = "BAR"
     //const val BASE_URL = "http://182.160.14.59:30765"
     const val BASE_URL = "https://www.liuhh.net/api/"

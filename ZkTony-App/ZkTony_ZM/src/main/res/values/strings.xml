@@ -8,7 +8,6 @@
     <string name="danbai_kd">蛋白大小范围（kD）</string>
     <string name="danbai_name">使用蛋白名称</string>
     <string name="detect">异常检测</string>
-    <string name="device">设备信息</string>
     <string name="experiment_time">实验日期</string>
     <string name="factory">厂家</string>
     <string name="hide">隐藏</string>
@@ -25,8 +24,6 @@
     <string name="models">模式</string>
     <string name="motor">泵速（0 ~ 250）RPM</string>
     <string name="navigation">导航栏</string>
-    <string name="no_log">没有日志</string>
-    <string name="notice">注意事项</string>
     <string name="notice_content">1. 请确认模块已经完全插入并正确识别后开始实验。\n2. 请确保管路正确安装后开始实验。\n3. 请勿在实验进行中插拔模块。\n4. 请在实验完成后清洗管路。\n5. 请在阅读使用说明后使用。</string>
     <string name="off">OFF</string>
     <string name="order">序号</string>

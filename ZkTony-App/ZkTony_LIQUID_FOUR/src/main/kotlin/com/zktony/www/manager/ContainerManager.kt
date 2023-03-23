@@ -24,7 +24,7 @@ class ContainerManager constructor(
         scope.launch {
             containerDao.getAll().collect {
                 if (it.isEmpty()) {
-                    containerDao.insert(Container(id = 1L, name = "默认容器",))
+                    containerDao.insert(Container(id = 1L, name = "默认容器"))
                     val plate1 = Plate(id = 1L, subId = 1L, index = 0)
                     val plate2 = Plate(id = 2L, subId = 1L, index = 1)
                     val plate3 = Plate(id = 3L, subId = 1L, index = 2)
@@ -46,7 +46,7 @@ class ContainerManager constructor(
     private suspend fun initHole(plate: Plate) {
         val snowflake = Snowflake(2)
         val holes = mutableListOf<Hole>()
-        for (i in 0 until  plate.x) {
+        for (i in 0 until plate.x) {
             for (j in 0 until plate.y) {
                 holes.add(Hole(id = snowflake.nextId(), subId = plate.id, x = i, y = j))
             }

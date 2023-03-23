@@ -81,9 +81,10 @@
                 android:textColor="@color/light_onPrimary"
                 android:textSize="16sp"
                 app:icon="@mipmap/plus"
-                app:iconSize="24dp"
                 app:iconGravity="textStart"
-                app:rippleColor="#7B1FA2" />
+                app:iconSize="24dp"
+                app:rippleColor="#7B1FA2"
+                tools:ignore="TextContrastCheck" />
 
         </LinearLayout>
 
@@ -92,7 +93,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="@mipmap/empty" />
+            android:background="@mipmap/empty"
+            tools:ignore="ContentDescription,ImageContrastCheck" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_view"

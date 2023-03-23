@@ -38,7 +38,7 @@ class AdminViewModel constructor(
     private val dataStore: DataStore<Preferences>,
     private val dao: MotorDao,
     private val service: ApplicationService,
-    private val serial: SerialManager
+    private val serialManager: SerialManager
 ) : BaseViewModel() {
 
 
@@ -52,21 +52,21 @@ class AdminViewModel constructor(
     init {
         viewModelScope.launch {
             launch {
-                serial.ttys0Flow.collect {
+                serialManager.ttys0Flow.collect {
                     it?.let {
                         onSerialOneResponse(it)
                     }
                 }
             }
             launch {
-                serial.ttys3Flow.collect {
+                serialManager.ttys3Flow.collect {
                     it?.let {
                         onSerialThreeResponse(it)
                     }
                 }
             }
             launch {
-                if (!serial.lock.value) {
+                if (!serialManager.lock.value) {
                     syncMotor()
                 }
             }
@@ -241,7 +241,7 @@ class AdminViewModel constructor(
                         0 -> Serial.TTYS0
                         else -> Serial.TTYS3
                     }
-                    serial.sendHex(
+                    serialManager.sendHex(
                         serial = port,
                         hex = V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex()
                     )

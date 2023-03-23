@@ -88,7 +88,7 @@
                 android:layout_weight="1"
                 android:background="@color/light_errorContainer"
                 android:gravity="center"
-                tools:ignore="NestedWeights">
+                tools:ignore="NestedWeights,UselessParent">
 
                 <ImageView
                     android:layout_width="30dp"

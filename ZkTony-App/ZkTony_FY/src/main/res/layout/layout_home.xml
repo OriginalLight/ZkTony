@@ -33,15 +33,16 @@
                 android:singleLine="true"
                 android:textAllCaps="false"
                 android:textColor="@color/light_onPrimary"
+                android:textSize="18sp"
                 app:cornerRadius="2dp"
                 app:elevation="0dp"
-                android:textSize="18sp"
                 app:icon="@mipmap/program"
                 app:iconSize="32dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:rippleColor="@color/purple_700" />
+                app:rippleColor="@color/purple_700"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <com.zktony.common.widget.MarqueTextView
                 android:id="@+id/actions"
@@ -61,7 +62,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/tv_icon"
                 app:layout_constraintStart_toEndOf="@+id/select"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="SpeakableTextPresentCheck" />
 
             <TextView
                 android:id="@+id/tv_icon"
@@ -75,7 +77,8 @@
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="VisualLintBounds" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -112,7 +115,7 @@
                         android:layout_height="24dp"
                         android:layout_marginStart="8dp"
                         android:background="@mipmap/done"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription,ImageContrastCheck" />
 
                     <TextView
                         android:id="@+id/status"
@@ -162,7 +165,7 @@
                         android:layout_height="24dp"
                         android:layout_marginStart="8dp"
                         android:background="@mipmap/temperature"
-                        tools:ignore="ContentDescription" />
+                        tools:ignore="ContentDescription,ImageContrastCheck" />
 
                     <TextView
                         android:id="@+id/temp"
@@ -204,7 +207,8 @@
             app:layout_constraintTop_toBottomOf="@id/con_select"
             app:rippleColor="@color/light_error"
             app:strokeColor="@color/dark_onBackground"
-            app:strokeWidth="2dp" />
+            app:strokeWidth="2dp"
+            tools:ignore="TextContrastCheck" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/stop"

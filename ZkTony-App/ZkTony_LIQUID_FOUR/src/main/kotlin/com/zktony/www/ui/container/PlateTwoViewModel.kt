@@ -48,7 +48,7 @@ class PlateTwoViewModel constructor(
                 holeDao.deleteBySubId(it.id)
                 val snowflake = Snowflake(2)
                 val holes = mutableListOf<Hole>()
-                for (i in 0 until  x) {
+                for (i in 0 until x) {
                     for (j in 0 until y) {
                         holes.add(Hole(id = snowflake.nextId(), subId = it.id, x = i, y = j))
                     }
@@ -72,7 +72,8 @@ class PlateTwoViewModel constructor(
                 val x0y0 = _uiState.value.holes.find { it.x == 0 && it.y == 0 }!!
                 holeDao.update(x0y0.copy(xAxis = x, yAxis = y))
             } else {
-                val x1y1 = _uiState.value.holes.find { it.x == _uiState.value.plate!!.x - 1 && it.y == _uiState.value.plate!!.y - 1 }!!
+                val x1y1 =
+                    _uiState.value.holes.find { it.x == _uiState.value.plate!!.x - 1 && it.y == _uiState.value.plate!!.y - 1 }!!
                 holeDao.update(x1y1.copy(xAxis = x, yAxis = y))
             }
             delay(500L)

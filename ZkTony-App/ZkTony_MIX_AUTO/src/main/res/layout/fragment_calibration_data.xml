@@ -19,7 +19,8 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
-            android:background="@color/light_onPrimary">
+            android:background="@color/light_onPrimary"
+            tools:ignore="TextSizeCheck">
 
             <ImageButton
                 android:id="@+id/back"
@@ -161,7 +162,7 @@
                 app:rippleColor="@color/purple_700"
                 app:strokeColor="@color/light_primary"
                 app:strokeWidth="2dp"
-                tools:ignore="NestedWeights" />
+                tools:ignore="NestedWeights,VisualLintButtonSize" />
 
             <EditText
                 android:id="@+id/expect"
@@ -177,7 +178,8 @@
                 android:inputType="numberDecimal"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                tools:ignore="Autofill,DuplicateSpeakableTextCheck" />
 
             <EditText
                 android:id="@+id/actual"
@@ -193,7 +195,8 @@
                 android:inputType="numberDecimal"
                 android:textColor="@color/black"
                 android:textSize="18sp"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+                tools:ignore="Autofill,DuplicateSpeakableTextCheck" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/add_liquid"

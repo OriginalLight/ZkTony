@@ -85,13 +85,14 @@
                 android:textColor="@color/light_onPrimary"
                 android:textSize="16sp"
                 app:icon="@mipmap/plus"
-                app:iconSize="24dp"
                 app:iconGravity="textStart"
+                app:iconSize="24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_weight="2"
                 app:layout_constraintStart_toEndOf="@+id/actions"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                tools:ignore="TextContrastCheck,VisualLintButtonSize" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -103,7 +104,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/title" />
+            app:layout_constraintTop_toBottomOf="@+id/title"
+            tools:ignore="ContentDescription,VisualLintBounds" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycle_view"
