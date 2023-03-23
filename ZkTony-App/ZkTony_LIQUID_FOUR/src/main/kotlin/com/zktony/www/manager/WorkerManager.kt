@@ -15,17 +15,13 @@ import java.util.concurrent.TimeUnit
  */
 class WorkerManager {
 
-    private val logRequest by lazy {
-        PeriodicWorkRequestBuilder<LogWorker>(60, TimeUnit.MINUTES).setConstraints(
-            Constraints.Builder().build()
-        ).build()
-    }
-
     fun createWorker() {
         WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
             UUID.randomUUID().toString(),
             ExistingPeriodicWorkPolicy.UPDATE,
-            logRequest
+            PeriodicWorkRequestBuilder<LogWorker>(1, TimeUnit.HOURS).setConstraints(
+                Constraints.Builder().build()
+            ).build()
         )
     }
 }
