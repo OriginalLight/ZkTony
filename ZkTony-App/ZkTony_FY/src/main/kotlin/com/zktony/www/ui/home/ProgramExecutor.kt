@@ -16,7 +16,6 @@ import kotlinx.coroutines.delay
  * 任务执行器
  * @param queue 任务队列
  * @param module 模块
- * @param settings 设置状态
  * @param scope 协程作用域
  */
 class ProgramExecutor constructor(
@@ -58,15 +57,15 @@ class ProgramExecutor constructor(
         commandExecutor.run {
             initAction(action)
             addBlockingLiquid {
-                event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 开始执行封闭液流程\n"))
+                event(ExecutorEvent.Log(module, "开始执行封闭液流程"))
                 countDown(
                     time = (action.time * 60 * 60).toLong(),
                     onTick = { event(ExecutorEvent.Time(module, it.getTimeFormat())) },
                     onFinish = {
-                        event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 封闭液流程执行完毕\n"))
-                        event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 开始清理封闭液废液\n"))
+                        event(ExecutorEvent.Log(module, "封闭液流程执行完毕"))
+                        event(ExecutorEvent.Log(module, "开始清理封闭液废液"))
                         wasteLiquid {
-                            event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 清理封闭液废液完毕\n"))
+                            event(ExecutorEvent.Log(module, "清理封闭液废液完毕"))
                             executeNext()
                         }
                     })
@@ -81,17 +80,17 @@ class ProgramExecutor constructor(
      */
     private suspend fun executeAntibodyOne(action: Action) {
         commandExecutor.run {
-            event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 开始执行一抗流程\n"))
+            event(ExecutorEvent.Log(module, "开始执行一抗流程"))
             initAction(action)
             addAntibodyOne {
                 countDown(
                     time = (action.time * 60 * 60).toLong(),
                     onTick = { event(ExecutorEvent.Time(module, it.getTimeFormat())) },
                     onFinish = {
-                        event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 一抗流程执行完毕\n"))
-                        event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t开始回收一抗\n"))
+                        event(ExecutorEvent.Log(module, "一抗流程执行完毕"))
+                        event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t开始回收一抗"))
                         recycleAntibodyOne {
-                            event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 回收一抗完毕\n"))
+                            event(ExecutorEvent.Log(module, "回收一抗完毕"))
                             executeNext()
                         }
                     })
@@ -105,17 +104,17 @@ class ProgramExecutor constructor(
      */
     private suspend fun executeAntibodyTwo(action: Action) {
         commandExecutor.run {
-            event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 开始执行二抗流程\n"))
+            event(ExecutorEvent.Log(module, "开始执行二抗流程"))
             initAction(action)
             addAntibodyTwo {
                 countDown(
                     time = (action.time * 60 * 60).toLong(),
                     onTick = { event(ExecutorEvent.Time(module, it.getTimeFormat())) },
                     onFinish = {
-                        event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 二抗流程执行完毕\n"))
-                        event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 开始清理二抗废液\n"))
+                        event(ExecutorEvent.Log(module, "二抗流程执行完毕"))
+                        event(ExecutorEvent.Log(module, "开始清理二抗废液"))
                         wasteLiquid {
-                            event(ExecutorEvent.Log(module, "[ ${currentTime()} ]\t 清理二抗废液完毕\n"))
+                            event(ExecutorEvent.Log(module, "清理二抗废液完毕"))
                             executeNext()
                         }
                     })
@@ -133,7 +132,7 @@ class ProgramExecutor constructor(
             event(
                 ExecutorEvent.Log(
                     module,
-                    "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程开始执行\n"
+                    "第 ${action.count - count + 1} 次洗涤流程开始执行"
                 )
             )
             initAction(action)
@@ -145,20 +144,20 @@ class ProgramExecutor constructor(
                         event(
                             ExecutorEvent.Log(
                                 module,
-                                "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程执行完毕\n"
+                                "第 ${action.count - count + 1} 次洗涤流程执行完毕"
                             )
                         )
                         event(
                             ExecutorEvent.Log(
                                 module,
-                                "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程废液清理开始\n"
+                                "第 ${action.count - count + 1} 次洗涤流程废液清理开始"
                             )
                         )
                         wasteLiquid {
                             event(
                                 ExecutorEvent.Log(
                                     module,
-                                    "[ ${currentTime()} ]\t 第 ${action.count - count + 1} 次洗涤流程废液清理完毕\n"
+                                    "第 ${action.count - count + 1} 次洗涤流程废液清理完毕"
                                 )
                             )
                             if (count - 1 > 0) {

@@ -13,12 +13,17 @@ import com.zktony.common.ext.setEqualText
 import com.zktony.www.R
 import com.zktony.www.data.local.room.entity.Container
 import com.zktony.www.databinding.FragmentContainerBinding
+import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.launch
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ContainerFragment :
     BaseFragment<ContainerViewModel, FragmentContainerBinding>(R.layout.fragment_container) {
+
     override val viewModel: ContainerViewModel by viewModel()
+
+    private val serialManager: SerialManager by inject()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -45,6 +50,24 @@ class ContainerFragment :
                             recycleOneZ.setEqualText(it.recycleOneZ.toString().removeZero())
                             twoY.setEqualText(it.twoY.toString().removeZero())
                             twoZ.setEqualText(it.twoZ.toString().removeZero())
+                        }
+                    }
+                }
+                launch {
+                    serialManager.lock.collect {
+                        binding.apply {
+                            toWashY.isEnabled = !it
+                            toWashZ.isEnabled = !it
+                            toWasteY.isEnabled = !it
+                            toWasteZ.isEnabled = !it
+                            toBlockY.isEnabled = !it
+                            toBlockZ.isEnabled = !it
+                            toOneY.isEnabled = !it
+                            toOneZ.isEnabled = !it
+                            toRecycleOneZ.isEnabled = !it
+                            toTwoY.isEnabled = !it
+                            toTwoZ.isEnabled = !it
+                            toZero.isEnabled = !it
                         }
                     }
                 }

@@ -24,7 +24,7 @@ include(":ZkTony_LIQUID_FOUR")
 include(":ZkTony_TEST")
 include(":ZkTony_ZM")
 include(":ZkTony_MIX_AUTO")
+include(":ZkTony_MIX_MANUAL")
 include(":common")
 include(":gpio")
 include(":serialport")
-

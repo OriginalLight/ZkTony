@@ -24,14 +24,14 @@ android {
         debug {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".mix.debug"
+            applicationIdSuffix = ".mix.auto.debug"
         }
 
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".mix.release"
+            applicationIdSuffix = ".mix.auto.release"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -72,7 +72,7 @@ android {
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-mix-${versionName}-${name}.apk"
+                "zktony-mix-auto-${versionName}-${name}.apk"
         }
     }
 }

@@ -95,7 +95,6 @@ dependencies {
     implementation(libs.chart)
     implementation(libs.datastore.preferences)
     implementation(libs.dialogx)
-    implementation(libs.dialogx)
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.workmanager)

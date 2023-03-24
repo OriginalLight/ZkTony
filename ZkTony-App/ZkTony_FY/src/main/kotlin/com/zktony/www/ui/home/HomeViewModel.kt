@@ -4,6 +4,7 @@ import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
+import com.zktony.common.ext.currentTime
 import com.zktony.common.ext.removeZero
 import com.zktony.common.utils.Constants
 import com.zktony.common.utils.Queue
@@ -237,7 +238,10 @@ class HomeViewModel constructor(
                         is ExecutorEvent.Log -> {
                             val log = state.value.log
                             log?.let { l ->
-                                updateLog(module, l.copy(content = l.content + it.msg))
+                                updateLog(
+                                    module,
+                                    l.copy(content = l.content + "[ ${currentTime()} ]\t" + "${state.value.temp} \t" + it.msg + "\n")
+                                )
                             }
                         }
                     }
