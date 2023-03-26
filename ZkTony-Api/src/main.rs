@@ -6,7 +6,11 @@ use std::env;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_LOG", "debug");
-    tracing_subscriber::fmt::init();
+    // init logger
+    tracing_subscriber::fmt()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .with_writer(std::io::stdout)
+        .init();
 
     // get env vars
     dotenvy::dotenv().ok();
@@ -22,6 +26,7 @@ async fn main() -> std::io::Result<()> {
 
     // log
     show_log();
+    tracing::info!("Starting server at {}", server_url);
 
     HttpServer::new(move || {
         App::new()
@@ -46,9 +51,9 @@ fn show_log() {
      ████████░██░░██    ░██    ░░██████  ███  ░██  ██           ░██     ░██░██      ░██
     ░░░░░░░░ ░░  ░░     ░░      ░░░░░░  ░░░   ░░  ░░            ░░      ░░ ░░       ░░     
        "#;
-    println!("{}", logo);
-    println!("编译器：{}", std::env::consts::DLL_EXTENSION);
-    println!("系统架构：{}", std::env::consts::OS);
-    println!("系统类型：{}", std::env::consts::ARCH);
-    println!("操作系统：{}", std::env::consts::FAMILY);
+    tracing::info!("{}", logo);
+    tracing::info!("编译器：{}", std::env::consts::DLL_EXTENSION);
+    tracing::info!("系统架构：{}", std::env::consts::OS);
+    tracing::info!("系统类型：{}", std::env::consts::ARCH);
+    tracing::info!("操作系统：{}", std::env::consts::FAMILY);
 }

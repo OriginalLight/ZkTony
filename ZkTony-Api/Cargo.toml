@@ -12,5 +12,6 @@ members = [".", "api", "core", "entity"]
 actix-web = "4"
 dotenvy = "0.15"
 serde = "1"
+tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 api = { path = "api" }
