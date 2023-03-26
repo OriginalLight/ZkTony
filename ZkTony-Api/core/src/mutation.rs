@@ -47,7 +47,7 @@ impl Mutation {
         let res = LogDetailEntity::insert_many(add_data)
             .on_conflict(
                 OnConflict::column(LogDetailColumn::Id)
-                    .do_nothing()
+                    .update_column(LogDetailColumn::Content)
                     .to_owned(),
             )
             .exec(db)
@@ -78,7 +78,11 @@ impl Mutation {
             add_data.push(add);
         }
         let res = LogEntity::insert_many(add_data)
-            .on_conflict(OnConflict::column(LogColumn::Id).do_nothing().to_owned())
+            .on_conflict(
+                OnConflict::column(LogColumn::Id)
+                    .update_column(LogColumn::Content)
+                    .to_owned(),
+            )
             .exec(db)
             .await;
 
@@ -108,7 +112,7 @@ impl Mutation {
         let res = ProgramEntity::insert_many(add_data)
             .on_conflict(
                 OnConflict::column(ProgramColumn::Id)
-                    .do_nothing()
+                    .update_column(ProgramColumn::Content)
                     .to_owned(),
             )
             .exec(db)
@@ -141,7 +145,14 @@ impl Mutation {
         let res = CustomerEntity::insert(add_data)
             .on_conflict(
                 OnConflict::column(CustomerColumn::Id)
-                    .do_nothing()
+                    .update_columns([
+                        CustomerColumn::Name,
+                        CustomerColumn::Address,
+                        CustomerColumn::Phone,
+                        CustomerColumn::Source,
+                        CustomerColumn::Industry,
+                        CustomerColumn::Remarks,
+                    ])
                     .to_owned(),
             )
             .exec(db)
@@ -199,7 +210,13 @@ impl Mutation {
         let res = SoftwareEntity::insert(add_data)
             .on_conflict(
                 OnConflict::column(SoftwareColumn::Id)
-                    .do_nothing()
+                    .update_columns([
+                        SoftwareColumn::Package,
+                        SoftwareColumn::VersionCode,
+                        SoftwareColumn::VersionName,
+                        SoftwareColumn::BuildType,
+                        SoftwareColumn::Remarks,
+                    ])
                     .to_owned(),
             )
             .exec(db)
@@ -259,7 +276,16 @@ impl Mutation {
         let res = EquipmentEntity::insert(add_data)
             .on_conflict(
                 OnConflict::column(EquipmentColumn::Id)
-                    .do_nothing()
+                    .update_columns([
+                        EquipmentColumn::Name,
+                        EquipmentColumn::Model,
+                        EquipmentColumn::Voltage,
+                        EquipmentColumn::Power,
+                        EquipmentColumn::Frequency,
+                        EquipmentColumn::Attachment,
+                        EquipmentColumn::Remarks,
+                        EquipmentColumn::CreateBy,
+                    ])
                     .to_owned(),
             )
             .exec(db)
@@ -327,7 +353,18 @@ impl Mutation {
         let res = ProductEntity::insert(add_data)
             .on_conflict(
                 OnConflict::column(ProductColumn::Id)
-                    .do_nothing()
+                    .update_columns([
+                        ProductColumn::SoftwareId,
+                        ProductColumn::CustomerId,
+                        ProductColumn::EquipmentId,
+                        ProductColumn::ExpressNumber,
+                        ProductColumn::ExpressCompany,
+                        ProductColumn::EquipmentNumber,
+                        ProductColumn::EquipmentTime,
+                        ProductColumn::Attachment,
+                        ProductColumn::Remarks,
+                        ProductColumn::CreateBy,
+                    ])
                     .to_owned(),
             )
             .exec(db)
