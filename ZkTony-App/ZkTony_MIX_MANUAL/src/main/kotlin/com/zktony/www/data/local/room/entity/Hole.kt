@@ -14,8 +14,8 @@ data class Hole(
     @PrimaryKey(autoGenerate = true)
     val id: Long = Snowflake(1).nextId(),
     val subId: Long = 0L,
-    val x: Int = 0,
-    val xAxis: Float = 0f,
+    val y: Int = 0,
+    val yAxis: Float = 0f,
     val v1: Float = 0f,
     val v2: Float = 0f,
     val enable: Boolean = false,

@@ -34,11 +34,9 @@ class PlateFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     binding.apply {
-                        size.text = "${it.plate?.x ?: 10}"
-                        moveZ.text = "底部高度: ${it.container?.bottom?.removeZero() ?: 0}"
-                        addZ.text = "头部高度: ${it.container?.top?.removeZero() ?: 0}"
-                        gradientPlate.setSize(it.plate?.x ?: 10)
-                        gradientPlate.setData(it.holeList.map { hole -> hole.x to (hole.xAxis > 0f) })
+                        size.text = "${it.plate?.size ?: 10}"
+                        gradientPlate.setSize(it.plate?.size ?: 10)
+                        gradientPlate.setData(it.holeList.map { hole -> hole.y to (hole.yAxis > 0f) })
                     }
                 }
             }
@@ -53,32 +51,16 @@ class PlateFragment :
             size.clickNoRepeat {
                 inputNumberDialog(
                     "请输入加液板尺寸",
-                    viewModel.uiState.value.plate?.x ?: 10
+                    viewModel.uiState.value.plate?.size ?: 10
                 ) {
                     viewModel.reSize(it)
                 }
             }
-            moveZ.clickNoRepeat {
-                inputDecimalDialog(
-                    message = "请输入底部高度",
-                    value = viewModel.uiState.value.container?.bottom ?: 0f,
-                    move = { viewModel.moveZ(it) },
-                    block = { viewModel.setBottom(it) }
-                )
-            }
-            addZ.clickNoRepeat {
-                inputDecimalDialog(
-                    message = "请输入头部高度",
-                    value = viewModel.uiState.value.container?.top ?: 0f,
-                    move = { viewModel.moveZ(it) },
-                    block = { viewModel.setTop(it) }
-                )
-            }
             gradientPlate.setOnItemClick { index ->
                 inputDecimalDialog(
                     message = "请输入 ${'A' + index} 横坐标",
-                    value = viewModel.uiState.value.holeList.find { it.x == index }?.xAxis ?: 0f,
-                    move = { viewModel.moveX(it) },
+                    value = viewModel.uiState.value.holeList.find { it.y == index }?.yAxis ?: 0f,
+                    move = { viewModel.moveY(it) },
                     block = { viewModel.setHolePosition(index, it) }
                 )
             }

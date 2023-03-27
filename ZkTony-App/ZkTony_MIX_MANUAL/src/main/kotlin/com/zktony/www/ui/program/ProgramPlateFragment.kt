@@ -33,8 +33,8 @@ class ProgramPlateFragment :
                 viewModel.uiState.collect {
                     binding.apply {
                         if (it.plate != null) {
-                            gradientPlate.setSize(it.plate.x)
-                            gradientPlate.setData(it.holeList.map { hole -> hole.x to hole.enable })
+                            gradientPlate.setSize(it.plate.size)
+                            gradientPlate.setData(it.holeList.map { hole -> hole.y to hole.enable })
                             selectAll.isEnabled = it.holeList.any { hole -> !hole.enable }
                             if (it.holeList.isNotEmpty()) {
                                 volume.text =

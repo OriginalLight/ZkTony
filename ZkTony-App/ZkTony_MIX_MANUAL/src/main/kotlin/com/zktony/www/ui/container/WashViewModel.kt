@@ -29,12 +29,12 @@ class WashViewModel constructor(
         }
     }
 
-    fun move(x: Float) {
+    fun move(y: Float) {
         if (serialManager.lock.value || serialManager.pause.value) {
             PopTip.show("机器正在运行中")
             return
         }
-        executionManager.executor(executionManager.generator(x = x))
+        executionManager.executor(executionManager.generator(y = y))
     }
 
     fun save(x: Float) {

@@ -51,8 +51,8 @@ class PlateViewModel constructor(
     fun reSize(size: Int) {
         viewModelScope.launch {
             _uiState.value.plate?.let {
-                if (it.x != size) {
-                    plateDao.update(it.copy(x = size))
+                if (it.size != size) {
+                    plateDao.update(it.copy(size = size))
                     holeDao.deleteBySubId(it.id)
                     val holeList = mutableListOf<Hole>()
                     val snowflake = Snowflake(1)
@@ -61,7 +61,7 @@ class PlateViewModel constructor(
                             Hole(
                                 id = snowflake.nextId(),
                                 subId = it.id,
-                                x = i,
+                                y = i,
                             )
                         )
                     }
@@ -73,66 +73,43 @@ class PlateViewModel constructor(
 
     fun setHolePosition(index: Int, axis: Float) {
         viewModelScope.launch {
-            val hole = _uiState.value.holeList.find { it.x == index }
+            val hole = _uiState.value.holeList.find { it.y == index }
             hole?.let {
-                holeDao.update(it.copy(xAxis = axis))
+                holeDao.update(it.copy(yAxis = axis))
                 delay(500L)
                 calculateCoordinate()
             }
         }
     }
 
-    fun moveZ(z: Float) {
+
+    fun moveY(y: Float) {
         if (serialManager.lock.value || serialManager.pause.value) {
             PopTip.show("机器正在运行中")
             return
         }
-        val hole = _uiState.value.holeList.find { it.x == 0 }
-        executionManager.executor(
-            executionManager.generator(x = hole?.xAxis ?: 0f),
-            executionManager.generator(x = hole?.xAxis ?: 0f, z = z)
-        )
-    }
-
-    fun moveX(x: Float) {
-        if (serialManager.lock.value || serialManager.pause.value) {
-            PopTip.show("机器正在运行中")
-            return
-        }
-        executionManager.executor(executionManager.generator(x = x))
-    }
-
-    fun setBottom(z: Float) {
-        viewModelScope.launch {
-            containerDao.update(_uiState.value.container?.copy(bottom = z) ?: return@launch)
-        }
-    }
-
-    fun setTop(z: Float) {
-        viewModelScope.launch {
-            containerDao.update(_uiState.value.container?.copy(top = z) ?: return@launch)
-        }
+        executionManager.executor(executionManager.generator(y = y))
     }
 
 
     private suspend fun calculateCoordinate() {
         val holeList = _uiState.value.holeList
-        val min = holeList.filter { it.xAxis != 0f }.minByOrNull { it.x }
-        val max = holeList.filter { it.xAxis != 0f }.maxByOrNull { it.x }
+        val min = holeList.filter { it.yAxis != 0f }.minByOrNull { it.y }
+        val max = holeList.filter { it.yAxis != 0f }.maxByOrNull { it.y }
         if (min == null || max == null) {
             return
         } else {
-            val minIndex = min.x
-            val maxIndex = max.x
+            val minIndex = min.y
+            val maxIndex = max.y
             if (maxIndex - minIndex >= 2) {
-                val minAxis = min.xAxis
-                val maxAxis = max.xAxis
+                val minAxis = min.yAxis
+                val maxAxis = max.yAxis
                 val distance = (maxAxis - minAxis) / (maxIndex - minIndex)
                 val holes = mutableListOf<Hole>()
                 for (i in minIndex + 1 until maxIndex) {
-                    val hole = holeList.find { it.x == i && it.xAxis == 0f }
+                    val hole = holeList.find { it.y == i && it.yAxis == 0f }
                     hole?.let {
-                        holes.add(it.copy(xAxis = minAxis + (i - minIndex) * distance))
+                        holes.add(it.copy(yAxis = minAxis + (i - minIndex) * distance))
                     }
                 }
                 holeDao.updateAll(holes)

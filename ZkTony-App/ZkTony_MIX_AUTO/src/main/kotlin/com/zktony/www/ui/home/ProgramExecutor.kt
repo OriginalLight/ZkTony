@@ -1,12 +1,15 @@
 package com.zktony.www.ui.home
 
 import com.zktony.common.ext.currentTime
+import com.zktony.common.utils.loge
+import com.zktony.serialport.util.Serial
 import com.zktony.www.common.ext.total
 import com.zktony.www.data.local.room.entity.Container
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -38,40 +41,55 @@ class ProgramExecutor constructor(
             val total = holeList.total()
             if (total > 0) {
                 val plate = plateList[0]
-                for (i in 0 until plate.x) {
+                for (i in 0 until plate.size) {
                     while (serialManager.lock.value || serialManager.pause.value) {
                         delay(100L)
                     }
-                    val hole = holeList.find { it.x == i && it.enable }
+                    val hole = holeList.find { it.y == i && it.enable }
                     if (hole != null && hole.v1 > 0f && hole.v2 > 0f) {
                         event(ExecutorEvent.CurrentHole(hole))
                         currentHoleList.add(Pair(i, true))
                         event(ExecutorEvent.HoleList(currentHoleList))
-                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t 执行孔位：${hole.x} 号孔\n"))
+                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t 执行孔位：${hole.y} 号孔\n"))
                         executionManager.executor(
                             executionManager.generator(
-                                x = hole.xAxis,
-                                p = hole.v1,
+                                y = hole.yAxis
                             ),
                             executionManager.generator(
-                                x = hole.xAxis,
-                                z = container.top,
-                                p = hole.v1,
-                                v1 = hole.v1,
-                                v2 = hole.v1,
-                                v3 = hole.v2,
+                                y = hole.yAxis,
+                                v1 = hole.v2,
+                                v2 = hole.v2,
+                                v3 = hole.v1,
                             ),
                             executionManager.generator(
-                                x = hole.xAxis,
-                                z = container.bottom,
-                                p = hole.v1,
-                                v3 = -hole.v2,
+                                y = hole.yAxis,
+                                v3 = -hole.v1,
                             ),
                         )
-                        delay(500L)
+                        delay(100L)
                         while (serialManager.lock.value) {
-                            delay(1000)
+                            delay(100L)
                         }
+                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t 排液\n"))
+                        executionManager.executor(
+                            executionManager.generator(
+                                y = container.wasteX
+                            )
+                        )
+                        delay(100L)
+                        while (serialManager.lock.value) {
+                            delay(100L)
+                        }
+                        serialManager.sendHex(
+                            serial = Serial.TTYS3,
+                            hex = V1(pa = "0B", data = "0401").toHex()
+                        )
+                        delay(3000L)
+                        serialManager.sendHex(
+                            serial = Serial.TTYS3,
+                            hex = V1(pa = "0B", data = "0400").toHex()
+                        )
+                        delay(500L)
                         complete += 1
                         event(ExecutorEvent.Progress(total, complete))
                     }

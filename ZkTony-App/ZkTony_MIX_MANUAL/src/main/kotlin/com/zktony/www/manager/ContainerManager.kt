@@ -32,7 +32,7 @@ class ContainerManager constructor(
                         Plate(
                             id = 1L,
                             subId = 1L,
-                            x = 10,
+                            size = 10,
                         )
                     )
                     val holes = mutableListOf<Hole>()
@@ -42,7 +42,7 @@ class ContainerManager constructor(
                             Hole(
                                 id = snowflake.nextId(),
                                 subId = 1L,
-                                x = i,
+                                y = i,
                             )
                         )
                     }

@@ -235,18 +235,17 @@ class AdminViewModel constructor(
      */
     private fun syncMotor() {
         viewModelScope.launch {
-            for (i in 0..1) {
-                for (j in 1..3) {
-                    val port = when (i) {
-                        0 -> Serial.TTYS0
-                        else -> Serial.TTYS3
-                    }
-                    serialManager.sendHex(
-                        serial = port,
-                        hex = V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex()
-                    )
-                    delay(100L)
-                }
+            serialManager.sendHex(
+                serial = Serial.TTYS0,
+                hex = V1(fn = "03", pa = "04", data = 2.int8ToHex()).toHex()
+            )
+            delay(100L)
+            for (i in 1..3) {
+                serialManager.sendHex(
+                    serial = Serial.TTYS3,
+                    hex = V1(fn = "03", pa = "04", data = i.int8ToHex()).toHex()
+                )
+                delay(100L)
             }
         }
     }

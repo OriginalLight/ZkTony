@@ -38,7 +38,7 @@ class SerialManager constructor(
     private var lockTime = 0L
 
     // 机构运行小步骤等待时间
-    private val waitTime = 10L
+    private val waitTime = 2 * 60L
 
     init {
         scope.launch {
@@ -121,6 +121,11 @@ class SerialManager constructor(
 
     fun reset(reset: Boolean) {
         _reset.value = reset
+    }
+
+    fun lock(lock: Boolean) {
+        _lock.value = lock
+        lockTime = 0L
     }
 
     /**

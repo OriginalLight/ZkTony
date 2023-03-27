@@ -40,7 +40,7 @@ abstract class BaseSerial(sPort: Serial, iBaudRate: Int) : SerialHelper(sPort, i
     /**
      * Send HEX data
      *
-     * @param hex hex data
+     * @param sHex hex data
      */
     fun sendHex(sHex: String) {
         val hex = sHex.trim { it <= ' ' }.replace(" ".toRegex(), "")
@@ -53,7 +53,7 @@ abstract class BaseSerial(sPort: Serial, iBaudRate: Int) : SerialHelper(sPort, i
     /**
      * Send string data
      *
-     * @param text string data
+     * @param sText string data
      */
     fun sendText(sText: String) {
         val bOutArray: ByteArray

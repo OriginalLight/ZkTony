@@ -40,7 +40,7 @@ class ProgramPlateViewModel constructor(
 
     fun selectHole(index: Int) {
         viewModelScope.launch {
-            _uiState.value.holeList.find { it.x == index }?.let {
+            _uiState.value.holeList.find { it.y == index }?.let {
                 holeDao.update(it.copy(enable = !it.enable))
             }
 

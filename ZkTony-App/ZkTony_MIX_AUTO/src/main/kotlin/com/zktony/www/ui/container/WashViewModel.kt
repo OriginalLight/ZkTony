@@ -34,7 +34,7 @@ class WashViewModel constructor(
             PopTip.show("机器正在运行中")
             return
         }
-        executionManager.executor(executionManager.generator(x = x))
+        executionManager.executor(executionManager.generator(y = x))
     }
 
     fun save(x: Float) {

@@ -56,7 +56,7 @@ class HomeViewModel constructor(
                 _uiState.value = _uiState.value.copy(plateList = it)
                 var size = 10
                 if (it.isNotEmpty()) {
-                    size = it[0].x
+                    size = it[0].size
                 }
                 _uiState.value = _uiState.value.copy(
                     info = _uiState.value.info.copy(
@@ -209,7 +209,7 @@ class HomeViewModel constructor(
                 time = 0L,
                 info = CurrentInfo().copy(
                     plateSize = if (_uiState.value.plateList.isNotEmpty()) {
-                        _uiState.value.plateList[0].x
+                        _uiState.value.plateList[0].size
                     } else {
                         10
                     },
@@ -222,7 +222,11 @@ class HomeViewModel constructor(
                 serial = Serial.TTYS0,
                 hex = V1(pa = "10").toHex()
             )
-            delay(300L)
+            delay(1000L)
+            serialManager.lock(false)
+            while (serialManager.lock.value) {
+                delay(100L)
+            }
             reset()
         }
     }

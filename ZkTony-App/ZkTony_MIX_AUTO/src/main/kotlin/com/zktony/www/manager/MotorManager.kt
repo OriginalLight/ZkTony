@@ -18,8 +18,7 @@ class MotorManager constructor(
     private val calibrationDao: CalibrationDao,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
-    private var x: Motor = Motor()
-    private var z: Motor = Motor()
+    private var y: Motor = Motor()
     private var p1: Motor = Motor()
     private var p2: Motor = Motor()
     private var p3: Motor = Motor()
@@ -30,19 +29,17 @@ class MotorManager constructor(
             launch {
                 motorDao.getAll().collect {
                     if (it.isNotEmpty()) {
-                        x = it.find { m -> m.id == 0 } ?: Motor()
-                        z = it.find { m -> m.id == 1 } ?: Motor()
-                        p1 = it.find { m -> m.id == 2 } ?: Motor()
-                        p2 = it.find { m -> m.id == 3 } ?: Motor()
-                        p3 = it.find { m -> m.id == 4 } ?: Motor()
+                        y = it.find { m -> m.id == 0 } ?: Motor()
+                        p1 = it.find { m -> m.id == 1 } ?: Motor()
+                        p2 = it.find { m -> m.id == 2 } ?: Motor()
+                        p3 = it.find { m -> m.id == 3 } ?: Motor()
                     } else {
                         motorDao.insertAll(
                             listOf(
-                                Motor(id = 0, name = "X轴", address = 1),
-                                Motor(id = 1, name = "Z轴", address = 3),
-                                Motor(id = 2, name = "泵一", address = 1),
-                                Motor(id = 3, name = "泵二", address = 2),
-                                Motor(id = 4, name = "泵三", address = 3),
+                                Motor(id = 0, name = "Y轴", address = 2),
+                                Motor(id = 1, name = "泵一", address = 1),
+                                Motor(id = 2, name = "泵二", address = 2),
+                                Motor(id = 3, name = "泵三", address = 3),
                             )
                         )
                     }
@@ -60,12 +57,8 @@ class MotorManager constructor(
         }
     }
 
-    fun move(distance: Float, id: Int): Int {
-        return when (id) {
-            0 -> x.pulseCount(distance, calibration.x)
-            1 -> z.pulseCount(distance, calibration.z)
-            else -> 0
-        }
+    fun move(distance: Float): Int {
+        return y.pulseCount(distance, calibration.y)
     }
 
     fun liquid(volume: Float, id: Int): Int {

@@ -18,21 +18,17 @@ class ExecutionManager constructor(
 ) {
     // 生成器
     fun generator(
-        x: Float = 0f,
-        z: Float = 0f,
-        p: Float = 0f,
+        y: Float = 0f,
         v1: Float = 0f,
         v2: Float = 0f,
         v3: Float = 0f,
     ): Pair<String, String> {
-        val mx = motorManager.move(x, 0)
-        val mz = motorManager.move(z, 1)
-        val mp = motorManager.liquid(p, 2)
+        val my = motorManager.move(y)
         val mv1 = motorManager.liquid(v1, 0)
         val mv2 = motorManager.liquid(v2, 1)
         val mv3 = motorManager.liquid(v3, 2)
         return Pair(
-            "$mz,$mx,$mp,",
+            "0,$my,0,0,",
             "$mv1,$mv2,$mv3,"
         )
     }

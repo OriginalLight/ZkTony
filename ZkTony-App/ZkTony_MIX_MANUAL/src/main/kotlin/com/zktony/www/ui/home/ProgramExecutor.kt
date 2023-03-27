@@ -38,32 +38,30 @@ class ProgramExecutor constructor(
             val total = holeList.total()
             if (total > 0) {
                 val plate = plateList[0]
-                for (i in 0 until plate.x) {
+                for (i in 0 until plate.size) {
                     while (serialManager.lock.value || serialManager.pause.value) {
                         delay(100L)
                     }
-                    val hole = holeList.find { it.x == i && it.enable }
+                    val hole = holeList.find { it.y == i && it.enable }
                     if (hole != null && hole.v1 > 0f && hole.v2 > 0f) {
                         event(ExecutorEvent.CurrentHole(hole))
                         currentHoleList.add(Pair(i, true))
                         event(ExecutorEvent.HoleList(currentHoleList))
-                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t 执行孔位：${hole.x} 号孔\n"))
+                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t 执行孔位：${hole.y} 号孔\n"))
                         executionManager.executor(
                             executionManager.generator(
-                                x = hole.xAxis,
+                                y = hole.yAxis,
                                 p = hole.v1,
                             ),
                             executionManager.generator(
-                                x = hole.xAxis,
-                                z = container.top,
+                                y = hole.yAxis,
                                 p = hole.v1,
                                 v1 = hole.v1,
                                 v2 = hole.v1,
                                 v3 = hole.v2,
                             ),
                             executionManager.generator(
-                                x = hole.xAxis,
-                                z = container.bottom,
+                                y = hole.yAxis,
                                 p = hole.v1,
                                 v3 = -hole.v2,
                             ),

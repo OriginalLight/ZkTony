@@ -15,10 +15,8 @@ data class Calibration(
     val id: Long = Snowflake(1).nextId(),
     // 校准名称
     val name: String = "默认",
-    // x轴电机一圈走的距离
-    val x: Float = 87.6f,
     // y轴电机一圈走的距离
-    val z: Float = 57.62f,
+    val y: Float = 4f,
     // 蠕动泵一一圈走的进液量
     val v1: Float = 200f,
     // 蠕动泵二一圈走的进液量

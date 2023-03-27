@@ -74,29 +74,37 @@ class CalibrationDataViewModel constructor(
         val con = _uiState.value.container
         val liquid = _uiState.value.expect
         val motorId = _uiState.value.pumpId
-        executionManager.executor(
-            executionManager.generator(y = con.washY),
-            executionManager.generator(
-                y = con.washY,
-                z = con.washZ,
-                v1 = if (motorId == 0) liquid else 0f,
-                v2 = if (motorId == 1) liquid else 0f,
-                v3 = if (motorId == 2) liquid else 0f,
-                v4 = if (motorId == 3) liquid else 0f,
-                v5 = if (motorId == 4) liquid else 0f,
-                v6 = if (motorId == 5) liquid else 0f
-            ),
-            executionManager.generator(
-                y = con.washY,
-                v1 = if (motorId == 0) 15000f else 0f,
-                v2 = if (motorId == 1) 15000f else 0f,
-                v3 = if (motorId == 2) 15000f else 0f,
-                v4 = if (motorId == 3) 15000f else 0f,
-                v5 = if (motorId == 4) 15000f else 0f,
-                v6 = if (motorId == 5) 15000f else 0f
-            ),
-            executionManager.generator()
-        )
+        if (motorId < 4) {
+            executionManager.executor(
+                executionManager.generator(y = con.washY),
+                executionManager.generator(
+                    y = con.washY,
+                    z = con.washZ,
+                    v1 = if (motorId == 0) liquid else 0f,
+                    v2 = if (motorId == 1) liquid else 0f,
+                    v3 = if (motorId == 2) liquid else 0f,
+                    v4 = if (motorId == 3) liquid else 0f,
+                ),
+                executionManager.generator(
+                    y = con.washY,
+                    v1 = if (motorId == 0) 15000f else 0f,
+                    v2 = if (motorId == 1) 15000f else 0f,
+                    v3 = if (motorId == 2) 15000f else 0f,
+                    v4 = if (motorId == 3) 15000f else 0f,
+                ),
+                executionManager.generator()
+            )
+        }
+        else {
+            executionManager.executor(
+                executionManager.generator(),
+                executionManager.generator(
+                    v4 = if (motorId == 4) liquid else 0f,
+                    v5 = if (motorId == 5) liquid else 0f,
+                ),
+                executionManager.generator()
+            )
+        }
     }
 
     fun save() {
