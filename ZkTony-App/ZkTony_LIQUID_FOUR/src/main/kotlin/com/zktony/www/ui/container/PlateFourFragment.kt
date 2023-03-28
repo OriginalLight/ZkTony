@@ -6,11 +6,11 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.dialog.inputNumberDialog
 import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.common.ext.positionDialog
-import com.zktony.www.common.ext.sizeDialog
 import com.zktony.www.databinding.FragmentPlateBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -43,7 +43,9 @@ class PlateFourFragment :
                                     x = plate.y
                                     y = plate.x
                                 }
-                                rowColumn.text = "${plate.x} X ${plate.y}"
+                                sizeIndicatorWidth.text = plate.y.toString()
+                                sizeIndicatorHeight.text = plate.x.toString()
+                                sizeIndicatorHeight.type = 1
                                 if (x0y0 != null) {
                                     positionOne.text = "( ${
                                         x0y0.xAxis.toString().removeZero()
@@ -68,13 +70,27 @@ class PlateFourFragment :
     private fun initView() {
         binding.apply {
             dynamicPlate.showLocation = true
-            rowColumn.clickNoRepeat {
-                val plate = viewModel.uiState.value.plate!!
-                sizeDialog(
-                    textRow = plate.x,
-                    textColumn = plate.y,
-                    block1 = { row, column -> viewModel.setXY(row, column) }
-                )
+            sizeIndicatorWidth.clickNoRepeat {
+                inputNumberDialog(
+                    "请输入加液板尺寸",
+                    sizeIndicatorWidth.text.toIntOrNull() ?: 12
+                ) {
+                    viewModel.setXY(
+                        x = sizeIndicatorHeight.text.toIntOrNull() ?: 8,
+                        y = it
+                    )
+                }
+            }
+            sizeIndicatorHeight.clickNoRepeat {
+                inputNumberDialog(
+                    "请输入加液板尺寸",
+                    sizeIndicatorHeight.text.toIntOrNull() ?: 8
+                ) {
+                    viewModel.setXY(
+                        x = it,
+                        y = sizeIndicatorWidth.text.toIntOrNull() ?: 12
+                    )
+                }
             }
             positionOne.clickNoRepeat {
                 val hole = viewModel.uiState.value.holes.find { hole -> hole.x == 0 && hole.y == 0 }

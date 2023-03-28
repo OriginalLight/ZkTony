@@ -147,7 +147,7 @@ fun inputDialog(message: String = "请输入程序/操作名", block: (String) -
 
 fun inputNumberDialog(message: String = "请输入程序/操作名", value: Int, block: (Int) -> Unit) {
     InputDialog("修改", message, "确定", "取消", value.toString())
-        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER))
+        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL))
         .setOkButton { _, _, inputStr ->
             if (inputStr.trim().isEmpty()) {
                 PopTip.show("不能为空")
@@ -165,7 +165,7 @@ fun inputDecimalDialog(
     block: (Float) -> Unit
 ) {
     InputDialog("修改", message, "确定", "取消", value.removeZero())
-        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER))
+        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL))
         .setOtherButton("移动") { _, _, str ->
             move(str.toFloatOrNull() ?: 0f)
             true

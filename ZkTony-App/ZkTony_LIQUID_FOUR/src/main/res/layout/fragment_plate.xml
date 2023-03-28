@@ -17,6 +17,22 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
+            <com.zktony.common.widget.SizeIndicator
+                android:id="@+id/size_indicator_width"
+                android:layout_width="600dp"
+                android:layout_height="48dp"
+                app:layout_constraintBottom_toTopOf="@+id/dynamic_plate"
+                app:layout_constraintEnd_toEndOf="@+id/dynamic_plate"
+                app:layout_constraintStart_toStartOf="@+id/dynamic_plate" />
+
+            <com.zktony.common.widget.SizeIndicator
+                android:id="@+id/size_indicator_height"
+                android:layout_width="48dp"
+                android:layout_height="400dp"
+                app:layout_constraintBottom_toBottomOf="@+id/dynamic_plate"
+                app:layout_constraintEnd_toStartOf="@+id/dynamic_plate"
+                app:layout_constraintTop_toTopOf="@+id/dynamic_plate" />
+
             <com.zktony.common.widget.DynamicPlate
                 android:id="@+id/dynamic_plate"
                 android:layout_width="600dp"
@@ -27,62 +43,50 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="VisualLintBounds" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="32dp"
-            android:orientation="horizontal">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/row_column"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:text="@string/button"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:cornerRadius="27dp"
-                app:rippleColor="@color/purple_500"
-                app:strokeColor="@color/light_primary"
-                app:strokeWidth="3dp"
-                tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize" />
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/position_one"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="292dp"
+                android:layout_height="48dp"
                 android:text="@string/button"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:cornerRadius="27dp"
-                app:rippleColor="@color/purple_700"
+                app:cornerRadius="24dp"
+                app:icon="@mipmap/circle"
+                app:iconSize="24dp"
+                app:iconTint="#0000FF"
+                android:layout_marginTop="16dp"
+                app:layout_constraintStart_toEndOf="@+id/size_indicator_height"
+                app:layout_constraintTop_toBottomOf="@+id/dynamic_plate"
+                app:strokeColor="#0000FF"
+                app:strokeWidth="2dp"
+                app:rippleColor="#0000FF"
                 tools:ignore="VisualLintButtonSize" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/position_two"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_weight="1"
-                android:backgroundTint="#64DD17"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="292dp"
+                android:layout_height="48dp"
                 android:text="@string/button"
+                android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:cornerRadius="27dp"
-                app:rippleColor="@color/purple_700"
+                app:cornerRadius="24dp"
+                app:elevation="0dp"
+                app:icon="@mipmap/circle"
+                app:iconSize="24dp"
+                app:iconTint="#00FF00"
+                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="@+id/dynamic_plate"
+                app:layout_constraintTop_toBottomOf="@+id/dynamic_plate"
+                app:rippleColor="#00FF00"
+                app:strokeWidth="2dp"
+                app:strokeColor="#00FF00"
                 tools:ignore="TextContrastCheck,VisualLintButtonSize" />
 
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 

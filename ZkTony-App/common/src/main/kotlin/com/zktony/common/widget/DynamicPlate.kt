@@ -57,7 +57,7 @@ class DynamicPlate : View {
         val paint = Paint()
         paint.style = Paint.Style.STROKE
         paint.color = Color.BLACK
-        paint.strokeWidth = 2f
+        paint.strokeWidth = 4f
         paint.isAntiAlias = true
         canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
 
