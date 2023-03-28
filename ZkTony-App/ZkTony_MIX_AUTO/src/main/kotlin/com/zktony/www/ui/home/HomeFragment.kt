@@ -25,7 +25,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
         initView()
-
     }
 
     private fun initFlowCollector() {
@@ -47,8 +46,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             select.text = "/"
                             holeNumber.text = "/"
                         }
-                        gradientPlate.setSize(it.info.plateSize)
-                        gradientPlate.setData(it.info.holeList)
+                        gradientPlate.size = it.info.plateSize
+                        gradientPlate.data = it.info.holeList
                         time.text = it.time.getTimeFormat()
                         currentCoagulantVolume.text = String.format("%.2f", it.info.hole.v1)
                         currentColloidVolume.text = String.format("%.2f", it.info.hole.v2)

@@ -15,8 +15,6 @@ class StateManager constructor(
     private val serialManager: SerialManager,
     private val motorManager: MotorManager,
     private val executionManager: ExecutionManager,
-    private val containerManager: ContainerManager,
-    private val workerManager: WorkerManager,
     private val dataStore: DataStore<Preferences>,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
@@ -30,9 +28,7 @@ class StateManager constructor(
             launch {
                 serialManager.test()
                 motorManager.test()
-                containerManager.test()
                 executionManager.test()
-                workerManager.createWorker()
             }
             launch {
                 dataStore.data.map {

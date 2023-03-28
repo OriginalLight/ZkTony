@@ -24,7 +24,7 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
     }
 
     private fun initView() {
-        binding.position.clickNoRepeat {
+        binding.washPlate.clickNoRepeat {
             positionDialog(
                 textX = viewModel.uiState.value!!.wasteX,
                 textY = viewModel.uiState.value!!.wasteY,
@@ -40,7 +40,7 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     if (it != null) {
-                        binding.position.text =
+                        binding.washPlate.text =
                             "( ${it.wasteX.toString().removeZero()} , ${
                                 it.wasteY.toString().removeZero()
                             } )"

@@ -4,18 +4,18 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
 import com.zktony.www.data.local.room.dao.CalibrationDao
 import com.zktony.www.data.local.room.dao.CalibrationDataDao
+import com.zktony.www.data.local.room.dao.ContainerDao
 import com.zktony.www.data.local.room.entity.Calibration
 import com.zktony.www.data.local.room.entity.CalibrationData
+import com.zktony.www.data.local.room.entity.Container
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CalibrationDataViewModel constructor(
+    private val containerDao: ContainerDao,
     private val calibrationDao: CalibrationDao,
     private val calibrationDataDao: CalibrationDataDao,
     private val serialManager: SerialManager,
@@ -36,6 +36,11 @@ class CalibrationDataViewModel constructor(
             launch {
                 calibrationDataDao.getBySubId(id).distinctUntilChanged().collect {
                     _uiState.value = _uiState.value.copy(caliData = it)
+                }
+            }
+            launch {
+                containerDao.getById(1L).collect {
+                    _uiState.value = _uiState.value.copy(container = it)
                 }
             }
             launch {
@@ -65,10 +70,14 @@ class CalibrationDataViewModel constructor(
 
     fun addLiquid() {
         val state = _uiState.value
+        val con = state.container
         val gen = when (state.pumpId) {
-            0 -> executionManager.generator(v1 = state.expect)
-            1 -> executionManager.generator(v2 = state.expect)
-            2 -> executionManager.generator(v3 = state.expect)
+            0 -> listOf(executionManager.generator(y = con.wasteY, v1 = state.expect))
+            1 -> listOf(executionManager.generator(y = con.wasteY, v2 = state.expect))
+            2 -> listOf(
+                executionManager.generator(y = con.wasteY, v3 = state.expect),
+                executionManager.generator(y = con.wasteY, v3 = -state.expect)
+            )
             else -> return
         }
         executionManager.executor(gen)
@@ -132,6 +141,7 @@ class CalibrationDataViewModel constructor(
 
 data class CalibrationDataUiState(
     val pumpId: Int = 0,
+    val container: Container = Container(),
     val cali: Calibration? = null,
     val caliData: List<CalibrationData> = emptyList(),
     val expect: Float = 0f,

@@ -136,6 +136,12 @@ class AdminFragment :
                     viewModel.toggleNavigationBar(isChecked)
                 }
             }
+            with(swRecycle) {
+                isChecked = stateManager.settings.value.recycle
+                setOnCheckedChangeListener { _, isChecked ->
+                    viewModel.toggleRecycle(isChecked)
+                }
+            }
             with(setting) {
                 clickScale()
                 clickNoRepeat {

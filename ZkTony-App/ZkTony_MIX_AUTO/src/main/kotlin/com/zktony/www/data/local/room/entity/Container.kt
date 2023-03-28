@@ -14,11 +14,7 @@ data class Container(
     @PrimaryKey val id: Long = Snowflake(1).nextId(),
     val name: String = "",
     // 废液槽坐标
-    val wasteX: Float = 0f,
-    // 底部高度
-    val bottom: Float = 0f,
-    // 顶部高度
-    val top: Float = 0f,
+    val wasteY: Float = 0f,
     // 创建时间
     val createTime: Date = Date(System.currentTimeMillis()),
 )

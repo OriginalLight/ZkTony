@@ -1,15 +1,9 @@
 package com.zktony.www.ui.home
 
-import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
-import com.zktony.common.dialog.spannerDialog
-import com.zktony.common.ext.getTimeFormat
 import com.zktony.serialport.util.Serial
-import com.zktony.www.common.ext.completeDialog
-import com.zktony.www.data.local.room.dao.*
-import com.zktony.www.data.local.room.entity.*
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.Job
@@ -19,84 +13,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel constructor(
-    private val logDao: LogDao,
-    private val containerDao: ContainerDao,
-    private val programDao: ProgramDao,
-    private val plateDao: PlateDao,
-    private val holeDao: HoleDao,
     private val serialManager: SerialManager,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            launch {
-                programDao.getAll().collect {
-                    if (it.isEmpty()) {
-                        _uiState.value = _uiState.value.copy(programList = it, program = null)
-                    } else {
-                        _uiState.value = _uiState.value.copy(programList = it, program = it[0])
-                        loadPlate(it[0].id)
-                    }
-                }
-            }
-            launch {
-                containerDao.getById(1L).collect {
-                    _uiState.value = _uiState.value.copy(container = it)
-                }
-            }
-        }
-    }
-
-    private fun loadPlate(id: Long) {
-        viewModelScope.launch {
-            plateDao.getBySubId(id).collect {
-                _uiState.value = _uiState.value.copy(plateList = it)
-                var size = 10
-                if (it.isNotEmpty()) {
-                    size = it[0].size
-                }
-                _uiState.value = _uiState.value.copy(
-                    info = _uiState.value.info.copy(
-                        plateSize = size
-                    )
-                )
-                loadHole(it.map { hole -> hole.id })
-            }
-        }
-    }
-
-    private fun loadHole(idList: List<Long>) {
-        viewModelScope.launch {
-            launch {
-                holeDao.getBySudIdList(idList).collect {
-                    _uiState.value = _uiState.value.copy(holeList = it)
-                }
-            }
-        }
-    }
-
-    fun select(view: View) {
-        val list = uiState.value.programList.map { it.name }
-        if (_uiState.value.job != null) {
-            PopTip.show("请先停止当前程序")
-            return
-        }
-        if (list.isEmpty()) {
-            PopTip.show("请先添加程序")
-            return
-        }
-        spannerDialog(
-            view = view,
-            menu = list,
-            block = { _, index ->
-                _uiState.value = _uiState.value.copy(program = uiState.value.programList[index])
-                loadPlate(uiState.value.programList[index].id)
-            }
-        )
-    }
 
     fun reset() {
         viewModelScope.launch {
@@ -114,108 +36,12 @@ class HomeViewModel constructor(
         }
     }
 
-    fun start() {
-        viewModelScope.launch {
-            val job = launch {
-                launch {
-                    while (true) {
-                        delay(1000L)
-                        if (!_uiState.value.pause) {
-                            _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
-                            val lastTime = _uiState.value.info.lastTime
-                            if (lastTime > 0) {
-                                _uiState.value = _uiState.value.copy(
-                                    info = _uiState.value.info.copy(
-                                        lastTime = lastTime - 1
-                                    )
-                                )
-                            }
-                        }
-                    }
-                }
-                launch {
-                    updateLog(Log(name = _uiState.value.program?.name ?: "未知程序"))
-                }
-                val executor = ProgramExecutor(
-                    container = _uiState.value.container!!,
-                    plateList = _uiState.value.plateList,
-                    holeList = _uiState.value.holeList,
-                    scope = this,
-                )
-                serialManager.reset(false)
-                executor.event = {
-                    when (it) {
-                        is ExecutorEvent.CurrentHole -> {
-                            _uiState.value = _uiState.value.copy(
-                                info = _uiState.value.info.copy(
-                                    hole = it.hole
-                                )
-                            )
-                        }
-                        is ExecutorEvent.HoleList -> {
-                            _uiState.value = _uiState.value.copy(
-                                info = _uiState.value.info.copy(
-                                    holeList = it.hole
-                                )
-                            )
-                        }
-                        is ExecutorEvent.Progress -> {
-                            val time = _uiState.value.time + 1
-                            val percent = it.complete.toFloat() / it.total.toFloat()
-                            val lastTime = time.toFloat() / percent - time.toFloat()
-                            val speed = it.complete / time.toFloat() * 60
-                            _uiState.value = _uiState.value.copy(
-                                info = _uiState.value.info.copy(
-                                    speed = speed,
-                                    lastTime = lastTime.toLong(),
-                                    process = ((it.complete / it.total.toFloat()) * 100).toInt(),
-                                )
-                            )
-
-                        }
-                        is ExecutorEvent.Log -> {
-                            _uiState.value.log?.let { l ->
-                                updateLog(l.copy(content = l.content + it.log))
-                            }
-                        }
-                        is ExecutorEvent.Finish -> {
-                            completeDialog(
-                                name = _uiState.value.program?.name ?: "错误",
-                                time = _uiState.value.time.getTimeFormat(),
-                                speed = "${String.format("%.2f", _uiState.value.info.speed)} 孔/分钟",
-                            )
-                            launch {
-                                _uiState.value.log?.let { l ->
-                                    updateLog(l.copy(status = 1))
-                                }
-                                delay(500L)
-                                stop()
-                            }
-                        }
-                    }
-                }
-                executor.execute()
-            }
-            _uiState.value = _uiState.value.copy(job = job)
-        }
-    }
-
     fun stop() {
         viewModelScope.launch {
             _uiState.value.job?.cancel()
             _uiState.value = _uiState.value.copy(
                 job = null,
-                log = null,
                 time = 0L,
-                info = CurrentInfo().copy(
-                    plateSize = if (_uiState.value.plateList.isNotEmpty()) {
-                        _uiState.value.plateList[0].size
-                    } else {
-                        10
-                    },
-                    holeList = emptyList(),
-                    process = 0
-                )
             )
             serialManager.pause(false)
             serialManager.sendHex(
@@ -232,12 +58,6 @@ class HomeViewModel constructor(
         this.serialManager.pause(_uiState.value.pause)
     }
 
-    private fun updateLog(log: Log) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(log = log)
-            logDao.insert(log)
-        }
-    }
 
     /**
      * 填充促凝剂
@@ -381,26 +201,10 @@ class HomeViewModel constructor(
 }
 
 data class HomeUiState(
-    val programList: List<Program> = emptyList(),
-    val plateList: List<Plate> = emptyList(),
-    val holeList: List<Hole> = emptyList(),
-    val container: Container? = null,
-    val log: Log? = null,
-    val program: Program? = null,
     val job: Job? = null,
     val pause: Boolean = false,
     val time: Long = 0L,
-    val info: CurrentInfo = CurrentInfo(),
     val fillCoagulant: Boolean = false,
     val recaptureCoagulant: Boolean = false,
     val upOrDown: Boolean = true,
-)
-
-data class CurrentInfo(
-    val plateSize: Int = 10,
-    val hole: Hole = Hole(),
-    val holeList: List<Pair<Int, Boolean>> = emptyList(),
-    val speed: Float = 0f,
-    val lastTime: Long = 0L,
-    val process: Int = 0,
 )

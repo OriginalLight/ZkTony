@@ -5,9 +5,7 @@ import org.koin.dsl.module
 
 val managerModule = module {
     single { SerialManager() }
-    single { WorkerManager() }
     single { MotorManager(get(), get()) }
     single { ExecutionManager(get(), get()) }
-    single { ContainerManager(get(), get(), get()) }
-    single { StateManager(get(), get(), get(), get(), get(), get()) }
+    single { StateManager(get(), get(), get(), get()) }
 }

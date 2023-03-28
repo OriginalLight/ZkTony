@@ -24,10 +24,10 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
     }
 
     private fun initView() {
-        binding.position.clickNoRepeat {
+        binding.washPlate.clickNoRepeat {
             inputDecimalDialog(
                 message = "请输入横坐标",
-                value = viewModel.uiState.value?.wasteX ?: 0f,
+                value = viewModel.uiState.value?.wasteY ?: 0f,
                 move = { viewModel.move(it) },
                 block = { viewModel.save(it) }
             )
@@ -40,7 +40,7 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     binding.apply {
-                        position.text = "当前位置: ${(it?.wasteX ?: 0f).removeZero()}"
+                        washPlate.text = (it?.wasteY ?: 0f).removeZero()
                     }
                 }
             }

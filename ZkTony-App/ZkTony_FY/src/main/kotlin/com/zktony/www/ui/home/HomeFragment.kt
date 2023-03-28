@@ -15,6 +15,7 @@ import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.R.color
 import com.zktony.common.R.mipmap
 import com.zktony.common.base.BaseFragment
+import com.zktony.common.ext.addTouchEvent
 import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
@@ -53,6 +54,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             tvPause.isVisible = !it
                             lock.isVisible = !it
                             tvLock.isVisible = !it
+                            fill.isVisible = !it
+                            tvFill.isVisible = !it
                         }
                     }
                 }
@@ -108,6 +111,18 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 setTextColor(Color.parseColor("#FFAB00"))
             }
             e.apply {
+                fill.addTouchEvent(
+                    down = {
+                        it.scaleX = 0.9f
+                        it.scaleY = 0.9f
+                        viewModel.fill(0)
+                    },
+                    up = {
+                        it.scaleX = 1f
+                        it.scaleY = 1f
+                        viewModel.fill(1)
+                    }
+                )
                 with(reset) {
                     clickScale()
                     clickNoRepeat { PopTip.show("长按复位") }

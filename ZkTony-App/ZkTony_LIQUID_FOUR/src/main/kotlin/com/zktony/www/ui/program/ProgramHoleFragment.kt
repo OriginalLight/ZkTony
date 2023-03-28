@@ -41,8 +41,9 @@ class ProgramHoleFragment :
                                 else -> "孔板"
                             }
                             dynamicPlate.run {
-                                setXY(it.plate.x, it.plate.y)
-                                setData(it.holes.map { h -> Triple(h.x, h.y, h.enable) })
+                                x = it.plate.y
+                                y = it.plate.x
+                                data = it.holes.map { h -> Triple(h.x, h.y, h.enable) }
                             }
                             val holeList = it.holes.filter { hole -> hole.enable }
                             selectAll.isEnabled = holeList.size != it.plate.x * it.plate.y
@@ -72,7 +73,7 @@ class ProgramHoleFragment :
             }
         }
         binding.apply {
-            dynamicPlate.setOnItemClick { x, y -> viewModel.select(x, y) }
+            dynamicPlate.onItemClick = { x, y -> viewModel.select(x, y) }
             volume.clickNoRepeat {
                 val holes = viewModel.uiState.value.holes[0]
                 val plate = viewModel.uiState.value.plate

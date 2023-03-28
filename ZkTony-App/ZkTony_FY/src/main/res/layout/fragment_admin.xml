@@ -89,6 +89,48 @@
                         android:background="@drawable/bg_line_bottom">
 
                         <ImageView
+                            android:id="@+id/iv_recycle"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/recycling"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toEndOf="@+id/iv_recycle"
+                            android:text="@string/recycle_antibody"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/sw_recycle"
+                            android:layout_width="50dp"
+                            android:layout_height="36dp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="35dp"
+                            android:checked="true"
+                            app:thumbTint="@color/light_primary"
+                            app:trackTint="@color/dark_surfaceTint"
+                            tools:ignore="TouchTargetSizeCheck" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_line_bottom">
+
+                        <ImageView
                             android:id="@+id/iv_temp"
                             android:layout_width="36dp"
                             android:layout_height="36dp"

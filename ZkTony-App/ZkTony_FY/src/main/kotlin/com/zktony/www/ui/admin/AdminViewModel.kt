@@ -225,6 +225,14 @@ class AdminViewModel constructor(
         Ext.ctx.sendBroadcast(intent)
     }
 
+    fun toggleRecycle(checked: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { preferences ->
+                preferences[booleanPreferencesKey(Constants.RECYCLE)] = checked
+            }
+        }
+    }
+
     /**
      * 抗体保温温度设置
      * @param temp [Float]

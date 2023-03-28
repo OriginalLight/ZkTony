@@ -17,40 +17,34 @@ class DynamicPlate : View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
             super(context, attrs, defStyleAttr)
 
-    private var x = 12
-    private var y = 8
-    private var color = Color.GREEN
-    private var showLocation = false
-    private var onItemClick: (Int, Int) -> Unit = { _, _ -> }
-    private var data = listOf<Triple<Int, Int, Boolean>>()
+    var x = 12
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var y = 8
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var color = Color.GREEN
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var showLocation = false
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var onItemClick: (Int, Int) -> Unit = { _, _ -> }
+    var data = listOf<Triple<Int, Int, Boolean>>()
+        set(value) {
+            field = value
+            invalidate()
+        }
     private var spacex: Float = 0f
     private var spacey: Float = 0f
-
-
-    fun setXY(x: Int, y: Int) {
-        this.x = y
-        this.y = x
-        invalidate()
-    }
-
-    fun setColor(color: Int) {
-        this.color = color
-        invalidate()
-    }
-
-    fun setShowLocation(showLocation: Boolean) {
-        this.showLocation = showLocation
-        invalidate()
-    }
-
-    fun setOnItemClick(onItemClick: (Int, Int) -> Unit) {
-        this.onItemClick = onItemClick
-    }
-
-    fun setData(data: List<Triple<Int, Int, Boolean>>) {
-        this.data = data
-        invalidate()
-    }
 
 
     @SuppressLint("DrawAllocation")
@@ -126,7 +120,8 @@ class DynamicPlate : View {
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event!!.action) {
-            MotionEvent.ACTION_DOWN -> {
+            MotionEvent.ACTION_DOWN -> {}
+            MotionEvent.ACTION_UP -> {
                 val xAxis = event.x.toInt()
                 val yAxis = event.y.toInt()
                 val i = (xAxis / spacex).toInt()
@@ -134,7 +129,7 @@ class DynamicPlate : View {
                 onItemClick((y - j - 1), i)
             }
         }
-        return super.onTouchEvent(event)
+        return true
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

@@ -9,7 +9,6 @@ import com.zktony.common.base.BaseFragment
 import com.zktony.common.dialog.inputDecimalDialog
 import com.zktony.common.dialog.inputNumberDialog
 import com.zktony.common.ext.clickNoRepeat
-import com.zktony.common.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentPlateBinding
 import kotlinx.coroutines.launch
@@ -35,8 +34,8 @@ class PlateFragment :
                 viewModel.uiState.collect {
                     binding.apply {
                         size.text = "${it.plate?.size ?: 10}"
-                        gradientPlate.setSize(it.plate?.size ?: 10)
-                        gradientPlate.setData(it.holeList.map { hole -> hole.y to (hole.yAxis > 0f) })
+                        gradientPlate.size = it.plate?.size ?: 10
+                        gradientPlate.yAxis = it.holeList.map { hole -> hole.y to hole.yAxis }
                     }
                 }
             }
@@ -56,7 +55,7 @@ class PlateFragment :
                     viewModel.reSize(it)
                 }
             }
-            gradientPlate.setOnItemClick { index ->
+            gradientPlate.onItemClick = { index ->
                 inputDecimalDialog(
                     message = "请输入 ${'A' + index} 横坐标",
                     value = viewModel.uiState.value.holeList.find { it.y == index }?.yAxis ?: 0f,

@@ -99,8 +99,8 @@ class CalibrationDataViewModel constructor(
             executionManager.executor(
                 executionManager.generator(),
                 executionManager.generator(
-                    v4 = if (motorId == 4) liquid else 0f,
-                    v5 = if (motorId == 5) liquid else 0f,
+                    v5 = if (motorId == 4) liquid else 0f,
+                    v6 = if (motorId == 5) liquid else 0f,
                 ),
                 executionManager.generator()
             )

@@ -17,24 +17,15 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <com.google.android.material.button.MaterialButton
+            <com.zktony.common.widget.SizeIndicator
                 android:id="@+id/size"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="640dp"
-                android:layout_height="48dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="@string/button"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                app:cornerRadius="0dp"
+                android:layout_height="36dp"
                 app:layout_constraintBottom_toTopOf="@+id/gradient_plate"
                 app:layout_constraintEnd_toEndOf="@+id/gradient_plate"
                 app:layout_constraintStart_toStartOf="@+id/gradient_plate"
-                app:rippleColor="@color/purple_500"
-                app:strokeColor="@color/light_primary"
-                app:strokeWidth="2dp"
-                tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize" />
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintBounds" />
 
             <com.zktony.common.widget.GradientPlate
                 android:id="@+id/gradient_plate"

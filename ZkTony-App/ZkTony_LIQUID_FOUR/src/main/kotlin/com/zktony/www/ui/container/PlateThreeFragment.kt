@@ -39,7 +39,10 @@ class PlateThreeFragment :
                             val x1y1 =
                                 it.holes.find { hole -> hole.x == plate.x - 1 && hole.y == plate.y - 1 }
                             binding.apply {
-                                dynamicPlate.setXY(plate.x, plate.y)
+                                with(dynamicPlate) {
+                                    x = plate.y
+                                    y = plate.x
+                                }
                                 rowColumn.text = "${plate.x} X ${plate.y}"
                                 if (x0y0 != null) {
                                     positionOne.text = "( ${
@@ -64,7 +67,7 @@ class PlateThreeFragment :
      */
     private fun initView() {
         binding.apply {
-            dynamicPlate.setShowLocation(true)
+            dynamicPlate.showLocation = true
             rowColumn.clickNoRepeat {
                 val plate = viewModel.uiState.value.plate!!
                 sizeDialog(

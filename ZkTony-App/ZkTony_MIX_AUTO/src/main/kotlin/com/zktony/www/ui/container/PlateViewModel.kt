@@ -77,7 +77,7 @@ class PlateViewModel constructor(
             hole?.let {
                 holeDao.update(it.copy(yAxis = axis))
                 delay(500L)
-                calculateCoordinate()
+                calculate()
             }
         }
     }
@@ -90,19 +90,27 @@ class PlateViewModel constructor(
         executionManager.executor(executionManager.generator(y = y))
     }
 
-
-    private suspend fun calculateCoordinate() {
+    /**
+     * 数组计算算法
+     */
+    private suspend fun calculate(index: Int  = 0) {
         val holeList = _uiState.value.holeList
-        val min = holeList.filter { it.yAxis != 0f }.minByOrNull { it.y }
-        val max = holeList.filter { it.yAxis != 0f }.maxByOrNull { it.y }
-        if (min == null || max == null) {
+        val h1 = holeList[index]
+        var h2 = holeList[index + 1]
+        for (i in index + 1 until holeList.size) {
+            if (holeList[i].yAxis != 0f) {
+                h2 = holeList[i]
+                break
+            }
+        }
+        if (h2.yAxis == 0f && h2.y == index + 1) {
             return
         } else {
-            val minIndex = min.y
-            val maxIndex = max.y
+            val minIndex = h1.y
+            val maxIndex = h2.y
             if (maxIndex - minIndex >= 2) {
-                val minAxis = min.yAxis
-                val maxAxis = max.yAxis
+                val minAxis = h1.yAxis
+                val maxAxis = h2.yAxis
                 val distance = (maxAxis - minAxis) / (maxIndex - minIndex)
                 val holes = mutableListOf<Hole>()
                 for (i in minIndex + 1 until maxIndex) {
@@ -112,6 +120,9 @@ class PlateViewModel constructor(
                     }
                 }
                 holeDao.updateAll(holes)
+            }
+            if (maxIndex < holeList.size - 2) {
+                calculate(maxIndex)
             }
         }
     }

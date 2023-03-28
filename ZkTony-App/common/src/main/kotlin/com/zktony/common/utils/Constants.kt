@@ -15,6 +15,7 @@ object Constants {
     const val INTERVAL = "INTERVAL"
     const val MOTOR_SPEED = "MOTOR_SPEED"
     const val TEMP = "TEMP"
+    const val RECYCLE = "RECYCLE"
     const val NEEDLE_SPACE = "NEEDLE_SPACE"
     const val MAX_MOTOR = 250
     const val MAX_TIME = 99f

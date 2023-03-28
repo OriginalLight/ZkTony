@@ -8,32 +8,11 @@
             android:title="@string/title_home" />
     </group>
 
-    <group android:id="@+id/g_program">
-        <item
-            android:id="@+id/navigation_program"
-            android:icon="@mipmap/program"
-            android:title="@string/title_program" />
-    </group>
-
-    <group android:id="@+id/g_container">
-        <item
-            android:id="@+id/navigation_container"
-            android:icon="@mipmap/container"
-            android:title="@string/title_container" />
-    </group>
-
     <group android:id="@+id/g_calibration">
         <item
             android:id="@+id/navigation_calibration"
             android:icon="@mipmap/calibration"
             android:title="@string/title_calibration" />
-    </group>
-
-    <group android:id="@+id/g_log">
-        <item
-            android:id="@+id/navigation_log"
-            android:icon="@mipmap/log"
-            android:title="@string/title_log" />
     </group>
 
     <group android:id="@+id/g_admin">

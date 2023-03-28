@@ -6,6 +6,7 @@ import com.zktony.common.utils.Queue
 import com.zktony.www.data.local.room.entity.Action
 import com.zktony.www.data.local.room.entity.ActionEnum
 import com.zktony.www.data.local.room.entity.Container
+import com.zktony.www.manager.Settings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -22,6 +23,7 @@ class ProgramExecutor constructor(
     val queue: Queue<Action>,
     val module: Int,
     val container: Container,
+    val settings: Settings,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var event: (ExecutorEvent) -> Unit = {}
@@ -29,7 +31,8 @@ class ProgramExecutor constructor(
         CommandExecutor(
             module = module,
             con = container,
-            event = { event(ExecutorEvent.Wait(module, it)) }
+            event = { event(ExecutorEvent.Wait(module, it)) },
+            settings = settings
         )
     }
 

@@ -204,7 +204,7 @@ class AdminViewModel constructor(
     private fun checkLocalUpdate(): File? {
         File("/storage").listFiles()?.forEach {
             it.listFiles()?.forEach { apk ->
-                if (apk.name.endsWith(".apk") && apk.name.contains("zktony-liquid")) {
+                if (apk.name.endsWith(".apk") && apk.name.contains("zktony-mix-manual")) {
                     return apk
                 }
             }

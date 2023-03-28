@@ -34,7 +34,7 @@ class CalibrationDataFragment :
                 viewModel.uiState.collect {
                     adapter.submitList(it.caliData)
                     binding.apply {
-                        select.text = listOf("泵一", "泵二", "泵三", "泵四")[it.pumpId]
+                        select.text = listOf("泵一", "泵二", "泵三")[it.pumpId]
                         if (it.expect > 0f) {
                             expect.setEqualText(it.expect.toString().removeZero())
                         }

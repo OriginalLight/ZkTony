@@ -17,27 +17,32 @@ class WashPlate : View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
             super(context, attrs, defStyleAttr)
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) :
-            super(context, attrs, defStyleAttr, defStyleRes)
+    var text = "TEXT"
+        set(value) {
+            field = value
+            invalidate()
+        }
 
-    private var onItemClick: () -> Unit = { }
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         // 绘制核心方法
         val paint = Paint()
-        paint.color = Color.LTGRAY
-        paint.strokeJoin = Paint.Join.ROUND
-        paint.strokeCap = Paint.Cap.ROUND
-        paint.strokeWidth = 2f
+        paint.color = Color.BLACK
+        paint.strokeWidth = 4f
 
-        val rect = Rect(0, 0, width, height)
-        canvas?.drawRect(rect, paint)
 
-        paint.color = Color.WHITE
-        val rect1 = Rect(20, 20, width - 20, height - 20)
-        canvas?.drawRect(rect1, paint)
+        // 绘制外框
+        paint.style = Paint.Style.STROKE
+        canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+
+        paint.textSize = 36f
+        paint.isAntiAlias = true
+        paint.style = Paint.Style.FILL
+        val x = (width - paint.measureText(text)) / 2
+        val y = height / 2  + (paint.fontMetrics.bottom - paint.fontMetrics.top) / 2 - paint.fontMetrics.bottom
+        canvas?.drawText(text, x, y, paint)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

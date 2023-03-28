@@ -1,15 +1,12 @@
 package com.zktony.www.ui.home
 
 import com.zktony.common.ext.currentTime
-import com.zktony.common.utils.loge
-import com.zktony.serialport.util.Serial
 import com.zktony.www.common.ext.total
 import com.zktony.www.data.local.room.entity.Container
 import com.zktony.www.data.local.room.entity.Hole
 import com.zktony.www.data.local.room.entity.Plate
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -73,23 +70,14 @@ class ProgramExecutor constructor(
                         event(ExecutorEvent.Log("[ ${currentTime()} ]\t 排液\n"))
                         executionManager.executor(
                             executionManager.generator(
-                                y = container.wasteX
+                                y = container.wasteY,
+                                v1 = 1000f
                             )
                         )
                         delay(100L)
                         while (serialManager.lock.value) {
                             delay(100L)
                         }
-                        serialManager.sendHex(
-                            serial = Serial.TTYS3,
-                            hex = V1(pa = "0B", data = "0401").toHex()
-                        )
-                        delay(3000L)
-                        serialManager.sendHex(
-                            serial = Serial.TTYS3,
-                            hex = V1(pa = "0B", data = "0400").toHex()
-                        )
-                        delay(500L)
                         complete += 1
                         event(ExecutorEvent.Progress(total, complete))
                     }

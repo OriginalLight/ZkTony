@@ -51,12 +51,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 holeNumber.text = "/"
                             }
                             time.text = it.time.getTimeFormat()
-                            dynamicPlate.setXY(
-                                it.info.plateSize.first,
-                                it.info.plateSize.second,
-                            )
-                            dynamicPlate.setData(it.info.holeList)
-                            dynamicPlate.setColor(it.info.color)
+                            with(dynamicPlate) {
+                                x = it.info.plateSize.second
+                                y = it.info.plateSize.first
+                                data = it.info.holeList
+                                color = it.info.color
+                            }
                             currentPlate.text = it.info.plate
                             currentLiquid.text = it.info.liquid
                             currentSpeed.text = String.format("%.2f", it.info.speed)

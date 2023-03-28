@@ -39,15 +39,17 @@ class ProgramPlateFragment :
                             val plate = it.plateList.find { plate -> plate.index == 0 }
                             val holes = it.holeList.filter { hole -> hole.subId == plate?.id }
                             if (plate != null) {
-                                setXY(plate.x, plate.y)
-                                setData(holes.map { h -> Triple(h.x, h.y, h.enable) })
+                                x = plate.y
+                                y = plate.x
+                                data = holes.map { h -> Triple(h.x, h.y, h.enable) }
                                 holeOne.text = holes.filter { hole -> hole.enable }.size.toString()
                             } else {
                                 val p0 = it.plates.find { p -> p.index == 0 }
                                 if (p0 != null) {
-                                    setXY(p0.x, p0.y)
+                                    x = p0.y
+                                    y = p0.x
                                 }
-                                setData(emptyList())
+                                data = emptyList()
                                 holeOne.text = ""
                             }
                         }
@@ -55,15 +57,17 @@ class ProgramPlateFragment :
                             val plate = it.plateList.find { plate -> plate.index == 1 }
                             val holes = it.holeList.filter { hole -> hole.subId == plate?.id }
                             if (plate != null) {
-                                setXY(plate.x, plate.y)
-                                setData(holes.map { h -> Triple(h.x, h.y, h.enable) })
+                                x = plate.y
+                                y = plate.x
+                                data = holes.map { h -> Triple(h.x, h.y, h.enable) }
                                 holeTwo.text = holes.filter { hole -> hole.enable }.size.toString()
                             } else {
                                 val p1 = it.plates.find { p -> p.index == 1 }
                                 if (p1 != null) {
-                                    setXY(p1.x, p1.y)
+                                    x = p1.y
+                                    y = p1.x
                                 }
-                                setData(emptyList())
+                                data = emptyList()
                                 holeTwo.text = ""
                             }
                         }
@@ -71,16 +75,18 @@ class ProgramPlateFragment :
                             val plate = it.plateList.find { plate -> plate.index == 2 }
                             val holes = it.holeList.filter { hole -> hole.subId == plate?.id }
                             if (plate != null) {
-                                setXY(plate.x, plate.y)
-                                setData(holes.map { h -> Triple(h.x, h.y, h.enable) })
+                                x = plate.y
+                                y = plate.x
+                                data = holes.map { h -> Triple(h.x, h.y, h.enable) }
                                 holeThree.text =
                                     holes.filter { hole -> hole.enable }.size.toString()
                             } else {
                                 val p2 = it.plates.find { p -> p.index == 2 }
                                 if (p2 != null) {
-                                    setXY(p2.x, p2.y)
+                                    x = p2.y
+                                    y = p2.x
                                 }
-                                setData(emptyList())
+                                data = emptyList()
                                 holeThree.text = ""
                             }
                         }
@@ -88,15 +94,17 @@ class ProgramPlateFragment :
                             val plate = it.plateList.find { plate -> plate.index == 3 }
                             val holes = it.holeList.filter { hole -> hole.subId == plate?.id }
                             if (plate != null) {
-                                setXY(plate.x, plate.y)
-                                setData(holes.map { h -> Triple(h.x, h.y, h.enable) })
+                                x = plate.y
+                                y = plate.x
+                                data = holes.map { h -> Triple(h.x, h.y, h.enable) }
                                 holeFour.text = holes.filter { hole -> hole.enable }.size.toString()
                             } else {
                                 val p3 = it.plates.find { p -> p.index == 3 }
                                 if (p3 != null) {
-                                    setXY(p3.x, p3.y)
+                                    x = p3.y
+                                    y = p3.x
                                 }
-                                setData(emptyList())
+                                data = emptyList()
                                 holeFour.text = ""
                             }
                         }
@@ -114,7 +122,7 @@ class ProgramPlateFragment :
             }
         }
         binding.apply {
-            dynamicPlateOne.clickNoRepeat {
+            dynamicPlateOne.onItemClick = { _, _ ->
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 0 }
                 if (plate != null) {
                     findNavController().navigate(
@@ -125,7 +133,7 @@ class ProgramPlateFragment :
                     PopTip.show("请先选中")
                 }
             }
-            dynamicPlateTwo.clickNoRepeat {
+            dynamicPlateTwo.onItemClick = { _, _ ->
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 1 }
                 if (plate != null) {
                     findNavController().navigate(
@@ -136,7 +144,7 @@ class ProgramPlateFragment :
                     PopTip.show("请先选中")
                 }
             }
-            dynamicPlateThree.clickNoRepeat {
+            dynamicPlateThree.onItemClick = { _, _ ->
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 2 }
                 if (plate != null) {
                     findNavController().navigate(
@@ -147,7 +155,7 @@ class ProgramPlateFragment :
                     PopTip.show("请先选中")
                 }
             }
-            dynamicPlateFour.clickNoRepeat {
+            dynamicPlateFour.onItemClick = { _, _ ->
                 val plate = viewModel.uiState.value.plateList.find { plate -> plate.index == 3 }
                 if (plate != null) {
                     findNavController().navigate(

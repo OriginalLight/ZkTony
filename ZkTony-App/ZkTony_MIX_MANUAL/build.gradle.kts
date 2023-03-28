@@ -72,7 +72,7 @@ android {
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-mix-manual${versionName}-${name}.apk"
+                "zktony-mix-manual-${versionName}-${name}.apk"
         }
     }
 }
@@ -90,12 +90,10 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.datastore.preferences)
     implementation(libs.dialogx)
     implementation(libs.koin.core)
     implementation(libs.koin.android)
-    implementation(libs.koin.androidx.workmanager)
     implementation(libs.material)
     implementation(libs.okhttp3)
     implementation(libs.okhttp3.logging.interceptor)

@@ -8,6 +8,7 @@ import com.zktony.common.ext.currentTime
 import com.zktony.common.ext.removeZero
 import com.zktony.common.utils.Constants
 import com.zktony.common.utils.Queue
+import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.TTYS0
 import com.zktony.serialport.util.Serial.TTYS3
 import com.zktony.www.data.local.room.dao.ActionDao
@@ -195,7 +196,10 @@ class HomeViewModel constructor(
                 }
                 // 创建程序执行者
                 val executor = ProgramExecutor(
-                    queue = actionQueue, module = module, container = _buttonFlow.value.container
+                    queue = actionQueue,
+                    module = module,
+                    container = _buttonFlow.value.container,
+                    settings = stateManager.settings.value,
                 )
                 // 收集执行者的状态
                 executor.event = {
@@ -312,6 +316,20 @@ class HomeViewModel constructor(
                 }
             } else {
                 PopTip.show("请中止所有运行中程序")
+            }
+        }
+    }
+
+    fun fill(flag: Int) {
+        viewModelScope.launch {
+            if (flag == 0) {
+                serialManager.sendHex(
+                    serial = Serial.TTYS2, hex = V1(pa = "0B", data = "0201").toHex()
+                )
+            } else {
+                serialManager.sendHex(
+                    serial = Serial.TTYS2, hex = V1(pa = "0B", data = "0200").toHex()
+                )
             }
         }
     }

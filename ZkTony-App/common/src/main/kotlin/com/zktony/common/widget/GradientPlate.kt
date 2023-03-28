@@ -8,6 +8,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import com.zktony.common.ext.removeZero
 
 class GradientPlate : View {
 
@@ -16,33 +17,26 @@ class GradientPlate : View {
     constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) :
             super(context, attrs, defStyleAttr)
 
-    private var size = 10
-    private var color = Color.GREEN
-    private var onItemClick: (Int) -> Unit = { _ -> }
-    private var data = listOf<Pair<Int, Boolean>>()
+    var size = 10
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var color = Color.GREEN
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var data = listOf<Pair<Int, Boolean>>()
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var yAxis = listOf<Pair<Int, Float>>()
+
+    var onItemClick: (Int) -> Unit = { _ -> }
+
     private var space: Float = 0f
-
-
-    fun setSize(size: Int) {
-        this.size = size
-        invalidate()
-    }
-
-    fun setColor(color: Int) {
-        this.color = color
-        invalidate()
-    }
-
-
-    fun setOnItemClick(onItemClick: (Int) -> Unit) {
-        this.onItemClick = onItemClick
-    }
-
-    fun setData(data: List<Pair<Int, Boolean>>) {
-        this.data = data
-        invalidate()
-    }
-
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas?) {
@@ -98,19 +92,37 @@ class GradientPlate : View {
             canvas?.drawText(text, left + (right - left - textWidth) / 2, height.toFloat() - 16, paint)
         }
 
-
+        for (i in 0 until size) {
+            val axis = yAxis.find { it.first == i }
+            if (axis != null) {
+                val left = i * space + if (i == 0) 8 else 4
+                val right = (i + 1) * space - if (i == size - 1) 8 else 4
+                val top = 8f
+                val bottom = height.toFloat()  - 8f
+                paint.style = Paint.Style.FILL
+                paint.color = Color.BLACK
+                paint.strokeWidth = 1f
+                paint.isAntiAlias = true
+                paint.textSize = space * 0.2f
+                val text = String.format("%.2f", axis.second).removeZero()
+                val x = left + (right - left - paint.measureText(text)) / 2
+                val y = top + (bottom - top - paint.textSize) / 2 + paint.textSize
+                canvas?.drawText(text, x, y, paint)
+            }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         when (event!!.action) {
-            MotionEvent.ACTION_DOWN -> {
+            MotionEvent.ACTION_DOWN -> {}
+            MotionEvent.ACTION_UP -> {
                 val xAxis = event.x.toInt()
                 val i = (xAxis / space).toInt()
                 onItemClick(i)
             }
         }
-        return super.onTouchEvent(event)
+        return true
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

@@ -50,6 +50,13 @@ class StateManager constructor(
                         _settings.value = _settings.value.copy(bar = it)
                     }
                 }
+                launch {
+                    dataStore.data.map {
+                        it[booleanPreferencesKey(Constants.RECYCLE)] ?: true
+                    }.collect {
+                        _settings.value = _settings.value.copy(recycle = it)
+                    }
+                }
             }
         }
     }
@@ -59,4 +66,5 @@ class StateManager constructor(
 data class Settings(
     val temp: Float = 3f,
     val bar: Boolean = false,
+    val recycle: Boolean = true,
 )

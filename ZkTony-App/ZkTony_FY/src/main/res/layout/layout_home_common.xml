@@ -13,7 +13,7 @@
             android:layout_width="80dp"
             android:layout_height="80dp"
             android:background="@mipmap/reset"
-            app:layout_constraintBottom_toTopOf="@+id/pause"
+            app:layout_constraintBottom_toTopOf="@+id/fill"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -29,6 +29,26 @@
             app:layout_constraintTop_toBottomOf="@+id/reset" />
 
         <ImageButton
+            android:id="@+id/fill"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@mipmap/right"
+            app:layout_constraintBottom_toTopOf="@+id/pause"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/reset"
+            tools:ignore="ContentDescription,ImageContrastCheck,SpeakableTextPresentCheck,VisualLintBounds" />
+
+        <TextView
+            android:id="@+id/tv_fill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/fill"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/fill" />
+
+        <ImageButton
             android:id="@+id/pause"
             android:layout_width="80dp"
             android:layout_height="80dp"
@@ -36,7 +56,7 @@
             app:layout_constraintBottom_toTopOf="@+id/insulating"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/reset"
+            app:layout_constraintTop_toBottomOf="@+id/fill"
             tools:ignore="ContentDescription,SpeakableTextPresentCheck,VisualLintBounds" />
 
         <TextView

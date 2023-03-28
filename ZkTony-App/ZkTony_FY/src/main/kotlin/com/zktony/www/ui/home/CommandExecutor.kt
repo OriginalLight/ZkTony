@@ -5,6 +5,7 @@ import com.zktony.www.data.local.room.entity.Action
 import com.zktony.www.data.local.room.entity.Container
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
+import com.zktony.www.manager.Settings
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.delay
 import org.koin.java.KoinJavaComponent.inject
@@ -16,6 +17,7 @@ import org.koin.java.KoinJavaComponent.inject
 class CommandExecutor constructor(
     private val module: Int,
     private val con: Container,
+    private val settings: Settings,
     private val event: (String) -> Unit = { }
 ) {
     private lateinit var action: Action
@@ -80,7 +82,10 @@ class CommandExecutor constructor(
         serialManager.sendHex(TTYS0, V1.queryDrawer())
         delay(500L)
         waitForFree {
-            recycleLiquid(y = con.oneY, z = con.recycleOneZ)
+            recycleLiquid(
+                y = if (settings.recycle) con.oneY else con.wasteY,
+                z = if (settings.recycle) con.recycleOneZ else con.wasteZ
+            )
             event("回收中")
             delay(100L)
             while (serialManager.lock.value) {
@@ -146,7 +151,7 @@ class CommandExecutor constructor(
         serialManager.sendHex(TTYS0, V1.queryDrawer())
         delay(500L)
         waitForFree {
-            recycleLiquid(y = con.washY, z = con.wasteZ)
+            recycleLiquid(y = con.wasteY, z = con.wasteZ)
             event("清理中")
             delay(100L)
             while (serialManager.lock.value) {
@@ -186,7 +191,7 @@ class CommandExecutor constructor(
      * @return [List]<[String]>
      */
     private fun recycleLiquid(y: Float, z: Float) {
-        val volume = -(action.liquidVolume + 10000f)
+        val volume = -(action.liquidVolume + 20000f)
         executionManager.executor(
             executionManager.generator(y = y),
             executionManager.generator(
@@ -196,7 +201,7 @@ class CommandExecutor constructor(
                 v2 = if (module == 1) volume else 0f,
                 v3 = if (module == 2) volume else 0f,
                 v4 = if (module == 3) volume else 0f,
-                v6 = action.liquidVolume + 10000f
+                v6 = action.liquidVolume + 20000f
             ),
             executionManager.generator(y = y)
         )

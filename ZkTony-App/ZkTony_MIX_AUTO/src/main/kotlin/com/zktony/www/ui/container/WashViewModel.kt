@@ -40,7 +40,7 @@ class WashViewModel constructor(
     fun save(x: Float) {
         viewModelScope.launch {
             _uiState.value?.let {
-                dao.update(it.copy(wasteX = x))
+                dao.update(it.copy(wasteY = x))
             }
         }
     }

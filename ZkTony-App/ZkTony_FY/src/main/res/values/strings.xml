@@ -82,4 +82,6 @@
     <string name="wifi_setting">WIFI设置</string>
     <string name="a">A</string>
     <string name="start_time">开始时间</string>
+    <string name="recycle_antibody">回收一抗</string>
+    <string name="fill">填充洗涤液</string>
 </resources>
