@@ -45,7 +45,7 @@ class LogFragment :
     }
 
     private fun initView() {
-        adapter.setOnDeleteButtonClick {
+        adapter.onDeleteButtonClick = {
             viewModel.delete(it)
         }
         binding.recycleView.adapter = adapter

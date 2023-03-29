@@ -40,10 +40,10 @@ class ProgramFragment :
 
     private fun initView() {
         adapter.apply {
-            setOnDeleteButtonClick {
+            onDeleteButtonClick = {
                 deleteDialog(name = it.name, block = { viewModel.delete(it) })
             }
-            setOnEditButtonClick {
+            onEditButtonClick = {
                 findNavController().navigate(
                     R.id.action_navigation_program_to_navigation_program_plate,
                     Bundle().apply { putLong("id", it.id) }

@@ -9,13 +9,11 @@ import com.zktony.common.BuildConfig
  * @author: 刘贺贺
  * @date: 2022-10-08 9:38
  */
-class DialogXManager constructor(application: Application) {
+object DialogXManager {
 
-    init {
+    fun init(application: Application) {
+
         DialogX.init(application)
-    }
-
-    fun init() {
         //开启调试模式，在部分情况下会使用 Log 输出日志信息
         DialogX.DEBUGMODE = BuildConfig.DEBUG
 

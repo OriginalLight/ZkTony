@@ -4,15 +4,13 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.common.ext.Ext
 import com.zktony.common.ext.installApk
 import com.zktony.common.ext.isNetworkAvailable
+import com.zktony.common.ext.save
 import com.zktony.common.http.download.DownloadManager
 import com.zktony.common.http.download.DownloadState
 import com.zktony.common.utils.Constants
@@ -87,11 +85,7 @@ class AdminViewModel constructor(
      * @param bar [Boolean]
      */
     fun toggleNavigationBar(bar: Boolean) {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[booleanPreferencesKey(Constants.BAR)] = bar
-            }
-        }
+        dataStore.save(Constants.BAR, bar)
         val intent = Intent().apply {
             action = "ACTION_SHOW_NAVBAR"
             putExtra("cmd", if (bar) "show" else "hide")
@@ -104,11 +98,7 @@ class AdminViewModel constructor(
      * @param audio [Boolean] true 开 false 关
      */
     fun toggleAudio(audio: Boolean) {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[booleanPreferencesKey(Constants.AUDIO)] = audio
-            }
-        }
+        dataStore.save(Constants.AUDIO, audio)
     }
 
     /**
@@ -116,11 +106,7 @@ class AdminViewModel constructor(
      * @param detect [Boolean] true 开 false 关
      */
     fun toggleDetect(detect: Boolean) {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[booleanPreferencesKey(Constants.DETECT)] = detect
-            }
-        }
+        dataStore.save(Constants.DETECT, detect)
     }
 
     /**
@@ -128,11 +114,7 @@ class AdminViewModel constructor(
      * @param interval [Int] 间隔时间
      */
     fun toggleInterval(interval: Int) {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[intPreferencesKey(Constants.INTERVAL)] = minOf(interval, 10)
-            }
-        }
+        dataStore.save(Constants.INTERVAL, minOf(interval, 10))
     }
 
     /**
@@ -140,11 +122,7 @@ class AdminViewModel constructor(
      * @param duration [Int] 持续时间
      */
     fun toggleDuration(duration: Int) {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[intPreferencesKey(Constants.DURATION)] = minOf(duration, 200)
-            }
-        }
+        dataStore.save(Constants.DURATION, minOf(duration, 200))
     }
 
     /**
@@ -152,11 +130,7 @@ class AdminViewModel constructor(
      * @param speed [Int] 转速
      */
     fun toggleMotorSpeed(speed: Int) {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[intPreferencesKey(Constants.MOTOR_SPEED)] = minOf(speed, 250)
-            }
-        }
+        dataStore.save(Constants.MOTOR_SPEED, minOf(speed, 250))
     }
 
     /**

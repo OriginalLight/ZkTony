@@ -58,7 +58,7 @@ class MotorFragment : BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layou
      * 初始化视图
      */
     private fun initView() {
-        adapter.setOnEditButtonClick { viewModel.selectMotor(it) }
+        adapter.onEditButtonClick = { viewModel.selectMotor(it) }
 
         binding.apply {
             recycleView.adapter = adapter

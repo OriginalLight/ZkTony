@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.floatPreferencesKey
+import com.zktony.common.ext.read
 import com.zktony.common.utils.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -37,16 +38,12 @@ class StateManager constructor(
             }
             launch {
                 launch {
-                    dataStore.data.map {
-                        it[booleanPreferencesKey(Constants.BAR)] ?: false
-                    }.collect {
+                    dataStore.read(Constants.BAR, false).collect {
                         _settings.value = _settings.value.copy(bar = it)
                     }
                 }
                 launch {
-                    dataStore.data.map {
-                        it[floatPreferencesKey(Constants.NEEDLE_SPACE)] ?: 7.3f
-                    }.collect {
+                    dataStore.read(Constants.NEEDLE_SPACE, 12f).collect {
                         _settings.value = _settings.value.copy(needleSpace = it)
                     }
                 }

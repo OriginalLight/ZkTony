@@ -2,8 +2,8 @@ package com.zktony.www.manager
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import com.zktony.common.ext.read
 import com.zktony.common.utils.Constants
 import com.zktony.common.utils.logi
 import com.zktony.www.manager.protocol.V1
@@ -47,37 +47,27 @@ class StateManager constructor(
             }
             launch {
                 launch {
-                    dataStore.data.map {
-                        it[booleanPreferencesKey(Constants.AUDIO)] ?: true
-                    }.collect {
+                    dataStore.read(Constants.AUDIO, true).collect {
                         _setting.value = _setting.value.copy(audio = it)
                     }
                 }
                 launch {
-                    dataStore.data.map {
-                        it[booleanPreferencesKey(Constants.BAR)] ?: false
-                    }.collect {
+                    dataStore.read(Constants.BAR, false).collect {
                         _setting.value = _setting.value.copy(bar = it)
                     }
                 }
                 launch {
-                    dataStore.data.map {
-                        it[booleanPreferencesKey(Constants.DETECT)] ?: true
-                    }.collect {
+                    dataStore.read(Constants.DETECT, true).collect {
                         _setting.value = _setting.value.copy(detect = it)
                     }
                 }
                 launch {
-                    dataStore.data.map {
-                        it[intPreferencesKey(Constants.INTERVAL)] ?: 1
-                    }.collect {
+                    dataStore.read(Constants.INTERVAL, 1).collect {
                         _setting.value = _setting.value.copy(interval = it)
                     }
                 }
                 launch {
-                    dataStore.data.map {
-                        it[intPreferencesKey(Constants.DURATION)] ?: 10
-                    }.collect {
+                    dataStore.read(Constants.DURATION, 10).collect {
                         _setting.value = _setting.value.copy(duration = it)
                     }
                 }

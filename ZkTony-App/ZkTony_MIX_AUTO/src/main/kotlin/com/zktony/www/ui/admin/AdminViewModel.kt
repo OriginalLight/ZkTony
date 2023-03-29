@@ -4,15 +4,10 @@ import android.content.Intent
 import android.provider.Settings
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
-import com.zktony.common.ext.Ext
-import com.zktony.common.ext.installApk
-import com.zktony.common.ext.int8ToHex
-import com.zktony.common.ext.isNetworkAvailable
+import com.zktony.common.ext.*
 import com.zktony.common.http.download.DownloadManager
 import com.zktony.common.http.download.DownloadState
 import com.zktony.common.utils.Constants
@@ -217,11 +212,7 @@ class AdminViewModel constructor(
      * @param bar [Boolean]
      */
     fun toggleNavigationBar(bar: Boolean) {
-        viewModelScope.launch {
-            dataStore.edit { preferences ->
-                preferences[booleanPreferencesKey(Constants.BAR)] = bar
-            }
-        }
+        dataStore.save(Constants.BAR, bar)
         val intent = Intent().apply {
             action = "ACTION_SHOW_NAVBAR"
             putExtra("cmd", if (bar) "show" else "hide")
@@ -270,5 +261,4 @@ class AdminViewModel constructor(
             }
         }
     }
-
 }

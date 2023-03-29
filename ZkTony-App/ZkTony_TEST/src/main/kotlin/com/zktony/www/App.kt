@@ -18,7 +18,7 @@ class App : Application(), KoinComponent {
         super.onCreate()
         Ext.with(this)
         DataStoreFactory.init(this)
-        DialogXManager(this).init()
+        DialogXManager.init(this)
 
         startKoin {
             androidContext(this@App)

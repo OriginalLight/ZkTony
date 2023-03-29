@@ -1,5 +1,4 @@
 @file:Suppress("UnstableApiUsage")
-
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.library)
@@ -37,6 +36,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
+    implementation(libs.datastore.preferences)
     implementation(libs.dialogx)
     implementation(libs.material)
     implementation(libs.okhttp3)

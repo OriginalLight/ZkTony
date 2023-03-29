@@ -89,7 +89,7 @@ class ActionFragment :
                 viewModel.load(id)
             }
         }
-        adapter.setOnDeleteButtonClick {
+        adapter.onDeleteButtonClick = {
             PopTip.show("已删除")
             viewModel.delete(it)
         }

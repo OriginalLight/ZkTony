@@ -15,15 +15,14 @@ import com.zktony.www.databinding.ItemProgramBinding
  * @author: 刘贺贺
  * @date: 2022-09-21 11:27
  */
-class ProgramAdapter :
-    ListAdapter<Program, ProgramAdapter.ViewHolder>(WorkDiffCallback()) {
+class ProgramAdapter : ListAdapter<Program, ProgramViewHolder>(diffCallback) {
 
-    private var onDeleteButtonClick: (Program) -> Unit = {}
-    private var onEditButtonClick: (Program) -> Unit = {}
+    var onDeleteButtonClick: (Program) -> Unit = {}
+    var onEditButtonClick: (Program) -> Unit = {}
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProgramViewHolder {
+        return ProgramViewHolder(
             ItemProgramBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
@@ -34,58 +33,47 @@ class ProgramAdapter :
         )
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ProgramViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    fun setOnDeleteButtonClick(onDeleteButtonClick: (Program) -> Unit) {
-        this.onDeleteButtonClick = onDeleteButtonClick
-    }
 
-    fun setOnEditButtonClick(onEditButtonClick: (Program) -> Unit) {
-        this.onEditButtonClick = onEditButtonClick
-    }
+    companion object {
+        val diffCallback = object : DiffUtil.ItemCallback<Program>() {
+            override fun areItemsTheSame(oldItem: Program, newItem: Program): Boolean {
+                return oldItem.id == newItem.id
+            }
 
-    class ViewHolder(
-        private val binding: ItemProgramBinding,
-        private val onDeleteButtonClick: (Program) -> Unit,
-        private val onEditButtonClick: (Program) -> Unit,
-    ) : RecyclerView.ViewHolder(binding.root) {
-        @SuppressLint("SetTextI18n")
-        fun bind(item: Program) {
-            binding.apply {
-                program = item
-                order.text = (layoutPosition + 1).toString()
-                with(edit) {
-                    clickScale()
-                    clickNoRepeat {
-                        onEditButtonClick.invoke(item)
-                    }
-                }
-                with(delete) {
-                    clickScale()
-                    clickNoRepeat {
-                        onDeleteButtonClick.invoke(item)
-                    }
-                }
-                executePendingBindings()
+            override fun areContentsTheSame(oldItem: Program, newItem: Program): Boolean {
+                return oldItem == newItem
             }
         }
     }
 }
 
-private class WorkDiffCallback : DiffUtil.ItemCallback<Program>() {
-    override fun areItemsTheSame(
-        oldItem: Program,
-        newItem: Program
-    ): Boolean {
-        return oldItem.id == newItem.id
-    }
-
-    override fun areContentsTheSame(
-        oldItem: Program,
-        newItem: Program
-    ): Boolean {
-        return oldItem == newItem
+class ProgramViewHolder(
+    private val binding: ItemProgramBinding,
+    private val onDeleteButtonClick: (Program) -> Unit,
+    private val onEditButtonClick: (Program) -> Unit,
+) : RecyclerView.ViewHolder(binding.root) {
+    @SuppressLint("SetTextI18n")
+    fun bind(item: Program) {
+        binding.apply {
+            program = item
+            order.text = (layoutPosition + 1).toString()
+            with(edit) {
+                clickScale()
+                clickNoRepeat {
+                    onEditButtonClick.invoke(item)
+                }
+            }
+            with(delete) {
+                clickScale()
+                clickNoRepeat {
+                    onDeleteButtonClick.invoke(item)
+                }
+            }
+            executePendingBindings()
+        }
     }
 }

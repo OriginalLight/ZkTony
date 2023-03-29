@@ -49,10 +49,10 @@ class LogFragment :
 
     @SuppressLint("SimpleDateFormat")
     private fun initView() {
-        adapter.setOnDeleteButtonClick {
+        adapter.onDeleteButtonClick = {
             deleteDialog(name = "该日志", block = { viewModel.delete(it) })
         }
-        adapter.setOnChartButtonClick {
+        adapter.onChartButtonClick = {
             findNavController().navigate(
                 R.id.action_navigation_log_to_navigation_log_chart,
                 Bundle().apply { putString("id", it.id) }

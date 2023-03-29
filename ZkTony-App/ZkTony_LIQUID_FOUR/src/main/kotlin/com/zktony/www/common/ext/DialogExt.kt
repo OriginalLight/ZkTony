@@ -2,6 +2,7 @@ package com.zktony.www.common.ext
 
 import android.graphics.Color
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import com.google.android.material.button.MaterialButton
@@ -33,9 +34,9 @@ fun positionDialog(
                 val title = v.findViewById<TextView>(R.id.title)
                 val inputX = v.findViewById<EditText>(R.id.input_x)
                 val inputY = v.findViewById<EditText>(R.id.input_y)
-                val move = v.findViewById<MaterialButton>(R.id.move)
-                val save = v.findViewById<MaterialButton>(R.id.save)
-                val cancel = v.findViewById<MaterialButton>(R.id.cancel)
+                val move = v.findViewById<Button>(R.id.move)
+                val save = v.findViewById<Button>(R.id.save)
+                val cancel = v.findViewById<Button>(R.id.cancel)
                 title.text = "设置坐标"
                 inputX.setText(textX.toString().removeZero())
                 inputY.setText(textY.toString().removeZero())
@@ -48,33 +49,6 @@ fun positionDialog(
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
                     block2(x, y)
-                    dialog.dismiss()
-                }
-                cancel.setOnClickListener { dialog.dismiss() }
-            }
-        })
-        .setCancelable(false)
-        .setMaskColor(Color.parseColor("#4D000000"))
-        .show()
-}
-
-fun sizeDialog(textRow: Int, textColumn: Int, block1: (Int, Int) -> Unit) {
-    CustomDialog.build()
-        .setCustomView(object :
-            OnBindView<CustomDialog>(R.layout.layout_size_input_dialog) {
-            override fun onBind(dialog: CustomDialog, v: View) {
-                val title = v.findViewById<TextView>(R.id.title)
-                val row = v.findViewById<EditText>(R.id.row)
-                val column = v.findViewById<EditText>(R.id.column)
-                val save = v.findViewById<MaterialButton>(R.id.save)
-                val cancel = v.findViewById<MaterialButton>(R.id.cancel)
-                title.text = "设置孔板规格"
-                row.setText(textRow.toString())
-                column.setText(textColumn.toString())
-                save.setOnClickListener {
-                    val x = row.text.toString().toIntOrNull() ?: 4
-                    val y = column.text.toString().toIntOrNull() ?: 4
-                    block1(x, y)
                     dialog.dismiss()
                 }
                 cancel.setOnClickListener { dialog.dismiss() }

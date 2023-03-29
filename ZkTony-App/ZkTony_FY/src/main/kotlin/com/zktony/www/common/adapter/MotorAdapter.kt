@@ -15,12 +15,12 @@ import com.zktony.www.databinding.ItemMotorBinding
  * @author: 刘贺贺
  * @date: 2022-09-21 11:27
  */
-class MotorAdapter : ListAdapter<Motor, MotorAdapter.ViewHolder>(MotorDiffCallback()) {
+class MotorAdapter : ListAdapter<Motor, MotorViewHolder>(diffCallback) {
 
-    private lateinit var onEditButtonClick: (Motor) -> Unit
+    var onEditButtonClick: (Motor) -> Unit = {}
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MotorViewHolder {
+        return MotorViewHolder(
             ItemMotorBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
             ), onEditButtonClick
@@ -28,45 +28,37 @@ class MotorAdapter : ListAdapter<Motor, MotorAdapter.ViewHolder>(MotorDiffCallba
     }
 
     @SuppressLint("ResourceAsColor")
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MotorViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    fun setOnEditButtonClick(onEditButtonClick: (Motor) -> Unit) {
-        this.onEditButtonClick = onEditButtonClick
-    }
+    companion object {
+        val diffCallback = object : DiffUtil.ItemCallback<Motor>() {
+            override fun areItemsTheSame(oldItem: Motor, newItem: Motor): Boolean {
+                return oldItem.id == newItem.id
+            }
 
-
-    @SuppressLint("SetTextI18n")
-    class ViewHolder(
-        private val binding: ItemMotorBinding, private val onEditButtonClick: (Motor) -> Unit
-    ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: Motor) {
-            binding.apply {
-                motor = item
-                if (item.id in 0..2) {
-                    icon.setImageResource(R.mipmap.motor)
-                } else {
-                    icon.setImageResource(R.mipmap.pump)
-                }
-                cardView.clickNoRepeat { onEditButtonClick(item) }
-                executePendingBindings()
+            @SuppressLint("DiffUtilEquals")
+            override fun areContentsTheSame(oldItem: Motor, newItem: Motor): Boolean {
+                return oldItem == newItem
             }
         }
     }
 }
 
-private class MotorDiffCallback : DiffUtil.ItemCallback<Motor>() {
-
-    override fun areItemsTheSame(
-        oldItem: Motor, newItem: Motor
-    ): Boolean {
-        return oldItem.id == newItem.id
-    }
-
-    override fun areContentsTheSame(
-        oldItem: Motor, newItem: Motor
-    ): Boolean {
-        return oldItem == newItem
+class MotorViewHolder(
+    private val binding: ItemMotorBinding, private val onEditButtonClick: (Motor) -> Unit
+) : RecyclerView.ViewHolder(binding.root) {
+    fun bind(item: Motor) {
+        binding.apply {
+            motor = item
+            if (item.id in 0..2) {
+                icon.setImageResource(R.mipmap.motor)
+            } else {
+                icon.setImageResource(R.mipmap.pump)
+            }
+            cardView.clickNoRepeat { onEditButtonClick(item) }
+            executePendingBindings()
+        }
     }
 }

@@ -54,12 +54,12 @@ class ProgramFragment :
      * 初始化循环列表
      */
     private fun initView() {
-        adapter.setOnDeleteButtonClick {
+        adapter.onDeleteButtonClick = {
             deleteDialog(
                 name = it.name,
                 block = { viewModel.delete(it) })
         }
-        adapter.setOnEditButtonClick {
+        adapter.onEditButtonClick = {
             findNavController().navigate(
                 if (it.model == 0) {
                     R.id.action_navigation_program_to_navigation_zm

@@ -46,11 +46,11 @@ class CalibrationFragment :
      */
     private fun initView() {
         adapter.apply {
-            setOnCheckedClick { viewModel.enable(it) }
-            setOnDeleteButtonClick {
+            onCheckedClick = { viewModel.enable(it) }
+            onDeleteButtonClick = {
                 deleteDialog(name = it.name, block = { viewModel.delete(it) })
             }
-            setOnEditButtonClick {
+            onEditButtonClick = {
                 findNavController().navigate(
                     R.id.action_navigation_calibration_to_navigation_calibration_data,
                     Bundle().apply { putLong("id", it.id) }

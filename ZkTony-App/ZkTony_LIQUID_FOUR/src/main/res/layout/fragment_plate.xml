@@ -23,7 +23,8 @@
                 android:layout_height="48dp"
                 app:layout_constraintBottom_toTopOf="@+id/dynamic_plate"
                 app:layout_constraintEnd_toEndOf="@+id/dynamic_plate"
-                app:layout_constraintStart_toStartOf="@+id/dynamic_plate" />
+                app:layout_constraintStart_toStartOf="@+id/dynamic_plate"
+                tools:ignore="VisualLintBounds" />
 
             <com.zktony.common.widget.SizeIndicator
                 android:id="@+id/size_indicator_height"
@@ -31,7 +32,8 @@
                 android:layout_height="400dp"
                 app:layout_constraintBottom_toBottomOf="@+id/dynamic_plate"
                 app:layout_constraintEnd_toStartOf="@+id/dynamic_plate"
-                app:layout_constraintTop_toTopOf="@+id/dynamic_plate" />
+                app:layout_constraintTop_toTopOf="@+id/dynamic_plate"
+                tools:ignore="VisualLintBounds" />
 
             <com.zktony.common.widget.DynamicPlate
                 android:id="@+id/dynamic_plate"
@@ -43,48 +45,15 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="VisualLintBounds" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/position_one"
+            <com.zktony.common.widget.AxisIndicator
+                android:id="@+id/position"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="292dp"
+                android:layout_width="600dp"
                 android:layout_height="48dp"
-                android:text="@string/button"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:cornerRadius="24dp"
-                app:icon="@mipmap/circle"
-                app:iconSize="24dp"
-                app:iconTint="#0000FF"
-                android:layout_marginTop="16dp"
+                app:layout_constraintEnd_toEndOf="@+id/dynamic_plate"
                 app:layout_constraintStart_toEndOf="@+id/size_indicator_height"
                 app:layout_constraintTop_toBottomOf="@+id/dynamic_plate"
-                app:strokeColor="#0000FF"
-                app:strokeWidth="2dp"
-                app:rippleColor="#0000FF"
-                tools:ignore="VisualLintButtonSize" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/position_two"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="292dp"
-                android:layout_height="48dp"
-                android:text="@string/button"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:cornerRadius="24dp"
-                app:elevation="0dp"
-                app:icon="@mipmap/circle"
-                app:iconSize="24dp"
-                app:iconTint="#00FF00"
-                android:layout_marginTop="16dp"
-                app:layout_constraintEnd_toEndOf="@+id/dynamic_plate"
-                app:layout_constraintTop_toBottomOf="@+id/dynamic_plate"
-                app:rippleColor="#00FF00"
-                app:strokeWidth="2dp"
-                app:strokeColor="#00FF00"
-                tools:ignore="TextContrastCheck,VisualLintButtonSize" />
+                tools:ignore="VisualLintBounds,SpeakableTextPresentCheck" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

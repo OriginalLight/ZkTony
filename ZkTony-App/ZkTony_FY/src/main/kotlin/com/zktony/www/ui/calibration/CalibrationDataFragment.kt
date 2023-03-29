@@ -55,7 +55,7 @@ class CalibrationDataFragment :
                 viewModel.load(id)
             }
         }
-        adapter.setOnDeleteButtonClick { viewModel.delete(it) }
+        adapter.onDeleteButtonClick = { viewModel.delete(it) }
 
         binding.apply {
             recycleView.adapter = adapter
