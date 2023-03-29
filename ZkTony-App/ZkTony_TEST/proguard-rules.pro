@@ -87,5 +87,5 @@
 -keep class android.view.** { *; }
 
 # Model
--keepclasseswithmembers class com.zktony.www.common.room.entity.** {*;}
+-keepclasseswithmembers class com.zktony.www.data.entity.** {*;}
 

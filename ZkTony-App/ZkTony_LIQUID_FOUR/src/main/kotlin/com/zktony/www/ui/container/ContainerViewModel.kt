@@ -1,8 +1,8 @@
 package com.zktony.www.ui.container
 
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.data.local.room.entity.Hole
-import com.zktony.www.data.local.room.entity.Plate
+import com.zktony.www.data.local.entity.Hole
+import com.zktony.www.data.local.entity.Plate
 
 class ContainerViewModel : BaseViewModel()
 

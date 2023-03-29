@@ -2,10 +2,10 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.data.local.room.dao.CalibrationDao
-import com.zktony.www.data.local.room.dao.CalibrationDataDao
-import com.zktony.www.data.local.room.entity.Calibration
-import com.zktony.www.data.local.room.entity.CalibrationData
+import com.zktony.www.data.local.dao.CalibrationDao
+import com.zktony.www.data.local.dao.CalibrationDataDao
+import com.zktony.www.data.local.entity.Calibration
+import com.zktony.www.data.local.entity.CalibrationData
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.flow.MutableStateFlow

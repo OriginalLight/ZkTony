@@ -4,8 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.serialport.util.Serial
-import com.zktony.www.data.local.room.dao.MotorDao
-import com.zktony.www.data.local.room.entity.Motor
+import com.zktony.www.data.local.dao.MotorDao
+import com.zktony.www.data.local.entity.Motor
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.flow.MutableStateFlow

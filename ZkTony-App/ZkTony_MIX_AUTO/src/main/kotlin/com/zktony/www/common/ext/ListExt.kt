@@ -1,6 +1,6 @@
 package com.zktony.www.common.ext
 
-import com.zktony.www.data.local.room.entity.Hole
+import com.zktony.www.data.local.entity.Hole
 
 fun List<Hole>.total(): Int {
     var total = 0

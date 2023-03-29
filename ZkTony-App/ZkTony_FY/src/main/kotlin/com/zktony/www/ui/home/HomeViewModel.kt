@@ -11,11 +11,11 @@ import com.zktony.common.utils.Queue
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.TTYS0
 import com.zktony.serialport.util.Serial.TTYS3
-import com.zktony.www.data.local.room.dao.ActionDao
-import com.zktony.www.data.local.room.dao.ContainerDao
-import com.zktony.www.data.local.room.dao.LogDao
-import com.zktony.www.data.local.room.dao.ProgramDao
-import com.zktony.www.data.local.room.entity.*
+import com.zktony.www.data.local.dao.ActionDao
+import com.zktony.www.data.local.dao.ContainerDao
+import com.zktony.www.data.local.dao.LogDao
+import com.zktony.www.data.local.dao.ProgramDao
+import com.zktony.www.data.local.entity.*
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.StateManager
 import com.zktony.www.manager.protocol.V1

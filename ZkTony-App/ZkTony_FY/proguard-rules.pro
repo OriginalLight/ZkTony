@@ -98,4 +98,4 @@
 
 # Model
 -keep class com.zktony.www.data.remote.model.** {*;}
--keepclasseswithmembers class com.zktony.www.data.local.room.entity.** {*;}
+-keepclasseswithmembers class com.zktony.www.data.local.entity.** {*;}

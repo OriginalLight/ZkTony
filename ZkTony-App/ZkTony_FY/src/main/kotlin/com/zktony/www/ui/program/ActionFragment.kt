@@ -17,8 +17,8 @@ import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.common.adapter.ActionAdapter
-import com.zktony.www.data.local.room.entity.ActionEnum
-import com.zktony.www.data.local.room.entity.getActionEnum
+import com.zktony.www.data.local.entity.ActionEnum
+import com.zktony.www.data.local.entity.getActionEnum
 import com.zktony.www.databinding.FragmentActionBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

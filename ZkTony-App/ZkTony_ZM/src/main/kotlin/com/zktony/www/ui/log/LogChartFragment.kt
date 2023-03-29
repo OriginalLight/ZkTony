@@ -16,7 +16,7 @@ import com.zktony.common.base.BaseFragment
 import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.www.R
-import com.zktony.www.data.local.room.entity.LogData
+import com.zktony.www.data.local.entity.LogData
 import com.zktony.www.databinding.FragmentLogChartBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

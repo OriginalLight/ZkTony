@@ -2,11 +2,11 @@ package com.zktony.www.ui.program
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.data.local.room.dao.ActionDao
-import com.zktony.www.data.local.room.dao.ProgramDao
-import com.zktony.www.data.local.room.entity.Action
-import com.zktony.www.data.local.room.entity.ActionEnum
-import com.zktony.www.data.local.room.entity.getActionEnum
+import com.zktony.www.data.local.dao.ActionDao
+import com.zktony.www.data.local.dao.ProgramDao
+import com.zktony.www.data.local.entity.Action
+import com.zktony.www.data.local.entity.ActionEnum
+import com.zktony.www.data.local.entity.getActionEnum
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

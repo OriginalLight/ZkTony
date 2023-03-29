@@ -11,7 +11,7 @@ import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.removeZero
 import com.zktony.common.ext.setEqualText
 import com.zktony.www.R
-import com.zktony.www.data.local.room.entity.Container
+import com.zktony.www.data.local.entity.Container
 import com.zktony.www.databinding.FragmentContainerBinding
 import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.launch

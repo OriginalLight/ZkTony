@@ -3,10 +3,10 @@ package com.zktony.www.ui.program
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
 import com.zktony.www.common.ext.volumeDialog
-import com.zktony.www.data.local.room.dao.HoleDao
-import com.zktony.www.data.local.room.dao.PlateDao
-import com.zktony.www.data.local.room.entity.Hole
-import com.zktony.www.data.local.room.entity.Plate
+import com.zktony.www.data.local.dao.HoleDao
+import com.zktony.www.data.local.dao.PlateDao
+import com.zktony.www.data.local.entity.Hole
+import com.zktony.www.data.local.entity.Plate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged

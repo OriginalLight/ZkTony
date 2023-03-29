@@ -4,10 +4,10 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.common.utils.Snowflake
-import com.zktony.www.data.local.room.dao.HoleDao
-import com.zktony.www.data.local.room.dao.PlateDao
-import com.zktony.www.data.local.room.dao.ProgramDao
-import com.zktony.www.data.local.room.entity.Program
+import com.zktony.www.data.local.dao.HoleDao
+import com.zktony.www.data.local.dao.PlateDao
+import com.zktony.www.data.local.dao.ProgramDao
+import com.zktony.www.data.local.entity.Program
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull

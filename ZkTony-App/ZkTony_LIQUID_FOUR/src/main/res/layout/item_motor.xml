@@ -7,7 +7,7 @@
 
         <variable
             name="motor"
-            type="com.zktony.www.data.local.room.entity.Motor" />
+            type="com.zktony.www.data.local.entity.Motor" />
     </data>
 
     <androidx.cardview.widget.CardView

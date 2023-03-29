@@ -8,8 +8,8 @@ import com.zktony.common.dialog.spannerDialog
 import com.zktony.common.ext.getTimeFormat
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.ext.completeDialog
-import com.zktony.www.data.local.room.dao.*
-import com.zktony.www.data.local.room.entity.*
+import com.zktony.www.data.local.dao.*
+import com.zktony.www.data.local.entity.*
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.Job

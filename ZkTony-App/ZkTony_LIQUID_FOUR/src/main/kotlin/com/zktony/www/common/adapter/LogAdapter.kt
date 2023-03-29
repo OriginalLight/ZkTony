@@ -11,7 +11,7 @@ import com.zktony.common.R
 import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.simpleDateFormat
-import com.zktony.www.data.local.room.entity.Log
+import com.zktony.www.data.local.entity.Log
 import com.zktony.www.databinding.ItemLogBinding
 
 /**

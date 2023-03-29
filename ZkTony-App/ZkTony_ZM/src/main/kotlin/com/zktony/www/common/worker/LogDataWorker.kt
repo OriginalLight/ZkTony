@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.www.data.local.room.dao.LogDataDao
+import com.zktony.www.data.local.dao.LogDataDao
 import com.zktony.www.data.remote.model.LogDetailDTO
 import com.zktony.www.data.remote.service.LogService
 import kotlinx.coroutines.flow.catch

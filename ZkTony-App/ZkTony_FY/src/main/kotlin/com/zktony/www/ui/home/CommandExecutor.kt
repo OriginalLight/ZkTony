@@ -1,8 +1,8 @@
 package com.zktony.www.ui.home
 
 import com.zktony.serialport.util.Serial.TTYS0
-import com.zktony.www.data.local.room.entity.Action
-import com.zktony.www.data.local.room.entity.Container
+import com.zktony.www.data.local.entity.Action
+import com.zktony.www.data.local.entity.Container
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.Settings

@@ -3,9 +3,9 @@ package com.zktony.www.ui.program
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.data.local.room.dao.ActionDao
-import com.zktony.www.data.local.room.dao.ProgramDao
-import com.zktony.www.data.local.room.entity.Program
+import com.zktony.www.data.local.dao.ActionDao
+import com.zktony.www.data.local.dao.ProgramDao
+import com.zktony.www.data.local.entity.Program
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull

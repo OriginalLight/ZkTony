@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
-import com.zktony.www.data.local.room.entity.Program
+import com.zktony.www.data.local.entity.Program
 import com.zktony.www.databinding.ItemProgramBinding
 
 /**

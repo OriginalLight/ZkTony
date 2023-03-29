@@ -10,7 +10,7 @@ import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.removeZero
 import com.zktony.common.ext.simpleDateFormat
-import com.zktony.www.data.local.room.entity.LogRecord
+import com.zktony.www.data.local.entity.LogRecord
 import com.zktony.www.databinding.ItemLogBinding
 
 /**

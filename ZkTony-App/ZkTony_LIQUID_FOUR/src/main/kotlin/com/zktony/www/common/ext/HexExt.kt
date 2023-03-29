@@ -2,7 +2,7 @@ package com.zktony.www.common.ext
 
 import com.zktony.common.ext.hex2ToInt16
 import com.zktony.common.ext.hexToInt8
-import com.zktony.www.data.local.room.entity.Motor
+import com.zktony.www.data.local.entity.Motor
 import com.zktony.www.manager.protocol.V1
 
 /**

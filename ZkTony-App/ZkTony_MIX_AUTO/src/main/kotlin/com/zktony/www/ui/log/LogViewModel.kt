@@ -2,8 +2,8 @@ package com.zktony.www.ui.log
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.common.base.BaseViewModel
-import com.zktony.www.data.local.room.dao.LogDao
-import com.zktony.www.data.local.room.entity.Log
+import com.zktony.www.data.local.dao.LogDao
+import com.zktony.www.data.local.entity.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

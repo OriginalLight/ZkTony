@@ -3,7 +3,7 @@ package com.zktony.www.common.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.www.data.local.room.dao.LogRecordDao
+import com.zktony.www.data.local.dao.LogRecordDao
 import org.koin.core.component.KoinComponent
 
 

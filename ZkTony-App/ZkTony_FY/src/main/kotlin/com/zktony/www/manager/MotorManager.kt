@@ -1,10 +1,10 @@
 package com.zktony.www.manager
 
 import com.zktony.common.utils.logi
-import com.zktony.www.data.local.room.dao.CalibrationDao
-import com.zktony.www.data.local.room.dao.MotorDao
-import com.zktony.www.data.local.room.entity.Calibration
-import com.zktony.www.data.local.room.entity.Motor
+import com.zktony.www.data.local.dao.CalibrationDao
+import com.zktony.www.data.local.dao.MotorDao
+import com.zktony.www.data.local.entity.Calibration
+import com.zktony.www.data.local.entity.Motor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

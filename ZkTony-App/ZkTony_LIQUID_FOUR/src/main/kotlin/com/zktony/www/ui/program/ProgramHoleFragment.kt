@@ -12,7 +12,7 @@ import com.zktony.common.ext.clickScale
 import com.zktony.common.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.common.ext.volumeDialog
-import com.zktony.www.data.local.room.entity.Hole
+import com.zktony.www.data.local.entity.Hole
 import com.zktony.www.databinding.FragmentProgramHoleBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
