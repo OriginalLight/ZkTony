@@ -19,7 +19,7 @@ COPY ./entity entity
 COPY ./tls tls
 
 # compile app
-RUN sudo apt update && sudo apt install -y protobuf-compiler libprotobuf-dev
+RUN apt update && apt install -y protobuf-compiler libprotobuf-dev
 RUN cargo build --release
 
 ###############
