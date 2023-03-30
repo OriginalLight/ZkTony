@@ -16,8 +16,8 @@ import java.util.concurrent.TimeUnit
 class WorkerManager {
     fun createWorker() {
         WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
-            UUID.randomUUID().toString(),
-            ExistingPeriodicWorkPolicy.UPDATE,
+            "worker_program",
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             PeriodicWorkRequestBuilder<ProgramWorker>(1, TimeUnit.HOURS)
                 .setConstraints(
                     Constraints.Builder()
@@ -26,8 +26,8 @@ class WorkerManager {
                 ).build()
         )
         WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
-            UUID.randomUUID().toString(),
-            ExistingPeriodicWorkPolicy.UPDATE,
+            "worker_log_record",
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             PeriodicWorkRequestBuilder<LogRecordWorker>(1, TimeUnit.HOURS)
                 .setConstraints(
                     Constraints.Builder()
@@ -36,8 +36,8 @@ class WorkerManager {
                 ).build()
         )
         WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
-            UUID.randomUUID().toString(),
-            ExistingPeriodicWorkPolicy.UPDATE,
+            "worker_log_data",
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             PeriodicWorkRequestBuilder<LogDataWorker>(15, TimeUnit.MINUTES)
                 .setConstraints(
                     Constraints.Builder()
@@ -46,8 +46,8 @@ class WorkerManager {
                 ).build()
         )
         WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
-            UUID.randomUUID().toString(),
-            ExistingPeriodicWorkPolicy.UPDATE,
+            "worker_log",
+            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             PeriodicWorkRequestBuilder<LogWorker>(1, TimeUnit.HOURS)
                 .setConstraints(
                     Constraints.Builder()

@@ -100,3 +100,6 @@
 -keepclasseswithmembers class com.zktony.www.data.remote.model.** {*;}
 -keepclasseswithmembers class com.zktony.www.data.local.entity.** {*;}
 
+-keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite* {
+   <fields>;
+}

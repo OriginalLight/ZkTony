@@ -24,5 +24,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         stateManager.initApp()
 
         noticeDialog(resources.getString(R.string.notice_content))
+
     }
+
 }

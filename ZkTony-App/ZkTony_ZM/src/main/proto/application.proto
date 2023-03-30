@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.zktony.proto";
+option java_outer_classname = "ApplicationProto";
+
+package application;
+
+// The greeting service definition.
+service ApplicationService {
+  // Sends a greeting
+  rpc getApplications (PostPerPage) returns (ApplicationList) {}
+  rpc GetByApplicationId (ApplicationSearch) returns (Application) {}
+  rpc GetById (ApplicationId) returns (Application) {}
+  rpc AddApplication (Application) returns (ApplicationId) {}
+  rpc UpdateApplication (Application) returns (ProcessStatus) {}
+  rpc DeleteApplication (ApplicationId) returns (ProcessStatus) {}
+}
+
+message PostPerPage { uint64 per_page = 1; }
+
+// The request message containing the user's name.
+message ApplicationSearch {
+  string application_id = 1;
+}
+
+message ApplicationId {
+  int32 id = 1;
+}
+
+message ProcessStatus { bool success = 1; }
+
+// The response message containing the greetings
+message Application {
+  int32 id = 1;
+  string application_id = 2;
+  string build_type = 3;
+  string download_url = 4;
+  string version_name = 5;
+  int32 version_code = 6;
+  string description = 7;
+  string create_time = 8;
+}
+
+message ApplicationList { repeated Application application = 1; }
