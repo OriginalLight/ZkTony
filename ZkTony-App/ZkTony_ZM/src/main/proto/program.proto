@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.zktony.proto";
+option java_outer_classname = "ProgramProto";
+
+package program;
+
+// The greeting service definition.
+service ProgramService {
+  // Sends a greeting
+  rpc GetPrograms (ProgramPerPage) returns (ProgramList) {}
+  rpc GetById (ProgramId) returns (Program) {}
+  rpc AddProgram (Program) returns (ProgramId) {}
+  rpc AddPrograms (ProgramList) returns (ProgramReply) {}
+  rpc UpdateProgram (Program) returns (ProgramReply) {}
+  rpc DeleteProgram (ProgramId) returns (ProgramReply) {}
+
+}
+
+message ProgramPerPage { uint64 per_page = 1; }
+
+message ProgramReply { bool success = 1; }
+
+// The request message containing the user's name.
+message ProgramId {
+  string id = 1;
+}
+
+// The response message containing the greetings
+message Program {
+  string id = 1;
+  string name = 2;
+  string content = 4;
+  string create_time = 5;
+}
+
+message ProgramList { repeated Program Program = 1; }

@@ -23,4 +23,7 @@ object Constants {
     const val MAX_VOLTAGE_RS = 30f
     const val ERROR_CURRENT = 0.1f
     const val ZERO_TIME = "00:00:00"
+    const val GRPC_HOST = "182.160.14.59"
+    const val GRPC_PORT = 9527
+    const val GRPC_AUTHORITY = "example.com"
 }

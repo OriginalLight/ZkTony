@@ -1,12 +1,13 @@
 package com.zktony.www.common.worker
 
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.zktony.common.ext.simpleDateFormat
+import com.zktony.common.utils.logi
+import com.zktony.proto.Program
 import com.zktony.www.data.local.dao.ProgramDao
-import com.zktony.www.data.remote.model.ProgramDTO
-import com.zktony.www.data.remote.service.ProgramService
+import com.zktony.www.data.remote.grpc.ProgramGrpc
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
@@ -14,7 +15,7 @@ import org.koin.core.component.KoinComponent
 
 class ProgramWorker constructor(
     private val dao: ProgramDao,
-    private val service: ProgramService,
+    private val grpc: ProgramGrpc,
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams), KoinComponent {
@@ -23,10 +24,10 @@ class ProgramWorker constructor(
         try {
             dao.withoutUpload().first().let { programs ->
                 if (programs.isEmpty()) {
-                    Log.d("ProgramWorker", "上传程序为空")
+                    "上传程序数据为空".logi("ProgramWorker")
                     return Result.success()
                 }
-                val list = mutableListOf<ProgramDTO>()
+                val list = mutableListOf<Program>()
                 programs.forEach {
                     val content = StringBuilder()
                     content.append("程序名称：${it.name}，泵速：${it.motor}，电压：${it.voltage}，时长：${it.time}")
@@ -34,17 +35,17 @@ class ProgramWorker constructor(
                     content.append("胶种类：${if (it.glueType == 0) "常规胶" else "梯度胶"}，胶厚度：${it.glueConcentration}，最小浓度：${it.glueMinConcentration}%， 最大浓度：${it.glueMaxConcentration}%")
                     content.append("模式：${if (it.model == 0) "转膜" else "染色"}，缓冲液：${it.bufferType}")
                     list.add(
-                        ProgramDTO(
-                            id = it.id,
-                            name = it.name,
-                            content = content.toString(),
-                            create_time = it.createTime,
-                        )
+                        Program.newBuilder()
+                            .setId(it.id)
+                            .setName(it.name)
+                            .setContent(content.toString())
+                            .setCreateTime(it.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+                            .build()
                     )
                 }
-                service.uploadProgram(list)
+                grpc.addPrograms(list)
                     .catch {
-                        Log.d("ProgramWorker", "上传程序失败")
+                        "上传程序数据失败".logi("ProgramWorker")
                     }
                     .collect {
                         dao.updateAll(programs.map { it.copy(upload = 1) })

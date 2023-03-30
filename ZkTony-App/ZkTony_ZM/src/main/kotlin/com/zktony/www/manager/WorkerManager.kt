@@ -6,7 +6,6 @@ import com.zktony.www.common.worker.LogDataWorker
 import com.zktony.www.common.worker.LogRecordWorker
 import com.zktony.www.common.worker.LogWorker
 import com.zktony.www.common.worker.ProgramWorker
-import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -15,9 +14,11 @@ import java.util.concurrent.TimeUnit
  */
 class WorkerManager {
     fun createWorker() {
+        WorkManager.getInstance(Ext.ctx).cancelAllWork()
+
         WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
             "worker_program",
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            ExistingPeriodicWorkPolicy.UPDATE,
             PeriodicWorkRequestBuilder<ProgramWorker>(1, TimeUnit.HOURS)
                 .setConstraints(
                     Constraints.Builder()
@@ -27,7 +28,7 @@ class WorkerManager {
         )
         WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
             "worker_log_record",
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            ExistingPeriodicWorkPolicy.UPDATE,
             PeriodicWorkRequestBuilder<LogRecordWorker>(1, TimeUnit.HOURS)
                 .setConstraints(
                     Constraints.Builder()
@@ -37,7 +38,7 @@ class WorkerManager {
         )
         WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
             "worker_log_data",
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+            ExistingPeriodicWorkPolicy.UPDATE,
             PeriodicWorkRequestBuilder<LogDataWorker>(15, TimeUnit.MINUTES)
                 .setConstraints(
                     Constraints.Builder()
@@ -45,14 +46,10 @@ class WorkerManager {
                         .build()
                 ).build()
         )
-        WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
-            "worker_log",
-            ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-            PeriodicWorkRequestBuilder<LogWorker>(1, TimeUnit.HOURS)
-                .setConstraints(
-                    Constraints.Builder()
-                        .build()
-                ).build()
+        WorkManager.getInstance(Ext.ctx).enqueue(
+            OneTimeWorkRequestBuilder<LogWorker>()
+                .setInitialDelay(15, TimeUnit.MINUTES)
+                .build()
         )
     }
 }

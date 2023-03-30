@@ -1,12 +1,13 @@
 package com.zktony.www.common.worker
 
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.zktony.common.ext.simpleDateFormat
+import com.zktony.common.utils.logi
+import com.zktony.proto.Log
 import com.zktony.www.data.local.dao.LogRecordDao
-import com.zktony.www.data.remote.model.LogDTO
-import com.zktony.www.data.remote.service.LogService
+import com.zktony.www.data.remote.grpc.LogGrpc
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
@@ -14,7 +15,7 @@ import org.koin.core.component.KoinComponent
 
 class LogRecordWorker constructor(
     private val dao: LogRecordDao,
-    private val service: LogService,
+    private val grpc: LogGrpc,
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams), KoinComponent {
@@ -23,24 +24,24 @@ class LogRecordWorker constructor(
         try {
             dao.withoutUpload().first().let { logs ->
                 if (logs.isEmpty()) {
-                    Log.d("LogRecordWorker", "上传日志为空")
+                    "上传日志数据为空".logi("LogRecordWorker")
                     return Result.success()
                 }
-                val list = mutableListOf<LogDTO>()
+                val list = mutableListOf<Log>()
                 logs.forEach {
                     list.add(
-                        LogDTO(
-                            id = it.id,
-                            sub_id = it.programId,
-                            log_type = "Running",
-                            content = "模式：${if (it.model == 0) "转膜" else "染色"}，泵速：${it.motor}，电压：${it.voltage}, 时长：${it.time}",
-                            create_time = it.createTime,
+                        Log.newBuilder()
+                            .setId(it.id)
+                            .setSubId(it.programId)
+                            .setLogType("Running")
+                            .setContent("模式：${if (it.model == 0) "转膜" else "染色"}，泵速：${it.motor}，电压：${it.voltage}, 时长：${it.time}")
+                            .setCreateTime(it.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+                            .build()
                         )
-                    )
                 }
-                service.uploadLog(list)
+                grpc.addLogs(list)
                     .catch {
-                        Log.d("LogRecordWorker", "上传日志失败")
+                        "上传日志数据失败".logi("LogRecordWorker")
                     }
                     .collect {
                         dao.updateAll(logs.map { it.copy(upload = 1) })

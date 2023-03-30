@@ -1,12 +1,13 @@
 package com.zktony.www.common.worker
 
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.zktony.common.ext.simpleDateFormat
+import com.zktony.common.utils.logi
+import com.zktony.proto.LogDetail
 import com.zktony.www.data.local.dao.LogDataDao
-import com.zktony.www.data.remote.model.LogDetailDTO
-import com.zktony.www.data.remote.service.LogService
+import com.zktony.www.data.remote.grpc.LogDetailGrpc
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
@@ -14,7 +15,7 @@ import org.koin.core.component.KoinComponent
 
 class LogDataWorker constructor(
     private val dao: LogDataDao,
-    private val service: LogService,
+    private val grpc: LogDetailGrpc,
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams), KoinComponent {
@@ -22,23 +23,23 @@ class LogDataWorker constructor(
         try {
             dao.withoutUpload().first().let { logs ->
                 if (logs.isEmpty()) {
-                    Log.d("LogDataWorker", "上传日志数据为空")
+                    "上传日志数据为空".logi("LogDataWorker")
                     return Result.success()
                 }
-                val list = mutableListOf<LogDetailDTO>()
+                val list = mutableListOf<LogDetail>()
                 logs.forEach {
                     list.add(
-                        LogDetailDTO(
-                            id = it.id,
-                            log_id = it.logId,
-                            content = "泵速：${it.motor}，电压：${it.voltage},电流：${it.current} 时间：${it.time}",
-                            create_time = it.createTime,
-                        )
+                        LogDetail.newBuilder()
+                            .setId(it.id)
+                            .setLogId(it.logId)
+                            .setContent("泵速：${it.motor}，电压：${it.voltage},电流：${it.current} 时间：${it.time}")
+                            .setCreateTime(it.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss"))
+                            .build()
                     )
                 }
-                service.uploadLogDetail(list)
+                grpc.addLogDetails(list)
                     .catch {
-                        Log.d("LogDataWorker", "上传日志数据失败")
+                        "上传日志数据失败".logi("LogDataWorker")
                     }
                     .collect {
                         dao.updateAll(logs.map { it.copy(upload = 1) })
