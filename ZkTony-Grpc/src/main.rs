@@ -15,9 +15,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let db_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
     let host = env::var("HOST").expect("HOST is not set in .env file");
     let port = env::var("PORT").expect("PORT is not set in .env file");
+    let cert_file_path = env::var("CERT_FILE_PATH").expect("CERT_FILE_PATH is not set in .env file");
+    let key_file_path = env::var("KEY_FILE_PATH").expect("KEY_FILE_PATH is not set in .env file");
     let server_url = format!("{host}:{port}").parse()?;
-    let cert = std::fs::read_to_string("tls/server.pem")?;
-    let key = std::fs::read_to_string("tls/server.key")?;
+    let cert = std::fs::read_to_string(cert_file_path)?;
+    let key = std::fs::read_to_string(key_file_path)?;
 
     let identity = Identity::from_pem(cert, key);
 
