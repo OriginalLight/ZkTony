@@ -29,7 +29,7 @@ FROM debian:bullseye-slim
 WORKDIR /app
 
 # copy server binary from build stage
-COPY --from=builder /code/target/release/zktony-grpc grpc
+COPY --from=builder /code/target/release/zktony-grpc zktony-grpc
 COPY --from=builder /code/.env /.env
 COPY --from=builder /code/tls /tls
 
@@ -37,4 +37,4 @@ COPY --from=builder /code/tls /tls
 EXPOSE 9527
 
 # run server
-CMD [ "/app/grpc" ]
+CMD [ "/app/zktony-grpc" ]
