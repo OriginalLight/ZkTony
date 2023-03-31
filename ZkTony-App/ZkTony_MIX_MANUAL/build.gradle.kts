@@ -57,6 +57,15 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+    packagingOptions {
+        jniLibs.keepDebugSymbols += listOf(
+            "*/x86/*.so",
+            "*/x86_64/*.so",
+            "*/armeabi-v7a/*.so",
+            "*/arm64-v8a/*.so"
+        )
+    }
+
     buildFeatures {
         dataBinding = true
     }

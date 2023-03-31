@@ -14,7 +14,7 @@ class LogGrpc constructor(
     suspend fun addLogs(logs: List<Log>) = flow {
         try {
             val request = LogList.newBuilder()
-                .addAllLog(logs)
+                .addAllList(logs)
                 .build()
 
             emit(stub.addLogs(request))

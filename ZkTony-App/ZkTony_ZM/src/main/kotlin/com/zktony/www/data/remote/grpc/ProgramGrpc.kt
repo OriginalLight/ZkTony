@@ -14,7 +14,7 @@ class ProgramGrpc constructor(
     suspend fun addPrograms(programs: List<Program>) = flow {
         try {
             val request = ProgramList.newBuilder()
-                .addAllProgram(programs)
+                .addAllList(programs)
                 .build()
 
             emit(stub.addPrograms(request))
