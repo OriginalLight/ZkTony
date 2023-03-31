@@ -1,6 +1,7 @@
-use grpc_api::sea_orm::Database;
-use std::env;
+use grpc_api::sea_orm::{ConnectOptions, Database};
+use std::{env, time::Duration};
 use tonic::transport::{Identity, Server, ServerTlsConfig};
+use tracing::log;
 
 use grpc_api::service;
 
@@ -10,6 +11,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::INFO)
+        .pretty()
         .init();
 
     let host = env::var("HOST").unwrap();
@@ -22,8 +24,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cert = std::fs::read_to_string(cert_file_path).unwrap();
     let key = std::fs::read_to_string(key_file_path).unwrap();
 
+    // create tls identity
     let identity = Identity::from_pem(cert, key);
-    let connection = Database::connect(&db_url).await?;
+
+    // connect to database
+    let mut opt = ConnectOptions::new(db_url.to_owned());
+    opt.max_connections(20)
+        .min_connections(2)
+        .connect_timeout(Duration::from_secs(8))
+        .acquire_timeout(Duration::from_secs(8))
+        .idle_timeout(Duration::from_secs(8))
+        .max_lifetime(Duration::from_secs(8))
+        .sqlx_logging(true)
+        .sqlx_logging_level(log::LevelFilter::Info);
+
+    let connection = Database::connect(opt).await?;
+
+    // get service
     let health_svc = service::health_svc().await;
     let application_svc = service::application_svc(connection.clone());
     let log_svc = service::log_svc(connection.clone());

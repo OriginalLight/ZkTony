@@ -15,6 +15,7 @@ impl Mutation {
         data: ApplicationModel,
     ) -> Result<ApplicationModel, DbErr> {
         application::ActiveModel {
+            id: Set(data.id),
             application_id: Set(data.application_id),
             build_type: Set(data.build_type),
             download_url: Set(data.download_url),
