@@ -1,13 +1,29 @@
+use chrono::NaiveDateTime;
 use tonic::{Request, Response, Status};
 use tonic_health::proto::health_server::{Health, HealthServer};
 
+use application::{
+    application_service_server::{ApplicationService, ApplicationServiceServer},
+    Application, ApplicationId, ApplicationList, ApplicationPerPage, ApplicationReply,
+    ApplicationSearch,
+};
 use entity::{
     application::Model as ApplicationModel, log::Model as LogModel,
     log_detail::Model as LogDetailModel, program::Model as ProgramModel,
 };
 use grpc_core::{sea_orm::DatabaseConnection, Mutation, Query};
-
-use chrono::NaiveDateTime;
+use log::{
+    log_service_server::{LogService, LogServiceServer},
+    Log, LogId, LogList, LogPerPage, LogReply,
+};
+use log_detail::{
+    log_detail_service_server::{LogDetailService, LogDetailServiceServer},
+    LogDetail, LogDetailId, LogDetailList, LogDetailPerPage, LogDetailReply,
+};
+use program::{
+    program_service_server::{ProgramService, ProgramServiceServer},
+    Program, ProgramId, ProgramList, ProgramPerPage, ProgramReply,
+};
 
 pub mod application {
     tonic::include_proto!("application");
@@ -24,27 +40,6 @@ pub mod log_detail {
 pub mod program {
     tonic::include_proto!("program");
 }
-
-use application::{
-    application_service_server::{ApplicationService, ApplicationServiceServer},
-    Application, ApplicationId, ApplicationList, ApplicationPerPage, ApplicationReply,
-    ApplicationSearch,
-};
-
-use log::{
-    log_service_server::{LogService, LogServiceServer},
-    Log, LogId, LogList, LogPerPage, LogReply,
-};
-
-use log_detail::{
-    log_detail_service_server::{LogDetailService, LogDetailServiceServer},
-    LogDetail, LogDetailId, LogDetailList, LogDetailPerPage, LogDetailReply,
-};
-
-use program::{
-    program_service_server::{ProgramService, ProgramServiceServer},
-    Program, ProgramId, ProgramList, ProgramPerPage, ProgramReply,
-};
 
 impl Application {
     fn into_model(self) -> ApplicationModel {
@@ -133,24 +128,23 @@ impl ApplicationService for MyApplicationServer {
             application: Vec::new(),
         };
 
-        let (applications, _) = Query::get_applications_in_page(conn, 1, per_page)
-            .await
-            .expect("Cannot find applications in page");
-
-        for m in applications {
-            response.application.push(Application {
-                id: m.id,
-                application_id: m.application_id,
-                build_type: m.build_type,
-                download_url: m.download_url,
-                version_name: m.version_name,
-                version_code: m.version_code,
-                description: m.description,
-                create_time: m.create_time.unwrap().to_string(),
-            });
+        if let Ok((applications, _)) = Query::get_applications_in_page(conn, 1, per_page).await {
+            for m in applications {
+                response.application.push(Application {
+                    id: m.id,
+                    application_id: m.application_id,
+                    build_type: m.build_type,
+                    download_url: m.download_url,
+                    version_name: m.version_name,
+                    version_code: m.version_code,
+                    description: m.description,
+                    create_time: m.create_time.unwrap().to_string(),
+                });
+            }
+            Ok(Response::new(response))
+        } else {
+            Err(Status::internal("Cannot find applications in page"))
         }
-
-        Ok(Response::new(response))
     }
 
     #[tracing::instrument]
@@ -179,7 +173,7 @@ impl ApplicationService for MyApplicationServer {
         } else {
             Err(Status::new(
                 tonic::Code::Aborted,
-                "Could not find Application".to_owned(),
+                "Could not find Application ".to_string(),
             ))
         }
     }
@@ -219,13 +213,13 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        let inserted = Mutation::create_application(conn, input)
-            .await
-            .expect("could not insert application");
-
-        let response = ApplicationId { id: inserted.id };
-
-        Ok(Response::new(response))
+        match Mutation::create_application(conn, input).await {
+            Ok(m) => Ok(Response::new(ApplicationId { id: m.id })),
+            Err(_) => Err(Status::new(
+                tonic::Code::Aborted,
+                "Could not find Application ".to_owned(),
+            )),
+        }
     }
 
     #[tracing::instrument]
@@ -266,21 +260,20 @@ impl LogService for MyLogServer {
 
         let mut response = LogList { log: Vec::new() };
 
-        let (logs, _) = Query::get_logs_in_page(conn, 1, per_page)
-            .await
-            .expect("Cannot find logs in page");
-
-        for m in logs {
-            response.log.push(Log {
-                id: m.id,
-                sub_id: m.sub_id,
-                log_type: m.log_type,
-                content: m.content,
-                create_time: m.create_time.unwrap().to_string(),
-            });
+        if let Ok((logs, _)) = Query::get_logs_in_page(conn, 1, per_page).await {
+            for m in logs {
+                response.log.push(Log {
+                    id: m.id,
+                    sub_id: m.sub_id,
+                    log_type: m.log_type,
+                    content: m.content,
+                    create_time: m.create_time.unwrap().to_string(),
+                });
+            }
+            Ok(Response::new(response))
+        } else {
+            Err(Status::internal("Cannot find logs in page"))
         }
-
-        Ok(Response::new(response))
     }
 
     #[tracing::instrument]
@@ -309,13 +302,13 @@ impl LogService for MyLogServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        let inserted = Mutation::create_log(conn, input)
-            .await
-            .expect("could not insert log");
-
-        let response = LogId { id: inserted.id };
-
-        Ok(Response::new(response))
+        match Mutation::create_log(conn, input).await {
+            Ok(m) => Ok(Response::new(LogId { id: m.id })),
+            Err(_) => Err(Status::new(
+                tonic::Code::Aborted,
+                "Could not find Log ".to_owned(),
+            )),
+        }
     }
 
     #[tracing::instrument]
@@ -369,20 +362,19 @@ impl LogDetailService for MyLogDetailServer {
             log_detail: Vec::new(),
         };
 
-        let (log_details, _) = Query::get_log_details_in_page(conn, 1, per_page)
-            .await
-            .expect("Cannot find log_details in page");
-
-        for m in log_details {
-            response.log_detail.push(LogDetail {
-                id: m.id,
-                log_id: m.log_id,
-                content: m.content,
-                create_time: m.create_time.unwrap().to_string(),
-            });
+        if let Ok((log_details, _)) = Query::get_log_details_in_page(conn, 1, per_page).await {
+            for m in log_details {
+                response.log_detail.push(LogDetail {
+                    id: m.id,
+                    log_id: m.log_id,
+                    content: m.content,
+                    create_time: m.create_time.unwrap().to_string(),
+                });
+            }
+            Ok(Response::new(response))
+        } else {
+            Err(Status::internal("Cannot find log_details in page"))
         }
-
-        Ok(Response::new(response))
     }
 
     #[tracing::instrument]
@@ -416,13 +408,13 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        let inserted = Mutation::create_log_detail(conn, input)
-            .await
-            .expect("could not insert log_detail");
-
-        let response = LogDetailId { id: inserted.id };
-
-        Ok(Response::new(response))
+        match Mutation::create_log_detail(conn, input).await {
+            Ok(m) => Ok(Response::new(LogDetailId { id: m.id })),
+            Err(_) => Err(Status::new(
+                tonic::Code::Aborted,
+                "Could not find LogDetail ".to_owned(),
+            )),
+        }
     }
 
     #[tracing::instrument]
@@ -485,20 +477,19 @@ impl ProgramService for MyProgramServer {
             program: Vec::new(),
         };
 
-        let (programs, _) = Query::get_programs_in_page(conn, 1, per_page)
-            .await
-            .expect("Cannot find programs in page");
-
-        for m in programs {
-            response.program.push(Program {
-                id: m.id,
-                name: m.name,
-                content: m.content,
-                create_time: m.create_time.unwrap().to_string(),
-            });
+        if let Ok((programs, _)) = Query::get_programs_in_page(conn, 1, per_page).await {
+            for m in programs {
+                response.program.push(Program {
+                    id: m.id,
+                    name: m.name,
+                    content: m.content,
+                    create_time: m.create_time.unwrap().to_string(),
+                });
+            }
+            Ok(Response::new(response))
+        } else {
+            Err(Status::internal("Cannot find programs in page"))
         }
-
-        Ok(Response::new(response))
     }
 
     #[tracing::instrument]
@@ -526,13 +517,13 @@ impl ProgramService for MyProgramServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        let inserted = Mutation::create_program(conn, input)
-            .await
-            .expect("could not insert program");
-
-        let response = ProgramId { id: inserted.id };
-
-        Ok(Response::new(response))
+        match Mutation::create_program(conn, input).await {
+            Ok(m) => Ok(Response::new(ProgramId { id: m.id })),
+            Err(_) => Err(Status::new(
+                tonic::Code::Aborted,
+                "Could not find Program ".to_owned(),
+            )),
+        }
     }
 
     #[tracing::instrument]
