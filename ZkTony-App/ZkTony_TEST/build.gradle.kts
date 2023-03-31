@@ -48,18 +48,6 @@ android {
         }
     }
 
-    packagingOptions {
-        jniLibs.keepDebugSymbols += listOf(
-            "*/x86/*.so",
-            "*/x86_64/*.so",
-            "*/armeabi-v7a/*.so",
-            "*/arm64-v8a/*.so"
-        )
-        resources {
-            excludes.add("/META-INF/{AL2.0,LGPL2.1}")
-        }
-    }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

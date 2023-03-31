@@ -43,9 +43,6 @@ dependencies {
     implementation(libs.dialogx)
     implementation(libs.material)
     implementation(libs.okhttp3)
-    implementation(libs.okhttp3.logging.interceptor)
-    implementation(libs.retrofit2)
-    implementation(libs.retrofit2.converter.gson)
     implementation(libs.zxing)
 
     ksp(libs.androidx.room.compiler)

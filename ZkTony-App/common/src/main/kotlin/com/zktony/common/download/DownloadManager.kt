@@ -1,4 +1,4 @@
-package com.zktony.common.http.download
+package com.zktony.common.download
 
 import com.zktony.common.ext.copyTo
 import kotlinx.coroutines.Dispatchers

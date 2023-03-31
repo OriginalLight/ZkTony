@@ -3,8 +3,8 @@
 compileSdk = "33"
 minSdk = "21"
 targetSdk = "33"
-ndk = "21.4.7075529"
-cmake = "3.10.2"
+ndk = "25.2.9519653"
+cmake = "3.22.1"
 ## dependencies
 android-lifecycle = "2.5.1"
 androidGradlePlugin = "7.4.2"

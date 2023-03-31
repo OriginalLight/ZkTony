@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseViewModel
 import com.zktony.common.ext.*
-import com.zktony.common.http.download.DownloadManager
-import com.zktony.common.http.download.DownloadState
+import com.zktony.common.download.DownloadManager
+import com.zktony.common.download.DownloadState
 import com.zktony.common.utils.Constants
 import com.zktony.proto.Application
 import com.zktony.serialport.util.toSerial
