@@ -9,7 +9,7 @@ package program;
 // The greeting service definition.
 service ProgramService {
   // Sends a greeting
-  rpc GetPrograms (ProgramPerPage) returns (ProgramList) {}
+  rpc GetPrograms (ProgramRequestPage) returns (ProgramReplyPage) {}
   rpc GetById (ProgramId) returns (Program) {}
   rpc AddProgram (Program) returns (ProgramId) {}
   rpc AddPrograms (ProgramList) returns (ProgramReply) {}
@@ -18,7 +18,10 @@ service ProgramService {
 
 }
 
-message ProgramPerPage { uint64 per_page = 1; }
+message ProgramRequestPage {
+  uint64 page_size = 1;
+  uint64 page = 2;
+}
 
 message ProgramReply { bool success = 1; }
 
@@ -35,4 +38,9 @@ message Program {
   string create_time = 5;
 }
 
-message ProgramList { repeated Program Program = 1; }
+message ProgramList { repeated Program list = 1; }
+
+message ProgramReplyPage {
+  repeated Program list = 1;
+  uint64 total = 2;
+}

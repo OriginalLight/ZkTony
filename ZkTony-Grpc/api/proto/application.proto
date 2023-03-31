@@ -9,7 +9,7 @@ package application;
 // The greeting service definition.
 service ApplicationService {
   // Sends a greeting
-  rpc getApplications (ApplicationPerPage) returns (ApplicationList) {}
+  rpc getApplications (ApplicationRequestPage) returns (ApplicationReplyPage) {}
   rpc GetByApplicationId (ApplicationSearch) returns (Application) {}
   rpc GetById (ApplicationId) returns (Application) {}
   rpc AddApplication (Application) returns (ApplicationId) {}
@@ -17,7 +17,10 @@ service ApplicationService {
   rpc DeleteApplication (ApplicationId) returns (ApplicationReply) {}
 }
 
-message ApplicationPerPage { uint64 per_page = 1; }
+message ApplicationRequestPage {
+  uint64 page_size = 1;
+  uint64 page = 2;
+}
 
 message ApplicationReply { bool success = 1; }
 
@@ -42,4 +45,9 @@ message Application {
   string create_time = 8;
 }
 
-message ApplicationList { repeated Application application = 1; }
+message ApplicationList { repeated Application list = 1; }
+
+message ApplicationReplyPage {
+  repeated Application list = 1;
+  uint64 total = 2;
+}

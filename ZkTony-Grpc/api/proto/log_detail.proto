@@ -11,7 +11,7 @@ package log_detail;
 // The greeting service definition.
 service LogDetailService {
   // Sends a greeting
-  rpc GetLogDetails (LogDetailPerPage) returns (LogDetailList) {}
+  rpc GetLogDetails (LogDetailRequestPage) returns (LogDetailReplyPage) {}
   rpc GetById (LogDetailId) returns (LogDetail) {}
   rpc AddLogDetail (LogDetail) returns (LogDetailId) {}
   rpc AddLogDetails (LogDetailList) returns (LogDetailReply) {}
@@ -20,7 +20,10 @@ service LogDetailService {
 
 }
 
-message LogDetailPerPage { uint64 per_page = 1; }
+message LogDetailRequestPage {
+  uint64 page_size = 1;
+  uint64 page = 2;
+}
 
 message LogDetailReply { bool success = 1; }
 
@@ -37,4 +40,9 @@ message LogDetail {
   string create_time = 4;
 }
 
-message LogDetailList { repeated LogDetail logDetail = 1; }
+message LogDetailList { repeated LogDetail list = 1; }
+
+message LogDetailReplyPage {
+  repeated LogDetail list = 1;
+  uint64 total = 2;
+}

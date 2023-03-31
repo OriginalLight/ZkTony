@@ -9,7 +9,7 @@ package log;
 // The greeting service definition.
 service LogService {
   // Sends a greeting
-  rpc GetLogs (LogPerPage) returns (LogList) {}
+  rpc GetLogs (LogRequestPage) returns (LogReplyPage) {}
   rpc GetById (LogId) returns (Log) {}
   rpc AddLog (Log) returns (LogId) {}
   rpc AddLogs (LogList) returns (LogReply) {}
@@ -18,7 +18,10 @@ service LogService {
 
 }
 
-message LogPerPage { uint64 per_page = 1; }
+message LogRequestPage {
+  uint64 page_size = 1;
+  uint64 page = 2;
+}
 
 message LogReply { bool success = 1; }
 
@@ -36,4 +39,6 @@ message Log {
   string create_time = 5;
 }
 
-message LogList { repeated Log log = 1; }
+message LogList { repeated Log list = 1; }
+
+message LogReplyPage { repeated Log list = 1; uint64 total = 2; }

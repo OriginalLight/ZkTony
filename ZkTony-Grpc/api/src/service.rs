@@ -1,98 +1,26 @@
-use chrono::NaiveDateTime;
+use super::protobuf::application::{
+    application_service_server::{ApplicationService, ApplicationServiceServer},
+    Application, ApplicationId, ApplicationReply, ApplicationReplyPage, ApplicationRequestPage,
+    ApplicationSearch,
+};
+
+use grpc_core::{sea_orm::DatabaseConnection, Mutation, Query};
 use tonic::{Request, Response, Status};
 use tonic_health::proto::health_server::{Health, HealthServer};
 
-use application::{
-    application_service_server::{ApplicationService, ApplicationServiceServer},
-    Application, ApplicationId, ApplicationList, ApplicationPerPage, ApplicationReply,
-    ApplicationSearch,
-};
-use entity::{
-    application::Model as ApplicationModel, log::Model as LogModel,
-    log_detail::Model as LogDetailModel, program::Model as ProgramModel,
-};
-use grpc_core::{sea_orm::DatabaseConnection, Mutation, Query};
-use log::{
+use super::protobuf::log::{
     log_service_server::{LogService, LogServiceServer},
-    Log, LogId, LogList, LogPerPage, LogReply,
+    Log, LogId, LogList, LogReply, LogReplyPage, LogRequestPage,
 };
-use log_detail::{
+use super::protobuf::log_detail::{
     log_detail_service_server::{LogDetailService, LogDetailServiceServer},
-    LogDetail, LogDetailId, LogDetailList, LogDetailPerPage, LogDetailReply,
+    LogDetail, LogDetailId, LogDetailList, LogDetailReply, LogDetailReplyPage,
+    LogDetailRequestPage,
 };
-use program::{
+use super::protobuf::program::{
     program_service_server::{ProgramService, ProgramServiceServer},
-    Program, ProgramId, ProgramList, ProgramPerPage, ProgramReply,
+    Program, ProgramId, ProgramList, ProgramReply, ProgramReplyPage, ProgramRequestPage,
 };
-
-pub mod application {
-    tonic::include_proto!("application");
-}
-
-pub mod log {
-    tonic::include_proto!("log");
-}
-
-pub mod log_detail {
-    tonic::include_proto!("log_detail");
-}
-
-pub mod program {
-    tonic::include_proto!("program");
-}
-
-impl Application {
-    fn into_model(self) -> ApplicationModel {
-        let create_time = NaiveDateTime::parse_from_str(&self.create_time, "%Y-%m-%d %H:%M:%S");
-        ApplicationModel {
-            id: self.id,
-            application_id: self.application_id,
-            build_type: self.build_type,
-            download_url: self.download_url,
-            version_name: self.version_name,
-            version_code: self.version_code,
-            description: self.description,
-            create_time: create_time.ok(),
-        }
-    }
-}
-
-impl Log {
-    fn into_model(self) -> LogModel {
-        let create_time = NaiveDateTime::parse_from_str(&self.create_time, "%Y-%m-%d %H:%M:%S");
-        LogModel {
-            id: self.id,
-            sub_id: self.sub_id,
-            log_type: self.log_type,
-            content: self.content,
-            create_time: create_time.ok(),
-        }
-    }
-}
-
-impl LogDetail {
-    fn into_model(self) -> LogDetailModel {
-        let create_time = NaiveDateTime::parse_from_str(&self.create_time, "%Y-%m-%d %H:%M:%S");
-        LogDetailModel {
-            id: self.id,
-            log_id: self.log_id,
-            content: self.content,
-            create_time: create_time.ok(),
-        }
-    }
-}
-
-impl Program {
-    fn into_model(self) -> ProgramModel {
-        let create_time = NaiveDateTime::parse_from_str(&self.create_time, "%Y-%m-%d %H:%M:%S");
-        ProgramModel {
-            id: self.id,
-            name: self.name,
-            content: self.content,
-            create_time: create_time.ok(),
-        }
-    }
-}
 
 #[derive(Debug, Default)]
 pub struct MyApplicationServer {
@@ -119,29 +47,21 @@ impl ApplicationService for MyApplicationServer {
     #[tracing::instrument]
     async fn get_applications(
         &self,
-        request: Request<ApplicationPerPage>,
-    ) -> Result<Response<ApplicationList>, Status> {
+        request: Request<ApplicationRequestPage>,
+    ) -> Result<Response<ApplicationReplyPage>, Status> {
         let conn = &self.connection;
-        let per_page = request.into_inner().per_page;
+        let (page, page_size) = request.into_inner().into_page();
 
-        let mut response = ApplicationList {
-            application: Vec::new(),
-        };
-
-        if let Ok((applications, _)) = Query::get_applications_in_page(conn, 1, per_page).await {
-            for m in applications {
-                response.application.push(Application {
-                    id: m.id,
-                    application_id: m.application_id,
-                    build_type: m.build_type,
-                    download_url: m.download_url,
-                    version_name: m.version_name,
-                    version_code: m.version_code,
-                    description: m.description,
-                    create_time: m.create_time.unwrap().to_string(),
-                });
-            }
-            Ok(Response::new(response))
+        if let Ok((applications, total)) =
+            Query::get_applications_in_page(conn, page, page_size).await
+        {
+            Ok(Response::new(ApplicationReplyPage {
+                list: applications
+                    .iter()
+                    .map(|model| Application::from(model.clone()))
+                    .collect::<Vec<Application>>(),
+                total,
+            }))
         } else {
             Err(Status::internal("Cannot find applications in page"))
         }
@@ -155,21 +75,12 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.connection;
         let application_id = request.into_inner().application_id;
 
-        if let Some(m) = Query::get_by_application_id(conn, application_id)
+        if let Some(application) = Query::get_by_application_id(conn, application_id)
             .await
             .ok()
             .flatten()
         {
-            Ok(Response::new(Application {
-                id: m.id,
-                application_id: m.application_id,
-                build_type: m.build_type,
-                download_url: m.download_url,
-                version_name: m.version_name,
-                version_code: m.version_code,
-                description: m.description,
-                create_time: m.create_time.unwrap().to_string(),
-            }))
+            Ok(Response::new(Application::from(application)))
         } else {
             Err(Status::new(
                 tonic::Code::Aborted,
@@ -186,17 +97,8 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        if let Some(m) = Query::get_application_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(Application {
-                id: m.id,
-                application_id: m.application_id,
-                build_type: m.build_type,
-                download_url: m.download_url,
-                version_name: m.version_name,
-                version_code: m.version_code,
-                description: m.description,
-                create_time: m.create_time.unwrap().to_string(),
-            }))
+        if let Some(application) = Query::get_application_by_id(conn, id).await.ok().flatten() {
+            Ok(Response::new(Application::from(application)))
         } else {
             Err(Status::new(
                 tonic::Code::Aborted,
@@ -254,23 +156,21 @@ impl ApplicationService for MyApplicationServer {
 #[tonic::async_trait]
 impl LogService for MyLogServer {
     #[tracing::instrument]
-    async fn get_logs(&self, request: Request<LogPerPage>) -> Result<Response<LogList>, Status> {
+    async fn get_logs(
+        &self,
+        request: Request<LogRequestPage>,
+    ) -> Result<Response<LogReplyPage>, Status> {
         let conn = &self.connection;
-        let per_page = request.into_inner().per_page;
+        let (page, page_size) = request.into_inner().into_page();
 
-        let mut response = LogList { log: Vec::new() };
-
-        if let Ok((logs, _)) = Query::get_logs_in_page(conn, 1, per_page).await {
-            for m in logs {
-                response.log.push(Log {
-                    id: m.id,
-                    sub_id: m.sub_id,
-                    log_type: m.log_type,
-                    content: m.content,
-                    create_time: m.create_time.unwrap().to_string(),
-                });
-            }
-            Ok(Response::new(response))
+        if let Ok((logs, total)) = Query::get_logs_in_page(conn, page, page_size).await {
+            Ok(Response::new(LogReplyPage {
+                list: logs
+                    .iter()
+                    .map(|model| Log::from(model.clone()))
+                    .collect::<Vec<Log>>(),
+                total,
+            }))
         } else {
             Err(Status::internal("Cannot find logs in page"))
         }
@@ -281,14 +181,8 @@ impl LogService for MyLogServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        if let Some(m) = Query::get_log_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(Log {
-                id: m.id,
-                sub_id: m.sub_id,
-                log_type: m.log_type,
-                content: m.content,
-                create_time: m.create_time.unwrap().to_string(),
-            }))
+        if let Some(log) = Query::get_log_by_id(conn, id).await.ok().flatten() {
+            Ok(Response::new(Log::from(log)))
         } else {
             Err(Status::new(
                 tonic::Code::Aborted,
@@ -314,10 +208,7 @@ impl LogService for MyLogServer {
     #[tracing::instrument]
     async fn add_logs(&self, request: Request<LogList>) -> Result<Response<LogReply>, Status> {
         let conn = &self.connection;
-        let mut input = Vec::new();
-        for m in request.into_inner().log {
-            input.push(m.into_model());
-        }
+        let input = request.into_inner().into_models();
 
         match Mutation::create_logs(conn, input).await {
             Ok(_) => Ok(Response::new(LogReply { success: true })),
@@ -353,25 +244,19 @@ impl LogDetailService for MyLogDetailServer {
     #[tracing::instrument]
     async fn get_log_details(
         &self,
-        request: Request<LogDetailPerPage>,
-    ) -> Result<Response<LogDetailList>, Status> {
+        request: Request<LogDetailRequestPage>,
+    ) -> Result<Response<LogDetailReplyPage>, Status> {
         let conn = &self.connection;
-        let per_page = request.into_inner().per_page;
+        let (page, page_size) = request.into_inner().into_page();
 
-        let mut response = LogDetailList {
-            log_detail: Vec::new(),
-        };
-
-        if let Ok((log_details, _)) = Query::get_log_details_in_page(conn, 1, per_page).await {
-            for m in log_details {
-                response.log_detail.push(LogDetail {
-                    id: m.id,
-                    log_id: m.log_id,
-                    content: m.content,
-                    create_time: m.create_time.unwrap().to_string(),
-                });
-            }
-            Ok(Response::new(response))
+        if let Ok((models, total)) = Query::get_log_details_in_page(conn, page, page_size).await {
+            Ok(Response::new(LogDetailReplyPage {
+                list: models
+                    .iter()
+                    .map(|model| LogDetail::from(model.clone()))
+                    .collect::<Vec<LogDetail>>(),
+                total,
+            }))
         } else {
             Err(Status::internal("Cannot find log_details in page"))
         }
@@ -385,13 +270,8 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        if let Some(m) = Query::get_log_detail_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(LogDetail {
-                id: m.id,
-                log_id: m.log_id,
-                content: m.content,
-                create_time: m.create_time.unwrap().to_string(),
-            }))
+        if let Some(model) = Query::get_log_detail_by_id(conn, id).await.ok().flatten() {
+            Ok(Response::new(LogDetail::from(model)))
         } else {
             Err(Status::new(
                 tonic::Code::Aborted,
@@ -423,10 +303,7 @@ impl LogDetailService for MyLogDetailServer {
         request: Request<LogDetailList>,
     ) -> Result<Response<LogDetailReply>, Status> {
         let conn = &self.connection;
-        let mut input = Vec::new();
-        for m in request.into_inner().log_detail {
-            input.push(m.into_model())
-        }
+        let input = request.into_inner().into_models();
 
         match Mutation::create_log_details(conn, input).await {
             Ok(_) => Ok(Response::new(LogDetailReply { success: true })),
@@ -468,25 +345,19 @@ impl ProgramService for MyProgramServer {
     #[tracing::instrument]
     async fn get_programs(
         &self,
-        request: Request<ProgramPerPage>,
-    ) -> Result<Response<ProgramList>, Status> {
+        request: Request<ProgramRequestPage>,
+    ) -> Result<Response<ProgramReplyPage>, Status> {
         let conn = &self.connection;
-        let per_page = request.into_inner().per_page;
+        let (page, page_size) = request.into_inner().into_page();
 
-        let mut response = ProgramList {
-            program: Vec::new(),
-        };
-
-        if let Ok((programs, _)) = Query::get_programs_in_page(conn, 1, per_page).await {
-            for m in programs {
-                response.program.push(Program {
-                    id: m.id,
-                    name: m.name,
-                    content: m.content,
-                    create_time: m.create_time.unwrap().to_string(),
-                });
-            }
-            Ok(Response::new(response))
+        if let Ok((models, total)) = Query::get_programs_in_page(conn, page, page_size).await {
+            Ok(Response::new(ProgramReplyPage {
+                list: models
+                    .iter()
+                    .map(|model| Program::from(model.clone()))
+                    .collect::<Vec<Program>>(),
+                total,
+            }))
         } else {
             Err(Status::internal("Cannot find programs in page"))
         }
@@ -497,13 +368,8 @@ impl ProgramService for MyProgramServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        if let Some(m) = Query::get_program_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(Program {
-                id: m.id,
-                name: m.name,
-                content: m.content,
-                create_time: m.create_time.unwrap().to_string(),
-            }))
+        if let Some(model) = Query::get_program_by_id(conn, id).await.ok().flatten() {
+            Ok(Response::new(Program::from(model)))
         } else {
             Err(Status::new(
                 tonic::Code::Aborted,
@@ -532,10 +398,7 @@ impl ProgramService for MyProgramServer {
         request: Request<ProgramList>,
     ) -> Result<Response<ProgramReply>, Status> {
         let conn = &self.connection;
-        let mut input = Vec::new();
-        for m in request.into_inner().program {
-            input.push(m.into_model())
-        }
+        let input = request.into_inner().into_models();
 
         match Mutation::create_programs(conn, input).await {
             Ok(_) => Ok(Response::new(ProgramReply { success: true })),
