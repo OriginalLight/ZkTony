@@ -1,38 +1,27 @@
 package com.zktony.www.di
 
-import com.google.gson.GsonBuilder
-import com.zktony.common.http.adapter.FlowCallAdapterFactory
-import com.zktony.common.utils.Constants
-import com.zktony.www.BuildConfig
-import com.zktony.www.data.remote.service.ApplicationService
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
+import com.zktony.common.R
+import com.zktony.common.ext.Ext
+import com.zktony.common.utils.Constants.GRPC_AUTHORITY
+import com.zktony.common.utils.Constants.GRPC_HOST
+import com.zktony.common.utils.Constants.GRPC_PORT
+import com.zktony.www.data.remote.grpc.ApplicationGrpc
+import io.grpc.TlsChannelCredentials
+import io.grpc.okhttp.OkHttpChannelBuilder
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 val remoteModule = module {
     single {
-        OkHttpClient.Builder()
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level =
-                    if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.BASIC
-            })
+        TlsChannelCredentials.newBuilder()
+            .trustManager(Ext.ctx.resources.openRawResource(R.raw.ca))
             .build()
     }
     single {
-        Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
-            .client(get())
-            .addCallAdapterFactory(FlowCallAdapterFactory.createAsync())
-            .addConverterFactory(
-                GsonConverterFactory.create(
-                    GsonBuilder()
-                        .setDateFormat("yyyy-MM-dd HH:mm:ss")
-                        .create()
-                )
-            )
+        OkHttpChannelBuilder.forAddress(GRPC_HOST, GRPC_PORT, get())
+            .overrideAuthority(GRPC_AUTHORITY)
             .build()
     }
-    single { get<Retrofit>().create(ApplicationService::class.java) }
+    single {
+        ApplicationGrpc(get())
+    }
 }

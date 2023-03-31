@@ -122,15 +122,23 @@ pub struct MyProgramServer {
 #[tonic::async_trait]
 impl ApplicationService for MyApplicationServer {
     #[tracing::instrument]
-    async fn get_by_id(
+    async fn get_applications(
         &self,
-        request: Request<ApplicationId>,
-    ) -> Result<Response<Application>, Status> {
+        request: Request<ApplicationPerPage>,
+    ) -> Result<Response<ApplicationList>, Status> {
         let conn = &self.connection;
-        let id = request.into_inner().id;
+        let per_page = request.into_inner().per_page;
 
-        if let Some(m) = Query::get_application_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(Application {
+        let mut response = ApplicationList {
+            application: Vec::new(),
+        };
+
+        let (applications, _) = Query::get_applications_in_page(conn, 1, per_page)
+            .await
+            .expect("Cannot find applications in page");
+
+        for m in applications {
+            response.application.push(Application {
                 id: m.id,
                 application_id: m.application_id,
                 build_type: m.build_type,
@@ -139,13 +147,10 @@ impl ApplicationService for MyApplicationServer {
                 version_code: m.version_code,
                 description: m.description,
                 create_time: m.create_time.unwrap().to_string(),
-            }))
-        } else {
-            Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find Application ".to_owned(),
-            ))
+            });
         }
+
+        Ok(Response::new(response))
     }
 
     #[tracing::instrument]
@@ -180,23 +185,15 @@ impl ApplicationService for MyApplicationServer {
     }
 
     #[tracing::instrument]
-    async fn get_applications(
+    async fn get_by_id(
         &self,
-        request: Request<ApplicationPerPage>,
-    ) -> Result<Response<ApplicationList>, Status> {
+        request: Request<ApplicationId>,
+    ) -> Result<Response<Application>, Status> {
         let conn = &self.connection;
-        let per_page = request.into_inner().per_page;
+        let id = request.into_inner().id;
 
-        let mut response = ApplicationList {
-            application: Vec::new(),
-        };
-
-        let (applications, _) = Query::get_applications_in_page(conn, 1, per_page)
-            .await
-            .expect("Cannot find applications in page");
-
-        for m in applications {
-            response.application.push(Application {
+        if let Some(m) = Query::get_application_by_id(conn, id).await.ok().flatten() {
+            Ok(Response::new(Application {
                 id: m.id,
                 application_id: m.application_id,
                 build_type: m.build_type,
@@ -205,10 +202,13 @@ impl ApplicationService for MyApplicationServer {
                 version_code: m.version_code,
                 description: m.description,
                 create_time: m.create_time.unwrap().to_string(),
-            });
+            }))
+        } else {
+            Err(Status::new(
+                tonic::Code::Aborted,
+                "Could not find Application ".to_owned(),
+            ))
         }
-
-        Ok(Response::new(response))
     }
 
     #[tracing::instrument]
@@ -260,27 +260,6 @@ impl ApplicationService for MyApplicationServer {
 #[tonic::async_trait]
 impl LogService for MyLogServer {
     #[tracing::instrument]
-    async fn get_by_id(&self, request: Request<LogId>) -> Result<Response<Log>, Status> {
-        let conn = &self.connection;
-        let id = request.into_inner().id;
-
-        if let Some(m) = Query::get_log_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(Log {
-                id: m.id,
-                sub_id: m.sub_id,
-                log_type: m.log_type,
-                content: m.content,
-                create_time: m.create_time.unwrap().to_string(),
-            }))
-        } else {
-            Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find Log ".to_owned(),
-            ))
-        }
-    }
-
-    #[tracing::instrument]
     async fn get_logs(&self, request: Request<LogPerPage>) -> Result<Response<LogList>, Status> {
         let conn = &self.connection;
         let per_page = request.into_inner().per_page;
@@ -302,6 +281,27 @@ impl LogService for MyLogServer {
         }
 
         Ok(Response::new(response))
+    }
+
+    #[tracing::instrument]
+    async fn get_by_id(&self, request: Request<LogId>) -> Result<Response<Log>, Status> {
+        let conn = &self.connection;
+        let id = request.into_inner().id;
+
+        if let Some(m) = Query::get_log_by_id(conn, id).await.ok().flatten() {
+            Ok(Response::new(Log {
+                id: m.id,
+                sub_id: m.sub_id,
+                log_type: m.log_type,
+                content: m.content,
+                create_time: m.create_time.unwrap().to_string(),
+            }))
+        } else {
+            Err(Status::new(
+                tonic::Code::Aborted,
+                "Could not find Log ".to_owned(),
+            ))
+        }
     }
 
     #[tracing::instrument]
@@ -358,29 +358,6 @@ impl LogService for MyLogServer {
 #[tonic::async_trait]
 impl LogDetailService for MyLogDetailServer {
     #[tracing::instrument]
-    async fn get_by_id(
-        &self,
-        request: Request<LogDetailId>,
-    ) -> Result<Response<LogDetail>, Status> {
-        let conn = &self.connection;
-        let id = request.into_inner().id;
-
-        if let Some(m) = Query::get_log_detail_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(LogDetail {
-                id: m.id,
-                log_id: m.log_id,
-                content: m.content,
-                create_time: m.create_time.unwrap().to_string(),
-            }))
-        } else {
-            Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find LogDetail ".to_owned(),
-            ))
-        }
-    }
-
-    #[tracing::instrument]
     async fn get_log_details(
         &self,
         request: Request<LogDetailPerPage>,
@@ -406,6 +383,29 @@ impl LogDetailService for MyLogDetailServer {
         }
 
         Ok(Response::new(response))
+    }
+
+    #[tracing::instrument]
+    async fn get_by_id(
+        &self,
+        request: Request<LogDetailId>,
+    ) -> Result<Response<LogDetail>, Status> {
+        let conn = &self.connection;
+        let id = request.into_inner().id;
+
+        if let Some(m) = Query::get_log_detail_by_id(conn, id).await.ok().flatten() {
+            Ok(Response::new(LogDetail {
+                id: m.id,
+                log_id: m.log_id,
+                content: m.content,
+                create_time: m.create_time.unwrap().to_string(),
+            }))
+        } else {
+            Err(Status::new(
+                tonic::Code::Aborted,
+                "Could not find LogDetail ".to_owned(),
+            ))
+        }
     }
 
     #[tracing::instrument]
@@ -474,26 +474,6 @@ impl LogDetailService for MyLogDetailServer {
 #[tonic::async_trait]
 impl ProgramService for MyProgramServer {
     #[tracing::instrument]
-    async fn get_by_id(&self, request: Request<ProgramId>) -> Result<Response<Program>, Status> {
-        let conn = &self.connection;
-        let id = request.into_inner().id;
-
-        if let Some(m) = Query::get_program_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(Program {
-                id: m.id,
-                name: m.name,
-                content: m.content,
-                create_time: m.create_time.unwrap().to_string(),
-            }))
-        } else {
-            Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find Program ".to_owned(),
-            ))
-        }
-    }
-
-    #[tracing::instrument]
     async fn get_programs(
         &self,
         request: Request<ProgramPerPage>,
@@ -519,6 +499,26 @@ impl ProgramService for MyProgramServer {
         }
 
         Ok(Response::new(response))
+    }
+
+    #[tracing::instrument]
+    async fn get_by_id(&self, request: Request<ProgramId>) -> Result<Response<Program>, Status> {
+        let conn = &self.connection;
+        let id = request.into_inner().id;
+
+        if let Some(m) = Query::get_program_by_id(conn, id).await.ok().flatten() {
+            Ok(Response::new(Program {
+                id: m.id,
+                name: m.name,
+                content: m.content,
+                create_time: m.create_time.unwrap().to_string(),
+            }))
+        } else {
+            Err(Status::new(
+                tonic::Code::Aborted,
+                "Could not find Program ".to_owned(),
+            ))
+        }
     }
 
     #[tracing::instrument]

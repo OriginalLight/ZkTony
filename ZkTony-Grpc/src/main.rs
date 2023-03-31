@@ -12,32 +12,26 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_max_level(tracing::Level::INFO)
         .init();
 
-    let db_url = env::var("DATABASE_URL").expect("DATABASE_URL is not set in .env file");
-    let host = env::var("HOST").expect("HOST is not set in .env file");
-    let port = env::var("PORT").expect("PORT is not set in .env file");
-    let cert_file_path = env::var("CERT_FILE_PATH").expect("CERT_FILE_PATH is not set in .env file");
-    let key_file_path = env::var("KEY_FILE_PATH").expect("KEY_FILE_PATH is not set in .env file");
-    let server_url = format!("{host}:{port}").parse()?;
-    let cert = std::fs::read_to_string(cert_file_path)?;
-    let key = std::fs::read_to_string(key_file_path)?;
+    let host = env::var("HOST").unwrap();
+    let port = env::var("PORT").unwrap();
+    let db_url = env::var("DATABASE_URL").unwrap();
+    let cert_file_path = env::var("CERT_FILE_PATH").unwrap();
+    let key_file_path = env::var("KEY_FILE_PATH").unwrap();
+
+    let server_url = format!("{host}:{port}").parse().unwrap();
+    let cert = std::fs::read_to_string(cert_file_path).unwrap();
+    let key = std::fs::read_to_string(key_file_path).unwrap();
 
     let identity = Identity::from_pem(cert, key);
-
-    // establish database connection
     let connection = Database::connect(&db_url).await?;
-
     let health_svc = service::health_svc().await;
     let application_svc = service::application_svc(connection.clone());
     let log_svc = service::log_svc(connection.clone());
     let log_detail_svc = service::log_detail_svc(connection.clone());
     let program_svc = service::program_svc(connection.clone());
 
-    tracing::info!("ZkTony-Grpc-Server");
+    tracing::info!("ZkTony-Grpc");
     tracing::info!("Starting server at {}", server_url);
-    tracing::info!("编译器：{}", std::env::consts::DLL_EXTENSION);
-    tracing::info!("系统架构：{}", std::env::consts::OS);
-    tracing::info!("系统类型：{}", std::env::consts::ARCH);
-    tracing::info!("操作系统：{}", std::env::consts::FAMILY);
 
     Server::builder()
         .tls_config(ServerTlsConfig::new().identity(identity))?

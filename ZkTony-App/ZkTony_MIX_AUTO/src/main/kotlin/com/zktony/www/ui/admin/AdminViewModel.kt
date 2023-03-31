@@ -11,14 +11,14 @@ import com.zktony.common.ext.*
 import com.zktony.common.http.download.DownloadManager
 import com.zktony.common.http.download.DownloadState
 import com.zktony.common.utils.Constants
+import com.zktony.proto.Application
 import com.zktony.serialport.util.Serial
 import com.zktony.www.BuildConfig
 import com.zktony.www.common.ext.toCommand
 import com.zktony.www.common.ext.toMotor
 import com.zktony.www.data.local.dao.MotorDao
 import com.zktony.www.data.local.entity.Motor
-import com.zktony.www.data.remote.model.Application
-import com.zktony.www.data.remote.service.ApplicationService
+import com.zktony.www.data.remote.grpc.ApplicationGrpc
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.delay
@@ -32,17 +32,12 @@ import java.io.File
 class AdminViewModel constructor(
     private val dataStore: DataStore<Preferences>,
     private val dao: MotorDao,
-    private val service: ApplicationService,
-    private val serialManager: SerialManager
+    private val grpc: ApplicationGrpc,
+    private val serialManager: SerialManager,
 ) : BaseViewModel() {
 
-
-    private val _file = MutableStateFlow<File?>(null)
-    private val _version = MutableStateFlow<Application?>(null)
-    private val _progress = MutableStateFlow(0)
-    val file = _file.asStateFlow()
-    val version = _version.asStateFlow()
-    val progress = _progress.asStateFlow()
+    private val _uiState = MutableStateFlow(AdminUiState())
+    val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -112,26 +107,31 @@ class AdminViewModel constructor(
     }
 
     /**
+     * 取消或确认更新时清空标志
+     * 防止重进进入时显示更新提示
+     */
+    fun cleanUpdate() {
+        _uiState.value = _uiState.value.copy(
+            file = null,
+            application = null,
+            loading = false
+        )
+    }
+
+    /**
      * 检查更新
      */
     fun checkUpdate() {
         viewModelScope.launch {
             val apk = checkLocalUpdate()
             if (apk != null) {
-                _file.value = apk
+                _uiState.value = uiState.value.copy(
+                    file = apk,
+                )
             } else {
                 checkRemoteUpdate()
             }
         }
-    }
-
-    /**
-     * 取消或确认更新时清空标志
-     * 防止重进进入时显示更新提示
-     */
-    fun cleanUpdate() {
-        _file.value = null
-        _version.value = null
     }
 
     /**
@@ -141,22 +141,28 @@ class AdminViewModel constructor(
         viewModelScope.launch {
             PopTip.show("开始下载")
             DownloadManager.download(
-                application.download_url,
+                application.downloadUrl,
                 File(Ext.ctx.getExternalFilesDir(null), "update.apk")
             ).collect {
                 when (it) {
                     is DownloadState.Success -> {
-                        _progress.value = 0
+                        _uiState.value = _uiState.value.copy(
+                            progress = 0
+                        )
                         Ext.ctx.installApk(it.file)
                     }
 
                     is DownloadState.Err -> {
-                        _progress.value = 0
+                        _uiState.value = _uiState.value.copy(
+                            progress = 0
+                        )
                         PopTip.show("下载失败,请重试!").showLong()
                     }
 
                     is DownloadState.Progress -> {
-                        _progress.value = it.progress
+                        _uiState.value = _uiState.value.copy(
+                            progress = it.progress
+                        )
                     }
                 }
             }
@@ -170,22 +176,27 @@ class AdminViewModel constructor(
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (Ext.ctx.isNetworkAvailable()) {
-                service.getById(BuildConfig.APPLICATION_ID)
-                    .catch {
-                        PopTip.show("升级接口异常请联系管理员")
+                _uiState.value = _uiState.value.copy(
+                    loading = true
+                )
+                grpc.getByApplicationId().catch {
+                    PopTip.show("获取版本信息失败,请重试!")
+                    _uiState.value = _uiState.value.copy(
+                        loading = false
+                    )
+                }.collect {
+                    if (it.versionCode > BuildConfig.VERSION_CODE) {
+                        _uiState.value = _uiState.value.copy(
+                            application = it,
+                            loading = false
+                        )
+                    } else {
+                        PopTip.show("已是最新版本")
+                        _uiState.value = _uiState.value.copy(
+                            loading = false
+                        )
                     }
-                    .collect {
-                        val data = it.body()
-                        if (data != null) {
-                            if (data.version_code > BuildConfig.VERSION_CODE) {
-                                _version.value = data
-                            } else {
-                                PopTip.show("已经是最新版本")
-                            }
-                        } else {
-                            PopTip.show("升级接口异常请联系管理员")
-                        }
-                    }
+                }
             } else {
                 PopTip.show("请连接网络或插入升级U盘")
             }
@@ -262,3 +273,11 @@ class AdminViewModel constructor(
         }
     }
 }
+
+
+data class AdminUiState(
+    val file: File? = null,
+    val application: Application? = null,
+    val progress: Int = 0,
+    val loading: Boolean = false
+)

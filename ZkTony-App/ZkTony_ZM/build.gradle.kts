@@ -120,6 +120,7 @@ protobuf {
 }
 
 dependencies {
+    protobuf(project(":protobuf"))
     implementation(project(mapOf("path" to ":common")))
     implementation(project(mapOf("path" to ":gpio")))
     implementation(project(mapOf("path" to ":serialport")))

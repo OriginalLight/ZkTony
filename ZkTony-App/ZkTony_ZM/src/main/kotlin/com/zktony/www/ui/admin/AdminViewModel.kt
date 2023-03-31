@@ -13,19 +13,15 @@ import com.zktony.common.ext.isNetworkAvailable
 import com.zktony.common.ext.save
 import com.zktony.common.http.download.DownloadManager
 import com.zktony.common.http.download.DownloadState
-import com.zktony.common.http.result.NetworkResult
-import com.zktony.common.http.result.data
 import com.zktony.common.utils.Constants
 import com.zktony.gpio.Gpio
 import com.zktony.proto.Application
 import com.zktony.www.BuildConfig
 import com.zktony.www.data.remote.grpc.ApplicationGrpc
 import com.zktony.www.manager.StateManager
-import io.grpc.stub.StreamObserver
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -35,13 +31,8 @@ class AdminViewModel constructor(
     private val stateManager: StateManager
 ) : BaseViewModel() {
 
-
-    private val _file = MutableStateFlow<File?>(null)
-    private val _application = MutableStateFlow<Application?>(null)
-    private val _progress = MutableStateFlow(0)
-    val file = _file.asStateFlow()
-    val application = _application.asStateFlow()
-    val progress = _progress.asStateFlow()
+    private val _uiState = MutableStateFlow(AdminUiState())
+    val uiState = _uiState.asStateFlow()
 
     /**
      * 下位机复位
@@ -142,8 +133,11 @@ class AdminViewModel constructor(
      * 防止重进进入时显示更新提示
      */
     fun cleanUpdate() {
-        _file.value = null
-        _application.value = null
+        _uiState.value = _uiState.value.copy(
+            file = null,
+            application = null,
+            loading = false
+        )
     }
 
     /**
@@ -153,7 +147,9 @@ class AdminViewModel constructor(
         viewModelScope.launch {
             val apk = checkLocalUpdate()
             if (apk != null) {
-                _file.value = apk
+                _uiState.value = uiState.value.copy(
+                    file = apk,
+                )
             } else {
                 checkRemoteUpdate()
             }
@@ -173,17 +169,23 @@ class AdminViewModel constructor(
             ).collect {
                 when (it) {
                     is DownloadState.Success -> {
-                        _progress.value = 0
+                        _uiState.value = _uiState.value.copy(
+                            progress = 0
+                        )
                         Ext.ctx.installApk(it.file)
                     }
 
                     is DownloadState.Err -> {
-                        _progress.value = 0
+                        _uiState.value = _uiState.value.copy(
+                            progress = 0
+                        )
                         PopTip.show("下载失败,请重试!").showLong()
                     }
 
                     is DownloadState.Progress -> {
-                        _progress.value = it.progress
+                        _uiState.value = _uiState.value.copy(
+                            progress = it.progress
+                        )
                     }
                 }
             }
@@ -197,13 +199,25 @@ class AdminViewModel constructor(
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (Ext.ctx.isNetworkAvailable()) {
+                _uiState.value = _uiState.value.copy(
+                    loading = true
+                )
                 grpc.getByApplicationId().catch {
                     PopTip.show("获取版本信息失败,请重试!")
+                    _uiState.value = _uiState.value.copy(
+                        loading = false
+                    )
                 }.collect {
                     if (it.versionCode > BuildConfig.VERSION_CODE) {
-                        _application.value = it
+                        _uiState.value = _uiState.value.copy(
+                            application = it,
+                            loading = false
+                        )
                     } else {
                         PopTip.show("已是最新版本")
+                        _uiState.value = _uiState.value.copy(
+                            loading = false
+                        )
                     }
                 }
             } else {
@@ -228,3 +242,10 @@ class AdminViewModel constructor(
     }
 
 }
+
+data class AdminUiState(
+    val file: File? = null,
+    val application: Application? = null,
+    val progress: Int = 0,
+    val loading: Boolean = false
+)

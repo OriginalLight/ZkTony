@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit
  */
 class WorkerManager {
     fun createWorker() {
-        WorkManager.getInstance(Ext.ctx).cancelAllWork()
 
         WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
             "worker_program",

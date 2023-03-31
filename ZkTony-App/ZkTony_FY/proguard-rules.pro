@@ -70,7 +70,7 @@
 # These classes are duplicated between android.jar and org.apache.http.legacy.jar.
 -dontnote org.apache.http.**
 -dontnote android.net.http.**
--dontwarn javax.lang.model.element.**
+-dontwarn javax.**
 
 # 保持自定义控件类不被混淆
 -keepclasseswithmembers class * {
@@ -91,11 +91,20 @@
     <fields>;
     <methods>;
 }
+
 # DialogX
 -keep class com.kongzue.dialogx.** { *; }
 -dontwarn com.kongzue.dialogx.**
 -keep class android.view.** { *; }
+-keep class androidx.core.view.** { *; }
+
+# 若启用模糊效果，请增加如下配置：
+-dontwarn androidx.renderscript.**
+-keep public class androidx.renderscript.** { *; }
 
 # Model
--keep class com.zktony.www.data.remote.model.** {*;}
 -keepclasseswithmembers class com.zktony.www.data.local.entity.** {*;}
+
+-keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite* {
+   <fields>;
+}

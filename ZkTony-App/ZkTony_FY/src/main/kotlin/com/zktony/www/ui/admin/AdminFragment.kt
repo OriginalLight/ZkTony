@@ -3,15 +3,13 @@ package com.zktony.www.ui.admin
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.provider.Settings
-import android.view.View
-import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.*
-import com.zktony.common.R.color
 import com.zktony.common.base.BaseFragment
 import com.zktony.common.dialog.aboutDialog
 import com.zktony.common.dialog.authDialog
@@ -48,72 +46,46 @@ class AdminFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-                    viewModel.file.collect {
-                        it?.let {
+                    viewModel.uiState.collect {
+                        if (it.file != null) {
                             updateDialog(
                                 title = "发现本地新版本",
                                 message = "是否更新？",
                                 block = {
-                                    requireContext().installApk(it)
+                                    requireContext().installApk(it.file)
                                     viewModel.cleanUpdate()
                                 }, block1 = {
                                     viewModel.cleanUpdate()
                                 })
                         }
-                    }
-                }
-                launch {
-                    viewModel.version.collect {
-                        it?.let {
+                        if (it.application != null) {
                             updateDialog(
                                 title = "发现在线新版本",
-                                message = it.description + "\n是否升级？",
+                                message = it.application.description + "\n是否升级？",
                                 block = {
-                                    viewModel.doRemoteUpdate(it)
+                                    viewModel.doRemoteUpdate(it.application)
                                     viewModel.cleanUpdate()
                                 },
                                 block1 = {
                                     viewModel.cleanUpdate()
                                 })
                         }
-                    }
-                }
-                launch {
-                    viewModel.progress.collect {
                         binding.apply {
-                            if (it == 0) {
-                                progress.visibility = View.GONE
-                            } else {
-                                progress.apply {
-                                    visibility = View.VISIBLE
-                                    progress = it
-                                }
+                            progress.apply {
+                                progress = it.progress
+                                isVisible = it.progress != 0
                             }
-                            tvUpdate.apply {
-                                if (it == 0) {
-                                    text = "检查更新"
-                                    setTextColor(
-                                        ContextCompat.getColor(
-                                            context,
-                                            color.dark_outline
-                                        )
-                                    )
-                                } else {
-                                    text = "$it%"
-                                    setTextColor(
-                                        ContextCompat.getColor(
-                                            context,
-                                            color.light_primary
-                                        )
-                                    )
-                                }
-                            }
+                            tvUpdate.text = if (it.progress == 0) "检查更新" else "${it.progress}%"
                         }
                     }
                 }
                 launch {
                     stateManager.settings.collect {
-                        binding.etTemp.setEqualText(it.temp.toString().removeZero())
+                        binding.apply {
+                            etTemp.setEqualText(it.temp.toString().removeZero())
+                            swBar.isChecked = it.bar
+                            swRecycle.isChecked = it.recycle
+                        }
                     }
                 }
             }
@@ -130,17 +102,11 @@ class AdminFragment :
                 viewModel.setAntibodyTemp(it.toFloatOrNull() ?: 3f)
             }
 
-            with(swBar) {
-                isChecked = stateManager.settings.value.bar
-                setOnCheckedChangeListener { _, isChecked ->
-                    viewModel.toggleNavigationBar(isChecked)
-                }
+            swBar.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.toggleNavigationBar(isChecked)
             }
-            with(swRecycle) {
-                isChecked = stateManager.settings.value.recycle
-                setOnCheckedChangeListener { _, isChecked ->
-                    viewModel.toggleRecycle(isChecked)
-                }
+            swRecycle.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.toggleRecycle(isChecked)
             }
             with(setting) {
                 clickScale()
@@ -168,11 +134,15 @@ class AdminFragment :
             with(update) {
                 clickScale()
                 clickNoRepeat {
-                    if (viewModel.progress.value > 0) {
+                    if (viewModel.uiState.value.progress > 0) {
                         PopTip.show("正在更新中")
-                    } else {
-                        viewModel.checkUpdate()
+                        return@clickNoRepeat
                     }
+                    if (viewModel.uiState.value.loading) {
+                        PopTip.show("正在检查更新中")
+                        return@clickNoRepeat
+                    }
+                    viewModel.checkUpdate()
                 }
             }
             with(version) {
