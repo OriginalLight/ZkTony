@@ -1,4 +1,4 @@
-use grpc_core::{sea_orm::DatabaseConnection, *};
+use grpc_core::{sea_orm::DbConn, *};
 
 use tonic::{
     codec::CompressionEncoding,
@@ -18,22 +18,22 @@ use super::protobuf::{
 
 #[derive(Debug, Default, Clone)]
 pub struct MyApplicationServer {
-    connection: DatabaseConnection,
+    db_conn: DbConn,
 }
 
 #[derive(Debug, Default, Clone)]
 pub struct MyLogServer {
-    connection: DatabaseConnection,
+    db_conn: DbConn,
 }
 
 #[derive(Debug, Default, Clone)]
 pub struct MyLogDetailServer {
-    connection: DatabaseConnection,
+    db_conn: DbConn,
 }
 
 #[derive(Debug, Default, Clone)]
 pub struct MyProgramServer {
-    connection: DatabaseConnection,
+    db_conn: DbConn,
 }
 
 #[derive(Debug, Default, Clone)]
@@ -46,7 +46,7 @@ impl ApplicationService for MyApplicationServer {
         &self,
         request: Request<ApplicationRequestPage>,
     ) -> Result<Response<ApplicationReplyPage>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let (page, page_size) = request.into_inner().into_page();
 
         if page == 0 || page_size == 0 {
@@ -72,7 +72,7 @@ impl ApplicationService for MyApplicationServer {
         &self,
         request: Request<ApplicationSearch>,
     ) -> Result<Response<Application>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let application_id = request.into_inner().application_id;
 
         if application_id.is_empty() {
@@ -93,7 +93,7 @@ impl ApplicationService for MyApplicationServer {
         &self,
         request: Request<ApplicationId>,
     ) -> Result<Response<Application>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let id = request.into_inner().id;
 
         match ApplicationQuery::get_application_by_id(conn, id).await {
@@ -110,7 +110,7 @@ impl ApplicationService for MyApplicationServer {
         &self,
         request: Request<Application>,
     ) -> Result<Response<ApplicationId>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
         match ApplicationMutation::create_application(conn, input).await {
@@ -124,7 +124,7 @@ impl ApplicationService for MyApplicationServer {
         &self,
         request: Request<Application>,
     ) -> Result<Response<ApplicationReply>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
         match ApplicationMutation::update_application(conn, input).await {
@@ -138,7 +138,7 @@ impl ApplicationService for MyApplicationServer {
         &self,
         request: Request<ApplicationId>,
     ) -> Result<Response<ApplicationReply>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let id = request.into_inner().id;
 
         match ApplicationMutation::delete_application(conn, id).await {
@@ -155,7 +155,7 @@ impl LogService for MyLogServer {
         &self,
         request: Request<LogRequestPage>,
     ) -> Result<Response<LogReplyPage>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let (page, page_size) = request.into_inner().into_page();
 
         if page == 0 || page_size == 0 {
@@ -178,7 +178,7 @@ impl LogService for MyLogServer {
 
     #[tracing::instrument]
     async fn get_by_id(&self, request: Request<LogId>) -> Result<Response<Log>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let id = request.into_inner().id;
 
         match LogQuery::get_log_by_id(conn, id).await {
@@ -192,7 +192,7 @@ impl LogService for MyLogServer {
 
     #[tracing::instrument]
     async fn add_log(&self, request: Request<Log>) -> Result<Response<LogId>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
         match LogMutation::create_log(conn, input).await {
@@ -203,7 +203,7 @@ impl LogService for MyLogServer {
 
     #[tracing::instrument]
     async fn add_logs(&self, request: Request<LogList>) -> Result<Response<LogReply>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let input = request.into_inner().into_models();
 
         match LogMutation::create_logs(conn, input).await {
@@ -214,7 +214,7 @@ impl LogService for MyLogServer {
 
     #[tracing::instrument]
     async fn update_log(&self, request: Request<Log>) -> Result<Response<LogReply>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
         match LogMutation::update_log(conn, input).await {
@@ -225,7 +225,7 @@ impl LogService for MyLogServer {
 
     #[tracing::instrument]
     async fn delete_log(&self, request: Request<LogId>) -> Result<Response<LogReply>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let id = request.into_inner().id;
 
         match LogMutation::delete_log(conn, id).await {
@@ -242,7 +242,7 @@ impl LogDetailService for MyLogDetailServer {
         &self,
         request: Request<LogDetailRequestPage>,
     ) -> Result<Response<LogDetailReplyPage>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let (page, page_size) = request.into_inner().into_page();
 
         if page == 0 || page_size == 0 {
@@ -267,7 +267,7 @@ impl LogDetailService for MyLogDetailServer {
         &self,
         request: Request<LogDetailId>,
     ) -> Result<Response<LogDetail>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let id = request.into_inner().id;
 
         match LogDetailQuery::get_log_detail_by_id(conn, id).await {
@@ -284,7 +284,7 @@ impl LogDetailService for MyLogDetailServer {
         &self,
         request: Request<LogDetail>,
     ) -> Result<Response<LogDetailId>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
         match LogDetailMutation::create_log_detail(conn, input).await {
@@ -298,7 +298,7 @@ impl LogDetailService for MyLogDetailServer {
         &self,
         request: Request<LogDetailList>,
     ) -> Result<Response<LogDetailReply>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let input = request.into_inner().into_models();
 
         match LogDetailMutation::create_log_details(conn, input).await {
@@ -312,7 +312,7 @@ impl LogDetailService for MyLogDetailServer {
         &self,
         request: Request<LogDetail>,
     ) -> Result<Response<LogDetailReply>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
         match LogDetailMutation::update_log_detail(conn, input).await {
@@ -326,7 +326,7 @@ impl LogDetailService for MyLogDetailServer {
         &self,
         request: Request<LogDetailId>,
     ) -> Result<Response<LogDetailReply>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let id = request.into_inner().id;
 
         match LogDetailMutation::delete_log_detail(conn, id).await {
@@ -343,7 +343,7 @@ impl ProgramService for MyProgramServer {
         &self,
         request: Request<ProgramRequestPage>,
     ) -> Result<Response<ProgramReplyPage>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let (page, page_size) = request.into_inner().into_page();
 
         if page == 0 || page_size == 0 {
@@ -367,7 +367,7 @@ impl ProgramService for MyProgramServer {
 
     #[tracing::instrument]
     async fn get_by_id(&self, request: Request<ProgramId>) -> Result<Response<Program>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let id = request.into_inner().id;
 
         match ProgramQuery::get_program_by_id(conn, id).await {
@@ -381,7 +381,7 @@ impl ProgramService for MyProgramServer {
 
     #[tracing::instrument]
     async fn add_program(&self, request: Request<Program>) -> Result<Response<ProgramId>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
         match ProgramMutation::create_program(conn, input).await {
@@ -395,7 +395,7 @@ impl ProgramService for MyProgramServer {
         &self,
         request: Request<ProgramList>,
     ) -> Result<Response<ProgramReply>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let input = request.into_inner().into_models();
 
         match ProgramMutation::create_programs(conn, input).await {
@@ -409,7 +409,7 @@ impl ProgramService for MyProgramServer {
         &self,
         request: Request<Program>,
     ) -> Result<Response<ProgramReply>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
         match ProgramMutation::update_program(conn, input).await {
@@ -423,7 +423,7 @@ impl ProgramService for MyProgramServer {
         &self,
         request: Request<ProgramId>,
     ) -> Result<Response<ProgramReply>, Status> {
-        let conn = &self.connection;
+        let conn = &self.db_conn;
         let id = request.into_inner().id;
 
         match ProgramMutation::delete_program(conn, id).await {
@@ -446,22 +446,22 @@ impl TestService for MyTestServer {
 }
 
 pub trait ServerExt {
-    fn add_grpc_service(self, conn: DatabaseConnection) -> Router;
+    fn add_grpc_service(self, db_conn: DbConn) -> Router;
 }
 
 impl ServerExt for Server {
-    fn add_grpc_service(mut self, conn: DatabaseConnection) -> Router {
+    fn add_grpc_service(mut self, db_conn: DbConn) -> Router {
         let mut application_svc = ApplicationServiceServer::new(MyApplicationServer {
-            connection: conn.clone(),
+            db_conn: db_conn.clone(),
         });
         let mut program_svc = ProgramServiceServer::new(MyProgramServer {
-            connection: conn.clone(),
+            db_conn: db_conn.clone(),
         });
         let mut log_svc = LogServiceServer::new(MyLogServer {
-            connection: conn.clone(),
+            db_conn: db_conn.clone(),
         });
         let mut log_detail_svc = LogDetailServiceServer::new(MyLogDetailServer {
-            connection: conn.clone(),
+            db_conn: db_conn.clone(),
         });
         let mut test_svc = TestServiceServer::new(MyTestServer {});
 

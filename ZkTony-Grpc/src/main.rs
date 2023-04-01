@@ -29,7 +29,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     // connect to database
-    let connection = Database::connect(CFG.database.link.to_owned()).await?;
+    let db_conn = Database::connect(CFG.database.link.to_owned()).await?;
 
     // start server
     let addr = SocketAddr::from_str(&CFG.server.address).unwrap();
@@ -39,7 +39,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let health_svc = health_svc().await;
 
     server
-        .add_grpc_service(connection)
+        .add_grpc_service(db_conn)
         .add_service(health_svc)
         .serve(addr)
         .await?;

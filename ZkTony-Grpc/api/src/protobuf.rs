@@ -29,7 +29,6 @@ pub mod test {
 
 impl Application {
     pub fn into_model(self) -> ApplicationModel {
-        let create_time = NaiveDateTime::parse_from_str(&self.create_time, "%Y-%m-%d %H:%M:%S");
         ApplicationModel {
             id: self.id,
             application_id: self.application_id,
@@ -38,7 +37,7 @@ impl Application {
             version_name: self.version_name,
             version_code: self.version_code,
             description: self.description,
-            create_time: create_time.ok(),
+            create_time: self.create_time.to_naivedatetime(),
         }
     }
 }
@@ -68,20 +67,19 @@ impl From<ApplicationModel> for Application {
             version_name: model.version_name,
             version_code: model.version_code,
             description: model.description,
-            create_time: model.create_time.unwrap().to_string(),
+            create_time: model.create_time.to_string(),
         }
     }
 }
 
 impl Log {
     pub fn into_model(self) -> LogModel {
-        let create_time = NaiveDateTime::parse_from_str(&self.create_time, "%Y-%m-%d %H:%M:%S");
         LogModel {
             id: self.id,
             sub_id: self.sub_id,
             log_type: self.log_type,
             content: self.content,
-            create_time: create_time.ok(),
+            create_time: self.create_time.to_naivedatetime(),
         }
     }
 }
@@ -105,19 +103,18 @@ impl From<LogModel> for Log {
             sub_id: model.sub_id,
             log_type: model.log_type,
             content: model.content,
-            create_time: model.create_time.unwrap().to_string(),
+            create_time: model.create_time.to_string(),
         }
     }
 }
 
 impl LogDetail {
     pub fn into_model(self) -> LogDetailModel {
-        let create_time = NaiveDateTime::parse_from_str(&self.create_time, "%Y-%m-%d %H:%M:%S");
         LogDetailModel {
             id: self.id,
             log_id: self.log_id,
             content: self.content,
-            create_time: create_time.ok(),
+            create_time: self.create_time.to_naivedatetime(),
         }
     }
 }
@@ -143,19 +140,18 @@ impl From<LogDetailModel> for LogDetail {
             id: model.id,
             log_id: model.log_id,
             content: model.content,
-            create_time: model.create_time.unwrap().to_string(),
+            create_time: model.create_time.to_string(),
         }
     }
 }
 
 impl Program {
     pub fn into_model(self) -> ProgramModel {
-        let create_time = NaiveDateTime::parse_from_str(&self.create_time, "%Y-%m-%d %H:%M:%S");
         ProgramModel {
             id: self.id,
             name: self.name,
             content: self.content,
-            create_time: create_time.ok(),
+            create_time: self.create_time.to_naivedatetime(),
         }
     }
 }
@@ -181,7 +177,32 @@ impl From<ProgramModel> for Program {
             id: model.id,
             name: model.name,
             content: model.content,
-            create_time: model.create_time.unwrap().to_string(),
+            create_time: model.create_time.to_string(),
+        }
+    }
+}
+
+// String -> Option<NaiveDateTime>
+pub trait StringExt {
+    fn to_naivedatetime(&self) -> Option<NaiveDateTime>;
+}
+
+impl StringExt for String {
+    fn to_naivedatetime(&self) -> Option<NaiveDateTime> {
+        NaiveDateTime::parse_from_str(self, "%Y-%m-%d %H:%M:%S").ok()
+    }
+}
+
+// Option<NaiveDateTime> -> String
+pub trait NaiveDateTimeExt {
+    fn to_string(&self) -> String;
+}
+
+impl NaiveDateTimeExt for Option<NaiveDateTime> {
+    fn to_string(&self) -> String {
+        match self {
+            Some(time) => time.format("%Y-%m-%d %H:%M:%S").to_string(),
+            None => "".to_string(),
         }
     }
 }
