@@ -1,28 +1,23 @@
-use ::entity::{
-    application::{
-        self, Column as ApplicationColumn, Entity as Application, Model as ApplicationModel,
-    },
-    log::{self, Column as LogColumn, Entity as Log, Model as LogModel},
-    log_detail::{self, Column as LogDetailColumn, Entity as LogDetail, Model as LogDetailModel},
-    program::{self, Column as ProgramColumn, Entity as Program, Model as ProgramModel},
-};
+use ::entity::*;
 use sea_orm::*;
 
-pub struct Query;
+pub struct ApplicationQuery;
+pub struct LogQuery;
+pub struct LogDetailQuery;
+pub struct ProgramQuery;
 
-impl Query {
-    // region: application
+impl ApplicationQuery {
     pub async fn get_application_by_id(
         db: &DbConn,
         id: i32,
-    ) -> Result<Option<application::Model>, DbErr> {
+    ) -> Result<Option<ApplicationModel>, DbErr> {
         Application::find_by_id(id).one(db).await
     }
 
     pub async fn get_by_application_id(
         db: &DbConn,
         id: String,
-    ) -> Result<Option<application::Model>, DbErr> {
+    ) -> Result<Option<ApplicationModel>, DbErr> {
         Application::find()
             .filter(ApplicationColumn::ApplicationId.eq(id))
             .one(db)
@@ -41,10 +36,10 @@ impl Query {
 
         paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
     }
-    // endregion
+}
 
-    // region: log
-    pub async fn get_log_by_id(db: &DbConn, id: String) -> Result<Option<log::Model>, DbErr> {
+impl LogQuery {
+    pub async fn get_log_by_id(db: &DbConn, id: String) -> Result<Option<LogModel>, DbErr> {
         Log::find_by_id(id).one(db).await
     }
 
@@ -60,13 +55,13 @@ impl Query {
 
         paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
     }
-    // endregion
+}
 
-    // region: log_detail
+impl LogDetailQuery {
     pub async fn get_log_detail_by_id(
         db: &DbConn,
         id: String,
-    ) -> Result<Option<log_detail::Model>, DbErr> {
+    ) -> Result<Option<LogDetailModel>, DbErr> {
         LogDetail::find_by_id(id).one(db).await
     }
 
@@ -82,13 +77,10 @@ impl Query {
 
         paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
     }
-    // endregion
+}
 
-    // region: program
-    pub async fn get_program_by_id(
-        db: &DbConn,
-        id: String,
-    ) -> Result<Option<program::Model>, DbErr> {
+impl ProgramQuery {
+    pub async fn get_program_by_id(db: &DbConn, id: String) -> Result<Option<ProgramModel>, DbErr> {
         Program::find_by_id(id).one(db).await
     }
 
@@ -104,5 +96,4 @@ impl Query {
 
         paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
     }
-    // endregion
 }

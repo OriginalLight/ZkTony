@@ -1,14 +1,11 @@
 use chrono::NaiveDateTime;
 
-use entity::{
-    application::Model as ApplicationModel, log::Model as LogModel,
-    log_detail::Model as LogDetailModel, program::Model as ProgramModel,
-};
+use entity::{ApplicationModel, LogDetailModel, LogModel, ProgramModel};
 
-use application::{Application, ApplicationList, ApplicationRequestPage};
-use log::{Log, LogList, LogRequestPage};
-use log_detail::{LogDetail, LogDetailList, LogDetailRequestPage};
-use program::{Program, ProgramList, ProgramRequestPage};
+use application::*;
+use log::*;
+use log_detail::*;
+use program::*;
 
 pub mod application {
     tonic::include_proto!("application");

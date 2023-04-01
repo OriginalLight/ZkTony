@@ -1,4 +1,4 @@
-use grpc_core::{sea_orm::DatabaseConnection, Mutation, Query};
+use grpc_core::{sea_orm::DatabaseConnection, *};
 
 use tonic::{
     codec::CompressionEncoding,
@@ -9,28 +9,11 @@ use tonic::{
 use super::config::CFG;
 
 use super::protobuf::{
-    application::{
-        application_service_server::{ApplicationService, ApplicationServiceServer},
-        Application, ApplicationId, ApplicationReply, ApplicationReplyPage, ApplicationRequestPage,
-        ApplicationSearch,
-    },
-    log::{
-        log_service_server::{LogService, LogServiceServer},
-        Log, LogId, LogList, LogReply, LogReplyPage, LogRequestPage,
-    },
-    log_detail::{
-        log_detail_service_server::{LogDetailService, LogDetailServiceServer},
-        LogDetail, LogDetailId, LogDetailList, LogDetailReply, LogDetailReplyPage,
-        LogDetailRequestPage,
-    },
-    program::{
-        program_service_server::{ProgramService, ProgramServiceServer},
-        Program, ProgramId, ProgramList, ProgramReply, ProgramReplyPage, ProgramRequestPage,
-    },
-    test::{
-        test_service_server::{TestService, TestServiceServer},
-        TestReply, TestRequest,
-    },
+    application::{application_service_server::*, *},
+    log::{log_service_server::*, *},
+    log_detail::{log_detail_service_server::*, *},
+    program::{program_service_server::*, *},
+    test::{test_service_server::*, *},
 };
 
 #[derive(Debug, Default, Clone)]
@@ -72,7 +55,7 @@ impl ApplicationService for MyApplicationServer {
             ));
         }
 
-        match Query::get_applications_in_page(conn, page, page_size).await {
+        match ApplicationQuery::get_applications_in_page(conn, page, page_size).await {
             Ok((models, total)) => Ok(Response::new(ApplicationReplyPage {
                 list: models
                     .iter()
@@ -96,7 +79,7 @@ impl ApplicationService for MyApplicationServer {
             return Err(Status::invalid_argument("Application id cannot be empty"));
         }
 
-        match Query::get_by_application_id(conn, application_id).await {
+        match ApplicationQuery::get_by_application_id(conn, application_id).await {
             Ok(model) => match model {
                 Some(m) => Ok(Response::new(Application::from(m))),
                 None => Err(Status::not_found("Cannot find application")),
@@ -113,7 +96,7 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        match Query::get_application_by_id(conn, id).await {
+        match ApplicationQuery::get_application_by_id(conn, id).await {
             Ok(model) => match model {
                 Some(m) => Ok(Response::new(Application::from(m))),
                 None => Err(Status::not_found("Cannot find application")),
@@ -130,7 +113,7 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        match Mutation::create_application(conn, input).await {
+        match ApplicationMutation::create_application(conn, input).await {
             Ok(m) => Ok(Response::new(ApplicationId { id: m.id })),
             Err(e) => Err(Status::internal(e.to_string())),
         }
@@ -144,7 +127,7 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        match Mutation::update_application(conn, input).await {
+        match ApplicationMutation::update_application(conn, input).await {
             Ok(_) => Ok(Response::new(ApplicationReply { success: true })),
             Err(_) => Ok(Response::new(ApplicationReply { success: false })),
         }
@@ -158,7 +141,7 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        match Mutation::delete_application(conn, id).await {
+        match ApplicationMutation::delete_application(conn, id).await {
             Ok(_) => Ok(Response::new(ApplicationReply { success: true })),
             Err(_) => Ok(Response::new(ApplicationReply { success: false })),
         }
@@ -181,7 +164,7 @@ impl LogService for MyLogServer {
             ));
         }
 
-        match Query::get_logs_in_page(conn, page, page_size).await {
+        match LogQuery::get_logs_in_page(conn, page, page_size).await {
             Ok((models, total)) => Ok(Response::new(LogReplyPage {
                 list: models
                     .iter()
@@ -198,7 +181,7 @@ impl LogService for MyLogServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        match Query::get_log_by_id(conn, id).await {
+        match LogQuery::get_log_by_id(conn, id).await {
             Ok(model) => match model {
                 Some(m) => Ok(Response::new(Log::from(m))),
                 None => Err(Status::not_found("Cannot find log")),
@@ -212,7 +195,7 @@ impl LogService for MyLogServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        match Mutation::create_log(conn, input).await {
+        match LogMutation::create_log(conn, input).await {
             Ok(m) => Ok(Response::new(LogId { id: m.id })),
             Err(e) => Err(Status::internal(e.to_string())),
         }
@@ -223,7 +206,7 @@ impl LogService for MyLogServer {
         let conn = &self.connection;
         let input = request.into_inner().into_models();
 
-        match Mutation::create_logs(conn, input).await {
+        match LogMutation::create_logs(conn, input).await {
             Ok(_) => Ok(Response::new(LogReply { success: true })),
             Err(_) => Ok(Response::new(LogReply { success: false })),
         }
@@ -234,7 +217,7 @@ impl LogService for MyLogServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        match Mutation::update_log(conn, input).await {
+        match LogMutation::update_log(conn, input).await {
             Ok(_) => Ok(Response::new(LogReply { success: true })),
             Err(_) => Ok(Response::new(LogReply { success: false })),
         }
@@ -245,7 +228,7 @@ impl LogService for MyLogServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        match Mutation::delete_log(conn, id).await {
+        match LogMutation::delete_log(conn, id).await {
             Ok(_) => Ok(Response::new(LogReply { success: true })),
             Err(_) => Ok(Response::new(LogReply { success: false })),
         }
@@ -267,7 +250,7 @@ impl LogDetailService for MyLogDetailServer {
                 "Page and page size cannot be zero",
             ));
         }
-        match Query::get_log_details_in_page(conn, page, page_size).await {
+        match LogDetailQuery::get_log_details_in_page(conn, page, page_size).await {
             Ok((models, total)) => Ok(Response::new(LogDetailReplyPage {
                 list: models
                     .iter()
@@ -287,7 +270,7 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        match Query::get_log_detail_by_id(conn, id).await {
+        match LogDetailQuery::get_log_detail_by_id(conn, id).await {
             Ok(model) => match model {
                 Some(m) => Ok(Response::new(LogDetail::from(m))),
                 None => Err(Status::not_found("Cannot find log detail")),
@@ -304,7 +287,7 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        match Mutation::create_log_detail(conn, input).await {
+        match LogDetailMutation::create_log_detail(conn, input).await {
             Ok(m) => Ok(Response::new(LogDetailId { id: m.id })),
             Err(e) => Err(Status::new(tonic::Code::Aborted, e.to_string().to_owned())),
         }
@@ -318,7 +301,7 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.connection;
         let input = request.into_inner().into_models();
 
-        match Mutation::create_log_details(conn, input).await {
+        match LogDetailMutation::create_log_details(conn, input).await {
             Ok(_) => Ok(Response::new(LogDetailReply { success: true })),
             Err(_) => Ok(Response::new(LogDetailReply { success: false })),
         }
@@ -332,7 +315,7 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        match Mutation::update_log_detail(conn, input).await {
+        match LogDetailMutation::update_log_detail(conn, input).await {
             Ok(_) => Ok(Response::new(LogDetailReply { success: true })),
             Err(_) => Ok(Response::new(LogDetailReply { success: false })),
         }
@@ -346,7 +329,7 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        match Mutation::delete_log_detail(conn, id).await {
+        match LogDetailMutation::delete_log_detail(conn, id).await {
             Ok(_) => Ok(Response::new(LogDetailReply { success: true })),
             Err(_) => Ok(Response::new(LogDetailReply { success: false })),
         }
@@ -370,7 +353,7 @@ impl ProgramService for MyProgramServer {
             ));
         }
 
-        match Query::get_programs_in_page(conn, page, page_size).await {
+        match ProgramQuery::get_programs_in_page(conn, page, page_size).await {
             Ok((models, total)) => Ok(Response::new(ProgramReplyPage {
                 list: models
                     .iter()
@@ -387,7 +370,7 @@ impl ProgramService for MyProgramServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        match Query::get_program_by_id(conn, id).await {
+        match ProgramQuery::get_program_by_id(conn, id).await {
             Ok(model) => match model {
                 Some(m) => Ok(Response::new(Program::from(m))),
                 None => Err(Status::not_found("Cannot find program")),
@@ -401,7 +384,7 @@ impl ProgramService for MyProgramServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        match Mutation::create_program(conn, input).await {
+        match ProgramMutation::create_program(conn, input).await {
             Ok(m) => Ok(Response::new(ProgramId { id: m.id })),
             Err(e) => Err(Status::new(tonic::Code::Aborted, e.to_string().to_owned())),
         }
@@ -415,7 +398,7 @@ impl ProgramService for MyProgramServer {
         let conn = &self.connection;
         let input = request.into_inner().into_models();
 
-        match Mutation::create_programs(conn, input).await {
+        match ProgramMutation::create_programs(conn, input).await {
             Ok(_) => Ok(Response::new(ProgramReply { success: true })),
             Err(_) => Ok(Response::new(ProgramReply { success: false })),
         }
@@ -429,7 +412,7 @@ impl ProgramService for MyProgramServer {
         let conn = &self.connection;
         let input = request.into_inner().into_model();
 
-        match Mutation::update_program(conn, input).await {
+        match ProgramMutation::update_program(conn, input).await {
             Ok(_) => Ok(Response::new(ProgramReply { success: true })),
             Err(_) => Ok(Response::new(ProgramReply { success: false })),
         }
@@ -443,7 +426,7 @@ impl ProgramService for MyProgramServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        match Mutation::delete_program(conn, id).await {
+        match ProgramMutation::delete_program(conn, id).await {
             Ok(_) => Ok(Response::new(ProgramReply { success: true })),
             Err(_) => Ok(Response::new(ProgramReply { success: false })),
         }
@@ -462,7 +445,6 @@ impl TestService for MyTestServer {
     }
 }
 
-// 扩展server添加 异步add_my_service 方法
 pub trait ServerExt {
     fn add_grpc_service(self, conn: DatabaseConnection) -> Router;
 }
