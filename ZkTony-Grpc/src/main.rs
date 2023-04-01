@@ -1,34 +1,38 @@
 use grpc_api::sea_orm::{ConnectOptions, Database};
-use std::{env, time::Duration};
-use tonic::transport::{Identity, Server, ServerTlsConfig};
+use std::{net::SocketAddr, str::FromStr, time::Duration};
+use tonic::{
+    codec::CompressionEncoding,
+    transport::{Identity, Server, ServerTlsConfig},
+};
 use tracing::log;
 
-use grpc_api::service;
+use grpc_api::{service, CFG};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    dotenvy::dotenv().ok();
+    std::env::set_var("RUST_LOG", &CFG.log.log_level);
 
     tracing_subscriber::fmt()
-        .with_max_level(tracing::Level::INFO)
-        .pretty()
+        .with_max_level(tracing::Level::from_str(&CFG.log.log_level).unwrap())
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    let host = env::var("HOST").unwrap();
-    let port = env::var("PORT").unwrap();
-    let db_url = env::var("DATABASE_URL").unwrap();
-    let cert_file_path = env::var("CERT_FILE_PATH").unwrap();
-    let key_file_path = env::var("KEY_FILE_PATH").unwrap();
+    let mut server = Server::builder();
 
-    let server_url = format!("{host}:{port}").parse().unwrap();
-    let cert = std::fs::read_to_string(cert_file_path).unwrap();
-    let key = std::fs::read_to_string(key_file_path).unwrap();
+    if CFG.server.ssl {
+        tracing::info!("SSL is enabled");
 
-    // create tls identity
-    let identity = Identity::from_pem(cert, key);
+        let cert = std::fs::read_to_string(&CFG.cert.cert).unwrap();
+        let key = std::fs::read_to_string(&CFG.cert.key).unwrap();
+
+        // create tls identity
+        let identity = Identity::from_pem(cert, key);
+        server = server.tls_config(ServerTlsConfig::new().identity(identity))?;
+    }
 
     // connect to database
-    let mut opt = ConnectOptions::new(db_url.to_owned());
+    let mut opt = ConnectOptions::new(CFG.database.link.to_owned());
+
     opt.max_connections(20)
         .min_connections(2)
         .connect_timeout(Duration::from_secs(8))
@@ -36,28 +40,47 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .idle_timeout(Duration::from_secs(8))
         .max_lifetime(Duration::from_secs(8))
         .sqlx_logging(true)
-        .sqlx_logging_level(log::LevelFilter::Info);
+        .sqlx_logging_level(log::LevelFilter::from_str(&CFG.log.log_level).unwrap());
 
     let connection = Database::connect(opt).await?;
 
     // get service
-    let health_svc = service::health_svc().await;
-    let application_svc = service::application_svc(connection.clone());
-    let log_svc = service::log_svc(connection.clone());
-    let log_detail_svc = service::log_detail_svc(connection.clone());
-    let program_svc = service::program_svc(connection.clone());
+    let mut health_svc = service::health_svc().await;
+    let mut application_svc = service::application_svc(connection.clone());
+    let mut log_svc = service::log_svc(connection.clone());
+    let mut log_detail_svc = service::log_detail_svc(connection.clone());
+    let mut program_svc = service::program_svc(connection.clone());
 
-    tracing::info!("ZkTony-Grpc");
-    tracing::info!("Starting server at {}", server_url);
+    if CFG.server.content_gzip {
+        tracing::info!("Content gzip is enabled");
+        health_svc = health_svc
+            .send_compressed(CompressionEncoding::Gzip)
+            .send_compressed(CompressionEncoding::Gzip);
+        application_svc = application_svc
+            .send_compressed(CompressionEncoding::Gzip)
+            .send_compressed(CompressionEncoding::Gzip);
+        log_svc = log_svc
+            .send_compressed(CompressionEncoding::Gzip)
+            .send_compressed(CompressionEncoding::Gzip);
+        log_detail_svc = log_detail_svc
+            .send_compressed(CompressionEncoding::Gzip)
+            .send_compressed(CompressionEncoding::Gzip);
+        program_svc = program_svc
+            .send_compressed(CompressionEncoding::Gzip)
+            .send_compressed(CompressionEncoding::Gzip);
+    }
 
-    Server::builder()
-        .tls_config(ServerTlsConfig::new().identity(identity))?
+    let addr = SocketAddr::from_str(&CFG.server.address).unwrap();
+
+    tracing::info!("{} Starting server at {}", &CFG.server.name, addr);
+
+    server
         .add_service(health_svc)
         .add_service(application_svc)
         .add_service(log_svc)
         .add_service(log_detail_svc)
         .add_service(program_svc)
-        .serve(server_url)
+        .serve(addr)
         .await?;
 
     Ok(())

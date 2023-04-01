@@ -1,0 +1,16 @@
+[server]
+name = "ZkTony-Grpc"
+version = "0.1.0"
+address = "0.0.0.0:9527"
+ssl = true
+content_gzip = true
+
+[cert]
+cert = "config/cert/server.pem"
+key = "config/cert/server.key"
+
+[log]
+log_level = "INFO"
+
+[database]
+link = "postgres://postgres:123456@182.160.14.59:30432/zktony"

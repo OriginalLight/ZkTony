@@ -9,8 +9,7 @@ members = [".", "api", "core", "entity"]
 
 [dependencies]
 grpc-api = { path = "api" }
-dotenvy = "0.15"
-tonic = { version = "0.8", features = ["tls", "transport"] }
+tonic = { version = "0.8", features = ["tls", "transport", "gzip"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "full"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }

@@ -14,9 +14,9 @@ COPY ./Cargo.toml Cargo.toml
 COPY ./.env .env
 COPY ./src src
 COPY ./api api
+COPY ./config config
 COPY ./core core
 COPY ./entity entity
-COPY ./tls tls
 
 # compile app
 RUN apt update && apt install -y protobuf-compiler libprotobuf-dev
@@ -30,8 +30,7 @@ WORKDIR /app
 
 # copy server binary from build stage
 COPY --from=builder /code/target/release/zktony-grpc zktony-grpc
-COPY --from=builder /code/.env /.env
-COPY --from=builder /code/tls /tls
+COPY --from=builder /code/config config
 
 # indicate what port the server is running on
 EXPOSE 9527
