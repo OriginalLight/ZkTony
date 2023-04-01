@@ -289,7 +289,7 @@ impl LogDetailService for MyLogDetailServer {
 
         match LogDetailMutation::create_log_detail(conn, input).await {
             Ok(m) => Ok(Response::new(LogDetailId { id: m.id })),
-            Err(e) => Err(Status::new(tonic::Code::Aborted, e.to_string().to_owned())),
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -386,7 +386,7 @@ impl ProgramService for MyProgramServer {
 
         match ProgramMutation::create_program(conn, input).await {
             Ok(m) => Ok(Response::new(ProgramId { id: m.id })),
-            Err(e) => Err(Status::new(tonic::Code::Aborted, e.to_string().to_owned())),
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
