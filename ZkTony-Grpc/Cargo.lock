@@ -647,7 +647,6 @@ name = "grpc-api"
 version = "0.1.0"
 dependencies = [
  "chrono",
- "dotenvy",
  "entity",
  "grpc-core",
  "once_cell",

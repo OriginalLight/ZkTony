@@ -6,9 +6,8 @@ publish = false
 
 [dependencies]
 chrono = "0.4"
-dotenvy = "0.15"
 grpc-core = { path = "../core" }
-tonic = "0.8"
+tonic = { version = "0.8", features = ["gzip"] }
 tonic-health = "0.8"
 tonic-types = "0.6"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "full"] }

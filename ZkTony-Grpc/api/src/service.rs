@@ -5,8 +5,13 @@ use super::protobuf::application::{
 };
 
 use grpc_core::{sea_orm::DatabaseConnection, Mutation, Query};
-use tonic::{Code, Request, Response, Status};
-use tonic_health::proto::health_server::{Health, HealthServer};
+use tonic::{
+    codec::CompressionEncoding,
+    transport::{server::Router, Server},
+    Code, Request, Response, Status,
+};
+
+use super::config::CFG;
 
 use super::protobuf::log::{
     log_service_server::{LogService, LogServiceServer},
@@ -22,22 +27,22 @@ use super::protobuf::program::{
     Program, ProgramId, ProgramList, ProgramReply, ProgramReplyPage, ProgramRequestPage,
 };
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct MyApplicationServer {
     connection: DatabaseConnection,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct MyLogServer {
     connection: DatabaseConnection,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct MyLogDetailServer {
     connection: DatabaseConnection,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct MyProgramServer {
     connection: DatabaseConnection,
 }
@@ -458,41 +463,44 @@ impl ProgramService for MyProgramServer {
     }
 }
 
-pub fn application_svc(
-    connection: DatabaseConnection,
-) -> ApplicationServiceServer<MyApplicationServer> {
-    ApplicationServiceServer::new(MyApplicationServer { connection })
+// 扩展server添加 异步add_my_service 方法
+pub trait ServerExt {
+    fn add_grpc_service(self, conn: DatabaseConnection) -> Router;
 }
 
-pub fn program_svc(connection: DatabaseConnection) -> ProgramServiceServer<MyProgramServer> {
-    ProgramServiceServer::new(MyProgramServer { connection })
-}
+impl ServerExt for Server {
+    fn add_grpc_service(mut self, conn: DatabaseConnection) -> Router {
+        let mut application_svc = ApplicationServiceServer::new(MyApplicationServer {
+            connection: conn.clone(),
+        });
+        let mut program_svc = ProgramServiceServer::new(MyProgramServer {
+            connection: conn.clone(),
+        });
+        let mut log_svc = LogServiceServer::new(MyLogServer {
+            connection: conn.clone(),
+        });
+        let mut log_detail_svc = LogDetailServiceServer::new(MyLogDetailServer {
+            connection: conn.clone(),
+        });
 
-pub fn log_svc(connection: DatabaseConnection) -> LogServiceServer<MyLogServer> {
-    LogServiceServer::new(MyLogServer { connection })
-}
+        if CFG.server.content_gzip {
+            application_svc = application_svc
+                .send_compressed(CompressionEncoding::Gzip)
+                .accept_compressed(CompressionEncoding::Gzip);
+            program_svc = program_svc
+                .send_compressed(CompressionEncoding::Gzip)
+                .accept_compressed(CompressionEncoding::Gzip);
+            log_svc = log_svc
+                .send_compressed(CompressionEncoding::Gzip)
+                .accept_compressed(CompressionEncoding::Gzip);
+            log_detail_svc = log_detail_svc
+                .send_compressed(CompressionEncoding::Gzip)
+                .accept_compressed(CompressionEncoding::Gzip);
+        }
 
-pub fn log_detail_svc(connection: DatabaseConnection) -> LogDetailServiceServer<MyLogDetailServer> {
-    LogDetailServiceServer::new(MyLogDetailServer { connection })
-}
-
-pub async fn health_svc() -> HealthServer<impl Health> {
-    let (mut health_reporter, health_service) = tonic_health::server::health_reporter();
-    health_reporter
-        .set_serving::<ApplicationServiceServer<MyApplicationServer>>()
-        .await;
-
-    health_reporter
-        .set_serving::<ProgramServiceServer<MyProgramServer>>()
-        .await;
-
-    health_reporter
-        .set_serving::<LogServiceServer<MyLogServer>>()
-        .await;
-
-    health_reporter
-        .set_serving::<LogDetailServiceServer<MyLogDetailServer>>()
-        .await;
-
-    health_service
+        self.add_service(application_svc)
+            .add_service(program_svc)
+            .add_service(log_svc)
+            .add_service(log_detail_svc)
+    }
 }
