@@ -26,6 +26,10 @@ pub mod program {
     tonic::include_proto!("program");
 }
 
+pub mod test {
+    tonic::include_proto!("test");
+}
+
 impl Application {
     pub fn into_model(self) -> ApplicationModel {
         let create_time = NaiveDateTime::parse_from_str(&self.create_time, "%Y-%m-%d %H:%M:%S");

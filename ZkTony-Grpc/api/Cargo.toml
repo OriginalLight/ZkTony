@@ -7,9 +7,9 @@ publish = false
 [dependencies]
 chrono = "0.4"
 grpc-core = { path = "../core" }
-tonic = { version = "0.8", features = ["gzip"] }
-tonic-health = "0.8"
-tonic-types = "0.6"
+tonic = { version = "0.9", features = ["gzip"] }
+tonic-health = "0.9"
+tonic-types = "0.9"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "full"] }
 tracing = "0.1"
 entity = { path = "../entity" }
@@ -22,4 +22,4 @@ serde = { version = "1", features = ["derive"] }
 path = "./src/lib.rs"
 
 [build-dependencies]
-tonic-build = "0.8"
+tonic-build = "0.9"

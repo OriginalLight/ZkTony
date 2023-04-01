@@ -1,10 +1,5 @@
-use super::protobuf::application::{
-    application_service_server::{ApplicationService, ApplicationServiceServer},
-    Application, ApplicationId, ApplicationReply, ApplicationReplyPage, ApplicationRequestPage,
-    ApplicationSearch,
-};
-
 use grpc_core::{sea_orm::DatabaseConnection, Mutation, Query};
+
 use tonic::{
     codec::CompressionEncoding,
     transport::{server::Router, Server},
@@ -13,18 +8,29 @@ use tonic::{
 
 use super::config::CFG;
 
-use super::protobuf::log::{
-    log_service_server::{LogService, LogServiceServer},
-    Log, LogId, LogList, LogReply, LogReplyPage, LogRequestPage,
-};
-use super::protobuf::log_detail::{
-    log_detail_service_server::{LogDetailService, LogDetailServiceServer},
-    LogDetail, LogDetailId, LogDetailList, LogDetailReply, LogDetailReplyPage,
-    LogDetailRequestPage,
-};
-use super::protobuf::program::{
-    program_service_server::{ProgramService, ProgramServiceServer},
-    Program, ProgramId, ProgramList, ProgramReply, ProgramReplyPage, ProgramRequestPage,
+use super::protobuf::{
+    application::{
+        application_service_server::{ApplicationService, ApplicationServiceServer},
+        Application, ApplicationId, ApplicationReply, ApplicationReplyPage, ApplicationRequestPage,
+        ApplicationSearch,
+    },
+    log::{
+        log_service_server::{LogService, LogServiceServer},
+        Log, LogId, LogList, LogReply, LogReplyPage, LogRequestPage,
+    },
+    log_detail::{
+        log_detail_service_server::{LogDetailService, LogDetailServiceServer},
+        LogDetail, LogDetailId, LogDetailList, LogDetailReply, LogDetailReplyPage,
+        LogDetailRequestPage,
+    },
+    program::{
+        program_service_server::{ProgramService, ProgramServiceServer},
+        Program, ProgramId, ProgramList, ProgramReply, ProgramReplyPage, ProgramRequestPage,
+    },
+    test::{
+        test_service_server::{TestService, TestServiceServer},
+        TestReply, TestRequest,
+    },
 };
 
 #[derive(Debug, Default, Clone)]
@@ -47,6 +53,9 @@ pub struct MyProgramServer {
     connection: DatabaseConnection,
 }
 
+#[derive(Debug, Default, Clone)]
+pub struct MyTestServer {}
+
 #[tonic::async_trait]
 impl ApplicationService for MyApplicationServer {
     #[tracing::instrument]
@@ -58,24 +67,20 @@ impl ApplicationService for MyApplicationServer {
         let (page, page_size) = request.into_inner().into_page();
 
         if page == 0 || page_size == 0 {
-            return Err(Status::new(
-                Code::InvalidArgument,
-                "Page and page size cannot be 0".to_string(),
+            return Err(Status::invalid_argument(
+                "Page and page size cannot be zero",
             ));
         }
 
-        if let Ok((applications, total)) =
-            Query::get_applications_in_page(conn, page, page_size).await
-        {
-            Ok(Response::new(ApplicationReplyPage {
-                list: applications
+        match Query::get_applications_in_page(conn, page, page_size).await {
+            Ok((models, total)) => Ok(Response::new(ApplicationReplyPage {
+                list: models
                     .iter()
                     .map(|model| Application::from(model.clone()))
                     .collect::<Vec<Application>>(),
                 total,
-            }))
-        } else {
-            Err(Status::internal("Cannot find applications in page"))
+            })),
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -88,23 +93,15 @@ impl ApplicationService for MyApplicationServer {
         let application_id = request.into_inner().application_id;
 
         if application_id.is_empty() {
-            return Err(Status::new(
-                Code::InvalidArgument,
-                "Application id cannot be empty".to_string(),
-            ));
+            return Err(Status::invalid_argument("Application id cannot be empty"));
         }
 
-        if let Some(application) = Query::get_by_application_id(conn, application_id)
-            .await
-            .ok()
-            .flatten()
-        {
-            Ok(Response::new(Application::from(application)))
-        } else {
-            Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find Application".to_string(),
-            ))
+        match Query::get_by_application_id(conn, application_id).await {
+            Ok(model) => match model {
+                Some(m) => Ok(Response::new(Application::from(m))),
+                None => Err(Status::not_found("Cannot find application")),
+            },
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -116,13 +113,12 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        if let Some(application) = Query::get_application_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(Application::from(application)))
-        } else {
-            Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find Application".to_owned(),
-            ))
+        match Query::get_application_by_id(conn, id).await {
+            Ok(model) => match model {
+                Some(m) => Ok(Response::new(Application::from(m))),
+                None => Err(Status::not_found("Cannot find application")),
+            },
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -136,7 +132,7 @@ impl ApplicationService for MyApplicationServer {
 
         match Mutation::create_application(conn, input).await {
             Ok(m) => Ok(Response::new(ApplicationId { id: m.id })),
-            Err(e) => Err(Status::new(tonic::Code::Aborted, e.to_string().to_owned())),
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -180,22 +176,20 @@ impl LogService for MyLogServer {
         let (page, page_size) = request.into_inner().into_page();
 
         if page == 0 || page_size == 0 {
-            return Err(Status::new(
-                Code::InvalidArgument,
-                "Page and page size cannot be 0".to_string(),
+            return Err(Status::invalid_argument(
+                "Page and page size cannot be zero",
             ));
         }
 
-        if let Ok((logs, total)) = Query::get_logs_in_page(conn, page, page_size).await {
-            Ok(Response::new(LogReplyPage {
-                list: logs
+        match Query::get_logs_in_page(conn, page, page_size).await {
+            Ok((models, total)) => Ok(Response::new(LogReplyPage {
+                list: models
                     .iter()
                     .map(|model| Log::from(model.clone()))
                     .collect::<Vec<Log>>(),
                 total,
-            }))
-        } else {
-            Err(Status::internal("Cannot find logs in page"))
+            })),
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -204,13 +198,12 @@ impl LogService for MyLogServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        if let Some(log) = Query::get_log_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(Log::from(log)))
-        } else {
-            Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find Log ".to_owned(),
-            ))
+        match Query::get_log_by_id(conn, id).await {
+            Ok(model) => match model {
+                Some(m) => Ok(Response::new(Log::from(m))),
+                None => Err(Status::not_found("Cannot find log")),
+            },
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -221,7 +214,7 @@ impl LogService for MyLogServer {
 
         match Mutation::create_log(conn, input).await {
             Ok(m) => Ok(Response::new(LogId { id: m.id })),
-            Err(e) => Err(Status::new(tonic::Code::Aborted, e.to_string().to_owned())),
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -270,22 +263,19 @@ impl LogDetailService for MyLogDetailServer {
         let (page, page_size) = request.into_inner().into_page();
 
         if page == 0 || page_size == 0 {
-            return Err(Status::new(
-                Code::InvalidArgument,
-                "Page and page size cannot be 0".to_string(),
+            return Err(Status::invalid_argument(
+                "Page and page size cannot be zero",
             ));
         }
-
-        if let Ok((models, total)) = Query::get_log_details_in_page(conn, page, page_size).await {
-            Ok(Response::new(LogDetailReplyPage {
+        match Query::get_log_details_in_page(conn, page, page_size).await {
+            Ok((models, total)) => Ok(Response::new(LogDetailReplyPage {
                 list: models
                     .iter()
                     .map(|model| LogDetail::from(model.clone()))
                     .collect::<Vec<LogDetail>>(),
                 total,
-            }))
-        } else {
-            Err(Status::internal("Cannot find log_details in page"))
+            })),
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -297,13 +287,12 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        if let Some(model) = Query::get_log_detail_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(LogDetail::from(model)))
-        } else {
-            Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find LogDetail".to_owned(),
-            ))
+        match Query::get_log_detail_by_id(conn, id).await {
+            Ok(model) => match model {
+                Some(m) => Ok(Response::new(LogDetail::from(m))),
+                None => Err(Status::not_found("Cannot find log detail")),
+            },
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -381,16 +370,15 @@ impl ProgramService for MyProgramServer {
             ));
         }
 
-        if let Ok((models, total)) = Query::get_programs_in_page(conn, page, page_size).await {
-            Ok(Response::new(ProgramReplyPage {
+        match Query::get_programs_in_page(conn, page, page_size).await {
+            Ok((models, total)) => Ok(Response::new(ProgramReplyPage {
                 list: models
                     .iter()
                     .map(|model| Program::from(model.clone()))
                     .collect::<Vec<Program>>(),
                 total,
-            }))
-        } else {
-            Err(Status::internal("Cannot find programs in page"))
+            })),
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -399,13 +387,12 @@ impl ProgramService for MyProgramServer {
         let conn = &self.connection;
         let id = request.into_inner().id;
 
-        if let Some(model) = Query::get_program_by_id(conn, id).await.ok().flatten() {
-            Ok(Response::new(Program::from(model)))
-        } else {
-            Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find Program".to_owned(),
-            ))
+        match Query::get_program_by_id(conn, id).await {
+            Ok(model) => match model {
+                Some(m) => Ok(Response::new(Program::from(m))),
+                None => Err(Status::not_found("Cannot find program")),
+            },
+            Err(e) => Err(Status::internal(e.to_string())),
         }
     }
 
@@ -463,6 +450,18 @@ impl ProgramService for MyProgramServer {
     }
 }
 
+#[tonic::async_trait]
+impl TestService for MyTestServer {
+    #[tracing::instrument]
+    async fn test(&self, request: Request<TestRequest>) -> Result<Response<TestReply>, Status> {
+        let input = request.into_inner();
+
+        Ok(Response::new(TestReply {
+            message: format!("Hello {}!", input.name),
+        }))
+    }
+}
+
 // 扩展server添加 异步add_my_service 方法
 pub trait ServerExt {
     fn add_grpc_service(self, conn: DatabaseConnection) -> Router;
@@ -482,6 +481,7 @@ impl ServerExt for Server {
         let mut log_detail_svc = LogDetailServiceServer::new(MyLogDetailServer {
             connection: conn.clone(),
         });
+        let mut test_svc = TestServiceServer::new(MyTestServer {});
 
         if CFG.server.content_gzip {
             application_svc = application_svc
@@ -496,11 +496,15 @@ impl ServerExt for Server {
             log_detail_svc = log_detail_svc
                 .send_compressed(CompressionEncoding::Gzip)
                 .accept_compressed(CompressionEncoding::Gzip);
+            test_svc = test_svc
+                .send_compressed(CompressionEncoding::Gzip)
+                .accept_compressed(CompressionEncoding::Gzip);
         }
 
         self.add_service(application_svc)
             .add_service(program_svc)
             .add_service(log_svc)
             .add_service(log_detail_svc)
+            .add_service(test_svc)
     }
 }

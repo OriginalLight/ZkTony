@@ -2213,14 +2213,14 @@ dependencies = [
 
 [[package]]
 name = "tonic"
-version = "0.8.3"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f219fad3b929bef19b1f86fbc0358d35daed8f2cac972037ac0dc10bbb8d5fb"
+checksum = "1395a90742867024769551f906de147d352fb7cbdb4fd1cdbffe17734cfb124c"
 dependencies = [
  "async-stream",
  "async-trait",
  "axum",
- "base64 0.13.1",
+ "base64 0.21.0",
  "bytes",
  "flate2",
  "futures-core",
@@ -2233,24 +2233,21 @@ dependencies = [
  "percent-encoding",
  "pin-project",
  "prost",
- "prost-derive",
  "rustls-pemfile",
  "tokio",
  "tokio-rustls",
  "tokio-stream",
- "tokio-util",
  "tower",
  "tower-layer",
  "tower-service",
  "tracing",
- "tracing-futures",
 ]
 
 [[package]]
 name = "tonic-build"
-version = "0.8.4"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5bf5e9b9c0f7e0a7c027dcfaba7b2c60816c7049171f679d99ee2ff65d0de8c4"
+checksum = "7f02f6f31111ddeb63768ab9f224a73104b790a7dcdc8e8ab2cb0889b72d4cab"
 dependencies = [
  "prettyplease",
  "proc-macro2",
@@ -2261,12 +2258,11 @@ dependencies = [
 
 [[package]]
 name = "tonic-health"
-version = "0.8.0"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a88aee666ef3a4d1ee46218bbc8e5f69bcf9cc27bf2e871d6b724d83f56d179f"
+checksum = "5d681c535501d2f6392b0b9843e390e5f1aec57381505507075ea5a7b59194be"
 dependencies = [
  "async-stream",
- "bytes",
  "prost",
  "tokio",
  "tokio-stream",
@@ -2275,9 +2271,9 @@ dependencies = [
 
 [[package]]
 name = "tonic-types"
-version = "0.6.1"
+version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b33a7caea455745042e5a13b6aa0f6035b9c7bf224224d4d0126172ca4dc1ced"
+checksum = "b2151dc50846c86fa7448efcc6d928c5558cfa1321c59eb990bf1d4f4111826f"
 dependencies = [
  "prost",
  "prost-types",
@@ -2348,16 +2344,6 @@ checksum = "24eb03ba0eab1fd845050058ce5e616558e8f8d8fca633e6b163fe25c797213a"
 dependencies = [
  "once_cell",
  "valuable",
-]
-
-[[package]]
-name = "tracing-futures"
-version = "0.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97d095ae15e245a057c8e8451bab9b3ee1e1f68e9ba2b4fbc18d0ac5237835f2"
-dependencies = [
- "pin-project",
- "tracing",
 ]
 
 [[package]]

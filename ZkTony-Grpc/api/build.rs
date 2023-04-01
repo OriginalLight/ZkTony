@@ -8,6 +8,7 @@ fn main() {
                 "log.proto",
                 "program.proto",
                 "log_detail.proto",
+                "test.proto",
             ],
             &["./proto"],
         )
