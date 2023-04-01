@@ -11,7 +11,6 @@ WORKDIR /code
 # which can take a long time within the docker context. Docker will cache it.
 RUN USER=root cargo init
 COPY ./Cargo.toml Cargo.toml
-COPY ./.env .env
 COPY ./src src
 COPY ./api api
 COPY ./config config
