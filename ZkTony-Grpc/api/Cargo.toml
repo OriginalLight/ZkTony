@@ -10,6 +10,7 @@ dotenvy = "0.15"
 grpc-core = { path = "../core" }
 tonic = "0.8"
 tonic-health = "0.8"
+tonic-types = "0.6"
 tokio = { version = "1", features = ["macros", "rt-multi-thread", "full"] }
 tracing = "0.1"
 entity = { path = "../entity" }

@@ -5,7 +5,7 @@ use super::protobuf::application::{
 };
 
 use grpc_core::{sea_orm::DatabaseConnection, Mutation, Query};
-use tonic::{Request, Response, Status};
+use tonic::{Code, Request, Response, Status};
 use tonic_health::proto::health_server::{Health, HealthServer};
 
 use super::protobuf::log::{
@@ -52,6 +52,13 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.connection;
         let (page, page_size) = request.into_inner().into_page();
 
+        if page == 0 || page_size == 0 {
+            return Err(Status::new(
+                Code::InvalidArgument,
+                "Page and page size cannot be 0".to_string(),
+            ));
+        }
+
         if let Ok((applications, total)) =
             Query::get_applications_in_page(conn, page, page_size).await
         {
@@ -75,6 +82,13 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.connection;
         let application_id = request.into_inner().application_id;
 
+        if application_id.is_empty() {
+            return Err(Status::new(
+                Code::InvalidArgument,
+                "Application id cannot be empty".to_string(),
+            ));
+        }
+
         if let Some(application) = Query::get_by_application_id(conn, application_id)
             .await
             .ok()
@@ -84,7 +98,7 @@ impl ApplicationService for MyApplicationServer {
         } else {
             Err(Status::new(
                 tonic::Code::Aborted,
-                "Could not find Application ".to_string(),
+                "Could not find Application".to_string(),
             ))
         }
     }
@@ -102,7 +116,7 @@ impl ApplicationService for MyApplicationServer {
         } else {
             Err(Status::new(
                 tonic::Code::Aborted,
-                "Could not find Application ".to_owned(),
+                "Could not find Application".to_owned(),
             ))
         }
     }
@@ -117,10 +131,7 @@ impl ApplicationService for MyApplicationServer {
 
         match Mutation::create_application(conn, input).await {
             Ok(m) => Ok(Response::new(ApplicationId { id: m.id })),
-            Err(_) => Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find Application ".to_owned(),
-            )),
+            Err(e) => Err(Status::new(tonic::Code::Aborted, e.to_string().to_owned())),
         }
     }
 
@@ -163,6 +174,13 @@ impl LogService for MyLogServer {
         let conn = &self.connection;
         let (page, page_size) = request.into_inner().into_page();
 
+        if page == 0 || page_size == 0 {
+            return Err(Status::new(
+                Code::InvalidArgument,
+                "Page and page size cannot be 0".to_string(),
+            ));
+        }
+
         if let Ok((logs, total)) = Query::get_logs_in_page(conn, page, page_size).await {
             Ok(Response::new(LogReplyPage {
                 list: logs
@@ -198,10 +216,7 @@ impl LogService for MyLogServer {
 
         match Mutation::create_log(conn, input).await {
             Ok(m) => Ok(Response::new(LogId { id: m.id })),
-            Err(_) => Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find Log ".to_owned(),
-            )),
+            Err(e) => Err(Status::new(tonic::Code::Aborted, e.to_string().to_owned())),
         }
     }
 
@@ -249,6 +264,13 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.connection;
         let (page, page_size) = request.into_inner().into_page();
 
+        if page == 0 || page_size == 0 {
+            return Err(Status::new(
+                Code::InvalidArgument,
+                "Page and page size cannot be 0".to_string(),
+            ));
+        }
+
         if let Ok((models, total)) = Query::get_log_details_in_page(conn, page, page_size).await {
             Ok(Response::new(LogDetailReplyPage {
                 list: models
@@ -275,7 +297,7 @@ impl LogDetailService for MyLogDetailServer {
         } else {
             Err(Status::new(
                 tonic::Code::Aborted,
-                "Could not find LogDetail ".to_owned(),
+                "Could not find LogDetail".to_owned(),
             ))
         }
     }
@@ -290,10 +312,7 @@ impl LogDetailService for MyLogDetailServer {
 
         match Mutation::create_log_detail(conn, input).await {
             Ok(m) => Ok(Response::new(LogDetailId { id: m.id })),
-            Err(_) => Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find LogDetail ".to_owned(),
-            )),
+            Err(e) => Err(Status::new(tonic::Code::Aborted, e.to_string().to_owned())),
         }
     }
 
@@ -350,6 +369,13 @@ impl ProgramService for MyProgramServer {
         let conn = &self.connection;
         let (page, page_size) = request.into_inner().into_page();
 
+        if page == 0 || page_size == 0 {
+            return Err(Status::new(
+                Code::InvalidArgument,
+                "Page and page size cannot be 0".to_string(),
+            ));
+        }
+
         if let Ok((models, total)) = Query::get_programs_in_page(conn, page, page_size).await {
             Ok(Response::new(ProgramReplyPage {
                 list: models
@@ -373,7 +399,7 @@ impl ProgramService for MyProgramServer {
         } else {
             Err(Status::new(
                 tonic::Code::Aborted,
-                "Could not find Program ".to_owned(),
+                "Could not find Program".to_owned(),
             ))
         }
     }
@@ -385,10 +411,7 @@ impl ProgramService for MyProgramServer {
 
         match Mutation::create_program(conn, input).await {
             Ok(m) => Ok(Response::new(ProgramId { id: m.id })),
-            Err(_) => Err(Status::new(
-                tonic::Code::Aborted,
-                "Could not find Program ".to_owned(),
-            )),
+            Err(e) => Err(Status::new(tonic::Code::Aborted, e.to_string().to_owned())),
         }
     }
 
