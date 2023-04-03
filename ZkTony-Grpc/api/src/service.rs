@@ -55,16 +55,18 @@ impl ApplicationService for MyApplicationServer {
             ));
         }
 
-        match ApplicationQuery::get_applications_in_page(conn, page, page_size).await {
-            Ok((models, total)) => Ok(Response::new(ApplicationReplyPage {
-                list: models
-                    .iter()
-                    .map(|model| Application::from(model.clone()))
-                    .collect::<Vec<Application>>(),
-                total,
-            })),
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+        ApplicationQuery::get_applications_in_page(conn, page, page_size)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|(models, total)| {
+                Response::new(ApplicationReplyPage {
+                    list: models
+                        .iter()
+                        .map(|model| Application::from(model.clone()))
+                        .collect::<Vec<Application>>(),
+                    total,
+                })
+            })
     }
 
     #[tracing::instrument]
@@ -79,13 +81,14 @@ impl ApplicationService for MyApplicationServer {
             return Err(Status::invalid_argument("Application id cannot be empty"));
         }
 
-        match ApplicationQuery::get_by_application_id(conn, application_id).await {
-            Ok(model) => match model {
-                Some(m) => Ok(Response::new(Application::from(m))),
-                None => Err(Status::not_found("Cannot find application")),
-            },
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+        ApplicationQuery::get_by_application_id(conn, application_id)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|model| {
+                model
+                    .map(|m| Ok(Response::new(Application::from(m))))
+                    .unwrap_or_else(|| Err(Status::not_found("Cannot find application")))
+            })?
     }
 
     #[tracing::instrument]
@@ -96,13 +99,14 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.db_conn;
         let id = request.into_inner().id;
 
-        match ApplicationQuery::get_application_by_id(conn, id).await {
-            Ok(model) => match model {
-                Some(m) => Ok(Response::new(Application::from(m))),
-                None => Err(Status::not_found("Cannot find application")),
-            },
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+        ApplicationQuery::get_application_by_id(conn, id)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|model| {
+                model
+                    .map(|m| Ok(Response::new(Application::from(m))))
+                    .unwrap_or_else(|| Err(Status::not_found("Cannot find application")))
+            })?
     }
 
     #[tracing::instrument]
@@ -113,10 +117,10 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
-        match ApplicationMutation::create_application(conn, input).await {
-            Ok(m) => Ok(Response::new(ApplicationId { id: m.id })),
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+        ApplicationMutation::create_application(conn, input)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|model| Response::new(ApplicationId { id: model.id }))
     }
 
     #[tracing::instrument]
@@ -127,10 +131,10 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
-        match ApplicationMutation::update_application(conn, input).await {
-            Ok(_) => Ok(Response::new(ApplicationReply { success: true })),
-            Err(_) => Ok(Response::new(ApplicationReply { success: false })),
-        }
+        ApplicationMutation::update_application(conn, input)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(ApplicationReply { success: true }))
     }
 
     #[tracing::instrument]
@@ -141,10 +145,10 @@ impl ApplicationService for MyApplicationServer {
         let conn = &self.db_conn;
         let id = request.into_inner().id;
 
-        match ApplicationMutation::delete_application(conn, id).await {
-            Ok(_) => Ok(Response::new(ApplicationReply { success: true })),
-            Err(_) => Ok(Response::new(ApplicationReply { success: false })),
-        }
+        ApplicationMutation::delete_application(conn, id)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(ApplicationReply { success: true }))
     }
 }
 
@@ -164,16 +168,18 @@ impl LogService for MyLogServer {
             ));
         }
 
-        match LogQuery::get_logs_in_page(conn, page, page_size).await {
-            Ok((models, total)) => Ok(Response::new(LogReplyPage {
-                list: models
-                    .iter()
-                    .map(|model| Log::from(model.clone()))
-                    .collect::<Vec<Log>>(),
-                total,
-            })),
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+        LogQuery::get_logs_in_page(conn, page, page_size)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|(models, total)| {
+                Response::new(LogReplyPage {
+                    list: models
+                        .iter()
+                        .map(|model| Log::from(model.clone()))
+                        .collect::<Vec<Log>>(),
+                    total,
+                })
+            })
     }
 
     #[tracing::instrument]
@@ -181,13 +187,14 @@ impl LogService for MyLogServer {
         let conn = &self.db_conn;
         let id = request.into_inner().id;
 
-        match LogQuery::get_log_by_id(conn, id).await {
-            Ok(model) => match model {
-                Some(m) => Ok(Response::new(Log::from(m))),
-                None => Err(Status::not_found("Cannot find log")),
-            },
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+        LogQuery::get_log_by_id(conn, id)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|model| {
+                model
+                    .map(|m| Ok(Response::new(Log::from(m))))
+                    .unwrap_or_else(|| Err(Status::not_found("Cannot find log")))
+            })?
     }
 
     #[tracing::instrument]
@@ -195,10 +202,10 @@ impl LogService for MyLogServer {
         let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
-        match LogMutation::create_log(conn, input).await {
-            Ok(m) => Ok(Response::new(LogId { id: m.id })),
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+        LogMutation::create_log(conn, input)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|model| Response::new(LogId { id: model.id }))
     }
 
     #[tracing::instrument]
@@ -206,10 +213,10 @@ impl LogService for MyLogServer {
         let conn = &self.db_conn;
         let input = request.into_inner().into_models();
 
-        match LogMutation::create_logs(conn, input).await {
-            Ok(_) => Ok(Response::new(LogReply { success: true })),
-            Err(_) => Ok(Response::new(LogReply { success: false })),
-        }
+        LogMutation::create_logs(conn, input)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(LogReply { success: true }))
     }
 
     #[tracing::instrument]
@@ -217,10 +224,10 @@ impl LogService for MyLogServer {
         let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
-        match LogMutation::update_log(conn, input).await {
-            Ok(_) => Ok(Response::new(LogReply { success: true })),
-            Err(_) => Ok(Response::new(LogReply { success: false })),
-        }
+        LogMutation::update_log(conn, input)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(LogReply { success: true }))
     }
 
     #[tracing::instrument]
@@ -228,10 +235,10 @@ impl LogService for MyLogServer {
         let conn = &self.db_conn;
         let id = request.into_inner().id;
 
-        match LogMutation::delete_log(conn, id).await {
-            Ok(_) => Ok(Response::new(LogReply { success: true })),
-            Err(_) => Ok(Response::new(LogReply { success: false })),
-        }
+        LogMutation::delete_log(conn, id)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(LogReply { success: true }))
     }
 }
 
@@ -250,16 +257,19 @@ impl LogDetailService for MyLogDetailServer {
                 "Page and page size cannot be zero",
             ));
         }
-        match LogDetailQuery::get_log_details_in_page(conn, page, page_size).await {
-            Ok((models, total)) => Ok(Response::new(LogDetailReplyPage {
-                list: models
-                    .iter()
-                    .map(|model| LogDetail::from(model.clone()))
-                    .collect::<Vec<LogDetail>>(),
-                total,
-            })),
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+
+        LogDetailQuery::get_log_details_in_page(conn, page, page_size)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|(models, total)| {
+                Response::new(LogDetailReplyPage {
+                    list: models
+                        .iter()
+                        .map(|model| LogDetail::from(model.clone()))
+                        .collect::<Vec<LogDetail>>(),
+                    total,
+                })
+            })
     }
 
     #[tracing::instrument]
@@ -270,13 +280,14 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.db_conn;
         let id = request.into_inner().id;
 
-        match LogDetailQuery::get_log_detail_by_id(conn, id).await {
-            Ok(model) => match model {
-                Some(m) => Ok(Response::new(LogDetail::from(m))),
-                None => Err(Status::not_found("Cannot find log detail")),
-            },
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+        LogDetailQuery::get_log_detail_by_id(conn, id)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|model| {
+                model
+                    .map(|m| Ok(Response::new(LogDetail::from(m))))
+                    .unwrap_or_else(|| Err(Status::not_found("Cannot find log detail")))
+            })?
     }
 
     #[tracing::instrument]
@@ -287,10 +298,10 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
-        match LogDetailMutation::create_log_detail(conn, input).await {
-            Ok(m) => Ok(Response::new(LogDetailId { id: m.id })),
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+        LogDetailMutation::create_log_detail(conn, input)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|model| Response::new(LogDetailId { id: model.id }))
     }
 
     #[tracing::instrument]
@@ -301,10 +312,10 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.db_conn;
         let input = request.into_inner().into_models();
 
-        match LogDetailMutation::create_log_details(conn, input).await {
-            Ok(_) => Ok(Response::new(LogDetailReply { success: true })),
-            Err(_) => Ok(Response::new(LogDetailReply { success: false })),
-        }
+        LogDetailMutation::create_log_details(conn, input)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(LogDetailReply { success: true }))
     }
 
     #[tracing::instrument]
@@ -315,10 +326,10 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
-        match LogDetailMutation::update_log_detail(conn, input).await {
-            Ok(_) => Ok(Response::new(LogDetailReply { success: true })),
-            Err(_) => Ok(Response::new(LogDetailReply { success: false })),
-        }
+        LogDetailMutation::update_log_detail(conn, input)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(LogDetailReply { success: true }))
     }
 
     #[tracing::instrument]
@@ -329,10 +340,10 @@ impl LogDetailService for MyLogDetailServer {
         let conn = &self.db_conn;
         let id = request.into_inner().id;
 
-        match LogDetailMutation::delete_log_detail(conn, id).await {
-            Ok(_) => Ok(Response::new(LogDetailReply { success: true })),
-            Err(_) => Ok(Response::new(LogDetailReply { success: false })),
-        }
+        LogDetailMutation::delete_log_detail(conn, id)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(LogDetailReply { success: true }))
     }
 }
 
@@ -349,7 +360,7 @@ impl ProgramService for MyProgramServer {
         if page == 0 || page_size == 0 {
             return Err(Status::new(
                 Code::InvalidArgument,
-                "Page and page size cannot be 0".to_string(),
+                "Page and page size cannot be zero".to_string(),
             ));
         }
 
@@ -370,13 +381,14 @@ impl ProgramService for MyProgramServer {
         let conn = &self.db_conn;
         let id = request.into_inner().id;
 
-        match ProgramQuery::get_program_by_id(conn, id).await {
-            Ok(model) => match model {
-                Some(m) => Ok(Response::new(Program::from(m))),
-                None => Err(Status::not_found("Cannot find program")),
-            },
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+        ProgramQuery::get_program_by_id(conn, id)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|model| {
+                model
+                    .map(|m| Ok(Response::new(Program::from(m))))
+                    .unwrap_or_else(|| Err(Status::not_found("Cannot find program")))
+            })?
     }
 
     #[tracing::instrument]
@@ -384,10 +396,10 @@ impl ProgramService for MyProgramServer {
         let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
-        match ProgramMutation::create_program(conn, input).await {
-            Ok(m) => Ok(Response::new(ProgramId { id: m.id })),
-            Err(e) => Err(Status::internal(e.to_string())),
-        }
+        ProgramMutation::create_program(conn, input)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|model| Response::new(ProgramId { id: model.id }))
     }
 
     #[tracing::instrument]
@@ -398,10 +410,10 @@ impl ProgramService for MyProgramServer {
         let conn = &self.db_conn;
         let input = request.into_inner().into_models();
 
-        match ProgramMutation::create_programs(conn, input).await {
-            Ok(_) => Ok(Response::new(ProgramReply { success: true })),
-            Err(_) => Ok(Response::new(ProgramReply { success: false })),
-        }
+        ProgramMutation::create_programs(conn, input)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(ProgramReply { success: true }))
     }
 
     #[tracing::instrument]
@@ -412,10 +424,10 @@ impl ProgramService for MyProgramServer {
         let conn = &self.db_conn;
         let input = request.into_inner().into_model();
 
-        match ProgramMutation::update_program(conn, input).await {
-            Ok(_) => Ok(Response::new(ProgramReply { success: true })),
-            Err(_) => Ok(Response::new(ProgramReply { success: false })),
-        }
+        ProgramMutation::update_program(conn, input)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(ProgramReply { success: true }))
     }
 
     #[tracing::instrument]
@@ -426,10 +438,10 @@ impl ProgramService for MyProgramServer {
         let conn = &self.db_conn;
         let id = request.into_inner().id;
 
-        match ProgramMutation::delete_program(conn, id).await {
-            Ok(_) => Ok(Response::new(ProgramReply { success: true })),
-            Err(_) => Ok(Response::new(ProgramReply { success: false })),
-        }
+        ProgramMutation::delete_program(conn, id)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(ProgramReply { success: true }))
     }
 }
 
