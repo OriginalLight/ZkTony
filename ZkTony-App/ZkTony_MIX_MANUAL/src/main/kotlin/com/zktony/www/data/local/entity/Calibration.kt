@@ -22,7 +22,7 @@ data class Calibration(
     // 蠕动泵二一圈走的进液量
     val v2: Float = 200f,
     // 蠕动泵三一圈走的进液量
-    val v3: Float = 200f,
+    val v3: Float = 100f,
     // 是否选用
     val enable: Int = 0,
     // 创建时间

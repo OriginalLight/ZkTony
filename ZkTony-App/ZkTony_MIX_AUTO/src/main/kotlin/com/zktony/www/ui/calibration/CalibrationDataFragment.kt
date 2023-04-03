@@ -41,7 +41,7 @@ class CalibrationDataFragment :
                         if (it.actual > 0f) {
                             actual.setEqualText(it.actual.toString().removeZero())
                         }
-                        addLiquid.isEnabled = it.expect > 0f && !it.lock && !it.work
+                        addLiquid.isEnabled = it.expect > 0f && !it.lock
                         save.isEnabled = it.expect > 0f && it.actual > 0f
                     }
                 }

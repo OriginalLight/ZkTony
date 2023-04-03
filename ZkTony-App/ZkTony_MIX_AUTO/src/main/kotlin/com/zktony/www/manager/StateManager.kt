@@ -45,4 +45,6 @@ class StateManager constructor(
 
 data class Settings(
     val bar: Boolean = false,
+    // 间距
+    val space: Float = 0f,
 )

@@ -101,7 +101,7 @@ class HomeViewModel constructor(
     fun reset() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (!serialManager.pause.value) {
+            if (_uiState.value.job == null) {
                 if (serialManager.lock.value) {
                     PopTip.show("运动中禁止复位")
                 } else {

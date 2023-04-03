@@ -76,28 +76,3 @@ inline fun <reified T> DataStore<Preferences>.read(key: String, defaultValue: T)
         }
     } as Flow<T>
 }
-
-
-fun DataStore<Preferences>.read(key: String, defaultValue: String): Flow<String> {
-    return data.catch { exception ->
-        if (exception is IOException) {
-            emit(emptyPreferences())
-        } else {
-            throw exception
-        }
-    }.map { preferences ->
-        preferences[stringPreferencesKey(key)] ?: defaultValue
-    }
-}
-
-fun DataStore<Preferences>.read(key: String, defaultValue: Boolean): Flow<Boolean> {
-    return data.catch { exception ->
-        if (exception is IOException) {
-            emit(emptyPreferences())
-        } else {
-            throw exception
-        }
-    }.map { preferences ->
-        preferences[booleanPreferencesKey(key)] ?: defaultValue
-    }
-}

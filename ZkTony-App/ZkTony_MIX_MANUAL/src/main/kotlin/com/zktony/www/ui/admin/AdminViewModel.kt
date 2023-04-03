@@ -54,13 +54,6 @@ class AdminViewModel constructor(
                 }
             }
             launch {
-                serialManager.ttys3Flow.collect {
-                    it?.let {
-                        onSerialThreeResponse(it)
-                    }
-                }
-            }
-            launch {
                 if (!serialManager.lock.value) {
                     syncMotor()
                 }
@@ -77,19 +70,6 @@ class AdminViewModel constructor(
             if (fn == "03" && pa == "04") {
                 val motor = data.toMotor()
                 updateMotor(motor.copy(id = motor.address - 1))
-            }
-        }
-    }
-
-    /**
-     * 处理串口三返回数据
-     * @param hex [String]
-     */
-    private fun onSerialThreeResponse(hex: String) {
-        hex.toCommand().run {
-            if (fn == "03" && pa == "04") {
-                val motor = data.toMotor()
-                updateMotor(motor.copy(id = motor.address + 2))
             }
         }
     }
@@ -246,14 +226,9 @@ class AdminViewModel constructor(
      */
     private fun syncMotor() {
         viewModelScope.launch {
-            serialManager.sendHex(
-                serial = Serial.TTYS0,
-                hex = V1(fn = "03", pa = "04", data = 2.int8ToHex()).toHex()
-            )
-            delay(100L)
             for (i in 1..3) {
                 serialManager.sendHex(
-                    serial = Serial.TTYS3,
+                    serial = Serial.TTYS0,
                     hex = V1(fn = "03", pa = "04", data = i.int8ToHex()).toHex()
                 )
                 delay(100L)

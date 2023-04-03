@@ -50,4 +50,6 @@
     <string name="fill_colloid">填充(胶体)</string>
     <string name="recapture_colloid">回吸(胶体)</string>
     <string name="reset">复  位</string>
+    <string name="colloid">胶体 μL:</string>
+    <string name="coagulant">促凝剂 μL:</string>
 </resources>

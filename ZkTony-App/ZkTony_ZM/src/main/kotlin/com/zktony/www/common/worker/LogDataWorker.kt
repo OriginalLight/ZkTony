@@ -42,7 +42,11 @@ class LogDataWorker constructor(
                         "上传日志数据失败".logi("LogDataWorker")
                     }
                     .collect {
-                        dao.updateAll(logs.map { it.copy(upload = 1) })
+                        if (it.success) {
+                            dao.updateAll(logs.map {l ->  l.copy(upload = 1) })
+                        } else {
+                            "上传日志数据失败".logi("LogDataWorker")
+                        }
                     }
             }
             return Result.success()

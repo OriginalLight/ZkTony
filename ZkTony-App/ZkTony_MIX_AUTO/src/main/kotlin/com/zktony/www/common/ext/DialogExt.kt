@@ -1,12 +1,16 @@
 package com.zktony.www.common.ext
 
 import android.graphics.Color
+import android.text.InputType
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
+import com.kongzue.dialogx.dialogs.InputDialog
+import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
+import com.kongzue.dialogx.util.InputInfo
 import com.zktony.common.ext.removeZero
 import com.zktony.www.R
 

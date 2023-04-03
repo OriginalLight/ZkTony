@@ -47,6 +47,14 @@ class PlateViewModel constructor(
             }
         }
     }
+    fun setSpace(f: Float) {
+        viewModelScope.launch {
+            _uiState.value.container?.let {
+                containerDao.update(it.copy(space = f))
+            }
+        }
+    }
+
 
     fun reSize(size: Int) {
         viewModelScope.launch {
@@ -87,7 +95,11 @@ class PlateViewModel constructor(
             PopTip.show("机器正在运行中")
             return
         }
-        executionManager.executor(executionManager.generator(y = y))
+        val space = _uiState.value.container?.space ?: 2f
+        executionManager.executor(
+            executionManager.generator(y =  y + space),
+            executionManager.generator(y =  y),
+        )
     }
 
     /**

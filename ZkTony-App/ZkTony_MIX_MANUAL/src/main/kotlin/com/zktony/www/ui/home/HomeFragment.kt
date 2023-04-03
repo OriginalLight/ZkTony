@@ -1,14 +1,14 @@
 package com.zktony.www.ui.home
 
 import android.os.Bundle
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.ext.addTouchEvent
-import com.zktony.common.ext.clickNoRepeat
-import com.zktony.common.ext.clickScale
+import com.zktony.common.dialog.spannerDialog
+import com.zktony.common.ext.*
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
@@ -29,6 +29,24 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     binding.apply {
+                        if (it.coagulant > 0) {
+                            coagulantEdit.setEqualText(it.coagulant.toString())
+                        }
+                        if (it.colloid > 0) {
+                            colloidEdit.setEqualText(it.colloid.toString())
+                        }
+                        start.isEnabled = it.coagulant > 0 && it.colloid > 0
+                        start.isVisible = it.job == null
+                        operate.isVisible = it.job == null
+                        coagulantEdit.isEnabled = it.job == null
+                        colloidEdit.isEnabled = it.job == null
+                        coagulantHistory.isClickable = it.job == null
+                        colloidHistory.isClickable = it.job == null
+                        timeText.text = it.time.getTimeFormat()
+                        fillCoagulantImage.setBackgroundResource(if (it.fillCoagulant) com.zktony.common.R.mipmap.close else com.zktony.common.R.mipmap.right)
+                        recaptureCoagulantImage.setBackgroundResource(if (it.recaptureCoagulant) com.zktony.common.R.mipmap.close else com.zktony.common.R.mipmap.left)
+                        fillCoagulantText.text = if (it.fillCoagulant) "停止" else "填充(促凝剂)"
+                        recaptureCoagulantText.text = if (it.recaptureCoagulant) "停止" else "回吸(促凝剂)"
                     }
                 }
             }
@@ -38,12 +56,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun initView() {
         binding.apply {
             start.clickNoRepeat {
+                viewModel.start()
             }
             stop.clickNoRepeat {
                 viewModel.stop()
-            }
-            pause.clickNoRepeat {
-                viewModel.pause()
             }
             with(reset) {
                 clickScale()
@@ -91,6 +107,47 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     viewModel.stopFillAndRecapture()
                 }
             )
+
+            coagulantEdit.afterTextChange {
+                viewModel.coagulantEdit(it)
+            }
+
+            colloidEdit.afterTextChange {
+                viewModel.colloidEdit(it)
+            }
+
+            with(coagulantHistory) {
+                clickScale()
+                clickNoRepeat {
+                    val menu = viewModel.uiState.value.coagulantHistory.toList().reversed()
+                    if (menu.isEmpty()) {
+                        PopTip.show("历史记录为空")
+                        return@clickNoRepeat
+                    }
+                    spannerDialog(
+                        view = binding.coagulantEdit,
+                        font = 30,
+                        menu = menu,
+                        block = { str, _ -> viewModel.selectCoagulant(str) }
+                    )
+                }
+            }
+            with(colloidHistory) {
+                clickScale()
+                clickNoRepeat {
+                    val menu = viewModel.uiState.value.colloidHistory.toList().reversed()
+                    if (menu.isEmpty()) {
+                        PopTip.show("历史记录为空")
+                        return@clickNoRepeat
+                    }
+                    spannerDialog(
+                        view = binding.colloidEdit,
+                        font = 30,
+                        menu = menu,
+                        block = { str, _ -> viewModel.selectColloid(str) }
+                    )
+                }
+            }
         }
     }
 }

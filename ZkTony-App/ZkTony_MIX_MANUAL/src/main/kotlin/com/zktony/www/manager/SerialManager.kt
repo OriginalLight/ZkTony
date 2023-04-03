@@ -9,7 +9,6 @@ import com.zktony.common.utils.logi
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.TTYS0
-import com.zktony.serialport.util.Serial.TTYS3
 import com.zktony.www.common.ext.toCommand
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.CoroutineScope
@@ -23,28 +22,23 @@ class SerialManager constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     private val _ttys0Flow = MutableStateFlow<String?>(null)
-    private val _ttys3Flow = MutableStateFlow<String?>(null)
     private val _lock = MutableStateFlow(false)
-    private val _pause = MutableStateFlow(false)
     private val _reset = MutableStateFlow(true)
 
     val ttys0Flow = _ttys0Flow.asStateFlow()
-    val ttys3Flow = _ttys3Flow.asStateFlow()
     val lock = _lock.asStateFlow()
-    val pause = _pause.asStateFlow()
     val reset = _reset.asStateFlow()
 
     // 机构运行已经等待的时间
     private var lockTime = 0L
 
     // 机构运行小步骤等待时间
-    private val waitTime = 10L
+    private val waitTime = 2 * 60L
 
     init {
         scope.launch {
             launch {
                 MutableSerial.instance.init(TTYS0, 115200)
-                MutableSerial.instance.init(TTYS3, 115200)
             }
             launch {
                 MutableSerial.instance.listener = { port, data ->
@@ -53,12 +47,6 @@ class SerialManager constructor(
                             data.verifyHex().forEach {
                                 _ttys0Flow.value = it
                                 it.hexFormat().logd("串口一 receivedHex: ")
-                            }
-                        }
-                        TTYS3 -> {
-                            data.verifyHex().forEach {
-                                _ttys3Flow.value = it
-                                it.hexFormat().logd("串口三 receivedHex: ")
                             }
                         }
                         else -> {}
@@ -106,21 +94,11 @@ class SerialManager constructor(
     }
 
     suspend fun reset() {
-        while (lock.value) {
-            delay(500L)
-        }
+        _reset.value = true
         _lock.value = true
-        lockTime = 0L
-        sendHex(serial = TTYS0, hex = V1().toHex())
-        sendHex(serial = TTYS3, hex = V1(pa = "0B", data = "0305").toHex())
-    }
-
-    fun pause(pause: Boolean) {
-        _pause.value = pause
-    }
-
-    fun reset(reset: Boolean) {
-        _reset.value = reset
+        sendHex(serial = TTYS0, hex = V1(pa = "0B", data = "0305").toHex())
+        delay(2000L)
+        _lock.value = false
     }
 
     /**

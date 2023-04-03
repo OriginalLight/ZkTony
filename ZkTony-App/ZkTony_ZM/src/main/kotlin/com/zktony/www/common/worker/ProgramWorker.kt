@@ -48,7 +48,11 @@ class ProgramWorker constructor(
                         "上传程序数据失败".logi("ProgramWorker")
                     }
                     .collect {
-                        dao.updateAll(programs.map { it.copy(upload = 1) })
+                        if (it.success) {
+                            dao.updateAll(programs.map {p ->  p.copy(upload = 1) })
+                        } else {
+                            "上传程序数据失败".logi("ProgramWorker")
+                        }
                     }
             }
             return Result.success()

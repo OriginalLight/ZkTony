@@ -16,5 +16,6 @@ data class Container(
     // 废液槽坐标
     val wasteY: Float = 0f,
     // 创建时间
+    val space: Float = 2f,
     val createTime: Date = Date(System.currentTimeMillis()),
 )

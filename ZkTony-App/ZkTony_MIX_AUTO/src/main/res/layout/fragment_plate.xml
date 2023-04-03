@@ -37,6 +37,16 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="VisualLintBounds" />
 
+            <com.zktony.common.widget.SizeIndicator
+                android:id="@+id/space"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="640dp"
+                android:layout_height="36dp"
+                app:layout_constraintEnd_toEndOf="@+id/gradient_plate"
+                app:layout_constraintStart_toStartOf="@+id/gradient_plate"
+                app:layout_constraintTop_toBottomOf="@+id/gradient_plate"
+                tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintBounds" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>

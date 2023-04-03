@@ -44,7 +44,11 @@ class LogRecordWorker constructor(
                         "上传日志数据失败".logi("LogRecordWorker")
                     }
                     .collect {
-                        dao.updateAll(logs.map { it.copy(upload = 1) })
+                        if (it.success) {
+                            dao.updateAll(logs.map {l ->  l.copy(upload = 1) })
+                        } else {
+                            "上传日志数据失败".logi("LogRecordWorker")
+                        }
                     }
             }
             return Result.success()

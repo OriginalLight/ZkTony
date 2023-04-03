@@ -57,7 +57,7 @@ class MotorViewHolder(
     fun bind(item: Motor) {
         binding.apply {
             motor = item
-            icon.setImageResource(if (item.id < 2) R.mipmap.motor else R.mipmap.pump)
+            icon.setImageResource(R.mipmap.pump)
             cardView.clickNoRepeat { onEditButtonClick(item) }
             executePendingBindings()
         }

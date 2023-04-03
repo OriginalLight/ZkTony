@@ -67,11 +67,11 @@ class ProgramExecutor constructor(
                         while (serialManager.lock.value) {
                             delay(100L)
                         }
-                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t 排液\n"))
+                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${hole.y} 号孔排液\n"))
                         executionManager.executor(
                             executionManager.generator(
-                                y = container.wasteY,
-                                v1 = 1000f
+                                y = hole.yAxis + container.space,
+                                v1 = 2000f
                             )
                         )
                         delay(100L)

@@ -48,11 +48,6 @@ class CalibrationDataViewModel constructor(
                     _uiState.value = _uiState.value.copy(lock = it)
                 }
             }
-            launch {
-                serialManager.pause.collect {
-                    _uiState.value = _uiState.value.copy(work = it)
-                }
-            }
         }
     }
 
@@ -147,5 +142,4 @@ data class CalibrationDataUiState(
     val expect: Float = 0f,
     val actual: Float = 0f,
     val lock: Boolean = false,
-    val work: Boolean = false,
 )

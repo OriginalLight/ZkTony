@@ -43,11 +43,6 @@ class CalibrationDataViewModel constructor(
                     _uiState.value = _uiState.value.copy(lock = it)
                 }
             }
-            launch {
-                serialManager.pause.collect {
-                    _uiState.value = _uiState.value.copy(work = it)
-                }
-            }
         }
     }
 
@@ -64,14 +59,21 @@ class CalibrationDataViewModel constructor(
     }
 
     fun addLiquid() {
-        val state = _uiState.value
-        val gen = when (state.pumpId) {
-            0 -> executionManager.generator(v1 = state.expect)
-            1 -> executionManager.generator(v2 = state.expect)
-            2 -> executionManager.generator(v3 = state.expect)
-            else -> return
+        viewModelScope.launch {
+            val state = _uiState.value
+            executionManager.executor(executionManager.generator(
+                v1 = if (state.pumpId == 0) state.expect else 0f,
+                v2 = if (state.pumpId == 1) state.expect else 0f,
+                v3 = if (state.pumpId == 2) state.expect else 0f,
+            ))
+            if (state.pumpId == 2) {
+                delay(100L)
+                while (serialManager.lock.value) {
+                    delay(100L)
+                }
+                serialManager.reset()
+            }
         }
-        executionManager.executor(gen)
     }
 
     fun save() {
@@ -137,5 +139,4 @@ data class CalibrationDataUiState(
     val expect: Float = 0f,
     val actual: Float = 0f,
     val lock: Boolean = false,
-    val work: Boolean = false,
 )

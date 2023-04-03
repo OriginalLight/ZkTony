@@ -158,6 +158,19 @@ fun inputNumberDialog(message: String = "请输入程序/操作名", value: Int,
         }.show()
 }
 
+fun inputNumberDialog(message: String = "请输入程序/操作名", value: Float, block: (Float) -> Unit) {
+    InputDialog("修改", message, "确定", "取消", value.removeZero())
+        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL))
+        .setOkButton { _, _, inputStr ->
+            if (inputStr.trim().isEmpty()) {
+                PopTip.show("不能为空")
+                return@setOkButton false
+            }
+            block(inputStr.trim().toFloatOrNull() ?: 0f)
+            false
+        }.show()
+}
+
 fun inputDecimalDialog(
     message: String = "请输入程序/操作名",
     value: Float,
@@ -202,10 +215,15 @@ fun updateDialog(title: String, message: String, block: () -> Unit, block1: () -
         }).setCancelable(false).setMaskColor(Color.parseColor("#4D000000")).show()
 }
 
-fun spannerDialog(view: View, menu: List<String>, block: (String, Int) -> Unit) {
+fun spannerDialog(
+    view: View,
+    font: Int = 16,
+    menu: List<String>,
+    block: (String, Int) -> Unit
+) {
     PopMenu.show(view, menu).setOverlayBaseView(false).setMenuTextInfo(TextInfo().apply {
         gravity = Gravity.CENTER
-        fontSize = 16
+        fontSize = font
     }).setOnMenuItemClickListener { _, text, index ->
         block(text.toString(), index)
         false

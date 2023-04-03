@@ -18,52 +18,35 @@ class ExecutionManager constructor(
 ) {
     // 生成器
     fun generator(
-        y: Float = 0f,
-        p: Float = 0f,
         v1: Float = 0f,
         v2: Float = 0f,
         v3: Float = 0f,
-    ): Pair<String, String> {
-        val my = motorManager.move(y)
-        val mp = motorManager.liquid(p, 2)
+    ): String {
         val mv1 = motorManager.liquid(v1, 0)
         val mv2 = motorManager.liquid(v2, 1)
         val mv3 = motorManager.liquid(v3, 2)
-        return Pair(
-            "0,$my,$mp,",
-            "$mv1,$mv2,$mv3,"
-        )
+        return "$mv1,$mv2,$mv3,"
     }
 
     // 执行器
-    fun executor(vararg gen: Pair<String, String>) {
+    fun executor(vararg gen: String) {
         scope.launch {
-            val str1 = gen.joinToString("") { it.first }
-            val str2 = gen.joinToString("") { it.second }
+            val str = gen.joinToString("")
             serialManager.sendHex(
                 serial = Serial.TTYS0,
-                hex = V1.complex(data = str1),
-            )
-            serialManager.sendHex(
-                serial = Serial.TTYS3,
-                hex = V1.complex(data = str2),
-                lock = true
+                hex = V1.complex(data = str),
+                true
             )
         }
     }
 
-    fun executor(gen: Collection<Pair<String, String>>) {
+    fun executor(gen: Collection<String>) {
         scope.launch {
-            val str1 = gen.joinToString("") { it.first }
-            val str2 = gen.joinToString("") { it.second }
+            val str = gen.joinToString("")
             serialManager.sendHex(
                 serial = Serial.TTYS0,
-                hex = V1.complex(data = str1),
-            )
-            serialManager.sendHex(
-                serial = Serial.TTYS3,
-                hex = V1.complex(data = str2),
-                lock = true
+                hex = V1.complex(data = str),
+                true
             )
         }
     }

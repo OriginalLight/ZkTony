@@ -103,7 +103,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             if (menuList.size < 2) {
                                 PopTip.show("没有更多程序！")
                             } else {
-                                spannerDialog(this, menuList) { text, _ ->
+                                spannerDialog(view = this, menu = menuList) { text, _ ->
                                     viewModel.selectProgram(programList.find { it.name == text }, i)
                                 }
                             }
