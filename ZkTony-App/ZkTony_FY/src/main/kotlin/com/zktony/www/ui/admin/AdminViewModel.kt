@@ -176,7 +176,7 @@ class AdminViewModel constructor(
                     loading = true
                 )
                 grpc.getByApplicationId().catch {
-                    PopTip.show("获取版本信息失败,请重试!")
+                    PopTip.show("获取版本信息失败,请重试!${it.message}")
                     _uiState.value = _uiState.value.copy(
                         loading = false
                     )
@@ -277,7 +277,6 @@ class AdminViewModel constructor(
             }
         }
     }
-
 }
 
 data class AdminUiState(

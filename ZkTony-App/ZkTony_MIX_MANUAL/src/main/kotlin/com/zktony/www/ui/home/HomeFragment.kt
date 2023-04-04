@@ -35,8 +35,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         if (it.colloid > 0) {
                             colloidEdit.setEqualText(it.colloid.toString())
                         }
-                        start.isEnabled = it.coagulant > 0 && it.colloid > 0
-                        start.isVisible = it.job == null
+                        start.isEnabled = it.coagulant > 0 && it.colloid > 0 && it.job == null
                         operate.isVisible = it.job == null
                         coagulantEdit.isEnabled = it.job == null
                         colloidEdit.isEnabled = it.job == null
@@ -57,9 +56,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         binding.apply {
             start.clickNoRepeat {
                 viewModel.start()
-            }
-            stop.clickNoRepeat {
-                viewModel.stop()
             }
             with(reset) {
                 clickScale()

@@ -7,7 +7,6 @@ package com.zktony.common.utils
 object Constants {
     const val AUDIO = "AUDIO"
     const val BAR = "BAR"
-    const val BASE_URL = "https://www.liuhh.net/api/"
     const val DETECT = "DETECT"
     const val DOMAIN = "https://www.zktony.com"
     const val DURATION = "DURATION"
@@ -23,6 +22,6 @@ object Constants {
     const val ERROR_CURRENT = 0.1f
     const val ZERO_TIME = "00:00:00"
     const val GRPC_HOST = "182.160.14.59"
-    const val GRPC_PORT = 30527
+    const val GRPC_PORT = 9527
     const val GRPC_AUTHORITY = "example.com"
 }

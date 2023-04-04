@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.common.R
 import com.zktony.common.ext.clickNoRepeat
 import com.zktony.common.ext.clickScale
@@ -77,7 +76,6 @@ class ActionViewHolder(
             water.text = item.liquidVolume.removeZero() + " 微升"
             counter.text = item.count.toString() + " 次"
             cardView.clickNoRepeat {
-                PopTip.show("点击右侧图标删除")
             }
             with(delete) {
                 clickScale()

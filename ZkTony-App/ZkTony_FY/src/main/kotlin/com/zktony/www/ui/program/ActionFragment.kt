@@ -1,24 +1,18 @@
 package com.zktony.www.ui.program
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.kongzue.dialogx.dialogs.PopMenu
-import com.kongzue.dialogx.dialogs.PopTip
-import com.kongzue.dialogx.util.TextInfo
 import com.zktony.common.base.BaseFragment
-import com.zktony.common.ext.afterTextChange
-import com.zktony.common.ext.clickNoRepeat
-import com.zktony.common.ext.clickScale
+import com.zktony.common.dialog.spannerDialog
+import com.zktony.common.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.adapter.ActionAdapter
 import com.zktony.www.data.local.entity.ActionEnum
-import com.zktony.www.data.local.entity.getActionEnum
 import com.zktony.www.databinding.FragmentActionBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -41,40 +35,60 @@ class ActionFragment :
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                launch {
-                    viewModel.actionList.collect {
-                        adapter.submitList(it)
-                        binding.apply {
-                            recycleView.isVisible = it.isNotEmpty()
-                            empty.isVisible = it.isEmpty()
-                        }
-                    }
-                }
-                launch {
-                    viewModel.buttonEnable.collect {
-                        binding.btnAdd.apply {
-                            isEnabled = it
-                            alpha = if (it) 1f else 0.5f
-                            text =
-                                if (it) resources.getString(R.string.add) else resources.getString(R.string.add_ban)
-                        }
-                    }
-                }
-                launch {
-                    viewModel.action.collect {
-                        if (getActionEnum(it.mode) == ActionEnum.WASHING) {
-                            binding.apply {
-                                llCount.visibility = View.VISIBLE
-                                dividerCount.visibility = View.VISIBLE
-                                tvTime.text = resources.getString(R.string.hint_time_min)
-                            }
+                viewModel.uiState.collect {
+                    binding.apply {
+                        adapter.submitList(it.actionList)
+                        recycleView.isVisible = it.actionList.isNotEmpty()
+                        empty.isVisible = it.actionList.isEmpty()
+                        btnBox.text = Box.values().first { box -> box.index == it.box }.value
+                        btnAction.text =
+                            ActionEnum.values().first { action -> action.index == it.action }.value
+                        if (it.order == 0) {
+                            order.setEqualText("")
                         } else {
-                            binding.apply {
-                                llCount.visibility = View.GONE
-                                dividerCount.visibility = View.GONE
-                                tvTime.text = resources.getString(R.string.hint_time_hour)
+                            order.setEqualText(it.order.toString())
+                        }
+                        if (it.time == 0f) {
+                            time.setEqualText("")
+                        } else {
+                            time.setEqualText(it.time.toString().removeZero())
+                        }
+                        if (it.temp == 0f) {
+                            temperature.setEqualText("")
+                        } else {
+                            temperature.setEqualText(it.temp.toString().removeZero())
+                        }
+                        if (it.volume == 0) {
+                            liquidVolume.setEqualText("")
+                        } else {
+                            liquidVolume.setEqualText(it.volume.toString())
+                        }
+                        if (it.count == 0) {
+                            count.setEqualText("")
+                        } else {
+                            count.setEqualText(it.count.toString())
+                        }
+                        with(btnAdd) {
+                            if (viewModel.validate()) {
+                                isEnabled = true
+                                alpha = 1f
+                                text = resources.getString(R.string.add)
+                            } else {
+                                isEnabled = false
+                                alpha = 0.5f
+                                text = resources.getString(R.string.add_ban)
                             }
                         }
+                        if (it.action == ActionEnum.WASHING.index) {
+                            llCount.visibility = View.VISIBLE
+                            dividerCount.visibility = View.VISIBLE
+                            tvTime.text = resources.getString(R.string.hint_time_min)
+                        } else {
+                            llCount.visibility = View.GONE
+                            dividerCount.visibility = View.GONE
+                            tvTime.text = resources.getString(R.string.hint_time_hour)
+                        }
+
                     }
                 }
             }
@@ -86,40 +100,29 @@ class ActionFragment :
         arguments?.let {
             val id = it.getString("id") ?: ""
             if (id.isNotEmpty()) {
-                viewModel.load(id)
+                viewModel.init(id)
             }
         }
         adapter.onDeleteButtonClick = {
-            PopTip.show("已删除")
             viewModel.delete(it)
         }
         binding.apply {
             recycleView.adapter = adapter
 
             order.afterTextChange {
-                viewModel.editAction(
-                    viewModel.action.value.copy(order = it.toIntOrNull() ?: 0)
-                )
+                viewModel.editOrder(it.toIntOrNull() ?: 0)
             }
             time.afterTextChange {
-                viewModel.editAction(
-                    viewModel.action.value.copy(time = it.toFloatOrNull() ?: 0f)
-                )
+                viewModel.editTime(it.toFloatOrNull() ?: 0f)
             }
             temperature.afterTextChange {
-                viewModel.editAction(
-                    viewModel.action.value.copy(temperature = it.toFloatOrNull() ?: 0f)
-                )
+                viewModel.editTemp(it.toFloatOrNull() ?: 0f)
             }
             liquidVolume.afterTextChange {
-                viewModel.editAction(
-                    viewModel.action.value.copy(liquidVolume = it.toFloatOrNull() ?: 0f)
-                )
+                viewModel.editVolume(it.toIntOrNull() ?: 0)
             }
             count.afterTextChange {
-                viewModel.editAction(
-                    viewModel.action.value.copy(count = it.toIntOrNull() ?: 0)
-                )
+                viewModel.editCount(it.toIntOrNull() ?: 0)
             }
 
             with(btnBack) {
@@ -134,24 +137,27 @@ class ActionFragment :
                     viewModel.insert()
                 }
             }
-            with(btnAction) {
-                text = getActionEnum(viewModel.action.value.mode).value
-                clickNoRepeat {
-                    val menuList = ActionEnum.values().map { it.value }
-                    PopMenu.show(binding.btnAction, menuList)
-                        .setMenuTextInfo(TextInfo().apply {
-                            gravity = Gravity.CENTER
-                            fontSize = 16
-                        })
-                        .setOverlayBaseView(false)
-                        .setOnMenuItemClickListener { _, text, index ->
-                            binding.btnAction.text = text
-                            viewModel.switchAction(getActionEnum(index))
-                            false
-                        }
-                        .setRadius(0f)
-                        .alignGravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-                }
+            btnAction.clickNoRepeat {
+                val menuList = ActionEnum.values().map { it.value }
+                spannerDialog(
+                    view = binding.btnAction,
+                    font = 16,
+                    menu = menuList,
+                    block = { _, index ->
+                        viewModel.switchAction(index)
+                    }
+                )
+            }
+            btnBox.clickNoRepeat {
+                val menuList = Box.values().map { it.value }
+                spannerDialog(
+                    view = binding.btnBox,
+                    font = 16,
+                    menu = menuList,
+                    block = { _, index ->
+                        viewModel.switchBox(index)
+                    }
+                )
             }
         }
     }

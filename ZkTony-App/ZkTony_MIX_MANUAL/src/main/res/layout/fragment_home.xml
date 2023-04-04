@@ -40,7 +40,6 @@
                         android:layout_height="64dp"
                         android:layout_marginStart="32dp"
                         android:layout_marginEnd="32dp"
-                        android:background="#4AECEBED"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         app:layout_constraintBottom_toTopOf="@+id/coagulant"
@@ -48,14 +47,29 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent">
 
-                        <TextView
-                            android:layout_width="128dp"
-                            android:layout_height="match_parent"
-                            android:background="@color/light_primary"
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/colloid_history"
+                            android:layout_width="196dp"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
                             android:gravity="center"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
                             android:text="@string/colloid"
                             android:textColor="@color/light_onPrimary"
-                            android:textSize="20sp" />
+                            android:textAllCaps="false"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="0dp"
+                            app:icon="@mipmap/expand_arrow"
+                            app:iconSize="24dp"
+                            app:iconTint="@null"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="SpeakableTextPresentCheck" />
 
                         <EditText
                             android:id="@+id/colloid_edit"
@@ -68,15 +82,8 @@
                             android:paddingStart="8dp"
                             android:paddingEnd="8dp"
                             android:textColor="@color/black"
-                            android:textSize="30sp" />
-
-                        <ImageView
-                            android:id="@+id/colloid_history"
-                            android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            android:background="@color/dark_secondary"
-                            android:padding="8dp"
-                            app:srcCompat="@mipmap/expand_arrow" />
+                            android:textSize="30sp"
+                            tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck" />
 
 
                     </LinearLayout>
@@ -87,7 +94,6 @@
                         android:layout_height="64dp"
                         android:layout_marginStart="32dp"
                         android:layout_marginEnd="32dp"
-                        android:background="#4AECEBED"
                         android:gravity="center_vertical"
                         android:orientation="horizontal"
                         app:layout_constraintBottom_toBottomOf="parent"
@@ -95,14 +101,29 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/colloid">
 
-                        <TextView
-                            android:layout_width="128dp"
-                            android:layout_height="match_parent"
-                            android:background="@color/light_primary"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/coagulant_history"
+                            android:layout_width="196dp"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
                             android:gravity="center"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:singleLine="true"
                             android:text="@string/coagulant"
                             android:textColor="@color/light_onPrimary"
-                            android:textSize="20sp" />
+                            android:textAllCaps="false"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="0dp"
+                            app:icon="@mipmap/expand_arrow"
+                            app:iconSize="24dp"
+                            app:iconTint="@null"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="SpeakableTextPresentCheck" />
 
                         <EditText
                             android:id="@+id/coagulant_edit"
@@ -115,23 +136,16 @@
                             android:paddingStart="8dp"
                             android:paddingEnd="8dp"
                             android:textColor="@color/black"
-                            android:textSize="30sp" />
+                            android:textSize="30sp"
+                            tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck" />
 
-                        <ImageView
-                            android:id="@+id/coagulant_history"
-                            android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            android:background="@color/dark_secondary"
-                            android:padding="8dp"
-                            app:srcCompat="@mipmap/expand_arrow" />
                     </LinearLayout>
-
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="2dp"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    tools:ignore="VisualLintBounds" />
 
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -153,33 +167,11 @@
                         app:icon="@mipmap/play"
                         app:iconGravity="textStart"
                         app:iconSize="24dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toTopOf="@+id/stop"
-                        app:rippleColor="@color/purple_700"
-                        tools:ignore="VisualLintButtonSize" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/stop"
-                        android:layout_width="0dp"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:backgroundTint="@color/light_error"
-                        android:text="@string/stop"
-                        android:textSize="22sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="32dp"
-                        app:icon="@mipmap/close"
-                        app:iconGravity="textStart"
-                        app:iconSize="24dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_weight="1"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/start"
+                        app:layout_constraintTop_toTopOf="parent"
                         app:rippleColor="@color/purple_700"
                         tools:ignore="VisualLintButtonSize" />
 

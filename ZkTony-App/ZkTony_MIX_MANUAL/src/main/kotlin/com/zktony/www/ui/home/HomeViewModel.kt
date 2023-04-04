@@ -98,20 +98,6 @@ class HomeViewModel constructor(
         _uiState.value = _uiState.value.copy(job = job)
     }
 
-    fun stop() {
-        viewModelScope.launch {
-            _uiState.value.job?.cancel()
-            _uiState.value = _uiState.value.copy(
-                job = null,
-                time = 0L,
-            )
-            serialManager.sendHex(
-                serial = Serial.TTYS0,
-                hex = V1(pa = "10").toHex()
-            )
-        }
-    }
-
 
     /**
      * 填充促凝剂

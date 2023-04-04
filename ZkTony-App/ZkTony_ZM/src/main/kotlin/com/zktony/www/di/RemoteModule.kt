@@ -22,7 +22,6 @@ val remoteModule = module {
     }
     single {
         OkHttpChannelBuilder.forAddress(GRPC_HOST, GRPC_PORT, get())
-            .idleTimeout(30, TimeUnit.SECONDS)
             .overrideAuthority(GRPC_AUTHORITY)
             .build()
     }

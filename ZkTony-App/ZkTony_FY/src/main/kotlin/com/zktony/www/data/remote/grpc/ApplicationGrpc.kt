@@ -11,7 +11,6 @@ class ApplicationGrpc constructor(
 ) {
     private val stub = ApplicationServiceGrpcKt.ApplicationServiceCoroutineStub(channel)
 
-
     suspend fun getByApplicationId(
         applicationId: String = BuildConfig.APPLICATION_ID
     ) = flow {
@@ -25,6 +24,5 @@ class ApplicationGrpc constructor(
         } catch (e: Exception) {
             throw e
         }
-
     }
 }
