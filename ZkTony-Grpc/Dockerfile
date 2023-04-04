@@ -32,7 +32,7 @@ COPY --from=builder /code/target/release/zktony-grpc zktony-grpc
 COPY --from=builder /code/config config
 
 # indicate what port the server is running on
-EXPOSE 9527
+EXPOSE 50051 50052
 
 # run server
 CMD [ "/app/zktony-grpc" ]

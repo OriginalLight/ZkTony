@@ -17,7 +17,7 @@ pub struct Configs {
 pub struct Server {
     pub name: String,
     pub version: String,
-    pub address: String,
+    pub addr: Vec<String>,
     pub ssl: bool,
     pub content_gzip: bool,
 }

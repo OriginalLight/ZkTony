@@ -12,6 +12,7 @@ import com.zktony.www.data.remote.grpc.ProgramGrpc
 import io.grpc.TlsChannelCredentials
 import io.grpc.okhttp.OkHttpChannelBuilder
 import org.koin.dsl.module
+import java.util.concurrent.TimeUnit
 
 val remoteModule = module {
     single {
@@ -21,6 +22,7 @@ val remoteModule = module {
     }
     single {
         OkHttpChannelBuilder.forAddress(GRPC_HOST, GRPC_PORT, get())
+            .idleTimeout(30, TimeUnit.SECONDS)
             .overrideAuthority(GRPC_AUTHORITY)
             .build()
     }
