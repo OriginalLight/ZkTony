@@ -1,7 +1,7 @@
 use grpc_api::{health::health_svc, sea_orm::Database, service::ServerExt, CFG};
 use std::{net::SocketAddr, str::FromStr};
-use tokio::sync::mpsc;
-use tonic::transport::{Identity, Server, ServerTlsConfig};
+use tokio::{signal, sync::mpsc};
+use tonic::transport::Server;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -13,13 +13,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
 
-    tracing::info!("Starting server...");
-
-    let cert = std::fs::read_to_string(&CFG.cert.cert).unwrap();
-    let key = std::fs::read_to_string(&CFG.cert.key).unwrap();
-
-    // create tls identity
-    let identity = Identity::from_pem(cert, key);
     // connect to database
     let db_conn = Database::connect(CFG.database.link.to_owned()).await?;
 
@@ -33,10 +26,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let health_svc = health_svc().await;
 
         let serve = Server::builder()
-            .tls_config(ServerTlsConfig::new().identity(identity.clone()))?
+            .enable_ssl()?
             .add_grpc_service(db_conn.clone())
             .add_service(health_svc)
-            .serve(addr);
+            .serve_with_shutdown(addr, shutdown_signal(addr));
 
         tokio::spawn(async move {
             if let Err(e) = serve.await {
@@ -49,4 +42,30 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     rx.recv().await;
 
     Ok(())
+}
+
+async fn shutdown_signal(addr: SocketAddr) {
+    let ctrl_c = async {
+        signal::ctrl_c()
+            .await
+            .expect("failed to install Ctrl+C handler");
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        signal::unix::signal(signal::unix::SignalKind::terminate())
+            .expect("failed to install signal handler")
+            .recv()
+            .await;
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<()>();
+
+    tokio::select! {
+        _ = ctrl_c => {},
+        _ = terminate => {},
+    }
+
+    println!("Shutting down server at {}", addr);
 }

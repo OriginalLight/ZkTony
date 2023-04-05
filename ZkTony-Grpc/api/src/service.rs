@@ -2,11 +2,11 @@ use grpc_core::{sea_orm::DbConn, *};
 
 use tonic::{
     codec::CompressionEncoding,
-    transport::{server::Router, Server},
+    transport::{server::Router, server::Server, Error, Identity, ServerTlsConfig},
     Code, Request, Response, Status,
 };
 
-use super::config::CFG;
+use super::CFG;
 
 use super::protobuf::{
     application::{application_service_server::*, *},
@@ -459,6 +459,9 @@ impl TestService for MyTestServer {
 
 pub trait ServerExt {
     fn add_grpc_service(self, db_conn: DbConn) -> Router;
+    fn enable_ssl(self) -> Result<Self, Error>
+    where
+        Self: Sized;
 }
 
 impl ServerExt for Server {
@@ -466,30 +469,38 @@ impl ServerExt for Server {
         let mut application_svc = ApplicationServiceServer::new(MyApplicationServer {
             db_conn: db_conn.clone(),
         });
+
         let mut program_svc = ProgramServiceServer::new(MyProgramServer {
             db_conn: db_conn.clone(),
         });
+
         let mut log_svc = LogServiceServer::new(MyLogServer {
             db_conn: db_conn.clone(),
         });
+
         let mut log_detail_svc = LogDetailServiceServer::new(MyLogDetailServer {
             db_conn: db_conn.clone(),
         });
+
         let mut test_svc = TestServiceServer::new(MyTestServer {});
 
         if CFG.server.content_gzip {
             application_svc = application_svc
                 .send_compressed(CompressionEncoding::Gzip)
                 .accept_compressed(CompressionEncoding::Gzip);
+
             program_svc = program_svc
                 .send_compressed(CompressionEncoding::Gzip)
                 .accept_compressed(CompressionEncoding::Gzip);
+
             log_svc = log_svc
                 .send_compressed(CompressionEncoding::Gzip)
                 .accept_compressed(CompressionEncoding::Gzip);
+
             log_detail_svc = log_detail_svc
                 .send_compressed(CompressionEncoding::Gzip)
                 .accept_compressed(CompressionEncoding::Gzip);
+
             test_svc = test_svc
                 .send_compressed(CompressionEncoding::Gzip)
                 .accept_compressed(CompressionEncoding::Gzip);
@@ -500,5 +511,16 @@ impl ServerExt for Server {
             .add_service(log_svc)
             .add_service(log_detail_svc)
             .add_service(test_svc)
+    }
+
+    fn enable_ssl(self) -> Result<Self, Error> {
+        let cert = std::fs::read_to_string(&CFG.cert.cert).unwrap();
+        let key = std::fs::read_to_string(&CFG.cert.key).unwrap();
+        let identity = Identity::from_pem(cert, key);
+        if CFG.server.ssl {
+            self.tls_config(ServerTlsConfig::new().identity(identity.clone()))
+        } else {
+            Ok(self)
+        }
     }
 }
