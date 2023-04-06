@@ -32,8 +32,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
-import com.zktony.manager.data.remote.model.Software
 import com.zktony.manager.ui.QrCodeActivity
+import com.zktony.proto.Software
 import java.util.*
 
 /**

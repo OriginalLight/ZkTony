@@ -4,7 +4,9 @@ import com.zktony.proto.LogDetail
 import com.zktony.proto.LogDetailList
 import com.zktony.proto.LogDetailServiceGrpcKt
 import io.grpc.ManagedChannel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class LogDetailGrpc constructor(
     private val channel: ManagedChannel,
@@ -21,5 +23,5 @@ class LogDetailGrpc constructor(
         } catch (e: Exception) {
             throw e
         }
-    }
+    }.flowOn(Dispatchers.IO)
 }

@@ -19,8 +19,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.room.Update
-import com.zktony.manager.data.remote.model.Product
+import com.zktony.proto.Order
+import com.zktony.proto.order
+import java.util.*
 
 // region FunctionCard
 @OptIn(ExperimentalMaterial3Api::class)
@@ -220,7 +221,7 @@ fun AttachmentCard(
 @Composable
 fun ProductCard(
     modifier: Modifier = Modifier,
-    product: Product,
+    order: Order,
     onClick: () -> Unit = {},
 ) {
     ElevatedCard(
@@ -245,18 +246,18 @@ fun ProductCard(
                     .fillMaxWidth()
                     .padding(8.dp),
             ) {
-                Text(text = "编号: ${product.id}", style = MaterialTheme.typography.labelMedium)
+                Text(text = "编号: ${order.id}", style = MaterialTheme.typography.labelMedium)
                 Text(
-                    text = "快递: ${product.express_number}",
+                    text = "快递: ${order.expressNumber}",
                     style = MaterialTheme.typography.labelMedium
                 )
                 Text(
-                    text = "时间: ${product.create_time.replace("T", " ")}",
+                    text = "时间: ${order.createTime.replace("T", " ")}",
                     style = MaterialTheme.typography.labelMedium
                 )
-                if (product.create_by.isNotEmpty()) {
+                if (order.createBy.isNotEmpty()) {
                     Text(
-                        text = "创建人: ${product.create_by}",
+                        text = "创建人: ${order.createBy}",
                         style = MaterialTheme.typography.labelMedium
                     )
                 }
@@ -371,7 +372,7 @@ fun AttachmentCardPreview() {
 @Composable
 fun ProductCardPreview() {
     ProductCard(
-        product = Product(),
+        order = order { id = UUID.randomUUID().toString() },
         onClick = { }
     )
 }

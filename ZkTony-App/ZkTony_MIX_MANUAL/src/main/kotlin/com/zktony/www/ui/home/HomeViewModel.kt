@@ -108,6 +108,7 @@ class HomeViewModel constructor(
                 _uiState.value = _uiState.value.copy(
                     upOrDown = true,
                     fillCoagulant = false,
+                    start = false
                 )
                 serialManager.sendHex(
                     serial = Serial.TTYS0,
@@ -124,6 +125,7 @@ class HomeViewModel constructor(
                     _uiState.value = _uiState.value.copy(
                         upOrDown = true,
                         fillCoagulant = true,
+                        start = true
                     )
                     delay(100L)
                     while (_uiState.value.fillCoagulant) {
@@ -160,6 +162,7 @@ class HomeViewModel constructor(
                 _uiState.value = _uiState.value.copy(
                     upOrDown = true,
                     recaptureCoagulant = false,
+                    start = false
                 )
                 serialManager.sendHex(
                     serial = Serial.TTYS0,
@@ -176,6 +179,7 @@ class HomeViewModel constructor(
                     _uiState.value = _uiState.value.copy(
                         upOrDown = true,
                         recaptureCoagulant = true,
+                        start = true
                     )
                     delay(100L)
                     while (_uiState.value.recaptureCoagulant) {
@@ -208,6 +212,7 @@ class HomeViewModel constructor(
      */
     fun fillColloid() {
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(start = true)
             serialManager.sendHex(
                 serial = Serial.TTYS0,
                 hex = V1(pa = "0B", data = "0401").toHex()
@@ -220,6 +225,7 @@ class HomeViewModel constructor(
      */
     fun recaptureColloid() {
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(start = true)
             serialManager.sendHex(
                 serial = Serial.TTYS0,
                 hex = V1(pa = "0B", data = "0402").toHex()
@@ -232,6 +238,7 @@ class HomeViewModel constructor(
      */
     fun stopFillAndRecapture() {
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(start = false)
             serialManager.sendHex(
                 serial = Serial.TTYS0,
                 hex = V1(pa = "0B", data = "0400").toHex()
@@ -309,6 +316,7 @@ class HomeViewModel constructor(
 data class HomeUiState(
     val job: Job? = null,
     val time: Long = 0L,
+    val start: Boolean = false,
     val fillCoagulant: Boolean = false,
     val recaptureCoagulant: Boolean = false,
     val upOrDown: Boolean = true,

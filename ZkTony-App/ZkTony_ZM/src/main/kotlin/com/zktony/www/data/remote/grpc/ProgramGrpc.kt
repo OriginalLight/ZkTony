@@ -4,7 +4,9 @@ import com.zktony.proto.Program
 import com.zktony.proto.ProgramList
 import com.zktony.proto.ProgramServiceGrpcKt
 import io.grpc.ManagedChannel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class ProgramGrpc constructor(
     private val channel: ManagedChannel,
@@ -21,5 +23,5 @@ class ProgramGrpc constructor(
         } catch (e: Exception) {
             throw e
         }
-    }
+    }.flowOn(Dispatchers.IO)
 }

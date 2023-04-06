@@ -34,7 +34,7 @@ class ExecutionManager constructor(
             val str = gen.joinToString("")
             serialManager.sendHex(
                 serial = Serial.TTYS0,
-                hex = V1.complex(data = str),
+                hex = V1.singlePoint(data = str),
                 true
             )
         }
@@ -45,7 +45,7 @@ class ExecutionManager constructor(
             val str = gen.joinToString("")
             serialManager.sendHex(
                 serial = Serial.TTYS0,
-                hex = V1.complex(data = str),
+                hex = V1.singlePoint(data = str),
                 true
             )
         }

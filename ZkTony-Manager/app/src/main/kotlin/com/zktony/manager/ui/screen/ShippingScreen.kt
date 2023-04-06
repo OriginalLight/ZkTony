@@ -8,15 +8,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zktony.manager.data.remote.model.Customer
-import com.zktony.manager.data.remote.model.Equipment
 import com.zktony.manager.ui.screen.page.CustomerModifyPage
-import com.zktony.manager.ui.screen.page.EquipmentModifyPage
+import com.zktony.manager.ui.screen.page.InstrumentModifyPage
 import com.zktony.manager.ui.screen.page.ShippingPage
 import com.zktony.manager.ui.screen.page.SoftwareModifyPage
 import com.zktony.manager.ui.screen.viewmodel.HomePageEnum
 import com.zktony.manager.ui.screen.viewmodel.ShippingPageEnum
 import com.zktony.manager.ui.screen.viewmodel.ShippingViewModel
+import com.zktony.proto.customer
+import com.zktony.proto.instrument
 
 /**
  * @author: 刘贺贺
@@ -46,12 +46,11 @@ fun ShippingScreen(
             navigateTo = viewModel::navigateTo,
             isDualPane = isDualPane,
             softwareChange = { viewModel.setSoftware(it) },
-            searchCustomer = { viewModel.searchCustomer() },
-            searchEquipment = { viewModel.searchEquipment() },
-            searchReqChange = { viewModel.searchReqChange(it) },
-            productChange = { viewModel.productChange(it) },
-            saveShipping = { viewModel.saveShipping { navigateTo(HomePageEnum.HOME) } },
-            onBack = { navigateTo(HomePageEnum.HOME) })
+            searchCustomer = { viewModel.searchCustomer(it) },
+            searchInstrument = { viewModel.searchInstrument(it) },
+            saveShipping = { viewModel.saveShipping(it) { navigateTo(HomePageEnum.HOME) } },
+            onBack = { navigateTo(HomePageEnum.HOME) }
+        )
     }
 
     AnimatedVisibility(
@@ -61,8 +60,8 @@ fun ShippingScreen(
     ) {
         SoftwareModifyPage(
             modifier = Modifier,
-            software = uiState.software,
-            softwareChange = { viewModel.setSoftware(it) },
+            software = uiState.software!!,
+            onSave = { viewModel.setSoftware(it) },
             onBack = { viewModel.navigateTo(ShippingPageEnum.SHIPPING) })
     }
 
@@ -73,26 +72,20 @@ fun ShippingScreen(
     ) {
         CustomerModifyPage(
             modifier = Modifier,
-            customer = if (uiState.customer == null) Customer(
-                create_by = uiState.user?.name ?: ""
-            ) else uiState.customer!!,
-            isAdd = uiState.customer == null,
-            onDone = { viewModel.saveCustomer(it, uiState.customer == null) },
+            customer = uiState.customer ?: customer { },
+            onSave = { viewModel.saveCustomer(it, uiState.customer == null) },
             onBack = { viewModel.navigateTo(ShippingPageEnum.SHIPPING) })
     }
 
     AnimatedVisibility(
-        visible = uiState.page == ShippingPageEnum.EQUIPMENT_MODIFY,
+        visible = uiState.page == ShippingPageEnum.INSTRUMENT_MODIFY,
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
-        EquipmentModifyPage(
+        InstrumentModifyPage(
             modifier = Modifier,
-            equipment = if (uiState.equipment == null) Equipment(
-                create_by = uiState.user?.name ?: ""
-            ) else uiState.equipment!!,
-            isAdd = uiState.equipment == null,
-            onDone = { viewModel.saveEquipment(it, uiState.equipment == null) },
+            instrument = uiState.instrument ?: instrument { },
+            onSave = { viewModel.saveInstrument(it, uiState.instrument == null) },
             onBack = { viewModel.navigateTo(ShippingPageEnum.SHIPPING) })
     }
 

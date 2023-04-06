@@ -6,23 +6,20 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.manager.common.ext.installApk
 import com.zktony.manager.common.http.DownloadManager
 import com.zktony.manager.common.http.DownloadState
+import com.zktony.manager.data.local.dao.UserDao
 import com.zktony.manager.data.local.model.User
-import com.zktony.manager.data.remote.model.Application
-import com.zktony.manager.data.repository.ApplicationRepository
-import com.zktony.manager.data.repository.UserRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.zktony.manager.data.remote.ApplicationGrpc
+import com.zktony.proto.Application
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import java.io.File
-import javax.inject.Inject
 
-@HiltViewModel
-class SettingViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    applicationRepository: ApplicationRepository
+class SettingViewModel constructor(
+    private val dao: UserDao,
+    private val grpc: ApplicationGrpc,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SettingUiState())
     val uiState = _uiState.asStateFlow()
@@ -30,15 +27,15 @@ class SettingViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             launch {
-                userRepository.getAll().collect {
+                dao.getAll().collect {
                     if (it.isNotEmpty()) {
                         _uiState.value = _uiState.value.copy(user = it.first())
                     }
                 }
             }
             launch {
-                applicationRepository.getById().collect {
-                    _uiState.value = _uiState.value.copy(application = it.body())
+                grpc.getByApplicationId().collect {
+                    _uiState.value = _uiState.value.copy(application = it)
                 }
             }
         }
@@ -50,7 +47,7 @@ class SettingViewModel @Inject constructor(
 
     fun saveUser() {
         viewModelScope.launch {
-            userRepository.insert(_uiState.value.user)
+            dao.insert(_uiState.value.user)
         }
     }
 
@@ -66,7 +63,7 @@ class SettingViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(download = true)
             _uiState.value.application?.let { app ->
                 DownloadManager.download(
-                    url = app.download_url,
+                    url = app.downloadUrl,
                     file = File(context.getExternalFilesDir(null), "app.apk"),
                 ).flowOn(Dispatchers.IO)
                     .collect {

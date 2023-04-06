@@ -32,7 +32,7 @@ fun ShippingHistoryScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AnimatedVisibility(
-        visible = uiState.page == ShippingHistoryPageEnum.SHIPPING_HISTORY,
+        visible = uiState.page == ShippingHistoryPageEnum.ORDER_LIST,
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
@@ -42,25 +42,24 @@ fun ShippingHistoryScreen(
             navigateTo = viewModel::navigateTo,
             isDualPane = isDualPane,
             onBack = { navigateTo(HomePageEnum.HOME) },
-            onProductClick = { viewModel.productClick(it) },
-            onSearch = { viewModel.search() },
-            onQueryDtoChange = { viewModel.queryDtoChange(it) },
+            onProductClick = { viewModel.orderClick(it) },
+            onSearch = { viewModel.search(it) },
         )
 
     }
 
     AnimatedVisibility(
-        visible = (uiState.page == ShippingHistoryPageEnum.PRODUCT_DETAIL),
+        visible = (uiState.page == ShippingHistoryPageEnum.ORDER_DETAIL),
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
         ProductDetailPage(
             modifier = Modifier,
-            product = uiState.product,
+            order = uiState.order,
             software = uiState.software,
-            equipment = uiState.equipment,
+            instrument = uiState.instrument,
             customer = uiState.customer,
-            onBack = { viewModel.navigateTo(ShippingHistoryPageEnum.SHIPPING_HISTORY) }
+            onBack = { viewModel.navigateTo(ShippingHistoryPageEnum.ORDER_LIST) }
         )
     }
 

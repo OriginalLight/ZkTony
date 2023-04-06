@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
+import com.google.protobuf.gradle.*
+
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kapt)
-    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -90,7 +92,7 @@ android {
 
     }
 
-    ndkVersion = "21.4.7075529"
+    ndkVersion = "25.2.9519653"
 
     applicationVariants.all {
         outputs.all {
@@ -103,21 +105,51 @@ android {
         jvmToolchain {
             languageVersion.set(JavaLanguageVersion.of("11"))
         }
-        sourceSets {
-            debug {
-                kotlin.srcDir("build/generated/ksp/debug/kotlin")
-            }
-            release {
-                kotlin.srcDir("build/generated/ksp/release/kotlin")
-            }
-        }
     }
 
-    java {
+    compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
 
+}
+
+protobuf {
+    protoc {
+        artifact = libs.protobuf.protoc.get().toString()
+    }
+    plugins {
+        id("java") {
+            artifact = libs.grpc.gen.java.get().toString()
+        }
+        id("grpc") {
+            artifact = libs.grpc.gen.java.get().toString()
+        }
+        id("grpckt") {
+            artifact = libs.grpc.gen.kotlin.get().toString()
+        }
+    }
+
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                id("kotlin") {
+                    option("lite")
+                }
+            }
+            task.plugins {
+                id("java") {
+                    option("lite")
+                }
+                id("grpc") {
+                    option("lite")
+                }
+                id("grpckt") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }
 
 dependencies {
@@ -135,7 +167,6 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.materialWindow)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
@@ -143,8 +174,13 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.window)
-    implementation(libs.hilt.android)
     implementation(libs.huawei.hms.scanplus)
+    implementation(libs.grpc.okhttp)
+    implementation(libs.grpc.kotlin.sub)
+    implementation(libs.grpc.protobuf.lite)
+    implementation(libs.protobuf.kotlin.lite)
+    implementation(libs.koin.core)
+    implementation(libs.koin.androidx.compose)
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.okhttp3)
@@ -153,9 +189,7 @@ dependencies {
     implementation(libs.retrofit2.converter.gson)
 
 
-    kapt(libs.androidx.room.compiler)
-    kapt(libs.hilt.compiler)
-    kapt(libs.hilt.ext.compiler)
+    ksp(libs.androidx.room.compiler)
 
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

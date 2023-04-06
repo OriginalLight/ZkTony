@@ -1,8 +1,8 @@
-package com.zktony.www.data.remote.grpc
+package com.zktony.manager.data.remote
 
-import com.zktony.proto.ApplicationSearch
+import com.zktony.manager.BuildConfig
 import com.zktony.proto.ApplicationServiceGrpcKt
-import com.zktony.www.BuildConfig
+import com.zktony.proto.applicationSearch
 import io.grpc.ManagedChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
@@ -14,17 +14,15 @@ class ApplicationGrpc constructor(
     private val stub = ApplicationServiceGrpcKt.ApplicationServiceCoroutineStub(channel)
 
     suspend fun getByApplicationId(
-        applicationId: String = BuildConfig.APPLICATION_ID
     ) = flow {
         try {
-            val request = ApplicationSearch.newBuilder()
-                .setApplicationId(applicationId)
-                .build()
+            emit(stub.getByApplicationId(applicationSearch {
+                applicationId = BuildConfig.APPLICATION_ID
 
-            val response = stub.getByApplicationId(request)
-            emit(response)
+            }))
         } catch (e: Exception) {
             throw e
         }
     }.flowOn(Dispatchers.IO)
+
 }

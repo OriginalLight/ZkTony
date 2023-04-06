@@ -4,7 +4,9 @@ import com.zktony.proto.ApplicationSearch
 import com.zktony.proto.ApplicationServiceGrpcKt
 import com.zktony.www.BuildConfig
 import io.grpc.ManagedChannel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class ApplicationGrpc constructor(
     private val channel: ManagedChannel,
@@ -25,6 +27,5 @@ class ApplicationGrpc constructor(
         } catch (e: Exception) {
             throw e
         }
-
-    }
+    }.flowOn(Dispatchers.IO)
 }

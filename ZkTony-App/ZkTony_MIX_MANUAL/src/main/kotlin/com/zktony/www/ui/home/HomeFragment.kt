@@ -27,25 +27,29 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect {
-                    binding.apply {
-                        if (it.coagulant > 0) {
-                            coagulantEdit.setEqualText(it.coagulant.toString())
+                launch {
+                    viewModel.uiState.collect {
+                        binding.apply {
+                            if (it.coagulant > 0) {
+                                coagulantEdit.setEqualText(it.coagulant.toString())
+                            }
+                            if (it.colloid > 0) {
+                                colloidEdit.setEqualText(it.colloid.toString())
+                            }
+                            start.isEnabled =
+                                it.coagulant > 0 && it.colloid > 0 && it.job == null && !it.start
+                            operate.isVisible = it.job == null
+                            coagulantEdit.isEnabled = it.job == null
+                            colloidEdit.isEnabled = it.job == null
+                            coagulantHistory.isClickable = it.job == null
+                            colloidHistory.isClickable = it.job == null
+                            timeText.text = it.time.getTimeFormat()
+                            fillCoagulantImage.setBackgroundResource(if (it.fillCoagulant) com.zktony.common.R.mipmap.close else com.zktony.common.R.mipmap.right)
+                            recaptureCoagulantImage.setBackgroundResource(if (it.recaptureCoagulant) com.zktony.common.R.mipmap.close else com.zktony.common.R.mipmap.left)
+                            fillCoagulantText.text = if (it.fillCoagulant) "停止" else "填充(促凝剂)"
+                            recaptureCoagulantText.text =
+                                if (it.recaptureCoagulant) "停止" else "回吸(促凝剂)"
                         }
-                        if (it.colloid > 0) {
-                            colloidEdit.setEqualText(it.colloid.toString())
-                        }
-                        start.isEnabled = it.coagulant > 0 && it.colloid > 0 && it.job == null
-                        operate.isVisible = it.job == null
-                        coagulantEdit.isEnabled = it.job == null
-                        colloidEdit.isEnabled = it.job == null
-                        coagulantHistory.isClickable = it.job == null
-                        colloidHistory.isClickable = it.job == null
-                        timeText.text = it.time.getTimeFormat()
-                        fillCoagulantImage.setBackgroundResource(if (it.fillCoagulant) com.zktony.common.R.mipmap.close else com.zktony.common.R.mipmap.right)
-                        recaptureCoagulantImage.setBackgroundResource(if (it.recaptureCoagulant) com.zktony.common.R.mipmap.close else com.zktony.common.R.mipmap.left)
-                        fillCoagulantText.text = if (it.fillCoagulant) "停止" else "填充(促凝剂)"
-                        recaptureCoagulantText.text = if (it.recaptureCoagulant) "停止" else "回吸(促凝剂)"
                     }
                 }
             }

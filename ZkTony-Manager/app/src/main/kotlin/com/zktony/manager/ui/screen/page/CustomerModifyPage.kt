@@ -8,7 +8,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -22,8 +24,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zktony.manager.R
-import com.zktony.manager.data.remote.model.Customer
 import com.zktony.manager.ui.components.ManagerAppBar
+import com.zktony.proto.Customer
+import com.zktony.proto.customer
+import com.zktony.www.common.extension.currentTime
+import java.util.*
 
 /**
  * @author: 刘贺贺
@@ -36,8 +41,7 @@ import com.zktony.manager.ui.components.ManagerAppBar
 fun CustomerModifyPage(
     modifier: Modifier = Modifier,
     customer: Customer,
-    isAdd: Boolean,
-    onDone: (Customer) -> Unit,
+    onSave: (Customer) -> Unit,
     onBack: () -> Unit,
 ) {
     BackHandler {
@@ -47,7 +51,13 @@ fun CustomerModifyPage(
     val keyboardController = LocalSoftwareKeyboardController.current
     val localFocusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
-    var tempCustomer by remember { mutableStateOf(customer) }
+
+    val mName = remember { mutableStateOf(customer.name) }
+    val mPhone = remember { mutableStateOf(customer.phone) }
+    val mAddress = remember { mutableStateOf(customer.address) }
+    val mIndustry = remember { mutableStateOf(customer.industry) }
+    val mSource = remember { mutableStateOf(customer.source) }
+    val mRemarks = remember { mutableStateOf(customer.remarks) }
 
     Column {
         ManagerAppBar(title = stringResource(id = R.string.page_customer_title),
@@ -66,8 +76,8 @@ fun CustomerModifyPage(
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
                 label = { Text(text = "客户姓名") },
-                value = tempCustomer.name,
-                onValueChange = {  tempCustomer = tempCustomer.copy(name = it) },
+                value = mName.value,
+                onValueChange = { mName.value = it },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text, imeAction = ImeAction.Next,
                 ),
@@ -82,8 +92,8 @@ fun CustomerModifyPage(
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
                 label = { Text(text = "客户电话") },
-                value = tempCustomer.phone,
-                onValueChange = { tempCustomer = tempCustomer.copy(phone = it) },
+                value = mPhone.value,
+                onValueChange = { mPhone.value = it },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
                 ),
@@ -98,8 +108,8 @@ fun CustomerModifyPage(
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
                 label = { Text(text = "客户地址") },
-                value = tempCustomer.address,
-                onValueChange = { tempCustomer = tempCustomer.copy(address = it) },
+                value = mAddress.value,
+                onValueChange = { mAddress.value = it },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                 ),
@@ -114,8 +124,8 @@ fun CustomerModifyPage(
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
                 label = { Text(text = "信息来源") },
-                value = tempCustomer.source,
-                onValueChange = { tempCustomer = tempCustomer.copy(source = it) },
+                value = mSource.value,
+                onValueChange = { mSource.value = it },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                 ),
@@ -130,8 +140,8 @@ fun CustomerModifyPage(
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
                 label = { Text(text = "客户行业") },
-                value = tempCustomer.industry,
-                onValueChange = { tempCustomer = tempCustomer.copy(industry = it) },
+                value = mIndustry.value,
+                onValueChange = { mIndustry.value = it },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                 ),
@@ -146,15 +156,13 @@ fun CustomerModifyPage(
                     .fillMaxWidth()
                     .focusRequester(focusRequester),
                 label = { Text(text = "备注说明") },
-                value = tempCustomer.remarks,
-                onValueChange = { tempCustomer = tempCustomer.copy(remarks = it) },
+                value = mRemarks.value,
+                onValueChange = { mRemarks.value = it },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(onDone = {
                     keyboardController?.hide()
-                    onBack()
-                    onDone(tempCustomer)
                 }),
                 maxLines = 10,
                 singleLine = false,
@@ -165,9 +173,18 @@ fun CustomerModifyPage(
                 .padding(top = 16.dp),
                 onClick = {
                     onBack()
-                    onDone(tempCustomer)
+                    onSave(customer {
+                        id = customer.id
+                        name = mName.value
+                        phone = mPhone.value
+                        address = mAddress.value
+                        industry = mIndustry.value
+                        source = mSource.value
+                        remarks = mRemarks.value
+                        createTime = currentTime()
+                    })
                 }) {
-                Text(text = if (isAdd) "添加" else "修改")
+                Text(text = "添加/修改")
             }
         }
     }
@@ -180,9 +197,8 @@ fun CustomerModifyPage(
 @Composable
 fun CustomerModifyPagePreview() {
     CustomerModifyPage(
-        customer = Customer(),
-        isAdd = true,
-        onDone = {},
+        customer = customer { id = UUID.randomUUID().toString() },
+        onSave = {},
         onBack = {},
     )
 }

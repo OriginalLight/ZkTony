@@ -3,7 +3,6 @@ package com.zktony.manager.ui.screen.page
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -13,19 +12,23 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zktony.manager.R
-import com.zktony.manager.data.remote.model.Product
-import com.zktony.manager.data.remote.model.Software
 import com.zktony.manager.ui.components.*
-import com.zktony.manager.ui.screen.viewmodel.HomePageEnum
-import com.zktony.manager.ui.screen.viewmodel.SearchReq
 import com.zktony.manager.ui.screen.viewmodel.ShippingPageEnum
 import com.zktony.manager.ui.screen.viewmodel.ShippingUiState
+import com.zktony.proto.Order
+import com.zktony.proto.Software
+import com.zktony.proto.order
+import com.zktony.proto.software
+import com.zktony.www.common.extension.currentTime
+import java.util.UUID
 
 /**
  * @author: 刘贺贺
@@ -40,31 +43,54 @@ fun ShippingPage(
     navigateTo: (ShippingPageEnum) -> Unit,
     isDualPane: Boolean = false,
     softwareChange: (Software) -> Unit,
-    searchCustomer: () -> Unit,
-    searchEquipment: () -> Unit,
-    productChange: (Product) -> Unit,
-    searchReqChange: (SearchReq) -> Unit,
-    saveShipping: () -> Unit,
+    searchCustomer: (String) -> Unit,
+    searchInstrument: (String) -> Unit,
+    saveShipping: (Order) -> Unit,
     onBack: () -> Unit,
 ) {
     BackHandler {
         onBack()
     }
+    val mSoftwareId = remember { mutableStateOf("") }
+    val mCustomerReq = remember { mutableStateOf("") }
+    val mInstrumentReq = remember { mutableStateOf("") }
+    val mInstrumentNumber = remember { mutableStateOf("") }
+    val mInstrumentTime = remember { mutableStateOf("") }
+    val mAttachment = remember { mutableStateOf("") }
+    val mExpressNumber = remember { mutableStateOf("") }
+    val mExpressCompany = remember { mutableStateOf("") }
+    val mRemarks = remember { mutableStateOf("") }
+
 
     Column {
-        ManagerAppBar(title = stringResource(id = R.string.page_shipping_title),
+        ManagerAppBar(
+            title = stringResource(id = R.string.page_shipping_title),
             isFullScreen = !isDualPane,
             onBack = { onBack() },
             actions = {
                 AnimatedVisibility(
-                    visible = uiState.software.id.isNotEmpty()
-                            && uiState.customer != null
-                            && uiState.equipment != null
-                            && uiState.product.equipment_number.isNotEmpty()
-                            && uiState.product.express_number.isNotEmpty()
+                    visible = mSoftwareId.value.isNotEmpty() &&
+                            mInstrumentNumber.value.isNotEmpty() &&
+                            mExpressNumber.value.isNotEmpty() &&
+                            uiState.customer != null &&
+                            uiState.instrument != null
                 ) {
                     FilledIconButton(
-                        onClick = { saveShipping() },
+                        onClick = { saveShipping(
+                            order {
+                                id = UUID.randomUUID().toString()
+                                softwareId = mSoftwareId.value
+                                customerId = uiState.customer?.id ?: ""
+                                instrumentId = uiState.instrument?.id ?: ""
+                                instrumentNumber = mInstrumentNumber.value
+                                instrumentTime = mInstrumentTime.value
+                                attachment = mAttachment.value
+                                expressNumber = mExpressNumber.value
+                                expressCompany = mExpressCompany.value
+                                remarks = mRemarks.value
+                                createTime = currentTime()
+                            }
+                        ) },
                         modifier = Modifier.padding(8.dp),
                         colors = IconButtonDefaults.filledIconButtonColors(
                             containerColor = MaterialTheme.colorScheme.surface,
@@ -95,43 +121,51 @@ fun ShippingPage(
                 Spacer(modifier = Modifier.height(16.dp))
                 CodeTextField(
                     label = "软件编号",
-                    value = uiState.software.id,
+                    value = mSoftwareId.value,
                     onValueChange = {
+                        mSoftwareId.value = it
                         softwareChange(
-                            uiState.software.copy(
-                                id = it,
-                                create_by = if (uiState.user != null) uiState.user.name else ""
-                            )
+                            software {
+                                id = it
+                                package_ = "com.zktony.not.found"
+                                versionName = "未找到"
+                                versionCode = 0
+                                buildType = "未找到"
+                                remarks = "未找到"
+                                createTime = currentTime()
+                            }
                         )
                     },
-                    onSoftwareChange = { softwareChange(it.copy(create_by = if (uiState.user != null) uiState.user.name else "")) },
+                    onSoftwareChange = { softwareChange(it) },
                 )
-                AnimatedVisibility(visible = uiState.software.id.isNotEmpty()) {
+                AnimatedVisibility(visible = uiState.software != null) {
                     Column {
-                        Spacer(modifier = Modifier.height(16.dp))
-                        val s = uiState.software
-                        val textList = listOf(
-                            "软件编号" to s.id,
-                            "软件包名" to s.`package`,
-                            "软件版本" to s.version_name,
-                            "软件代号" to s.version_code.toString(),
-                            "构建类型" to s.build_type,
-                            "备注说明" to s.remarks.ifEmpty { "无" },
-                        )
-                        TextCard(
-                            textList = textList,
-                            onClick = { navigateTo(ShippingPageEnum.SOFTWARE_MODIFY) }
-                        )
+                        if (uiState.software != null) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            val s = uiState.software
+                            val textList = listOf(
+                                "软件编号" to s.id,
+                                "软件包名" to s.`package`,
+                                "软件版本" to s.versionName,
+                                "软件代号" to s.versionCode.toString(),
+                                "构建类型" to s.buildType,
+                                "备注说明" to s.remarks.ifEmpty { "无" },
+                            )
+                            TextCard(
+                                textList = textList,
+                                onClick = { navigateTo(ShippingPageEnum.SOFTWARE_MODIFY) }
+                            )
+                        }
                     }
                 }
             }
             item {
                 SearchTextField(
                     label = "客户姓名/手机",
-                    value = uiState.searchReq.customer,
-                    onValueChange = { searchReqChange(uiState.searchReq.copy(customer = it)) },
+                    value = mCustomerReq.value,
+                    onValueChange = { mCustomerReq.value = it },
                     icon = Icons.Outlined.Person,
-                    onSearch = { searchCustomer() },
+                    onSearch = { searchCustomer(it) },
                     onAdd = { navigateTo(ShippingPageEnum.CUSTOMER_MODIFY) }
                 )
 
@@ -160,18 +194,18 @@ fun ShippingPage(
             item {
                 SearchTextField(
                     label = "机器名称/型号",
-                    value = uiState.searchReq.equipment,
-                    onValueChange = { searchReqChange(uiState.searchReq.copy(equipment = it)) },
+                    value = mInstrumentReq.value,
+                    onValueChange = { mInstrumentReq.value = it },
                     icon = Icons.Outlined.LaptopMac,
-                    onSearch = { searchEquipment() },
-                    onAdd = { navigateTo(ShippingPageEnum.EQUIPMENT_MODIFY) }
+                    onSearch = { searchInstrument(it) },
+                    onAdd = { navigateTo(ShippingPageEnum.INSTRUMENT_MODIFY) }
                 )
 
-                AnimatedVisibility(visible = uiState.equipment != null) {
+                AnimatedVisibility(visible = uiState.instrument != null) {
                     Column {
-                        if (uiState.equipment != null) {
+                        if (uiState.instrument != null) {
                             Spacer(modifier = Modifier.height(16.dp))
-                            val e = uiState.equipment
+                            val e = uiState.instrument
                             val textList = listOf(
                                 "机器编号" to e.id,
                                 "机器名称" to e.name,
@@ -184,37 +218,36 @@ fun ShippingPage(
                             )
                             TextCard(
                                 textList = textList,
-                                onClick = { navigateTo(ShippingPageEnum.EQUIPMENT_MODIFY) }
+                                onClick = { navigateTo(ShippingPageEnum.INSTRUMENT_MODIFY) }
                             )
                         }
                     }
                 }
             }
+
             item {
                 CodeTextField(
                     label = "设备编号",
-                    value = uiState.product.equipment_number,
-                    onValueChange = {
-                        productChange(uiState.product.copy(equipment_number = it))
-                    },
+                    value = mInstrumentNumber.value,
+                    onValueChange = { mInstrumentNumber.value = it },
                     isQrCode = false,
                 )
             }
             item {
                 TimeTextField(
                     label = "生产日期",
-                    value = uiState.product.equipment_time,
-                    onValueChange = { productChange(uiState.product.copy(equipment_time = it)) }
+                    value = mInstrumentTime.value,
+                    onValueChange = { mInstrumentTime.value = it },
                 )
 
-                AnimatedVisibility(visible = uiState.equipment != null) {
+                AnimatedVisibility(visible = uiState.instrument != null) {
                     Column {
                         Spacer(modifier = Modifier.height(16.dp))
-                        if (uiState.equipment != null && uiState.equipment.attachment.isNotEmpty()) {
+                        if (uiState.instrument != null && uiState.instrument.attachment.isNotEmpty()) {
                             AttachmentCard(
-                                attachment = uiState.equipment.attachment,
-                                value = uiState.product.attachment,
-                                onValueChange = { productChange(uiState.product.copy(attachment = it)) }
+                                attachment = uiState.instrument.attachment,
+                                value = uiState.instrument.attachment,
+                                onValueChange = { mAttachment.value = it }
                             )
                         }
                     }
@@ -224,28 +257,26 @@ fun ShippingPage(
             item {
                 CodeTextField(
                     label = "快递编号",
-                    value = uiState.product.express_number,
-                    onValueChange = {
-                        productChange(uiState.product.copy(express_number = it))
-                    },
+                    value = mExpressNumber.value,
+                    onValueChange = { mExpressNumber.value = it },
                     isQrCode = false,
                 )
             }
             item {
                 CommonTextField(
                     label = "快递公司",
-                    value = uiState.product.express_company,
+                    value = mExpressCompany.value,
                     icon = Icons.Outlined.Domain,
-                    onValueChange = { productChange(uiState.product.copy(express_company = it)) }
+                    onValueChange = { mExpressCompany.value = it },
                 )
             }
             item {
                 CommonTextField(
                     label = "备注说明",
-                    value = uiState.product.remarks,
+                    value = mRemarks.value,
                     icon = Icons.Outlined.Note,
                     singleLine = false,
-                    onValueChange = { productChange(uiState.product.copy(remarks = it)) }
+                    onValueChange = { mRemarks.value = it },
                 )
             }
         }
@@ -262,9 +293,7 @@ fun ShippingPagePreview() {
         navigateTo = {},
         softwareChange = {},
         searchCustomer = {},
-        searchEquipment = {},
-        searchReqChange = {},
-        productChange = {},
+        searchInstrument = {},
         saveShipping = {},
         onBack = {},
     )

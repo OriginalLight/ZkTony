@@ -23,7 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.layout.DisplayFeature
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
@@ -33,6 +32,7 @@ import com.zktony.manager.ui.screen.viewmodel.HomePageEnum
 import com.zktony.manager.ui.screen.viewmodel.HomeUiState
 import com.zktony.manager.ui.screen.viewmodel.HomeViewModel
 import com.zktony.manager.ui.utils.ContentType
+import org.koin.androidx.compose.koinViewModel
 
 // region HomeScreen
 @Composable
@@ -84,7 +84,7 @@ fun HomeScreenSinglePane(
         exit = shrinkHorizontally()
     ) {
         ShippingScreen(
-            navigateTo = navigateTo, viewModel = hiltViewModel()
+            navigateTo = navigateTo, viewModel = koinViewModel()
         )
     }
 
@@ -94,7 +94,7 @@ fun HomeScreenSinglePane(
         exit = shrinkHorizontally()
     ) {
         ShippingHistoryScreen(
-            navigateTo = navigateTo, viewModel = hiltViewModel()
+            navigateTo = navigateTo, viewModel = koinViewModel()
         )
     }
 }
@@ -121,7 +121,7 @@ fun HomeScreenDualPane(
                 exit = shrinkHorizontally()
             ) {
                 ShippingScreen(
-                    navigateTo = navigateTo, viewModel = hiltViewModel(), isDualPane = true
+                    navigateTo = navigateTo, viewModel = koinViewModel(), isDualPane = true
                 )
             }
 
@@ -131,7 +131,7 @@ fun HomeScreenDualPane(
                 exit = shrinkHorizontally()
             ) {
                 ShippingHistoryScreen(
-                    navigateTo = navigateTo, viewModel = hiltViewModel(), isDualPane = true
+                    navigateTo = navigateTo, viewModel = koinViewModel(), isDualPane = true
                 )
             }
         },

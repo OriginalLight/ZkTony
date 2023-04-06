@@ -2,115 +2,100 @@ package com.zktony.manager.ui.screen.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.manager.data.remote.model.*
-import com.zktony.manager.data.repository.*
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.zktony.manager.common.ext.showShortToast
+import com.zktony.manager.data.remote.CustomerGrpc
+import com.zktony.manager.data.remote.InstrumentGrpc
+import com.zktony.manager.data.remote.OrderGrpc
+import com.zktony.manager.data.remote.SoftwareGrpc
+import com.zktony.proto.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-@HiltViewModel
-class ShippingHistoryViewModel @Inject constructor(
-    private val productRepository: ProductRepository,
-    private val softwareRepository: SoftwareRepository,
-    private val equipmentRepository: EquipmentRepository,
-    private val customerRepository: CustomerRepository
+class ShippingHistoryViewModel constructor(
+    private val orderGrpc: OrderGrpc,
+    private val softwareGrpc: SoftwareGrpc,
+    private val customerGrpc: CustomerGrpc,
+    private val instrumentGrpc: InstrumentGrpc,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ShippingHistoryUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
-            productRepository.search(_uiState.value.queryDTO)
-                .flowOn(Dispatchers.IO)
-                .catch { _uiState.value = _uiState.value.copy(error = it.message ?: "") }
+            orderGrpc.getOrderPage(orderRequestPage {
+                page = 1
+                pageSize = 40
+            }).flowOn(Dispatchers.IO)
+                .catch { it.message.toString().showShortToast() }
                 .collect {
-                    val data = it.body()
-                    if (data != null) {
-                        _uiState.value = _uiState.value.copy(productList = data)
-                    } else {
-                        _uiState.value = _uiState.value.copy(productList = emptyList())
-                    }
+                    _uiState.value = _uiState.value.copy(orderList = it.listList)
                 }
         }
     }
 
     fun navigateTo(page: ShippingHistoryPageEnum) {
-        _uiState.value = _uiState.value.copy(page = page)
+        _uiState.value = _uiState.value.copy(
+            page = page,
+        )
+        if (page == ShippingHistoryPageEnum.ORDER_LIST) {
+            _uiState.value = _uiState.value.copy(
+                order = null,
+                software = null,
+                instrument = null,
+                customer = null,
+            )
+        }
     }
 
-    fun search() {
+    fun search(search: OrderSearch) {
         viewModelScope.launch {
-            productRepository.search(_uiState.value.queryDTO)
-                .flowOn(Dispatchers.IO)
-                .catch { _uiState.value = _uiState.value.copy(error = it.message ?: "") }
+            orderGrpc.searchOrder(search).flowOn(Dispatchers.IO)
+                .catch {
+                    "查询失败".showShortToast()
+                }
                 .collect {
-                    it.body()?.let { productList ->
-                        _uiState.value = _uiState.value.copy(productList = productList)
-                    }
+                    _uiState.value = _uiState.value.copy(orderList = it.listList)
                 }
         }
     }
 
-    fun queryDtoChange(queryDTO: ProductQueryDTO) {
-        _uiState.value = _uiState.value.copy(queryDTO = queryDTO)
-    }
-
-    fun productClick(product: Product) {
-        loadInfo(product)
+    fun orderClick(order: Order) {
+        loadInfo(order)
         _uiState.value = _uiState.value.copy(
-            product = product,
-            page = ShippingHistoryPageEnum.PRODUCT_DETAIL
+            order = order,
+            page = ShippingHistoryPageEnum.ORDER_DETAIL
         )
     }
 
-    private fun loadInfo(product: Product) {
+    private fun loadInfo(order: Order) {
         viewModelScope.launch {
             launch {
-                softwareRepository.search(SoftwareQueryDTO(id = product.software_id))
-                    .flowOn(Dispatchers.IO)
-                    .catch { _uiState.value = _uiState.value.copy(error = it.message ?: "") }
+                softwareGrpc.getById(order.softwareId).flowOn(Dispatchers.IO)
+                    .catch { "查询软件信息失败".showShortToast() }
                     .collect {
-                        val data = it.body()
-                        if (data != null) {
-                            _uiState.value = _uiState.value.copy(software = data[0])
-                        } else {
-                            _uiState.value = _uiState.value.copy(software = null)
-                        }
+                        _uiState.value = _uiState.value.copy(software = it)
                     }
             }
             launch {
-                equipmentRepository.search(EquipmentQueryDTO(id = product.equipment_id))
-                    .flowOn(Dispatchers.IO)
-                    .catch { _uiState.value = _uiState.value.copy(error = it.message ?: "") }
+                instrumentGrpc.getById(order.instrumentId).flowOn(Dispatchers.IO)
+                    .catch { "查询仪器信息失败".showShortToast() }
                     .collect {
-                        val data = it.body()
-                        if (data != null) {
-                            _uiState.value = _uiState.value.copy(equipment = data[0])
-                        } else {
-                            _uiState.value = _uiState.value.copy(equipment = null)
-                        }
+                        _uiState.value = _uiState.value.copy(instrument = it)
                     }
             }
             launch {
-                customerRepository.search(CustomerQueryDTO(id = product.customer_id))
-                    .flowOn(Dispatchers.IO)
-                    .catch { _uiState.value = _uiState.value.copy(error = it.message ?: "") }
+                customerGrpc.getById(order.customerId).flowOn(Dispatchers.IO)
+                    .catch { "查询客户信息失败".showShortToast() }
                     .collect {
-                        val data = it.body()
-                        if (data != null) {
-                            _uiState.value = _uiState.value.copy(customer = data[0])
-                        } else {
-                            _uiState.value = _uiState.value.copy(customer = null)
-                        }
+                        _uiState.value = _uiState.value.copy(customer = it)
                     }
             }
         }
@@ -118,18 +103,17 @@ class ShippingHistoryViewModel @Inject constructor(
 }
 
 data class ShippingHistoryUiState(
-    val productList: List<Product> = emptyList(),
-    val product: Product? = null,
+    val orderList: List<Order> = emptyList(),
+    val order: Order? = null,
     val software: Software? = null,
-    val equipment: Equipment? = null,
+    val instrument: Instrument? = null,
     val customer: Customer? = null,
     val loading: Boolean = false,
     val error: String = "",
-    val page: ShippingHistoryPageEnum = ShippingHistoryPageEnum.SHIPPING_HISTORY,
-    val queryDTO: ProductQueryDTO = ProductQueryDTO(),
+    val page: ShippingHistoryPageEnum = ShippingHistoryPageEnum.ORDER_LIST,
 )
 
 enum class ShippingHistoryPageEnum {
-    SHIPPING_HISTORY,
-    PRODUCT_DETAIL,
+    ORDER_LIST,
+    ORDER_DETAIL,
 }

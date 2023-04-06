@@ -212,22 +212,22 @@ enum class Recommended(
     val count: Int
 ) {
     // 完整
-    WHOLE_BLOCKING_LIQUID(0, 0, 1f, 35f, 5000, 1),
-    WHOLE_ANTIBODY_ONE(1, 0, 12f, 5f, 5000, 1),
-    WHOLE_ANTIBODY_TWO(2, 0, 1f, 35f, 5000, 1),
-    WHOLE_WASHING(3, 0, 5f, 35f, 5000, 3),
+    WHOLE_BLOCKING_LIQUID(0, 0, 1f, 35f, 10000, 1),
+    WHOLE_ANTIBODY_ONE(1, 0, 12f, 5f, 8500, 1),
+    WHOLE_ANTIBODY_TWO(2, 0, 1f, 35f, 10000, 1),
+    WHOLE_WASHING(3, 0, 5f, 35f, 13000, 3),
 
     // 半个
-    HALF_BLOCKING_LIQUID(0, 1, 1f, 35f, 2500, 1),
-    HALF_ANTIBODY_ONE(1, 1, 12f, 5f, 2500, 1),
-    HALF_ANTIBODY_TWO(2, 1, 1f, 35f, 2500, 1),
-    HALF_WASHING(3, 1, 5f, 35f, 2500, 3),
+    HALF_BLOCKING_LIQUID(0, 1, 1f, 35f, 8000, 1),
+    HALF_ANTIBODY_ONE(1, 1, 12f, 5f, 6000, 1),
+    HALF_ANTIBODY_TWO(2, 1, 1f, 35f, 8000, 1),
+    HALF_WASHING(3, 1, 5f, 35f, 10000, 3),
 
     // 四分之一盒
-    QUARTER_BLOCKING_LIQUID(0, 2, 1f, 35f, 1200, 1),
-    QUARTER_ANTIBODY_ONE(1, 2, 12f, 5f, 1200, 1),
-    QUARTER_ANTIBODY_TWO(2, 2, 1f, 35f, 1200, 1),
-    QUARTER_WASHING(3, 2, 5f, 35f, 1200, 3),
+    QUARTER_BLOCKING_LIQUID(0, 2, 1f, 35f, 4000, 1),
+    QUARTER_ANTIBODY_ONE(1, 2, 12f, 5f, 3000, 1),
+    QUARTER_ANTIBODY_TWO(2, 2, 1f, 35f, 4000, 1),
+    QUARTER_WASHING(3, 2, 5f, 35f, 5000, 3),
 }
 
 enum class Box(val index: Int, val value: String) {

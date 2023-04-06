@@ -19,14 +19,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zktony.manager.R
-import com.zktony.manager.data.remote.model.Product
-import com.zktony.manager.data.remote.model.ProductQueryDTO
 import com.zktony.manager.ui.components.CodeTextField
 import com.zktony.manager.ui.components.ManagerAppBar
 import com.zktony.manager.ui.components.ProductCard
 import com.zktony.manager.ui.components.TimeTextField
 import com.zktony.manager.ui.screen.viewmodel.ShippingHistoryPageEnum
 import com.zktony.manager.ui.screen.viewmodel.ShippingHistoryUiState
+import com.zktony.proto.Order
+import com.zktony.proto.OrderSearch
+import com.zktony.proto.orderSearch
 
 /**
  * @author: 刘贺贺
@@ -40,9 +41,8 @@ fun ShippingHistoryPage(
     uiState: ShippingHistoryUiState,
     navigateTo: (ShippingHistoryPageEnum) -> Unit,
     isDualPane: Boolean = false,
-    onSearch: () -> Unit = {},
-    onProductClick: (Product) -> Unit = {},
-    onQueryDtoChange: (ProductQueryDTO) -> Unit = {},
+    onSearch: (OrderSearch) -> Unit = {},
+    onProductClick: (Order) -> Unit = {},
     onBack: () -> Unit,
 ) {
     BackHandler {
@@ -74,13 +74,13 @@ fun ShippingHistoryPage(
 
         // 搜索栏
         AnimatedVisibility(visible = isSearchExpanded.value) {
-            ProductSearchBar(modifier = Modifier,
+            ProductSearchBar(
+                modifier = Modifier,
                 onSearch = {
-                    onSearch()
+                    onSearch(it)
                     isSearchExpanded.value = !isSearchExpanded.value
                 },
-                queryDTO = uiState.queryDTO,
-                onValueChange = { onQueryDtoChange(it) })
+            )
         }
 
         // 列表状态
@@ -92,10 +92,10 @@ fun ShippingHistoryPage(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             state = listState,
             content = {
-                uiState.productList.forEach {
+                uiState.orderList.forEach {
                     item {
                         ProductCard(modifier = Modifier,
-                            product = it,
+                            order = it,
                             onClick = { onProductClick(it) })
                     }
                 }
@@ -109,10 +109,14 @@ fun ShippingHistoryPage(
 @Composable
 fun ProductSearchBar(
     modifier: Modifier = Modifier,
-    onSearch: () -> Unit,
-    queryDTO: ProductQueryDTO,
-    onValueChange: (ProductQueryDTO) -> Unit,
+    onSearch: (OrderSearch) -> Unit,
 ) {
+
+    val mSoftWareId = remember { mutableStateOf("") }
+    val mInstrumentId = remember { mutableStateOf("") }
+    val mExpressNumber = remember { mutableStateOf("") }
+    val mTime = remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -120,21 +124,21 @@ fun ProductSearchBar(
     ) {
         CodeTextField(
             label = "软件编号",
-            value = queryDTO.software_id,
+            value = mSoftWareId.value,
             onValueChange = {
-                onValueChange(queryDTO.copy(software_id = it))
+                mSoftWareId.value = it
             },
             onSoftwareChange = {
-                onValueChange(queryDTO.copy(software_id = it.id))
+                mSoftWareId.value = it.id
             },
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         CodeTextField(
             label = "设备编号",
-            value = queryDTO.equipment_number,
+            value = mInstrumentId.value,
             onValueChange = {
-                onValueChange(queryDTO.copy(equipment_number = it))
+                mInstrumentId.value = it
             },
             isQrCode = false,
         )
@@ -143,9 +147,9 @@ fun ProductSearchBar(
 
         CodeTextField(
             label = "快递编号",
-            value = queryDTO.express_number,
+            value = mExpressNumber.value,
             onValueChange = {
-                onValueChange(queryDTO.copy(express_number = it))
+                mExpressNumber.value = it
             },
             isQrCode = false,
         )
@@ -154,9 +158,9 @@ fun ProductSearchBar(
 
         TimeTextField(
             label = "生产日期",
-            value = queryDTO.begin_time,
+            value = mTime.value,
             onValueChange = {
-                onValueChange(queryDTO.copy(begin_time = it, end_time = it))
+                mTime.value = it
             })
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -166,7 +170,17 @@ fun ProductSearchBar(
         ) {
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = { onSearch() },
+                onClick = {
+                    onSearch(
+                        orderSearch {
+                            softwareId = mSoftWareId.value
+                            instrumentId = mInstrumentId.value
+                            expressNumber = mExpressNumber.value
+                            beginTime = mTime.value
+                            endTime = mTime.value
+                        }
+                    )
+                },
             ) {
                 Row {
                     Icon(
@@ -179,7 +193,12 @@ fun ProductSearchBar(
             }
             Button(
                 modifier = Modifier.weight(1f),
-                onClick = { onValueChange(ProductQueryDTO()) },
+                onClick = {
+                    mSoftWareId.value = ""
+                    mInstrumentId.value = ""
+                    mExpressNumber.value = ""
+                    mTime.value = ""
+                },
             ) {
                 Row {
                     Icon(
@@ -206,8 +225,6 @@ fun ShippingHistoryPagePreview() {
 @Composable
 fun ProductSearchBarPreview() {
     ProductSearchBar(
-        queryDTO = ProductQueryDTO(),
-        onValueChange = {},
         onSearch = {},
     )
 }

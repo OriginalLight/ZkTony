@@ -26,22 +26,24 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zktony.manager.R
-import com.zktony.manager.data.remote.model.Equipment
 import com.zktony.manager.ui.components.ManagerAppBar
+import com.zktony.proto.Instrument
+import com.zktony.proto.instrument
+import com.zktony.www.common.extension.currentTime
+import java.util.*
 
 /**
  * @author: 刘贺贺
  * @date: 2023-02-23 13:15
  */
 
-// region EquipmentModifyPage
+// region InstrumentModifyPage
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun EquipmentModifyPage(
+fun InstrumentModifyPage(
     modifier: Modifier = Modifier,
-    equipment: Equipment,
-    isAdd: Boolean,
-    onDone: (Equipment) -> Unit,
+    instrument: Instrument,
+    onSave: (Instrument) -> Unit,
     onBack: () -> Unit,
 ) {
     BackHandler {
@@ -51,7 +53,14 @@ fun EquipmentModifyPage(
     val keyboardController = LocalSoftwareKeyboardController.current
     val localFocusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
-    var temp by remember { mutableStateOf(equipment) }
+
+    val mName = remember { mutableStateOf(instrument.name) }
+    val mModel = remember { mutableStateOf(instrument.model) }
+    val mVoltage = remember { mutableStateOf(instrument.voltage) }
+    val mPower = remember { mutableStateOf(instrument.power) }
+    val mFrequency = remember { mutableStateOf(instrument.frequency) }
+    val mAttachment = remember { mutableStateOf(instrument.attachment) }
+    val mRemarks = remember { mutableStateOf(instrument.remarks) }
 
     Column {
         ManagerAppBar(title = stringResource(id = R.string.page_customer_title),
@@ -75,8 +84,8 @@ fun EquipmentModifyPage(
                                 .fillMaxWidth()
                                 .focusRequester(focusRequester),
                             label = { Text(text = "设备名称") },
-                            value = temp.name,
-                            onValueChange = { temp = temp.copy(name = it) },
+                            value = mName.value,
+                            onValueChange = { mName.value = it },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Text, imeAction = ImeAction.Next,
                             ),
@@ -93,8 +102,8 @@ fun EquipmentModifyPage(
                                 .fillMaxWidth()
                                 .focusRequester(focusRequester),
                             label = { Text(text = "设备型号") },
-                            value = temp.model,
-                            onValueChange = { temp = temp.copy(model = it) },
+                            value = mModel.value,
+                            onValueChange = { mModel.value = it },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
                             ),
@@ -111,8 +120,8 @@ fun EquipmentModifyPage(
                                 .fillMaxWidth()
                                 .focusRequester(focusRequester),
                             label = { Text(text = "设备电压") },
-                            value = temp.voltage,
-                            onValueChange = { temp = temp.copy(voltage = it) },
+                            value = mVoltage.value,
+                            onValueChange = { mVoltage.value = it },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                             ),
@@ -129,8 +138,8 @@ fun EquipmentModifyPage(
                                 .fillMaxWidth()
                                 .focusRequester(focusRequester),
                             label = { Text(text = "设备功率") },
-                            value = temp.power,
-                            onValueChange = { temp = temp.copy(power = it) },
+                            value = mPower.value,
+                            onValueChange = { mPower.value = it },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                             ),
@@ -147,8 +156,8 @@ fun EquipmentModifyPage(
                                 .fillMaxWidth()
                                 .focusRequester(focusRequester),
                             label = { Text(text = "设备频率") },
-                            value = temp.frequency,
-                            onValueChange = { temp = temp.copy(frequency = it) },
+                            value = mFrequency.value,
+                            onValueChange = { mFrequency.value = it },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
                             ),
@@ -172,8 +181,7 @@ fun EquipmentModifyPage(
                                 IconButton(
                                     onClick = {
                                         if (attachment.isNotEmpty()) {
-                                            temp =
-                                                temp.copy(attachment = temp.attachment + attachment + " ")
+                                            mAttachment.value = mAttachment.value + attachment + " "
                                             attachment = ""
                                         }
                                     }
@@ -193,9 +201,9 @@ fun EquipmentModifyPage(
                             maxLines = 1,
                             singleLine = true,
                         )
-                        AnimatedVisibility(visible = temp.attachment.isNotEmpty()) {
+                        AnimatedVisibility(visible = mAttachment.value.isNotEmpty()) {
                             Column {
-                                val list = temp.attachment.split(" ").map { it.trim() }
+                                val list = mAttachment.value.split(" ").map { it.trim() }
                                 list.forEachIndexed { index, it ->
                                     if (it.isNotEmpty()) {
                                         Row(
@@ -220,11 +228,9 @@ fun EquipmentModifyPage(
                                                 modifier = Modifier
                                                     .padding(end = 16.dp),
                                                 onClick = {
-                                                    temp = temp.copy(
-                                                        attachment = temp.attachment.replace(
-                                                            "$it ",
-                                                            ""
-                                                        )
+                                                    mAttachment.value = mAttachment.value.replace(
+                                                        "$it ",
+                                                        ""
                                                     )
                                                 }
                                             ) {
@@ -245,15 +251,13 @@ fun EquipmentModifyPage(
                                 .fillMaxWidth()
                                 .focusRequester(focusRequester),
                             label = { Text(text = "备注说明") },
-                            value = temp.remarks,
-                            onValueChange = { temp = temp.copy(remarks = it) },
+                            value = mRemarks.value,
+                            onValueChange = { mRemarks.value = it },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
                             ),
                             keyboardActions = KeyboardActions(onDone = {
                                 keyboardController?.hide()
-                                onBack()
-                                onDone(temp)
                             }),
                             maxLines = 10,
                             singleLine = false,
@@ -265,10 +269,21 @@ fun EquipmentModifyPage(
                             .fillMaxWidth()
                             .padding(top = 16.dp),
                             onClick = {
-                                onBack()
-                                onDone(temp)
+                                onSave(
+                                    instrument {
+                                        id = instrument.id
+                                        name = mName.value
+                                        model = mModel.value
+                                        voltage = mVoltage.value
+                                        power = mPower.value
+                                        frequency = mFrequency.value
+                                        attachment = mAttachment.value
+                                        remarks = mRemarks.value
+                                        createTime = currentTime()
+                                    }
+                                )
                             }) {
-                            Text(text = if (isAdd) "添加" else "修改")
+                            Text(text = "添加/修改")
                         }
                     }
                 }
@@ -282,11 +297,10 @@ fun EquipmentModifyPage(
 
 @Preview
 @Composable
-fun EquipmentModifyPagePreview() {
-    EquipmentModifyPage(
-        equipment = Equipment(),
-        isAdd = true,
-        onDone = {},
+fun InstrumentModifyPagePreview() {
+    InstrumentModifyPage(
+        instrument = instrument { id = UUID.randomUUID().toString() },
+        onSave = {},
         onBack = {},
     )
 }
