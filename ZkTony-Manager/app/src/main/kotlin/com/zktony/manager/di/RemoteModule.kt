@@ -2,7 +2,7 @@ package com.zktony.manager.di
 
 import com.zktony.manager.R
 import com.zktony.manager.common.ext.Ext
-import com.zktony.manager.data.remote.*
+import com.zktony.manager.data.remote.grpc.*
 import io.grpc.TlsChannelCredentials
 import io.grpc.okhttp.OkHttpChannelBuilder
 import org.koin.core.qualifier.named

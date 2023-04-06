@@ -5,10 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.manager.common.ext.showShortToast
 import com.zktony.manager.data.local.dao.UserDao
 import com.zktony.manager.data.local.model.User
-import com.zktony.manager.data.remote.CustomerGrpc
-import com.zktony.manager.data.remote.InstrumentGrpc
-import com.zktony.manager.data.remote.OrderGrpc
-import com.zktony.manager.data.remote.SoftwareGrpc
+import com.zktony.manager.data.remote.grpc.CustomerGrpc
+import com.zktony.manager.data.remote.grpc.InstrumentGrpc
+import com.zktony.manager.data.remote.grpc.OrderGrpc
+import com.zktony.manager.data.remote.grpc.SoftwareGrpc
 import com.zktony.proto.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

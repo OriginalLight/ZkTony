@@ -1,0 +1,15 @@
+[package]
+name = "zktony-manager"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[workspace]
+members = [".", "api", "core", "entity"]
+
+[dependencies]
+manager-api = { path = "api" }
+tonic = { version = "0.9", features = ["transport"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }

@@ -44,3 +44,7 @@
 -keep class com.huawei.**{*;}
 
 -keepclasseswithmembers class com.zktony.manager.data.remote.model.** {*;}
+
+-keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite* {
+   <fields>;
+}

@@ -8,7 +8,7 @@ import com.zktony.manager.common.http.DownloadManager
 import com.zktony.manager.common.http.DownloadState
 import com.zktony.manager.data.local.dao.UserDao
 import com.zktony.manager.data.local.model.User
-import com.zktony.manager.data.remote.ApplicationGrpc
+import com.zktony.manager.data.remote.grpc.ApplicationGrpc
 import com.zktony.proto.Application
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

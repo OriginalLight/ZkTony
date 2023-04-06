@@ -32,8 +32,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
+import com.zktony.manager.data.remote.model.QrCode
 import com.zktony.manager.ui.QrCodeActivity
 import com.zktony.proto.Software
+import com.zktony.proto.software
+import com.zktony.www.common.extension.currentTime
 import java.util.*
 
 /**
@@ -65,9 +68,16 @@ fun CodeTextField(
                 // result 是json字符串解析成software对象
                 if (isQrCode) {
                     try {
-                        val software = Gson().fromJson(result, Software::class.java)
+                        val qrCode = Gson().fromJson(result, QrCode::class.java)
                         isError = false
-                        onSoftwareChange(software)
+                        onSoftwareChange(software {
+                            id = qrCode.id
+                            package_ = qrCode.`package`
+                            versionCode = qrCode.version_code
+                            versionName = qrCode.version_name
+                            buildType = qrCode.build_type
+                            createTime = currentTime()
+                        })
                     } catch (e: Exception) {
                         isError = true
                         Toast.makeText(context, "二维码格式错误", Toast.LENGTH_SHORT).show()

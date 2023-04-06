@@ -18,7 +18,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ZkTony-App"
+rootProject.name = "App"
 include(":ZkTony_FY")
 include(":ZkTony_LIQUID_FOUR")
 include(":ZkTony_TEST")
