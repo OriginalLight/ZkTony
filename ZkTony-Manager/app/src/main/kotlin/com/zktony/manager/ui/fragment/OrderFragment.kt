@@ -98,7 +98,10 @@ fun OrderFragment(
                             viewModel.setSoftware(null)
                         }
                     },
-                    onSoftwareChange = { viewModel.setSoftware(it) },
+                    onSoftwareChange = {
+                        mSoftwareId.value = it.id
+                        viewModel.setSoftware(it)
+                    },
                 )
             }
             if (uiState.software != null) {
@@ -227,11 +230,8 @@ fun OrderFragment(
             }
             item {
                 AnimatedVisibility(
-                    visible = mSoftwareId.value.isNotEmpty() &&
-                            mInstrumentNumber.value.isNotEmpty() &&
-                            mExpressNumber.value.isNotEmpty() &&
-                            uiState.customer != null &&
-                            uiState.instrument != null
+                    visible = mInstrumentNumber.value.isNotEmpty() &&
+                            mExpressNumber.value.isNotEmpty()
                 ) {
                     Button(
                         modifier = Modifier

@@ -24,7 +24,7 @@
     <string name="models">模式</string>
     <string name="motor">泵速（0 ~ 250）RPM</string>
     <string name="navigation">导航栏</string>
-    <string name="notice_content">1. 请确认模块已经完全插入并正确识别后开始实验。\n2. 请确保管路正确安装后开始实验。\n3. 请勿在实验进行中插拔模块。\n4. 请在实验完成后清洗管路。\n5. 请在阅读使用说明后使用。</string>
+    <string name="notice_content">1. 请确认模块已经完全插入并正确识别后开始实验。\n2. 请确保管路正确安装后开始实验。\n3. 请勿在实验进行中插拔模块。\n4. 请在实验完成后清洗管路。\n5. 请不要长时间连续工作，避免模块过热形变。\n6. 请在阅读使用说明后使用。</string>
     <string name="off">OFF</string>
     <string name="order">序号</string>
     <string name="other">其他</string>
