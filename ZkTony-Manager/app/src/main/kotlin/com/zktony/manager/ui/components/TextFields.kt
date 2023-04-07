@@ -3,20 +3,23 @@ package com.zktony.manager.ui.components
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.absoluteOffset
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.Key
+import androidx.compose.material.icons.outlined.QrCode
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -99,6 +102,7 @@ fun CodeTextField(
                         Color.Cyan.copy(alpha = 0.2f),
                     )
                 ),
+                shape = RoundedCornerShape(4.dp)
             )
             .focusRequester(focusRequester),
         value = value,
@@ -115,23 +119,26 @@ fun CodeTextField(
             )
         },
         trailingIcon = {
-            Icon(
+            IconButton(
                 modifier = Modifier
-                    .size(32.dp)
-                    .absoluteOffset(x = (-8).dp)
-                    .clickable {
-                        qrCodeScanner.launch(
-                            Intent(
-                                context, QrCodeActivity::class.java
-                            )
+                    .absoluteOffset(x = (-8).dp),
+                onClick = {
+                    qrCodeScanner.launch(
+                        Intent(
+                            context, QrCodeActivity::class.java
                         )
-                    },
-                imageVector = Icons.Outlined.QrCode,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
+                    )
+                }) {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    imageVector = Icons.Outlined.QrCode,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
         },
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(4.dp),
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
@@ -146,94 +153,6 @@ fun CodeTextField(
         ),
         keyboardActions = KeyboardActions(
             onDone = {
-                keyboardController?.hide()
-                localFocusManager.clearFocus()
-            }),
-        visualTransformation = VisualTransformation.None,
-    )
-}
-
-// endregion
-
-// region SearchTextField
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
-@Composable
-fun SearchTextField(
-    modifier: Modifier = Modifier,
-    label: String,
-    value: String,
-    icon: ImageVector,
-    onValueChange: (String) -> Unit,
-    onSearch: (String) -> Unit,
-) {
-
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val localFocusManager = LocalFocusManager.current
-    val focusRequester = remember { FocusRequester() }
-    var isError by remember { mutableStateOf(false) }
-
-    TextField(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color.Blue.copy(alpha = 0.2f),
-                        Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.2f),
-                    )
-                ),
-            )
-            .focusRequester(focusRequester),
-        isError = isError,
-        value = value,
-        label = { Text(text = label) },
-        onValueChange = {
-            isError = false
-            onValueChange(it)
-        },
-        leadingIcon = {
-            Icon(
-                modifier = Modifier.size(16.dp),
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.outline
-            )
-        },
-        trailingIcon = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clickable {
-                            onSearch(value)
-                            keyboardController?.hide()
-                            localFocusManager.clearFocus()
-                        },
-                    imageVector = Icons.Outlined.Search,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-            }
-        },
-        shape = RoundedCornerShape(8.dp),
-        colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            containerColor = Color.Transparent,
-        ),
-        textStyle = MaterialTheme.typography.bodyMedium,
-        maxLines = 1,
-        singleLine = true,
-        keyboardOptions = KeyboardOptions.Default.copy(
-            imeAction = ImeAction.Search,
-            keyboardType = KeyboardType.Text
-        ),
-        keyboardActions = KeyboardActions(
-            onSearch = {
                 keyboardController?.hide()
                 localFocusManager.clearFocus()
             }),
@@ -272,6 +191,7 @@ fun CommonTextField(
                         Color.Cyan.copy(alpha = 0.2f),
                     )
                 ),
+                shape = RoundedCornerShape(4.dp)
             )
             .focusRequester(focusRequester),
         value = value,
@@ -287,7 +207,7 @@ fun CommonTextField(
                 tint = MaterialTheme.colorScheme.outline
             )
         },
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(4.dp),
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
@@ -356,6 +276,7 @@ fun TimeTextField(
                         Color.Cyan.copy(alpha = 0.2f),
                     )
                 ),
+                shape = RoundedCornerShape(4.dp)
             )
             .focusRequester(focusRequester),
         value = value,
@@ -372,19 +293,20 @@ fun TimeTextField(
             )
         },
         trailingIcon = {
-            Icon(
+            IconButton(
                 modifier = Modifier
-                    .size(32.dp)
-                    .absoluteOffset(x = (-8).dp)
-                    .clickable {
-                        datePickerDialog.show()
-                    },
-                imageVector = Icons.Outlined.CalendarToday,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
+                    .absoluteOffset(x = (-8).dp),
+                onClick = { datePickerDialog.show() }
+            ) {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    imageVector = Icons.Outlined.CalendarToday,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         },
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(4.dp),
         colors = TextFieldDefaults.textFieldColors(
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,

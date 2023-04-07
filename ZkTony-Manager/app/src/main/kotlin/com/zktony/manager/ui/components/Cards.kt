@@ -33,40 +33,41 @@ fun FeatureCard(
     Card(
         modifier = modifier
             .fillMaxSize()
-            .clickable { onClick() }
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color.Blue.copy(alpha = 0.2f),
-                        Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.2f),
+            .clickable { onClick() },
+        shape = RoundedCornerShape(4.dp),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            Color.Blue.copy(alpha = 0.2f),
+                            Color.Blue.copy(alpha = 0.1f),
+                            Color.Cyan.copy(alpha = 0.2f),
+                        )
                     )
                 )
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent,
-        ),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            Icon(
+            Column(
                 modifier = Modifier
-                    .size(48.dp)
-                    .padding(top = 8.dp),
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                modifier = Modifier.padding(bottom = 8.dp),
-                text = title,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.primary
-            )
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(top = 8.dp),
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    text = title,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
         }
     }
 }
@@ -82,34 +83,35 @@ fun IconCard(
     Card(
         modifier = modifier
             .fillMaxSize()
-            .clickable { onClick() }
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color.Blue.copy(alpha = 0.2f),
-                        Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.2f),
+            .clickable { onClick() },
+        shape = RoundedCornerShape(4.dp),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            Color.Blue.copy(alpha = 0.2f),
+                            Color.Blue.copy(alpha = 0.1f),
+                            Color.Cyan.copy(alpha = 0.2f),
+                        )
                     )
                 )
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent,
-        ),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            Icon(
+            Column(
                 modifier = Modifier
-                    .size(64.dp)
-                    .padding(top = 8.dp),
-                imageVector = icon,
-                contentDescription = null,
-                tint = color
-            )
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Icon(
+                    modifier = Modifier
+                        .size(48.dp),
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = color
+                )
+            }
         }
     }
 }
@@ -124,39 +126,41 @@ fun OrderCard(
     Card(
         modifier = modifier
             .fillMaxSize()
-            .clickable { onClick() }
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color.Blue.copy(alpha = 0.2f),
-                        Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.2f),
+            .clickable { onClick() },
+        shape = RoundedCornerShape(4.dp),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            Color.Blue.copy(alpha = 0.2f),
+                            Color.Blue.copy(alpha = 0.1f),
+                            Color.Cyan.copy(alpha = 0.2f),
+                        )
                     )
                 )
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent,
-        ),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = order.instrumentNumber,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = order.softwareId,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = order.createTime,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = order.instrumentNumber,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = order.softwareId,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = order.createTime,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
@@ -171,39 +175,41 @@ fun CustomerCard(
     Card(
         modifier = modifier
             .fillMaxSize()
-            .clickable { onClick() }
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color.Blue.copy(alpha = 0.2f),
-                        Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.2f),
+            .clickable { onClick() },
+        shape = RoundedCornerShape(4.dp),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            Color.Blue.copy(alpha = 0.2f),
+                            Color.Blue.copy(alpha = 0.1f),
+                            Color.Cyan.copy(alpha = 0.2f),
+                        )
                     )
                 )
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent,
-        ),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = customer.name,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = customer.phone,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = customer.address,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = customer.name,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = customer.phone,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = customer.address,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
@@ -218,35 +224,37 @@ fun InstrumentCard(
     Card(
         modifier = modifier
             .fillMaxSize()
-            .clickable { onClick() }
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color.Blue.copy(alpha = 0.2f),
-                        Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.2f),
+            .clickable { onClick() },
+        shape = RoundedCornerShape(4.dp),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            Color.Blue.copy(alpha = 0.2f),
+                            Color.Blue.copy(alpha = 0.1f),
+                            Color.Cyan.copy(alpha = 0.2f),
+                        )
                     )
                 )
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent,
-        ),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = instrument.name,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = instrument.model,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = instrument.name,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = instrument.model,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
@@ -261,39 +269,41 @@ fun SoftwareCard(
     Card(
         modifier = modifier
             .fillMaxSize()
-            .clickable { onClick() }
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color.Blue.copy(alpha = 0.2f),
-                        Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.2f),
+            .clickable { onClick() },
+        shape = RoundedCornerShape(4.dp),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            Color.Blue.copy(alpha = 0.2f),
+                            Color.Blue.copy(alpha = 0.1f),
+                            Color.Cyan.copy(alpha = 0.2f),
+                        )
                     )
                 )
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent,
-        ),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = software.id,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = software.`package`,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = software.createTime,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = software.id,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = software.`package`,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = software.createTime,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
@@ -310,39 +320,41 @@ fun TextCard(
     Card(
         modifier = modifier
             .fillMaxSize()
-            .clickable { onClick() }
-            .background(
-                brush = Brush.horizontalGradient(
-                    colors = listOf(
-                        Color.Blue.copy(alpha = 0.2f),
-                        Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.2f),
+            .clickable { onClick() },
+        shape = RoundedCornerShape(4.dp),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            Color.Blue.copy(alpha = 0.2f),
+                            Color.Blue.copy(alpha = 0.1f),
+                            Color.Cyan.copy(alpha = 0.2f),
+                        )
                     )
                 )
-            ),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent,
-        ),
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
         ) {
-            textList.forEachIndexed { index, map ->
-                Row {
-                    Text(
-                        modifier = Modifier.width(64.dp),
-                        text = map.first,
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                    Text(
-                        text = ":  ${map.second}",
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
-                if (index != textList.size - 1) {
-                    Divider(modifier = Modifier.padding(vertical = 1.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+            ) {
+                textList.forEachIndexed { index, map ->
+                    Row {
+                        Text(
+                            modifier = Modifier.width(64.dp),
+                            text = map.first,
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                        Text(
+                            text = ":  ${map.second}",
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                    if (index != textList.size - 1) {
+                        Divider(modifier = Modifier.padding(vertical = 1.dp))
+                    }
                 }
             }
         }

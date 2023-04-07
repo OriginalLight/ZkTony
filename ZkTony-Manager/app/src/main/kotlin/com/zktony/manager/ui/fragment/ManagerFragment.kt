@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.LaptopMac
+import androidx.compose.material.icons.filled.MiscellaneousServices
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -56,7 +57,7 @@ fun ManagerFragment(
             item {
                 FeatureCard(
                     title = "仪器管理",
-                    icon = Icons.Default.LaptopMac,
+                    icon = Icons.Default.MiscellaneousServices,
                     onClick = { navigateTo(ManagerPageEnum.INSTRUMENT_LIST) }
                 )
             }

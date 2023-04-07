@@ -13,10 +13,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
 import androidx.compose.material.icons.filled.LaptopMac
+import androidx.compose.material.icons.filled.MiscellaneousServices
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Domain
 import androidx.compose.material.icons.outlined.Note
 import androidx.compose.material3.Button
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -100,7 +102,7 @@ fun OrderFragment(
                 Row {
                     IconCard(
                         modifier = Modifier
-                            .height(64.dp)
+                            .height(48.dp)
                             .weight(1f),
                         icon = Icons.Filled.Android,
                         color = if (uiState.software != null) {
@@ -119,9 +121,9 @@ fun OrderFragment(
                     Spacer(modifier = Modifier.width(16.dp))
                     IconCard(
                         modifier = Modifier
-                            .height(64.dp)
+                            .height(48.dp)
                             .weight(1f),
-                        icon = Icons.Filled.LaptopMac,
+                        icon = Icons.Filled.MiscellaneousServices,
                         color = if (uiState.instrument != null) {
                             Color.Green
                         } else {
@@ -135,7 +137,7 @@ fun OrderFragment(
                     Spacer(modifier = Modifier.width(16.dp))
                     IconCard(
                         modifier = Modifier
-                            .height(64.dp)
+                            .height(48.dp)
                             .weight(1f),
                         icon = Icons.Filled.Person,
                         color = if (uiState.customer != null) {

@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.LocalShipping
+import androidx.compose.material.icons.outlined.Note
 import androidx.compose.material.icons.outlined.Shop
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -61,7 +62,7 @@ fun HomeFragment(
             item {
                 FeatureCard(
                     title = stringResource(id = R.string.page_after_sale_title),
-                    icon = Icons.Outlined.Shop,
+                    icon = Icons.Outlined.Note,
                     onClick = { navigateTo(HomePageEnum.AFTER_SALE) }
                 )
             }
