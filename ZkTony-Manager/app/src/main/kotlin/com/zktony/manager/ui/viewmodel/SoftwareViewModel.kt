@@ -3,9 +3,10 @@ package com.zktony.manager.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.manager.common.ext.showShortToast
-import com.zktony.manager.data.remote.grpc.CustomerGrpc
 import com.zktony.manager.data.remote.grpc.SoftwareGrpc
-import com.zktony.proto.*
+import com.zktony.proto.Software
+import com.zktony.proto.SoftwareSearch
+import com.zktony.proto.softwareRequestPage
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch

@@ -24,19 +24,21 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.manager.ui.components.InstrumentCard
 import com.zktony.manager.ui.components.InstrumentSearchBar
 import com.zktony.manager.ui.components.ManagerAppBar
+import com.zktony.manager.ui.viewmodel.HomePageEnum
 import com.zktony.manager.ui.viewmodel.InstrumentViewModel
 import com.zktony.manager.ui.viewmodel.ManagerPageEnum
+import com.zktony.manager.ui.viewmodel.OrderViewModel
 
 @Composable
-fun InstrumentListFragment(
+fun InstrumentSelectFragment(
     modifier: Modifier = Modifier,
-    navigateTo: (ManagerPageEnum) -> Unit,
-    viewModel: InstrumentViewModel,
+    navigateTo: (HomePageEnum) -> Unit,
+    viewModel: OrderViewModel,
     isDualPane: Boolean = false
 ) {
 
     BackHandler {
-        navigateTo(ManagerPageEnum.MANAGER)
+        navigateTo(HomePageEnum.ORDER)
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -49,41 +51,21 @@ fun InstrumentListFragment(
         ManagerAppBar(
             title = "仪器列表",
             isFullScreen = !isDualPane,
-            onBack = { navigateTo(ManagerPageEnum.MANAGER) },
+            onBack = { navigateTo(HomePageEnum.ORDER) },
             actions = {
-                Row {
-                    FilledIconButton(
-                        onClick = { isSearchExpanded.value = !isSearchExpanded.value },
-                        modifier = Modifier.padding(8.dp),
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    ) {
-                        Icon(
-                            imageVector = if (isSearchExpanded.value) Icons.Outlined.Close else Icons.Filled.Search,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-
-                    FilledIconButton(
-                        onClick = {
-                            viewModel.setInstrument(null)
-                            navigateTo(ManagerPageEnum.INSTRUMENT_EDIT)
-                        },
-                        modifier = Modifier.padding(8.dp),
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
+                FilledIconButton(
+                    onClick = { isSearchExpanded.value = !isSearchExpanded.value },
+                    modifier = Modifier.padding(8.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    Icon(
+                        imageVector = if (isSearchExpanded.value) Icons.Outlined.Close else Icons.Filled.Search,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp)
+                    )
                 }
             })
 
@@ -92,7 +74,7 @@ fun InstrumentListFragment(
             InstrumentSearchBar(
                 modifier = Modifier,
                 onSearch = {
-                    viewModel.search(it)
+                    viewModel.searchInstrument(it)
                     isSearchExpanded.value = !isSearchExpanded.value
                 },
             )
@@ -110,13 +92,13 @@ fun InstrumentListFragment(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 columns = GridCells.Adaptive(minSize = 128.dp)
             ) {
-                uiState.list.forEach {
+                uiState.instrumentList.forEach {
                     item {
                         InstrumentCard(
                             instrument = it,
                             onClick = {
-                                viewModel.setInstrument(it)
-                                navigateTo(ManagerPageEnum.INSTRUMENT_EDIT)
+                                viewModel.initInstrument(it)
+                                navigateTo(HomePageEnum.ORDER)
                             }
                         )
                     }

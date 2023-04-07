@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
+import com.zktony.manager.common.ext.showShortToast
 import com.zktony.manager.data.remote.model.QrCode
 import com.zktony.manager.ui.QrCodeActivity
 import com.zktony.proto.Software
@@ -52,7 +53,7 @@ fun CodeTextField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    isQrCode : Boolean = true,
+    isQrCode: Boolean = true,
     onSoftwareChange: (Software) -> Unit = {},
 ) {
 
@@ -60,7 +61,6 @@ fun CodeTextField(
     val keyboardController = LocalSoftwareKeyboardController.current
     val localFocusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
-    var isError by remember { mutableStateOf(false) }
     val qrCodeScanner =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (it.resultCode == Activity.RESULT_OK) {
@@ -69,7 +69,6 @@ fun CodeTextField(
                 if (isQrCode) {
                     try {
                         val qrCode = Gson().fromJson(result, QrCode::class.java)
-                        isError = false
                         onSoftwareChange(software {
                             id = qrCode.id
                             package_ = qrCode.`package`
@@ -78,12 +77,11 @@ fun CodeTextField(
                             buildType = qrCode.build_type
                             createTime = currentTime()
                         })
+                        onValueChange(qrCode.id)
                     } catch (e: Exception) {
-                        isError = true
-                        Toast.makeText(context, "二维码格式错误", Toast.LENGTH_SHORT).show()
+                        "二维码格式错误".showShortToast()
                     }
                 } else {
-                    isError = false
                     onValueChange(result ?: "")
                 }
 
@@ -91,7 +89,7 @@ fun CodeTextField(
         }
 
     TextField(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(
                 brush = Brush.horizontalGradient(
@@ -103,11 +101,9 @@ fun CodeTextField(
                 ),
             )
             .focusRequester(focusRequester),
-        isError = isError,
         value = value,
         label = { Text(text = label) },
         onValueChange = {
-            isError = false
             onValueChange(it)
         },
         leadingIcon = {
@@ -258,7 +254,7 @@ fun CommonTextField(
     singleLine: Boolean = true,
     onValueChange: (String) -> Unit,
     isDone: Boolean = false,
-    onDone : () -> Unit = {},
+    onDone: () -> Unit = {},
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -326,7 +322,7 @@ fun TimeTextField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
-    onDone : () -> Unit = {},
+    onDone: () -> Unit = {},
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current

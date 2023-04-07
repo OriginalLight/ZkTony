@@ -29,10 +29,10 @@ import com.google.accompanist.adaptive.TwoPane
 import com.zktony.manager.ui.fragment.SettingFragment
 import com.zktony.manager.ui.fragment.UpgradeFragment
 import com.zktony.manager.ui.fragment.UserEditFragment
+import com.zktony.manager.ui.utils.ContentType
 import com.zktony.manager.ui.viewmodel.SettingPage
 import com.zktony.manager.ui.viewmodel.SettingUiState
 import com.zktony.manager.ui.viewmodel.SettingViewModel
-import com.zktony.manager.ui.utils.ContentType
 import org.koin.androidx.compose.koinViewModel
 
 // region: SettingScreen
@@ -81,7 +81,7 @@ fun SettingScreenSinglePane(
         )
     }
     AnimatedVisibility(
-        visible = uiState.page == SettingPage.USER_MODIFY,
+        visible = uiState.page == SettingPage.USER_EDIT,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = shrinkHorizontally { it }
     ) {

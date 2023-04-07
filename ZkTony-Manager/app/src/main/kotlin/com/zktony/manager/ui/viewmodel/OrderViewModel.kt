@@ -28,7 +28,7 @@ class OrderViewModel constructor(
     private val instrumentGrpc: InstrumentGrpc,
     private val dao: UserDao
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(ShippingUiState())
+    private val _uiState = MutableStateFlow(OrderUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -43,181 +43,102 @@ class OrderViewModel constructor(
         }
     }
 
-    fun navigateTo(page: ShippingPageEnum) {
-        _uiState.value = _uiState.value.copy(page = page)
-    }
-
-    fun setSoftware(software: Software?) {
-        _uiState.value = _uiState.value.copy(software = software)
-    }
-
-    fun searchCustomer(value: String) {
+    fun initSoftware(id: String) {
         viewModelScope.launch {
-            if (value.isEmpty()) return@launch
-            val req = customerSearch {
-                if (value.matches(Regex("^1[3-9]\\d{9}\$"))) {
-                    phone = value
-                } else {
-                    name = value
-                }
-            }
-            customerGrpc.searchCustomer(req)
-                .flowOn(Dispatchers.IO)
-                .catch {
+            softwareGrpc.getById(id).flowOn(Dispatchers.IO)
+                .catch { it.message.toString().showShortToast() }
+                .collect {
                     _uiState.value = _uiState.value.copy(
-                        customer = null,
+                        software = it,
                     )
                 }
+        }
+    }
+
+    fun initCustomer(customer: Customer) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                customer = customer,
+            )
+        }
+    }
+
+    fun initInstrument(instrument: Instrument) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                instrument = instrument,
+            )
+        }
+    }
+
+    fun loadCustomerList() {
+        viewModelScope.launch {
+            customerGrpc.getCustomerPage(
+                customerRequestPage {
+                    page = 1
+                    pageSize = 20
+                }
+            ).catch { it.message.toString().showShortToast() }
                 .collect {
-                    if (it.listList.isNotEmpty()) {
-                        _uiState.value = _uiState.value.copy(
-                            customer = it.getList(0),
-                        )
-                    } else {
-                        _uiState.value = _uiState.value.copy(
-                            customer = null,
-                        )
-                        "未找到客户".showShortToast()
-                    }
+                    _uiState.value = _uiState.value.copy(customerList = it.listList)
                 }
         }
     }
 
-
-    fun saveCustomer(customer: Customer, add: Boolean) {
+    fun searchCustomer(search: CustomerSearch) {
         viewModelScope.launch {
-            if (add) {
-                customerGrpc.add(customer)
-                    .flowOn(Dispatchers.IO)
-                    .catch {
-                        "保存客户失败".showShortToast()
-                    }
-                    .collect {
-                        _uiState.value = _uiState.value.copy(
-                            customer = customer,
-                        )
-                        "保存客户成功".showShortToast()
-                    }
-            } else {
-                customerGrpc.update(customer)
-                    .flowOn(Dispatchers.IO)
-                    .catch {
-                        "修改客户失败".showShortToast()
-                    }
-                    .collect {
-                        if (it.success) {
-                            _uiState.value = _uiState.value.copy(
-                                customer = customer,
-                            )
-                            "修改客户成功".showShortToast()
-                        } else {
-                            "修改客户失败".showShortToast()
-                        }
-                    }
+            customerGrpc.searchCustomer(search).catch {
+                "查询失败".showShortToast()
+            }.collect {
+                _uiState.value = _uiState.value.copy(customerList = it.listList)
             }
         }
     }
 
-    fun searchInstrument(value: String) {
-        viewModelScope.launch {
-            if (value.isEmpty()) return@launch
 
-            val req = instrumentSearch {
-                if (value.matches(Regex("^[\u4e00-\u9fa5].*\$"))) {
-                    name = value
-                } else {
-                    model = value
+    fun loadInstrumentList() {
+        viewModelScope.launch {
+            instrumentGrpc.getInstrumentPage(
+                instrumentRequestPage {
+                    page = 1
+                    pageSize = 20
                 }
-            }
-            instrumentGrpc.searchInstrument(req)
-                .flowOn(Dispatchers.IO)
-                .catch {
-                    _uiState.value = _uiState.value.copy(
-                        instrument = null,
-                    )
-                }
+            ).catch { it.message.toString().showShortToast() }
                 .collect {
-                    if (it.listList.isNotEmpty()) {
-                        _uiState.value = _uiState.value.copy(
-                            instrument = it.getList(0),
-                        )
-                    } else {
-                        _uiState.value = _uiState.value.copy(
-                            instrument = null,
-                        )
-                        "未找到仪器".showShortToast()
-                    }
+                    _uiState.value = _uiState.value.copy(instrumentList = it.listList)
                 }
         }
     }
 
-    fun saveInstrument(instrument: Instrument, add: Boolean) {
+    fun searchInstrument(search: InstrumentSearch) {
         viewModelScope.launch {
-            if (add) {
-                instrumentGrpc.add(instrument)
-                    .flowOn(Dispatchers.IO)
-                    .catch {
-                        "保存仪器失败".showShortToast()
-                    }
-                    .collect {
-                        _uiState.value = _uiState.value.copy(
-                            instrument = instrument,
-                        )
-                        "保存仪器成功".showShortToast()
-                    }
-            } else {
-                instrumentGrpc.update(instrument)
-                    .flowOn(Dispatchers.IO)
-                    .catch {
-                        "修改仪器失败".showShortToast()
-                    }
-                    .collect {
-                        if (it.success) {
-                            _uiState.value = _uiState.value.copy(
-                                instrument = instrument,
-                            )
-                            "修改仪器成功".showShortToast()
-                        } else {
-                            "修改仪器失败".showShortToast()
-                        }
-                    }
+            instrumentGrpc.searchInstrument(search).catch {
+                "查询失败".showShortToast()
+            }.collect {
+                _uiState.value = _uiState.value.copy(instrumentList = it.listList)
             }
         }
     }
 
     fun addOrder(order: Order, block: () -> Unit) {
         viewModelScope.launch {
-            _uiState.value.software?.let { software ->
-                softwareGrpc.add(software).flowOn(Dispatchers.IO)
-                    .catch {
-                        "保存软件信息失败".showShortToast()
-                    }
-                    .collect {
-                        orderGrpc.add(order).flowOn(Dispatchers.IO)
-                            .catch {
-                                "保存发货信息失败".showShortToast()
-                            }
-                            .collect {
-                                _uiState.value = ShippingUiState()
-                                block()
-                            }
-                    }
-            }
+            orderGrpc.add(order).flowOn(Dispatchers.IO)
+                .catch {
+                    "保存发货信息失败".showShortToast()
+                }
+                .collect {
+                    _uiState.value = OrderUiState()
+                    block()
+                }
         }
     }
 }
 
-data class ShippingUiState(
+data class OrderUiState(
     val user: User? = null,
+    val customerList: List<Customer> = emptyList(),
     val customer: Customer? = null,
     val software: Software? = null,
+    val instrumentList: List<Instrument> = emptyList(),
     val instrument: Instrument? = null,
-    val page: ShippingPageEnum = ShippingPageEnum.SHIPPING,
 )
-
-enum class ShippingPageEnum {
-    SHIPPING,
-    SOFTWARE_MODIFY,
-    CUSTOMER_MODIFY,
-    INSTRUMENT_MODIFY,
-}

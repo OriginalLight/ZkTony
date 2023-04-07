@@ -2,7 +2,7 @@ package com.zktony.manager.data.remote.model
 
 import com.zktony.www.common.extension.currentTime
 
-data class QrCode (
+data class QrCode(
     val id: String = "",
     val `package`: String = "com.zktony.manager",
     val version_name: String = "1.0.0",

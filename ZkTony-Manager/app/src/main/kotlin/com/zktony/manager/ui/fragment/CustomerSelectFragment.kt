@@ -21,22 +21,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.zktony.manager.ui.components.InstrumentCard
-import com.zktony.manager.ui.components.InstrumentSearchBar
+import com.zktony.manager.ui.components.CustomerCard
+import com.zktony.manager.ui.components.CustomerSearchBar
 import com.zktony.manager.ui.components.ManagerAppBar
-import com.zktony.manager.ui.viewmodel.InstrumentViewModel
+import com.zktony.manager.ui.viewmodel.CustomerViewModel
+import com.zktony.manager.ui.viewmodel.HomePageEnum
 import com.zktony.manager.ui.viewmodel.ManagerPageEnum
+import com.zktony.manager.ui.viewmodel.OrderViewModel
 
 @Composable
-fun InstrumentListFragment(
+fun CustomerSelectFragment(
     modifier: Modifier = Modifier,
-    navigateTo: (ManagerPageEnum) -> Unit,
-    viewModel: InstrumentViewModel,
+    navigateTo: (HomePageEnum) -> Unit,
+    viewModel: OrderViewModel,
     isDualPane: Boolean = false
 ) {
 
     BackHandler {
-        navigateTo(ManagerPageEnum.MANAGER)
+        navigateTo(HomePageEnum.ORDER)
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -47,52 +49,32 @@ fun InstrumentListFragment(
         val isSearchExpanded = remember { mutableStateOf(false) }
 
         ManagerAppBar(
-            title = "仪器列表",
+            title = "客户列表",
             isFullScreen = !isDualPane,
-            onBack = { navigateTo(ManagerPageEnum.MANAGER) },
+            onBack = { navigateTo(HomePageEnum.ORDER) },
             actions = {
-                Row {
-                    FilledIconButton(
-                        onClick = { isSearchExpanded.value = !isSearchExpanded.value },
-                        modifier = Modifier.padding(8.dp),
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    ) {
-                        Icon(
-                            imageVector = if (isSearchExpanded.value) Icons.Outlined.Close else Icons.Filled.Search,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
-
-                    FilledIconButton(
-                        onClick = {
-                            viewModel.setInstrument(null)
-                            navigateTo(ManagerPageEnum.INSTRUMENT_EDIT)
-                        },
-                        modifier = Modifier.padding(8.dp),
-                        colors = IconButtonDefaults.filledIconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                            contentColor = MaterialTheme.colorScheme.onSurface
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Add,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp)
-                        )
-                    }
+                FilledIconButton(
+                    onClick = { isSearchExpanded.value = !isSearchExpanded.value },
+                    modifier = Modifier.padding(8.dp),
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    )
+                ) {
+                    Icon(
+                        imageVector = if (isSearchExpanded.value) Icons.Outlined.Close else Icons.Filled.Search,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp)
+                    )
                 }
             })
 
         // 搜索栏
         AnimatedVisibility(visible = isSearchExpanded.value) {
-            InstrumentSearchBar(
+            CustomerSearchBar(
                 modifier = Modifier,
                 onSearch = {
-                    viewModel.search(it)
+                    viewModel.searchCustomer(it)
                     isSearchExpanded.value = !isSearchExpanded.value
                 },
             )
@@ -110,13 +92,13 @@ fun InstrumentListFragment(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 columns = GridCells.Adaptive(minSize = 128.dp)
             ) {
-                uiState.list.forEach {
+                uiState.customerList.forEach {
                     item {
-                        InstrumentCard(
-                            instrument = it,
+                        CustomerCard(
+                            customer = it,
                             onClick = {
-                                viewModel.setInstrument(it)
-                                navigateTo(ManagerPageEnum.INSTRUMENT_EDIT)
+                                navigateTo(HomePageEnum.ORDER)
+                                viewModel.initCustomer(it)
                             }
                         )
                     }

@@ -1,16 +1,21 @@
 package com.zktony.manager.ui.fragment
 
+import android.app.Activity
+import android.content.Intent
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.LaptopMac
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Domain
-import androidx.compose.material.icons.outlined.LaptopMac
 import androidx.compose.material.icons.outlined.Note
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,15 +23,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.gson.Gson
 import com.zktony.manager.R
+import com.zktony.manager.common.ext.showShortToast
+import com.zktony.manager.data.remote.model.QrCode
+import com.zktony.manager.ui.QrCodeActivity
 import com.zktony.manager.ui.components.*
 import com.zktony.manager.ui.viewmodel.HomePageEnum
 import com.zktony.manager.ui.viewmodel.OrderViewModel
 import com.zktony.proto.order
-import com.zktony.proto.software
 import com.zktony.www.common.extension.currentTime
 import java.util.*
 
@@ -47,9 +57,20 @@ fun OrderFragment(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val mSoftwareId = remember { mutableStateOf("") }
-    val mCustomerReq = remember { mutableStateOf("") }
-    val mInstrumentReq = remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val qrCodeScanner =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (it.resultCode == Activity.RESULT_OK) {
+                val result = it.data?.getStringExtra("SCAN_RESULT")
+                try {
+                    val qrCode = Gson().fromJson(result, QrCode::class.java)
+                    viewModel.initSoftware(qrCode.id)
+                } catch (e: Exception) {
+                    "二维码格式错误".showShortToast()
+                }
+            }
+        }
+
     val mInstrumentNumber = remember { mutableStateOf("") }
     val mInstrumentTime = remember { mutableStateOf("") }
     val mAttachment = remember { mutableStateOf("") }
@@ -57,13 +78,13 @@ fun OrderFragment(
     val mExpressCompany = remember { mutableStateOf("") }
     val mRemarks = remember { mutableStateOf("") }
 
-
     Column {
         ManagerAppBar(
             title = stringResource(id = R.string.page_shipping_title),
             isFullScreen = !isDualPane,
             onBack = { navigateTo(HomePageEnum.HOME) },
         )
+        Spacer(modifier = Modifier.height(16.dp))
 
         val lazyListState = rememberLazyListState()
 
@@ -76,107 +97,58 @@ fun OrderFragment(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
-                Spacer(modifier = Modifier.height(16.dp))
-                CodeTextField(
-                    label = "软件编号",
-                    value = mSoftwareId.value,
-                    onValueChange = {
-                        mSoftwareId.value = it
-                        if (mSoftwareId.value.isNotEmpty()) {
-                            viewModel.setSoftware(
-                                software {
-                                    id = it
-                                    package_ = "com.zktony.not.found"
-                                    versionName = "未找到"
-                                    versionCode = 0
-                                    buildType = "未找到"
-                                    remarks = "未找到"
-                                    createTime = currentTime()
-                                }
-                            )
+                Row {
+                    IconCard(
+                        modifier = Modifier
+                            .height(64.dp)
+                            .weight(1f),
+                        icon = Icons.Filled.Android,
+                        color = if (uiState.software != null) {
+                            Color.Green
                         } else {
-                            viewModel.setSoftware(null)
+                            Color.Red
+                        },
+                        onClick = {
+                            qrCodeScanner.launch(
+                                Intent(
+                                    context, QrCodeActivity::class.java
+                                )
+                            )
                         }
-                    },
-                    onSoftwareChange = {
-                        mSoftwareId.value = it.id
-                        viewModel.setSoftware(it)
-                    },
-                )
-            }
-            if (uiState.software != null) {
-                item {
-                    val s = uiState.software!!
-                    val textList = listOf(
-                        "软件编号" to s.id,
-                        "软件包名" to s.`package`,
-                        "软件版本" to s.versionName,
-                        "软件代号" to s.versionCode.toString(),
-                        "构建类型" to s.buildType,
-                        "备注说明" to s.remarks.ifEmpty { "无" },
                     )
-                    TextCard(
-                        textList = textList,
-                        onClick = { }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    IconCard(
+                        modifier = Modifier
+                            .height(64.dp)
+                            .weight(1f),
+                        icon = Icons.Filled.LaptopMac,
+                        color = if (uiState.instrument != null) {
+                            Color.Green
+                        } else {
+                            Color.Red
+                        },
+                        onClick = {
+                            viewModel.loadInstrumentList()
+                            navigateTo(HomePageEnum.INSTRUMENT_SELECT)
+                        }
                     )
-                }
-            }
-            item {
-                SearchTextField(
-                    label = "客户姓名/手机",
-                    value = mCustomerReq.value,
-                    onValueChange = { mCustomerReq.value = it },
-                    icon = Icons.Outlined.Person,
-                    onSearch = { viewModel.searchCustomer(it) },
-                )
-            }
-            if (uiState.customer != null) {
-                item {
-                    val c = uiState.customer!!
-                    val textList = listOf(
-                        "客户编号" to c.id,
-                        "客户姓名" to c.name,
-                        "客户手机" to c.phone,
-                        "客户地址" to c.address,
-                        "信息来源" to c.source,
-                        "从事行业" to c.industry,
-                        "客户备注" to c.remarks.ifEmpty { "无" },
-                    )
-                    TextCard(
-                        textList = textList,
-                        onClick = { }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    IconCard(
+                        modifier = Modifier
+                            .height(64.dp)
+                            .weight(1f),
+                        icon = Icons.Filled.Person,
+                        color = if (uiState.customer != null) {
+                            Color.Green
+                        } else {
+                            Color.Red
+                        },
+                        onClick = {
+                            viewModel.loadCustomerList()
+                            navigateTo(HomePageEnum.CUSTOMER_SELECT)
+                        }
                     )
                 }
-            }
-
-            item {
-                SearchTextField(
-                    label = "机器名称/型号",
-                    value = mInstrumentReq.value,
-                    onValueChange = { mInstrumentReq.value = it },
-                    icon = Icons.Outlined.LaptopMac,
-                    onSearch = { viewModel.searchInstrument(it) },
-                )
-            }
-
-            if (uiState.instrument != null) {
-               item {
-                   val e = uiState.instrument!!
-                   val textList = listOf(
-                       "机器编号" to e.id,
-                       "机器名称" to e.name,
-                       "机器型号" to e.model,
-                       "使用电压" to e.voltage,
-                       "使用功率" to e.power,
-                       "使用频率" to e.frequency,
-                       "机器附件" to e.attachment,
-                       "机器备注" to e.remarks.ifEmpty { "无" },
-                   )
-                   TextCard(
-                       textList = textList,
-                       onClick = { }
-                   )
-               }
             }
 
             item {
@@ -198,7 +170,7 @@ fun OrderFragment(
                 item {
                     AttachmentCard(
                         attachment = uiState.instrument!!.attachment,
-                        value = uiState.instrument!!.attachment,
+                        value = mAttachment.value,
                         onValueChange = { mAttachment.value = it }
                     )
                 }
@@ -231,7 +203,8 @@ fun OrderFragment(
             item {
                 AnimatedVisibility(
                     visible = mInstrumentNumber.value.isNotEmpty() &&
-                            mExpressNumber.value.isNotEmpty()
+                            mExpressNumber.value.isNotEmpty() &&
+                            mInstrumentTime.value.isNotEmpty()
                 ) {
                     Button(
                         modifier = Modifier
@@ -240,15 +213,15 @@ fun OrderFragment(
                             viewModel.addOrder(
                                 order = order {
                                     id = UUID.randomUUID().toString()
-                                    softwareId = mSoftwareId.value
-                                    customerId = uiState.customer?.id ?: ""
-                                    instrumentId = uiState.instrument?.id ?: ""
+                                    softwareId = uiState.software?.id ?: "no software"
+                                    customerId = uiState.customer?.id ?: "no customer"
+                                    instrumentId = uiState.instrument?.id ?: "no instrument"
                                     instrumentNumber = mInstrumentNumber.value
                                     instrumentTime = mInstrumentTime.value + " 00:00:00"
-                                    attachment = mAttachment.value
+                                    attachment = mAttachment.value.ifEmpty { "无" }
                                     expressNumber = mExpressNumber.value
-                                    expressCompany = mExpressCompany.value
-                                    remarks = mRemarks.value
+                                    expressCompany = mExpressCompany.value.ifEmpty { "无" }
+                                    remarks = mRemarks.value.ifEmpty { "无" }
                                     createTime = currentTime()
                                 },
                                 block = { navigateTo(HomePageEnum.ORDER_HISTORY) }

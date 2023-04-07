@@ -25,7 +25,7 @@ class OrderHistoryViewModel constructor(
     private val customerGrpc: CustomerGrpc,
     private val instrumentGrpc: InstrumentGrpc,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(ShippingHistoryUiState())
+    private val _uiState = MutableStateFlow(OrderHistoryUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -58,40 +58,64 @@ class OrderHistoryViewModel constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(order = order)
             launch {
-                softwareGrpc.getById(order.softwareId).flowOn(Dispatchers.IO)
-                    .catch {
-                        _uiState.value = _uiState.value.copy(software = null)
-                        "查询软件信息失败".showShortToast()
-                    }
-                    .collect {
-                        _uiState.value = _uiState.value.copy(software = it)
-                    }
+                if (order.softwareId.isNotEmpty()) {
+                    softwareGrpc.getById(order.softwareId).flowOn(Dispatchers.IO)
+                        .catch {
+                            _uiState.value = _uiState.value.copy(software = null)
+                        }
+                        .collect {
+                            _uiState.value = _uiState.value.copy(software = it)
+                        }
+                }
             }
             launch {
-                instrumentGrpc.getById(order.instrumentId).flowOn(Dispatchers.IO)
-                    .catch {
-                        _uiState.value = _uiState.value.copy(instrument = null)
-                        "查询仪器信息失败".showShortToast()
-                    }
-                    .collect {
-                        _uiState.value = _uiState.value.copy(instrument = it)
-                    }
+                if (order.instrumentId.isNotEmpty()) {
+                    instrumentGrpc.getById(order.instrumentId).flowOn(Dispatchers.IO)
+                        .catch {
+                            _uiState.value = _uiState.value.copy(instrument = null)
+                        }
+                        .collect {
+                            _uiState.value = _uiState.value.copy(instrument = it)
+                        }
+                }
             }
             launch {
-                customerGrpc.getById(order.customerId).flowOn(Dispatchers.IO)
+                if (order.customerId.isNotEmpty()) {
+                    customerGrpc.getById(order.customerId).flowOn(Dispatchers.IO)
+                        .catch {
+                            _uiState.value = _uiState.value.copy(customer = null)
+                        }
+                        .collect {
+                            _uiState.value = _uiState.value.copy(customer = it)
+                        }
+                }
+            }
+        }
+    }
+
+    fun delete() {
+        viewModelScope.launch {
+            _uiState.value.order?.let { order ->
+                orderGrpc.delete(order.id).flowOn(Dispatchers.IO)
                     .catch {
-                        _uiState.value = _uiState.value.copy(customer = null)
-                        "查询客户信息失败".showShortToast()
+                        "删除失败".showShortToast()
                     }
                     .collect {
-                        _uiState.value = _uiState.value.copy(customer = it)
+                        "删除成功".showShortToast()
+                        _uiState.value = _uiState.value.copy(
+                            orderList = _uiState.value.orderList.filter { o -> o.id != order.id },
+                            order = null,
+                            software = null,
+                            instrument = null,
+                            customer = null,
+                        )
                     }
             }
         }
     }
 }
 
-data class ShippingHistoryUiState(
+data class OrderHistoryUiState(
     val orderList: List<Order> = emptyList(),
     val order: Order? = null,
     val software: Software? = null,

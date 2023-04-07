@@ -2,6 +2,8 @@ package com.zktony.manager.ui.fragment
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -72,159 +74,178 @@ fun CustomerEditFragment(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Column(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 16.dp)
-                .fillMaxSize(),
-        ) {
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                label = { Text(text = "客户姓名") },
-                value = mName.value,
-                onValueChange = { mName.value = it },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text, imeAction = ImeAction.Next,
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    localFocusManager.moveFocus(FocusDirection.Next)
-                }),
-                maxLines = 1,
-                singleLine = true,
-            )
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                label = { Text(text = "客户电话") },
-                value = mPhone.value,
-                onValueChange = { mPhone.value = it },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    localFocusManager.moveFocus(FocusDirection.Next)
-                }),
-                maxLines = 1,
-                singleLine = true,
-            )
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                label = { Text(text = "客户地址") },
-                value = mAddress.value,
-                onValueChange = { mAddress.value = it },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    localFocusManager.moveFocus(FocusDirection.Next)
-                }),
-                maxLines = 1,
-                singleLine = true,
-            )
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                label = { Text(text = "信息来源") },
-                value = mSource.value,
-                onValueChange = { mSource.value = it },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    localFocusManager.moveFocus(FocusDirection.Next)
-                }),
-                maxLines = 1,
-                singleLine = true,
-            )
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                label = { Text(text = "客户行业") },
-                value = mIndustry.value,
-                onValueChange = { mIndustry.value = it },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    localFocusManager.moveFocus(FocusDirection.Next)
-                }),
-                maxLines = 1,
-                singleLine = true,
-            )
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
-                label = { Text(text = "备注说明") },
-                value = mRemarks.value,
-                onValueChange = { mRemarks.value = it },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
-                ),
-                keyboardActions = KeyboardActions(onDone = {
-                    keyboardController?.hide()
-                }),
-                maxLines = 10,
-                singleLine = false,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            if (uiState.customer == null) {
-                Button(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                    onClick = {
-                        navigateTo(ManagerPageEnum.CUSTOMER_LIST)
-                        viewModel.insert(customer {
-                            id = UUID.randomUUID().toString()
-                            name = mName.value
-                            phone = mPhone.value
-                            address = mAddress.value
-                            industry = mIndustry.value
-                            source = mSource.value
-                            remarks = mRemarks.value
-                            createTime = currentTime()
-                        })
-                    }) {
-                    Text(text = "添加")
-                }
-            } else {
-                Button(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                    onClick = {
-                        navigateTo(ManagerPageEnum.CUSTOMER_LIST)
-                        viewModel.update(customer {
-                            id = customer.id
-                            name = mName.value
-                            phone = mPhone.value
-                            address = mAddress.value
-                            industry = mIndustry.value
-                            source = mSource.value
-                            remarks = mRemarks.value
-                        })
-                    }) {
-                    Text(text = "修改")
-                }
+        val lazyColumnState = rememberLazyListState()
 
-                Button(
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = 16.dp),
+            state = lazyColumnState,
+        ) {
+            item {
+                OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    label = { Text(text = "客户姓名") },
+                    value = mName.value,
+                    onValueChange = { mName.value = it },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text, imeAction = ImeAction.Next,
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        localFocusManager.moveFocus(FocusDirection.Next)
+                    }),
+                    maxLines = 1,
+                    singleLine = true,
+                )
+            }
+            item {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    label = { Text(text = "客户电话") },
+                    value = mPhone.value,
+                    onValueChange = { mPhone.value = it },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        localFocusManager.moveFocus(FocusDirection.Next)
+                    }),
+                    maxLines = 1,
+                    singleLine = true,
+                )
+            }
+            item {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    label = { Text(text = "客户地址") },
+                    value = mAddress.value,
+                    onValueChange = { mAddress.value = it },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        localFocusManager.moveFocus(FocusDirection.Next)
+                    }),
+                    maxLines = 1,
+                    singleLine = true,
+                )
+            }
+            item {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    label = { Text(text = "信息来源") },
+                    value = mSource.value,
+                    onValueChange = { mSource.value = it },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        localFocusManager.moveFocus(FocusDirection.Next)
+                    }),
+                    maxLines = 1,
+                    singleLine = true,
+                )
+            }
+            item {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    label = { Text(text = "客户行业") },
+                    value = mIndustry.value,
+                    onValueChange = { mIndustry.value = it },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text, imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(onNext = {
+                        localFocusManager.moveFocus(FocusDirection.Next)
+                    }),
+                    maxLines = 1,
+                    singleLine = true,
+                )
+            }
+            item {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .focusRequester(focusRequester),
+                    label = { Text(text = "备注说明") },
+                    value = mRemarks.value,
+                    onValueChange = { mRemarks.value = it },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text, imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(onDone = {
+                        keyboardController?.hide()
+                    }),
+                    maxLines = 10,
+                    singleLine = false,
+                )
+            }
+            item {
+                if (uiState.customer == null) {
+                    Button(modifier = Modifier
+                        .fillMaxWidth()
                         .padding(top = 16.dp),
-                    onClick = {
-                        viewModel.delete(customer.id)
-                        navigateTo(ManagerPageEnum.CUSTOMER_LIST)
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red,
-                    )
-                ) {
-                    Text(text = "删除")
+                        enabled = mName.value.isNotEmpty() && mPhone.value.isNotEmpty(),
+                        onClick = {
+                            navigateTo(ManagerPageEnum.CUSTOMER_LIST)
+                            viewModel.insert(customer {
+                                id = UUID.randomUUID().toString()
+                                name = mName.value
+                                phone = mPhone.value
+                                address = mAddress.value
+                                industry = mIndustry.value
+                                source = mSource.value
+                                remarks = mRemarks.value
+                                createTime = currentTime()
+                            })
+                        }) {
+                        Text(text = "添加")
+                    }
+                } else {
+                    Button(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                        onClick = {
+                            navigateTo(ManagerPageEnum.CUSTOMER_LIST)
+                            viewModel.update(customer {
+                                id = customer.id
+                                name = mName.value
+                                phone = mPhone.value
+                                address = mAddress.value
+                                industry = mIndustry.value
+                                source = mSource.value
+                                remarks = mRemarks.value
+                            })
+                        }) {
+                        Text(text = "修改")
+                    }
+
+                    if (customer.id.isNotEmpty()) {
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            onClick = {
+                                viewModel.delete(customer.id)
+                                navigateTo(ManagerPageEnum.CUSTOMER_LIST)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Red,
+                            )
+                        ) {
+                            Text(text = "删除")
+                        }
+                    }
                 }
             }
         }

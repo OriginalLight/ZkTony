@@ -27,7 +27,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.manager.data.local.model.User
 import com.zktony.manager.ui.components.ManagerAppBar
 import com.zktony.manager.ui.viewmodel.SettingPage
-import com.zktony.manager.ui.viewmodel.UpgradeViewModel
 import com.zktony.manager.ui.viewmodel.UserViewModel
 
 /**

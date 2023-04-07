@@ -17,11 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.zktony.proto.Customer
-import com.zktony.proto.Instrument
-import com.zktony.proto.Order
-import com.zktony.proto.Software
-import com.zktony.proto.order
+import com.zktony.proto.*
 import com.zktony.www.common.extension.currentTime
 import java.util.*
 
@@ -63,11 +59,56 @@ fun FeatureCard(
                     .padding(top = 8.dp),
                 imageVector = icon,
                 contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
             )
             Text(
                 modifier = Modifier.padding(bottom = 8.dp),
                 text = title,
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
+}
+
+// Icon卡片
+@Composable
+fun IconCard(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    color: Color = MaterialTheme.colorScheme.primary,
+    onClick: () -> Unit = {},
+) {
+    Card(
+        modifier = modifier
+            .fillMaxSize()
+            .clickable { onClick() }
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color.Blue.copy(alpha = 0.2f),
+                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.2f),
+                    )
+                )
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                modifier = Modifier
+                    .size(64.dp)
+                    .padding(top = 8.dp),
+                imageVector = icon,
+                contentDescription = null,
+                tint = color
             )
         }
     }
@@ -327,11 +368,11 @@ fun AttachmentCard(
         Box(
             modifier = modifier
                 .background(
-                    brush = Brush.verticalGradient(
+                    brush = Brush.horizontalGradient(
                         colors = listOf(
+                            Color.Blue.copy(alpha = 0.2f),
                             Color.Blue.copy(alpha = 0.1f),
-                            Color.Cyan.copy(alpha = 0.1f),
-                            Color.Blue.copy(alpha = 0.1f),
+                            Color.Cyan.copy(alpha = 0.2f),
                         )
                     )
                 )
@@ -347,15 +388,16 @@ fun AttachmentCard(
                     modifier = Modifier.padding(vertical = 1.dp),
                     color = Color.Gray.copy(alpha = 0.2f)
                 )
-                val list = attachment.split(" ").filter { it.isNotEmpty() }
-                list.forEachIndexed() { index, it ->
+                val list = attachment.split("|").filter { it.isNotEmpty() || it.isNotBlank() }
+                var index = 1
+                list.forEach {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "${index + 1}.", style = MaterialTheme.typography.labelMedium)
+                        Text(text = "$index .", style = MaterialTheme.typography.labelMedium)
                         Spacer(modifier = Modifier.width(16.dp))
                         Text(text = it, style = MaterialTheme.typography.labelMedium)
                         Spacer(modifier = Modifier.weight(1f))
@@ -366,24 +408,21 @@ fun AttachmentCard(
                                 .size(16.dp)
                                 .clickable {
                                     if (value.contains(it)) {
-                                        onValueChange(value.replace("$it ", ""))
+                                        onValueChange(value.replace("$it|", ""))
                                     } else {
-                                        onValueChange("${value + it} ")
+                                        onValueChange("${value + it}|")
                                     }
                                 }
                         )
                     }
-                    Divider(
-                        modifier = Modifier.padding(vertical = 1.dp),
-                        color = Color.Gray.copy(alpha = 0.2f)
-                    )
+                    Divider(thickness = 1.dp, color = Color.LightGray)
+                    index++
                 }
             }
         }
     }
 }
 // endregion
-
 
 // region preview
 
@@ -405,7 +444,7 @@ fun OrderCardPreview() {
             instrumentNumber = "test"
             softwareId = "test"
             createTime = currentTime()
-                      },
+        },
         onClick = { }
     )
 }

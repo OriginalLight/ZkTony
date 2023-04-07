@@ -27,14 +27,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.layout.DisplayFeature
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
-import com.zktony.manager.ui.fragment.HomeFragment
-import com.zktony.manager.ui.fragment.OrderDetailFragment
-import com.zktony.manager.ui.fragment.OrderFragment
-import com.zktony.manager.ui.fragment.OrderHistoryFragment
+import com.zktony.manager.ui.fragment.*
+import com.zktony.manager.ui.utils.ContentType
 import com.zktony.manager.ui.viewmodel.HomePageEnum
 import com.zktony.manager.ui.viewmodel.HomeUiState
 import com.zktony.manager.ui.viewmodel.HomeViewModel
-import com.zktony.manager.ui.utils.ContentType
 import org.koin.androidx.compose.koinViewModel
 
 // region HomeScreen
@@ -112,6 +109,28 @@ fun HomeScreenSinglePane(
         exit = shrinkHorizontally()
     ) {
         OrderDetailFragment(
+            navigateTo = navigateTo,
+            viewModel = koinViewModel()
+        )
+    }
+
+    AnimatedVisibility(
+        visible = uiState.page == HomePageEnum.CUSTOMER_SELECT,
+        enter = expandHorizontally(),
+        exit = shrinkHorizontally()
+    ) {
+        CustomerSelectFragment(
+            navigateTo = navigateTo,
+            viewModel = koinViewModel()
+        )
+    }
+
+    AnimatedVisibility(
+        visible = uiState.page == HomePageEnum.INSTRUMENT_SELECT,
+        enter = expandHorizontally(),
+        exit = shrinkHorizontally()
+    ) {
+        InstrumentSelectFragment(
             navigateTo = navigateTo,
             viewModel = koinViewModel()
         )

@@ -28,4 +28,6 @@ enum class HomePageEnum {
     ORDER_DETAIL,
     AFTER_SALE,
     AFTER_SALE_HISTORY,
+    CUSTOMER_SELECT,
+    INSTRUMENT_SELECT,
 }
