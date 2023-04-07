@@ -1,4 +1,4 @@
-package com.zktony.manager.ui.screen.viewmodel
+package com.zktony.manager.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class ShippingHistoryViewModel constructor(
+class OrderHistoryViewModel constructor(
     private val orderGrpc: OrderGrpc,
     private val softwareGrpc: SoftwareGrpc,
     private val customerGrpc: CustomerGrpc,
@@ -41,19 +41,6 @@ class ShippingHistoryViewModel constructor(
         }
     }
 
-    fun navigateTo(page: ShippingHistoryPageEnum) {
-        _uiState.value = _uiState.value.copy(
-            page = page,
-        )
-        if (page == ShippingHistoryPageEnum.ORDER_LIST) {
-            _uiState.value = _uiState.value.copy(
-                order = null,
-                software = null,
-                instrument = null,
-                customer = null,
-            )
-        }
-    }
 
     fun search(search: OrderSearch) {
         viewModelScope.launch {
@@ -67,33 +54,35 @@ class ShippingHistoryViewModel constructor(
         }
     }
 
-    fun orderClick(order: Order) {
-        loadInfo(order)
-        _uiState.value = _uiState.value.copy(
-            order = order,
-            page = ShippingHistoryPageEnum.ORDER_DETAIL
-        )
-    }
-
-    private fun loadInfo(order: Order) {
+    fun clickOrder(order: Order) {
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(order = order)
             launch {
                 softwareGrpc.getById(order.softwareId).flowOn(Dispatchers.IO)
-                    .catch { "查询软件信息失败".showShortToast() }
+                    .catch {
+                        _uiState.value = _uiState.value.copy(software = null)
+                        "查询软件信息失败".showShortToast()
+                    }
                     .collect {
                         _uiState.value = _uiState.value.copy(software = it)
                     }
             }
             launch {
                 instrumentGrpc.getById(order.instrumentId).flowOn(Dispatchers.IO)
-                    .catch { "查询仪器信息失败".showShortToast() }
+                    .catch {
+                        _uiState.value = _uiState.value.copy(instrument = null)
+                        "查询仪器信息失败".showShortToast()
+                    }
                     .collect {
                         _uiState.value = _uiState.value.copy(instrument = it)
                     }
             }
             launch {
                 customerGrpc.getById(order.customerId).flowOn(Dispatchers.IO)
-                    .catch { "查询客户信息失败".showShortToast() }
+                    .catch {
+                        _uiState.value = _uiState.value.copy(customer = null)
+                        "查询客户信息失败".showShortToast()
+                    }
                     .collect {
                         _uiState.value = _uiState.value.copy(customer = it)
                     }
@@ -108,12 +97,4 @@ data class ShippingHistoryUiState(
     val software: Software? = null,
     val instrument: Instrument? = null,
     val customer: Customer? = null,
-    val loading: Boolean = false,
-    val error: String = "",
-    val page: ShippingHistoryPageEnum = ShippingHistoryPageEnum.ORDER_LIST,
 )
-
-enum class ShippingHistoryPageEnum {
-    ORDER_LIST,
-    ORDER_DETAIL,
-}

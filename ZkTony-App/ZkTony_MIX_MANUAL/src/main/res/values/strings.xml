@@ -52,4 +52,5 @@
     <string name="reset">复  位</string>
     <string name="colloid">胶体 μL:</string>
     <string name="coagulant">促凝剂 μL:</string>
+    <string name="previous">预排液</string>
 </resources>

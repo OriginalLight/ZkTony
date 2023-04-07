@@ -1,4 +1,4 @@
-package com.zktony.manager.ui.screen.viewmodel
+package com.zktony.manager.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class ShippingViewModel constructor(
+class OrderViewModel constructor(
     private val orderGrpc: OrderGrpc,
     private val softwareGrpc: SoftwareGrpc,
     private val customerGrpc: CustomerGrpc,
@@ -47,7 +47,7 @@ class ShippingViewModel constructor(
         _uiState.value = _uiState.value.copy(page = page)
     }
 
-    fun setSoftware(software: Software) {
+    fun setSoftware(software: Software?) {
         _uiState.value = _uiState.value.copy(software = software)
     }
 
@@ -77,6 +77,7 @@ class ShippingViewModel constructor(
                         _uiState.value = _uiState.value.copy(
                             customer = null,
                         )
+                        "未找到客户".showShortToast()
                     }
                 }
         }
@@ -144,6 +145,7 @@ class ShippingViewModel constructor(
                         _uiState.value = _uiState.value.copy(
                             instrument = null,
                         )
+                        "未找到仪器".showShortToast()
                     }
                 }
         }
@@ -183,7 +185,7 @@ class ShippingViewModel constructor(
         }
     }
 
-    fun saveShipping(order: Order, block: () -> Unit) {
+    fun addOrder(order: Order, block: () -> Unit) {
         viewModelScope.launch {
             _uiState.value.software?.let { software ->
                 softwareGrpc.add(software).flowOn(Dispatchers.IO)
@@ -210,8 +212,6 @@ data class ShippingUiState(
     val customer: Customer? = null,
     val software: Software? = null,
     val instrument: Instrument? = null,
-    val loading: Boolean = false,
-    val error: String = "",
     val page: ShippingPageEnum = ShippingPageEnum.SHIPPING,
 )
 

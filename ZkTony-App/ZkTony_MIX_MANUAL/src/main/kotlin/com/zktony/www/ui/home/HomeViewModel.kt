@@ -91,9 +91,36 @@ class HomeViewModel constructor(
                 _uiState.value = _uiState.value.copy(
                     job = null,
                     time = 0L,
+                    previous = true
                 )
             }
             executor.execute()
+        }
+        _uiState.value = _uiState.value.copy(job = job)
+    }
+
+    fun previous() {
+        val job = viewModelScope.launch {
+            launch {
+                while (true) {
+                    delay(1000L)
+                    _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
+                }
+            }
+            val executor = ProgramExecutor(
+                colloid = _uiState.value.colloid,
+                coagulant = _uiState.value.coagulant,
+                scope = this,
+            )
+            executor.finish = {
+                _uiState.value.job?.cancel()
+                _uiState.value = _uiState.value.copy(
+                    job = null,
+                    time = 0L,
+                    previous = false
+                )
+            }
+            executor.execute2()
         }
         _uiState.value = _uiState.value.copy(job = job)
     }
@@ -108,7 +135,7 @@ class HomeViewModel constructor(
                 _uiState.value = _uiState.value.copy(
                     upOrDown = true,
                     fillCoagulant = false,
-                    start = false
+                    start = false,
                 )
                 serialManager.sendHex(
                     serial = Serial.TTYS0,
@@ -125,7 +152,8 @@ class HomeViewModel constructor(
                     _uiState.value = _uiState.value.copy(
                         upOrDown = true,
                         fillCoagulant = true,
-                        start = true
+                        start = true,
+                        previous = true
                     )
                     delay(100L)
                     while (_uiState.value.fillCoagulant) {
@@ -179,7 +207,8 @@ class HomeViewModel constructor(
                     _uiState.value = _uiState.value.copy(
                         upOrDown = true,
                         recaptureCoagulant = true,
-                        start = true
+                        start = true,
+                        previous = true
                     )
                     delay(100L)
                     while (_uiState.value.recaptureCoagulant) {
@@ -212,7 +241,10 @@ class HomeViewModel constructor(
      */
     fun fillColloid() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(start = true)
+            _uiState.value = _uiState.value.copy(
+                start = true,
+                previous = true,
+            )
             serialManager.sendHex(
                 serial = Serial.TTYS0,
                 hex = V1(pa = "0B", data = "0401").toHex()
@@ -225,7 +257,10 @@ class HomeViewModel constructor(
      */
     fun recaptureColloid() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(start = true)
+            _uiState.value = _uiState.value.copy(
+                start = true,
+                previous = true,
+            )
             serialManager.sendHex(
                 serial = Serial.TTYS0,
                 hex = V1(pa = "0B", data = "0402").toHex()
@@ -322,6 +357,7 @@ data class HomeUiState(
     val upOrDown: Boolean = true,
     val colloid: Int = 0,
     val coagulant: Int = 0,
+    val previous: Boolean = true,
     val colloidHistory: Set<String> = emptySet(),
     val coagulantHistory: Set<String> = emptySet(),
 )

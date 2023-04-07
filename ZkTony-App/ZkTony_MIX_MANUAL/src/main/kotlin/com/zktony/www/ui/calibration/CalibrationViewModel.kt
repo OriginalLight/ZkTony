@@ -27,13 +27,15 @@ class CalibrationViewModel constructor(
         }
     }
 
-    fun insert(name: String) {
+    fun insert(name: String, block: (Long) -> Unit) {
         viewModelScope.launch {
             val cali = _uiState.value?.find { it.name == name }
             if (cali != null) {
                 PopTip.show("校准程序名已存在")
             } else {
-                calibrationDao.insert(Calibration(name = name))
+                val model = Calibration(name = name)
+                calibrationDao.insert(model)
+                block(model.id)
             }
         }
     }

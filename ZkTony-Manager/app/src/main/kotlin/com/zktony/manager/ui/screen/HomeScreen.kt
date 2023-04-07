@@ -27,10 +27,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.layout.DisplayFeature
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
-import com.zktony.manager.ui.screen.page.HomePage
-import com.zktony.manager.ui.screen.viewmodel.HomePageEnum
-import com.zktony.manager.ui.screen.viewmodel.HomeUiState
-import com.zktony.manager.ui.screen.viewmodel.HomeViewModel
+import com.zktony.manager.ui.fragment.HomeFragment
+import com.zktony.manager.ui.fragment.OrderDetailFragment
+import com.zktony.manager.ui.fragment.OrderFragment
+import com.zktony.manager.ui.fragment.OrderHistoryFragment
+import com.zktony.manager.ui.viewmodel.HomePageEnum
+import com.zktony.manager.ui.viewmodel.HomeUiState
+import com.zktony.manager.ui.viewmodel.HomeViewModel
 import com.zktony.manager.ui.utils.ContentType
 import org.koin.androidx.compose.koinViewModel
 
@@ -46,11 +49,13 @@ fun HomeScreen(
 
     if (contentType == ContentType.SINGLE_PANE) {
         HomeScreenSinglePane(
+            modifier = modifier,
             uiState = uiState,
             navigateTo = viewModel::navigateTo,
         )
     } else {
         HomeScreenDualPane(
+            modifier = modifier,
             uiState = uiState,
             displayFeatures = displayFeatures,
             navigateTo = viewModel::navigateTo,
@@ -73,30 +78,45 @@ fun HomeScreenSinglePane(
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
-        HomePage(
-            modifier = modifier, navigateTo = navigateTo
+        HomeFragment(
+            modifier = modifier,
+            navigateTo = navigateTo
         )
     }
 
     AnimatedVisibility(
-        visible = uiState.page == HomePageEnum.SHIPPING,
+        visible = uiState.page == HomePageEnum.ORDER,
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
-        ShippingScreen(
-            navigateTo = navigateTo, viewModel = koinViewModel()
+        OrderFragment(
+            navigateTo = navigateTo,
+            viewModel = koinViewModel()
         )
     }
 
     AnimatedVisibility(
-        visible = uiState.page == HomePageEnum.SHIPPING_HISTORY,
+        visible = uiState.page == HomePageEnum.ORDER_HISTORY,
         enter = expandHorizontally(),
         exit = shrinkHorizontally()
     ) {
-        ShippingHistoryScreen(
-            navigateTo = navigateTo, viewModel = koinViewModel()
+        OrderHistoryFragment(
+            navigateTo = navigateTo,
+            viewModel = koinViewModel()
         )
     }
+
+    AnimatedVisibility(
+        visible = uiState.page == HomePageEnum.ORDER_DETAIL,
+        enter = expandHorizontally(),
+        exit = shrinkHorizontally()
+    ) {
+        OrderDetailFragment(
+            navigateTo = navigateTo,
+            viewModel = koinViewModel()
+        )
+    }
+
 }
 // endregion
 
@@ -109,36 +129,10 @@ fun HomeScreenDualPane(
     navigateTo: (HomePageEnum) -> Unit,
 ) {
     TwoPane(
-        first = {
-            HomePage(
-                modifier = modifier, navigateTo = navigateTo
-            )
-        },
-        second = {
-            AnimatedVisibility(
-                visible = (uiState.page == HomePageEnum.SHIPPING || uiState.page == HomePageEnum.HOME),
-                enter = expandHorizontally(),
-                exit = shrinkHorizontally()
-            ) {
-                ShippingScreen(
-                    navigateTo = navigateTo, viewModel = koinViewModel(), isDualPane = true
-                )
-            }
-
-            AnimatedVisibility(
-                visible = (uiState.page == HomePageEnum.SHIPPING_HISTORY),
-                enter = expandHorizontally(),
-                exit = shrinkHorizontally()
-            ) {
-                ShippingHistoryScreen(
-                    navigateTo = navigateTo, viewModel = koinViewModel(), isDualPane = true
-                )
-            }
-        },
+        first = {},
+        second = {},
         strategy = HorizontalTwoPaneStrategy(splitFraction = 0.5f, gapWidth = 16.dp),
         displayFeatures = displayFeatures
     )
 }
 // endregion
-
-

@@ -1,9 +1,10 @@
-package com.zktony.manager.ui.screen.viewmodel
+package com.zktony.manager.ui.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zktony.manager.common.ext.Ext
 import com.zktony.manager.common.ext.installApk
+import com.zktony.manager.common.ext.showShortToast
 import com.zktony.manager.common.http.DownloadManager
 import com.zktony.manager.common.http.DownloadState
 import com.zktony.manager.data.local.dao.UserDao
@@ -13,49 +14,34 @@ import com.zktony.proto.Application
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import java.io.File
 
-class SettingViewModel constructor(
-    private val dao: UserDao,
+class UpgradeViewModel constructor(
     private val grpc: ApplicationGrpc,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(SettingUiState())
+
+
+    private val _uiState = MutableStateFlow(UpgradeUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             launch {
-                dao.getAll().collect {
-                    if (it.isNotEmpty()) {
-                        _uiState.value = _uiState.value.copy(user = it.first())
+                grpc.getByApplicationId()
+                    .flowOn(Dispatchers.IO)
+                    .catch { it.message.toString().showShortToast() }
+                    .collect {
+                        _uiState.value = _uiState.value.copy(application = it)
                     }
-                }
-            }
-            launch {
-                grpc.getByApplicationId().collect {
-                    _uiState.value = _uiState.value.copy(application = it)
-                }
             }
         }
     }
 
-    fun navigateTo(page: SettingPage) {
-        _uiState.value = _uiState.value.copy(page = page)
-    }
 
-    fun saveUser() {
-        viewModelScope.launch {
-            dao.insert(_uiState.value.user)
-        }
-    }
-
-    fun onUserChange(user: User) {
-        _uiState.value = _uiState.value.copy(user = user)
-    }
-
-    fun update(context: Context) {
+    fun upgrade() {
         viewModelScope.launch {
             if (_uiState.value.download) {
                 return@launch
@@ -64,14 +50,14 @@ class SettingViewModel constructor(
             _uiState.value.application?.let { app ->
                 DownloadManager.download(
                     url = app.downloadUrl,
-                    file = File(context.getExternalFilesDir(null), "app.apk"),
+                    file = File(Ext.ctx.getExternalFilesDir(null), "app.apk"),
                 ).flowOn(Dispatchers.IO)
                     .collect {
                         when (it) {
                             is DownloadState.Success -> {
                                 _uiState.value = _uiState.value.copy(download = false)
                                 // install apk
-                                context.installApk(it.file)
+                                Ext.ctx.installApk(it.file)
                             }
                             is DownloadState.Err -> {
                                 _uiState.value = _uiState.value.copy(download = false)
@@ -89,18 +75,11 @@ class SettingViewModel constructor(
         }
     }
 
+
 }
 
-data class SettingUiState(
+data class UpgradeUiState(
     val download: Boolean = false,
-    val loading: Boolean = false,
     val progress: Int = 0,
-    val error: String? = null,
-    val page: SettingPage = SettingPage.SETTING,
-    val user: User = User(),
     val application: Application? = null,
 )
-
-enum class SettingPage {
-    SETTING, USER_MODIFY
-}

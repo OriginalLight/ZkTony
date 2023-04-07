@@ -1,4 +1,4 @@
-package com.zktony.manager.ui.screen.page
+package com.zktony.manager.ui.fragment
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -8,34 +8,35 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.manager.ui.components.ManagerAppBar
 import com.zktony.manager.ui.components.TextCard
-import com.zktony.proto.*
-import java.util.*
+import com.zktony.manager.ui.viewmodel.HomePageEnum
+import com.zktony.manager.ui.viewmodel.OrderHistoryViewModel
 
 @Composable
-fun ProductDetailPage(
-    modifier: Modifier = Modifier,
-    order: Order?,
-    software: Software?,
-    instrument: Instrument?,
-    customer: Customer?,
-    onBack: () -> Unit,
+fun OrderDetailFragment(
+    navigateTo: (HomePageEnum) -> Unit,
+    viewModel: OrderHistoryViewModel,
+    isDualPane: Boolean = false
 ) {
 
     BackHandler {
-        onBack()
+        navigateTo(HomePageEnum.ORDER_HISTORY)
     }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
 
     Column {
         ManagerAppBar(
             title = "产品详情",
-            onBack = onBack,
-            isFullScreen = true,
+            isFullScreen = !isDualPane,
+            onBack = { navigateTo(HomePageEnum.ORDER_HISTORY) },
         )
 
         val listState = rememberLazyListState()
@@ -48,6 +49,7 @@ fun ProductDetailPage(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            val order = uiState.order
             if (order != null) {
                 item {
                     val textList = listOf(
@@ -63,6 +65,7 @@ fun ProductDetailPage(
                 }
             }
 
+            val software = uiState.software
             if (software != null) {
                 item {
                     TextCard(textList = listOf(
@@ -76,6 +79,7 @@ fun ProductDetailPage(
                 }
             }
 
+            val instrument = uiState.instrument
             if (instrument != null) {
                 item {
                     TextCard(
@@ -93,6 +97,7 @@ fun ProductDetailPage(
                 }
             }
 
+            val customer = uiState.customer
             if(customer != null) {
                 item {
                     TextCard(textList = listOf(
@@ -109,27 +114,3 @@ fun ProductDetailPage(
         }
     }
 }
-
-// region Preview
-
-@Preview
-@Composable
-fun ProductDetailPagePreview() {
-    ProductDetailPage(
-        order = order {
-            id = UUID.randomUUID().toString()
-        },
-        software = software {
-            id = UUID.randomUUID().toString()
-        },
-        instrument = instrument {
-            id = UUID.randomUUID().toString()
-        },
-        customer = customer {
-            id = UUID.randomUUID().toString()
-        },
-        onBack = { },
-    )
-}
-
-// endregion

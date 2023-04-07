@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
-import androidx.compose.material.icons.filled.Upgrade
-import androidx.compose.material.icons.outlined.ArrowForwardIos
 import androidx.compose.material.icons.outlined.RadioButtonChecked
 import androidx.compose.material.icons.outlined.RadioButtonUnchecked
 import androidx.compose.material3.*
@@ -19,29 +17,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.zktony.proto.Customer
+import com.zktony.proto.Instrument
 import com.zktony.proto.Order
+import com.zktony.proto.Software
 import com.zktony.proto.order
+import com.zktony.www.common.extension.currentTime
 import java.util.*
 
-// region FunctionCard
-@OptIn(ExperimentalMaterial3Api::class)
+
+// 功能卡片
 @Composable
-fun FunctionCard(
+fun FeatureCard(
     modifier: Modifier = Modifier,
     title: String,
-    subtitle: String,
     icon: ImageVector,
     onClick: () -> Unit = {},
-    shape: RoundedCornerShape = RoundedCornerShape(0.dp),
 ) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = shape,
-        onClick = { onClick() },
-    ) {
-
-        Box(
-            modifier = Modifier.background(
+    Card(
+        modifier = modifier
+            .fillMaxSize()
+            .clickable { onClick() }
+            .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
                         Color.Blue.copy(alpha = 0.2f),
@@ -49,91 +46,262 @@ fun FunctionCard(
                         Color.Cyan.copy(alpha = 0.2f),
                     )
                 )
-            )
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    modifier = Modifier.size(32.dp),
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = Color.Unspecified
-                )
-                Column(
-                    modifier = Modifier.padding(start = 16.dp)
-                ) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                    Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    modifier = Modifier.size(16.dp),
-                    imageVector = Icons.Outlined.ArrowForwardIos,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.outline
-                )
-            }
+            Icon(
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(top = 8.dp),
+                imageVector = icon,
+                contentDescription = null,
+            )
+            Text(
+                modifier = Modifier.padding(bottom = 8.dp),
+                text = title,
+                style = MaterialTheme.typography.titleSmall
+            )
         }
     }
 }
-// endregion
+
+// 订单展示卡片
+@Composable
+fun OrderCard(
+    modifier: Modifier = Modifier,
+    order: Order,
+    onClick: () -> Unit = {},
+) {
+    Card(
+        modifier = modifier
+            .fillMaxSize()
+            .clickable { onClick() }
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color.Blue.copy(alpha = 0.2f),
+                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.2f),
+                    )
+                )
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = order.instrumentNumber,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = order.softwareId,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = order.createTime,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+// 客户展示卡片
+@Composable
+fun CustomerCard(
+    modifier: Modifier = Modifier,
+    customer: Customer,
+    onClick: () -> Unit = {},
+) {
+    Card(
+        modifier = modifier
+            .fillMaxSize()
+            .clickable { onClick() }
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color.Blue.copy(alpha = 0.2f),
+                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.2f),
+                    )
+                )
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = customer.name,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = customer.phone,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = customer.address,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+// 仪器展示卡片
+@Composable
+fun InstrumentCard(
+    modifier: Modifier = Modifier,
+    instrument: Instrument,
+    onClick: () -> Unit = {},
+) {
+    Card(
+        modifier = modifier
+            .fillMaxSize()
+            .clickable { onClick() }
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color.Blue.copy(alpha = 0.2f),
+                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.2f),
+                    )
+                )
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = instrument.name,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = instrument.model,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
+// 软件卡片
+@Composable
+fun SoftwareCard(
+    modifier: Modifier = Modifier,
+    software: Software,
+    onClick: () -> Unit = {},
+) {
+    Card(
+        modifier = modifier
+            .fillMaxSize()
+            .clickable { onClick() }
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color.Blue.copy(alpha = 0.2f),
+                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.2f),
+                    )
+                )
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = software.id,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = software.`package`,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = software.createTime,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
+}
+
 
 // region TextCard
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextCard(
     modifier: Modifier = Modifier,
     textList: List<Pair<String, String>>,
     onClick: () -> Unit = {},
 ) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(4.dp),
-        onClick = { onClick() }
-    ) {
-        Box(
-            modifier = modifier
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Blue.copy(alpha = 0.1f),
-                            Color.Cyan.copy(alpha = 0.1f),
-                            Color.Blue.copy(alpha = 0.1f),
-                        )
+
+    Card(
+        modifier = modifier
+            .fillMaxSize()
+            .clickable { onClick() }
+            .background(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(
+                        Color.Blue.copy(alpha = 0.2f),
+                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.2f),
                     )
                 )
+            ),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Transparent,
+        ),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp, vertical = 4.dp),
-            ) {
-                textList.forEachIndexed { index, map ->
-                    Row {
-                        Text(
-                            modifier = Modifier.width(64.dp),
-                            text = map.first,
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                        Text(
-                            text = ":  ${map.second}",
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
-                    if (index != textList.size - 1) {
-                        Divider(modifier = Modifier.padding(vertical = 1.dp))
-                    }
+            textList.forEachIndexed { index, map ->
+                Row {
+                    Text(
+                        modifier = Modifier.width(64.dp),
+                        text = map.first,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                    Text(
+                        text = ":  ${map.second}",
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
+                if (index != textList.size - 1) {
+                    Divider(modifier = Modifier.padding(vertical = 1.dp))
                 }
             }
         }
@@ -216,132 +384,29 @@ fun AttachmentCard(
 }
 // endregion
 
-// region ProductCard
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ProductCard(
-    modifier: Modifier = Modifier,
-    order: Order,
-    onClick: () -> Unit = {},
-) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(4.dp),
-        onClick = { onClick() }
-    ) {
-        Box(
-            modifier = modifier
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Blue.copy(alpha = 0.1f),
-                            Color.Cyan.copy(alpha = 0.1f),
-                            Color.Blue.copy(alpha = 0.1f),
-                        )
-                    )
-                )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-            ) {
-                Text(text = "编号: ${order.id}", style = MaterialTheme.typography.labelMedium)
-                Text(
-                    text = "快递: ${order.expressNumber}",
-                    style = MaterialTheme.typography.labelMedium
-                )
-                Text(
-                    text = "时间: ${order.createTime.replace("T", " ")}",
-                    style = MaterialTheme.typography.labelMedium
-                )
-                if (order.createBy.isNotEmpty()) {
-                    Text(
-                        text = "创建人: ${order.createBy}",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                }
-            }
-        }
-    }
-}
-
-
-// endregion
-
-// region UpdateCard
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun UpdateCard(
-    modifier: Modifier = Modifier,
-    title: String,
-    subtitle: String,
-    progress: Int,
-    onClick: () -> Unit = {},
-) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(4.dp),
-        onClick = { onClick() }
-    ) {
-        Box(
-            modifier = modifier
-                .background(
-                    brush = Brush.horizontalGradient(
-                        colors = listOf(
-                            Color.Blue.copy(alpha = 0.2f),
-                            Color.Blue.copy(alpha = 0.1f),
-                            Color.Cyan.copy(alpha = 0.2f),
-                        )
-                    )
-                )
-        ) {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    modifier = Modifier.size(32.dp),
-                    imageVector = Icons.Default.Upgrade,
-                    contentDescription = null,
-                    tint = Color.Unspecified
-                )
-                Column(
-                    modifier = Modifier.padding(start = 16.dp)
-                ) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.labelLarge,
-                    )
-                    Text(
-                        text = subtitle,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                }
-                Spacer(modifier = Modifier.weight(1f))
-                if (progress > 0) {
-                    Text(
-                        color = MaterialTheme.colorScheme.primary,
-                        text = "$progress %"
-                    )
-                }
-            }
-        }
-    }
-}
-// endregion
 
 // region preview
+
 @Preview
 @Composable
-fun FunctionCardPreview() {
-    FunctionCard(
+fun FeatureCardPreview() {
+    FeatureCard(
         title = "title",
-        subtitle = "subtitle",
         icon = Icons.Default.Android
+    )
+}
+
+@Preview
+@Composable
+fun OrderCardPreview() {
+    OrderCard(
+        order = order {
+            id = UUID.randomUUID().toString()
+            instrumentNumber = "test"
+            softwareId = "test"
+            createTime = currentTime()
+                      },
+        onClick = { }
     )
 }
 
@@ -365,26 +430,6 @@ fun AttachmentCardPreview() {
         value = "att1 att2 att3",
         onClick = { },
         onValueChange = { }
-    )
-}
-
-@Preview
-@Composable
-fun ProductCardPreview() {
-    ProductCard(
-        order = order { id = UUID.randomUUID().toString() },
-        onClick = { }
-    )
-}
-
-@Preview
-@Composable
-fun UpdateCardPreview() {
-    UpdateCard(
-        title = "title",
-        subtitle = "subtitle",
-        progress = 10,
-        onClick = { }
     )
 }
 // endregion

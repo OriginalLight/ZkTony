@@ -38,6 +38,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             }
                             start.isEnabled =
                                 it.coagulant > 0 && it.colloid > 0 && it.job == null && !it.start
+                            previous.isVisible = it.previous
+                            start.isVisible = !it.previous
                             operate.isVisible = it.job == null
                             coagulantEdit.isEnabled = it.job == null
                             colloidEdit.isEnabled = it.job == null
@@ -60,6 +62,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         binding.apply {
             start.clickNoRepeat {
                 viewModel.start()
+            }
+            previous.clickNoRepeat {
+                viewModel.previous()
             }
             with(reset) {
                 clickScale()

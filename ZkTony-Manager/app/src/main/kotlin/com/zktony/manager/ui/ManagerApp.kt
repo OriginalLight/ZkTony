@@ -39,7 +39,6 @@ import androidx.window.layout.DisplayFeature
 import androidx.window.layout.FoldingFeature
 import com.zktony.manager.ui.navigation.*
 import com.zktony.manager.ui.screen.*
-import com.zktony.manager.ui.screen.viewmodel.HomeViewModel
 import com.zktony.manager.ui.utils.*
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -272,7 +271,11 @@ private fun ManagerNavHost(
             )
         }
         composable(Route.MANAGER) {
-            EmptyComingSoon()
+            ManagerScreen(
+                contentType = contentType,
+                displayFeatures = displayFeatures,
+                viewModel = koinViewModel()
+            )
         }
         composable(Route.STORE) {
             EmptyComingSoon()

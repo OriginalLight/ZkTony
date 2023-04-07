@@ -44,4 +44,23 @@ class ProgramExecutor constructor(
             finish()
         }
     }
+
+    suspend fun execute2() {
+        scope.launch {
+            while (serialManager.lock.value) {
+                delay(100L)
+            }
+            executionManager.executor(
+                executionManager.generator(
+                    v1 = 1000f,
+                )
+            )
+            delay(100L)
+            while (serialManager.lock.value) {
+                delay(100L)
+            }
+            serialManager.reset()
+            finish()
+        }
+    }
 }

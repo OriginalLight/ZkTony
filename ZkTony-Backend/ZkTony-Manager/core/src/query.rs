@@ -24,7 +24,7 @@ impl CustomerQuery {
         page_size: u64,
     ) -> Result<(Vec<CustomerModel>, u64), DbErr> {
         let paginator = CustomerEntity::find()
-            .order_by_asc(CustomerColumn::Id)
+            .order_by_desc(CustomerColumn::CreateTime)
             .paginate(db, page_size);
         let num_pages = paginator.num_pages().await?;
 
@@ -85,7 +85,7 @@ impl InstrumentQuery {
         page_size: u64,
     ) -> Result<(Vec<InstrumentModel>, u64), DbErr> {
         let paginator = InstrumentEntity::find()
-            .order_by_asc(InstrumentColumn::Id)
+            .order_by_desc(InstrumentColumn::CreateTime)
             .paginate(db, page_size);
         let num_pages = paginator.num_pages().await?;
 
@@ -139,7 +139,7 @@ impl OrderQuery {
         page_size: u64,
     ) -> Result<(Vec<OrderModel>, u64), DbErr> {
         let paginator = OrderEntity::find()
-            .order_by_asc(OrderColumn::Id)
+            .order_by_desc(OrderColumn::CreateTime)
             .paginate(db, page_size);
         let num_pages = paginator.num_pages().await?;
 
@@ -208,7 +208,7 @@ impl SoftwareQuery {
         page_size: u64,
     ) -> Result<(Vec<SoftwareModel>, u64), DbErr> {
         let paginator = SoftwareEntity::find()
-            .order_by_asc(SoftwareColumn::Id)
+            .order_by_desc(SoftwareColumn::CreateTime)
             .paginate(db, page_size);
         let num_pages = paginator.num_pages().await?;
 

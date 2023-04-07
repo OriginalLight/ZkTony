@@ -1,4 +1,4 @@
-package com.zktony.manager.ui.screen.viewmodel
+package com.zktony.manager.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,15 +18,14 @@ class HomeViewModel : ViewModel() {
 }
 
 data class HomeUiState(
-    val loading: Boolean = false,
-    val error: String = "",
     val page: HomePageEnum = HomePageEnum.HOME,
 )
 
 enum class HomePageEnum {
     HOME,
-    SHIPPING,
-    SHIPPING_HISTORY,
+    ORDER,
+    ORDER_HISTORY,
+    ORDER_DETAIL,
     AFTER_SALE,
     AFTER_SALE_HISTORY,
 }

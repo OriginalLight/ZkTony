@@ -1,4 +1,4 @@
-package com.zktony.manager.ui.screen.page
+package com.zktony.manager.ui.fragment
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -11,6 +11,9 @@ import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -19,12 +22,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.manager.data.local.model.User
 import com.zktony.manager.ui.components.ManagerAppBar
-import com.zktony.manager.ui.screen.viewmodel.SettingPage
-import com.zktony.manager.ui.screen.viewmodel.SettingUiState
+import com.zktony.manager.ui.viewmodel.SettingPage
+import com.zktony.manager.ui.viewmodel.UpgradeViewModel
+import com.zktony.manager.ui.viewmodel.UserViewModel
 
 /**
  * @author: 刘贺贺
@@ -32,31 +36,37 @@ import com.zktony.manager.ui.screen.viewmodel.SettingUiState
  */
 
 
-// region: UserModifyPage
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun UserModifyPage(
-    uiState: SettingUiState,
+fun UserEditFragment(
+    modifier: Modifier = Modifier,
     navigateTo: (SettingPage) -> Unit,
-    onUserChange: (User) -> Unit,
-    onSaveUser: () -> Unit,
+    viewModel: UserViewModel,
+    isDualPane: Boolean = false
 ) {
-
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val localFocusManager = LocalFocusManager.current
-
     BackHandler {
         navigateTo(SettingPage.SETTING)
     }
 
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    val userName = remember { mutableStateOf(uiState.user.name) }
+    val userPhone = remember { mutableStateOf(uiState.user.phone) }
+
+
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val localFocusManager = LocalFocusManager.current
+
+
     ManagerAppBar(
         title = "个人信息",
-        isFullScreen = true,
+        isFullScreen = !isDualPane,
         onBack = { navigateTo(SettingPage.SETTING) },
     )
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.Center,
@@ -64,8 +74,8 @@ fun UserModifyPage(
     ) {
 
         OutlinedTextField(
-            value = uiState.user.name,
-            onValueChange = { onUserChange(uiState.user.copy(name = it)) },
+            value = userName.value,
+            onValueChange = { userName.value = it },
             modifier = Modifier
                 .fillMaxWidth(),
             label = { Text(text = "姓名") },
@@ -76,9 +86,9 @@ fun UserModifyPage(
                 )
             },
             trailingIcon = {
-                AnimatedVisibility(uiState.user.name.isNotEmpty()) {
+                AnimatedVisibility(userName.value.isNotEmpty()) {
                     IconButton(onClick = {
-                        onUserChange(uiState.user.copy(name = ""))
+                        userName.value = ""
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Clear,
@@ -98,8 +108,8 @@ fun UserModifyPage(
         )
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
-            value = uiState.user.phone,
-            onValueChange = { onUserChange(uiState.user.copy(phone = it)) },
+            value = userPhone.value,
+            onValueChange = { userPhone.value = it },
             modifier = Modifier
                 .fillMaxWidth(),
             label = { Text(text = "手机号") },
@@ -110,9 +120,9 @@ fun UserModifyPage(
                 )
             },
             trailingIcon = {
-                AnimatedVisibility(uiState.user.phone.isNotEmpty()) {
+                AnimatedVisibility(userPhone.value.isNotEmpty()) {
                     IconButton(onClick = {
-                        onUserChange(uiState.user.copy(phone = ""))
+                        userPhone.value = ""
                     }) {
                         Icon(
                             imageVector = Icons.Default.Clear,
@@ -137,6 +147,13 @@ fun UserModifyPage(
             modifier = Modifier
                 .fillMaxWidth(),
             onClick = {
+                viewModel.insert(
+                    User(
+                        id = uiState.user.id,
+                        name = userName.value,
+                        phone = userPhone.value
+                    )
+                )
                 navigateTo(SettingPage.SETTING)
             },
         ) {
@@ -144,17 +161,3 @@ fun UserModifyPage(
         }
     }
 }
-// endregion
-
-// region Preview
-@Preview
-@Composable
-fun UserModifyPagePreview() {
-    UserModifyPage(
-        uiState = SettingUiState(),
-        navigateTo = {},
-        onUserChange = {},
-        onSaveUser = {},
-    )
-}
-// endregion

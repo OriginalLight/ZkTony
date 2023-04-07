@@ -1,4 +1,4 @@
-package com.zktony.manager.ui.screen.page
+package com.zktony.manager.ui.fragment
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -18,16 +18,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.zktony.manager.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.manager.ui.components.ManagerAppBar
-import com.zktony.proto.Instrument
+import com.zktony.manager.ui.viewmodel.InstrumentViewModel
+import com.zktony.manager.ui.viewmodel.ManagerPageEnum
 import com.zktony.proto.instrument
 import com.zktony.www.common.extension.currentTime
 import java.util.*
@@ -37,22 +37,25 @@ import java.util.*
  * @date: 2023-02-23 13:15
  */
 
-// region InstrumentModifyPage
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun InstrumentModifyPage(
+fun InstrumentEditFragment(
     modifier: Modifier = Modifier,
-    instrument: Instrument,
-    onSave: (Instrument) -> Unit,
-    onBack: () -> Unit,
+    navigateTo: (ManagerPageEnum) -> Unit,
+    viewModel: InstrumentViewModel,
+    isDualPane: Boolean = false
 ) {
     BackHandler {
-        onBack()
+        navigateTo(ManagerPageEnum.INSTRUMENT_LIST)
     }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val localFocusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
+
+    val instrument = uiState.instrument ?: instrument {}
 
     val mName = remember { mutableStateOf(instrument.name) }
     val mModel = remember { mutableStateOf(instrument.model) }
@@ -62,10 +65,13 @@ fun InstrumentModifyPage(
     val mAttachment = remember { mutableStateOf(instrument.attachment) }
     val mRemarks = remember { mutableStateOf(instrument.remarks) }
 
-    Column {
-        ManagerAppBar(title = stringResource(id = R.string.page_customer_title),
-            isFullScreen = true,
-            onBack = { onBack() })
+    Column(
+        modifier = modifier
+    ) {
+        ManagerAppBar(
+            title = "仪器信息",
+            isFullScreen = !isDualPane,
+            onBack = { navigateTo(ManagerPageEnum.INSTRUMENT_LIST) })
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -265,13 +271,14 @@ fun InstrumentModifyPage(
                     }
                     item {
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                            onClick = {
-                                onSave(
-                                    instrument {
-                                        id = instrument.id
+                        if (uiState.instrument == null) {
+                            Button(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                                onClick = {
+                                    navigateTo(ManagerPageEnum.INSTRUMENT_LIST)
+                                    viewModel.insert(instrument {
+                                        id = UUID.randomUUID().toString()
                                         name = mName.value
                                         model = mModel.value
                                         voltage = mVoltage.value
@@ -280,27 +287,48 @@ fun InstrumentModifyPage(
                                         attachment = mAttachment.value
                                         remarks = mRemarks.value
                                         createTime = currentTime()
-                                    }
+                                    })
+                                }) {
+                                Text(text = "添加")
+                            }
+                        } else {
+                            Button(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                                onClick = {
+                                    navigateTo(ManagerPageEnum.INSTRUMENT_LIST)
+                                    viewModel.update(instrument {
+                                        id = instrument.id
+                                        name = mName.value
+                                        model = mModel.value
+                                        voltage = mVoltage.value
+                                        power = mPower.value
+                                        frequency = mFrequency.value
+                                        attachment = mAttachment.value
+                                        remarks = mRemarks.value
+                                    })
+                                }) {
+                                Text(text = "修改")
+                            }
+
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp),
+                                onClick = {
+                                    navigateTo(ManagerPageEnum.INSTRUMENT_LIST)
+                                    viewModel.delete(instrument.id)
+                                },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color.Red,
                                 )
-                            }) {
-                            Text(text = "添加/修改")
+                            ) {
+                                Text(text = "删除")
+                            }
                         }
                     }
                 }
             )
         }
     }
-}
-// endregion
-
-// region Preview
-
-@Preview
-@Composable
-fun InstrumentModifyPagePreview() {
-    InstrumentModifyPage(
-        instrument = instrument { id = UUID.randomUUID().toString() },
-        onSave = {},
-        onBack = {},
-    )
 }

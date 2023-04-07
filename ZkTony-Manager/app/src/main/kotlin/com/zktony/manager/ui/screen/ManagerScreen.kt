@@ -26,32 +26,30 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.layout.DisplayFeature
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
-import com.zktony.manager.ui.fragment.SettingFragment
-import com.zktony.manager.ui.fragment.UpgradeFragment
-import com.zktony.manager.ui.fragment.UserEditFragment
-import com.zktony.manager.ui.viewmodel.SettingPage
-import com.zktony.manager.ui.viewmodel.SettingUiState
-import com.zktony.manager.ui.viewmodel.SettingViewModel
+import com.zktony.manager.ui.fragment.*
 import com.zktony.manager.ui.utils.ContentType
+import com.zktony.manager.ui.viewmodel.ManagerPageEnum
+import com.zktony.manager.ui.viewmodel.ManagerUiState
+import com.zktony.manager.ui.viewmodel.ManagerViewModel
 import org.koin.androidx.compose.koinViewModel
 
-// region: SettingScreen
+// region: ManagerScreen
 @Composable
-fun SettingScreen(
+fun ManagerScreen(
     modifier: Modifier = Modifier,
     contentType: ContentType,
     displayFeatures: List<DisplayFeature>,
-    viewModel: SettingViewModel,
+    viewModel: ManagerViewModel,
 ) {
     val uiState = viewModel.uiState.collectAsStateWithLifecycle()
     if (contentType == ContentType.SINGLE_PANE) {
-        SettingScreenSinglePane(
+        ManagerScreenSinglePane(
             modifier = modifier,
             uiState = uiState.value,
             viewModel = viewModel,
         )
     } else {
-        SettingScreenDualPane(
+        ManagerScreenDualPane(
             modifier = modifier,
             uiState = uiState.value,
             displayFeatures = displayFeatures,
@@ -63,60 +61,114 @@ fun SettingScreen(
 }
 // endregion
 
-// region: SettingScreenSinglePane
+// region: ManagerScreenSinglePane
 @Composable
-fun SettingScreenSinglePane(
+fun ManagerScreenSinglePane(
     modifier: Modifier = Modifier,
-    uiState: SettingUiState,
-    viewModel: SettingViewModel,
+    uiState: ManagerUiState,
+    viewModel: ManagerViewModel,
 ) {
     AnimatedVisibility(
-        visible = uiState.page == SettingPage.SETTING,
+        visible = uiState.page == ManagerPageEnum.MANAGER,
         enter = slideInVertically(initialOffsetY = { it }),
         exit = shrinkHorizontally { it }
     ) {
-        SettingFragment(
+        ManagerFragment(
             modifier = modifier,
             navigateTo = viewModel::navigateTo,
-        )
-    }
-    AnimatedVisibility(
-        visible = uiState.page == SettingPage.USER_MODIFY,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = shrinkHorizontally { it }
-    ) {
-        UserEditFragment(
-            modifier = modifier,
-            navigateTo = viewModel::navigateTo,
-            viewModel = koinViewModel(),
-        )
-    }
-    AnimatedVisibility(
-        visible = uiState.page == SettingPage.UPGRADE,
-        enter = slideInVertically(initialOffsetY = { it }),
-        exit = shrinkHorizontally { it }
-    ) {
-        UpgradeFragment(
-            modifier = modifier,
-            navigateTo = viewModel::navigateTo,
-            viewModel = koinViewModel(),
         )
     }
 
+    AnimatedVisibility(
+        visible = uiState.page == ManagerPageEnum.CUSTOMER_LIST,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = shrinkHorizontally { it }
+    ) {
+        CustomerListFragment(
+            modifier = modifier,
+            navigateTo = viewModel::navigateTo,
+            viewModel = koinViewModel()
+        )
+    }
+
+    AnimatedVisibility(
+        visible = uiState.page == ManagerPageEnum.CUSTOMER_EDIT,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = shrinkHorizontally { it }
+    ) {
+        CustomerEditFragment(
+            modifier = modifier,
+            navigateTo = viewModel::navigateTo,
+            viewModel = koinViewModel()
+        )
+    }
+
+    AnimatedVisibility(
+        visible = uiState.page == ManagerPageEnum.INSTRUMENT_LIST,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = shrinkHorizontally { it }
+    ) {
+        InstrumentListFragment(
+            modifier = modifier,
+            navigateTo = viewModel::navigateTo,
+            viewModel = koinViewModel()
+        )
+    }
+
+    AnimatedVisibility(
+        visible = uiState.page == ManagerPageEnum.INSTRUMENT_EDIT,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = shrinkHorizontally { it }
+    ) {
+        InstrumentEditFragment(
+            modifier = modifier,
+            navigateTo = viewModel::navigateTo,
+            viewModel = koinViewModel()
+        )
+    }
+
+    AnimatedVisibility(
+        visible = uiState.page == ManagerPageEnum.SOFTWARE_LIST,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = shrinkHorizontally { it }
+    ) {
+        SoftwareListFragment(
+            modifier = modifier,
+            navigateTo = viewModel::navigateTo,
+            viewModel = koinViewModel()
+        )
+    }
+
+    AnimatedVisibility(
+        visible = uiState.page == ManagerPageEnum.SOFTWARE_EDIT,
+        enter = slideInVertically(initialOffsetY = { it }),
+        exit = shrinkHorizontally { it }
+    ) {
+        SoftwareEditFragment(
+            modifier = modifier,
+            navigateTo = viewModel::navigateTo,
+            viewModel = koinViewModel()
+        )
+    }
 }
-// endregion
 
-// region: SettingScreenDualPane
+// region: ManagerScreenDualPane
 @Composable
-fun SettingScreenDualPane(
+fun ManagerScreenDualPane(
     modifier: Modifier = Modifier,
-    uiState: SettingUiState,
+    uiState: ManagerUiState,
     displayFeatures: List<DisplayFeature>,
-    viewModel: SettingViewModel,
+    viewModel: ManagerViewModel,
 ) {
     TwoPane(
-        first = {},
-        second = {},
+        first = {
+            ManagerFragment(
+                modifier = modifier,
+                navigateTo = viewModel::navigateTo,
+            )
+        },
+        second = {
+        },
         strategy = HorizontalTwoPaneStrategy(splitFraction = 0.5f, gapWidth = 16.dp),
         displayFeatures = displayFeatures
     )

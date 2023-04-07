@@ -96,12 +96,11 @@ fun CodeTextField(
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
+                        Color.Blue.copy(alpha = 0.2f),
                         Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.1f),
-                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.2f),
                     )
                 ),
-                shape = RoundedCornerShape(4.dp)
             )
             .focusRequester(focusRequester),
         isError = isError,
@@ -170,7 +169,6 @@ fun SearchTextField(
     icon: ImageVector,
     onValueChange: (String) -> Unit,
     onSearch: (String) -> Unit,
-    onAdd: () -> Unit,
 ) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -184,12 +182,11 @@ fun SearchTextField(
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
+                        Color.Blue.copy(alpha = 0.2f),
                         Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.1f),
-                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.2f),
                     )
                 ),
-                shape = RoundedCornerShape(4.dp)
             )
             .focusRequester(focusRequester),
         isError = isError,
@@ -220,19 +217,6 @@ fun SearchTextField(
                             localFocusManager.clearFocus()
                         },
                     imageVector = Icons.Outlined.Search,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Icon(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clickable {
-                            onAdd()
-                            keyboardController?.hide()
-                            localFocusManager.clearFocus()
-                        },
-                    imageVector = Icons.Outlined.Add,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )
@@ -287,12 +271,11 @@ fun CommonTextField(
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
+                        Color.Blue.copy(alpha = 0.2f),
                         Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.1f),
-                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.2f),
                     )
                 ),
-                shape = RoundedCornerShape(4.dp)
             )
             .focusRequester(focusRequester),
         value = value,
@@ -356,8 +339,6 @@ fun TimeTextField(
     val month = calendar.get(Calendar.MONTH)
     val day = calendar.get(Calendar.DAY_OF_MONTH)
 
-    val time = remember { mutableStateOf("") }
-
     val datePickerDialog = DatePickerDialog(
         context,
         { _, y, mon, dayOfMonth ->
@@ -374,12 +355,11 @@ fun TimeTextField(
             .background(
                 brush = Brush.horizontalGradient(
                     colors = listOf(
+                        Color.Blue.copy(alpha = 0.2f),
                         Color.Blue.copy(alpha = 0.1f),
-                        Color.Cyan.copy(alpha = 0.1f),
-                        Color.Blue.copy(alpha = 0.1f),
+                        Color.Cyan.copy(alpha = 0.2f),
                     )
                 ),
-                shape = RoundedCornerShape(4.dp)
             )
             .focusRequester(focusRequester),
         value = value,
@@ -430,3 +410,4 @@ fun TimeTextField(
         ),
     )
 }
+// endregion

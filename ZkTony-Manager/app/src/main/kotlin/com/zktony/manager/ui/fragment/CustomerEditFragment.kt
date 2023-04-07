@@ -1,14 +1,12 @@
-package com.zktony.manager.ui.screen.page
+package com.zktony.manager.ui.fragment
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -16,16 +14,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.zktony.manager.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.manager.ui.components.ManagerAppBar
-import com.zktony.proto.Customer
+import com.zktony.manager.ui.viewmodel.CustomerViewModel
+import com.zktony.manager.ui.viewmodel.ManagerPageEnum
 import com.zktony.proto.customer
 import com.zktony.www.common.extension.currentTime
 import java.util.*
@@ -35,22 +33,27 @@ import java.util.*
  * @date: 2023-02-23 13:15
  */
 
-// region CustomerModifyPage
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun CustomerModifyPage(
+fun CustomerEditFragment(
     modifier: Modifier = Modifier,
-    customer: Customer,
-    onSave: (Customer) -> Unit,
-    onBack: () -> Unit,
+    navigateTo: (ManagerPageEnum) -> Unit,
+    viewModel: CustomerViewModel,
+    isDualPane: Boolean = false
+
 ) {
     BackHandler {
-        onBack()
+        navigateTo(ManagerPageEnum.CUSTOMER_LIST)
     }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val localFocusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
+
+    val customer = uiState.customer ?: customer {}
 
     val mName = remember { mutableStateOf(customer.name) }
     val mPhone = remember { mutableStateOf(customer.phone) }
@@ -59,10 +62,13 @@ fun CustomerModifyPage(
     val mSource = remember { mutableStateOf(customer.source) }
     val mRemarks = remember { mutableStateOf(customer.remarks) }
 
-    Column {
-        ManagerAppBar(title = stringResource(id = R.string.page_customer_title),
-            isFullScreen = true,
-            onBack = { onBack() })
+    Column(
+        modifier = modifier
+    ) {
+        ManagerAppBar(
+            title = "客户信息",
+            isFullScreen = !isDualPane,
+            onBack = { navigateTo(ManagerPageEnum.CUSTOMER_LIST) })
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -168,37 +174,59 @@ fun CustomerModifyPage(
                 singleLine = false,
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 16.dp),
-                onClick = {
-                    onBack()
-                    onSave(customer {
-                        id = customer.id
-                        name = mName.value
-                        phone = mPhone.value
-                        address = mAddress.value
-                        industry = mIndustry.value
-                        source = mSource.value
-                        remarks = mRemarks.value
-                        createTime = currentTime()
-                    })
-                }) {
-                Text(text = "添加/修改")
+            if (uiState.customer == null) {
+                Button(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                    onClick = {
+                        navigateTo(ManagerPageEnum.CUSTOMER_LIST)
+                        viewModel.insert(customer {
+                            id = UUID.randomUUID().toString()
+                            name = mName.value
+                            phone = mPhone.value
+                            address = mAddress.value
+                            industry = mIndustry.value
+                            source = mSource.value
+                            remarks = mRemarks.value
+                            createTime = currentTime()
+                        })
+                    }) {
+                    Text(text = "添加")
+                }
+            } else {
+                Button(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                    onClick = {
+                        navigateTo(ManagerPageEnum.CUSTOMER_LIST)
+                        viewModel.update(customer {
+                            id = customer.id
+                            name = mName.value
+                            phone = mPhone.value
+                            address = mAddress.value
+                            industry = mIndustry.value
+                            source = mSource.value
+                            remarks = mRemarks.value
+                        })
+                    }) {
+                    Text(text = "修改")
+                }
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    onClick = {
+                        viewModel.delete(customer.id)
+                        navigateTo(ManagerPageEnum.CUSTOMER_LIST)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red,
+                    )
+                ) {
+                    Text(text = "删除")
+                }
             }
         }
     }
-}
-// endregion
-
-// region Preview
-
-@Preview
-@Composable
-fun CustomerModifyPagePreview() {
-    CustomerModifyPage(
-        customer = customer { id = UUID.randomUUID().toString() },
-        onSave = {},
-        onBack = {},
-    )
 }

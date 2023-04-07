@@ -1,14 +1,12 @@
-package com.zktony.manager.ui.screen.page
+package com.zktony.manager.ui.fragment
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -16,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -23,10 +22,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.manager.R
 import com.zktony.manager.ui.components.ManagerAppBar
+import com.zktony.manager.ui.viewmodel.CustomerViewModel
+import com.zktony.manager.ui.viewmodel.ManagerPageEnum
+import com.zktony.manager.ui.viewmodel.SoftwareViewModel
 import com.zktony.proto.Software
+import com.zktony.proto.customer
 import com.zktony.proto.software
+import com.zktony.www.common.extension.currentTime
 import java.util.*
 
 /**
@@ -34,22 +39,26 @@ import java.util.*
  * @date: 2023-02-23 13:15
  */
 
-// region SoftwareModifyPage
+// region SoftwareEditFragment
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun SoftwareModifyPage(
+fun SoftwareEditFragment(
     modifier: Modifier = Modifier,
-    software: Software,
-    onBack: () -> Unit,
-    onSave: (Software) -> Unit,
+    navigateTo: (ManagerPageEnum) -> Unit,
+    viewModel: SoftwareViewModel,
+    isDualPane: Boolean = false
 ) {
     BackHandler {
-        onBack()
+        navigateTo(ManagerPageEnum.SOFTWARE_LIST)
     }
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val keyboardController = LocalSoftwareKeyboardController.current
     val localFocusManager = LocalFocusManager.current
     val focusRequester = remember { FocusRequester() }
+
+    val software = uiState.software ?: software { id = "error" }
     
     val mPackage = remember { mutableStateOf(software.`package`) }
     val mVersionName = remember { mutableStateOf(software.versionName) }
@@ -60,9 +69,10 @@ fun SoftwareModifyPage(
 
 
     Column {
-        ManagerAppBar(title = stringResource(id = R.string.page_software_title),
-            isFullScreen = true,
-            onBack = { onBack() }
+        ManagerAppBar(
+            title = "软件信息",
+            isFullScreen = !isDualPane,
+            onBack = { navigateTo(ManagerPageEnum.SOFTWARE_LIST) }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -150,44 +160,63 @@ fun SoftwareModifyPage(
                 ),
                 keyboardActions = KeyboardActions(onDone = {
                     keyboardController?.hide()
-                    onBack()
                 }),
                 maxLines = 10,
                 singleLine = false,
             )
             Spacer(modifier = Modifier.height(32.dp))
-            Button(
-                modifier = Modifier
+            if (uiState.software == null) {
+                Button(modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 16.dp),
-                onClick = {
-                    onSave(
-                        software {
+                    onClick = {
+                        navigateTo(ManagerPageEnum.SOFTWARE_LIST)
+                        viewModel.insert(software {
                             id = software.id
                             package_ = mPackage.value
                             versionName = mVersionName.value
                             versionCode = mVersionCode.value
                             buildType = mBuildType.value
                             remarks = mRemarks.value
-                        }
-                    )
+                            createTime = currentTime()
+                        })
+                    }) {
+                    Text(text = "添加")
                 }
-            ) {
-                Text(text = "保存")
+            } else {
+                Button(modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                    onClick = {
+                        navigateTo(ManagerPageEnum.SOFTWARE_LIST)
+                        viewModel.update(software {
+                            id = software.id
+                            package_ = mPackage.value
+                            versionName = mVersionName.value
+                            versionCode = mVersionCode.value
+                            buildType = mBuildType.value
+                            remarks = mRemarks.value
+                        })
+                    }) {
+                    Text(text = "修改")
+                }
+
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    onClick = {
+                        viewModel.delete(software.id)
+                        navigateTo(ManagerPageEnum.SOFTWARE_LIST)
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red,
+                    )
+                ) {
+                    Text(text = "删除")
+                }
             }
         }
     }
 }
 // endregion
-
-// region Preview
-
-@Preview
-@Composable
-fun SoftwareModifyPagePreview() {
-    SoftwareModifyPage(
-        software = software { id = UUID.randomUUID().toString() },
-        onBack = {},
-        onSave = {}
-    )
-}
