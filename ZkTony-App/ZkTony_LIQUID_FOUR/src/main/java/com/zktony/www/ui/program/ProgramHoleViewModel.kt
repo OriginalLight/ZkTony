@@ -1,7 +1,7 @@
 package com.zktony.www.ui.program
 
 import androidx.lifecycle.viewModelScope
-import com.zktony.common.base.BaseViewModel
+import com.zktony.core.base.BaseViewModel
 import com.zktony.www.common.ext.volumeDialog
 import com.zktony.www.room.dao.HoleDao
 import com.zktony.www.room.dao.PlateDao

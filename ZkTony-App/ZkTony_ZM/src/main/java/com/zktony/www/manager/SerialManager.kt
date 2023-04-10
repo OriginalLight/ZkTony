@@ -1,6 +1,6 @@
 package com.zktony.www.manager
 
-import com.zktony.common.utils.logi
+import com.zktony.core.ext.logi
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import kotlinx.coroutines.CoroutineScope

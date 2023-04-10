@@ -1,6 +1,6 @@
 package com.zktony.www.manager.protocol
 
-import com.zktony.common.ext.toHex
+import com.zktony.core.ext.toHex
 
 
 /**

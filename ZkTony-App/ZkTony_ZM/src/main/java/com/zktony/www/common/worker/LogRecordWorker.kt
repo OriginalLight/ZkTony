@@ -3,8 +3,8 @@ package com.zktony.www.common.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.common.ext.simpleDateFormat
-import com.zktony.common.utils.logi
+import com.zktony.core.ext.simpleDateFormat
+import com.zktony.core.ext.logi
 import com.zktony.proto.Log
 import com.zktony.protobuf.grpc.LogGrpc
 import com.zktony.www.room.dao.LogRecordDao

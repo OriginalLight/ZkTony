@@ -8,8 +8,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.util.TextInfo
-import com.zktony.common.base.BaseFragment
-import com.zktony.common.ext.*
+import com.zktony.core.base.BaseFragment
+import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.adapter.CalibrationDataAdapter
 import com.zktony.www.databinding.FragmentCalibrationDataBinding

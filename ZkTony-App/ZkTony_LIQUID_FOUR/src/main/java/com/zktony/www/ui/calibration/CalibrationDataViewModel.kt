@@ -1,7 +1,7 @@
 package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
-import com.zktony.common.base.BaseViewModel
+import com.zktony.core.base.BaseViewModel
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.CalibrationDataDao
 import com.zktony.www.room.entity.Calibration

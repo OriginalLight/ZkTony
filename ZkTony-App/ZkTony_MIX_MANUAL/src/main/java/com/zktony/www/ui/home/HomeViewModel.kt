@@ -4,9 +4,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseViewModel
-import com.zktony.common.ext.read
-import com.zktony.common.ext.save
+import com.zktony.core.base.BaseViewModel
+import com.zktony.datastore.ext.read
+import com.zktony.datastore.ext.save
 import com.zktony.serialport.util.Serial
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1

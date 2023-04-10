@@ -1,7 +1,7 @@
 package com.zktony.www.ui.admin
 
 import androidx.lifecycle.viewModelScope
-import com.zktony.common.base.BaseViewModel
+import com.zktony.core.base.BaseViewModel
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.entity.Container
 import com.zktony.www.manager.ExecutionManager

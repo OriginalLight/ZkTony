@@ -1,7 +1,7 @@
 package com.zktony.www.manager
 
 import androidx.work.*
-import com.zktony.common.ext.Ext
+import com.zktony.core.ext.Ext
 import com.zktony.www.common.worker.LogDataWorker
 import com.zktony.www.common.worker.LogRecordWorker
 import com.zktony.www.common.worker.LogWorker

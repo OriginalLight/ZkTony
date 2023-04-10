@@ -17,7 +17,7 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <com.zktony.common.widget.SizeIndicator
+            <com.zktony.core.widget.SizeIndicator
                 android:id="@+id/size"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="640dp"
@@ -27,7 +27,7 @@
                 app:layout_constraintStart_toStartOf="@+id/gradient_plate"
                 tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintBounds" />
 
-            <com.zktony.common.widget.GradientPlate
+            <com.zktony.core.widget.GradientPlate
                 android:id="@+id/gradient_plate"
                 android:layout_width="640dp"
                 android:layout_height="320dp"
@@ -37,7 +37,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="VisualLintBounds" />
 
-            <com.zktony.common.widget.SizeIndicator
+            <com.zktony.core.widget.SizeIndicator
                 android:id="@+id/space"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="640dp"

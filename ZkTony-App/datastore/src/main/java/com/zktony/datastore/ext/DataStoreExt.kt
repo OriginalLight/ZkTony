@@ -1,4 +1,4 @@
-package com.zktony.common.ext
+package com.zktony.datastore.ext
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*

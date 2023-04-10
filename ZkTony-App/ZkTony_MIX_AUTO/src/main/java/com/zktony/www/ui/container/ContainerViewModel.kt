@@ -1,5 +1,5 @@
 package com.zktony.www.ui.container
 
-import com.zktony.common.base.BaseViewModel
+import com.zktony.core.base.BaseViewModel
 
 class ContainerViewModel : BaseViewModel()

@@ -2,7 +2,7 @@ package com.zktony.www.manager
 
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.zktony.common.ext.Ext
+import com.zktony.core.ext.Ext
 import com.zktony.www.common.worker.LogWorker
 import java.util.concurrent.TimeUnit
 

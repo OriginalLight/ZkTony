@@ -6,21 +6,20 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseViewModel
-import com.zktony.common.ext.*
-import com.zktony.common.download.DownloadManager
-import com.zktony.common.download.DownloadState
-import com.zktony.common.utils.Constants
+import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.*
+import com.zktony.core.utils.Constants
+import com.zktony.datastore.ext.save
 import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.serialport.util.toSerial
 import com.zktony.www.BuildConfig
 import com.zktony.www.common.ext.toMotor
 import com.zktony.www.common.ext.toV1
-import com.zktony.www.room.dao.MotorDao
-import com.zktony.www.room.entity.Motor
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
+import com.zktony.www.room.dao.MotorDao
+import com.zktony.www.room.entity.Motor
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -136,20 +135,18 @@ class AdminViewModel constructor(
     fun doRemoteUpdate(application: Application) {
         viewModelScope.launch {
             PopTip.show("开始下载")
-            DownloadManager.download(
-                application.downloadUrl,
-                File(Ext.ctx.getExternalFilesDir(null), "update.apk")
-            ).collect {
-                when (it) {
-                    is DownloadState.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            progress = 0
-                        )
-                        Ext.ctx.installApk(it.file)
-                    }
+            application.downloadUrl.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
+                .collect {
+                    when (it) {
+                        is DownloadState.Success -> {
+                            _uiState.value = _uiState.value.copy(
+                                progress = 0
+                            )
+                            Ext.ctx.installApk(it.file)
+                        }
 
-                    is DownloadState.Err -> {
-                        _uiState.value = _uiState.value.copy(
+                        is DownloadState.Err -> {
+                            _uiState.value = _uiState.value.copy(
                             progress = 0
                         )
                         PopTip.show("下载失败,请重试!").showLong()

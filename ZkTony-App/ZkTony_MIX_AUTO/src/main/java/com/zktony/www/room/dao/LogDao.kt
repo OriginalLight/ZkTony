@@ -17,7 +17,7 @@
 package com.zktony.www.room.dao
 
 import androidx.room.*
-import com.zktony.common.room.dao.BaseDao
+import com.zktony.room.dao.BaseDao
 import com.zktony.www.room.entity.Log
 import kotlinx.coroutines.flow.Flow
 import java.util.*

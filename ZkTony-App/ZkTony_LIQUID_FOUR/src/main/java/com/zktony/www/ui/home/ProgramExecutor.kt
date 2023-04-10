@@ -1,6 +1,6 @@
 package com.zktony.www.ui.home
 
-import com.zktony.common.ext.currentTime
+import com.zktony.core.ext.currentTime
 import com.zktony.www.common.ext.total
 import com.zktony.www.room.entity.Hole
 import com.zktony.www.room.entity.Plate

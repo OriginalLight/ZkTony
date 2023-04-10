@@ -11,7 +11,7 @@ import com.kongzue.dialogx.dialogs.InputDialog
 import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.kongzue.dialogx.util.InputInfo
-import com.zktony.common.ext.removeZero
+import com.zktony.core.ext.removeZero
 import com.zktony.www.R
 
 /**

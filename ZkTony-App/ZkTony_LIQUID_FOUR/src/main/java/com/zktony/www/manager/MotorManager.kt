@@ -1,6 +1,6 @@
 package com.zktony.www.manager
 
-import com.zktony.common.utils.logi
+import com.zktony.core.ext.logi
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Calibration

@@ -6,8 +6,8 @@ import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.zktony.common.base.BaseFragment
-import com.zktony.common.ext.removeZero
+import com.zktony.core.base.BaseFragment
+import com.zktony.core.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentTecBinding
 import kotlinx.coroutines.launch

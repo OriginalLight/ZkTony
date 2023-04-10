@@ -12,9 +12,9 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
-import com.zktony.common.base.BaseFragment
-import com.zktony.common.ext.clickNoRepeat
-import com.zktony.common.ext.clickScale
+import com.zktony.core.base.BaseFragment
+import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.room.entity.LogData
 import com.zktony.www.databinding.FragmentLogChartBinding

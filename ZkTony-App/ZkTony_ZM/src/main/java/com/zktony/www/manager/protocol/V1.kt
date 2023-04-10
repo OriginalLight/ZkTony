@@ -5,7 +5,7 @@
  */
 package com.zktony.www.manager.protocol
 
-import com.zktony.common.ext.*
+import com.zktony.core.ext.*
 
 /**
  * @author 刘贺贺

@@ -9,9 +9,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
-import com.zktony.common.base.BaseFragment
-import com.zktony.common.dialog.deleteDialog
-import com.zktony.common.ext.*
+import com.zktony.core.base.BaseFragment
+import com.zktony.core.dialog.deleteDialog
+import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.adapter.LogAdapter
 import com.zktony.www.databinding.FragmentLogBinding

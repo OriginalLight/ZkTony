@@ -44,7 +44,7 @@
                 app:rippleColor="@color/purple_700"
                 tools:ignore="SpeakableTextPresentCheck" />
 
-            <com.zktony.common.widget.MarqueTextView
+            <com.zktony.core.widget.MarqueTextView
                 android:id="@+id/actions"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

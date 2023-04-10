@@ -2,14 +2,15 @@ package com.zktony.www.ui.home
 
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.MessageDialog
-import com.zktony.common.audio.AudioPlayer
-import com.zktony.common.base.BaseViewModel
-import com.zktony.common.ext.getTimeFormat
-import com.zktony.common.utils.Constants.ERROR_CURRENT
-import com.zktony.common.utils.Constants.MAX_MOTOR
-import com.zktony.common.utils.Constants.MAX_TIME
-import com.zktony.common.utils.Constants.MAX_VOLTAGE_RS
-import com.zktony.common.utils.Constants.MAX_VOLTAGE_ZM
+import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.Ext
+import com.zktony.core.ext.getTimeFormat
+import com.zktony.core.ext.playAudio
+import com.zktony.core.utils.Constants.ERROR_CURRENT
+import com.zktony.core.utils.Constants.MAX_MOTOR
+import com.zktony.core.utils.Constants.MAX_TIME
+import com.zktony.core.utils.Constants.MAX_VOLTAGE_RS
+import com.zktony.core.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.www.R
 import com.zktony.www.room.dao.LogDataDao
 import com.zktony.www.room.dao.LogRecordDao
@@ -479,7 +480,7 @@ class HomeViewModel constructor(
     private fun playAudio(id: Int) {
         viewModelScope.launch {
             if (stateManager.setting.value.audio) {
-                AudioPlayer.instance.play(id)
+                Ext.ctx.playAudio(id)
             }
         }
     }

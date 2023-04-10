@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.zktony.common.ext.clickNoRepeat
-import com.zktony.common.ext.clickScale
+import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.clickScale
 import com.zktony.www.room.entity.Program
 import com.zktony.www.databinding.ItemProgramBinding
 

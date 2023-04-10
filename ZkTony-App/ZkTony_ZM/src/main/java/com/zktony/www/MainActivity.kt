@@ -3,8 +3,8 @@ package com.zktony.www
 import android.os.Bundle
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.zktony.common.base.BaseActivity
-import com.zktony.common.dialog.noticeDialog
+import com.zktony.core.base.BaseActivity
+import com.zktony.core.dialog.noticeDialog
 import com.zktony.www.databinding.ActivityMainBinding
 import com.zktony.www.manager.StateManager
 import org.koin.android.ext.android.inject

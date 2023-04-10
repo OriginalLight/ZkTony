@@ -205,7 +205,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="VisualLintBounds">
 
-                    <com.zktony.common.widget.DynamicPlate
+                    <com.zktony.core.widget.DynamicPlate
                         android:id="@+id/dynamic_plate"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"

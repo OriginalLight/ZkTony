@@ -4,9 +4,9 @@ import android.graphics.Color
 import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseViewModel
-import com.zktony.common.dialog.spannerDialog
-import com.zktony.common.ext.getTimeFormat
+import com.zktony.core.base.BaseViewModel
+import com.zktony.core.dialog.spannerDialog
+import com.zktony.core.ext.getTimeFormat
 import com.zktony.serialport.util.Serial
 import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.manager.ExecutionManager

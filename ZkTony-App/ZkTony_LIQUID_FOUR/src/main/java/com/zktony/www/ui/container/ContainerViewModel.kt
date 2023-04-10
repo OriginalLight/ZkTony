@@ -1,6 +1,6 @@
 package com.zktony.www.ui.container
 
-import com.zktony.common.base.BaseViewModel
+import com.zktony.core.base.BaseViewModel
 import com.zktony.www.room.entity.Hole
 import com.zktony.www.room.entity.Plate
 

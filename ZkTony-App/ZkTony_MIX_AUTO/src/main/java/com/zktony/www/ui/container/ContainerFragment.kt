@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayoutMediator
-import com.zktony.common.base.BaseFragment
+import com.zktony.core.base.BaseFragment
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentContainerBinding
 import org.koin.androidx.viewmodel.ext.android.viewModel

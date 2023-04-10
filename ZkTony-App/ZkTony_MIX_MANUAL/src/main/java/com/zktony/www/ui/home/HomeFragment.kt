@@ -6,9 +6,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseFragment
-import com.zktony.common.dialog.spannerDialog
-import com.zktony.common.ext.*
+import com.zktony.core.base.BaseFragment
+import com.zktony.core.dialog.spannerDialog
+import com.zktony.core.ext.*
+import com.zktony.core.R.mipmap
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
@@ -46,8 +47,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             coagulantHistory.isClickable = it.job == null
                             colloidHistory.isClickable = it.job == null
                             timeText.text = it.time.getTimeFormat()
-                            fillCoagulantImage.setBackgroundResource(if (it.fillCoagulant) com.zktony.common.R.mipmap.close else com.zktony.common.R.mipmap.right)
-                            recaptureCoagulantImage.setBackgroundResource(if (it.recaptureCoagulant) com.zktony.common.R.mipmap.close else com.zktony.common.R.mipmap.left)
+                            fillCoagulantImage.setBackgroundResource(if (it.fillCoagulant) mipmap.close else mipmap.right)
+                            recaptureCoagulantImage.setBackgroundResource(if (it.recaptureCoagulant) mipmap.close else mipmap.left)
                             fillCoagulantText.text = if (it.fillCoagulant) "停止" else "填充(促凝剂)"
                             recaptureCoagulantText.text =
                                 if (it.recaptureCoagulant) "停止" else "回吸(促凝剂)"

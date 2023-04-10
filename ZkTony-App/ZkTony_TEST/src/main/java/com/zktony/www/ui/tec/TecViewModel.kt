@@ -2,9 +2,9 @@ package com.zktony.www.ui.tec
 
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseViewModel
-import com.zktony.common.ext.hexToAscii
-import com.zktony.common.ext.removeZero
+import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.hexToAscii
+import com.zktony.core.ext.removeZero
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import kotlinx.coroutines.Job

@@ -7,9 +7,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseFragment
-import com.zktony.common.ext.clickNoRepeat
-import com.zktony.common.ext.clickScale
+import com.zktony.core.base.BaseFragment
+import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentProgramPlateBinding
 import kotlinx.coroutines.launch

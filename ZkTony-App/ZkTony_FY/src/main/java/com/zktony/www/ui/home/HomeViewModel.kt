@@ -3,11 +3,11 @@ package com.zktony.www.ui.home
 import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseViewModel
-import com.zktony.common.ext.currentTime
-import com.zktony.common.ext.removeZero
-import com.zktony.common.utils.Constants
-import com.zktony.common.utils.Queue
+import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.currentTime
+import com.zktony.core.ext.removeZero
+import com.zktony.core.utils.Constants
+import com.zktony.core.utils.Queue
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.TTYS0
 import com.zktony.serialport.util.Serial.TTYS3

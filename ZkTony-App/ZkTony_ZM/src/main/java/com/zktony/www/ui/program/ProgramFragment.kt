@@ -11,10 +11,10 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.interfaces.OnBindView
-import com.zktony.common.base.BaseFragment
-import com.zktony.common.dialog.deleteDialog
-import com.zktony.common.ext.clickNoRepeat
-import com.zktony.common.ext.clickScale
+import com.zktony.core.base.BaseFragment
+import com.zktony.core.dialog.deleteDialog
+import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.clickScale
 import com.zktony.www.R
 import com.zktony.www.common.adapter.ProgramAdapter
 import com.zktony.www.databinding.FragmentProgramBinding

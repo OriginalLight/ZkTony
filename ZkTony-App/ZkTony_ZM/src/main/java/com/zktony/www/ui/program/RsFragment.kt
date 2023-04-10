@@ -7,10 +7,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseFragment
-import com.zktony.common.ext.*
-import com.zktony.common.utils.Constants.MAX_TIME
-import com.zktony.common.utils.Constants.MAX_VOLTAGE_RS
+import com.zktony.core.base.BaseFragment
+import com.zktony.core.ext.*
+import com.zktony.core.utils.Constants.MAX_TIME
+import com.zktony.core.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentRsBinding
 import kotlinx.coroutines.launch

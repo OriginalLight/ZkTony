@@ -5,7 +5,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.zktony.common.base.BaseFragment
+import com.zktony.core.base.BaseFragment
 import com.zktony.www.R
 import com.zktony.www.common.adapter.LogAdapter
 import com.zktony.www.databinding.FragmentLogBinding

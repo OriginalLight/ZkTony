@@ -1,10 +1,10 @@
 package com.zktony.www.manager
 
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.ext.hexToAscii
-import com.zktony.common.ext.hexToInt8
-import com.zktony.common.ext.verifyHex
-import com.zktony.common.utils.logi
+import com.zktony.core.ext.hexToAscii
+import com.zktony.core.ext.hexToInt8
+import com.zktony.core.ext.verifyHex
+import com.zktony.core.ext.logi
 import com.zktony.serialport.MutableSerial
 import com.zktony.serialport.util.Serial
 import com.zktony.serialport.util.Serial.*

@@ -8,8 +8,8 @@ import android.widget.TextView
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.interfaces.OnBindView
-import com.zktony.common.ext.clickNoRepeat
-import com.zktony.common.ext.removeZero
+import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.removeZero
 import com.zktony.www.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

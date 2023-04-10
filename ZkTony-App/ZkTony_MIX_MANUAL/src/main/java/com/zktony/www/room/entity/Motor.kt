@@ -2,8 +2,8 @@ package com.zktony.www.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.zktony.common.ext.int16ToHex2
-import com.zktony.common.ext.int8ToHex
+import com.zktony.core.ext.int16ToHex2
+import com.zktony.core.ext.int8ToHex
 import java.util.*
 
 /**

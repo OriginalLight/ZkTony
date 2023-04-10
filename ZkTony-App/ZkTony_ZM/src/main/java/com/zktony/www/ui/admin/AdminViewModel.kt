@@ -6,14 +6,10 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseViewModel
-import com.zktony.common.ext.Ext
-import com.zktony.common.ext.installApk
-import com.zktony.common.ext.isNetworkAvailable
-import com.zktony.common.ext.save
-import com.zktony.common.download.DownloadManager
-import com.zktony.common.download.DownloadState
-import com.zktony.common.utils.Constants
+import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.*
+import com.zktony.core.utils.Constants
+import com.zktony.datastore.ext.save
 import com.zktony.gpio.Gpio
 import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
@@ -163,30 +159,28 @@ class AdminViewModel constructor(
     fun doRemoteUpdate(application: Application) {
         viewModelScope.launch {
             PopTip.show("开始下载")
-            DownloadManager.download(
-                application.downloadUrl,
-                File(Ext.ctx.getExternalFilesDir(null), "update.apk")
-            ).collect {
-                when (it) {
-                    is DownloadState.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            progress = 0
-                        )
-                        Ext.ctx.installApk(it.file)
-                    }
+            application.downloadUrl.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
+                .collect {
+                    when (it) {
+                        is DownloadState.Success -> {
+                            _uiState.value = _uiState.value.copy(
+                                progress = 0
+                            )
+                            Ext.ctx.installApk(it.file)
+                        }
 
-                    is DownloadState.Err -> {
-                        _uiState.value = _uiState.value.copy(
-                            progress = 0
-                        )
-                        PopTip.show("下载失败,请重试!").showLong()
-                    }
+                        is DownloadState.Err -> {
+                            _uiState.value = _uiState.value.copy(
+                                progress = 0
+                            )
+                            PopTip.show("下载失败,请重试!").showLong()
+                        }
 
-                    is DownloadState.Progress -> {
-                        _uiState.value = _uiState.value.copy(
-                            progress = it.progress
-                        )
-                    }
+                        is DownloadState.Progress -> {
+                            _uiState.value = _uiState.value.copy(
+                                progress = it.progress
+                            )
+                        }
                 }
             }
         }

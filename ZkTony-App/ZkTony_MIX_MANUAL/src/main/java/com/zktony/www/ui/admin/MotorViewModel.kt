@@ -2,7 +2,7 @@ package com.zktony.www.ui.admin
 
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseViewModel
+import com.zktony.core.base.BaseViewModel
 import com.zktony.serialport.util.Serial
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Motor

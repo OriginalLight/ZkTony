@@ -2,8 +2,8 @@ package com.zktony.www.ui.container
 
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseViewModel
-import com.zktony.common.utils.Snowflake
+import com.zktony.core.base.BaseViewModel
+import com.zktony.core.utils.Snowflake
 import com.zktony.www.common.ext.calculateCoordinate
 import com.zktony.www.room.dao.HoleDao
 import com.zktony.www.room.dao.PlateDao

@@ -1,10 +1,10 @@
 package com.zktony.www.di
 
-import com.zktony.common.R
-import com.zktony.common.ext.Ext
-import com.zktony.common.utils.Constants.GRPC_AUTHORITY
-import com.zktony.common.utils.Constants.GRPC_HOST
-import com.zktony.common.utils.Constants.GRPC_PORT
+import com.zktony.core.R
+import com.zktony.core.ext.Ext
+import com.zktony.core.utils.Constants.GRPC_AUTHORITY
+import com.zktony.core.utils.Constants.GRPC_HOST
+import com.zktony.core.utils.Constants.GRPC_PORT
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.protobuf.grpc.LogDetailGrpc
 import com.zktony.protobuf.grpc.LogGrpc

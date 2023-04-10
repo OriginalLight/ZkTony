@@ -1,9 +1,9 @@
 package com.zktony.www.ui.log
 
 import androidx.lifecycle.viewModelScope
-import com.zktony.common.base.BaseViewModel
-import com.zktony.common.ext.getDayEnd
-import com.zktony.common.ext.getDayStart
+import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.getDayEnd
+import com.zktony.core.ext.getDayStart
 import com.zktony.www.room.dao.LogDataDao
 import com.zktony.www.room.dao.LogRecordDao
 import com.zktony.www.room.entity.LogRecord

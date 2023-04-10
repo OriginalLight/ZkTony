@@ -57,7 +57,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1">
 
-                <com.zktony.common.widget.GradientPlate
+                <com.zktony.core.widget.GradientPlate
                     android:id="@+id/gradient_plate"
                     android:layout_width="640dp"
                     android:layout_height="320dp"

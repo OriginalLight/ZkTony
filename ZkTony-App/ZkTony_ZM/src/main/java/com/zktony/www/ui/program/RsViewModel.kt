@@ -2,9 +2,9 @@ package com.zktony.www.ui.program
 
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.common.base.BaseViewModel
-import com.zktony.common.utils.Constants.MAX_TIME
-import com.zktony.common.utils.Constants.MAX_VOLTAGE_RS
+import com.zktony.core.base.BaseViewModel
+import com.zktony.core.utils.Constants.MAX_TIME
+import com.zktony.core.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.www.room.dao.ProgramDao
 import com.zktony.www.room.entity.Program
 import kotlinx.coroutines.flow.MutableStateFlow
