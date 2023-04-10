@@ -2,10 +2,8 @@ package com.zktony.www.manager
 
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.ext.*
-import com.zktony.serialport.MutableSerial
-import com.zktony.serialport.util.Serial
-import com.zktony.serialport.util.Serial.TTYS0
-import com.zktony.serialport.util.Serial.TTYS3
+import com.zktony.serialport.SerialConfig
+import com.zktony.serialport.SerialMap
 import com.zktony.www.common.ext.toCommand
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +16,9 @@ import kotlinx.coroutines.launch
 class SerialManager constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
+
+    private val serialMap by lazy { SerialMap() }
+
     private val _ttys0Flow = MutableStateFlow<String?>(null)
     private val _ttys3Flow = MutableStateFlow<String?>(null)
     private val _lock = MutableStateFlow(false)
@@ -39,19 +40,25 @@ class SerialManager constructor(
     init {
         scope.launch {
             launch {
-                MutableSerial.instance.init(TTYS0, 115200)
-                MutableSerial.instance.init(TTYS3, 115200)
+                serialMap.init(SerialConfig(
+                    index = 0,
+                    device = "/dev/ttyS0",
+                ))
+                serialMap.init(SerialConfig(
+                    index = 3,
+                    device = "/dev/ttyS3",
+                ))
             }
             launch {
-                MutableSerial.instance.listener = { port, data ->
-                    when (port) {
-                        TTYS0 -> {
+                serialMap.callback = { index, data ->
+                    when (index) {
+                        0 -> {
                             data.verifyHex().forEach {
                                 _ttys0Flow.value = it
                                 it.hexFormat().logd("串口一 receivedHex: ")
                             }
                         }
-                        TTYS3 -> {
+                        3 -> {
                             data.verifyHex().forEach {
                                 _ttys3Flow.value = it
                                 it.hexFormat().logd("串口三 receivedHex: ")
@@ -107,8 +114,8 @@ class SerialManager constructor(
         }
         _lock.value = true
         lockTime = 0L
-        sendHex(serial = TTYS0, hex = V1().toHex())
-        sendHex(serial = TTYS3, hex = V1(pa = "0B", data = "0305").toHex())
+        sendHex(index = 0, hex = V1().toHex())
+        sendHex(index = 3, hex = V1(pa = "0B", data = "0305").toHex())
     }
 
     fun pause(pause: Boolean) {
@@ -126,12 +133,11 @@ class SerialManager constructor(
 
     /**
      * 发送Hex
-     * @param serial 串口
+     * @param index 串口
      * @param hex 命令
      */
-    fun sendHex(serial: Serial, hex: String, lock: Boolean = false) {
-        MutableSerial.instance.sendHex(serial, hex)
-        hex.hexFormat().logd("${serial.device} sendHex: ")
+    fun sendHex(index: Int, hex: String, lock: Boolean = false) {
+        serialMap.sendHex(index, hex)
         if (lock) {
             _lock.value = true
             lockTime = 0L

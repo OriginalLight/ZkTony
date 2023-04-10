@@ -35,7 +35,7 @@ class StateManager constructor(
                 workerManager.createWorker()
             }
             launch {
-                serialManager.ttys4Flow.collect {
+                serialManager.callback.collect {
                     it?.let {
                         val v1 = V1(it)
                         if (v1.cmd == 2) {

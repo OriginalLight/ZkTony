@@ -12,7 +12,6 @@ import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.save
 import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
-import com.zktony.serialport.util.toSerial
 import com.zktony.www.BuildConfig
 import com.zktony.www.common.ext.toMotor
 import com.zktony.www.common.ext.toV1
@@ -243,11 +242,7 @@ class AdminViewModel constructor(
         viewModelScope.launch {
             for (i in 0..2) {
                 for (j in 1..3) {
-                    serialManager.sendHex(
-                        i.toSerial(), V1(
-                            fn = "03", pa = "04", data = j.int8ToHex()
-                        ).toHex()
-                    )
+                    serialManager.sendHex(i, V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex())
                     delay(200L)
                 }
             }

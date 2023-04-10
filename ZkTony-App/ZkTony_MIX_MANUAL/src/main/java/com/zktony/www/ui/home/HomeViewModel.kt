@@ -7,7 +7,6 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
-import com.zktony.serialport.util.Serial
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.Job
@@ -137,10 +136,7 @@ class HomeViewModel constructor(
                     fillCoagulant = false,
                     start = false,
                 )
-                serialManager.sendHex(
-                    serial = Serial.TTYS0,
-                    hex = V1(pa = "0B", data = "0300").toHex()
-                )
+                serialManager.sendHex(hex = V1(pa = "0B", data = "0300").toHex())
                 delay(100L)
                 reset()
             } else {
@@ -159,17 +155,11 @@ class HomeViewModel constructor(
                     while (_uiState.value.fillCoagulant) {
                         if (_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
-                            serialManager.sendHex(
-                                serial = Serial.TTYS0,
-                                hex = V1(pa = "0B", data = "0301").toHex()
-                            )
+                            serialManager.sendHex(hex = V1(pa = "0B", data = "0301").toHex())
                             delay(7000L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
-                            serialManager.sendHex(
-                                serial = Serial.TTYS0,
-                                hex = V1(pa = "0B", data = "0305").toHex()
-                            )
+                            serialManager.sendHex(hex = V1(pa = "0B", data = "0305").toHex())
                             delay(6500L)
                         }
                     }
@@ -192,10 +182,7 @@ class HomeViewModel constructor(
                     recaptureCoagulant = false,
                     start = false
                 )
-                serialManager.sendHex(
-                    serial = Serial.TTYS0,
-                    hex = V1(pa = "0B", data = "0300").toHex()
-                )
+                serialManager.sendHex(hex = V1(pa = "0B", data = "0300").toHex())
                 delay(100L)
                 reset()
             } else {
@@ -214,17 +201,11 @@ class HomeViewModel constructor(
                     while (_uiState.value.recaptureCoagulant) {
                         if (_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
-                            serialManager.sendHex(
-                                serial = Serial.TTYS0,
-                                hex = V1(pa = "0B", data = "0303").toHex()
-                            )
+                            serialManager.sendHex(hex = V1(pa = "0B", data = "0303").toHex())
                             delay(6500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
-                            serialManager.sendHex(
-                                serial = Serial.TTYS0,
-                                hex = V1(pa = "0B", data = "0305").toHex()
-                            )
+                            serialManager.sendHex(hex = V1(pa = "0B", data = "0305").toHex())
                             delay(6500L)
                         }
                     }
@@ -245,10 +226,7 @@ class HomeViewModel constructor(
                 start = true,
                 previous = true,
             )
-            serialManager.sendHex(
-                serial = Serial.TTYS0,
-                hex = V1(pa = "0B", data = "0401").toHex()
-            )
+            serialManager.sendHex(hex = V1(pa = "0B", data = "0401").toHex())
         }
     }
 
@@ -261,10 +239,7 @@ class HomeViewModel constructor(
                 start = true,
                 previous = true,
             )
-            serialManager.sendHex(
-                serial = Serial.TTYS0,
-                hex = V1(pa = "0B", data = "0402").toHex()
-            )
+            serialManager.sendHex(hex = V1(pa = "0B", data = "0402").toHex())
         }
     }
 
@@ -274,10 +249,7 @@ class HomeViewModel constructor(
     fun stopFillAndRecapture() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(start = false)
-            serialManager.sendHex(
-                serial = Serial.TTYS0,
-                hex = V1(pa = "0B", data = "0400").toHex()
-            )
+            serialManager.sendHex(hex = V1(pa = "0B", data = "0400").toHex())
         }
     }
 

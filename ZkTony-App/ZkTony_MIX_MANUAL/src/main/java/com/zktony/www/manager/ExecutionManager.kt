@@ -1,7 +1,6 @@
 package com.zktony.www.manager
 
 import com.zktony.core.ext.logi
-import com.zktony.serialport.util.Serial
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +32,6 @@ class ExecutionManager constructor(
         scope.launch {
             val str = gen.joinToString("")
             serialManager.sendHex(
-                serial = Serial.TTYS0,
                 hex = V1.singlePoint(data = str),
                 true
             )
@@ -44,7 +42,6 @@ class ExecutionManager constructor(
         scope.launch {
             val str = gen.joinToString("")
             serialManager.sendHex(
-                serial = Serial.TTYS0,
                 hex = V1.complex(data = str),
                 true
             )

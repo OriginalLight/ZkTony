@@ -9,7 +9,13 @@ import java.io.*
  */
 class SerialPort
 @Throws(IOException::class) constructor(
-    device: File, baudRate: Int, stopBits: Int, dataBits: Int, parity: Int, flowCon: Int, flags: Int
+    device: File,
+    baudRate: Int,
+    stopBits: Int,
+    dataBits: Int,
+    parity: Int,
+    flowCon: Int,
+    flags: Int,
 ) {
 
     /**
@@ -33,9 +39,6 @@ class SerialPort
     val outputStream: FileOutputStream
         get() = fileOutputStream
 
-    constructor(device: File, baudrate: Int, flags: Int) : this(
-        device, baudrate, 1, 8, 0, 0, flags
-    )
 
     init {
         checkPermission(device)
@@ -90,7 +93,7 @@ class SerialPort
         parity: Int,
         flowCon: Int,
         flags: Int
-    ): FileDescriptor
+    ): FileDescriptor?
 
     /**
      * 关闭串口

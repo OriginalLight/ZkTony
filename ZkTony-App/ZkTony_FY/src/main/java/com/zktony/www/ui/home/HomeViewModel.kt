@@ -8,9 +8,6 @@ import com.zktony.core.ext.currentTime
 import com.zktony.core.ext.removeZero
 import com.zktony.core.utils.Constants
 import com.zktony.core.utils.Queue
-import com.zktony.serialport.util.Serial
-import com.zktony.serialport.util.Serial.TTYS0
-import com.zktony.serialport.util.Serial.TTYS3
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.StateManager
 import com.zktony.www.manager.protocol.V1
@@ -99,7 +96,7 @@ class HomeViewModel constructor(
                     for (i in 0..4) {
                         delay(300L)
                         serialManager.sendText(
-                            serial = TTYS3, text = V1.queryTemp(i.toString())
+                            index = 3, text = V1.queryTemp(i.toString())
                         )
                     }
                     delay(3 * 1000L)
@@ -324,11 +321,11 @@ class HomeViewModel constructor(
         viewModelScope.launch {
             if (flag == 0) {
                 serialManager.sendHex(
-                    serial = Serial.TTYS2, hex = V1(pa = "0B", data = "0201").toHex()
+                    index = 2, hex = V1(pa = "0B", data = "0201").toHex()
                 )
             } else {
                 serialManager.sendHex(
-                    serial = Serial.TTYS2, hex = V1(pa = "0B", data = "0200").toHex()
+                    index = 2, hex = V1(pa = "0B", data = "0200").toHex()
                 )
             }
         }
@@ -345,7 +342,7 @@ class HomeViewModel constructor(
                     if (swing) "摇床-已暂停" else "摇床-已恢复"
                 )
                 serialManager.sendHex(
-                    serial = TTYS0, hex = if (swing) V1.pauseShakeBed() else V1.resumeShakeBed()
+                    index = 0, hex = if (swing) V1.pauseShakeBed() else V1.resumeShakeBed()
                 )
                 // 更新状态
                 serialManager.swing(!swing)
@@ -378,14 +375,14 @@ class HomeViewModel constructor(
                 lock = false
             )
             serialManager.sendHex(
-                serial = TTYS0, hex = V1.openLock()
+                index = 0, hex = V1.openLock()
             )
             delay(10 * 1000L)
             _buttonFlow.value = _buttonFlow.value.copy(
                 lock = true
             )
             serialManager.sendHex(
-                serial = TTYS0, hex = V1.closeLock()
+                index = 0, hex = V1.closeLock()
             )
         }
     }

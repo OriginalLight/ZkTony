@@ -2,8 +2,7 @@ package com.zktony.serialport
 
 import android.os.Message
 import android.util.Log
-import com.zktony.serialport.util.Serial
-import com.zktony.serialport.util.SerialDataUtils
+import com.zktony.serialport.ext.DataConversion.hexStringToBytes
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.security.InvalidParameterException
@@ -12,12 +11,12 @@ import java.security.InvalidParameterException
  * @author: 刘贺贺
  * @date: 2022-12-08 14:39
  */
-abstract class BaseSerial(sPort: Serial, iBaudRate: Int) : SerialHelper(sPort, iBaudRate) {
+abstract class BaseSerial(config: SerialConfig) : SerialHelper(config) {
 
     /**
      * Open the serial port
      */
-    fun init(): Int {
+    fun openDevice(): Int {
         return try {
             open()
             Log.i(TAG, "Open the serial port successfully")
@@ -43,8 +42,8 @@ abstract class BaseSerial(sPort: Serial, iBaudRate: Int) : SerialHelper(sPort, i
      * @param sHex hex data
      */
     fun sendHex(sHex: String) {
-        val hex = sHex.trim { it <= ' ' }.replace(" ".toRegex(), "")
-        val bOutArray = SerialDataUtils.hexToByteArr(hex)
+        val hex = sHex.trim { it <= ' ' }.replace(" ", "")
+        val bOutArray = hexStringToBytes(hex)
         val msg = Message.obtain()
         msg.obj = bOutArray
         addWaitMessage(msg)
@@ -58,7 +57,7 @@ abstract class BaseSerial(sPort: Serial, iBaudRate: Int) : SerialHelper(sPort, i
     fun sendText(sText: String) {
         val bOutArray: ByteArray
         try {
-            bOutArray = sText.toByteArray(charset("GB18030"))
+            bOutArray = sText.toByteArray()
             val msg = Message.obtain()
             msg.obj = bOutArray
             addWaitMessage(msg)

@@ -1,6 +1,5 @@
 package com.zktony.www.ui.home
 
-import com.zktony.serialport.util.Serial.TTYS0
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.Settings
@@ -33,7 +32,7 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
-        serialManager.sendHex(TTYS0, V1.queryDrawer())
+        serialManager.sendHex(0, V1.queryDrawer())
         delay(500L)
         waitForFree {
             // 设置温度
@@ -56,7 +55,7 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
-        serialManager.sendHex(TTYS0, V1.queryDrawer())
+        serialManager.sendHex(0, V1.queryDrawer())
         delay(500L)
         waitForFree {
             // 设置温度
@@ -79,7 +78,7 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
-        serialManager.sendHex(TTYS0, V1.queryDrawer())
+        serialManager.sendHex(0, V1.queryDrawer())
         delay(500L)
         waitForFree {
             recycleLiquid(
@@ -100,7 +99,7 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
-        serialManager.sendHex(TTYS0, V1.queryDrawer())
+        serialManager.sendHex(0, V1.queryDrawer())
         delay(500L)
         waitForFree {
             // 设置温度
@@ -123,7 +122,7 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
-        serialManager.sendHex(TTYS0, V1.queryDrawer())
+        serialManager.sendHex(0, V1.queryDrawer())
         delay(500L)
         waitForFree {
             // 设置温度
@@ -148,7 +147,7 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
-        serialManager.sendHex(TTYS0, V1.queryDrawer())
+        serialManager.sendHex(0, V1.queryDrawer())
         delay(500L)
         waitForFree {
             recycleLiquid(y = con.wasteY, z = con.wasteZ)

@@ -3,7 +3,6 @@ package com.zktony.www.ui.admin
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
-import com.zktony.serialport.util.Serial
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import com.zktony.www.room.dao.MotorDao
@@ -99,20 +98,11 @@ class MotorViewModel constructor(
                 if (validateMotor(it)) {
                     dao.update(it)
                     val serial = when (it.id) {
-                        in 0..2 -> {
-                            Serial.TTYS0
-                        }
-                        in 3..5 -> {
-                            Serial.TTYS1
-                        }
-                        else -> {
-                            Serial.TTYS2
-                        }
+                        in 0..2 -> { 0 }
+                        in 3..5 -> { 1 }
+                        else -> { 2 }
                     }
-                    serialManager.sendHex(
-                        serial,
-                        V1(pa = "04", data = it.toHex()).toHex()
-                    )
+                    serialManager.sendHex(serial, V1(pa = "04", data = it.toHex()).toHex())
                     PopTip.show("更新成功")
                 }
             }

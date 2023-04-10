@@ -1,8 +1,8 @@
 package com.zktony.www.manager
 
 import com.zktony.core.ext.logi
-import com.zktony.serialport.MutableSerial
-import com.zktony.serialport.util.Serial
+import com.zktony.serialport.SerialConfig
+import com.zktony.serialport.SerialMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,24 +16,32 @@ import kotlinx.coroutines.launch
 class SerialManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
-    private val _ttys4Flow = MutableStateFlow<String?>(null)
-    val ttys4Flow = _ttys4Flow.asStateFlow()
+    private val _callback = MutableStateFlow<String?>(null)
+    val callback = _callback.asStateFlow()
+
+    private val serialMap by lazy { SerialMap() }
 
     init {
         scope.launch {
             launch {
-                MutableSerial.instance.init(Serial.TTYS4, 115200, 100L, 30L)
+                serialMap.init(SerialConfig(
+                    index = 4,
+                    device = "/dev/ttyS4",
+                    delay = 100L
+                ))
             }
             launch {
-                MutableSerial.instance.listener = { _, data ->
-                    _ttys4Flow.value = data
+                serialMap.callback = { index, data ->
+                    if (index == 4) {
+                        _callback.value = data
+                    }
                 }
             }
         }
     }
 
-    fun send(data: String) {
-        MutableSerial.instance.sendHex(Serial.TTYS4, data)
+    fun send(hex: String) {
+        serialMap.sendHex(4, hex)
     }
 
     fun test() {
@@ -41,5 +49,4 @@ class SerialManager(
             "SerialManager test".logi()
         }
     }
-
 }

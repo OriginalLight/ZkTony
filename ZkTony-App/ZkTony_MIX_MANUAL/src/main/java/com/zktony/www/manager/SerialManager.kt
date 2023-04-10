@@ -1,10 +1,10 @@
 package com.zktony.www.manager
 
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.core.ext.*
-import com.zktony.serialport.MutableSerial
-import com.zktony.serialport.util.Serial
-import com.zktony.serialport.util.Serial.TTYS0
+import com.zktony.core.ext.hexToInt8
+import com.zktony.core.ext.logi
+import com.zktony.serialport.SerialConfig
+import com.zktony.serialport.SerialMap
 import com.zktony.www.common.ext.toCommand
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.CoroutineScope
@@ -17,11 +17,14 @@ import kotlinx.coroutines.launch
 class SerialManager constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
-    private val _ttys0Flow = MutableStateFlow<String?>(null)
+
+    private val serialMap by lazy { SerialMap() }
+
+    private val _callback = MutableStateFlow<String?>(null)
     private val _lock = MutableStateFlow(false)
     private val _reset = MutableStateFlow(true)
 
-    val ttys0Flow = _ttys0Flow.asStateFlow()
+    val callback = _callback.asStateFlow()
     val lock = _lock.asStateFlow()
     val reset = _reset.asStateFlow()
 
@@ -34,23 +37,20 @@ class SerialManager constructor(
     init {
         scope.launch {
             launch {
-                MutableSerial.instance.init(TTYS0, 115200)
+                serialMap.init(SerialConfig(
+                    index = 0,
+                    device = "/dev/ttyS0",
+                ))
             }
             launch {
-                MutableSerial.instance.listener = { port, data ->
-                    when (port) {
-                        TTYS0 -> {
-                            data.verifyHex().forEach {
-                                _ttys0Flow.value = it
-                                it.hexFormat().logd("串口一 receivedHex: ")
-                            }
-                        }
-                        else -> {}
+                serialMap.callback = { index, data ->
+                    if (index == 0) {
+                        _callback.value = data
                     }
                 }
             }
             launch {
-                ttys0Flow.collect {
+                callback.collect {
                     it?.let {
                         val res = it.toCommand()
                         when (res.fn) {
@@ -92,19 +92,17 @@ class SerialManager constructor(
     suspend fun reset() {
         _reset.value = true
         _lock.value = true
-        sendHex(serial = TTYS0, hex = V1(pa = "0B", data = "0305").toHex())
+        sendHex(hex = V1(pa = "0B", data = "0305").toHex())
         delay(2000L)
         _lock.value = false
     }
 
     /**
      * 发送Hex
-     * @param serial 串口
      * @param hex 命令
      */
-    fun sendHex(serial: Serial, hex: String, lock: Boolean = false) {
-        MutableSerial.instance.sendHex(serial, hex)
-        hex.hexFormat().logd("${serial.device} sendHex: ")
+    fun sendHex(hex: String, lock: Boolean = false) {
+        serialMap.sendHex(0, hex)
         if (lock) {
             _lock.value = true
             lockTime = 0L

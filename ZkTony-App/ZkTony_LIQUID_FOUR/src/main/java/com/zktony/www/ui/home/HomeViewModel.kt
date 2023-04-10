@@ -7,7 +7,6 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.dialog.spannerDialog
 import com.zktony.core.ext.getTimeFormat
-import com.zktony.serialport.util.Serial
 import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
@@ -149,11 +148,11 @@ class HomeViewModel constructor(
             if (type == 0) {
                 val washJob = launch {
                     serialManager.sendHex(
-                        serial = Serial.TTYS0,
+                        index = 0,
                         hex = V1(pa = "0B", data = "0301").toHex()
                     )
                     serialManager.sendHex(
-                        serial = Serial.TTYS3,
+                        index = 3,
                         hex = V1(pa = "0B", data = "0401").toHex()
                     )
                     delay(time * 1000L)
@@ -165,11 +164,11 @@ class HomeViewModel constructor(
                 _uiState.value.washJob?.cancel()
                 _uiState.value = _uiState.value.copy(washJob = null)
                 serialManager.sendHex(
-                    serial = Serial.TTYS0,
+                    index = 0,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
                 serialManager.sendHex(
-                    serial = Serial.TTYS3,
+                    index = 3,
                     hex = V1(pa = "0B", data = "0400").toHex()
                 )
             }
@@ -180,20 +179,20 @@ class HomeViewModel constructor(
         viewModelScope.launch {
             if (type == 0) {
                 serialManager.sendHex(
-                    serial = Serial.TTYS0,
+                    index = 0,
                     hex = V1(pa = "0B", data = "0301").toHex()
                 )
                 serialManager.sendHex(
-                    serial = Serial.TTYS3,
+                    index = 3,
                     hex = V1(pa = "0B", data = "0401").toHex()
                 )
             } else {
                 serialManager.sendHex(
-                    serial = Serial.TTYS0,
+                    index = 0,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
                 serialManager.sendHex(
-                    serial = Serial.TTYS3,
+                    index = 3,
                     hex = V1(pa = "0B", data = "0400").toHex()
                 )
             }
@@ -204,20 +203,20 @@ class HomeViewModel constructor(
         viewModelScope.launch {
             if (type == 0) {
                 serialManager.sendHex(
-                    serial = Serial.TTYS0,
+                    index = 0,
                     hex = V1(pa = "0B", data = "0302").toHex()
                 )
                 serialManager.sendHex(
-                    serial = Serial.TTYS3,
+                    index = 3,
                     hex = V1(pa = "0B", data = "0402").toHex()
                 )
             } else {
                 serialManager.sendHex(
-                    serial = Serial.TTYS0,
+                    index = 0,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
                 serialManager.sendHex(
-                    serial = Serial.TTYS3,
+                    index = 3,
                     hex = V1(pa = "0B", data = "0400").toHex()
                 )
             }

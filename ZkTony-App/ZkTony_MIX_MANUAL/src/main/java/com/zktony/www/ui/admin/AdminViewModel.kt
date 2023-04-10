@@ -13,7 +13,6 @@ import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
 import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
-import com.zktony.serialport.util.Serial
 import com.zktony.www.BuildConfig
 import com.zktony.www.common.ext.toCommand
 import com.zktony.www.common.ext.toMotor
@@ -42,7 +41,7 @@ class AdminViewModel constructor(
     init {
         viewModelScope.launch {
             launch {
-                serialManager.ttys0Flow.collect {
+                serialManager.callback.collect {
                     it?.let {
                         onSerialOneResponse(it)
                     }
@@ -220,10 +219,7 @@ class AdminViewModel constructor(
     private fun syncMotor() {
         viewModelScope.launch {
             for (i in 1..3) {
-                serialManager.sendHex(
-                    serial = Serial.TTYS0,
-                    hex = V1(fn = "03", pa = "04", data = i.int8ToHex()).toHex()
-                )
+                serialManager.sendHex(hex = V1(fn = "03", pa = "04", data = i.int8ToHex()).toHex())
                 delay(100L)
             }
         }

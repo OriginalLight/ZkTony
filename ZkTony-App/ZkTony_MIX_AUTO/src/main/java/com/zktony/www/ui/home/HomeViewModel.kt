@@ -6,7 +6,6 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.dialog.spannerDialog
 import com.zktony.core.ext.getTimeFormat
-import com.zktony.serialport.util.Serial
 import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
@@ -219,7 +218,7 @@ class HomeViewModel constructor(
             )
             serialManager.pause(false)
             serialManager.sendHex(
-                serial = Serial.TTYS0,
+                index = 0,
                 hex = V1(pa = "10").toHex()
             )
             delay(1000L)
@@ -254,7 +253,7 @@ class HomeViewModel constructor(
                     fillCoagulant = false,
                 )
                 serialManager.sendHex(
-                    serial = Serial.TTYS3,
+                    index = 3,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
                 delay(100L)
@@ -274,14 +273,14 @@ class HomeViewModel constructor(
                         if (_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
                             serialManager.sendHex(
-                                serial = Serial.TTYS3,
+                                index = 3,
                                 hex = V1(pa = "0B", data = "0301").toHex()
                             )
                             delay(7000L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
                             serialManager.sendHex(
-                                serial = Serial.TTYS3,
+                                index = 3,
                                 hex = V1(pa = "0B", data = "0305").toHex()
                             )
                             delay(6500L)
@@ -306,7 +305,7 @@ class HomeViewModel constructor(
                     recaptureCoagulant = false,
                 )
                 serialManager.sendHex(
-                    serial = Serial.TTYS3,
+                    index = 3,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
                 delay(100L)
@@ -326,14 +325,14 @@ class HomeViewModel constructor(
                         if (_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
                             serialManager.sendHex(
-                                serial = Serial.TTYS3,
+                                index = 3,
                                 hex = V1(pa = "0B", data = "0303").toHex()
                             )
                             delay(6500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
                             serialManager.sendHex(
-                                serial = Serial.TTYS3,
+                                index = 3,
                                 hex = V1(pa = "0B", data = "0305").toHex()
                             )
                             delay(6500L)
@@ -353,7 +352,7 @@ class HomeViewModel constructor(
     fun fillColloid() {
         viewModelScope.launch {
             serialManager.sendHex(
-                serial = Serial.TTYS3,
+                index = 3,
                 hex = V1(pa = "0B", data = "0401").toHex()
             )
         }
@@ -365,7 +364,7 @@ class HomeViewModel constructor(
     fun recaptureColloid() {
         viewModelScope.launch {
             serialManager.sendHex(
-                serial = Serial.TTYS3,
+                index = 3,
                 hex = V1(pa = "0B", data = "0402").toHex()
             )
         }
@@ -377,7 +376,7 @@ class HomeViewModel constructor(
     fun stopFillAndRecapture() {
         viewModelScope.launch {
             serialManager.sendHex(
-                serial = Serial.TTYS3,
+                index = 3,
                 hex = V1(pa = "0B", data = "0400").toHex()
             )
         }

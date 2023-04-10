@@ -4,8 +4,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Message
 import com.zktony.serialport.core.SerialPort
-import com.zktony.serialport.util.Serial
-import com.zktony.serialport.util.SerialDataUtils.byteArrToHex
+import com.zktony.serialport.ext.DataConversion.bytesToHexString
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -15,43 +14,55 @@ import java.security.InvalidParameterException
 /**
  * Serial port auxiliary tool class
  */
-abstract class SerialHelper(sPort: Serial, iBaudRate: Int) {
+abstract class SerialHelper(serialConfig: SerialConfig) {
+    /**
+     * Serial port
+     */
+    private val config = serialConfig
     private var serialPort: SerialPort? = null
     private var outputStream: OutputStream? = null
     private var inputStream: InputStream? = null
-    private var readThread: ReadThread? = null
-    private var workHandler: Handler? = null
-    private var handlerThread: HandlerThread? = null
-    private var readData: String = ""
-    private val port: File = File(sPort.device)
-    private val baudRate: Int = iBaudRate
-    var onDataReceived: (String) -> Unit = { _ -> }
-    var stopBits: Int = 1 //StopBits，1 or 2  （default 1）
-    var dataBits: Int = 8 // DataBits，5 ~ 8  （default 8）
-    var parity: Int = 0 //Parity，0 None（default）； 1 Odd； 2 Even
-    var flowCon: Int = 0 //FlowCon
     var isOpen: Boolean = false
-    var readDelay: Long = 30L
-    var sendDelay: Long = 30L
+
+    /**
+     * Thread for receiving data
+     */
+    private var readThread: ReadThread? = null
+    private var handler: Handler? = null
+    private var handlerThread: HandlerThread? = null
+
+    private var cache: String = ""
+
+    var callback: (String) -> Unit = { _ -> }
+
 
     @Throws(SecurityException::class, IOException::class, InvalidParameterException::class)
     fun open() {
-        serialPort = SerialPort(port, baudRate, stopBits, dataBits, parity, flowCon, 0)
+        serialPort = SerialPort(
+            device = File(config.device),
+            baudRate = config.baudRate,
+            stopBits = config.stopBits,
+            dataBits = config.dataBits,
+            parity = config.parity,
+            flowCon = config.flowCon,
+            flags = config.flags
+        )
         serialPort?.let {
             outputStream = it.outputStream
             inputStream = it.inputStream
         }
         readThread = ReadThread()
         readThread?.start()
+
         handlerThread = HandlerThread("handlerThread")
         handlerThread?.let {
             it.start()
-            workHandler = object : Handler(it.looper) {
+            handler = object : Handler(it.looper) {
                 override fun handleMessage(msg: Message) {
                     super.handleMessage(msg)
                     send(msg.obj as ByteArray)
                     try {
-                        Thread.sleep(sendDelay)
+                        Thread.sleep(config.delay)
                     } catch (e: InterruptedException) {
                         e.printStackTrace()
                     }
@@ -62,7 +73,7 @@ abstract class SerialHelper(sPort: Serial, iBaudRate: Int) {
     }
 
     fun addWaitMessage(msg: Message) {
-        workHandler?.sendMessage(msg)
+        handler?.sendMessage(msg)
     }
 
     open fun close() {
@@ -89,15 +100,20 @@ abstract class SerialHelper(sPort: Serial, iBaudRate: Int) {
         if (!isOpen) return
     }
 
-    private fun parseData(tempData: String) {
-        if (tempData == TAG_END) {
-            if (readData.isNotEmpty()) {
-                onDataReceived.invoke(readData.trim { it <= ' ' }.replace(" ".toRegex(), ""))
-                readData = ""
+    /**
+     * data processing
+     * @param temp
+     * @return
+     */
+    private fun dataProcess(temp: String) {
+        if (temp == TAG_END) {
+            if (cache.isNotEmpty()) {
+                callback.invoke(cache)
+                cache = ""
             }
             return
         }
-        readData += tempData
+        cache += temp
     }
 
     private inner class ReadThread : Thread() {
@@ -105,19 +121,20 @@ abstract class SerialHelper(sPort: Serial, iBaudRate: Int) {
             super.run()
             while (!isInterrupted) {
                 try {
-                    val im = inputStream?.available()
-                    if (im != null) {
-                        if (im > 0) {
-                            val buffer = ByteArray(im)
+                    val input = inputStream?.available()
+                    input?.let {
+                        if (it > 0) {
+                            val buffer = ByteArray(it)
                             inputStream?.read(buffer)
-                            val hexString = byteArrToHex(buffer).trim { it <= ' ' }
-                            parseData(hexString)
+                            bytesToHexString(buffer, 0, buffer.size)?.let { hex ->
+                                dataProcess(hex)
+                            }
                         } else {
-                            parseData(TAG_END)
+                            dataProcess(TAG_END)
                         }
                     }
                     try {
-                        sleep(readDelay)
+                        sleep(1L)
                     } catch (e: InterruptedException) {
                         e.printStackTrace()
                     }
