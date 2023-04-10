@@ -7,7 +7,7 @@
 
         <variable
             name="cali"
-            type="com.zktony.www.data.local.entity.Calibration" />
+            type="com.zktony.www.room.entity.Calibration" />
     </data>
 
     <LinearLayout

@@ -17,7 +17,7 @@
     <string name="input_v1">促凝剂加液量 μL</string>
     <string name="input_v2">胶体加液量 μL</string>
     <string name="mode">模式</string>
-    <string name="notice_content">1. 执行程序前请确认有充足的溶液。\n2. 程序结束后请及时清理容器，避免滋生微生物等问题。\n3. 请阅读说明书后使用，避免误操作。</string>
+    <string name="notice_content">1. 执行程序前请确认有充足的胶体和促凝剂。\n2. 程序结束后请及时清理容器，避免滋生微生物等问题。\n3. 请阅读说明书后使用，避免误操作。</string>
     <string name="operate">操作</string>
     <string name="order">序号</string>
     <string name="program_name">程序名</string>

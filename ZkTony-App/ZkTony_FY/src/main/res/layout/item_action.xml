@@ -7,7 +7,7 @@
 
         <variable
             name="action"
-            type="com.zktony.www.data.local.entity.Action" />
+            type="com.zktony.www.room.entity.Action" />
     </data>
 
     <androidx.cardview.widget.CardView

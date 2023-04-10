@@ -24,11 +24,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-
 }
 
 dependencies {
-
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
@@ -39,7 +37,6 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
-    implementation(libs.datastore.preferences)
     implementation(libs.dialogx)
     implementation(libs.material)
     implementation(libs.okhttp3)

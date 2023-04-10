@@ -6,7 +6,7 @@ targetSdk = "33"
 ndk = "25.2.9519653"
 cmake = "3.22.1"
 ## dependencies
-android-lifecycle = "2.5.1"
+android-lifecycle = "2.6.0"
 androidGradlePlugin = "7.4.2"
 androidx-activity = "1.6.1"
 androidx-appcompat = "1.6.1"

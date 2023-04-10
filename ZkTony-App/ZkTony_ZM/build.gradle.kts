@@ -1,13 +1,9 @@
 @file:Suppress("UnstableApiUsage")
-
-import com.google.protobuf.gradle.*
-
 @Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.protobuf)
 }
 
 android {
@@ -78,48 +74,12 @@ android {
     }
 }
 
-protobuf {
-    protoc {
-        artifact = libs.protobuf.protoc.get().toString()
-    }
-    plugins {
-        id("java") {
-            artifact = libs.grpc.gen.java.get().toString()
-        }
-        id("grpc") {
-            artifact = libs.grpc.gen.java.get().toString()
-        }
-        id("grpckt") {
-            artifact = libs.grpc.gen.kotlin.get().toString()
-        }
-    }
-
-    generateProtoTasks {
-        all().forEach { task ->
-            task.builtins {
-                id("kotlin") {
-                    option("lite")
-                }
-            }
-            task.plugins {
-                id("java") {
-                    option("lite")
-                }
-                id("grpc") {
-                    option("lite")
-                }
-                id("grpckt") {
-                    option("lite")
-                }
-            }
-        }
-    }
-}
 
 dependencies {
-    protobuf(project(":protobuf"))
     implementation(project(mapOf("path" to ":common")))
+    implementation(project(mapOf("path" to ":datastore")))
     implementation(project(mapOf("path" to ":gpio")))
+    implementation(project(mapOf("path" to ":protobuf")))
     implementation(project(mapOf("path" to ":serialport")))
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
@@ -136,10 +96,7 @@ dependencies {
     implementation(libs.datastore.preferences)
     implementation(libs.dialogx)
     implementation(libs.grpc.okhttp)
-    implementation(libs.grpc.kotlin.sub)
-    implementation(libs.grpc.protobuf.lite)
     implementation(libs.gson)
-    implementation(libs.protobuf.kotlin.lite)
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.workmanager)

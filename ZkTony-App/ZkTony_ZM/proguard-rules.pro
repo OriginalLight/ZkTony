@@ -102,9 +102,6 @@
 -dontwarn androidx.renderscript.**
 -keep public class androidx.renderscript.** { *; }
 
-# Model
--keepclasseswithmembers class com.zktony.www.data.local.entity.** {*;}
-
 -keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite* {
    <fields>;
 }

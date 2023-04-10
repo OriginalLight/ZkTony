@@ -1,13 +1,89 @@
+@file:Suppress("UnstableApiUsage")
+
+import com.google.protobuf.gradle.*
+
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
-    id("kotlin")
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.protobuf)
 }
 
-java {
-    sourceSets {
-        main {
-            resources {
-                srcDir("src/main/proto")
+android {
+    namespace = "com.zktony.protobuf"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        dataBinding = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+}
+
+protobuf {
+    protoc {
+        artifact = libs.protobuf.protoc.get().toString()
+    }
+    plugins {
+        id("java") {
+            artifact = libs.grpc.gen.java.get().toString()
+        }
+        id("grpc") {
+            artifact = libs.grpc.gen.java.get().toString()
+        }
+        id("grpckt") {
+            artifact = libs.grpc.gen.kotlin.get().toString()
+        }
+    }
+
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                id("kotlin") {
+                    option("lite")
+                }
+            }
+            task.plugins {
+                id("java") {
+                    option("lite")
+                }
+                id("grpc") {
+                    option("lite")
+                }
+                id("grpckt") {
+                    option("lite")
+                }
             }
         }
     }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_11.toString()
+        freeCompilerArgs = listOf("-opt-in=kotlin.RequiresOptIn")
+    }
+}
+
+dependencies {
+    implementation(libs.androidx.core.ktx)
+    api(libs.grpc.stub)
+    api(libs.grpc.kotlin.sub)
+    api(libs.grpc.protobuf.lite)
+    api(libs.protobuf.kotlin.lite)
+
+    testImplementation(libs.junit)
+
+    androidTestImplementation(libs.androidx.test.ext.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
 }
