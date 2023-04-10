@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.zktony.core.R
 import com.zktony.core.ext.clickNoRepeat
-import com.zktony.www.room.entity.Motor
 import com.zktony.www.databinding.ItemMotorBinding
+import com.zktony.www.room.entity.Motor
 
 /**
  * @author: 刘贺贺

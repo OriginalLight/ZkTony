@@ -27,7 +27,7 @@ class CalibrationViewModel constructor(
         }
     }
 
-    fun insert(name: String, block : (String) -> Unit) {
+    fun insert(name: String, block: (String) -> Unit) {
         viewModelScope.launch {
             val cali = _uiState.value?.find { it.name == name }
             if (cali != null) {

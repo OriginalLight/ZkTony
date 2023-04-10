@@ -4,14 +4,14 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.utils.Snowflake
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.dao.HoleDao
 import com.zktony.www.room.dao.PlateDao
 import com.zktony.www.room.entity.Container
 import com.zktony.www.room.entity.Hole
 import com.zktony.www.room.entity.Plate
-import com.zktony.www.manager.ExecutionManager
-import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -47,6 +47,7 @@ class PlateViewModel constructor(
             }
         }
     }
+
     fun setSpace(f: Float) {
         viewModelScope.launch {
             _uiState.value.container?.let {
@@ -97,15 +98,15 @@ class PlateViewModel constructor(
         }
         val space = _uiState.value.container?.space ?: 2f
         executionManager.executor(
-            executionManager.generator(y =  y + space),
-            executionManager.generator(y =  y),
+            executionManager.generator(y = y + space),
+            executionManager.generator(y = y),
         )
     }
 
     /**
      * 数组计算算法
      */
-    private suspend fun calculate(index: Int  = 0) {
+    private suspend fun calculate(index: Int = 0) {
         val holeList = _uiState.value.holeList
         val h1 = holeList[index]
         var h2 = holeList[index + 1]

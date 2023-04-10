@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.core.ext.removeZero
-import com.zktony.www.room.entity.Program
 import com.zktony.www.databinding.ItemProgramBinding
+import com.zktony.www.room.entity.Program
 
 /**
  * @author: 刘贺贺

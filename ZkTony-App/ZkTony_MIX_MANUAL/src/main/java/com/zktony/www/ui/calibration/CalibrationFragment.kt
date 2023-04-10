@@ -62,12 +62,14 @@ class CalibrationFragment :
             with(add) {
                 clickScale()
                 clickNoRepeat {
-                    inputDialog { viewModel.insert(it) {
-                        findNavController().navigate(
-                            R.id.action_navigation_calibration_to_navigation_calibration_data,
-                            Bundle().apply { putLong("id", it) }
-                        )
-                    } }
+                    inputDialog {
+                        viewModel.insert(it) {
+                            findNavController().navigate(
+                                R.id.action_navigation_calibration_to_navigation_calibration_data,
+                                Bundle().apply { putLong("id", it) }
+                            )
+                        }
+                    }
                 }
             }
         }

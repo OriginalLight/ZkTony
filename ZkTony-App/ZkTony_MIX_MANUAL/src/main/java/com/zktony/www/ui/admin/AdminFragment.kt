@@ -19,10 +19,10 @@ import com.zktony.core.ext.Ext
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.core.ext.installApk
+import com.zktony.core.model.QrCode
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.common.ext.*
-import com.zktony.core.model.QrCode
 import com.zktony.www.databinding.FragmentAdminBinding
 import com.zktony.www.manager.StateManager
 import kotlinx.coroutines.launch

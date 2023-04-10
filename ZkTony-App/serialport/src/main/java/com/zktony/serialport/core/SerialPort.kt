@@ -6,8 +6,6 @@ import java.io.*
 /**
  * JNI 串口通讯
  *
- * @author zhouhuan
- * @time 2022/3/5
  */
 class SerialPort
 @Throws(IOException::class) constructor(

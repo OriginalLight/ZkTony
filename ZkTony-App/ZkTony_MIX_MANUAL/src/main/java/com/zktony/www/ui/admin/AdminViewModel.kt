@@ -132,18 +132,18 @@ class AdminViewModel constructor(
 
                         is DownloadState.Err -> {
                             _uiState.value = _uiState.value.copy(
-                            progress = 0
-                        )
-                        PopTip.show("下载失败,请重试!").showLong()
-                    }
+                                progress = 0
+                            )
+                            PopTip.show("下载失败,请重试!").showLong()
+                        }
 
-                    is DownloadState.Progress -> {
-                        _uiState.value = _uiState.value.copy(
-                            progress = it.progress
-                        )
+                        is DownloadState.Progress -> {
+                            _uiState.value = _uiState.value.copy(
+                                progress = it.progress
+                            )
+                        }
                     }
                 }
-            }
         }
 
     }

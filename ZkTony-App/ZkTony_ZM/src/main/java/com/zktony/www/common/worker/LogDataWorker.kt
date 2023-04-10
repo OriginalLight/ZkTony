@@ -3,8 +3,8 @@ package com.zktony.www.common.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.core.ext.simpleDateFormat
 import com.zktony.core.ext.logi
+import com.zktony.core.ext.simpleDateFormat
 import com.zktony.proto.LogDetail
 import com.zktony.protobuf.grpc.LogDetailGrpc
 import com.zktony.www.room.dao.LogDataDao
@@ -43,7 +43,7 @@ class LogDataWorker constructor(
                     }
                     .collect {
                         if (it.success) {
-                            dao.updateAll(logs.map {l ->  l.copy(upload = 1) })
+                            dao.updateAll(logs.map { l -> l.copy(upload = 1) })
                         } else {
                             "上传日志数据失败".logi("LogDataWorker")
                         }

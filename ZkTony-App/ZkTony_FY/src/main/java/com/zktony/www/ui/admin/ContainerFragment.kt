@@ -11,9 +11,9 @@ import com.zktony.core.ext.clickScale
 import com.zktony.core.ext.removeZero
 import com.zktony.core.ext.setEqualText
 import com.zktony.www.R
-import com.zktony.www.room.entity.Container
 import com.zktony.www.databinding.FragmentContainerBinding
 import com.zktony.www.manager.SerialManager
+import com.zktony.www.room.entity.Container
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel

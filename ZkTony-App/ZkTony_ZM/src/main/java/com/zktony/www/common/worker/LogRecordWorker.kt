@@ -3,8 +3,8 @@ package com.zktony.www.common.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.core.ext.simpleDateFormat
 import com.zktony.core.ext.logi
+import com.zktony.core.ext.simpleDateFormat
 import com.zktony.proto.Log
 import com.zktony.protobuf.grpc.LogGrpc
 import com.zktony.www.room.dao.LogRecordDao
@@ -37,7 +37,7 @@ class LogRecordWorker constructor(
                             .setContent("模式：${if (it.model == 0) "转膜" else "染色"}，泵速：${it.motor}，电压：${it.voltage}, 时长：${it.time}")
                             .setCreateTime(it.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss"))
                             .build()
-                        )
+                    )
                 }
                 grpc.addLogs(list)
                     .catch {
@@ -45,7 +45,7 @@ class LogRecordWorker constructor(
                     }
                     .collect {
                         if (it.success) {
-                            dao.updateAll(logs.map {l ->  l.copy(upload = 1) })
+                            dao.updateAll(logs.map { l -> l.copy(upload = 1) })
                         } else {
                             "上传日志数据失败".logi("LogRecordWorker")
                         }

@@ -1,9 +1,9 @@
 package com.zktony.www
 
 import android.app.Application
-import com.zktony.datastore.DataStoreFactory
 import com.zktony.core.dialog.DialogXManager
 import com.zktony.core.ext.Ext
+import com.zktony.datastore.DataStoreFactory
 import com.zktony.www.di.localModule
 import com.zktony.www.di.viewModule
 import org.koin.android.ext.koin.androidContext

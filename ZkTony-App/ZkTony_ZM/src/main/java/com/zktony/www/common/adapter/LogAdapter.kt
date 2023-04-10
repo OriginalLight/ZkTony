@@ -10,8 +10,8 @@ import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.core.ext.removeZero
 import com.zktony.core.ext.simpleDateFormat
-import com.zktony.www.room.entity.LogRecord
 import com.zktony.www.databinding.ItemLogBinding
+import com.zktony.www.room.entity.LogRecord
 
 /**
  * @author: 刘贺贺

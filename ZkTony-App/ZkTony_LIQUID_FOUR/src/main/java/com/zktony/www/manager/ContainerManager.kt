@@ -1,7 +1,7 @@
 package com.zktony.www.manager
 
-import com.zktony.core.utils.Snowflake
 import com.zktony.core.ext.logi
+import com.zktony.core.utils.Snowflake
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.dao.HoleDao
 import com.zktony.www.room.dao.PlateDao

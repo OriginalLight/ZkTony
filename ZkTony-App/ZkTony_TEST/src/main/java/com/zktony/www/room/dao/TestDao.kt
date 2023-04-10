@@ -24,5 +24,4 @@ import com.zktony.www.room.entity.Test
  * Data access object to query the database.
  */
 @Dao
-interface TestDao: BaseDao<Test> {
-}
+interface TestDao : BaseDao<Test>

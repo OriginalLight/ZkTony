@@ -2,12 +2,12 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.SerialManager
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.CalibrationDataDao
 import com.zktony.www.room.entity.Calibration
 import com.zktony.www.room.entity.CalibrationData
-import com.zktony.www.manager.ExecutionManager
-import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -61,11 +61,13 @@ class CalibrationDataViewModel constructor(
     fun addLiquid() {
         viewModelScope.launch {
             val state = _uiState.value
-            executionManager.executor(executionManager.generator(
-                v1 = if (state.pumpId == 0) state.expect else 0f,
-                v2 = if (state.pumpId == 1) state.expect else 0f,
-                v3 = if (state.pumpId == 2) state.expect else 0f,
-            ))
+            executionManager.executor(
+                executionManager.generator(
+                    v1 = if (state.pumpId == 0) state.expect else 0f,
+                    v2 = if (state.pumpId == 1) state.expect else 0f,
+                    v3 = if (state.pumpId == 2) state.expect else 0f,
+                )
+            )
             if (state.pumpId == 2) {
                 delay(100L)
                 while (serialManager.lock.value) {

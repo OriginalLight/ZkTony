@@ -3,8 +3,8 @@ package com.zktony.www.common.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.zktony.core.ext.simpleDateFormat
 import com.zktony.core.ext.logi
+import com.zktony.core.ext.simpleDateFormat
 import com.zktony.proto.Program
 import com.zktony.protobuf.grpc.ProgramGrpc
 import com.zktony.www.room.dao.ProgramDao
@@ -49,7 +49,7 @@ class ProgramWorker constructor(
                     }
                     .collect {
                         if (it.success) {
-                            dao.updateAll(programs.map {p ->  p.copy(upload = 1) })
+                            dao.updateAll(programs.map { p -> p.copy(upload = 1) })
                         } else {
                             "上传程序数据失败".logi("ProgramWorker")
                         }

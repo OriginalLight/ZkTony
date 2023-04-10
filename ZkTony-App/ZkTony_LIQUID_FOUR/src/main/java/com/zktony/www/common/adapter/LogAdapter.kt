@@ -11,8 +11,8 @@ import com.zktony.core.R
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.core.ext.simpleDateFormat
-import com.zktony.www.room.entity.Log
 import com.zktony.www.databinding.ItemLogBinding
+import com.zktony.www.room.entity.Log
 
 /**
  * @author: 刘贺贺

@@ -181,8 +181,8 @@ class AdminViewModel constructor(
                                 progress = it.progress
                             )
                         }
+                    }
                 }
-            }
         }
 
     }

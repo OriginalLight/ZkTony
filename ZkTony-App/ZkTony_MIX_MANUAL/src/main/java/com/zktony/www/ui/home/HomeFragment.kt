@@ -6,10 +6,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.PopTip
+import com.zktony.core.R.mipmap
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.dialog.spannerDialog
 import com.zktony.core.ext.*
-import com.zktony.core.R.mipmap
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch

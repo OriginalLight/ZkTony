@@ -1,7 +1,6 @@
 package com.zktony.www.ui.container
 
 import android.annotation.SuppressLint
-import android.graphics.Color
 import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -102,7 +101,8 @@ class PlateOneFragment :
             }
             position.onItemClick = { index ->
                 if (index == 0) {
-                    val hole = viewModel.uiState.value.holes.find { hole -> hole.x == 0 && hole.y == 0 }
+                    val hole =
+                        viewModel.uiState.value.holes.find { hole -> hole.x == 0 && hole.y == 0 }
                     positionDialog(
                         textX = hole?.xAxis ?: 0f,
                         textY = hole?.yAxis ?: 0f,

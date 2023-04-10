@@ -49,7 +49,8 @@ class TecViewModel : BaseViewModel() {
                         if (it.startsWith("TC1:TCACTUALTEMP=")) {
                             // 读取温度
                             val address = it.substring(it.length - 2, it.length - 1).toInt()
-                            val temp = it.replace("TC1:TCACTUALTEMP=", "").split("@")[0].removeZero()
+                            val temp =
+                                it.replace("TC1:TCACTUALTEMP=", "").split("@")[0].removeZero()
                             val flow = flow(address)
                             flow.value = flow.value.copy(temp = temp.toFloatOrNull() ?: 0f)
                         }
