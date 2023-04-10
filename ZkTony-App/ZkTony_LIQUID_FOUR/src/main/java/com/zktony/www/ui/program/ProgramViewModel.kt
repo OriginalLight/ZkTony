@@ -43,13 +43,15 @@ class ProgramViewModel constructor(
         }
     }
 
-    fun insert(name: String) {
+    fun insert(name: String, block: (Long) -> Unit) {
         viewModelScope.launch {
             val work = workList.value.find { it.name == name }
             if (work != null) {
                 PopTip.show("已存在相同名称的程序")
             } else {
-                dao.insert(Program(name = name))
+                val program = Program(name = name)
+                dao.insert(program)
+                block(program.id)
             }
         }
     }

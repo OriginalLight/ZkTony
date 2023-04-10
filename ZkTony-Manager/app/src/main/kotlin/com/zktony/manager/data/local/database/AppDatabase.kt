@@ -1,10 +1,10 @@
-package com.zktony.manager.data.local.room
+package com.zktony.manager.data.local.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.zktony.manager.data.local.dao.UserDao
-import com.zktony.manager.data.local.model.User
+import com.zktony.manager.data.local.entity.User
 
 /**
  * @author: 刘贺贺

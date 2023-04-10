@@ -2,7 +2,6 @@ package com.zktony.manager.ui.fragment
 
 import android.app.Activity
 import android.content.Intent
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,7 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.gson.Gson
-import com.zktony.manager.common.ext.showShortToast
+import com.zktony.manager.ext.showShortToast
 import com.zktony.manager.data.remote.model.QrCode
 import com.zktony.manager.ui.QrCodeActivity
 import com.zktony.manager.ui.components.ManagerAppBar

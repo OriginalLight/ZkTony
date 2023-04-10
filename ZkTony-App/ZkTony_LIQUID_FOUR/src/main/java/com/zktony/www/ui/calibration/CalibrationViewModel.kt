@@ -27,7 +27,7 @@ class CalibrationViewModel constructor(
         }
     }
 
-    fun insert(name: String) {
+    fun insert(name: String, block: (Long) -> Unit) {
         viewModelScope.launch {
             val cali = _uiState.value?.find { it.name == name }
             if (cali != null) {
@@ -35,6 +35,7 @@ class CalibrationViewModel constructor(
             } else {
                 val calibration = Calibration(name = name)
                 dao.insert(calibration)
+                block(calibration.id)
             }
         }
     }

@@ -12,13 +12,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Android
-import androidx.compose.material.icons.filled.LaptopMac
 import androidx.compose.material.icons.filled.MiscellaneousServices
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Domain
 import androidx.compose.material.icons.outlined.Note
 import androidx.compose.material3.Button
-import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.gson.Gson
 import com.zktony.manager.R
-import com.zktony.manager.common.ext.showShortToast
+import com.zktony.manager.ext.showShortToast
 import com.zktony.manager.data.remote.model.QrCode
 import com.zktony.manager.ui.QrCodeActivity
 import com.zktony.manager.ui.components.*

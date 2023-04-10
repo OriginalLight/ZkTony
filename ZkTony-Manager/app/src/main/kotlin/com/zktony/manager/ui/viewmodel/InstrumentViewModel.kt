@@ -2,7 +2,7 @@ package com.zktony.manager.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.manager.common.ext.showShortToast
+import com.zktony.manager.ext.showShortToast
 import com.zktony.manager.data.remote.grpc.InstrumentGrpc
 import com.zktony.proto.Instrument
 import com.zktony.proto.InstrumentSearch

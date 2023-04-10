@@ -1,4 +1,4 @@
-package com.zktony.manager.common.ext
+package com.zktony.manager.ext
 
 import java.io.InputStream
 import java.io.OutputStream

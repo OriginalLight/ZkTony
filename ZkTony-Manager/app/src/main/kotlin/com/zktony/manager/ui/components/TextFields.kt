@@ -35,7 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.google.gson.Gson
-import com.zktony.manager.common.ext.showShortToast
+import com.zktony.manager.ext.showShortToast
 import com.zktony.manager.data.remote.model.QrCode
 import com.zktony.manager.ui.QrCodeActivity
 import com.zktony.proto.Software

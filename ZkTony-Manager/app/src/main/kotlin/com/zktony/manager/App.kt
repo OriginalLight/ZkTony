@@ -1,7 +1,7 @@
 package com.zktony.manager
 
 import android.app.Application
-import com.zktony.manager.common.ext.Ext
+import com.zktony.manager.ext.Ext
 import com.zktony.manager.di.localModule
 import com.zktony.manager.di.remoteModule
 import com.zktony.manager.di.viewModule

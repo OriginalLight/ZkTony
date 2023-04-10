@@ -1,7 +1,7 @@
 package com.zktony.manager.data.local.dao
 
 import androidx.room.*
-import com.zktony.manager.data.local.model.User
+import com.zktony.manager.data.local.entity.User
 import kotlinx.coroutines.flow.Flow
 
 /**

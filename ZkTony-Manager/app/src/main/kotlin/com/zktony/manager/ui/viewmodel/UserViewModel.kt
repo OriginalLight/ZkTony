@@ -3,7 +3,7 @@ package com.zktony.manager.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.manager.data.local.dao.UserDao
-import com.zktony.manager.data.local.model.User
+import com.zktony.manager.data.local.entity.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

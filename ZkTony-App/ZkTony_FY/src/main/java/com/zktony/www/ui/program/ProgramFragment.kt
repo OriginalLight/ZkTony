@@ -65,7 +65,16 @@ class ProgramFragment :
 
             with(btnAdd) {
                 clickScale()
-                clickNoRepeat { inputDialog { viewModel.insert(it) } }
+                clickNoRepeat {
+                    inputDialog {
+                        viewModel.insert(it) {
+                            findNavController().navigate(
+                                R.id.action_navigation_program_to_navigation_action,
+                                Bundle().apply { putString("id", it) }
+                            )
+                        }
+                    }
+                }
             }
         }
     }

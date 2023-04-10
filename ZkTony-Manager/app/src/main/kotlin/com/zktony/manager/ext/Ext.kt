@@ -1,4 +1,4 @@
-package com.zktony.manager.common.ext
+package com.zktony.manager.ext
 
 import android.app.Application
 

@@ -40,12 +40,12 @@ class ExecutionManager constructor(
         }
     }
 
-    fun executor(gen: Collection<String>) {
+    fun executor2(vararg gen: String) {
         scope.launch {
             val str = gen.joinToString("")
             serialManager.sendHex(
                 serial = Serial.TTYS0,
-                hex = V1.singlePoint(data = str),
+                hex = V1.complex(data = str),
                 true
             )
         }

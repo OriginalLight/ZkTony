@@ -2,12 +2,8 @@ package com.zktony.manager.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.manager.common.ext.Ext
-import com.zktony.manager.common.ext.installApk
-import com.zktony.manager.common.ext.showShortToast
-import com.zktony.manager.common.http.DownloadManager
-import com.zktony.manager.common.http.DownloadState
 import com.zktony.manager.data.remote.grpc.ApplicationGrpc
+import com.zktony.manager.ext.*
 import com.zktony.proto.Application
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,10 +42,8 @@ class UpgradeViewModel constructor(
             }
             _uiState.value = _uiState.value.copy(download = true)
             _uiState.value.application?.let { app ->
-                DownloadManager.download(
-                    url = app.downloadUrl,
-                    file = File(Ext.ctx.getExternalFilesDir(null), "app.apk"),
-                ).flowOn(Dispatchers.IO)
+                app.downloadUrl.download(File(Ext.ctx.getExternalFilesDir(null), "app.apk"))
+                    .flowOn(Dispatchers.IO)
                     .collect {
                         when (it) {
                             is DownloadState.Success -> {

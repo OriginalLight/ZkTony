@@ -50,9 +50,10 @@ class ProgramExecutor constructor(
             while (serialManager.lock.value) {
                 delay(100L)
             }
-            executionManager.executor(
+            executionManager.executor2(
                 executionManager.generator(
                     v1 = 1000f,
+                    v2 = 10f,
                 )
             )
             delay(100L)

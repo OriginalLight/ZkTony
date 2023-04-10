@@ -44,7 +44,7 @@ maps-compose = "2.5.3"
 material = "1.9.0-abeta01"
 # @keep
 minSdk = "21"
-okhttp = "4.10.0"
+okhttp = "5.0.0-alpha.11"
 protobuf = "3.22.2"
 protobuf-gradle-plugin = "0.9.1"
 robolectric = "4.9.2"

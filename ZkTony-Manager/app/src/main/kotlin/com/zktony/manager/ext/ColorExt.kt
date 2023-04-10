@@ -1,4 +1,4 @@
-package com.zktony.manager.common.ext
+package com.zktony.manager.ext
 
 // 生成随机颜色
 fun randomColor(): Int {

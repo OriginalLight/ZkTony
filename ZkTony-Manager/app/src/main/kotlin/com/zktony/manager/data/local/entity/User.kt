@@ -1,4 +1,4 @@
-package com.zktony.manager.data.local.model
+package com.zktony.manager.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
