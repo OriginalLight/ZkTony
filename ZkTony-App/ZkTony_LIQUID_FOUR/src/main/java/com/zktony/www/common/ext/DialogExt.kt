@@ -7,6 +7,7 @@ import android.widget.EditText
 import android.widget.TextView
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
+import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.removeZero
@@ -43,12 +44,16 @@ fun positionDialog(
                 move.clickNoRepeat {
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                    block1(x, y)
+                    if (x > 240f) PopTip.show("X轴最大值为240")
+                    if (y > 320f) PopTip.show("Y轴最大值为320")
+                    block1(minOf(240f, x), minOf(320f, y))
                 }
                 save.setOnClickListener {
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                    block2(x, y)
+                    if (x > 240f) PopTip.show("X轴最大值为240")
+                    if (y > 320f) PopTip.show("Y轴最大值为320")
+                    block2(minOf(240f, x), minOf(320f, y))
                     dialog.dismiss()
                 }
                 cancel.setOnClickListener { dialog.dismiss() }
