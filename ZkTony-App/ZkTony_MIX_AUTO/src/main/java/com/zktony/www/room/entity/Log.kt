@@ -18,6 +18,7 @@ package com.zktony.www.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.zktony.core.utils.Snowflake
 import java.util.*
 
 /**
@@ -26,7 +27,7 @@ import java.util.*
 @Entity(tableName = "log")
 data class Log(
     @PrimaryKey
-    val id: String = UUID.randomUUID().toString(),
+    val id: Long = Snowflake(1).nextId(),
     val name: String = "",
     val content: String = "",
     val status: Int = 0,

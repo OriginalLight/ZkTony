@@ -8,7 +8,6 @@ import com.zktony.www.databinding.ActivityMainBinding
 
 class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::inflate) {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -17,6 +16,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
 
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         binding.navView.setupWithNavController(navController)
+
 
     }
 }

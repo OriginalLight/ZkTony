@@ -29,10 +29,10 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class AdminViewModel constructor(
-    private val dataStore: DataStore<Preferences>,
     private val dao: MotorDao,
     private val grpc: ApplicationGrpc,
     private val serialManager: SerialManager,
+    private val dataStore: DataStore<Preferences>,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(AdminUiState())

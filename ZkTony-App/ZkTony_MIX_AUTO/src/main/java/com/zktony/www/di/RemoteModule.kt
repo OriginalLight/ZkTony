@@ -8,6 +8,7 @@ import com.zktony.protobuf.grpc.ApplicationGrpc
 import io.grpc.TlsChannelCredentials
 import io.grpc.okhttp.OkHttpChannelBuilder
 import org.koin.android.ext.koin.androidContext
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val remoteModule = module {
@@ -21,7 +22,5 @@ val remoteModule = module {
             .overrideAuthority(GRPC_AUTHORITY)
             .build()
     }
-    single {
-        ApplicationGrpc(get())
-    }
+    singleOf(::ApplicationGrpc)
 }

@@ -3,6 +3,7 @@ package com.zktony.www.common.adapter
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -63,6 +64,7 @@ class CalibrationViewHolder(
         binding.apply {
             cali = item
             order.text = (layoutPosition + 1).toString()
+            delete.isVisible = item.name != "默认"
             with(select) {
                 clickScale()
                 clickNoRepeat {

@@ -4,7 +4,7 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.ext.hexToInt8
 import com.zktony.core.ext.logi
 import com.zktony.serialport.SerialConfig
-import com.zktony.serialport.SerialMap
+import com.zktony.serialport.SerialHelpers
 import com.zktony.www.common.ext.toCommand
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.CoroutineScope
@@ -14,11 +14,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class SerialManager constructor(
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-) {
+class SerialManager {
 
-    private val serialMap by lazy { SerialMap() }
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    private val serialHelpers by lazy { SerialHelpers() }
 
     private val _callback = MutableStateFlow<String?>(null)
     private val _lock = MutableStateFlow(false)
@@ -37,13 +36,15 @@ class SerialManager constructor(
     init {
         scope.launch {
             launch {
-                serialMap.init(SerialConfig(
-                    index = 0,
-                    device = "/dev/ttyS0",
-                ))
+                serialHelpers.init(
+                    SerialConfig(
+                        index = 0,
+                        device = "/dev/ttyS0",
+                    )
+                )
             }
             launch {
-                serialMap.callback = { index, data ->
+                serialHelpers.callback = { index, data ->
                     if (index == 0) {
                         _callback.value = data
                     }
@@ -89,6 +90,12 @@ class SerialManager constructor(
         }
     }
 
+    fun init() {
+        scope.launch {
+            "串口管理器初始化完成！！！".logi()
+        }
+    }
+
     suspend fun reset() {
         _reset.value = true
         _lock.value = true
@@ -102,14 +109,10 @@ class SerialManager constructor(
      * @param hex 命令
      */
     fun sendHex(hex: String, lock: Boolean = false) {
-        serialMap.sendHex(0, hex)
+        serialHelpers.sendHex(0, hex)
         if (lock) {
             _lock.value = true
             lockTime = 0L
         }
-    }
-
-    fun test() {
-        scope.launch { "SerialManager test".logi() }
     }
 }

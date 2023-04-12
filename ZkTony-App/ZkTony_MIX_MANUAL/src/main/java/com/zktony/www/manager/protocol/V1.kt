@@ -30,7 +30,7 @@ data class V1(
          * @return [String] 指令
          */
         @JvmStatic
-        fun singlePoint(data: String): String {
+        fun single(data: String): String {
             return V1(fn = "05", pa = "01", data = "0101" + data.toHex()).toHex()
         }
 
@@ -40,7 +40,7 @@ data class V1(
          * @return [String] 指令
          */
         @JvmStatic
-        fun complex(data: String): String {
+        fun mutable(data: String): String {
             return V1(fn = "05", pa = "04", data = "0101" + data.toHex()).toHex()
         }
 

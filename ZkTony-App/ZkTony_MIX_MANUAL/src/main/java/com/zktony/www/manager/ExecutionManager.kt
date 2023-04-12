@@ -13,10 +13,17 @@ import kotlinx.coroutines.launch
 class ExecutionManager constructor(
     private val serialManager: SerialManager,
     private val motorManager: MotorManager,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+
+    fun init() {
+        scope.launch {
+            "命令执行管理器初始化完成！！！".logi()
+        }
+    }
+
     // 生成器
-    fun generator(
+    fun builder(
         v1: Float = 0f,
         v2: Float = 0f,
         v3: Float = 0f,
@@ -28,27 +35,19 @@ class ExecutionManager constructor(
     }
 
     // 执行器
-    fun executor(vararg gen: String) {
+    fun actuator(vararg gen: String, type: Int = 0) {
         scope.launch {
             val str = gen.joinToString("")
-            serialManager.sendHex(
-                hex = V1.singlePoint(data = str),
-                true
-            )
+            when(type) {
+                0 -> serialManager.sendHex(
+                    hex = V1.mutable(data = str),
+                    true
+                )
+                1 -> serialManager.sendHex(
+                    hex = V1.single(data = str),
+                    true
+                )
+            }
         }
-    }
-
-    fun executor2(vararg gen: String) {
-        scope.launch {
-            val str = gen.joinToString("")
-            serialManager.sendHex(
-                hex = V1.complex(data = str),
-                true
-            )
-        }
-    }
-
-    fun test() {
-        scope.launch { "ExecutionManager test".logi() }
     }
 }

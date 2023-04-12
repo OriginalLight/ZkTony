@@ -1,6 +1,8 @@
 package com.zktony.www.ui.home
 
 import android.view.View
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
@@ -8,8 +10,8 @@ import com.zktony.core.ext.currentTime
 import com.zktony.core.ext.removeZero
 import com.zktony.core.utils.Constants
 import com.zktony.core.utils.Queue
+import com.zktony.datastore.ext.read
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.StateManager
 import com.zktony.www.manager.protocol.V1
 import com.zktony.www.room.dao.ActionDao
 import com.zktony.www.room.dao.ContainerDao
@@ -29,7 +31,7 @@ class HomeViewModel constructor(
     private val logDao: LogDao,
     private val containerDao: ContainerDao,
     private val serialManager: SerialManager,
-    private val stateManager: StateManager
+    private val dataStore: DataStore<Preferences>,
 ) : BaseViewModel() {
 
 
@@ -39,6 +41,7 @@ class HomeViewModel constructor(
     private val _cFlow = MutableStateFlow(ModuleUiState(status = "C模块已就绪"))
     private val _dFlow = MutableStateFlow(ModuleUiState(status = "D模块已就绪"))
     private val _buttonFlow = MutableStateFlow(UiState())
+    private val _settings = MutableStateFlow(Settings())
     val programFlow = _programFlow.asStateFlow()
     val aFlow = _aFlow.asStateFlow()
     val bFlow = _bFlow.asStateFlow()
@@ -87,7 +90,7 @@ class HomeViewModel constructor(
                     delay(500L)
                     serialManager.setTemp(
                         addr = i,
-                        temp = if (i == 0) stateManager.settings.value.temp.toString()
+                        temp = if (i == 0) _settings.value.temp.toString()
                             .removeZero() else "26"
                     )
                 }
@@ -100,6 +103,18 @@ class HomeViewModel constructor(
                         )
                     }
                     delay(3 * 1000L)
+                }
+            }
+            launch {
+                launch {
+                    dataStore.read(Constants.TEMP, 3.0f).collect {
+                        _settings.value = _settings.value.copy(temp = it)
+                    }
+                }
+                launch {
+                    dataStore.read(Constants.RECYCLE, true).collect {
+                        _settings.value = _settings.value.copy(recycle = it)
+                    }
                 }
             }
         }
@@ -196,7 +211,7 @@ class HomeViewModel constructor(
                     queue = actionQueue,
                     module = module,
                     container = _buttonFlow.value.container,
-                    settings = stateManager.settings.value,
+                    settings = _settings.value,
                 )
                 // 收集执行者的状态
                 executor.event = {
@@ -221,7 +236,7 @@ class HomeViewModel constructor(
                                 delay(100L)
                                 stop(
                                     it.module,
-                                    stateManager.settings.value.temp.toString().removeZero()
+                                    _settings.value.temp.toString().removeZero()
                                 )
                             }
                         }
@@ -360,7 +375,7 @@ class HomeViewModel constructor(
             // 发送设置温度命令 如果当前是未保温状态发送设置中的温度，否则发送室温26度
             serialManager.setTemp(
                 addr = 0, temp = if (_buttonFlow.value.insulating) "26"
-                else stateManager.settings.value.temp.toString().removeZero()
+                else _settings.value.temp.toString().removeZero()
             )
             // 更改按钮状态
             _buttonFlow.value = _buttonFlow.value.copy(
@@ -421,4 +436,9 @@ data class UiState(
     val temp: String = "0.0℃",
     val lock: Boolean = true,
     val container: Container = Container(),
+)
+
+data class Settings(
+    val temp: Float = 5f,
+    val recycle: Boolean = true,
 )

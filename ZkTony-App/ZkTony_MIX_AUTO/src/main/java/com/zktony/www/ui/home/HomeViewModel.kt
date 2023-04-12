@@ -9,8 +9,12 @@ import com.zktony.core.ext.getTimeFormat
 import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
-import com.zktony.www.room.dao.*
-import com.zktony.www.room.entity.*
+import com.zktony.www.room.dao.LogDao
+import com.zktony.www.room.dao.PointDao
+import com.zktony.www.room.dao.ProgramDao
+import com.zktony.www.room.entity.Log
+import com.zktony.www.room.entity.Point
+import com.zktony.www.room.entity.Program
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,10 +23,8 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel constructor(
     private val logDao: LogDao,
-    private val containerDao: ContainerDao,
     private val programDao: ProgramDao,
-    private val plateDao: PlateDao,
-    private val holeDao: HoleDao,
+    private val pointDao: PointDao,
     private val serialManager: SerialManager,
 ) : BaseViewModel() {
 
@@ -37,45 +39,21 @@ class HomeViewModel constructor(
                         _uiState.value = _uiState.value.copy(programList = it, program = null)
                     } else {
                         _uiState.value = _uiState.value.copy(programList = it, program = it[0])
-                        loadPlate(it[0].id)
+                        loadPoint(it[0].id)
                     }
                 }
             }
-            launch {
-                containerDao.getById(1L).collect {
-                    _uiState.value = _uiState.value.copy(container = it)
-                }
+        }
+    }
+
+    private fun loadPoint(id: Long) {
+        viewModelScope.launch {
+            pointDao.getBySubId(id).collect {
+                _uiState.value = _uiState.value.copy(pointList = it)
             }
         }
     }
 
-    private fun loadPlate(id: Long) {
-        viewModelScope.launch {
-            plateDao.getBySubId(id).collect {
-                _uiState.value = _uiState.value.copy(plateList = it)
-                var size = 10
-                if (it.isNotEmpty()) {
-                    size = it[0].size
-                }
-                _uiState.value = _uiState.value.copy(
-                    info = _uiState.value.info.copy(
-                        plateSize = size
-                    )
-                )
-                loadHole(it.map { hole -> hole.id })
-            }
-        }
-    }
-
-    private fun loadHole(idList: List<Long>) {
-        viewModelScope.launch {
-            launch {
-                holeDao.getBySudIdList(idList).collect {
-                    _uiState.value = _uiState.value.copy(holeList = it)
-                }
-            }
-        }
-    }
 
     fun select(view: View) {
         val list = uiState.value.programList.map { it.name }
@@ -92,7 +70,7 @@ class HomeViewModel constructor(
             menu = list,
             block = { _, index ->
                 _uiState.value = _uiState.value.copy(program = uiState.value.programList[index])
-                loadPlate(uiState.value.programList[index].id)
+                loadPoint(uiState.value.programList[index].id)
             }
         )
     }
@@ -136,25 +114,23 @@ class HomeViewModel constructor(
                     updateLog(Log(name = _uiState.value.program?.name ?: "未知程序"))
                 }
                 val executor = ProgramExecutor(
-                    container = _uiState.value.container!!,
-                    plateList = _uiState.value.plateList,
-                    holeList = _uiState.value.holeList,
+                    list = _uiState.value.pointList,
                     scope = this,
                 )
                 serialManager.reset(false)
                 executor.event = {
                     when (it) {
-                        is ExecutorEvent.CurrentHole -> {
+                        is ExecutorEvent.CurrentPoint -> {
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
-                                    hole = it.hole
+                                    point = it.point
                                 )
                             )
                         }
-                        is ExecutorEvent.HoleList -> {
+                        is ExecutorEvent.FinishList -> {
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
-                                    holeList = it.hole
+                                    pairs = it.list
                                 )
                             )
                         }
@@ -207,12 +183,7 @@ class HomeViewModel constructor(
                 log = null,
                 time = 0L,
                 info = CurrentInfo().copy(
-                    plateSize = if (_uiState.value.plateList.isNotEmpty()) {
-                        _uiState.value.plateList[0].size
-                    } else {
-                        10
-                    },
-                    holeList = emptyList(),
+                    pairs = emptyList(),
                     process = 0
                 )
             )
@@ -385,9 +356,7 @@ class HomeViewModel constructor(
 
 data class HomeUiState(
     val programList: List<Program> = emptyList(),
-    val plateList: List<Plate> = emptyList(),
-    val holeList: List<Hole> = emptyList(),
-    val container: Container? = null,
+    val pointList: List<Point> = emptyList(),
     val log: Log? = null,
     val program: Program? = null,
     val job: Job? = null,
@@ -400,9 +369,8 @@ data class HomeUiState(
 )
 
 data class CurrentInfo(
-    val plateSize: Int = 10,
-    val hole: Hole = Hole(),
-    val holeList: List<Pair<Int, Boolean>> = emptyList(),
+    val point: Point = Point(),
+    val pairs: List<Pair<Int, Boolean>> = emptyList(),
     val speed: Float = 0f,
     val lastTime: Long = 0L,
     val process: Int = 0,

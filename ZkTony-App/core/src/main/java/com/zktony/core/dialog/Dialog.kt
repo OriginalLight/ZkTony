@@ -153,6 +153,7 @@ fun inputNumberDialog(message: String = "请输入程序/操作名", value: Int,
                 PopTip.show("不能为空")
                 return@setOkButton false
             }
+            "test".logi()
             block(inputStr.trim().toIntOrNull() ?: 0)
             false
         }.show()

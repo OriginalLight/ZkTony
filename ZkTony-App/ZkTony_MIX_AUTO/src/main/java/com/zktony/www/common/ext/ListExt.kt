@@ -1,8 +1,8 @@
 package com.zktony.www.common.ext
 
-import com.zktony.www.room.entity.Hole
+import com.zktony.www.room.entity.Point
 
-fun List<Hole>.total(): Int {
+fun List<Point>.total(): Int {
     var total = 0
     forEach {
         if (it.enable) {

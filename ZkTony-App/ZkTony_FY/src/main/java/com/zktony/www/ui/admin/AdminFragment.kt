@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.provider.Settings
 import androidx.core.view.isVisible
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,11 +19,12 @@ import com.zktony.core.dialog.deviceDialog
 import com.zktony.core.dialog.updateDialog
 import com.zktony.core.ext.*
 import com.zktony.core.model.QrCode
+import com.zktony.core.utils.Constants
+import com.zktony.datastore.ext.read
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.common.ext.*
 import com.zktony.www.databinding.FragmentAdminBinding
-import com.zktony.www.manager.StateManager
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -31,7 +34,7 @@ class AdminFragment :
 
     override val viewModel: AdminViewModel by viewModel()
 
-    private val stateManager: StateManager by inject()
+    private val dataStore: DataStore<Preferences> by inject()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -80,11 +83,19 @@ class AdminFragment :
                     }
                 }
                 launch {
-                    stateManager.settings.collect {
-                        binding.apply {
-                            etTemp.setEqualText(it.temp.toString().removeZero())
-                            swBar.isChecked = it.bar
-                            swRecycle.isChecked = it.recycle
+                    launch {
+                        dataStore.read(Constants.TEMP, 5.0f).collect {
+                            binding.etTemp.setEqualText(it.toString().removeZero())
+                        }
+                    }
+                    launch {
+                        dataStore.read(Constants.BAR, true).collect {
+                            binding.swBar.isChecked = it
+                        }
+                    }
+                    launch {
+                        dataStore.read(Constants.RECYCLE, true).collect {
+                            binding.swRecycle.isChecked = it
                         }
                     }
                 }

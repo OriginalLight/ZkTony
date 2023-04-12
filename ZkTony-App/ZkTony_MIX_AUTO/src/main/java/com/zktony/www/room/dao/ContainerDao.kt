@@ -23,7 +23,16 @@ interface ContainerDao : BaseDao<Container> {
     @Query(
         """
         SELECT * FROM container
+        ORDER BY createTime ASC
         """
     )
     fun getAll(): Flow<List<Container>>
+
+    @Query(
+        """
+        SELECT * FROM container
+        WHERE type = :type
+        """
+    )
+    fun getByType(type: Int): Flow<List<Container>>
 }

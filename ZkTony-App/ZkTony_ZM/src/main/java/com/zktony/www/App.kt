@@ -31,7 +31,6 @@ class App : Application(), KoinComponent {
             modules(
                 localModule,
                 remoteModule,
-                workerModule,
                 managerModule,
                 viewModule
             )

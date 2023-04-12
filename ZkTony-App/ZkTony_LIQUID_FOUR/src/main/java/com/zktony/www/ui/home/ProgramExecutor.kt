@@ -4,7 +4,6 @@ import com.zktony.core.ext.currentTime
 import com.zktony.www.common.ext.total
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.Settings
 import com.zktony.www.room.entity.Hole
 import com.zktony.www.room.entity.Plate
 import kotlinx.coroutines.CoroutineScope

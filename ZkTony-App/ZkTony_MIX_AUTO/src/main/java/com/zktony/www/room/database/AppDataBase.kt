@@ -17,10 +17,9 @@ import com.zktony.www.room.entity.*
         Motor::class,
         Calibration::class,
         CalibrationData::class,
-        Plate::class,
-        Hole::class,
         Program::class,
         Container::class,
+        Point::class
     ],
     version = 1,
     exportSchema = false
@@ -31,8 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun motorDao(): MotorDao
     abstract fun calibrationDao(): CalibrationDao
     abstract fun calibrationDataDao(): CalibrationDataDao
-    abstract fun plateDao(): PlateDao
-    abstract fun holeDao(): HoleDao
     abstract fun programDao(): ProgramDao
     abstract fun containerDao(): ContainerDao
+    abstract fun pointDao(): PointDao
 }

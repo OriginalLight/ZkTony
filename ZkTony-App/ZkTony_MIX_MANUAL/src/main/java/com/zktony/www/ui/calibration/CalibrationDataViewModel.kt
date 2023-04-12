@@ -61,8 +61,8 @@ class CalibrationDataViewModel constructor(
     fun addLiquid() {
         viewModelScope.launch {
             val state = _uiState.value
-            executionManager.executor(
-                executionManager.generator(
+            executionManager.actuator(
+                executionManager.builder(
                     v1 = if (state.pumpId == 0) state.expect else 0f,
                     v2 = if (state.pumpId == 1) state.expect else 0f,
                     v3 = if (state.pumpId == 2) state.expect else 0f,

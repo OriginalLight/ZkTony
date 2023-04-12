@@ -9,15 +9,19 @@ import java.util.*
  * @author: 刘贺贺
  * @date: 2023-01-28 15:54
  */
-@Entity(tableName = "hole")
-data class Hole(
+@Entity(tableName = "point")
+data class Point(
     @PrimaryKey(autoGenerate = true)
     val id: Long = Snowflake(1).nextId(),
     val subId: Long = 0L,
-    val y: Int = 0,
-    val yAxis: Float = 0f,
-    val v1: Float = 0f,
-    val v2: Float = 0f,
+    val thirdId: Long = 0L,
+    val index: Int = 0,
+    val axis: Float = 0f,
+    val waste: Float = 0f,
+    val v1: Int = 0,
+    val v2: Int = 0,
+    val v3: Int = 0,
+    val v4: Int = 0,
     val enable: Boolean = false,
     val createTime: Date = Date(System.currentTimeMillis()),
 )

@@ -2,15 +2,18 @@ package com.zktony.www.ui.home
 
 import android.graphics.Color
 import android.view.View
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.dialog.spannerDialog
 import com.zktony.core.ext.getTimeFormat
+import com.zktony.core.utils.Constants
+import com.zktony.datastore.ext.read
 import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.StateManager
 import com.zktony.www.manager.protocol.V1
 import com.zktony.www.room.dao.*
 import com.zktony.www.room.entity.*
@@ -28,12 +31,13 @@ class HomeViewModel constructor(
     private val logDao: LogDao,
     private val serialManager: SerialManager,
     private val executionManager: ExecutionManager,
-    private val stateManager: StateManager
+    private val dataStore: DataStore<Preferences>,
 ) : BaseViewModel() {
 
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
+    private val _settings = MutableStateFlow(Settings())
 
     init {
         viewModelScope.launch {
@@ -56,6 +60,11 @@ class HomeViewModel constructor(
                     _uiState.value = _uiState.value.copy(
                         container = it
                     )
+                }
+            }
+            launch {
+                dataStore.read(Constants.NEEDLE_SPACE, 12f).collect {
+                    _settings.value = _settings.value.copy(needleSpace = it)
                 }
             }
         }
@@ -248,7 +257,7 @@ class HomeViewModel constructor(
                 val executor = ProgramExecutor(
                     plateList = _uiState.value.plateList,
                     holeList = _uiState.value.holeList,
-                    settings = stateManager.settings.value,
+                    settings = _settings.value,
                     scope = this,
                 )
                 executor.event = {
@@ -396,4 +405,8 @@ data class CurrentInfo(
     val lastTime: Long = 0L,
     val color: Int = Color.GREEN,
     val process: Int = 0,
+)
+
+data class Settings(
+    val needleSpace: Float = 7.3f,
 )

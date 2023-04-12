@@ -16,8 +16,8 @@ import kotlinx.coroutines.launch
 class MotorManager(
     private val motorDao: MotorDao,
     private val calibrationDao: CalibrationDao,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     private var x: Motor = Motor()
     private var y: Motor = Motor()
@@ -73,6 +73,12 @@ class MotorManager(
         }
     }
 
+    fun init() {
+        scope.launch {
+            "电机管理器初始化完成！！！".logi()
+        }
+    }
+
     fun move(distance: Float, id: Int): Int {
         return when (id) {
             0 -> x.pulseCount(distance, cali.x)
@@ -92,9 +98,5 @@ class MotorManager(
             5 -> p6.pulseCount(volume, cali.v6)
             else -> 0
         }
-    }
-
-    fun test() {
-        scope.launch { "MotorManager test".logi() }
     }
 }

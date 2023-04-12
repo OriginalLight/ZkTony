@@ -1,13 +1,14 @@
 package com.zktony.www.di
 
 import com.zktony.www.manager.*
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val managerModule = module {
-    single { SerialManager() }
-    single { WorkerManager() }
-    single { MotorManager(get(), get()) }
-    single { ExecutionManager(get(), get()) }
-    single { ContainerManager(get(), get(), get()) }
-    single { StateManager(get(), get(), get(), get(), get(), get()) }
+    singleOf(::SerialManager)
+    singleOf(::WorkerManager)
+    singleOf(::MotorManager)
+    singleOf(::ExecutionManager)
+    singleOf(::ContainerManager)
+    singleOf(::Initializer)
 }

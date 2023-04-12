@@ -6,7 +6,7 @@ import com.zktony.core.ext.hexToInt8
 import com.zktony.core.ext.logi
 import com.zktony.core.ext.verifyHex
 import com.zktony.serialport.SerialConfig
-import com.zktony.serialport.SerialMap
+import com.zktony.serialport.SerialHelpers
 import com.zktony.www.common.ext.toV1
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.CoroutineScope
@@ -16,10 +16,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class SerialManager(
+class SerialManager {
+
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-) {
-    private val serialMap by lazy { SerialMap() }
+    private val helpers by lazy { SerialHelpers() }
 
     private val _ttys0Flow = MutableStateFlow<String?>(null)
     private val _ttys1Flow = MutableStateFlow<String?>(null)
@@ -57,26 +57,28 @@ class SerialManager(
     init {
         scope.launch {
             launch {
-                serialMap.init(SerialConfig(
-                    index = 0,
-                    device = "/dev/ttyS0",
-                ))
-                serialMap.init(SerialConfig(
-                    index = 1,
-                    device = "/dev/ttyS1",
-                ))
-                serialMap.init(SerialConfig(
-                    index = 2,
-                    device = "/dev/ttyS2",
-                ))
-                serialMap.init(SerialConfig(
-                    index = 3,
-                    device = "/dev/ttyS3",
-                    baudRate = 57600
-                ))
+                helpers.init(
+                    SerialConfig(
+                        index = 0,
+                        device = "/dev/ttyS0",
+                    ),
+                    SerialConfig(
+                        index = 1,
+                        device = "/dev/ttyS1",
+                    ),
+                    SerialConfig(
+                        index = 2,
+                        device = "/dev/ttyS2",
+                    ), SerialConfig(
+                        index = 3,
+                        device = "/dev/ttyS3",
+                        baudRate = 57600,
+                    )
+
+                )
             }
             launch {
-                serialMap.callback = { index, data ->
+                helpers.callback = { index, data ->
                     when (index) {
                         0 -> {
                             data.verifyHex().forEach {
@@ -151,13 +153,19 @@ class SerialManager(
         }
     }
 
+    fun init() {
+        scope.launch {
+            "串口管理器初始化完成！！！".logi()
+        }
+    }
+
     /**
      * 发送Hex
      * @param index 串口
      * @param hex 命令
      */
     fun sendHex(index: Int, hex: String, lock: Boolean = false) {
-        serialMap.sendHex(index, hex)
+        helpers.sendHex(index, hex)
         if (lock) {
             _lock.value = true
             lockTime = 0L
@@ -170,7 +178,7 @@ class SerialManager(
      * @param text 命令
      */
     fun sendText(index: Int, text: String) {
-        serialMap.sendText(index, text)
+        helpers.sendText(index, text)
     }
 
     suspend fun reset() {
@@ -214,10 +222,5 @@ class SerialManager(
             sendHex(0, V1.pauseShakeBed())
             _swing.value = false
         }
-    }
-
-
-    fun test() {
-        scope.launch { "SerialManager test".logi() }
     }
 }

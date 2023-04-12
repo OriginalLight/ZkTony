@@ -20,7 +20,6 @@ val localModule = module {
     single { get<AppDatabase>().calibrationDao() }
     single { get<AppDatabase>().calibrationDataDao() }
     single { get<AppDatabase>().containerDao() }
-    single { get<AppDatabase>().plateDao() }
-    single { get<AppDatabase>().holeDao() }
     single { get<AppDatabase>().programDao() }
+    single { get<AppDatabase>().pointDao() }
 }

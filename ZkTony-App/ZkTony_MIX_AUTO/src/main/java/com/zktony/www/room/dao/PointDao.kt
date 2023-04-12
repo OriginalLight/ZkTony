@@ -2,7 +2,7 @@ package com.zktony.www.room.dao
 
 import androidx.room.*
 import com.zktony.room.dao.BaseDao
-import com.zktony.www.room.entity.Hole
+import com.zktony.www.room.entity.Point
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -10,26 +10,19 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-13 11:49
  */
 @Dao
-interface HoleDao : BaseDao<Hole> {
+interface PointDao : BaseDao<Point> {
     @Query(
         """
-        SELECT * FROM hole
+        SELECT * FROM point
         WHERE subId = :id
         """
     )
-    fun getBySubId(id: Long): Flow<List<Hole>>
+    fun getBySubId(id: Long): Flow<List<Point>>
+
 
     @Query(
         """
-        SELECT * FROM hole
-        WHERE subId IN (:map)
-        """
-    )
-    fun getBySudIdList(map: List<Long>): Flow<List<Hole>>
-
-    @Query(
-        """
-        DELETE FROM hole
+        DELETE FROM point
         WHERE subId = :id
         """
     )

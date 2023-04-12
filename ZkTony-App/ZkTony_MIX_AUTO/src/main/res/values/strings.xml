@@ -14,8 +14,10 @@
     <string name="hint_deceleration">减速度</string>
     <string name="hint_speed">转速</string>
     <string name="hint_wait_time">等待时间</string>
-    <string name="input_v1">促凝剂加液量 μL</string>
-    <string name="input_v2">胶体加液量 μL</string>
+    <string name="input_v1">制胶促凝剂量 μL</string>
+    <string name="input_v2">制胶胶体量 μL</string>
+    <string name="input_v3">预排液促凝剂量 μL</string>
+    <string name="input_v4">预排液胶体量 μL</string>
     <string name="mode">模式</string>
     <string name="notice_content">1. 执行程序前请确认有充足的溶液。\n2. 程序结束后请及时清理容器，避免滋生微生物等问题。\n3. 请阅读说明书后使用，避免误操作。</string>
     <string name="operate">操作</string>
@@ -44,10 +46,13 @@
     <string name="volume_input">加液量编辑</string>
     <string name="wifi_setting">WIFI设置</string>
     <string name="about">使用说明</string>
-    <string name="title_program_plate">加液板编辑</string>
+    <string name="title_program_edit">程序编辑</string>
     <string name="fill_coagulant">填充(促凝剂)</string>
     <string name="recapture_coagulant">回吸(促凝剂)</string>
     <string name="fill_colloid">填充(胶体)</string>
     <string name="recapture_colloid">回吸(胶体)</string>
     <string name="reset">复  位</string>
+    <string name="input_axis">请输入加液孔坐标</string>
+    <string name="input_waste">请输入排液孔坐标</string>
+    <string name="container_name">容器名</string>
 </resources>

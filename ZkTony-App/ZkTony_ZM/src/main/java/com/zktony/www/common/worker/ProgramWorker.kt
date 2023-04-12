@@ -11,14 +11,16 @@ import com.zktony.www.room.dao.ProgramDao
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 
 class ProgramWorker constructor(
-    private val dao: ProgramDao,
-    private val grpc: ProgramGrpc,
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams), KoinComponent {
+
+    private val dao: ProgramDao by inject()
+    private val grpc: ProgramGrpc by inject()
 
     override suspend fun doWork(): Result {
         try {

@@ -2,8 +2,8 @@ package com.zktony.serialport
 
 import android.util.Log
 
-class SerialMap {
-    private val serialMap: MutableMap<Int, BaseSerial> = HashMap()
+class SerialHelpers {
+    private val serialMap: MutableMap<Int, SerialHelper> = HashMap()
     var callback: (Int, String) -> Unit = { _, _ -> }
 
     @Synchronized
@@ -13,13 +13,24 @@ class SerialMap {
             return 1
         }
 
-        val baseSerial = object : BaseSerial(config) {}
+        val baseSerial = SerialHelper(config)
         baseSerial.callback = { callback(config.index, it)}
         val openStatus = baseSerial.openDevice()
         if (openStatus == 0) {
             serialMap[config.index] = baseSerial
         }
         return openStatus
+    }
+
+    fun init(vararg configs: SerialConfig): Int {
+        var status = 0
+        for (config in configs) {
+            status = init(config)
+            if (status != 0) {
+                break
+            }
+        }
+        return status
     }
 
     /**
@@ -90,6 +101,6 @@ class SerialMap {
     }
 
     companion object {
-        private const val TAG = "MutableSerial"
+        private const val TAG = "SerialHelpers"
     }
 }

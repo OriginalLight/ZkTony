@@ -14,6 +14,7 @@ interface CalibrationDao : BaseDao<Calibration> {
     @Query(
         """
         SELECT * FROM calibration
+        ORDER BY createTime ASC
         """
     )
     fun getAll(): Flow<List<Calibration>>

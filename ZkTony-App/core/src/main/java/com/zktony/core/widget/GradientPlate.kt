@@ -32,7 +32,7 @@ class GradientPlate : View {
             field = value
             invalidate()
         }
-    var yAxis = listOf<Pair<Int, Float>>()
+    var axis = listOf<Triple<Int, Float, Float>>()
 
     var onItemClick: (Int) -> Unit = { _ -> }
 
@@ -93,7 +93,7 @@ class GradientPlate : View {
         }
 
         for (i in 0 until size) {
-            val axis = yAxis.find { it.first == i }
+            val axis = axis.find { it.first == i }
             if (axis != null) {
                 val left = i * space + if (i == 0) 8 else 4
                 val right = (i + 1) * space - if (i == size - 1) 8 else 4
@@ -106,8 +106,13 @@ class GradientPlate : View {
                 paint.textSize = space * 0.2f
                 val text = String.format("%.2f", axis.second).removeZero()
                 val x = left + (right - left - paint.measureText(text)) / 2
-                val y = top + (bottom - top - paint.textSize) / 2 + paint.textSize
+                val y = top + (bottom - top - paint.textSize) / 2 - paint.textSize
                 canvas?.drawText(text, x, y, paint)
+
+                val text2 = String.format("%.2f", axis.third).removeZero()
+                val x2 = left + (right - left - paint.measureText(text2)) / 2
+                val y2 = top + (bottom - top - paint.textSize) / 2 + paint.textSize * 2
+                canvas?.drawText(text2, x2, y2, paint)
             }
         }
     }

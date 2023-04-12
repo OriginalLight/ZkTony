@@ -5,14 +5,16 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.zktony.www.room.dao.LogRecordDao
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 
 class LogWorker constructor(
-    private val logRecordDao: LogRecordDao,
-    private val logDataDao: LogRecordDao,
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams), KoinComponent {
+
+    private val logRecordDao: LogRecordDao by inject()
+    private val logDataDao: LogRecordDao by inject()
 
     override suspend fun doWork(): Result {
         return try {

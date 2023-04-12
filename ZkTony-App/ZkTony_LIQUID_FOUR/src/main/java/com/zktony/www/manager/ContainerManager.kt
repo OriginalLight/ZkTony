@@ -17,8 +17,8 @@ class ContainerManager constructor(
     private val containerDao: ContainerDao,
     private val plateDao: PlateDao,
     private val holeDao: HoleDao,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     init {
         scope.launch {
@@ -43,6 +43,12 @@ class ContainerManager constructor(
         }
     }
 
+    fun init() {
+        scope.launch {
+            "容器管理器初始化完成！！！".logi()
+        }
+    }
+
     private suspend fun initHole(plate: Plate) {
         val snowflake = Snowflake(2)
         val holes = mutableListOf<Hole>()
@@ -52,9 +58,5 @@ class ContainerManager constructor(
             }
         }
         holeDao.insertAll(holes)
-    }
-
-    fun test() {
-        scope.launch { "ContainerManager test".logi() }
     }
 }

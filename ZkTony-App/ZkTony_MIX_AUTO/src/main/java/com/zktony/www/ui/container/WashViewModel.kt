@@ -21,9 +21,9 @@ class WashViewModel constructor(
     private val _uiState = MutableStateFlow<Container?>(null)
     val uiState = _uiState.asStateFlow()
 
-    init {
+    fun init(id: Long) {
         viewModelScope.launch {
-            dao.getById(1L).collect {
+            dao.getById(id).collect {
                 _uiState.value = it
             }
         }
@@ -40,7 +40,7 @@ class WashViewModel constructor(
     fun save(x: Float) {
         viewModelScope.launch {
             _uiState.value?.let {
-                dao.update(it.copy(wasteY = x))
+                dao.update(it.copy(axis = x))
             }
         }
     }

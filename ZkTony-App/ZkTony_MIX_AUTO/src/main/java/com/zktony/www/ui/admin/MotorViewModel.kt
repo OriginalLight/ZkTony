@@ -98,9 +98,15 @@ class MotorViewModel constructor(
                 if (validateMotor(it)) {
                     dao.update(it)
                     val port = when (it.id) {
-                        in 0..1 -> { 0 }
-                        in 2..4 -> { 3 }
-                        else -> { 0 }
+                        in 0..1 -> {
+                            0
+                        }
+                        in 2..4 -> {
+                            3
+                        }
+                        else -> {
+                            0
+                        }
                     }
                     serial.sendHex(
                         index = port,

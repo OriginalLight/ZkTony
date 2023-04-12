@@ -14,7 +14,7 @@ import com.zktony.gpio.Gpio
 import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.www.BuildConfig
-import com.zktony.www.manager.StateManager
+import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -24,7 +24,7 @@ import java.io.File
 class AdminViewModel constructor(
     private val dataStore: DataStore<Preferences>,
     private val grpc: ApplicationGrpc,
-    private val stateManager: StateManager
+    private val serialManager: SerialManager
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(AdminUiState())
@@ -44,7 +44,7 @@ class AdminViewModel constructor(
      * @param pump [Boolean] true 开 false 关
      */
     fun touchPump(pump: Boolean) {
-        val cmd = stateManager.send.value
+        val cmd = serialManager.send.value
         if (pump) {
             cmd.motorX = 1
             cmd.motorY = 1
@@ -52,7 +52,7 @@ class AdminViewModel constructor(
             cmd.motorX = 0
             cmd.motorY = 0
         }
-        stateManager.send(cmd)
+        serialManager.send(cmd)
     }
 
     /**

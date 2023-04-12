@@ -1,6 +1,7 @@
 package com.zktony.www.ui.program
 
 import android.os.Bundle
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -33,6 +34,10 @@ class ProgramFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.workList.collect {
                     adapter.submitList(it)
+                    binding.apply {
+                        recyclerView.isVisible = it.isNotEmpty()
+                        empty.isVisible = it.isEmpty()
+                    }
                 }
             }
         }
@@ -45,7 +50,7 @@ class ProgramFragment :
             }
             onEditButtonClick = {
                 findNavController().navigate(
-                    R.id.action_navigation_program_to_navigation_program_plate,
+                    R.id.action_navigation_program_to_navigation_program_edit,
                     Bundle().apply { putLong("id", it.id) }
                 )
             }
@@ -59,7 +64,7 @@ class ProgramFragment :
                         inputDialog {
                             viewModel.insert(it) {
                                 findNavController().navigate(
-                                    R.id.action_navigation_program_to_navigation_program_plate,
+                                    R.id.action_navigation_program_to_navigation_program_edit,
                                     Bundle().apply { putLong("id", it) }
                                 )
                             }

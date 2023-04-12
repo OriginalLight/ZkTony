@@ -13,8 +13,15 @@ import kotlinx.coroutines.launch
 class ExecutionManager(
     private val serialManager: SerialManager,
     private val motorManager: MotorManager,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
+
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+
+    fun init() {
+        scope.launch {
+            "命令执行管理器初始化完成！！！".logi()
+        }
+    }
 
     // 生成器
     fun generator(
@@ -68,9 +75,5 @@ class ExecutionManager(
                 lock = true
             )
         }
-    }
-
-    fun test() {
-        scope.launch { "ExecutionManager test".logi() }
     }
 }

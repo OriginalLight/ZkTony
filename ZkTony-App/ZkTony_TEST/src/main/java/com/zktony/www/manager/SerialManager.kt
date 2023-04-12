@@ -1,15 +1,14 @@
 package com.zktony.www.manager
 
-import com.zktony.serialport.SerialMap
+import com.zktony.core.ext.logi
+import com.zktony.serialport.SerialHelpers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class SerialManager(
+class SerialManager {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-) {
-
-    private val serialMap by lazy { SerialMap() }
+    private val helpers by lazy { SerialHelpers() }
 
     init {
         scope.launch {
@@ -19,25 +18,29 @@ class SerialManager(
         }
     }
 
+    fun init() {
+        scope.launch {
+            "串口管理器初始化完成！！！".logi()
+        }
+    }
+
     /**
      * 发送Hex
-     * @param serial 串口
      * @param hex 命令
      */
     fun sendHex(index: Int, hex: String) {
         scope.launch {
-            serialMap.sendHex(index, hex)
+            helpers.sendHex(index, hex)
         }
     }
 
     /**
      * 发送Text
-     * @param serial 串口
      * @param text 命令
      */
     fun sendText(index: Int, text: String) {
         scope.launch {
-            serialMap.sendText(index, text)
+            helpers.sendText(index, text)
         }
     }
 }

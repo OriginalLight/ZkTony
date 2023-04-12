@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.provider.Settings
 import androidx.core.view.isVisible
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -17,11 +19,12 @@ import com.zktony.core.dialog.deviceDialog
 import com.zktony.core.dialog.updateDialog
 import com.zktony.core.ext.*
 import com.zktony.core.model.QrCode
+import com.zktony.core.utils.Constants
+import com.zktony.datastore.ext.read
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.common.ext.*
 import com.zktony.www.databinding.FragmentAdminBinding
-import com.zktony.www.manager.StateManager
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -31,7 +34,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
 
     override val viewModel: AdminViewModel by viewModel()
 
-    private val stateManager: StateManager by inject()
+    private val dataStore: DataStore<Preferences> by inject()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -77,10 +80,14 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     }
                 }
                 launch {
-                    stateManager.settings.collect {
-                        binding.apply {
-                            swBar.isChecked = it.bar
-                            needleSpace.setEqualText(it.needleSpace.toString().removeZero())
+                    launch {
+                        dataStore.read(Constants.BAR, false).collect {
+                            binding.swBar.isChecked = it
+                        }
+                    }
+                    launch {
+                        dataStore.read(Constants.NEEDLE_SPACE, 12f).collect {
+                            binding.needleSpace.setEqualText(it.toString().removeZero())
                         }
                     }
                 }

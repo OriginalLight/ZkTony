@@ -95,7 +95,6 @@ dependencies {
     implementation(libs.dialogx)
     implementation(libs.grpc.okhttp)
     implementation(libs.gson)
-    implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.material)
 

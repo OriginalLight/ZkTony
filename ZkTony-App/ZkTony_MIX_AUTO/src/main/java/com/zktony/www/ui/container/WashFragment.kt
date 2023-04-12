@@ -5,9 +5,11 @@ import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.dialog.inputDecimalDialog
 import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.clickScale
 import com.zktony.core.ext.removeZero
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentWashBinding
@@ -23,16 +25,6 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
         initFlowCollector()
     }
 
-    private fun initView() {
-        binding.washPlate.clickNoRepeat {
-            inputDecimalDialog(
-                message = "请输入横坐标",
-                value = viewModel.uiState.value?.wasteY ?: 0f,
-                move = { viewModel.move(it) },
-                block = { viewModel.save(it) }
-            )
-        }
-    }
 
     @SuppressLint("SetTextI18n")
     private fun initFlowCollector() {
@@ -40,9 +32,35 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     binding.apply {
-                        washPlate.text = (it?.wasteY ?: 0f).removeZero()
+                        washPlate.text = (it?.axis ?: 0f).removeZero()
+                        title.text = it?.name ?: "容器管理"
                     }
                 }
+            }
+        }
+    }
+
+
+    private fun initView() {
+        arguments?.let {
+            val id = it.getLong("id")
+            if (id != 0L) {
+                viewModel.init(id)
+            }
+        }
+        binding.apply {
+            washPlate.clickNoRepeat {
+                inputDecimalDialog(
+                    message = "请输入横坐标",
+                    value = viewModel.uiState.value?.axis ?: 0f,
+                    move = { viewModel.move(it) },
+                    block = { viewModel.save(it) }
+                )
+            }
+
+            with(back) {
+                clickScale()
+                clickNoRepeat { findNavController().navigateUp() }
             }
         }
     }

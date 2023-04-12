@@ -44,15 +44,27 @@ fun positionDialog(
                 move.clickNoRepeat {
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                    if (x > 240f) PopTip.show("X轴最大值为240")
-                    if (y > 320f) PopTip.show("Y轴最大值为320")
+                    if (x > 240f) {
+                        PopTip.show("X轴最大值为240")
+                        return@clickNoRepeat
+                    }
+                    if (y > 320f) {
+                        PopTip.show("Y轴最大值为320")
+                        return@clickNoRepeat
+                    }
                     block1(minOf(240f, x), minOf(320f, y))
                 }
-                save.setOnClickListener {
+                save.clickNoRepeat {
                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                    if (x > 240f) PopTip.show("X轴最大值为240")
-                    if (y > 320f) PopTip.show("Y轴最大值为320")
+                    if (x > 240f) {
+                        PopTip.show("X轴最大值为240")
+                        return@clickNoRepeat
+                    }
+                    if (y > 320f) {
+                        PopTip.show("Y轴最大值为320")
+                        return@clickNoRepeat
+                    }
                     block2(minOf(240f, x), minOf(320f, y))
                     dialog.dismiss()
                 }

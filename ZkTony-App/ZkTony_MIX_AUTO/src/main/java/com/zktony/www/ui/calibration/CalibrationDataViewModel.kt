@@ -42,8 +42,10 @@ class CalibrationDataViewModel constructor(
                 }
             }
             launch {
-                containerDao.getById(1L).collect {
-                    _uiState.value = _uiState.value.copy(container = it)
+                containerDao.getByType(0).collect {
+                    if (it.isNotEmpty()) {
+                        _uiState.value = _uiState.value.copy(container = it.first())
+                    }
                 }
             }
             launch {
@@ -70,11 +72,11 @@ class CalibrationDataViewModel constructor(
         val state = _uiState.value
         val con = state.container
         val gen = when (state.pumpId) {
-            0 -> listOf(executionManager.generator(y = con.wasteY, v1 = state.expect))
-            1 -> listOf(executionManager.generator(y = con.wasteY, v2 = state.expect))
+            0 -> listOf(executionManager.generator(y = con.axis, v1 = state.expect))
+            1 -> listOf(executionManager.generator(y = con.axis, v2 = state.expect))
             2 -> listOf(
-                executionManager.generator(y = con.wasteY, v3 = state.expect),
-                executionManager.generator(y = con.wasteY, v3 = -state.expect)
+                executionManager.generator(y = con.axis, v3 = state.expect),
+                executionManager.generator(y = con.axis, v3 = -state.expect)
             )
             else -> return
         }

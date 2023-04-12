@@ -11,14 +11,16 @@ import com.zktony.www.room.dao.LogRecordDao
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 
 class LogRecordWorker constructor(
-    private val dao: LogRecordDao,
-    private val grpc: LogGrpc,
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams), KoinComponent {
+
+    private val dao: LogRecordDao by inject()
+    private val grpc: LogGrpc by inject()
 
     override suspend fun doWork(): Result {
         try {

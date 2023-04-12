@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.removeZero
-import com.zktony.serialport.SerialMap
+import com.zktony.serialport.SerialHelpers
 import com.zktony.serialport.SerialConfig
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class TecViewModel : BaseViewModel() {
 
-    private val serialMap by lazy { SerialMap() }
+    private val helpers by lazy { SerialHelpers() }
 
 
     private val _serialFlow = MutableStateFlow<String?>(null)
@@ -34,12 +34,12 @@ class TecViewModel : BaseViewModel() {
     fun init() {
         viewModelScope.launch {
             launch {
-                serialMap.init(SerialConfig(
+                helpers.init(SerialConfig(
                     index = 3,
                     device = "/dev/ttyS3",
                     baudRate = 57600,
                 ))
-                serialMap.callback = { index, data ->
+                helpers.callback = { index, data ->
                     if (index == 3) {
                         _serialFlow.value = data
                     }
@@ -64,7 +64,7 @@ class TecViewModel : BaseViewModel() {
                 while (true) {
                     for (i in 0..4) {
                         delay(200L)
-                        serialMap.sendText(3, "TC1:TCACTUALTEMP?@$i\r")
+                        helpers.sendText(3, "TC1:TCACTUALTEMP?@$i\r")
                     }
                     delay(2 * 1000L)
                 }
@@ -84,7 +84,7 @@ class TecViewModel : BaseViewModel() {
 
     fun destroy() {
         viewModelScope.launch {
-            serialMap.close(3)
+            helpers.close(3)
         }
     }
 
@@ -120,7 +120,7 @@ class TecViewModel : BaseViewModel() {
     ) {
         val flow = flow(flag)
         setTempDelay(flag)
-        serialMap.sendText(
+        helpers.sendText(
             3,
             "TC1:TCADJUSTTEMP=${low.toString().removeZero()}@$flag\r"
         )
@@ -132,7 +132,7 @@ class TecViewModel : BaseViewModel() {
             return
         }
         setTempDelay(flag)
-        serialMap.sendText(
+        helpers.sendText(
             3,
             "TC1:TCADJUSTTEMP=${high.toString().removeZero()}@$flag\r"
         )
@@ -151,12 +151,12 @@ class TecViewModel : BaseViewModel() {
      * 设置温度时先关闭输出十秒后打开输出
      */
     private suspend fun setTempDelay(flag: Int) {
-        serialMap.sendText(
+        helpers.sendText(
             3,
             "TC1:TCSW=0@$flag\r"
         )
         delay(20 * 1000L)
-        serialMap.sendText(
+        helpers.sendText(
             3,
             "TC1:TCSW=1@$flag\r"
         )

@@ -30,6 +30,7 @@
                 android:baselineAligned="false">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/normal_container"
                     android:layout_width="480dp"
                     android:layout_height="match_parent"
                     tools:ignore="VisualLintBounds">
@@ -127,6 +128,122 @@
 
                         <EditText
                             android:id="@+id/coagulant_edit"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:imeOptions="actionDone"
+                            android:inputType="number"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:textColor="@color/black"
+                            android:textSize="30sp"
+                            tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck" />
+
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/previous_container"
+                    android:layout_width="480dp"
+                    android:layout_height="match_parent"
+                    tools:ignore="VisualLintBounds"
+                    android:visibility="gone"
+                    >
+
+                    <LinearLayout
+                        android:id="@+id/previous_colloid"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginEnd="32dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toTopOf="@+id/previous_coagulant"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/previous_colloid_history"
+                            android:layout_width="196dp"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:text="@string/colloid"
+                            android:textAllCaps="false"
+                            android:textColor="@color/light_onPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="0dp"
+                            app:icon="@mipmap/expand_arrow"
+                            app:iconSize="24dp"
+                            app:iconTint="@null"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="SpeakableTextPresentCheck" />
+
+                        <EditText
+                            android:id="@+id/previous_colloid_edit"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:imeOptions="actionNext"
+                            android:inputType="number"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:textColor="@color/black"
+                            android:textSize="30sp"
+                            tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck" />
+
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/previous_coagulant"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="32dp"
+                        android:layout_marginEnd="32dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/previous_colloid">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/previous_coagulant_history"
+                            android:layout_width="196dp"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:gravity="center"
+                            android:insetTop="0dp"
+                            android:insetBottom="0dp"
+                            android:singleLine="true"
+                            android:text="@string/coagulant"
+                            android:textAllCaps="false"
+                            android:textColor="@color/light_onPrimary"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            app:cornerRadius="0dp"
+                            app:icon="@mipmap/expand_arrow"
+                            app:iconSize="24dp"
+                            app:iconTint="@null"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="SpeakableTextPresentCheck" />
+
+                        <EditText
+                            android:id="@+id/previous_coagulant_edit"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_weight="1"

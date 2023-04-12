@@ -20,47 +20,49 @@ class ProgramExecutor constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var finish: () -> Unit = {}
-    private val executionManager: ExecutionManager by inject(ExecutionManager::class.java)
-    private val serialManager: SerialManager by inject(SerialManager::class.java)
+    private val ex: ExecutionManager by inject(ExecutionManager::class.java)
+    private val serial: SerialManager by inject(SerialManager::class.java)
 
 
     suspend fun execute() {
         scope.launch {
-            while (serialManager.lock.value) {
+            while (serial.lock.value) {
                 delay(100L)
             }
-            executionManager.executor(
-                executionManager.generator(
+            ex.actuator(
+                ex.builder(
                     v1 = colloid.toFloat(),
                     v2 = colloid.toFloat(),
                     v3 = coagulant.toFloat(),
-                )
+                ),
+                type = 1
             )
             delay(100L)
-            while (serialManager.lock.value) {
+            while (serial.lock.value) {
                 delay(100L)
             }
-            serialManager.reset()
+            serial.reset()
             finish()
         }
     }
 
-    suspend fun execute2() {
+    suspend fun executePrevious() {
         scope.launch {
-            while (serialManager.lock.value) {
+            while (serial.lock.value) {
                 delay(100L)
             }
-            executionManager.executor2(
-                executionManager.generator(
-                    v1 = 1000f,
-                    v2 = 10f,
+            ex.actuator(
+                ex.builder(
+                    v1 = colloid.toFloat(),
+                    v3 = coagulant.toFloat(),
                 )
+
             )
             delay(100L)
-            while (serialManager.lock.value) {
+            while (serial.lock.value) {
                 delay(100L)
             }
-            serialManager.reset()
+            serial.reset()
             finish()
         }
     }

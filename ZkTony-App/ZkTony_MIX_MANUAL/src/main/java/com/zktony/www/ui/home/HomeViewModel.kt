@@ -49,6 +49,30 @@ class HomeViewModel constructor(
                     }
                 }
             }
+            launch {
+                dataStore.read("PREVIOUS_COLLOID_HISTORY", emptySet<String>()).collect {
+                    _uiState.value = _uiState.value.copy(
+                        previousColloidHistory = it
+                    )
+                    if (_uiState.value.previousColloid == 0) {
+                        _uiState.value = _uiState.value.copy(
+                            previousColloid = it.lastOrNull()?.toInt() ?: 0
+                        )
+                    }
+                }
+            }
+            launch {
+                dataStore.read("PREVIOUS_COAGULANT_HISTORY", emptySet<String>()).collect {
+                    _uiState.value = _uiState.value.copy(
+                        previousCoagulantHistory = it
+                    )
+                    if (_uiState.value.previousCoagulant == 0) {
+                        _uiState.value = _uiState.value.copy(
+                            previousCoagulant = it.lastOrNull()?.toInt() ?: 0
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -101,14 +125,18 @@ class HomeViewModel constructor(
     fun previous() {
         val job = viewModelScope.launch {
             launch {
+                previousColloidHistory(_uiState.value.previousColloid.toString())
+                previousCoagulantHistory(_uiState.value.previousCoagulant.toString())
+            }
+            launch {
                 while (true) {
                     delay(1000L)
                     _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
                 }
             }
             val executor = ProgramExecutor(
-                colloid = _uiState.value.colloid,
-                coagulant = _uiState.value.coagulant,
+                colloid = _uiState.value.previousColloid,
+                coagulant = _uiState.value.previousCoagulant,
                 scope = this,
             )
             executor.finish = {
@@ -119,7 +147,7 @@ class HomeViewModel constructor(
                     previous = false
                 )
             }
-            executor.execute2()
+            executor.executePrevious()
         }
         _uiState.value = _uiState.value.copy(job = job)
     }
@@ -262,12 +290,30 @@ class HomeViewModel constructor(
         }
     }
 
+    fun selectPreviousCoagulant(str: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                previousCoagulant = str.toIntOrNull() ?: 0,
+            )
+            previousCoagulantHistory(str)
+        }
+    }
+
     fun selectColloid(str: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
                 colloid = str.toIntOrNull() ?: 0,
             )
             colloidHistory(str)
+        }
+    }
+
+    fun selectPreviousColloid(str: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                previousColloid = str.toIntOrNull() ?: 0,
+            )
+            previousColloidHistory(str)
         }
     }
 
@@ -289,6 +335,24 @@ class HomeViewModel constructor(
         }
     }
 
+    private fun previousCoagulantHistory(str: String) {
+        viewModelScope.launch {
+            val set = _uiState.value.previousCoagulantHistory.toMutableSet()
+            if (set.contains(str)) {
+                set.remove(str)
+                dataStore.save("PREVIOUS_COAGULANT_HISTORY", set)
+                delay(100L)
+                set.add(str)
+            } else {
+                if (set.size == 5) {
+                    set.remove(set.first())
+                }
+                set.add(str)
+            }
+            dataStore.save("PREVIOUS_COAGULANT_HISTORY", set)
+        }
+    }
+
     private fun colloidHistory(str: String) {
         viewModelScope.launch {
             val set = _uiState.value.colloidHistory.toMutableSet()
@@ -307,6 +371,24 @@ class HomeViewModel constructor(
         }
     }
 
+    private fun previousColloidHistory(str: String) {
+        viewModelScope.launch {
+            val set = _uiState.value.previousColloidHistory.toMutableSet()
+            if (set.contains(str)) {
+                set.remove(str)
+                dataStore.save("PREVIOUS_COLLOID_HISTORY", set)
+                delay(100L)
+                set.add(str)
+            } else {
+                if (set.size == 5) {
+                    set.remove(set.first())
+                }
+                set.add(str)
+            }
+            dataStore.save("PREVIOUS_COLLOID_HISTORY", set)
+        }
+    }
+
     fun colloidEdit(str: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(colloid = str.toIntOrNull() ?: 0)
@@ -316,6 +398,18 @@ class HomeViewModel constructor(
     fun coagulantEdit(str: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(coagulant = minOf(str.toIntOrNull() ?: 0, 800))
+        }
+    }
+
+    fun previousColloidEdit(str: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(previousColloid = str.toIntOrNull() ?: 0)
+        }
+    }
+
+    fun previousCoagulantEdit(str: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(previousCoagulant = minOf(str.toIntOrNull() ?: 0, 800))
         }
     }
 }
@@ -329,7 +423,11 @@ data class HomeUiState(
     val upOrDown: Boolean = true,
     val colloid: Int = 0,
     val coagulant: Int = 0,
+    val previousColloid: Int = 0,
+    val previousCoagulant: Int = 0,
     val previous: Boolean = true,
     val colloidHistory: Set<String> = emptySet(),
     val coagulantHistory: Set<String> = emptySet(),
+    val previousColloidHistory: Set<String> = emptySet(),
+    val previousCoagulantHistory: Set<String> = emptySet(),
 )
