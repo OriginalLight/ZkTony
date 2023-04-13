@@ -1,11 +1,11 @@
 package com.zktony.www.ui.home
 
 import com.zktony.core.ext.currentTime
+import com.zktony.www.common.ext.list
 import com.zktony.www.common.ext.total
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.room.entity.Hole
-import com.zktony.www.room.entity.Plate
+import com.zktony.www.room.entity.Point
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -19,8 +19,7 @@ import org.koin.java.KoinJavaComponent.inject
  * @param scope 协程作用域
  */
 class ProgramExecutor constructor(
-    private val plateList: List<Plate>,
-    private val holeList: List<Hole>,
+    private val list: List<Point>,
     private val settings: Settings,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
@@ -28,48 +27,49 @@ class ProgramExecutor constructor(
     private val executionManager: ExecutionManager by inject(ExecutionManager::class.java)
     private val serialManager: SerialManager by inject(SerialManager::class.java)
     private var complete: Int = 0
-    private val currentHoleList: MutableList<Triple<Int, Int, Boolean>> = mutableListOf()
+    private val currentList: MutableList<Triple<Int, Int, Boolean>> = mutableListOf()
 
     suspend fun execute() {
         scope.launch {
             delay(100L)
             event(ExecutorEvent.Log("[ ${currentTime()} ]\t 开始执行任务\n"))
-            val total = holeList.total()
+            val total = list.total()
             if (total > 0) {
                 for (e in 0..3) {
                     event(ExecutorEvent.Liquid(e))
-                    plateList.forEach { plate ->
-                        event(ExecutorEvent.CurrentPlate(plate))
-                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${e + 1}号液体,${plate.index + 1}号板开始加液\n"))
-                        forEachHole(plate.x, plate.y) { i, j ->
-                            val hole =
-                                holeList.find { it.x == i && it.y == j && it.subId == plate.id }
-                            if (hole != null) {
+                    list.list().forEach { index ->
+                        event(ExecutorEvent.CurrentContainer(index))
+                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${e + 1}号液体,${index + 1}号板开始加液\n"))
+                        val pointList = list.filter { it.index == index }
+                        val x = pointList.maxByOrNull { it.x }?.x ?: 0
+                        val y = pointList.maxByOrNull { it.y }?.y ?: 0
+                        forEachHole(x, y) { i, j ->
+                            pointList.find { it.x == i && it.y == j }?.let {
                                 val volume = when (e) {
-                                    0 -> hole.v1
-                                    1 -> hole.v2
-                                    2 -> hole.v3
-                                    3 -> hole.v4
-                                    else -> 0f
+                                    0 -> it.v1
+                                    1 -> it.v2
+                                    2 -> it.v3
+                                    3 -> it.v4
+                                    else -> 0
                                 }
-                                if (hole.enable && volume > 0f) {
-                                    currentHoleList.add(Triple(i, j, true))
-                                    event(ExecutorEvent.HoleList(currentHoleList))
+                                if (it.enable && volume > 0) {
+                                    currentList.add(Triple(i, j, true))
+                                    event(ExecutorEvent.PointList(currentList))
                                     while (serialManager.lock.value || serialManager.pause.value) {
                                         delay(100)
                                     }
                                     executionManager.executor(
                                         executionManager.generator(
-                                            x = hole.xAxis + settings.needleSpace * e,
-                                            y = hole.yAxis
+                                            x = it.xAxis + settings.needleSpace * e,
+                                            y = it.yAxis
                                         ),
                                         executionManager.generator(
-                                            x = hole.xAxis + settings.needleSpace * e,
-                                            y = hole.yAxis,
-                                            v1 = if (e == 0) hole.v1 else 0f,
-                                            v2 = if (e == 1) hole.v2 else 0f,
-                                            v3 = if (e == 2) hole.v3 else 0f,
-                                            v4 = if (e == 3) hole.v4 else 0f
+                                            x = it.xAxis + settings.needleSpace * e,
+                                            y = it.yAxis,
+                                            v1 = if (e == 0) it.v1.toFloat() else 0f,
+                                            v2 = if (e == 1) it.v2.toFloat() else 0f,
+                                            v3 = if (e == 2) it.v3.toFloat() else 0f,
+                                            v4 = if (e == 3) it.v4.toFloat() else 0f
                                         ),
                                     )
                                     delay(100L)
@@ -81,8 +81,8 @@ class ProgramExecutor constructor(
                                 }
                             }
                         }
-                        currentHoleList.clear()
-                        event(ExecutorEvent.HoleList(currentHoleList))
+                        currentList.clear()
+                        event(ExecutorEvent.PointList(currentList))
                     }
                 }
             }
@@ -108,9 +108,9 @@ class ProgramExecutor constructor(
 }
 
 sealed class ExecutorEvent {
-    data class CurrentPlate(val plate: Plate) : ExecutorEvent()
+    data class CurrentContainer(val index: Int) : ExecutorEvent()
     data class Liquid(val liquid: Int) : ExecutorEvent()
-    data class HoleList(val hole: List<Triple<Int, Int, Boolean>>) : ExecutorEvent()
+    data class PointList(val hole: List<Triple<Int, Int, Boolean>>) : ExecutorEvent()
     data class Progress(val total: Int, val complete: Int) : ExecutorEvent()
     data class Log(val log: String) : ExecutorEvent()
     object Finish : ExecutorEvent()

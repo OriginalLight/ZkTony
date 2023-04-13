@@ -18,8 +18,6 @@ import com.zktony.www.room.entity.*
         Calibration::class,
         CalibrationData::class,
         Container::class,
-        Plate::class,
-        Hole::class,
         Program::class,
         Point::class,
     ],
@@ -31,16 +29,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun logDao(): LogDao
     abstract fun motorDao(): MotorDao
     abstract fun calibrationDao(): CalibrationDao
-
     abstract fun calibrationDataDao(): CalibrationDataDao
-
-    abstract fun plateDao(): PlateDao
-
-    abstract fun holeDao(): HoleDao
-
     abstract fun programDao(): ProgramDao
-
     abstract fun containerDao(): ContainerDao
-
     abstract fun pointDao(): PointDao
 }

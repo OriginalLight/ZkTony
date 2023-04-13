@@ -2,7 +2,6 @@ package com.zktony.www.room.dao
 
 import androidx.room.*
 import com.zktony.room.dao.BaseDao
-import com.zktony.www.room.entity.Hole
 import com.zktony.www.room.entity.Point
 import kotlinx.coroutines.flow.Flow
 

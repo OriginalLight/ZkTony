@@ -45,7 +45,7 @@ class ProgramEditFragment :
 
                             val list = it.pointList.filter { point -> point.index == 0 }
                             if (list.isNotEmpty()) {
-                                data = list.map { point -> Triple(point.y, point.x, point.enable) }
+                                data = list.map { point -> Triple(point.x, point.y, point.enable) }
                                 holeOne.text = list.filter { point -> point.enable }.size.toString()
                                 x = list.maxOf { point -> point.y } + 1
                                 y = list.maxOf { point -> point.x } + 1
@@ -67,7 +67,7 @@ class ProgramEditFragment :
 
                             val list = it.pointList.filter { point -> point.index == 1 }
                             if (list.isNotEmpty()) {
-                                data = list.map { point -> Triple(point.y, point.x, point.enable) }
+                                data = list.map { point -> Triple(point.x, point.y, point.enable) }
                                 holeTwo.text = list.filter { point -> point.enable }.size.toString()
                                 x = list.maxOf { point -> point.y } + 1
                                 y = list.maxOf { point -> point.x } + 1
@@ -90,7 +90,7 @@ class ProgramEditFragment :
 
                             val list = it.pointList.filter { point -> point.index == 2 }
                             if (list.isNotEmpty()) {
-                                data = list.map { point -> Triple(point.y, point.x, point.enable) }
+                                data = list.map { point -> Triple(point.x, point.y, point.enable) }
                                 holeThree.text = list.filter { point -> point.enable }.size.toString()
                                 x = list.maxOf { point -> point.y } + 1
                                 y = list.maxOf { point -> point.x } + 1
@@ -113,7 +113,7 @@ class ProgramEditFragment :
 
                             val list = it.pointList.filter { point -> point.index == 3 }
                             if (list.isNotEmpty()) {
-                                data = list.map { point -> Triple(point.y, point.x, point.enable) }
+                                data = list.map { point -> Triple(point.x, point.y, point.enable) }
                                 holeFour.text = list.filter { point -> point.enable }.size.toString()
                                 x = list.maxOf { point -> point.y } + 1
                                 y = list.maxOf { point -> point.x } + 1

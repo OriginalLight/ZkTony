@@ -37,7 +37,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         binding.apply {
                             operate.isVisible = it.job == null
                             start.isVisible =
-                                it.job == null && it.holeList.total() > 0
+                                it.job == null && it.pointList.total() > 0
                             with(pause) {
                                 isVisible = it.job != null
                                 text = if (!it.pause) "暂停" else "继续"
@@ -45,19 +45,19 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             }
                             if (it.program != null) {
                                 select.text = it.program.name
-                                holeNumber.text = it.holeList.total().toString()
+                                holeNumber.text = it.pointList.total().toString()
                             } else {
                                 select.text = "/"
                                 holeNumber.text = "/"
                             }
                             time.text = it.time.getTimeFormat()
                             with(dynamicPlate) {
-                                x = it.info.plateSize.second
-                                y = it.info.plateSize.first
-                                data = it.info.holeList
+                                x = it.info.size.second
+                                y = it.info.size.first
+                                data = it.info.tripleList
                                 color = it.info.color
                             }
-                            currentPlate.text = it.info.plate
+                            currentPlate.text = it.info.index
                             currentLiquid.text = it.info.liquid
                             currentSpeed.text = String.format("%.2f", it.info.speed)
                             currentLastTime.text = it.info.lastTime.getTimeFormat()

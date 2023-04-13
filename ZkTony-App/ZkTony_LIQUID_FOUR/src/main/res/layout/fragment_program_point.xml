@@ -71,63 +71,58 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="VisualLintBounds" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="54dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="32dp"
-                android:orientation="horizontal"
-                tools:ignore="MissingConstraints">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/custom"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="196dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="8dp"
+                    android:text="@string/custom_disable"
+                    android:textSize="18sp"
+                    app:cornerRadius="0dp"
+                    app:iconPadding="0dp"
+                    app:layout_constraintBottom_toTopOf="@+id/dynamic_plate"
+                    app:layout_constraintStart_toStartOf="@+id/dynamic_plate"
+                    app:rippleColor="@color/purple_700"
+                    app:strokeColor="@color/light_primary"
+                    app:strokeWidth="2dp"
+                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/select_all"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
+                    android:layout_width="196dp"
+                    android:layout_height="48dp"
+                    android:layout_marginBottom="8dp"
                     android:text="@string/select_all"
                     android:textSize="16sp"
                     android:textStyle="bold"
-                    app:cornerRadius="27dp"
-                    app:rippleColor="@color/purple_500"
-                    tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/custom"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:text="@string/custom_disable"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="27dp"
-                    app:rippleColor="@color/purple_500"
-                    tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize" />
+                    app:cornerRadius="0dp"
+                    app:layout_constraintBottom_toTopOf="@+id/dynamic_plate"
+                    app:layout_constraintEnd_toEndOf="@+id/dynamic_plate"
+                    app:rippleColor="@color/purple_700"
+                    tools:ignore="DuplicateSpeakableTextCheck,VisualLintButtonSize,VisualLintBounds" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/volume"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_weight="3"
-                    android:backgroundTint="#64DD17"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="600dp"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp"
                     android:text="@string/button"
                     android:textAllCaps="false"
+                    android:textColor="@color/black"
                     android:textSize="16sp"
-                    android:textStyle="bold"
-                    app:cornerRadius="27dp"
+                    app:cornerRadius="0dp"
+                    app:layout_constraintEnd_toEndOf="@+id/dynamic_plate"
+                    app:layout_constraintStart_toStartOf="@+id/dynamic_plate"
+                    app:layout_constraintTop_toBottomOf="@+id/dynamic_plate"
                     app:rippleColor="@color/purple_700"
-                    tools:ignore="TextContrastCheck,VisualLintButtonSize" />
+                    app:strokeColor="@color/light_primary"
+                    app:strokeWidth="2dp"
+                    tools:ignore="TextContrastCheck,VisualLintButtonSize,VisualLintBounds" />
 
-
-
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
 

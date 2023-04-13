@@ -15,8 +15,14 @@ import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
-import com.zktony.www.room.dao.*
-import com.zktony.www.room.entity.*
+import com.zktony.www.room.dao.ContainerDao
+import com.zktony.www.room.dao.LogDao
+import com.zktony.www.room.dao.PointDao
+import com.zktony.www.room.dao.ProgramDao
+import com.zktony.www.room.entity.Container
+import com.zktony.www.room.entity.Log
+import com.zktony.www.room.entity.Point
+import com.zktony.www.room.entity.Program
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,8 +32,7 @@ import kotlinx.coroutines.launch
 class HomeViewModel constructor(
     private val programDao: ProgramDao,
     private val containerDao: ContainerDao,
-    private val plateDao: PlateDao,
-    private val holeDao: HoleDao,
+    private val pointDao: PointDao,
     private val logDao: LogDao,
     private val serialManager: SerialManager,
     private val executionManager: ExecutionManager,
@@ -72,31 +77,24 @@ class HomeViewModel constructor(
 
     private fun loadPlate(id: Long) {
         viewModelScope.launch {
-            plateDao.getBySubId(id).collect {
-                _uiState.value = _uiState.value.copy(plateList = it)
+            pointDao.getBySubId(id).collect {
+                _uiState.value = _uiState.value.copy(pointList = it)
                 var size: Pair<Int, Int> = Pair(8, 12)
                 if (it.isNotEmpty()) {
-                    size = it[0].x to it[0].y
+                    val minIndex = it.minOf { point -> point.index }
+                    val x = it.filter { point -> point.index == minIndex }.maxOf { point -> point.x } + 1
+                    val y = it.filter { point -> point.index == minIndex }.maxOf { point -> point.y } + 1
+                    size = x to y
                 }
                 _uiState.value = _uiState.value.copy(
                     info = _uiState.value.info.copy(
-                        plateSize = size
+                        size = size
                     )
                 )
-                loadHole(it.map { hole -> hole.id })
             }
         }
     }
 
-    private fun loadHole(idList: List<Long>) {
-        viewModelScope.launch {
-            launch {
-//                holeDao.getBySudIdList(idList).collect {
-//                    _uiState.value = _uiState.value.copy(holeList = it)
-//                }
-            }
-        }
-    }
 
     fun select(view: View) {
         val list = uiState.value.programList.map { it.name }
@@ -255,24 +253,25 @@ class HomeViewModel constructor(
                     updateLog(Log(name = _uiState.value.program?.name ?: "未知程序"))
                 }
                 val executor = ProgramExecutor(
-                    plateList = _uiState.value.plateList,
-                    holeList = _uiState.value.holeList,
+                    list = _uiState.value.pointList,
                     settings = _settings.value,
                     scope = this,
                 )
                 executor.event = {
                     when (it) {
-                        is ExecutorEvent.CurrentPlate -> {
+                        is ExecutorEvent.CurrentContainer -> {
+                            val maxX = _uiState.value.pointList.maxOf { point -> point.x } + 1
+                            val maxY = _uiState.value.pointList.maxOf { point -> point.y } + 1
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
-                                    plate = when (it.plate.index) {
+                                    index = when (it.index) {
                                         0 -> "一号板"
                                         1 -> "二号板"
                                         2 -> "三号板"
                                         3 -> "四号板"
                                         else -> "未知板"
                                     },
-                                    plateSize = it.plate.x to it.plate.y,
+                                    size = maxX to maxY,
                                 )
                             )
                         }
@@ -296,10 +295,10 @@ class HomeViewModel constructor(
                                 )
                             )
                         }
-                        is ExecutorEvent.HoleList -> {
+                        is ExecutorEvent.PointList -> {
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
-                                    holeList = it.hole
+                                    tripleList = it.hole
                                 )
                             )
                         }
@@ -352,16 +351,15 @@ class HomeViewModel constructor(
 
     fun stop() {
         _uiState.value.job?.cancel()
+        val minIndex = _uiState.value.pointList.minOf { point -> point.index }
+        val maxX = _uiState.value.pointList.filter { point -> point.index == minIndex }.maxOf { point -> point.x } + 1
+        val maxY = _uiState.value.pointList.filter { point -> point.index == minIndex }.maxOf { point -> point.y } + 1
         _uiState.value = _uiState.value.copy(
             job = null,
             log = null,
             time = 0L,
             info = CurrentInfo().copy(
-                plateSize = if (_uiState.value.plateList.isNotEmpty()) {
-                    _uiState.value.plateList[0].x to _uiState.value.plateList[0].y
-                } else {
-                    Pair(8, 12)
-                },
+                size = maxX to maxY,
                 process = 0
             )
         )
@@ -384,8 +382,7 @@ class HomeViewModel constructor(
 
 data class HomeUiState(
     val programList: List<Program> = emptyList(),
-    val plateList: List<Plate> = emptyList(),
-    val holeList: List<Hole> = emptyList(),
+    val pointList: List<Point> = emptyList(),
     val log: Log? = null,
     val container: Container? = null,
     val program: Program? = null,
@@ -397,9 +394,9 @@ data class HomeUiState(
 )
 
 data class CurrentInfo(
-    val plate: String = "/",
-    val plateSize: Pair<Int, Int> = Pair(8, 12),
-    val holeList: List<Triple<Int, Int, Boolean>> = emptyList(),
+    val index: String = "/",
+    val size: Pair<Int, Int> = Pair(8, 12),
+    val tripleList: List<Triple<Int, Int, Boolean>> = emptyList(),
     val liquid: String = "/",
     val speed: Float = 0f,
     val lastTime: Long = 0L,
@@ -408,5 +405,5 @@ data class CurrentInfo(
 )
 
 data class Settings(
-    val needleSpace: Float = 7.3f,
+    val needleSpace: Float = 12f,
 )

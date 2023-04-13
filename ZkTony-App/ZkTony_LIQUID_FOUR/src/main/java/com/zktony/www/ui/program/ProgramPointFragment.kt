@@ -11,9 +11,7 @@ import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.core.ext.removeZero
 import com.zktony.www.R
-import com.zktony.www.common.ext.volumeDialog
 import com.zktony.www.databinding.FragmentProgramPointBinding
-import com.zktony.www.room.entity.Hole
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -22,91 +20,76 @@ class ProgramPointFragment :
     override val viewModel: ProgramPointViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
-//        initFlowCollector()
-//        initView()
+        initFlowCollector()
+        initView()
     }
 
-//    @SuppressLint("SetTextI18n")
-//    private fun initFlowCollector() {
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-//                viewModel.uiState.collect {
-//                    if (it.plate != null) {
-//                        binding.apply {
-//                            title.text = when (it.plate.index) {
-//                                0 -> "一号孔板"
-//                                1 -> "二号孔板"
-//                                2 -> "三号孔板"
-//                                3 -> "四号孔板"
-//                                else -> "孔板"
-//                            }
-//                            dynamicPlate.run {
-//                                x = it.plate.y
-//                                y = it.plate.x
-//                                data = it.holes.map { h -> Triple(h.x, h.y, h.enable) }
-//                            }
-//                            val holeList = it.holes.filter { hole -> hole.enable }
-//                            selectAll.isEnabled = holeList.size != it.plate.x * it.plate.y
-//                            custom.text = "自定义：${if (it.plate.custom == 0) '关' else '开'}"
-//                            val h0 = if (it.holes.isNotEmpty()) it.holes[0] else Hole()
-//                            volume.text = if (it.plate.custom == 0) "[ ${
-//                                h0.v1.toString().removeZero()
-//                            } μL, ${
-//                                h0.v2.toString().removeZero()
-//                            } μL, ${
-//                                h0.v3.toString().removeZero()
-//                            } μL, ${
-//                                h0.v4.toString().removeZero()
-//                            } μL ]" else "自定义,请单独设置每孔加液量！"
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    private fun initView() {
-//        arguments?.let {
-//            val id = it.getLong("id")
-//            val index = it.getInt("index")
-//            if (id != 0L) {
-//                viewModel.init(id, index)
-//            }
-//        }
-//        binding.apply {
-//            dynamicPlate.onItemClick = { x, y -> viewModel.select(x, y) }
-//            volume.clickNoRepeat {
-//                val holes = viewModel.uiState.value.holes[0]
-//                val plate = viewModel.uiState.value.plate
-//                if (plate?.custom == 1) return@clickNoRepeat
-//                volumeDialog(
-//                    v1 = holes.v1,
-//                    v2 = holes.v2,
-//                    v3 = holes.v3,
-//                    v4 = holes.v4
-//                ) { v1, v2, v3, v4 ->
-//                    viewModel.setVolume(v1, v2, v3, v4)
-//                }
-//            }
-//
-//            with(back) {
-//                clickScale()
-//                clickNoRepeat {
-//                    findNavController().navigateUp()
-//                }
-//            }
-//            with(selectAll) {
-//                clickScale()
-//                clickNoRepeat {
-//                    viewModel.selectAll()
-//                }
-//            }
-//            with(custom) {
-//                clickScale()
-//                clickNoRepeat {
-//                    viewModel.setCustom()
-//                }
-//            }
-//        }
-//    }
+    @SuppressLint("SetTextI18n")
+    private fun initFlowCollector() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect {
+                    binding.apply {
+                        custom.text = "自定义：${if (it.custom) '开' else '关'}"
+                        if (it.list.isEmpty()) {
+                            selectAll.isEnabled = false
+                            volume.text = "/"
+                            title.text = "/"
+                        } else {
+                            selectAll.isEnabled = it.list.any { point -> !point.enable }
+                            volume.text = if (!it.custom) "[ ${
+                                it.list[0].v1.toString().removeZero()
+                            } μL, ${
+                                it.list[0].v2.toString().removeZero()
+                            } μL, ${
+                                it.list[0].v3.toString().removeZero()
+                            } μL, ${
+                                it.list[0].v4.toString().removeZero()
+                            } μL ]" else "自定义,请单独设置每孔加液量！"
+                            title.text = when (it.list[0].index) {
+                                0 -> "一号孔板"
+                                1 -> "二号孔板"
+                                2 -> "三号孔板"
+                                3 -> "四号孔板"
+                                else -> "孔板"
+                            }
+                            with(dynamicPlate) {
+                                x = it.list.maxOf { point -> point.y } + 1
+                                y = it.list.maxOf { point -> point.x } + 1
+                                data =
+                                    it.list.map { point -> Triple(point.x, point.y, point.enable) }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun initView() {
+        arguments?.let {
+            val id = it.getLong("id")
+            val index = it.getInt("index")
+            if (id != 0L) {
+                viewModel.init(id, index)
+            }
+        }
+        binding.apply {
+            dynamicPlate.onItemClick = { x, y -> viewModel.select(x, y) }
+            volume.clickNoRepeat { viewModel.setVolume() }
+
+            with(back) {
+                clickScale()
+                clickNoRepeat { findNavController().navigateUp() }
+            }
+            with(selectAll) {
+                clickScale()
+                clickNoRepeat { viewModel.selectAll() }
+            }
+            with(custom) {
+                clickScale()
+                clickNoRepeat { viewModel.custom() }
+            }
+        }
+    }
 }
