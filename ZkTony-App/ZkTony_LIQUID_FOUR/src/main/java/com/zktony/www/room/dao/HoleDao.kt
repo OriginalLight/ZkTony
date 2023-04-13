@@ -19,13 +19,6 @@ interface HoleDao : BaseDao<Hole> {
     )
     fun getBySubId(id: Long): Flow<List<Hole>>
 
-    @Query(
-        """
-        SELECT * FROM hole
-        WHERE subId IN (:idList)
-        """
-    )
-    fun getBySudIdList(idList: List<Long>): Flow<List<Hole>>
 
     @Query(
         """

@@ -11,7 +11,7 @@
         android:animateLayoutChanges="true"
         android:background="@color/dark_onBackground"
         android:orientation="vertical"
-        tools:context=".ui.program.ProgramHoleFragment">
+        tools:context=".ui.program.ProgramPointFragment">
 
         <RelativeLayout
             android:layout_width="match_parent"

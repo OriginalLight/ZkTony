@@ -1,8 +1,10 @@
 package com.zktony.www.ui.admin
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import androidx.core.view.isVisible
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -10,13 +12,12 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.*
+import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.aboutDialog
-import com.zktony.core.dialog.authDialog
-import com.zktony.core.dialog.deviceDialog
-import com.zktony.core.dialog.updateDialog
+import com.zktony.core.dialog.*
 import com.zktony.core.ext.*
 import com.zktony.core.model.QrCode
 import com.zktony.core.utils.Constants
@@ -123,14 +124,24 @@ class AdminFragment :
                 clickScale()
                 clickNoRepeat {
                     authDialog {
-                        selectDialog(
-                            block = {
-                                findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor)
-                            },
-                            block1 = {
-                                findNavController().navigate(R.id.action_navigation_admin_to_navigation_container)
-                            }
-                        )
+                        CustomDialog.build()
+                            .setCustomView(object :
+                                OnBindView<CustomDialog>(R.layout.layout_select) {
+                                override fun onBind(dialog: CustomDialog, v: View) {
+                                    val motor = v.findViewById<MaterialButton>(R.id.motor)
+                                    val container = v.findViewById<MaterialButton>(R.id.container)
+                                    motor.clickNoRepeat(1000L) {
+                                        findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor)
+                                        dialog.dismiss()
+                                    }
+                                    container.clickNoRepeat(1000L) {
+                                        findNavController().navigate(R.id.action_navigation_admin_to_navigation_container)
+                                        dialog.dismiss()
+                                    }
+                                }
+                            })
+                            .setMaskColor(Color.parseColor("#4D000000"))
+                            .show()
                     }
                 }
             }
@@ -165,7 +176,7 @@ class AdminFragment :
             with(about) {
                 clickScale()
                 clickNoRepeat {
-                    aboutDialog()
+                    aboutDialog() { webDialog() }
                 }
             }
             with(device) {

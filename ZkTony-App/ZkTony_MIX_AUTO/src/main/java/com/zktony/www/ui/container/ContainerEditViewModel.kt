@@ -77,7 +77,7 @@ class ContainerEditViewModel constructor(
         }
     }
 
-    fun moveY(y: Float) {
+    fun move(y: Float) {
         if (serialManager.lock.value || serialManager.pause.value) {
             PopTip.show("机器正在运行中")
             return

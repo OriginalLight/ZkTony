@@ -97,34 +97,36 @@ class ProgramEditFragment :
                 val point = pointList[0]
                 CustomDialog.build()
                     .setCustomView(object :
-                        OnBindView<CustomDialog>(R.layout.layout_volume_input) {
+                        OnBindView<CustomDialog>(R.layout.layout_volume) {
                         override fun onBind(dialog: CustomDialog, v: View) {
                             val inputV1 = v.findViewById<EditText>(R.id.input_v1)
                             val inputV2 = v.findViewById<EditText>(R.id.input_v2)
                             val inputV3 = v.findViewById<EditText>(R.id.input_v3)
                             val inputV4 = v.findViewById<EditText>(R.id.input_v4)
-                            val save = v.findViewById<MaterialButton>(R.id.save)
-                            val cancel = v.findViewById<MaterialButton>(R.id.cancel)
+                            val btnOk = v.findViewById<MaterialButton>(R.id.ok)
+                            val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
                             if (point.v1 != 0) inputV1.setText(point.v1.toString())
                             if (point.v2 != 0) inputV2.setText(point.v2.toString())
                             if (point.v3 != 0) inputV3.setText(point.v3.toString())
                             if (point.v4 != 0) inputV4.setText(point.v4.toString())
 
-                            save.setOnClickListener {
-                                viewModel.updateVolume(
-                                    inputV1.text.toString().toIntOrNull() ?: 0,
-                                    inputV2.text.toString().toIntOrNull() ?: 0,
-                                    inputV3.text.toString().toIntOrNull() ?: 0,
-                                    inputV4.text.toString().toIntOrNull() ?: 0
-                                )
-                                dialog.dismiss()
+                            btnOk.clickNoRepeat {
+                                val v1 = inputV1.text.toString().toIntOrNull() ?: 0
+                                val v2 = inputV2.text.toString().toIntOrNull() ?: 0
+                                val v3 = inputV3.text.toString().toIntOrNull() ?: 0
+                                val v4 = inputV4.text.toString().toIntOrNull() ?: 0
+                                if (v1 > 800 || v3 > 800) {
+                                    PopTip.show("促凝剂大容量为800μL")
+                                } else {
+                                    viewModel.updateVolume(v1, v2, v3, v4)
+                                    dialog.dismiss()
+                                }
                             }
-                            cancel.setOnClickListener { dialog.dismiss() }
+                            btnCancel.clickNoRepeat { dialog.dismiss() }
                         }
                     })
                     .setCancelable(false)
                     .setMaskColor(Color.parseColor("#4D000000"))
-                    .setWidth(500)
                     .show()
             }
         }

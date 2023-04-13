@@ -15,7 +15,50 @@
         android:id="@+id/navigation_container"
         android:name="com.zktony.www.ui.container.ContainerFragment"
         android:label="@string/title_container"
-        tools:layout="@layout/fragment_container" />
+        tools:layout="@layout/fragment_container" >
+        <action
+            android:id="@+id/action_navigation_container_to_navigation_container_edit"
+            app:destination="@id/navigation_container_edit"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+        <action
+            android:id="@+id/action_navigation_container_to_navigation_wash"
+            app:destination="@id/navigation_wash"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_wash"
+        android:name="com.zktony.www.ui.container.WashFragment"
+        android:label="@string/title_container"
+        tools:layout="@layout/fragment_wash">
+        <action
+            android:id="@+id/action_navigation_wash_to_navigation_container"
+            app:destination="@id/navigation_container"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_container_edit"
+        android:name="com.zktony.www.ui.container.ContainerEditFragment"
+        android:label="@string/title_container"
+        tools:layout="@layout/fragment_container_edit">
+        <action
+            android:id="@+id/action_navigation_container_edit_to_navigation_container"
+            app:destination="@id/navigation_container"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_program"
@@ -23,8 +66,8 @@
         android:label="@string/title_program"
         tools:layout="@layout/fragment_program">
         <action
-            android:id="@+id/action_navigation_program_to_navigation_program_plate"
-            app:destination="@id/navigation_program_plate"
+            android:id="@+id/action_navigation_program_to_navigation_program_edit"
+            app:destination="@id/navigation_program_edit"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
@@ -32,20 +75,20 @@
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_program_plate"
-        android:name="com.zktony.www.ui.program.ProgramPlateFragment"
+        android:id="@+id/navigation_program_edit"
+        android:name="com.zktony.www.ui.program.ProgramEditFragment"
         android:label="@string/title_program"
-        tools:layout="@layout/fragment_program_plate">
+        tools:layout="@layout/fragment_program_edit">
         <action
-            android:id="@+id/action_navigation_program_plate_to_navigation_program"
+            android:id="@+id/action_navigation_program_edit_to_navigation_program"
             app:destination="@id/navigation_program"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
         <action
-            android:id="@+id/action_navigation_program_plate_to_navigation_program_hole"
-            app:destination="@id/navigation_program_hole"
+            android:id="@+id/action_navigation_program_edit_to_navigation_program_point"
+            app:destination="@id/navigation_program_point"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
@@ -53,13 +96,13 @@
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_program_hole"
-        android:name="com.zktony.www.ui.program.ProgramHoleFragment"
+        android:id="@+id/navigation_program_point"
+        android:name="com.zktony.www.ui.program.ProgramPointFragment"
         android:label="@string/title_program"
-        tools:layout="@layout/fragment_program_hole">
+        tools:layout="@layout/fragment_program_point">
         <action
-            android:id="@+id/action_navigation_program_hole_to_navigation_program_plate"
-            app:destination="@id/navigation_program_plate"
+            android:id="@+id/action_navigation_program_point_to_navigation_program_edit"
+            app:destination="@id/navigation_program_edit"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"

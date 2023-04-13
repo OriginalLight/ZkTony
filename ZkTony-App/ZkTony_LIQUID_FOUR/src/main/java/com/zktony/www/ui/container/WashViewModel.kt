@@ -9,7 +9,6 @@ import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.entity.Container
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class WashViewModel constructor(
@@ -23,7 +22,7 @@ class WashViewModel constructor(
 
     init {
         viewModelScope.launch {
-            dao.getAll().distinctUntilChanged().collect {
+            dao.getByType(0).collect {
                 if (it.isNotEmpty()) {
                     _uiState.value = it[0]
                 }
@@ -42,7 +41,7 @@ class WashViewModel constructor(
     fun save(x: Float, y: Float) {
         viewModelScope.launch {
             _uiState.value?.let {
-                dao.update(it.copy(wasteX = x, wasteY = y))
+                dao.update(it.copy(xAxis = x, yAxis = y))
             }
         }
     }

@@ -11,11 +11,13 @@ import java.util.*
  */
 @Entity(tableName = "container")
 data class Container(
-    @PrimaryKey val id: Long = Snowflake(1).nextId(),
-    val name: String = "",
-    // 废液槽坐标
-    val wasteX: Float = 0f,
-    val wasteY: Float = 0f,
-    // 创建时间
+    @PrimaryKey
+    val id: Long = Snowflake(1).nextId(),
+    val name: String = "默认",
+    val x: Int = 8,
+    val y: Int = 12,
+    val xAxis: Float = 0f,
+    val yAxis: Float = 0f,
+    val type: Int = 0,
     val createTime: Date = Date(System.currentTimeMillis()),
 )

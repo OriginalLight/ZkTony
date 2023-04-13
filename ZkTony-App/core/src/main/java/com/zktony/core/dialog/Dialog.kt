@@ -7,20 +7,20 @@ import android.view.Gravity
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.*
 import com.kongzue.dialogx.interfaces.OnBindView
-import com.kongzue.dialogx.util.InputInfo
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.core.R
 import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
 
 
-fun aboutDialog() {
+fun aboutDialog(block: () -> Unit) {
     CustomDialog.build()
         .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_about_dialog) {
             override fun onBind(dialog: CustomDialog, v: View) {
@@ -28,25 +28,39 @@ fun aboutDialog() {
                 btnWeb.isVisible = Ext.ctx.isNetworkAvailable()
                 btnWeb.clickNoRepeat {
                     dialog.dismiss()
-                    webDialog()
+                    block()
                 }
             }
         }).setMaskColor(Color.parseColor("#4D000000")).show()
 }
 
 fun authDialog(block: () -> Unit) {
-    InputDialog("权限认证", "请输入密码", "确定", "取消")
-        .setCancelable(false)
-        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD))
-        .setOkButton { _, _, inputStr ->
-            if (inputStr.isBlank().not() && inputStr == "123456") {
-                block()
-            } else {
-                PopTip.show("密码错误")
+    CustomDialog.build()
+    .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_input) {
+        override fun onBind(dialog: CustomDialog, v: View) {
+            val tvTitle = v.findViewById<TextView>(R.id.title)
+            val etInput = v.findViewById<EditText>(R.id.input)
+            val btnOk = v.findViewById<MaterialButton>(R.id.ok)
+            val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
+            tvTitle.text = "权限认证"
+            etInput.hint = "请输入密码"
+            etInput.inputType = InputType.TYPE_CLASS_TEXT
+            btnOk.clickNoRepeat {
+                if (etInput.text.isBlank().not() && etInput.text.toString() == "123456") {
+                    block()
+                    dialog.dismiss()
+                } else {
+                    PopTip.show("密码错误")
+                }
             }
-            false
+            btnCancel.clickNoRepeat {
+                dialog.dismiss()
+            }
         }
-        .show()
+    })
+    .setCancelable(false)
+    .setMaskColor(Color.parseColor("#4D000000"))
+    .show()
 }
 
 fun deviceDialog(code: String) {
@@ -72,15 +86,6 @@ fun deviceDialog(code: String) {
                 device.setImageBitmap(image)
             }
         }).setMaskColor(Color.parseColor("#4D000000")).show()
-}
-
-fun deleteDialog(name: String, block: () -> Unit) {
-    MessageDialog.show(
-        "提示", "确定删除 $name 吗？", "确定", "取消"
-    ).setOkButton { _, _ ->
-        block()
-        false
-    }
 }
 
 fun noticeDialog(text: String) {
@@ -132,67 +137,66 @@ fun webDialog() {
     }).setMaxWidth(1920).show()
 }
 
-fun inputDialog(message: String = "请输入程序/操作名", block: (String) -> Unit) {
-    InputDialog("添加", message, "确定", "取消").setCancelable(false)
-        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_NORMAL))
-        .setOkButton { _, _, inputStr ->
-            if (inputStr.trim().isEmpty()) {
-                PopTip.show("不能为空")
-                return@setOkButton false
-            }
-            block(inputStr.trim())
-            false
-        }.show()
-}
-
-fun inputNumberDialog(message: String = "请输入程序/操作名", value: Int, block: (Int) -> Unit) {
-    InputDialog("修改", message, "确定", "取消", value.toString())
-        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL))
-        .setOkButton { _, _, inputStr ->
-            if (inputStr.trim().isEmpty()) {
-                PopTip.show("不能为空")
-                return@setOkButton false
-            }
-            "test".logi()
-            block(inputStr.trim().toIntOrNull() ?: 0)
-            false
-        }.show()
-}
-
-fun inputNumberDialog(message: String = "请输入程序/操作名", value: Float, block: (Float) -> Unit) {
-    InputDialog("修改", message, "确定", "取消", value.removeZero())
-        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL))
-        .setOkButton { _, _, inputStr ->
-            if (inputStr.trim().isEmpty()) {
-                PopTip.show("不能为空")
-                return@setOkButton false
-            }
-            block(inputStr.trim().toFloatOrNull() ?: 0f)
-            false
-        }.show()
-}
-
-fun inputDecimalDialog(
-    message: String = "请输入程序/操作名",
-    value: Float,
-    move: (Float) -> Unit,
-    block: (Float) -> Unit
+fun inputDialog(
+    title: String,
+    hint: String = "",
+    value: String = "",
+    inputType: Int = InputType.TYPE_CLASS_TEXT,
+    block: (String) -> Unit
 ) {
-    InputDialog("修改", message, "确定", "取消", value.removeZero())
-        .setInputInfo(InputInfo().setInputType(InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL))
-        .setOtherButton("移动") { _, _, str ->
-            move(str.toFloatOrNull() ?: 0f)
-            true
-        }
-        .setOkButton { _, _, inputStr ->
-            if (inputStr.trim().isEmpty()) {
-                PopTip.show("不能为空")
-                return@setOkButton false
+    CustomDialog.build()
+        .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_input) {
+            override fun onBind(dialog: CustomDialog, v: View) {
+                val tvTitle = v.findViewById<TextView>(R.id.title)
+                val etInput = v.findViewById<EditText>(R.id.input)
+                val btnOk = v.findViewById<MaterialButton>(R.id.ok)
+                val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
+                tvTitle.text = title
+                etInput.hint = hint
+                etInput.inputType = inputType
+                etInput.setText(value)
+                btnOk.clickNoRepeat {
+                    block(etInput.text.toString())
+                    dialog.dismiss()
+                }
+                btnCancel.clickNoRepeat {
+                    dialog.dismiss()
+                }
             }
-            block(inputStr.trim().toFloatOrNull() ?: 0f)
-            false
-        }.show()
+        })
+        .setCancelable(false)
+        .setMaskColor(Color.parseColor("#4D000000"))
+        .show()
 }
+
+fun messageDialog(
+    title: String,
+    message: String = "",
+    block: () -> Unit = {}
+) {
+    CustomDialog.build()
+        .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_message) {
+            override fun onBind(dialog: CustomDialog, v: View) {
+                val tvTitle = v.findViewById<TextView>(R.id.title)
+                val tvMessage = v.findViewById<TextView>(R.id.message)
+                val btnOk = v.findViewById<MaterialButton>(R.id.ok)
+                val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
+                tvTitle.text = title
+                tvMessage.text = message
+                btnOk.clickNoRepeat {
+                    block()
+                    dialog.dismiss()
+                }
+                btnCancel.clickNoRepeat {
+                    dialog.dismiss()
+                }
+            }
+        })
+        .setCancelable(false)
+        .setMaskColor(Color.parseColor("#4D000000"))
+        .show()
+}
+
 
 fun updateDialog(title: String, message: String, block: () -> Unit, block1: () -> Unit) {
     CustomDialog.build()
@@ -204,16 +208,19 @@ fun updateDialog(title: String, message: String, block: () -> Unit, block1: () -
                 val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
                 tvTitle.text = title
                 tvMessage.text = message
-                btnOk.setOnClickListener {
+                btnOk.clickNoRepeat {
                     block()
                     dialog.dismiss()
                 }
-                btnCancel.setOnClickListener {
+                btnCancel.clickNoRepeat {
                     block1()
                     dialog.dismiss()
                 }
             }
-        }).setCancelable(false).setMaskColor(Color.parseColor("#4D000000")).show()
+        })
+        .setCancelable(false)
+        .setMaskColor(Color.parseColor("#4D000000"))
+        .show()
 }
 
 fun spannerDialog(
@@ -228,5 +235,6 @@ fun spannerDialog(
     }).setOnMenuItemClickListener { _, text, index ->
         block(text.toString(), index)
         false
-    }.setRadius(0f).alignGravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+    }.setRadius(0f)
+        .alignGravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
 }

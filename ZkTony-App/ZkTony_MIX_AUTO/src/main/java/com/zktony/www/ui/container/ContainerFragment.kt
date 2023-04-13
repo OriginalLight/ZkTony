@@ -6,8 +6,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.deleteDialog
 import com.zktony.core.dialog.inputDialog
+import com.zktony.core.dialog.messageDialog
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.www.R
@@ -43,7 +43,11 @@ class ContainerFragment :
      */
     private fun initView() {
         adapter.onDeleteButtonClick = {
-            deleteDialog(name = it.name, block = { viewModel.delete(it) })
+            messageDialog(
+                title = "删除容器",
+                message = "是否删除容器 ${it.name} ?",
+                block = { viewModel.delete(it) }
+            )
         }
         adapter.onEditButtonClick = {
             val directions =
@@ -58,14 +62,18 @@ class ContainerFragment :
             with(add) {
                 clickScale()
                 clickNoRepeat {
-                    inputDialog {
-                        viewModel.insert(it) {
-                            findNavController().navigate(
-                                R.id.action_navigation_container_to_navigation_container_edit,
-                                Bundle().apply { putLong("id", it) }
-                            )
+                    inputDialog(
+                        title = "添加容器",
+                        hint = "请输入容器名称",
+                        block = {
+                            viewModel.insert(it) {
+                                findNavController().navigate(
+                                    R.id.action_navigation_container_to_navigation_container_edit,
+                                    Bundle().apply { putLong("id", it) }
+                                )
+                            }
                         }
-                    }
+                    )
                 }
             }
         }

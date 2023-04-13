@@ -92,9 +92,11 @@ class ZmFragment : BaseFragment<ZmViewModel, FragmentZmBinding>(R.layout.fragmen
                         if (it.waterKind == "厂家") {
                             factory.isChecked = true
                             otherWaterInfo.visibility = View.GONE
+                            otherWaterInfoDiv.visibility = View.GONE
                         } else {
                             other.isChecked = true
                             otherWaterInfo.visibility = View.VISIBLE
+                            otherWaterInfoDiv.visibility = View.VISIBLE
                             otherWater.setEqualText(it.waterKind)
                         }
                         if (it.voltage > 0f) {

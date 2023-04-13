@@ -20,8 +20,8 @@
     <string name="input_v2">泵二加液量 μL</string>
     <string name="input_v3">泵三加液量 μL</string>
     <string name="input_v4">泵四加液量 μL</string>
-    <string name="input_x">横坐标</string>
-    <string name="input_y">纵坐标</string>
+    <string name="input_x">横坐标:</string>
+    <string name="input_y">纵坐标:</string>
     <string name="mode">模式</string>
     <string name="move">移动</string>
     <string name="needle_space">针头间距</string>
@@ -62,4 +62,9 @@
     <string name="work_plate">加液板编辑</string>
     <string name="about">使用说明</string>
     <string name="waste">废液槽</string>
+    <string name="container_name">容器名</string>
+    <string name="axis_input">坐标编辑</string>
+    <string name="input_x_size">横坐标尺寸:</string>
+    <string name="input_y_size">纵坐标尺寸:</string>
+    <string name="size_input">尺寸编辑</string>
 </resources>

@@ -28,15 +28,19 @@ class ProgramViewModel constructor(
 
     /**
      * 添加程序
-     * @param programName [String] 程序名
+     * @param name [String] 程序名
      */
-    fun insert(programName: String, block: (String) -> Unit) {
+    fun insert(name: String, block: (String) -> Unit) {
         viewModelScope.launch {
-            programDao.getByName(programName).firstOrNull()?.let {
+            if (name.isEmpty()) {
+                PopTip.show("程序名不能为空")
+                return@launch
+            }
+            programDao.getByName(name).firstOrNull()?.let {
                 PopTip.show("程序名已存在")
                 return@launch
             }
-            val program = Program(name = programName)
+            val program = Program(name = name)
             programDao.insert(program)
             block(program.id)
         }

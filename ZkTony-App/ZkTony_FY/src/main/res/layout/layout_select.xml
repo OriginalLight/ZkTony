@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/motor"
+        android:layout_width="0dp"
+        android:layout_height="96dp"
+        android:layout_weight="1"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="电机"
+        android:textSize="36sp"
+        app:cornerRadius="0dp"
+        app:rippleColor="@color/purple_700"
+        tools:ignore="HardcodedText" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/container"
+        android:layout_width="0dp"
+        android:layout_height="96dp"
+        android:layout_weight="1"
+        android:backgroundTint="@color/purple_700"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="容器"
+        android:textSize="36sp"
+        app:cornerRadius="0dp"
+        app:rippleColor="@color/light_primary"
+        tools:ignore="HardcodedText" />
+
+</LinearLayout>

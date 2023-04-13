@@ -3,6 +3,7 @@ package com.zktony.www.ui.container
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -15,7 +16,7 @@ import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.inputNumberDialog
+import com.zktony.core.dialog.inputDialog
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.core.ext.removeZero
@@ -70,65 +71,66 @@ class ContainerEditFragment :
                 clickNoRepeat { findNavController().navigateUp() }
             }
             size.clickNoRepeat {
-                inputNumberDialog(
-                    message = "请输入加液板尺寸",
-                    value = viewModel.uiState.value.container?.size ?: 10,
-                    block = { viewModel.reSize(it) }
+                inputDialog(
+                    title = "尺寸调整",
+                    hint = "请输入加液板尺寸",
+                    value = size.text,
+                    inputType = InputType.TYPE_CLASS_NUMBER,
+                    block = { viewModel.reSize(it.toIntOrNull() ?: 10) }
                 )
             }
             gradientPlate.onItemClick = { index ->
                 CustomDialog.build()
-                    .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_axis_input) {
+                    .setCustomView(object :
+                        OnBindView<CustomDialog>(R.layout.layout_axis_double) {
                         @SuppressLint("SetTextI18n")
                         override fun onBind(dialog: CustomDialog, v: View) {
                             val tvTitle = v.findViewById<TextView>(R.id.title)
-                            val input = v.findViewById<EditText>(R.id.input_axis)
-                            val waste = v.findViewById<EditText>(R.id.input_waste)
-                            val moveAxis = v.findViewById<MaterialButton>(R.id.move_axis)
-                            val moveWaste = v.findViewById<MaterialButton>(R.id.move_waste)
-                            val btnOk = v.findViewById<MaterialButton>(R.id.save)
+                            val inputAxis = v.findViewById<EditText>(R.id.input_axis)
+                            val inputWaste = v.findViewById<EditText>(R.id.input_waste)
+                            val btnMoveAxis = v.findViewById<MaterialButton>(R.id.move_axis)
+                            val btnMoveWaste = v.findViewById<MaterialButton>(R.id.move_waste)
+                            val btnOk = v.findViewById<MaterialButton>(R.id.ok)
                             val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
-
                             tvTitle.text = "请输入 ${'A' + index} 横坐标"
-                            val axis =
-                                viewModel.uiState.value.list.find { it.index == index }?.axis ?: 0f
-                            val wasteAxis =
-                                viewModel.uiState.value.list.find { it.index == index }?.waste ?: 0f
-                            if (axis != 0f) {
-                                input.setText(axis.removeZero())
-                            }
-                            if (wasteAxis != 0f) {
-                                waste.setText(wasteAxis.removeZero())
-                            }
-                            moveAxis.clickNoRepeat {
-                                val distance = input.text.toString().toFloatOrNull() ?: 0f
-                                if (distance > 250f) {
-                                    PopTip.show("最大移动距离为250mm")
-                                    return@clickNoRepeat
+                            val point = viewModel.uiState.value.list.find { it.index == index }
+                            inputAxis.setText(point?.axis?.removeZero() ?: "0")
+                            inputWaste.setText(point?.waste?.removeZero() ?: "0")
+
+                            btnMoveAxis.clickNoRepeat {
+                                val axis = inputAxis.text.toString().toFloatOrNull() ?: 0f
+                                if (axis > 250f) {
+                                    PopTip.show("坐标不能大于250")
+                                } else {
+                                    viewModel.move(axis)
                                 }
-                                viewModel.moveY(distance)
                             }
-                            moveWaste.clickNoRepeat {
-                                val distance = waste.text.toString().toFloatOrNull() ?: 0f
-                                if (distance > 250f) {
-                                    PopTip.show("最大移动距离为250mm")
-                                    return@clickNoRepeat
+
+                            btnMoveWaste.clickNoRepeat {
+                                val waste = inputWaste.text.toString().toFloatOrNull() ?: 0f
+                                if (waste > 250f) {
+                                    PopTip.show("坐标不能大于250")
+                                } else {
+                                    viewModel.move(waste)
                                 }
-                                viewModel.moveY(distance)
                             }
+
                             btnOk.clickNoRepeat {
-                                val distance = input.text.toString().toFloatOrNull() ?: 0f
-                                val distance1 = waste.text.toString().toFloatOrNull() ?: 0f
-                                if (distance > 250f || distance1 > 250f) {
-                                    PopTip.show("最大移动距离为250mm")
-                                    return@clickNoRepeat
+                                val axis = inputAxis.text.toString().toFloatOrNull() ?: 0f
+                                val waste = inputWaste.text.toString().toFloatOrNull() ?: 0f
+                                if (axis > 250f || waste > 250f) {
+                                    PopTip.show("坐标不能大于250")
+                                } else {
+                                    viewModel.setPointPosition(index, axis, waste)
+                                    dialog.dismiss()
                                 }
-                                viewModel.setPointPosition(index, distance, distance1)
-                                dialog.dismiss()
                             }
                             btnCancel.clickNoRepeat { dialog.dismiss() }
                         }
-                    }).setCancelable(false).setMaskColor(Color.parseColor("#4D000000")).show()
+                    })
+                    .setCancelable(false)
+                    .setMaskColor(Color.parseColor("#4D000000"))
+                    .show()
             }
         }
     }

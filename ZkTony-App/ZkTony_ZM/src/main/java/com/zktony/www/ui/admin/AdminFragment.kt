@@ -15,6 +15,7 @@ import com.zktony.core.base.BaseFragment
 import com.zktony.core.dialog.aboutDialog
 import com.zktony.core.dialog.deviceDialog
 import com.zktony.core.dialog.updateDialog
+import com.zktony.core.dialog.webDialog
 import com.zktony.core.ext.*
 import com.zktony.core.model.QrCode
 import com.zktony.core.utils.Constants
@@ -193,7 +194,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             with(about) {
                 clickScale()
                 clickNoRepeat {
-                    aboutDialog()
+                    aboutDialog() { webDialog() }
                 }
             }
 

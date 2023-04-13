@@ -6,8 +6,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.deleteDialog
 import com.zktony.core.dialog.inputDialog
+import com.zktony.core.dialog.messageDialog
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.www.R
@@ -48,7 +48,11 @@ class CalibrationFragment :
         adapter.apply {
             onCheckedClick = { viewModel.enable(it) }
             onDeleteButtonClick = {
-                deleteDialog(name = it.name, block = { viewModel.delete(it) })
+                messageDialog(
+                    title = "删除校准程序",
+                    message = "是否删除校准程序 ${it.name} ?",
+                    block = { viewModel.delete(it) }
+                )
             }
             onEditButtonClick = {
                 findNavController().navigate(
@@ -62,14 +66,18 @@ class CalibrationFragment :
             with(add) {
                 clickScale()
                 clickNoRepeat {
-                    inputDialog {
-                        viewModel.insert(it) {
-                            findNavController().navigate(
-                                R.id.action_navigation_calibration_to_navigation_calibration_data,
-                                Bundle().apply { putLong("id", it) }
-                            )
+                    inputDialog(
+                        title = "添加校准程序",
+                        hint = "请输入校准程序名称",
+                        block = {
+                            viewModel.insert(it) {
+                                findNavController().navigate(
+                                    R.id.action_navigation_calibration_to_navigation_calibration_data,
+                                    Bundle().apply { putLong("id", it) }
+                                )
+                            }
                         }
-                    }
+                    )
                 }
             }
         }

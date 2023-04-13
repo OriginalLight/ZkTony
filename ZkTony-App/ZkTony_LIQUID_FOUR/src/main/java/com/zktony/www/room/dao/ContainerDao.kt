@@ -26,4 +26,13 @@ interface ContainerDao : BaseDao<Container> {
         """
     )
     fun getAll(): Flow<List<Container>>
+
+
+    @Query(
+        """
+        SELECT * FROM container
+        WHERE type = :type
+        """
+    )
+    fun getByType(type: Int): Flow<List<Container>>
 }

@@ -91,9 +91,9 @@ class HomeViewModel constructor(
     private fun loadHole(idList: List<Long>) {
         viewModelScope.launch {
             launch {
-                holeDao.getBySudIdList(idList).collect {
-                    _uiState.value = _uiState.value.copy(holeList = it)
-                }
+//                holeDao.getBySudIdList(idList).collect {
+//                    _uiState.value = _uiState.value.copy(holeList = it)
+//                }
             }
         }
     }
@@ -143,8 +143,8 @@ class HomeViewModel constructor(
                 _uiState.value.container?.let {
                     executionManager.executor(
                         executionManager.generator(
-                            x = it.wasteX,
-                            y = it.wasteY,
+                            x = it.xAxis,
+                            y = it.yAxis,
                         )
                     )
                 }
@@ -252,7 +252,7 @@ class HomeViewModel constructor(
                     }
                 }
                 launch {
-                    updateLog(Log(workName = _uiState.value.program?.name ?: "未知程序"))
+                    updateLog(Log(name = _uiState.value.program?.name ?: "未知程序"))
                 }
                 val executor = ProgramExecutor(
                     plateList = _uiState.value.plateList,

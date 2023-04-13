@@ -184,11 +184,11 @@ class HomeViewModel constructor(
                         if (_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
                             serialManager.sendHex(hex = V1(pa = "0B", data = "0301").toHex())
-                            delay(7000L)
+                            delay(8500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
                             serialManager.sendHex(hex = V1(pa = "0B", data = "0305").toHex())
-                            delay(6500L)
+                            delay(9000L)
                         }
                     }
 
@@ -230,11 +230,11 @@ class HomeViewModel constructor(
                         if (_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
                             serialManager.sendHex(hex = V1(pa = "0B", data = "0303").toHex())
-                            delay(6500L)
+                            delay(8500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
                             serialManager.sendHex(hex = V1(pa = "0B", data = "0305").toHex())
-                            delay(6500L)
+                            delay(9000L)
                         }
                     }
 

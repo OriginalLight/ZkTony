@@ -7,8 +7,8 @@ import com.zktony.www.ui.calibration.CalibrationViewModel
 import com.zktony.www.ui.container.*
 import com.zktony.www.ui.home.HomeViewModel
 import com.zktony.www.ui.log.LogViewModel
-import com.zktony.www.ui.program.ProgramHoleViewModel
-import com.zktony.www.ui.program.ProgramPlateViewModel
+import com.zktony.www.ui.program.ProgramPointViewModel
+import com.zktony.www.ui.program.ProgramEditViewModel
 import com.zktony.www.ui.program.ProgramViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
@@ -20,13 +20,10 @@ val viewModule = module {
     viewModelOf(::CalibrationViewModel)
     viewModelOf(::CalibrationDataViewModel)
     viewModelOf(::ContainerViewModel)
-    viewModelOf(::PlateOneViewModel)
-    viewModelOf(::PlateTwoViewModel)
-    viewModelOf(::PlateThreeViewModel)
-    viewModelOf(::PlateFourViewModel)
+    viewModelOf(::ContainerEditViewModel)
     viewModelOf(::WashViewModel)
     viewModelOf(::LogViewModel)
     viewModelOf(::ProgramViewModel)
-    viewModelOf(::ProgramPlateViewModel)
-    viewModelOf(::ProgramHoleViewModel)
+    viewModelOf(::ProgramEditViewModel)
+    viewModelOf(::ProgramPointViewModel)
 }

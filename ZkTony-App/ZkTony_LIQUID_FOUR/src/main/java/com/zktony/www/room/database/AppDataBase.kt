@@ -21,6 +21,7 @@ import com.zktony.www.room.entity.*
         Plate::class,
         Hole::class,
         Program::class,
+        Point::class,
     ],
     version = 1,
     exportSchema = false
@@ -40,4 +41,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun programDao(): ProgramDao
 
     abstract fun containerDao(): ContainerDao
+
+    abstract fun pointDao(): PointDao
 }

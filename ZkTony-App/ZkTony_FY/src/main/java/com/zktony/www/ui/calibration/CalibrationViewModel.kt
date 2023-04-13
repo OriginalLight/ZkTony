@@ -29,6 +29,10 @@ class CalibrationViewModel constructor(
 
     fun insert(name: String, block: (String) -> Unit) {
         viewModelScope.launch {
+            if (name.isEmpty()) {
+                PopTip.show("校准程序名不能为空")
+                return@launch
+            }
             val cali = _uiState.value?.find { it.name == name }
             if (cali != null) {
                 PopTip.show("校准程序名已存在")

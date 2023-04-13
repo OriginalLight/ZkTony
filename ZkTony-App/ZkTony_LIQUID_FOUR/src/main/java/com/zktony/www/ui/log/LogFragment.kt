@@ -6,6 +6,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.core.base.BaseFragment
+import com.zktony.core.dialog.messageDialog
 import com.zktony.www.R
 import com.zktony.www.common.adapter.LogAdapter
 import com.zktony.www.databinding.FragmentLogBinding
@@ -46,7 +47,11 @@ class LogFragment :
 
     private fun initView() {
         adapter.onDeleteButtonClick = {
-            viewModel.delete(it)
+            messageDialog(
+                title = "删除日志",
+                message = "确定删除该日志？",
+                block = { viewModel.delete(it) }
+            )
         }
         binding.recycleView.adapter = adapter
     }

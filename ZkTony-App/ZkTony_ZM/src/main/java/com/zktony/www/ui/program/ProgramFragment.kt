@@ -12,7 +12,7 @@ import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.deleteDialog
+import com.zktony.core.dialog.messageDialog
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.www.R
@@ -55,9 +55,11 @@ class ProgramFragment :
      */
     private fun initView() {
         adapter.onDeleteButtonClick = {
-            deleteDialog(
-                name = it.name,
-                block = { viewModel.delete(it) })
+            messageDialog(
+                title = "删除程序",
+                message = "是否删除${it.name}？",
+                block = { viewModel.delete(it) },
+            )
         }
         adapter.onEditButtonClick = {
             findNavController().navigate(
@@ -76,23 +78,21 @@ class ProgramFragment :
                 clickNoRepeat {
                     CustomDialog.build()
                         .setCustomView(object :
-                            OnBindView<CustomDialog>(R.layout.layout_model_select) {
+                            OnBindView<CustomDialog>(R.layout.layout_select) {
                             override fun onBind(dialog: CustomDialog, v: View) {
                                 val zm = v.findViewById<MaterialButton>(R.id.zm)
                                 val rs = v.findViewById<MaterialButton>(R.id.rs)
-                                val cancel = v.findViewById<MaterialButton>(R.id.cancel)
-                                zm.clickNoRepeat {
+                                zm.clickNoRepeat(1000L) {
                                     dialog.dismiss()
                                     findNavController().navigate(R.id.action_navigation_program_to_navigation_zm)
                                 }
-                                rs.clickNoRepeat {
+                                rs.clickNoRepeat(1000L) {
                                     dialog.dismiss()
                                     findNavController().navigate(R.id.action_navigation_program_to_navigation_rs)
                                 }
-                                cancel.setOnClickListener { dialog.dismiss() }
                             }
                         })
-                        .setCancelable(false)
+                        .setCancelable(true)
                         .setMaskColor(Color.parseColor("#4D000000"))
                         .show()
                 }

@@ -23,4 +23,5 @@ val localModule = module {
     single { get<AppDatabase>().plateDao() }
     single { get<AppDatabase>().holeDao() }
     single { get<AppDatabase>().programDao() }
+    single { get<AppDatabase>().pointDao() }
 }

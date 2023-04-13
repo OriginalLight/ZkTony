@@ -7,8 +7,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.deleteDialog
 import com.zktony.core.dialog.inputDialog
+import com.zktony.core.dialog.messageDialog
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.www.R
@@ -46,7 +46,11 @@ class ProgramFragment :
     private fun initView() {
         adapter.apply {
             onDeleteButtonClick = {
-                deleteDialog(name = it.name, block = { viewModel.delete(it) })
+                messageDialog(
+                    title = "删除程序",
+                    message = "是否删除程序 ${it.name} ?",
+                    block = { viewModel.delete(it) }
+                )
             }
             onEditButtonClick = {
                 findNavController().navigate(
@@ -61,14 +65,18 @@ class ProgramFragment :
                 with(add) {
                     clickScale()
                     clickNoRepeat {
-                        inputDialog {
-                            viewModel.insert(it) {
-                                findNavController().navigate(
-                                    R.id.action_navigation_program_to_navigation_program_edit,
-                                    Bundle().apply { putLong("id", it) }
-                                )
+                        inputDialog(
+                            title = "添加程序",
+                            hint = "请输入程序名",
+                            block = {
+                                viewModel.insert(it) {
+                                    findNavController().navigate(
+                                        R.id.action_navigation_program_to_navigation_program_edit,
+                                        Bundle().apply { putLong("id", it) }
+                                    )
+                                }
                             }
-                        }
+                        )
                     }
                 }
             }

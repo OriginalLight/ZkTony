@@ -1,7 +1,9 @@
 package com.zktony.www.common.ext
 
+import com.zktony.www.room.entity.Container
 import com.zktony.www.room.entity.Hole
 import com.zktony.www.room.entity.Plate
+import com.zktony.www.room.entity.Point
 
 fun List<Hole>.total(): Int {
     var total = 0
@@ -17,15 +19,15 @@ fun List<Hole>.total(): Int {
 }
 
 
-fun List<Hole>.calculateCoordinate(plate: Plate): List<Hole> {
-    val hl = mutableListOf<Hole>()
+fun List<Point>.calculateCoordinate(con: Container): List<Point> {
+    val hl = mutableListOf<Point>()
     val x0y0 = this.find { it.x == 0 && it.y == 0 }
-    val x1y1 = this.find { it.x == plate.x - 1 && it.y == plate.y - 1 }
-    if (x0y0 != null && x1y1 != null) {
-        val x = (x1y1.xAxis - x0y0.xAxis) / if (plate.x == 1) 1 else (plate.x - 1)
-        val y = (x1y1.yAxis - x0y0.yAxis) / if (plate.y == 1) 1 else (plate.y - 1)
-        for (i in 0 until plate.x) {
-            for (j in 0 until plate.y) {
+    val xmyn = this.find { it.x == con.x - 1 && it.y == con.y - 1 }
+    if (x0y0 != null && xmyn != null) {
+        val x = (xmyn.xAxis - x0y0.xAxis) / if (con.x == 1) 1 else (con.x - 1)
+        val y = (xmyn.yAxis - x0y0.yAxis) / if (con.y == 1) 1 else (con.y - 1)
+        for (i in 0 until con.x) {
+            for (j in 0 until con.y) {
                 val hole = this.find { it.x == i && it.y == j }!!
                 hl.add(
                     hole.copy(

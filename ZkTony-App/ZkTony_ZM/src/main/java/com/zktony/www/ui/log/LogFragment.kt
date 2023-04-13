@@ -10,7 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.deleteDialog
+import com.zktony.core.dialog.messageDialog
 import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.adapter.LogAdapter
@@ -50,7 +50,11 @@ class LogFragment :
     @SuppressLint("SimpleDateFormat")
     private fun initView() {
         adapter.onDeleteButtonClick = {
-            deleteDialog(name = "该日志", block = { viewModel.delete(it) })
+            messageDialog(
+                title = "删除日志",
+                message = "是否删除该日志？",
+                block = { viewModel.delete(it) }
+            )
         }
         adapter.onChartButtonClick = {
             findNavController().navigate(
