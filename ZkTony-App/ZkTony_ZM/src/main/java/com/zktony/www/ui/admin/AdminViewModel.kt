@@ -20,9 +20,9 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class AdminViewModel constructor(
-    private val dataStore: DataStore<Preferences>,
-    private val grpc: ApplicationGrpc,
-    private val serialManager: SerialManager
+    private val DS: DataStore<Preferences>,
+    private val AG: ApplicationGrpc,
+    private val SM: SerialManager
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(AdminUiState())
@@ -42,7 +42,7 @@ class AdminViewModel constructor(
      * @param pump [Boolean] true 开 false 关
      */
     fun touchPump(pump: Boolean) {
-        val cmd = serialManager.send.value
+        val cmd = SM.send.value
         if (pump) {
             cmd.motorX = 1
             cmd.motorY = 1
@@ -50,7 +50,7 @@ class AdminViewModel constructor(
             cmd.motorX = 0
             cmd.motorY = 0
         }
-        serialManager.send(cmd)
+        SM.send(cmd)
     }
 
     /**
@@ -74,7 +74,7 @@ class AdminViewModel constructor(
      * @param bar [Boolean]
      */
     fun toggleNavigationBar(bar: Boolean) {
-        dataStore.save(Constants.BAR, bar)
+        DS.save(Constants.BAR, bar)
         val intent = Intent().apply {
             action = "ACTION_SHOW_NAVBAR"
             putExtra("cmd", if (bar) "show" else "hide")
@@ -87,7 +87,7 @@ class AdminViewModel constructor(
      * @param audio [Boolean] true 开 false 关
      */
     fun toggleAudio(audio: Boolean) {
-        dataStore.save(Constants.AUDIO, audio)
+        DS.save(Constants.AUDIO, audio)
     }
 
     /**
@@ -95,7 +95,7 @@ class AdminViewModel constructor(
      * @param detect [Boolean] true 开 false 关
      */
     fun toggleDetect(detect: Boolean) {
-        dataStore.save(Constants.DETECT, detect)
+        DS.save(Constants.DETECT, detect)
     }
 
     /**
@@ -103,7 +103,7 @@ class AdminViewModel constructor(
      * @param interval [Int] 间隔时间
      */
     fun toggleInterval(interval: Int) {
-        dataStore.save(Constants.INTERVAL, minOf(interval, 10))
+        DS.save(Constants.INTERVAL, minOf(interval, 10))
     }
 
     /**
@@ -111,7 +111,7 @@ class AdminViewModel constructor(
      * @param duration [Int] 持续时间
      */
     fun toggleDuration(duration: Int) {
-        dataStore.save(Constants.DURATION, minOf(duration, 200))
+        DS.save(Constants.DURATION, minOf(duration, 200))
     }
 
     /**
@@ -119,7 +119,7 @@ class AdminViewModel constructor(
      * @param speed [Int] 转速
      */
     fun toggleMotorSpeed(speed: Int) {
-        dataStore.save(Constants.MOTOR_SPEED, minOf(speed, 250))
+        DS.save(Constants.MOTOR_SPEED, minOf(speed, 250))
     }
 
     /**
@@ -194,7 +194,7 @@ class AdminViewModel constructor(
                 _uiState.value = _uiState.value.copy(
                     loading = true
                 )
-                grpc.getByApplicationId(BuildConfig.APPLICATION_ID).catch {
+                AG.getByApplicationId(BuildConfig.APPLICATION_ID).catch {
                     PopTip.show("获取版本信息失败,请重试!")
                     _uiState.value = _uiState.value.copy(
                         loading = false

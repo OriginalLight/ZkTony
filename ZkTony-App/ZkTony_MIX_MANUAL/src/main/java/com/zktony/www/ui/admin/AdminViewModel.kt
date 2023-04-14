@@ -12,56 +12,17 @@ import com.zktony.core.utils.Constants
 import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.www.BuildConfig
-import com.zktony.www.common.ext.toCommand
-import com.zktony.www.common.ext.toMotor
-import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
-import com.zktony.www.room.dao.MotorDao
-import com.zktony.www.room.entity.Motor
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
 
 class AdminViewModel constructor(
-    private val dao: MotorDao,
-    private val grpc: ApplicationGrpc,
-    private val serialManager: SerialManager,
-    private val dataStore: DataStore<Preferences>,
+    private val AG: ApplicationGrpc,
+    private val DS: DataStore<Preferences>,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(AdminUiState())
     val uiState = _uiState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            launch {
-                serialManager.callback.collect {
-                    it?.let {
-                        onSerialOneResponse(it)
-                    }
-                }
-            }
-            launch {
-                if (!serialManager.lock.value) {
-                    syncMotor()
-                }
-            }
-        }
-    }
-
-    /**
-     * 处理串口一返回数据
-     * @param hex [String]
-     */
-    private fun onSerialOneResponse(hex: String) {
-        hex.toCommand().run {
-            if (fn == "03" && pa == "04") {
-                val motor = data.toMotor()
-                updateMotor(motor.copy(id = motor.address - 1))
-            }
-        }
-    }
 
 
     /**
@@ -151,7 +112,7 @@ class AdminViewModel constructor(
                 _uiState.value = _uiState.value.copy(
                     loading = true
                 )
-                grpc.getByApplicationId(BuildConfig.APPLICATION_ID).catch {
+                AG.getByApplicationId(BuildConfig.APPLICATION_ID).catch {
                     PopTip.show("获取版本信息失败,请重试!")
                     _uiState.value = _uiState.value.copy(
                         loading = false
@@ -196,7 +157,7 @@ class AdminViewModel constructor(
      */
     fun toggleNavigationBar(bar: Boolean) {
         viewModelScope.launch {
-            dataStore.edit { preferences ->
+            DS.edit { preferences ->
                 preferences[booleanPreferencesKey(Constants.BAR)] = bar
             }
         }
@@ -207,39 +168,6 @@ class AdminViewModel constructor(
         Ext.ctx.sendBroadcast(intent)
     }
 
-
-    /**
-     * 同步电机参数
-     */
-    private fun syncMotor() {
-        viewModelScope.launch {
-            for (i in 1..3) {
-                serialManager.sendHex(hex = V1(fn = "03", pa = "04", data = i.int8ToHex()).toHex())
-                delay(100L)
-            }
-        }
-    }
-
-    /**
-     * 根据返回更新电机参数
-     * @param motor [Motor]
-     */
-    private fun updateMotor(motor: Motor) {
-        viewModelScope.launch {
-            dao.getById(motor.id).firstOrNull()?.let {
-                dao.update(
-                    it.copy(
-                        subdivision = motor.subdivision,
-                        speed = motor.speed,
-                        acceleration = motor.acceleration,
-                        deceleration = motor.deceleration,
-                        waitTime = motor.waitTime,
-                        mode = motor.mode,
-                    )
-                )
-            }
-        }
-    }
 }
 
 data class AdminUiState(

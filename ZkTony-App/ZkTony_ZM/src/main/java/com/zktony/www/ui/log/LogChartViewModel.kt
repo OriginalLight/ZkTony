@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class LogChartViewModel constructor(
-    private val dao: LogDataDao
+    private val LDD: LogDataDao
 ) : BaseViewModel() {
 
     private val _logList = MutableStateFlow(emptyList<LogData>())
@@ -17,7 +17,7 @@ class LogChartViewModel constructor(
 
     fun loadData(id: String) {
         viewModelScope.launch {
-            dao.getByLogId(id).collect {
+            LDD.getByLogId(id).collect {
                 _logList.value = it
             }
         }

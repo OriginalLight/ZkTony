@@ -5,7 +5,7 @@ import com.zktony.core.ext.hexToInt8
 import com.zktony.core.ext.logi
 import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
-import com.zktony.www.common.ext.toCommand
+import com.zktony.www.common.ext.toV1
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 class SerialManager {
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-    private val serialHelpers by lazy { SerialHelpers() }
+    private val helpers by lazy { SerialHelpers() }
 
     private val _callback = MutableStateFlow<String?>(null)
     private val _lock = MutableStateFlow(false)
@@ -33,7 +33,7 @@ class SerialManager {
     init {
         scope.launch {
             launch {
-                serialHelpers.init(
+                helpers.init(
                     SerialConfig(
                         index = 0,
                         device = "/dev/ttyS0",
@@ -41,7 +41,7 @@ class SerialManager {
                 )
             }
             launch {
-                serialHelpers.callback = { index, data ->
+                helpers.callback = { index, data ->
                     if (index == 0) {
                         _callback.value = data
                     }
@@ -50,7 +50,7 @@ class SerialManager {
             launch {
                 callback.collect {
                     it?.let {
-                        val res = it.toCommand()
+                        val res = it.toV1()
                         when (res.fn) {
                             "85" -> {
                                 if (res.pa == "01") {
@@ -88,12 +88,6 @@ class SerialManager {
         }
     }
 
-    fun init() {
-        scope.launch {
-            "串口管理器初始化完成！！！".logi()
-        }
-    }
-
     suspend fun reset() {
         _reset.value = true
         _lock.value = true
@@ -107,10 +101,14 @@ class SerialManager {
      * @param hex 命令
      */
     fun sendHex(hex: String, lock: Boolean = false) {
-        serialHelpers.sendHex(0, hex)
+        helpers.sendHex(0, hex)
         if (lock) {
             _lock.value = true
             lockTime = 0L
         }
+    }
+
+    fun initializer() {
+        "串口管理器初始化完成！！！".logi()
     }
 }

@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 import java.util.Date
 
 class LogViewModel constructor(
-    private val logRecordDao: LogRecordDao,
-    private val logDataDao: LogDataDao
+    private val LRD: LogRecordDao,
+    private val LDD: LogDataDao
 ) : BaseViewModel() {
 
     private val _logList = MutableStateFlow(emptyList<LogRecord>())
@@ -25,7 +25,7 @@ class LogViewModel constructor(
      */
     init {
         viewModelScope.launch {
-            logRecordDao.getAll().collect {
+            LRD.getAll().collect {
                 _logList.value = it
             }
         }
@@ -38,7 +38,7 @@ class LogViewModel constructor(
      */
     fun changeLogRecord(start: Date, end: Date) {
         viewModelScope.launch {
-            logRecordDao.getByDate(start.getDayStart(), end.getDayEnd())
+            LRD.getByDate(start.getDayStart(), end.getDayEnd())
                 .collect {
                     _logList.value = it
                 }
@@ -51,8 +51,8 @@ class LogViewModel constructor(
      */
     fun delete(logRecord: LogRecord) {
         viewModelScope.launch {
-            logRecordDao.delete(logRecord)
-            logDataDao.deleteByRecordId(logRecord.id)
+            LRD.delete(logRecord)
+            LDD.deleteByRecordId(logRecord.id)
         }
     }
 }

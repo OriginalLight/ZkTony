@@ -22,13 +22,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class HomeViewModel constructor(
-    private val programDao: ProgramDao,
-    private val containerDao: ContainerDao,
-    private val pointDao: PointDao,
-    private val logDao: LogDao,
-    private val serialManager: SerialManager,
-    private val executionManager: ExecutionManager,
-    private val dataStore: DataStore<Preferences>,
+    private val CD: ContainerDao,
+    private val DS: DataStore<Preferences>,
+    private val EM: ExecutionManager,
+    private val LD: LogDao,
+    private val PD: PointDao,
+    private val PGD: ProgramDao,
+    private val SM: SerialManager,
 ) : BaseViewModel() {
 
 
@@ -43,7 +43,7 @@ class HomeViewModel constructor(
                 waste()
             }
             launch {
-                programDao.getAll().collect {
+                PGD.getAll().collect {
                     if (it.isEmpty()) {
                         _uiState.value = _uiState.value.copy(programList = it, program = null)
                     } else {
@@ -53,14 +53,14 @@ class HomeViewModel constructor(
                 }
             }
             launch {
-                containerDao.getById(1L).collect {
+                CD.getById(1L).collect {
                     _uiState.value = _uiState.value.copy(
                         container = it
                     )
                 }
             }
             launch {
-                dataStore.read(Constants.NEEDLE_SPACE, 12f).collect {
+                DS.read(Constants.NEEDLE_SPACE, 12f).collect {
                     _settings.value = _settings.value.copy(needleSpace = it)
                 }
             }
@@ -69,7 +69,7 @@ class HomeViewModel constructor(
 
     private fun loadPlate(id: Long) {
         viewModelScope.launch {
-            pointDao.getBySubId(id).collect {
+            PD.getBySubId(id).collect {
                 _uiState.value = _uiState.value.copy(pointList = it)
                 var size: Pair<Int, Int> = Pair(8, 12)
                 if (it.isNotEmpty()) {
@@ -113,11 +113,11 @@ class HomeViewModel constructor(
     fun reset() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (!serialManager.pause.value) {
-                if (serialManager.lock.value) {
+            if (!SM.pause.value) {
+                if (SM.lock.value) {
                     PopTip.show("运动中禁止复位")
                 } else {
-                    serialManager.reset()
+                    SM.reset()
                     PopTip.show("复位-已下发")
                 }
             } else {
@@ -129,12 +129,12 @@ class HomeViewModel constructor(
     fun waste() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (serialManager.lock.value) {
+            if (SM.lock.value) {
                 PopTip.show("运动中")
             } else {
                 _uiState.value.container?.let {
-                    executionManager.executor(
-                        executionManager.generator(
+                    EM.actuator(
+                        EM.builder(
                             x = it.xAxis,
                             y = it.yAxis,
                         )
@@ -148,11 +148,11 @@ class HomeViewModel constructor(
         viewModelScope.launch {
             if (type == 0) {
                 val washJob = launch {
-                    serialManager.sendHex(
+                    SM.sendHex(
                         index = 0,
                         hex = V1(pa = "0B", data = "0301").toHex()
                     )
-                    serialManager.sendHex(
+                    SM.sendHex(
                         index = 3,
                         hex = V1(pa = "0B", data = "0401").toHex()
                     )
@@ -164,11 +164,11 @@ class HomeViewModel constructor(
             } else {
                 _uiState.value.washJob?.cancel()
                 _uiState.value = _uiState.value.copy(washJob = null)
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 0,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 3,
                     hex = V1(pa = "0B", data = "0400").toHex()
                 )
@@ -179,20 +179,20 @@ class HomeViewModel constructor(
     fun fill(type: Int) {
         viewModelScope.launch {
             if (type == 0) {
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 0,
                     hex = V1(pa = "0B", data = "0301").toHex()
                 )
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 3,
                     hex = V1(pa = "0B", data = "0401").toHex()
                 )
             } else {
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 0,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 3,
                     hex = V1(pa = "0B", data = "0400").toHex()
                 )
@@ -203,20 +203,20 @@ class HomeViewModel constructor(
     fun suckBack(type: Int) {
         viewModelScope.launch {
             if (type == 0) {
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 0,
                     hex = V1(pa = "0B", data = "0302").toHex()
                 )
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 3,
                     hex = V1(pa = "0B", data = "0402").toHex()
                 )
             } else {
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 0,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 3,
                     hex = V1(pa = "0B", data = "0400").toHex()
                 )
@@ -341,7 +341,7 @@ class HomeViewModel constructor(
                                     updateLog(l.copy(status = 1))
                                 }
                                 delay(500L)
-                                while (serialManager.lock.value) {
+                                while (SM.lock.value) {
                                     delay(100L)
                                 }
                                 waste()
@@ -373,45 +373,45 @@ class HomeViewModel constructor(
                 process = 0
             )
         )
-        serialManager.pause(false)
+        SM.pause(false)
     }
 
     fun pause() {
         _uiState.value = _uiState.value.copy(pause = !_uiState.value.pause)
-        serialManager.pause(_uiState.value.pause)
+        SM.pause(_uiState.value.pause)
     }
 
     private fun updateLog(log: Log) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(log = log)
-            logDao.insert(log)
+            LD.insert(log)
         }
     }
 
 }
 
 data class HomeUiState(
-    val programList: List<Program> = emptyList(),
-    val pointList: List<Point> = emptyList(),
-    val log: Log? = null,
     val container: Container? = null,
-    val program: Program? = null,
-    val job: Job? = null,
-    val washJob: Job? = null,
-    val pause: Boolean = false,
-    val time: Long = 0L,
     val info: CurrentInfo = CurrentInfo(),
+    val job: Job? = null,
+    val log: Log? = null,
+    val pause: Boolean = false,
+    val pointList: List<Point> = emptyList(),
+    val program: Program? = null,
+    val programList: List<Program> = emptyList(),
+    val time: Long = 0L,
+    val washJob: Job? = null,
 )
 
 data class CurrentInfo(
-    val index: String = "/",
-    val size: Pair<Int, Int> = Pair(8, 12),
-    val tripleList: List<Triple<Int, Int, Boolean>> = emptyList(),
-    val liquid: String = "/",
-    val speed: Float = 0f,
-    val lastTime: Long = 0L,
     val color: Int = Color.GREEN,
+    val index: String = "/",
+    val lastTime: Long = 0L,
+    val liquid: String = "/",
     val process: Int = 0,
+    val size: Pair<Int, Int> = Pair(8, 12),
+    val speed: Float = 0f,
+    val tripleList: List<Triple<Int, Int, Boolean>> = emptyList(),
 )
 
 data class Settings(

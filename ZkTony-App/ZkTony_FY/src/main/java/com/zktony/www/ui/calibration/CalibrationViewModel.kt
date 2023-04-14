@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CalibrationViewModel constructor(
-    private val dao: CalibrationDao,
-    private val dataDao: CalibrationDataDao
+    private val CD: CalibrationDao,
+    private val CDD: CalibrationDataDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow<List<Calibration>?>(null)
@@ -19,7 +19,7 @@ class CalibrationViewModel constructor(
 
     init {
         viewModelScope.launch {
-            dao.getAll().distinctUntilChanged().collect {
+            CD.getAll().distinctUntilChanged().collect {
                 _uiState.value = it
             }
         }
@@ -36,7 +36,7 @@ class CalibrationViewModel constructor(
                 PopTip.show("校准程序名已存在")
             } else {
                 val calibration = Calibration(name = name)
-                dao.insert(calibration)
+                CD.insert(calibration)
                 block(calibration.id)
             }
         }
@@ -44,11 +44,11 @@ class CalibrationViewModel constructor(
 
     fun delete(calibration: Calibration) {
         viewModelScope.launch {
-            dao.delete(calibration)
-            dataDao.deleteBySubId(calibration.id)
+            CD.delete(calibration)
+            CDD.deleteBySubId(calibration.id)
             if (calibration.enable == 1) {
                 val cali = _uiState.value?.find { it.name == "默认" }
-                cali?.let { dao.update(it.copy(enable = 1)) }
+                cali?.let { CD.update(it.copy(enable = 1)) }
             }
         }
     }
@@ -57,10 +57,10 @@ class CalibrationViewModel constructor(
         viewModelScope.launch {
             val cali = _uiState.value?.find { it.enable == 1 }
             if (cali == null) {
-                dao.update(calibration.copy(enable = 1))
+                CD.update(calibration.copy(enable = 1))
             } else {
                 if (cali.id != calibration.id) {
-                    dao.updateAll(
+                    CD.updateAll(
                         listOf(
                             cali.copy(enable = 0),
                             calibration.copy(enable = 1)

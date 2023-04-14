@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 
 class ActionViewModel constructor(
-    private val programDao: ProgramDao,
-    private val actionDao: ActionDao
+    private val PD: ProgramDao,
+    private val AD: ActionDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(ActionUiState())
@@ -27,7 +27,7 @@ class ActionViewModel constructor(
     fun init(id: String) {
         viewModelScope.launch {
             if (id.isNotEmpty()) {
-                actionDao.getByProgramId(id).collect { actionList ->
+                AD.getByProgramId(id).collect { actionList ->
                     _uiState.value = _uiState.value.copy(
                         actionList = actionList,
                         programId = id
@@ -43,7 +43,7 @@ class ActionViewModel constructor(
     fun insert() {
         viewModelScope.launch {
             val uiState = _uiState.value
-            actionDao.insert(
+            AD.insert(
                 Action(
                     id = UUID.randomUUID().toString(),
                     programId = uiState.programId,
@@ -69,7 +69,7 @@ class ActionViewModel constructor(
      */
     fun delete(action: Action) {
         viewModelScope.launch {
-            actionDao.delete(action)
+            AD.delete(action)
             delay(500L)
             PopTip.show("已删除")
             updateActions()
@@ -81,7 +81,7 @@ class ActionViewModel constructor(
      */
     private fun updateActions() {
         viewModelScope.launch {
-            actionDao.getByProgramId(_uiState.value.programId).firstOrNull()?.let {
+            AD.getByProgramId(_uiState.value.programId).firstOrNull()?.let {
                 val str = StringBuilder()
                 if (it.isNotEmpty()) {
                     it.forEachIndexed { index, action ->
@@ -93,8 +93,8 @@ class ActionViewModel constructor(
                 } else {
                     str.append("没有任何操作，去添加吧...")
                 }
-                programDao.getById(_uiState.value.programId).firstOrNull()?.let { program ->
-                    programDao.update(
+                PD.getById(_uiState.value.programId).firstOrNull()?.let { program ->
+                    PD.update(
                         program.copy(
                             actions = str.toString(),
                             actionCount = it.size

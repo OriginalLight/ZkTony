@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ContainerViewModel constructor(
-    private val dao: ContainerDao,
-    private val pointDao: PointDao
+    private val CD: ContainerDao,
+    private val PD: PointDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(ContainerUiState())
@@ -22,7 +22,7 @@ class ContainerViewModel constructor(
 
     init {
         viewModelScope.launch {
-            dao.getAll().collect {
+            CD.getAll().collect {
                 _uiState.value = _uiState.value.copy(list = it)
             }
         }
@@ -30,8 +30,8 @@ class ContainerViewModel constructor(
 
     fun delete(container: Container) {
         viewModelScope.launch {
-            dao.delete(container)
-            pointDao.deleteBySubId(container.id)
+            CD.delete(container)
+            PD.deleteBySubId(container.id)
         }
     }
 
@@ -47,7 +47,7 @@ class ContainerViewModel constructor(
                     name = name,
                     type = 1
                 )
-                dao.insert(con)
+                CD.insert(con)
                 val list = mutableListOf<Point>()
                 for (i in 0 until con.size) {
                     list.add(
@@ -58,7 +58,7 @@ class ContainerViewModel constructor(
                         )
                     )
                 }
-                pointDao.insertAll(list)
+                PD.insertAll(list)
                 function(con.id)
             }
         }

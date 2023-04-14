@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ProgramViewModel constructor(
-    private val dao: ProgramDao
+    private val PD: ProgramDao
 ) : BaseViewModel() {
 
     private val _programList = MutableStateFlow(emptyList<Program>())
@@ -17,7 +17,7 @@ class ProgramViewModel constructor(
 
     init {
         viewModelScope.launch {
-            dao.getAll().collect {
+            PD.getAll().collect {
                 _programList.value = it
             }
         }
@@ -29,7 +29,7 @@ class ProgramViewModel constructor(
      */
     fun delete(program: Program) {
         viewModelScope.launch {
-            dao.delete(program)
+            PD.delete(program)
         }
     }
 

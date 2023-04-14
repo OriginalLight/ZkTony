@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ProgramViewModel constructor(
-    private val dao: ProgramDao,
-    private val pointDao: PointDao,
+    private val PD: PointDao,
+    private val PGD: ProgramDao,
 ) : BaseViewModel() {
 
     private val _programList = MutableStateFlow<List<Program>>(emptyList())
@@ -19,7 +19,7 @@ class ProgramViewModel constructor(
 
     init {
         viewModelScope.launch {
-            dao.getAll().distinctUntilChanged().collect {
+            PGD.getAll().distinctUntilChanged().collect {
                 _programList.value = it
             }
         }
@@ -27,8 +27,8 @@ class ProgramViewModel constructor(
 
     fun delete(program: Program) {
         viewModelScope.launch {
-            dao.delete(program)
-            pointDao.deleteBySubId(program.id)
+            PGD.delete(program)
+            PD.deleteBySubId(program.id)
         }
     }
 
@@ -43,7 +43,7 @@ class ProgramViewModel constructor(
                 PopTip.show("已存在相同名称的程序")
             } else {
                 val program = Program(name = name)
-                dao.insert(program)
+                PGD.insert(program)
                 block(program.id)
             }
         }

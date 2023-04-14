@@ -55,12 +55,12 @@ class ProgramExecutor constructor(
                                     while (serialManager.lock.value || serialManager.pause.value) {
                                         delay(100)
                                     }
-                                    executionManager.executor(
-                                        executionManager.generator(
+                                    executionManager.actuator(
+                                        executionManager.builder(
                                             x = it.xAxis + settings.needleSpace * e,
                                             y = it.yAxis
                                         ),
-                                        executionManager.generator(
+                                        executionManager.builder(
                                             x = it.xAxis + settings.needleSpace * e,
                                             y = it.yAxis,
                                             v1 = if (e == 0) it.v1.toFloat() else 0f,

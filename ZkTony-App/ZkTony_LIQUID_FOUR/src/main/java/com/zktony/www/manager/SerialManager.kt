@@ -4,7 +4,7 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.ext.*
 import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
-import com.zktony.www.common.ext.toCommand
+import com.zktony.www.common.ext.toV1
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,7 +69,7 @@ class SerialManager {
             launch {
                 ttys0Flow.collect {
                     it?.let {
-                        val res = it.toCommand()
+                        val res = it.toV1()
                         when (res.fn) {
                             "85" -> {
                                 if (res.pa == "01") {
@@ -106,12 +106,6 @@ class SerialManager {
         }
     }
 
-    fun init() {
-        scope.launch {
-            "串口管理器初始化完成！！！".logi()
-        }
-    }
-
     suspend fun reset() {
         while (lock.value) {
             delay(500L)
@@ -142,4 +136,9 @@ class SerialManager {
             lockTime = 0L
         }
     }
+
+    fun initializer() {
+        "串口管理器初始化完成！！！".logi()
+    }
+
 }

@@ -24,11 +24,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class HomeViewModel constructor(
-    private val programDao: ProgramDao,
-    private val logRecordDao: LogRecordDao,
-    private val logDataDao: LogDataDao,
-    private val serialManager: SerialManager,
-    private val dataStore: DataStore<Preferences>
+    private val PD: ProgramDao,
+    private val LRD: LogRecordDao,
+    private val LDD: LogDataDao,
+    private val SM: SerialManager,
+    private val DS: DataStore<Preferences>
 ) : BaseViewModel() {
 
     private val _uiStateX = MutableStateFlow(HomeUiState())
@@ -46,7 +46,7 @@ class HomeViewModel constructor(
     init {
         viewModelScope.launch {
             launch {
-                programDao.getAll().collect {
+                PD.getAll().collect {
                     _programList.value = listOf(
                         Program(
                             name = "洗涤",
@@ -63,7 +63,7 @@ class HomeViewModel constructor(
             }
             launch {
                 delay(100)
-                serialManager.received.collect {
+                SM.received.collect {
                     _uiStateX.value = _uiStateX.value.copy(
                         currentMotor = it.stepMotorX,
                         currentVoltage = it.getVoltageX,
@@ -78,27 +78,27 @@ class HomeViewModel constructor(
             }
             launch {
                 launch {
-                    dataStore.read(Constants.AUDIO, true).collect {
+                    DS.read(Constants.AUDIO, true).collect {
                         _setting.value = _setting.value.copy(audio = it)
                     }
                 }
                 launch {
-                    dataStore.read(Constants.DETECT, true).collect {
+                    DS.read(Constants.DETECT, true).collect {
                         _setting.value = _setting.value.copy(detect = it)
                     }
                 }
                 launch {
-                    dataStore.read(Constants.INTERVAL, 1).collect {
+                    DS.read(Constants.INTERVAL, 1).collect {
                         _setting.value = _setting.value.copy(interval = it)
                     }
                 }
                 launch {
-                    dataStore.read(Constants.DURATION, 10).collect {
+                    DS.read(Constants.DURATION, 10).collect {
                         _setting.value = _setting.value.copy(duration = it)
                     }
                 }
                 launch {
-                    dataStore.read(Constants.MOTOR_SPEED, 160).collect {
+                    DS.read(Constants.MOTOR_SPEED, 160).collect {
                         _setting.value = _setting.value.copy(motorSpeed = it)
                     }
                 }
@@ -214,7 +214,7 @@ class HomeViewModel constructor(
      * @param xy 模块
      */
     fun pumpUpOrBack(upOrBack: Int, start: Int, xy: Int) {
-        val latest = serialManager.send.value
+        val latest = SM.send.value
         var speed = _setting.value.motorSpeed
         if (upOrBack == 1) speed = -speed
         if (xy == 0) {
@@ -223,14 +223,14 @@ class HomeViewModel constructor(
             } else {
                 speed = _uiStateX.value.motorCache
             }
-            serialManager.send(latest.apply { stepMotorX = speed })
+            SM.send(latest.apply { stepMotorX = speed })
         } else {
             if (start == 0) {
                 _uiStateY.value = _uiStateY.value.copy(motorCache = latest.stepMotorY)
             } else {
                 speed = _uiStateY.value.motorCache
             }
-            serialManager.send(latest.apply { stepMotorY = speed })
+            SM.send(latest.apply { stepMotorY = speed })
         }
     }
 
@@ -248,8 +248,8 @@ class HomeViewModel constructor(
         // 开始计时
         val job = viewModelScope.launch {
             if (state.value.programName == "洗涤") {
-                val latest = serialManager.send.value
-                serialManager.send(latest.apply {
+                val latest = SM.send.value
+                SM.send(latest.apply {
                     stepMotorX = if (xy == 0) state.value.motor else latest.stepMotorX
                     stepMotorY = if (xy == 1) state.value.motor else latest.stepMotorY
                 })
@@ -266,8 +266,8 @@ class HomeViewModel constructor(
                 delay(1000)
                 state.value = state.value.copy(currentTime = i.getTimeFormat())
                 if (i == 20 && state.value.programName == "洗涤") {
-                    val latest = serialManager.send.value
-                    serialManager.send(latest.apply {
+                    val latest = SM.send.value
+                    SM.send(latest.apply {
                         stepMotorX = if (xy == 0) -state.value.motor else latest.stepMotorX
                         stepMotorY = if (xy == 1) -state.value.motor else latest.stepMotorY
                     })
@@ -289,10 +289,10 @@ class HomeViewModel constructor(
                     voltage = state.value.voltage,
                     time = state.value.time,
                 )
-                logRecordDao.insert(log)
+                LRD.insert(log)
                 for (i in 0..(state.value.time * 60).toInt() step 5) {
-                    val rec = serialManager.received.value
-                    logDataDao.insert(
+                    val rec = SM.received.value
+                    LDD.insert(
                         LogData().copy(
                             logId = log.id,
                             time = i,
@@ -326,8 +326,8 @@ class HomeViewModel constructor(
         if (state.value.programName != "洗涤") {
             startOrStop(false, xy)
         } else {
-            val latest = serialManager.send.value
-            serialManager.send(latest.apply {
+            val latest = SM.send.value
+            SM.send(latest.apply {
                 stepMotorX = if (xy == 0) 0 else latest.stepMotorX
                 stepMotorY = if (xy == 1) 0 else latest.stepMotorY
             })
@@ -360,10 +360,10 @@ class HomeViewModel constructor(
      * @param xy 模块
      */
     private fun startOrStop(start: Boolean, xy: Int) {
-        val latest = serialManager.send.value
+        val latest = SM.send.value
         val state = getUiState(xy)
         if (start) {
-            serialManager.send(latest.apply {
+            SM.send(latest.apply {
                 powerENX = if (xy == 0) 1 else latest.powerENX
                 powerENY = if (xy == 1) 1 else latest.powerENY
                 autoX = if (xy == 0) 1 else latest.autoX
@@ -374,7 +374,7 @@ class HomeViewModel constructor(
                 targetVoltageY = if (xy == 1) state.value.voltage else latest.targetVoltageY
             })
         } else {
-            serialManager.send(latest.apply {
+            SM.send(latest.apply {
                 powerENX = if (xy == 0) 0 else latest.powerENX
                 powerENY = if (xy == 1) 0 else latest.powerENY
                 autoX = if (xy == 0) 0 else latest.autoX
@@ -395,7 +395,7 @@ class HomeViewModel constructor(
             val job = viewModelScope.launch {
                 while (true) {
                     delay(5000L)
-                    val rec = serialManager.received.value
+                    val rec = SM.received.value
                     var msg = ""
                     if (rec.powerENX == 1 && rec.powerENY == 0) {
                         if (rec.getCurrentX < ERROR_CURRENT) {
@@ -455,13 +455,13 @@ class HomeViewModel constructor(
                     delay(interval * 60 * 1000L)
                     viewModelScope.launch {
                         // 开启直流泵
-                        serialManager.send(serialManager.send.value.apply {
+                        SM.send(SM.send.value.apply {
                             motorX = 1
                             motorY = 1
                         })
                         delay(duration * 1000L)
                         // 关闭直流泵
-                        serialManager.send(serialManager.send.value.apply {
+                        SM.send(SM.send.value.apply {
                             motorX = 0
                             motorY = 0
                         })
@@ -481,7 +481,7 @@ class HomeViewModel constructor(
         viewModelScope.launch {
             val state = getUiState(xy = xy)
             state.value.program?.let {
-                programDao.update(
+                PD.update(
                     it.copy(
                         count = it.count + 1,
                         upload = 0

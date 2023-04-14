@@ -163,9 +163,9 @@ class CommandExecutor constructor(
      * 主机命令生成器
      */
     private fun addLiquid(y: Float, z: Float) {
-        executionManager.executor(
-            executionManager.generator(y = y),
-            executionManager.generator(
+        executionManager.actuator(
+            executionManager.builder(y = y),
+            executionManager.builder(
                 y = y,
                 z = z,
                 v1 = if (module == 0) action.liquidVolume else 0f,
@@ -174,7 +174,7 @@ class CommandExecutor constructor(
                 v4 = if (module == 3) action.liquidVolume else 0f,
                 v5 = if (action.mode == 3) action.liquidVolume else 0f
             ),
-            executionManager.generator(
+            executionManager.builder(
                 y = y,
                 v1 = if (module == 0) 15000f else 0f,
                 v2 = if (module == 1) 15000f else 0f,
@@ -190,9 +190,9 @@ class CommandExecutor constructor(
      */
     private fun recycleLiquid(y: Float, z: Float) {
         val volume = -(action.liquidVolume + 20000f)
-        executionManager.executor(
-            executionManager.generator(y = y),
-            executionManager.generator(
+        executionManager.actuator(
+            executionManager.builder(y = y),
+            executionManager.builder(
                 y = y,
                 z = z,
                 v1 = if (module == 0) volume else 0f,
@@ -201,7 +201,7 @@ class CommandExecutor constructor(
                 v4 = if (module == 3) volume else 0f,
                 v6 = action.liquidVolume + 20000f
             ),
-            executionManager.generator(y = y)
+            executionManager.builder(y = y)
         )
     }
 

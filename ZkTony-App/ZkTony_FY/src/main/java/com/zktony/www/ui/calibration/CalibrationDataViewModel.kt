@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CalibrationDataViewModel constructor(
-    private val dao: CalibrationDao,
-    private val dataDao: CalibrationDataDao,
-    private val containerDao: ContainerDao,
-    private val serialManager: SerialManager,
-    private val executionManager: ExecutionManager,
+    private val CD: CalibrationDao,
+    private val CDD: CalibrationDataDao,
+    private val COND: ContainerDao,
+    private val SM: SerialManager,
+    private val EM: ExecutionManager,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(CalibrationDataUiState())
@@ -23,14 +23,14 @@ class CalibrationDataViewModel constructor(
     init {
         viewModelScope.launch {
             launch {
-                containerDao.getAll().distinctUntilChanged().collect {
+                COND.getAll().distinctUntilChanged().collect {
                     if (it.isNotEmpty()) {
                         _uiState.value = _uiState.value.copy(container = it.first())
                     }
                 }
             }
             launch {
-                serialManager.lock.collect {
+                SM.lock.collect {
                     _uiState.value = _uiState.value.copy(lock = it)
                 }
             }
@@ -40,12 +40,12 @@ class CalibrationDataViewModel constructor(
     fun load(id: String) {
         viewModelScope.launch {
             launch {
-                dao.getById(id).distinctUntilChanged().collect {
+                CD.getById(id).distinctUntilChanged().collect {
                     _uiState.value = _uiState.value.copy(cali = it)
                 }
             }
             launch {
-                dataDao.getBySubId(id).distinctUntilChanged().collect {
+                CDD.getBySubId(id).distinctUntilChanged().collect {
                     _uiState.value = _uiState.value.copy(caliData = it)
                 }
             }
@@ -58,7 +58,7 @@ class CalibrationDataViewModel constructor(
 
     fun delete(data: CalibrationData) {
         viewModelScope.launch {
-            dataDao.delete(data)
+            CDD.delete(data)
             calculateActual(data.calibrationId)
         }
     }
@@ -68,9 +68,9 @@ class CalibrationDataViewModel constructor(
         val liquid = _uiState.value.expect
         val motorId = _uiState.value.pumpId
         if (motorId < 4) {
-            executionManager.executor(
-                executionManager.generator(y = con.washY),
-                executionManager.generator(
+            EM.actuator(
+                EM.builder(y = con.washY),
+                EM.builder(
                     y = con.washY,
                     z = con.washZ,
                     v1 = if (motorId == 0) liquid else 0f,
@@ -78,23 +78,23 @@ class CalibrationDataViewModel constructor(
                     v3 = if (motorId == 2) liquid else 0f,
                     v4 = if (motorId == 3) liquid else 0f,
                 ),
-                executionManager.generator(
+                EM.builder(
                     y = con.washY,
                     v1 = if (motorId == 0) 15000f else 0f,
                     v2 = if (motorId == 1) 15000f else 0f,
                     v3 = if (motorId == 2) 15000f else 0f,
                     v4 = if (motorId == 3) 15000f else 0f,
                 ),
-                executionManager.generator()
+                EM.builder()
             )
         } else {
-            executionManager.executor(
-                executionManager.generator(),
-                executionManager.generator(
+            EM.actuator(
+                EM.builder(),
+                EM.builder(
                     v5 = if (motorId == 4) liquid else 0f,
                     v6 = if (motorId == 5) liquid else 0f,
                 ),
-                executionManager.generator()
+                EM.builder()
             )
         }
     }
@@ -107,7 +107,7 @@ class CalibrationDataViewModel constructor(
                 expect = _uiState.value.expect,
                 actual = _uiState.value.actual,
             )
-            dataDao.insert(data)
+            CDD.insert(data)
             calculateActual(data.calibrationId)
         }
     }
@@ -125,8 +125,8 @@ class CalibrationDataViewModel constructor(
     }
 
     private suspend fun calculateActual(id: String) {
-        val cali = dao.getById(id).firstOrNull()
-        val dataList = dataDao.getBySubId(id).firstOrNull()
+        val cali = CD.getById(id).firstOrNull()
+        val dataList = CDD.getBySubId(id).firstOrNull()
         var v1 = 180f
         var v2 = 180f
         var v3 = 180f
@@ -165,7 +165,7 @@ class CalibrationDataViewModel constructor(
                 }
             }
         }
-        dao.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3, v4 = v4, v5 = v5, v6 = v6))
+        CD.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3, v4 = v4, v5 = v5, v6 = v6))
     }
 
 }

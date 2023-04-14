@@ -19,12 +19,12 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 class HomeViewModel constructor(
-    private val programDao: ProgramDao,
-    private val actionDao: ActionDao,
-    private val logDao: LogDao,
-    private val containerDao: ContainerDao,
-    private val serialManager: SerialManager,
-    private val dataStore: DataStore<Preferences>,
+    private val PD: ProgramDao,
+    private val AD: ActionDao,
+    private val LD: LogDao,
+    private val CD: ContainerDao,
+    private val SM: SerialManager,
+    private val DS: DataStore<Preferences>,
 ) : BaseViewModel() {
 
 
@@ -45,13 +45,13 @@ class HomeViewModel constructor(
     init {
         viewModelScope.launch {
             launch {
-                programDao.getAll().collect {
+                PD.getAll().collect {
                     _programFlow.value = it
                     onProgramChange(it)
                 }
             }
             launch {
-                containerDao.getAll().collect {
+                CD.getAll().collect {
                     if (it.isNotEmpty()) {
                         _buttonFlow.value = _buttonFlow.value.copy(container = it[0])
                     }
@@ -59,7 +59,7 @@ class HomeViewModel constructor(
             }
             launch {
                 // 串口四flow
-                serialManager.ttys3Flow.collect {
+                SM.ttys3Flow.collect {
                     it?.let {
                         if (it.startsWith("TC1:TCACTUALTEMP=")) {
                             // 读取温度
@@ -81,7 +81,7 @@ class HomeViewModel constructor(
                 // 设置和定时查询温控
                 for (i in 0..4) {
                     delay(500L)
-                    serialManager.setTemp(
+                    SM.setTemp(
                         addr = i,
                         temp = if (i == 0) _settings.value.temp.toString()
                             .removeZero() else "26"
@@ -91,7 +91,7 @@ class HomeViewModel constructor(
                 while (true) {
                     for (i in 0..4) {
                         delay(300L)
-                        serialManager.sendText(
+                        SM.sendText(
                             index = 3, text = V1.queryTemp(i.toString())
                         )
                     }
@@ -100,12 +100,12 @@ class HomeViewModel constructor(
             }
             launch {
                 launch {
-                    dataStore.read(Constants.TEMP, 3.0f).collect {
+                    DS.read(Constants.TEMP, 3.0f).collect {
                         _settings.value = _settings.value.copy(temp = it)
                     }
                 }
                 launch {
-                    dataStore.read(Constants.RECYCLE, true).collect {
+                    DS.read(Constants.RECYCLE, true).collect {
                         _settings.value = _settings.value.copy(recycle = it)
                     }
                 }
@@ -196,7 +196,7 @@ class HomeViewModel constructor(
             val job = launch {
                 // 将程序中的所有步骤排序放入队列
                 val actionQueue = Queue<Action>()
-                actionDao.getByProgramId(state.value.program!!.id).first().forEach {
+                AD.getByProgramId(state.value.program!!.id).first().forEach {
                     actionQueue.enqueue(it)
                 }
                 // 创建程序执行者
@@ -271,13 +271,13 @@ class HomeViewModel constructor(
                     programName = state.value.program?.name ?: "None",
                     module = module,
                 )
-                logDao.insert(log)
+                LD.insert(log)
                 // 更新状态中的job和日志
                 state.value = state.value.copy(
                     job = job, log = log
                 )
                 // 更新当前程序的运行次数
-                programDao.update(
+                PD.update(
                     state.value.program!!.copy(
                         runCount = state.value.program!!.runCount + 1
                     )
@@ -307,7 +307,7 @@ class HomeViewModel constructor(
             )
             // 恢复到室温
             delay(200L)
-            serialManager.setTemp(addr = module + 1, temp = temp)
+            SM.setTemp(addr = module + 1, temp = temp)
         }
     }
 
@@ -317,11 +317,11 @@ class HomeViewModel constructor(
     fun reset() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (!serialManager.run.value) {
-                if (serialManager.lock.value) {
+            if (!SM.run.value) {
+                if (SM.lock.value) {
                     PopTip.show("运动中禁止复位")
                 } else {
-                    serialManager.reset()
+                    SM.reset()
                     PopTip.show("复位-已下发")
                 }
             } else {
@@ -333,11 +333,11 @@ class HomeViewModel constructor(
     fun fill(flag: Int) {
         viewModelScope.launch {
             if (flag == 0) {
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 2, hex = V1(pa = "0B", data = "0201").toHex()
                 )
             } else {
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 2, hex = V1(pa = "0B", data = "0200").toHex()
                 )
             }
@@ -349,16 +349,16 @@ class HomeViewModel constructor(
      */
     fun shakeBed() {
         viewModelScope.launch {
-            if (!serialManager.lock.value) {
-                val swing = serialManager.swing.value
+            if (!SM.lock.value) {
+                val swing = SM.swing.value
                 PopTip.show(
                     if (swing) "摇床-已暂停" else "摇床-已恢复"
                 )
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 0, hex = if (swing) V1.pauseShakeBed() else V1.resumeShakeBed()
                 )
                 // 更新状态
-                serialManager.swing(!swing)
+                SM.swing(!swing)
             }
         }
     }
@@ -371,7 +371,7 @@ class HomeViewModel constructor(
             // insulatingEnable false 未保温状态 true 保温状态
             // 发送设置温度命令 -> 更改按钮状态
             // 发送设置温度命令 如果当前是未保温状态发送设置中的温度，否则发送室温26度
-            serialManager.setTemp(
+            SM.setTemp(
                 addr = 0, temp = if (_buttonFlow.value.insulating) "26"
                 else _settings.value.temp.toString().removeZero()
             )
@@ -387,14 +387,14 @@ class HomeViewModel constructor(
             _buttonFlow.value = _buttonFlow.value.copy(
                 lock = false
             )
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 0, hex = V1.openLock()
             )
             delay(10 * 1000L)
             _buttonFlow.value = _buttonFlow.value.copy(
                 lock = true
             )
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 0, hex = V1.closeLock()
             )
         }
@@ -404,7 +404,7 @@ class HomeViewModel constructor(
         viewModelScope.launch {
             val state = flow(module)
             state.value = state.value.copy(log = log)
-            logDao.insert(log)
+            LD.insert(log)
         }
     }
 }

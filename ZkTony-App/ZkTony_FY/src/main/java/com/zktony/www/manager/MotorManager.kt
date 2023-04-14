@@ -1,100 +1,162 @@
 package com.zktony.www.manager
 
+import com.zktony.core.ext.int8ToHex
 import com.zktony.core.ext.logi
+import com.zktony.www.common.ext.toMotor
+import com.zktony.www.common.ext.toV1
+import com.zktony.www.manager.protocol.V1
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Calibration
 import com.zktony.www.room.entity.Motor
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.firstOrNull
 
 /**
  * @author: 刘贺贺
  * @date: 2023-01-30 14:27
  */
 class MotorManager(
-    private val motorDao: MotorDao,
-    private val calibrationDao: CalibrationDao,
+    private val MD: MotorDao,
+    private val CD: CalibrationDao,
+    private val SM: SerialManager,
 ) {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
-    private var x: Motor = Motor()
-    private var y: Motor = Motor()
-    private var z: Motor = Motor()
-    private var p1: Motor = Motor()
-    private var p2: Motor = Motor()
-    private var p3: Motor = Motor()
-    private var p4: Motor = Motor()
-    private var p5: Motor = Motor()
-    private var p6: Motor = Motor()
-    private var cali: Calibration = Calibration()
+    /**
+     *  0: X轴 1: Y轴 2: Z轴 3: 泵1 4: 泵2 5: 泵3 6: 泵4 7: 泵5 8: 泵6
+     */
+    private val hpm: MutableMap<Int, Motor> = HashMap()
+    private val hpc: MutableMap<Int, Float> = HashMap()
 
     init {
         scope.launch {
             launch {
-                motorDao.getAll().collect {
+                MD.getAll().collect {
                     if (it.isNotEmpty()) {
-                        x = it.find { m -> m.id == 0 } ?: Motor()
-                        y = it.find { m -> m.id == 1 } ?: Motor()
-                        z = it.find { m -> m.id == 2 } ?: Motor()
-                        p1 = it.find { m -> m.id == 3 } ?: Motor()
-                        p2 = it.find { m -> m.id == 4 } ?: Motor()
-                        p3 = it.find { m -> m.id == 5 } ?: Motor()
-                        p4 = it.find { m -> m.id == 6 } ?: Motor()
-                        p5 = it.find { m -> m.id == 7 } ?: Motor()
-                        p6 = it.find { m -> m.id == 8 } ?: Motor()
+                        hpm.clear()
+                        it.forEach { it1 ->
+                            hpm[it1.id] = it1
+                        }
                     } else {
-                        val motorList = mutableListOf<Motor>()
-                        motorList.add(Motor(id = 0, name = "X轴", address = 1))
-                        motorList.add(Motor(id = 1, name = "Y轴", address = 2))
-                        motorList.add(Motor(id = 2, name = "Z轴", address = 3))
+                        val list = mutableListOf<Motor>()
+                        list.add(Motor(id = 0, name = "X轴", address = 1))
+                        list.add(Motor(id = 1, name = "Y轴", address = 2))
+                        list.add(Motor(id = 2, name = "Z轴", address = 3))
                         for (i in 1..6) {
                             val motor = Motor(
                                 id = i + 2,
                                 name = "泵$i",
                                 address = if (i <= 3) i else i - 3,
                             )
-                            motorList.add(motor)
+                            list.add(motor)
                         }
-                        motorDao.insertAll(motorList)
+                        MD.insertAll(list)
                     }
                 }
             }
             launch {
-                calibrationDao.getAll().collect {
+                CD.getAll().collect {
                     if (it.isNotEmpty()) {
-                        cali = it.find { c -> c.enable == 1 } ?: Calibration()
+                        it.find { c -> c.enable == 1 }?.let { c ->
+                            hpc.clear()
+                            hpc[0] = c.x
+                            hpc[1] = c.y
+                            hpc[2] = c.z
+                            hpc[3] = c.v1
+                            hpc[4] = c.v2
+                            hpc[5] = c.v3
+                            hpc[6] = c.v4
+                            hpc[7] = c.v5
+                            hpc[8] = c.v6
+                        }
                     } else {
-                        calibrationDao.insert(Calibration(enable = 1))
+                        CD.insert(Calibration(enable = 1))
+                    }
+                }
+            }
+            launch {
+                delay(5000L)
+                if (!SM.lock.value) {
+                    for (i in 0..2) {
+                        for (j in 1..3) {
+                            SM.sendHex(i, V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex())
+                            delay(200L)
+                        }
+                    }
+                }
+            }
+            launch {
+                SM.ttys0Flow.collect {
+                    it?.let {
+                        it.toV1().run {
+                            if (fn == "03" && pa == "04") {
+                                val motor = data.toMotor()
+                                sync(motor.copy(id = motor.address - 1))
+                            }
+                        }
+                    }
+                }
+            }
+            launch {
+                SM.ttys1Flow.collect {
+                    it?.let {
+                        it.toV1().run {
+                            if (fn == "03" && pa == "04") {
+                                val motor = data.toMotor()
+                                sync(motor.copy(id = motor.address + 2))
+                            }
+                        }
+                    }
+                }
+            }
+            launch {
+                SM.ttys2Flow.collect {
+                    it?.let {
+                        it.toV1().run {
+                            if (fn == "03" && pa == "04") {
+                                val motor = data.toMotor()
+                                sync(motor.copy(id = motor.address + 5))
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    fun init() {
+    private fun pulse(dv: Float, type: Int): Int {
+        val me = hpm[type] ?: Motor()
+        val ce = hpc[type] ?: 200f
+        return me.pulseCount(dv, ce)
+    }
+
+    fun pulse(dv: List<Float>, type: List<Int>): List<Int> {
+        val list = mutableListOf<Int>()
+        for (i in dv.indices) {
+            list.add(pulse(dv[i], type[i]))
+        }
+        return list
+    }
+
+    private fun sync(entity: Motor) {
         scope.launch {
-            "电机管理器初始化完成！！！".logi()
+            MD.getById(entity.id).firstOrNull()?.let {
+                MD.update(
+                    it.copy(
+                        subdivision = entity.subdivision,
+                        speed = entity.speed,
+                        acceleration = entity.acceleration,
+                        deceleration = entity.deceleration,
+                        waitTime = entity.waitTime,
+                        mode = entity.mode,
+                    )
+                )
+            }
         }
     }
 
-    fun move(distance: Float, id: Int): Int {
-        return when (id) {
-            0 -> x.pulseCount(distance, cali.x)
-            1 -> y.pulseCount(distance, cali.y)
-            2 -> z.pulseCount(distance, cali.z)
-            else -> 0
-        }
-    }
-
-    fun liquid(volume: Float, id: Int): Int {
-        return when (id) {
-            0 -> p1.pulseCount(volume, cali.v1)
-            1 -> p2.pulseCount(volume, cali.v2)
-            2 -> p3.pulseCount(volume, cali.v3)
-            3 -> p4.pulseCount(volume, cali.v4)
-            4 -> p5.pulseCount(volume, cali.v5)
-            5 -> p6.pulseCount(volume, cali.v6)
-            else -> 0
-        }
+    fun initializer() {
+        "电机管理器初始化完成！！！".logi()
     }
 }

@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ContainerViewModel constructor(
-    private val dao: ContainerDao,
-    private val executionManager: ExecutionManager
+    private val CD: ContainerDao,
+    private val EM: ExecutionManager
 ) : BaseViewModel() {
 
     private val _container: MutableStateFlow<Container> = MutableStateFlow(Container())
@@ -19,7 +19,7 @@ class ContainerViewModel constructor(
 
     init {
         viewModelScope.launch {
-            dao.getAll().collect {
+            CD.getAll().collect {
                 if (it.isNotEmpty()) {
                     _container.value = it.first()
                 }
@@ -33,7 +33,7 @@ class ContainerViewModel constructor(
      */
     fun update(container: Container) {
         viewModelScope.launch {
-            dao.insert(container)
+            CD.insert(container)
         }
     }
 
@@ -42,8 +42,8 @@ class ContainerViewModel constructor(
      */
     fun toWasteY() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator(y = container.value.wasteY)
+            EM.actuator(
+                EM.builder(y = container.value.wasteY)
             )
         }
     }
@@ -53,9 +53,9 @@ class ContainerViewModel constructor(
      */
     fun toWasteZ() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator(y = container.value.wasteY),
-                executionManager.generator(y = container.value.wasteY, z = container.value.wasteZ)
+            EM.actuator(
+                EM.builder(y = container.value.wasteY),
+                EM.builder(y = container.value.wasteY, z = container.value.wasteZ)
             )
         }
     }
@@ -66,8 +66,8 @@ class ContainerViewModel constructor(
      */
     fun toWashY() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator(y = container.value.washY)
+            EM.actuator(
+                EM.builder(y = container.value.washY)
             )
         }
     }
@@ -77,9 +77,9 @@ class ContainerViewModel constructor(
      */
     fun toWashZ() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator(y = container.value.washY),
-                executionManager.generator(y = container.value.washY, z = container.value.washZ)
+            EM.actuator(
+                EM.builder(y = container.value.washY),
+                EM.builder(y = container.value.washY, z = container.value.washZ)
             )
         }
     }
@@ -89,8 +89,8 @@ class ContainerViewModel constructor(
      */
     fun toBlockY() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator(y = container.value.blockY)
+            EM.actuator(
+                EM.builder(y = container.value.blockY)
             )
         }
     }
@@ -100,9 +100,9 @@ class ContainerViewModel constructor(
      */
     fun toBlockZ() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator(y = container.value.blockY),
-                executionManager.generator(y = container.value.blockY, z = container.value.blockZ)
+            EM.actuator(
+                EM.builder(y = container.value.blockY),
+                EM.builder(y = container.value.blockY, z = container.value.blockZ)
             )
         }
     }
@@ -112,8 +112,8 @@ class ContainerViewModel constructor(
      */
     fun toOneY() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator(y = container.value.oneY)
+            EM.actuator(
+                EM.builder(y = container.value.oneY)
             )
         }
     }
@@ -123,9 +123,9 @@ class ContainerViewModel constructor(
      */
     fun toOneZ() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator(y = container.value.oneY),
-                executionManager.generator(y = container.value.oneY, z = container.value.oneZ)
+            EM.actuator(
+                EM.builder(y = container.value.oneY),
+                EM.builder(y = container.value.oneY, z = container.value.oneZ)
             )
         }
     }
@@ -135,9 +135,9 @@ class ContainerViewModel constructor(
      */
     fun toRecycleOneZ() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator(y = container.value.oneY),
-                executionManager.generator(
+            EM.actuator(
+                EM.builder(y = container.value.oneY),
+                EM.builder(
                     y = container.value.oneY,
                     z = container.value.recycleOneZ
                 )
@@ -150,8 +150,8 @@ class ContainerViewModel constructor(
      */
     fun toTwoY() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator(y = container.value.twoY)
+            EM.actuator(
+                EM.builder(y = container.value.twoY)
             )
         }
     }
@@ -161,9 +161,9 @@ class ContainerViewModel constructor(
      */
     fun toTwoZ() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator(y = container.value.twoY),
-                executionManager.generator(y = container.value.twoY, z = container.value.twoZ)
+            EM.actuator(
+                EM.builder(y = container.value.twoY),
+                EM.builder(y = container.value.twoY, z = container.value.twoZ)
             )
         }
     }
@@ -173,8 +173,8 @@ class ContainerViewModel constructor(
      */
     fun toZero() {
         viewModelScope.launch {
-            executionManager.executor(
-                executionManager.generator()
+            EM.actuator(
+                EM.builder()
             )
         }
 

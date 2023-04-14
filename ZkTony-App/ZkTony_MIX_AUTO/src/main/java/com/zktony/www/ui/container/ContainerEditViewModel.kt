@@ -15,10 +15,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class ContainerEditViewModel constructor(
-    private val dao: ContainerDao,
-    private val pointDao: PointDao,
-    private val serialManager: SerialManager,
-    private val executionManager: ExecutionManager,
+    private val CD: ContainerDao,
+    private val PD: PointDao,
+    private val SM: SerialManager,
+    private val EM: ExecutionManager,
 ) : BaseViewModel() {
 
 
@@ -28,12 +28,12 @@ class ContainerEditViewModel constructor(
     fun init(id: Long) {
         viewModelScope.launch {
             launch {
-                dao.getById(id).collect {
+                CD.getById(id).collect {
                     _uiState.value = _uiState.value.copy(container = it)
                 }
             }
             launch {
-                pointDao.getBySubId(id).collect {
+                PD.getBySubId(id).collect {
                     _uiState.value = _uiState.value.copy(list = it)
                 }
             }
@@ -45,8 +45,8 @@ class ContainerEditViewModel constructor(
         viewModelScope.launch {
             _uiState.value.container?.let {
                 if (it.size != size) {
-                    dao.update(it.copy(size = size))
-                    pointDao.deleteBySubId(it.id)
+                    CD.update(it.copy(size = size))
+                    PD.deleteBySubId(it.id)
                     val list = mutableListOf<Point>()
                     val snowflake = Snowflake(1)
                     for (i in 0 until size) {
@@ -58,7 +58,7 @@ class ContainerEditViewModel constructor(
                             )
                         )
                     }
-                    pointDao.insertAll(list)
+                    PD.insertAll(list)
                 }
             }
         }
@@ -68,7 +68,7 @@ class ContainerEditViewModel constructor(
         viewModelScope.launch {
             val point = _uiState.value.list.find { it.index == index }
             point?.let {
-                pointDao.update(it.copy(axis = axis, waste = waste))
+                PD.update(it.copy(axis = axis, waste = waste))
                 delay(500L)
                 calculateAxis()
                 delay(500L)
@@ -78,12 +78,12 @@ class ContainerEditViewModel constructor(
     }
 
     fun move(y: Float) {
-        if (serialManager.lock.value || serialManager.pause.value) {
+        if (SM.lock.value || SM.pause.value) {
             PopTip.show("机器正在运行中")
             return
         }
-        executionManager.executor(
-            executionManager.generator(y = y),
+        EM.actuator(
+            EM.builder(y = y),
         )
     }
 
@@ -116,7 +116,7 @@ class ContainerEditViewModel constructor(
                         pointList.add(it.copy(axis = minAxis + (i - minIndex) * distance))
                     }
                 }
-                pointDao.updateAll(pointList)
+                PD.updateAll(pointList)
             }
             if (maxIndex < list.size - 2) {
                 calculateAxis(maxIndex)
@@ -150,7 +150,7 @@ class ContainerEditViewModel constructor(
                         pointList.add(it.copy(waste = minAxis + (i - minIndex) * distance))
                     }
                 }
-                pointDao.updateAll(pointList)
+                PD.updateAll(pointList)
             }
             if (maxIndex < list.size - 2) {
                 calculateWaste(maxIndex)

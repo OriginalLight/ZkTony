@@ -14,8 +14,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class HomeViewModel constructor(
-    private val dataStore: DataStore<Preferences>,
-    private val serialManager: SerialManager,
+    private val DS: DataStore<Preferences>,
+    private val SM: SerialManager,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -24,7 +24,7 @@ class HomeViewModel constructor(
     init {
         viewModelScope.launch {
             launch {
-                dataStore.read("COLLOID_HISTORY", emptySet<String>()).collect {
+                DS.read("COLLOID_HISTORY", emptySet<String>()).collect {
                     _uiState.value = _uiState.value.copy(
                         colloidHistory = it
                     )
@@ -36,7 +36,7 @@ class HomeViewModel constructor(
                 }
             }
             launch {
-                dataStore.read("COAGULANT_HISTORY", emptySet<String>()).collect {
+                DS.read("COAGULANT_HISTORY", emptySet<String>()).collect {
                     _uiState.value = _uiState.value.copy(
                         coagulantHistory = it
                     )
@@ -48,7 +48,7 @@ class HomeViewModel constructor(
                 }
             }
             launch {
-                dataStore.read("PREVIOUS_COLLOID_HISTORY", emptySet<String>()).collect {
+                DS.read("PREVIOUS_COLLOID_HISTORY", emptySet<String>()).collect {
                     _uiState.value = _uiState.value.copy(
                         previousColloidHistory = it
                     )
@@ -60,7 +60,7 @@ class HomeViewModel constructor(
                 }
             }
             launch {
-                dataStore.read("PREVIOUS_COAGULANT_HISTORY", emptySet<String>()).collect {
+                DS.read("PREVIOUS_COAGULANT_HISTORY", emptySet<String>()).collect {
                     _uiState.value = _uiState.value.copy(
                         previousCoagulantHistory = it
                     )
@@ -78,10 +78,10 @@ class HomeViewModel constructor(
     fun reset() {
         viewModelScope.launch {
             if (_uiState.value.job == null) {
-                if (serialManager.lock.value) {
+                if (SM.lock.value) {
                     PopTip.show("运动中禁止复位")
                 } else {
-                    serialManager.reset()
+                    SM.reset()
                     PopTip.show("复位-已下发")
                 }
             } else {
@@ -162,11 +162,11 @@ class HomeViewModel constructor(
                     fillCoagulant = false,
                     start = false,
                 )
-                serialManager.sendHex(hex = V1(pa = "0B", data = "0300").toHex())
+                SM.sendHex(hex = V1(pa = "0B", data = "0300").toHex())
                 delay(100L)
                 reset()
             } else {
-                if (serialManager.reset.value) {
+                if (SM.reset.value) {
                     if (_uiState.value.recaptureCoagulant) {
                         PopTip.show("请先停止回吸")
                         return@launch
@@ -181,11 +181,11 @@ class HomeViewModel constructor(
                     while (_uiState.value.fillCoagulant) {
                         if (_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
-                            serialManager.sendHex(hex = V1(pa = "0B", data = "0301").toHex())
+                            SM.sendHex(hex = V1(pa = "0B", data = "0301").toHex())
                             delay(8500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
-                            serialManager.sendHex(hex = V1(pa = "0B", data = "0305").toHex())
+                            SM.sendHex(hex = V1(pa = "0B", data = "0305").toHex())
                             delay(9000L)
                         }
                     }
@@ -208,11 +208,11 @@ class HomeViewModel constructor(
                     recaptureCoagulant = false,
                     start = false
                 )
-                serialManager.sendHex(hex = V1(pa = "0B", data = "0300").toHex())
+                SM.sendHex(hex = V1(pa = "0B", data = "0300").toHex())
                 delay(100L)
                 reset()
             } else {
-                if (serialManager.reset.value) {
+                if (SM.reset.value) {
                     if (_uiState.value.fillCoagulant) {
                         PopTip.show("请先停止填充")
                         return@launch
@@ -227,11 +227,11 @@ class HomeViewModel constructor(
                     while (_uiState.value.recaptureCoagulant) {
                         if (_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
-                            serialManager.sendHex(hex = V1(pa = "0B", data = "0303").toHex())
+                            SM.sendHex(hex = V1(pa = "0B", data = "0303").toHex())
                             delay(8500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
-                            serialManager.sendHex(hex = V1(pa = "0B", data = "0304").toHex())
+                            SM.sendHex(hex = V1(pa = "0B", data = "0304").toHex())
                             delay(9000L)
                         }
                     }
@@ -252,7 +252,7 @@ class HomeViewModel constructor(
                 start = true,
                 previous = true,
             )
-            serialManager.sendHex(hex = V1(pa = "0B", data = "0401").toHex())
+            SM.sendHex(hex = V1(pa = "0B", data = "0401").toHex())
         }
     }
 
@@ -265,7 +265,7 @@ class HomeViewModel constructor(
                 start = true,
                 previous = true,
             )
-            serialManager.sendHex(hex = V1(pa = "0B", data = "0402").toHex())
+            SM.sendHex(hex = V1(pa = "0B", data = "0402").toHex())
         }
     }
 
@@ -275,7 +275,7 @@ class HomeViewModel constructor(
     fun stopFillAndRecapture() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(start = false)
-            serialManager.sendHex(hex = V1(pa = "0B", data = "0400").toHex())
+            SM.sendHex(hex = V1(pa = "0B", data = "0400").toHex())
         }
     }
 
@@ -320,7 +320,7 @@ class HomeViewModel constructor(
             val set = _uiState.value.coagulantHistory.toMutableSet()
             if (set.contains(str)) {
                 set.remove(str)
-                dataStore.save("COAGULANT_HISTORY", set)
+                DS.save("COAGULANT_HISTORY", set)
                 delay(100L)
                 set.add(str)
             } else {
@@ -329,7 +329,7 @@ class HomeViewModel constructor(
                 }
                 set.add(str)
             }
-            dataStore.save("COAGULANT_HISTORY", set)
+            DS.save("COAGULANT_HISTORY", set)
         }
     }
 
@@ -338,7 +338,7 @@ class HomeViewModel constructor(
             val set = _uiState.value.previousCoagulantHistory.toMutableSet()
             if (set.contains(str)) {
                 set.remove(str)
-                dataStore.save("PREVIOUS_COAGULANT_HISTORY", set)
+                DS.save("PREVIOUS_COAGULANT_HISTORY", set)
                 delay(100L)
                 set.add(str)
             } else {
@@ -347,7 +347,7 @@ class HomeViewModel constructor(
                 }
                 set.add(str)
             }
-            dataStore.save("PREVIOUS_COAGULANT_HISTORY", set)
+            DS.save("PREVIOUS_COAGULANT_HISTORY", set)
         }
     }
 
@@ -356,7 +356,7 @@ class HomeViewModel constructor(
             val set = _uiState.value.colloidHistory.toMutableSet()
             if (set.contains(str)) {
                 set.remove(str)
-                dataStore.save("COLLOID_HISTORY", set)
+                DS.save("COLLOID_HISTORY", set)
                 delay(100L)
                 set.add(str)
             } else {
@@ -365,7 +365,7 @@ class HomeViewModel constructor(
                 }
                 set.add(str)
             }
-            dataStore.save("COLLOID_HISTORY", set)
+            DS.save("COLLOID_HISTORY", set)
         }
     }
 
@@ -374,7 +374,7 @@ class HomeViewModel constructor(
             val set = _uiState.value.previousColloidHistory.toMutableSet()
             if (set.contains(str)) {
                 set.remove(str)
-                dataStore.save("PREVIOUS_COLLOID_HISTORY", set)
+                DS.save("PREVIOUS_COLLOID_HISTORY", set)
                 delay(100L)
                 set.add(str)
             } else {
@@ -383,7 +383,7 @@ class HomeViewModel constructor(
                 }
                 set.add(str)
             }
-            dataStore.save("PREVIOUS_COLLOID_HISTORY", set)
+            DS.save("PREVIOUS_COLLOID_HISTORY", set)
         }
     }
 

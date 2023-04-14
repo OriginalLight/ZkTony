@@ -109,12 +109,6 @@ class SerialManager {
         }
     }
 
-    fun init() {
-        scope.launch {
-            "串口管理器初始化完成！！！".logi()
-        }
-    }
-
     suspend fun reset() {
         while (lock.value) {
             delay(500L)
@@ -149,5 +143,9 @@ class SerialManager {
             _lock.value = true
             lockTime = 0L
         }
+    }
+
+    fun initializer() {
+        "串口管理器初始化完成！！！".logi()
     }
 }

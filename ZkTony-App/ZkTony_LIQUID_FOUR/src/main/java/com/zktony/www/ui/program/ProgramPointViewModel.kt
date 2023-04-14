@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ProgramPointViewModel constructor(
-    private val dao: PointDao
+    private val PD: PointDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(ProgramHoleUiState())
@@ -24,7 +24,7 @@ class ProgramPointViewModel constructor(
 
     fun init(id: Long, index: Int) {
         viewModelScope.launch {
-            dao.getBySudIdByIndex(id, index).collect {
+            PD.getBySudIdByIndex(id, index).collect {
                 _uiState.value = _uiState.value.copy(list = it)
             }
         }
@@ -32,7 +32,7 @@ class ProgramPointViewModel constructor(
 
     fun selectAll() {
         viewModelScope.launch {
-            dao.updateAll(_uiState.value.list.map {
+            PD.updateAll(_uiState.value.list.map {
                 it.copy(enable = true)
             })
         }
@@ -42,15 +42,15 @@ class ProgramPointViewModel constructor(
         viewModelScope.launch {
             if (!_uiState.value.custom) {
                 val point = _uiState.value.list.find { it.x == x && it.y == y }!!
-                dao.update(point.copy(enable = !point.enable))
+                PD.update(point.copy(enable = !point.enable))
             } else {
                 val point = _uiState.value.list.find { it.x == x && it.y == y }!!
                 if (point.enable) {
-                    dao.update(point.copy(enable = false))
+                    PD.update(point.copy(enable = false))
                 } else {
                     volumeDialog(point) {
                         viewModelScope.launch {
-                            dao.update(it)
+                            PD.update(it)
                         }
                     }
                 }
@@ -77,7 +77,7 @@ class ProgramPointViewModel constructor(
                             )
                         )
                     }
-                    dao.updateAll(list1)
+                    PD.updateAll(list1)
                 }
             }
         }

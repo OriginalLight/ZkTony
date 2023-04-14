@@ -9,19 +9,13 @@ import kotlinx.coroutines.*
  * @date: 2023-02-01 10:28
  */
 class ExecutionManager(
-    private val serialManager: SerialManager,
-    private val motorManager: MotorManager,
+    private val SM: SerialManager,
+    private val MM: MotorManager,
 ) {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
-    fun init() {
-        scope.launch {
-            "命令执行管理器初始化完成！！！".logi()
-        }
-    }
-
     // 生成器
-    fun generator(
+    fun builder(
         y: Float = 0f,
         z: Float = 0f,
         v1: Float = 0f,
@@ -31,39 +25,35 @@ class ExecutionManager(
         v5: Float = 0f,
         v6: Float = 0f
     ): Triple<String, String, String> {
-        val my = motorManager.move(y, 1)
-        val mz = motorManager.move(z, 2)
-        val mv1 = motorManager.liquid(v1, 0)
-        val mv2 = motorManager.liquid(v2, 1)
-        val mv3 = motorManager.liquid(v3, 2)
-        val mv4 = motorManager.liquid(v4, 3)
-        val mv5 = motorManager.liquid(v5, 4)
-        val mv6 = motorManager.liquid(v6, 5)
+        val list = MM.pulse(
+            listOf(y, z, v1, v2, v3, v4, v5, v6),
+            listOf(1, 2, 3, 4, 5, 6, 7, 8)
+        )
         return Triple(
-            "0,$my,$mz,",
-            "$mv1,$mv2,$mv3,",
-            "$mv4,$mv5,$mv6,"
+            "0,${list[0]},${list[1]},",
+            "${list[2]},${list[3]},${list[4]},",
+            "${list[5]},${list[6]},${list[7]},"
         )
     }
 
     // 执行器
-    fun executor(vararg gen: Triple<String, String, String>) {
+    fun actuator(vararg gen: Triple<String, String, String>) {
         scope.launch {
             val str1 = gen.joinToString("") { it.first }
             val str2 = gen.joinToString("") { it.second }
             val str3 = gen.joinToString("") { it.third }
-            while (serialManager.lock.value) {
+            while (SM.lock.value) {
                 delay(100L)
             }
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 0,
                 hex = V1.complex(data = str1)
             )
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 1,
                 hex = V1.complex(data = str2)
             )
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 2,
                 hex = V1.complex(data = str3),
                 lock = true
@@ -71,28 +61,7 @@ class ExecutionManager(
         }
     }
 
-
-    fun executor(gen: Collection<Triple<String, String, String>>) {
-        scope.launch {
-            val str1 = gen.joinToString("") { it.first }
-            val str2 = gen.joinToString("") { it.second }
-            val str3 = gen.joinToString("") { it.third }
-            while (serialManager.lock.value) {
-                delay(100L)
-            }
-            serialManager.sendHex(
-                index = 0,
-                hex = V1.complex(data = str1)
-            )
-            serialManager.sendHex(
-                index = 1,
-                hex = V1.complex(data = str2)
-            )
-            serialManager.sendHex(
-                index = 2,
-                hex = V1.complex(data = str3),
-                lock = true
-            )
-        }
+    fun initializer() {
+        "命令执行管理器初始化完成！！！".logi()
     }
 }

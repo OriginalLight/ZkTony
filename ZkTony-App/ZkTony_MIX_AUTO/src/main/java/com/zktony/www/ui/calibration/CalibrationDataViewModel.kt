@@ -11,11 +11,11 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CalibrationDataViewModel constructor(
-    private val containerDao: ContainerDao,
-    private val calibrationDao: CalibrationDao,
-    private val calibrationDataDao: CalibrationDataDao,
-    private val serialManager: SerialManager,
-    private val executionManager: ExecutionManager
+    private val CD: ContainerDao,
+    private val CDD: CalibrationDataDao,
+    private val CLD: CalibrationDao,
+    private val EM: ExecutionManager,
+    private val SM: SerialManager,
 ) : BaseViewModel() {
 
 
@@ -25,24 +25,24 @@ class CalibrationDataViewModel constructor(
     fun init(id: Long) {
         viewModelScope.launch {
             launch {
-                calibrationDao.getById(id).distinctUntilChanged().collect {
+                CLD.getById(id).distinctUntilChanged().collect {
                     _uiState.value = _uiState.value.copy(cali = it)
                 }
             }
             launch {
-                calibrationDataDao.getBySubId(id).distinctUntilChanged().collect {
+                CDD.getBySubId(id).distinctUntilChanged().collect {
                     _uiState.value = _uiState.value.copy(caliData = it)
                 }
             }
             launch {
-                containerDao.getByType(0).collect {
+                CD.getByType(0).collect {
                     if (it.isNotEmpty()) {
                         _uiState.value = _uiState.value.copy(container = it.first())
                     }
                 }
             }
             launch {
-                serialManager.lock.collect {
+                SM.lock.collect {
                     _uiState.value = _uiState.value.copy(lock = it)
                 }
             }
@@ -55,7 +55,7 @@ class CalibrationDataViewModel constructor(
 
     fun delete(data: CalibrationData) {
         viewModelScope.launch {
-            calibrationDataDao.delete(data)
+            CDD.delete(data)
             delay(300L)
             calculateActual(data.subId)
         }
@@ -65,21 +65,21 @@ class CalibrationDataViewModel constructor(
         val state = _uiState.value
         val con = state.container
         val gen = when (state.pumpId) {
-            0 -> listOf(executionManager.generator(y = con.axis, v1 = state.expect))
-            1 -> listOf(executionManager.generator(y = con.axis, v2 = state.expect))
+            0 -> listOf(EM.builder(y = con.axis, v1 = state.expect))
+            1 -> listOf(EM.builder(y = con.axis, v2 = state.expect))
             2 -> listOf(
-                executionManager.generator(y = con.axis, v3 = state.expect),
-                executionManager.generator(y = con.axis, v3 = -state.expect)
+                EM.builder(y = con.axis, v3 = state.expect),
+                EM.builder(y = con.axis, v3 = -state.expect)
             )
 
             else -> return
         }
-        executionManager.executor(gen)
+        EM.actuator(gen)
     }
 
     fun save() {
         viewModelScope.launch {
-            calibrationDataDao.insert(
+            CDD.insert(
                 CalibrationData(
                     pumpId = _uiState.value.pumpId,
                     subId = _uiState.value.cali?.id ?: 0L,
@@ -106,8 +106,8 @@ class CalibrationDataViewModel constructor(
 
     // 计算实际值
     private suspend fun calculateActual(id: Long) {
-        val cali = calibrationDao.getById(id).firstOrNull()
-        val dataList = calibrationDataDao.getBySubId(id).firstOrNull()
+        val cali = CLD.getById(id).firstOrNull()
+        val dataList = CDD.getBySubId(id).firstOrNull()
         var v1 = 200f
         var v2 = 200f
         var v3 = 200f
@@ -128,17 +128,17 @@ class CalibrationDataViewModel constructor(
                 }
             }
         }
-        calibrationDao.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3))
+        CLD.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3))
     }
 
 }
 
 data class CalibrationDataUiState(
-    val pumpId: Int = 0,
-    val container: Container = Container(),
+    val actual: Float = 0f,
     val cali: Calibration? = null,
     val caliData: List<CalibrationData> = emptyList(),
+    val container: Container = Container(),
     val expect: Float = 0f,
-    val actual: Float = 0f,
     val lock: Boolean = false,
+    val pumpId: Int = 0,
 )

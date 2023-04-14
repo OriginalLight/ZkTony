@@ -13,10 +13,10 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CalibrationDataViewModel constructor(
-    private val calibrationDao: CalibrationDao,
-    private val calibrationDataDao: CalibrationDataDao,
-    private val serialManager: SerialManager,
-    private val executionManager: ExecutionManager
+    private val CD: CalibrationDao,
+    private val CDD: CalibrationDataDao,
+    private val SM: SerialManager,
+    private val EM: ExecutionManager
 ) : BaseViewModel() {
 
 
@@ -26,17 +26,17 @@ class CalibrationDataViewModel constructor(
     fun init(id: Long) {
         viewModelScope.launch {
             launch {
-                calibrationDao.getById(id).distinctUntilChanged().collect {
+                CD.getById(id).distinctUntilChanged().collect {
                     _uiState.value = _uiState.value.copy(cali = it)
                 }
             }
             launch {
-                calibrationDataDao.getBySubId(id).distinctUntilChanged().collect {
+                CDD.getBySubId(id).distinctUntilChanged().collect {
                     _uiState.value = _uiState.value.copy(caliData = it)
                 }
             }
             launch {
-                serialManager.lock.collect {
+                SM.lock.collect {
                     _uiState.value = _uiState.value.copy(lock = it)
                 }
             }
@@ -49,7 +49,7 @@ class CalibrationDataViewModel constructor(
 
     fun delete(data: CalibrationData) {
         viewModelScope.launch {
-            calibrationDataDao.delete(data)
+            CDD.delete(data)
             delay(300L)
             calculateActual(data.subId)
         }
@@ -58,26 +58,27 @@ class CalibrationDataViewModel constructor(
     fun addLiquid() {
         viewModelScope.launch {
             val state = _uiState.value
-            executionManager.actuator(
-                executionManager.builder(
+            EM.actuator(
+                EM.builder(
                     v1 = if (state.pumpId == 0) state.expect else 0f,
                     v2 = if (state.pumpId == 1) state.expect else 0f,
                     v3 = if (state.pumpId == 2) state.expect else 0f,
-                )
+                ),
+                type = 1
             )
             if (state.pumpId == 2) {
                 delay(100L)
-                while (serialManager.lock.value) {
+                while (SM.lock.value) {
                     delay(100L)
                 }
-                serialManager.reset()
+                SM.reset()
             }
         }
     }
 
     fun save() {
         viewModelScope.launch {
-            calibrationDataDao.insert(
+            CDD.insert(
                 CalibrationData(
                     pumpId = _uiState.value.pumpId,
                     subId = _uiState.value.cali?.id ?: 0L,
@@ -104,8 +105,8 @@ class CalibrationDataViewModel constructor(
 
     // 计算实际值
     private suspend fun calculateActual(id: Long) {
-        val cali = calibrationDao.getById(id).firstOrNull()
-        val dataList = calibrationDataDao.getBySubId(id).firstOrNull()
+        val cali = CD.getById(id).firstOrNull()
+        val dataList = CDD.getBySubId(id).firstOrNull()
         var v1 = 200f
         var v2 = 200f
         var v3 = 200f
@@ -126,7 +127,7 @@ class CalibrationDataViewModel constructor(
                 }
             }
         }
-        calibrationDao.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3))
+        CD.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3))
     }
 
 }

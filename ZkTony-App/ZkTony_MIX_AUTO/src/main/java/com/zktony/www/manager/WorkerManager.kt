@@ -26,9 +26,7 @@ class WorkerManager {
         }
     }
 
-    fun init() {
-        scope.launch {
-            "定时任务管理器初始化完成！！！".logi()
-        }
+    fun initializer() {
+        "定时任务管理器初始化完成！！！".logi()
     }
 }

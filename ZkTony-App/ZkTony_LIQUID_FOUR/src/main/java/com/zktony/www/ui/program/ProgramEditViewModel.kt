@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ProgramEditViewModel constructor(
-    private val containerDao: ContainerDao,
-    private val pointDao: PointDao
+    private val CD: ContainerDao,
+    private val PD: PointDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(ProgramEditUiState())
@@ -23,12 +23,12 @@ class ProgramEditViewModel constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(id = id)
             launch {
-                containerDao.getByType(1).collect {
+                CD.getByType(1).collect {
                     _uiState.value = _uiState.value.copy(containerList = it)
                 }
             }
             launch {
-                pointDao.getBySubId(id).collect {
+                PD.getBySubId(id).collect {
                     _uiState.value = _uiState.value.copy(pointList = it)
                 }
             }
@@ -38,7 +38,7 @@ class ProgramEditViewModel constructor(
     fun selectPoint(index: Int, cIndex: Int) {
         viewModelScope.launch {
             val c1 = _uiState.value.containerList[cIndex]
-            val l1 = pointDao.getBySubId(c1.id).firstOrNull()
+            val l1 = PD.getBySubId(c1.id).firstOrNull()
             l1?.let {
                 val snowflake = Snowflake(1)
                 val list = mutableListOf<Point>()
@@ -52,7 +52,7 @@ class ProgramEditViewModel constructor(
                         )
                     )
                 }
-                pointDao.insertAll(list)
+                PD.insertAll(list)
             }
         }
     }
@@ -60,7 +60,7 @@ class ProgramEditViewModel constructor(
     fun deletePoint(index: Int) {
         viewModelScope.launch {
             val list = _uiState.value.pointList.filter { it.index == index }
-            pointDao.deleteAll(list)
+            PD.deleteAll(list)
         }
     }
 }

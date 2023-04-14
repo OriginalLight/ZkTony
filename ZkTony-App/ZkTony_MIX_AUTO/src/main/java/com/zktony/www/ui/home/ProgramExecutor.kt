@@ -40,8 +40,8 @@ class ProgramExecutor constructor(
 
                         if (point.v3 > 0 && point.v4 > 0) {
                             event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${point.index + 1} 号孔排液\n"))
-                            executionManager.executor(
-                                executionManager.generator(
+                            executionManager.actuator(
+                                executionManager.builder(
                                     y = point.waste,
                                     v1 = point.v4.toFloat(),
                                     v3 = point.v3.toFloat(),
@@ -58,17 +58,17 @@ class ProgramExecutor constructor(
 
                         if (point.v1 > 0 && point.v2 > 0) {
                             event(ExecutorEvent.Log("[ ${currentTime()} ]\t 执行孔位：${point.index + 1} 号孔\n"))
-                            executionManager.executor(
-                                executionManager.generator(
+                            executionManager.actuator(
+                                executionManager.builder(
                                     y = point.axis
                                 ),
-                                executionManager.generator(
+                                executionManager.builder(
                                     y = point.axis,
                                     v1 = point.v2.toFloat(),
                                     v2 = point.v2.toFloat(),
                                     v3 = point.v1.toFloat(),
                                 ),
-                                executionManager.generator(
+                                executionManager.builder(
                                     y = point.axis,
                                     v3 = -point.v1.toFloat(),
                                 ),

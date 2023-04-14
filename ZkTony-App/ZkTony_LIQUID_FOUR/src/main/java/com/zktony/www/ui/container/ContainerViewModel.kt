@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ContainerViewModel constructor(
-    private val dao: ContainerDao,
-    private val pointDao: PointDao
+    private val CD: ContainerDao,
+    private val PD: PointDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(ContainerUiState())
@@ -22,7 +22,7 @@ class ContainerViewModel constructor(
 
     init {
         viewModelScope.launch {
-            dao.getAll().collect {
+            CD.getAll().collect {
                 _uiState.value = _uiState.value.copy(list = it)
             }
         }
@@ -30,8 +30,8 @@ class ContainerViewModel constructor(
 
     fun delete(container: Container) {
         viewModelScope.launch {
-            dao.delete(container)
-            pointDao.deleteBySubId(container.id)
+            CD.delete(container)
+            PD.deleteBySubId(container.id)
         }
     }
 
@@ -47,14 +47,14 @@ class ContainerViewModel constructor(
                     name = name,
                     type = 1
                 )
-                dao.insert(con)
+                CD.insert(con)
                 val pointList = mutableListOf<Point>()
                 for (i in 0 until con.x) {
                     for (j in 0 until con.y) {
                         pointList.add(Point(id = snowflake.nextId(), subId = con.id, x = i, y = j))
                     }
                 }
-                pointDao.insertAll(pointList)
+                PD.insertAll(pointList)
                 function(con.id)
             }
         }

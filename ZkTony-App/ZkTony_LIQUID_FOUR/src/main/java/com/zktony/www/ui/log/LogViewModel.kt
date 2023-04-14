@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class LogViewModel constructor(
-    private val dao: LogDao
+    private val LD: LogDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow<List<Log>>(emptyList())
@@ -17,7 +17,7 @@ class LogViewModel constructor(
 
     init {
         viewModelScope.launch {
-            dao.getAll().collect {
+            LD.getAll().collect {
                 _uiState.value = it
             }
         }
@@ -25,7 +25,7 @@ class LogViewModel constructor(
 
     fun delete(log: Log) {
         viewModelScope.launch {
-            dao.delete(log)
+            LD.delete(log)
         }
     }
 

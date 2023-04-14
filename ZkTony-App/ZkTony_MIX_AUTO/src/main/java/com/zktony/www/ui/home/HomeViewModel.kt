@@ -16,10 +16,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class HomeViewModel constructor(
-    private val logDao: LogDao,
-    private val programDao: ProgramDao,
-    private val pointDao: PointDao,
-    private val serialManager: SerialManager,
+    private val LD: LogDao,
+    private val PGD: ProgramDao,
+    private val PD: PointDao,
+    private val SM: SerialManager,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -28,7 +28,7 @@ class HomeViewModel constructor(
     init {
         viewModelScope.launch {
             launch {
-                programDao.getAll().collect {
+                PGD.getAll().collect {
                     if (it.isEmpty()) {
                         _uiState.value = _uiState.value.copy(programList = it, program = null)
                     } else {
@@ -42,7 +42,7 @@ class HomeViewModel constructor(
 
     private fun loadPoint(id: Long) {
         viewModelScope.launch {
-            pointDao.getBySubId(id).collect {
+            PD.getBySubId(id).collect {
                 _uiState.value = _uiState.value.copy(pointList = it)
             }
         }
@@ -73,10 +73,10 @@ class HomeViewModel constructor(
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
             if (_uiState.value.job == null) {
-                if (serialManager.lock.value) {
+                if (SM.lock.value) {
                     PopTip.show("运动中禁止复位")
                 } else {
-                    serialManager.reset()
+                    SM.reset()
                     PopTip.show("复位-已下发")
                 }
             } else {
@@ -111,7 +111,7 @@ class HomeViewModel constructor(
                     list = _uiState.value.pointList,
                     scope = this,
                 )
-                serialManager.reset(false)
+                SM.reset(false)
                 executor.event = {
                     when (it) {
                         is ExecutorEvent.CurrentPoint -> {
@@ -190,14 +190,14 @@ class HomeViewModel constructor(
                     process = 0
                 )
             )
-            serialManager.pause(false)
-            serialManager.sendHex(
+            SM.pause(false)
+            SM.sendHex(
                 index = 0,
                 hex = V1(pa = "10").toHex()
             )
             delay(1000L)
-            serialManager.lock(false)
-            while (serialManager.lock.value) {
+            SM.lock(false)
+            while (SM.lock.value) {
                 delay(100L)
             }
             reset()
@@ -206,13 +206,13 @@ class HomeViewModel constructor(
 
     fun pause() {
         _uiState.value = _uiState.value.copy(pause = !_uiState.value.pause)
-        this.serialManager.pause(_uiState.value.pause)
+        this.SM.pause(_uiState.value.pause)
     }
 
     private fun updateLog(log: Log) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(log = log)
-            logDao.insert(log)
+            LD.insert(log)
         }
     }
 
@@ -226,14 +226,14 @@ class HomeViewModel constructor(
                     upOrDown = true,
                     fillCoagulant = false,
                 )
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 3,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
                 delay(100L)
                 reset()
             } else {
-                if (serialManager.reset.value) {
+                if (SM.reset.value) {
                     if (_uiState.value.recaptureCoagulant) {
                         PopTip.show("请先停止回吸")
                         return@launch
@@ -246,14 +246,14 @@ class HomeViewModel constructor(
                     while (_uiState.value.fillCoagulant) {
                         if (_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
-                            serialManager.sendHex(
+                            SM.sendHex(
                                 index = 3,
                                 hex = V1(pa = "0B", data = "0301").toHex()
                             )
                             delay(8500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
-                            serialManager.sendHex(
+                            SM.sendHex(
                                 index = 3,
                                 hex = V1(pa = "0B", data = "0305").toHex()
                             )
@@ -278,14 +278,14 @@ class HomeViewModel constructor(
                     upOrDown = true,
                     recaptureCoagulant = false,
                 )
-                serialManager.sendHex(
+                SM.sendHex(
                     index = 3,
                     hex = V1(pa = "0B", data = "0300").toHex()
                 )
                 delay(100L)
                 reset()
             } else {
-                if (serialManager.reset.value) {
+                if (SM.reset.value) {
                     if (_uiState.value.fillCoagulant) {
                         PopTip.show("请先停止填充")
                         return@launch
@@ -298,14 +298,14 @@ class HomeViewModel constructor(
                     while (_uiState.value.recaptureCoagulant) {
                         if (_uiState.value.upOrDown) {
                             _uiState.value = _uiState.value.copy(upOrDown = false)
-                            serialManager.sendHex(
+                            SM.sendHex(
                                 index = 3,
                                 hex = V1(pa = "0B", data = "0303").toHex()
                             )
                             delay(8500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
-                            serialManager.sendHex(
+                            SM.sendHex(
                                 index = 3,
                                 hex = V1(pa = "0B", data = "0304").toHex()
                             )
@@ -325,7 +325,7 @@ class HomeViewModel constructor(
      */
     fun fillColloid() {
         viewModelScope.launch {
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 3,
                 hex = V1(pa = "0B", data = "0401").toHex()
             )
@@ -337,7 +337,7 @@ class HomeViewModel constructor(
      */
     fun recaptureColloid() {
         viewModelScope.launch {
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 3,
                 hex = V1(pa = "0B", data = "0402").toHex()
             )
@@ -349,7 +349,7 @@ class HomeViewModel constructor(
      */
     fun stopFillAndRecapture() {
         viewModelScope.launch {
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 3,
                 hex = V1(pa = "0B", data = "0400").toHex()
             )

@@ -10,15 +10,15 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ProgramViewModel constructor(
-    private val programDao: ProgramDao,
-    private val actionDao: ActionDao
+    private val PD: ProgramDao,
+    private val AD: ActionDao
 ) : BaseViewModel() {
     private val _programList = MutableStateFlow(emptyList<Program>())
     val programList = _programList.asStateFlow()
 
     init {
         viewModelScope.launch {
-            programDao.getAll().collect {
+            PD.getAll().collect {
                 _programList.value = it
             }
         }
@@ -34,24 +34,24 @@ class ProgramViewModel constructor(
                 PopTip.show("程序名不能为空")
                 return@launch
             }
-            programDao.getByName(name).firstOrNull()?.let {
+            PD.getByName(name).firstOrNull()?.let {
                 PopTip.show("程序名已存在")
                 return@launch
             }
             val program = Program(name = name)
-            programDao.insert(program)
+            PD.insert(program)
             block(program.id)
         }
     }
 
     /**
      * 删除程序
-     * @param program [Program] 程序
+     * @param entity [Program] 程序
      */
-    fun delete(program: Program) {
+    fun delete(entity: Program) {
         viewModelScope.launch {
-            programDao.delete(program)
-            actionDao.deleteByProgramId(program.id)
+            PD.delete(entity)
+            AD.deleteByProgramId(entity.id)
         }
     }
 }

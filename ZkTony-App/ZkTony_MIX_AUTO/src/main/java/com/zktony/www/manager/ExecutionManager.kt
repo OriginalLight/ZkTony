@@ -9,28 +9,22 @@ import kotlinx.coroutines.*
  * @date: 2023-02-01 10:28
  */
 class ExecutionManager constructor(
-    private val serialManager: SerialManager,
-    private val motorManager: MotorManager,
+    private val SM: SerialManager,
+    private val MM: MotorManager,
 ) {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
-    fun init() {
-        scope.launch {
-            "命令执行管理器初始化完成！！！".logi()
-        }
-    }
-
     // 生成器
-    fun generator(
+    fun builder(
         y: Float = 0f,
         v1: Float = 0f,
         v2: Float = 0f,
         v3: Float = 0f,
     ): Pair<String, String> {
-        val my = motorManager.move(y)
-        val mv1 = motorManager.liquid(v1, 0)
-        val mv2 = motorManager.liquid(v2, 1)
-        val mv3 = motorManager.liquid(v3, 2)
+        val my = MM.pulse(y, 0)
+        val mv1 = MM.pulse(v1, 1)
+        val mv2 = MM.pulse(v2, 2)
+        val mv3 = MM.pulse(v3, 3)
         return Pair(
             "0,$my,0,0,",
             "$mv1,$mv2,$mv3,"
@@ -38,15 +32,15 @@ class ExecutionManager constructor(
     }
 
     // 执行器
-    fun executor(vararg gen: Pair<String, String>) {
+    fun actuator(vararg gen: Pair<String, String>) {
         scope.launch {
             val str1 = gen.joinToString("") { it.first }
             val str2 = gen.joinToString("") { it.second }
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 0,
                 hex = V1.complex(data = str1),
             )
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 3,
                 hex = V1.complex(data = str2),
                 lock = true
@@ -54,19 +48,23 @@ class ExecutionManager constructor(
         }
     }
 
-    fun executor(gen: Collection<Pair<String, String>>) {
+    fun actuator(gen: Collection<Pair<String, String>>) {
         scope.launch {
             val str1 = gen.joinToString("") { it.first }
             val str2 = gen.joinToString("") { it.second }
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 0,
                 hex = V1.complex(data = str1),
             )
-            serialManager.sendHex(
+            SM.sendHex(
                 index = 3,
                 hex = V1.complex(data = str2),
                 lock = true
             )
         }
+    }
+
+    fun initializer() {
+        "命令执行管理器初始化完成！！！".logi()
     }
 }

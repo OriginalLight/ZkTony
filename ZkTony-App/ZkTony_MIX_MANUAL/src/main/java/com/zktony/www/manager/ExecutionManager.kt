@@ -9,16 +9,10 @@ import kotlinx.coroutines.*
  * @date: 2023-02-01 10:28
  */
 class ExecutionManager constructor(
-    private val motorManager: MotorManager,
-    private val serialManager: SerialManager,
+    private val MM: MotorManager,
+    private val SM: SerialManager,
 ) {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-
-    fun init() {
-        scope.launch {
-            "命令执行管理器初始化完成！！！".logi()
-        }
-    }
 
     // 生成器
     fun builder(
@@ -26,9 +20,9 @@ class ExecutionManager constructor(
         v2: Float = 0f,
         v3: Float = 0f,
     ): String {
-        val mv1 = motorManager.liquid(v1, 0)
-        val mv2 = motorManager.liquid(v2, 1)
-        val mv3 = motorManager.liquid(v3, 2)
+        val mv1 = MM.pulse(v1, 0)
+        val mv2 = MM.pulse(v2, 1)
+        val mv3 = MM.pulse(v3, 2)
         return "$mv1,$mv2,$mv3,"
     }
 
@@ -37,16 +31,20 @@ class ExecutionManager constructor(
         scope.launch {
             val str = gen.joinToString("")
             when (type) {
-                0 -> serialManager.sendHex(
+                0 -> SM.sendHex(
                     hex = V1.mutable(data = str),
                     true
                 )
 
-                1 -> serialManager.sendHex(
+                1 -> SM.sendHex(
                     hex = V1.single(data = str),
                     true
                 )
             }
         }
+    }
+
+    fun initializer() {
+        "命令执行管理器初始化完成！！！".logi()
     }
 }

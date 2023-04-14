@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class ZmViewModel constructor(
-    private val dao: ProgramDao
+    private val PD: ProgramDao
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(ZmUiState())
@@ -21,7 +21,7 @@ class ZmViewModel constructor(
 
     init {
         viewModelScope.launch {
-            dao.getAll().collect {
+            PD.getAll().collect {
                 _uiState.value = _uiState.value.copy(programList = it)
             }
         }
@@ -29,7 +29,7 @@ class ZmViewModel constructor(
 
     fun load(id: String) {
         viewModelScope.launch {
-            dao.getById(id).collect {
+            PD.getById(id).collect {
                 _uiState.value = _uiState.value.copy(
                     program = it,
                     name = it.name,
@@ -58,7 +58,7 @@ class ZmViewModel constructor(
                     PopTip.show("名称已存在")
                     return@launch
                 }
-                dao.insert(
+                PD.insert(
                     Program(
                         name = _uiState.value.name,
                         proteinName = _uiState.value.danbaiName,
@@ -80,7 +80,7 @@ class ZmViewModel constructor(
                     PopTip.show("名称已存在")
                     return@launch
                 }
-                dao.update(
+                PD.update(
                     _uiState.value.program!!.copy(
                         name = _uiState.value.name,
                         proteinName = _uiState.value.danbaiName,

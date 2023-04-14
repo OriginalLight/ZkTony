@@ -152,12 +152,6 @@ class SerialManager {
         }
     }
 
-    fun init() {
-        scope.launch {
-            "串口管理器初始化完成！！！".logi()
-        }
-    }
-
     /**
      * 发送Hex
      * @param index 串口
@@ -221,5 +215,9 @@ class SerialManager {
             sendHex(0, V1.pauseShakeBed())
             _swing.value = false
         }
+    }
+
+    fun initializer() {
+        "串口管理器初始化完成！！！".logi()
     }
 }

@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ProgramEditViewModel constructor(
-    private val containerDao: ContainerDao,
-    private val pointDao: PointDao,
+    private val CD: ContainerDao,
+    private val PD: PointDao,
 ) : BaseViewModel() {
 
 
@@ -25,7 +25,7 @@ class ProgramEditViewModel constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(id = id)
             launch {
-                containerDao.getByType(1).collect {
+                CD.getByType(1).collect {
                     _uiState.value = _uiState.value.copy(containerList = it)
                     if (it.isNotEmpty() && _uiState.value.container == null) {
                         _uiState.value = _uiState.value.copy(container = it[0])
@@ -34,7 +34,7 @@ class ProgramEditViewModel constructor(
             }
             launch {
                 delay(200L)
-                pointDao.getBySubId(id).collect {
+                PD.getBySubId(id).collect {
                     _uiState.value = _uiState.value.copy(pointList = it)
                     if (it.isEmpty()) {
                         val c1 = _uiState.value.container
@@ -56,20 +56,20 @@ class ProgramEditViewModel constructor(
     fun enablePoint(index: Int) {
         viewModelScope.launch {
             _uiState.value.pointList.find { it.index == index }?.let {
-                pointDao.update(it.copy(enable = !it.enable))
+                PD.update(it.copy(enable = !it.enable))
             }
         }
     }
 
     fun enableAll() {
         viewModelScope.launch {
-            pointDao.updateAll(_uiState.value.pointList.map { it.copy(enable = true) })
+            PD.updateAll(_uiState.value.pointList.map { it.copy(enable = true) })
         }
     }
 
     fun updateVolume(v1: Int, v2: Int, v3: Int, v4: Int) {
         viewModelScope.launch {
-            pointDao.updateAll(_uiState.value.pointList.map {
+            PD.updateAll(_uiState.value.pointList.map {
                 it.copy(
                     v1 = v1,
                     v2 = v2,
@@ -90,21 +90,21 @@ class ProgramEditViewModel constructor(
 
             delay(200L)
             val pid = _uiState.value.id
-            pointDao.deleteBySubId(pid)
+            PD.deleteBySubId(pid)
         }
     }
 
     private fun buildPoint(id: Long) {
         viewModelScope.launch {
             val pid = _uiState.value.id
-            val list = pointDao.getBySubId(id).firstOrNull()
+            val list = PD.getBySubId(id).firstOrNull()
             list?.let { it1 ->
                 val snowflake = Snowflake(1)
                 val list1 = mutableListOf<Point>()
                 it1.forEach { point ->
                     list1.add(point.copy(id = snowflake.nextId(), subId = pid, thirdId = id))
                 }
-                pointDao.insertAll(list1)
+                PD.insertAll(list1)
             }
         }
     }

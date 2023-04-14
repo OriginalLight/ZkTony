@@ -52,12 +52,6 @@ class SerialManager {
         }
     }
 
-    fun init() {
-        scope.launch {
-            "串口管理器初始化完成！！！".logi()
-        }
-    }
-
     /**
      * 发送指令
      * @param v1 [V1] 指令
@@ -69,5 +63,9 @@ class SerialManager {
                 helpers.sendHex(4, v1.genHex())
             }
         }
+    }
+
+    fun initializer() {
+        "串口管理器初始化完成！！！".logi()
     }
 }
