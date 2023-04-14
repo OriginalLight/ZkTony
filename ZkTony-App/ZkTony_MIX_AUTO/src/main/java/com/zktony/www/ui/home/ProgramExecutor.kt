@@ -64,8 +64,8 @@ class ProgramExecutor constructor(
                                 ),
                                 executionManager.builder(
                                     y = point.axis,
-                                    v1 = point.v2.toFloat(),
-                                    v2 = point.v2.toFloat(),
+                                    v1 = point.v2 / 2f,
+                                    v2 = point.v2 / 2f,
                                     v3 = point.v1.toFloat(),
                                 ),
                                 executionManager.builder(

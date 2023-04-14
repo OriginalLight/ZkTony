@@ -28,8 +28,8 @@ class ProgramExecutor constructor(
             }
             ex.actuator(
                 ex.builder(
-                    v1 = colloid.toFloat(),
-                    v2 = colloid.toFloat(),
+                    v1 = colloid / 2f,
+                    v2 = colloid / 2f,
                     v3 = coagulant.toFloat(),
                 ),
                 type = 1

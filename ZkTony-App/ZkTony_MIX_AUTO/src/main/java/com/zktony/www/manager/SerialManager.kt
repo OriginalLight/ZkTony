@@ -31,7 +31,7 @@ class SerialManager {
     private var lockTime = 0L
 
     // 机构运行小步骤等待时间
-    private val waitTime = 2 * 60L
+    private val waitTime = 3 * 60L
 
     init {
         scope.launch {
