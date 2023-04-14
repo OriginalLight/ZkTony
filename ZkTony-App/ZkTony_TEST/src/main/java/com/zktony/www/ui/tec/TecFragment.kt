@@ -3,9 +3,7 @@ package com.zktony.www.ui.tec
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.removeZero
 import com.zktony.www.R

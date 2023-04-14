@@ -2,9 +2,7 @@ package com.zktony.core.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -56,7 +54,7 @@ class GradientPlate : View {
             val left = i * space + if (i == 0) 8 else 4
             val right = (i + 1) * space - if (i == size - 1) 8 else 4
             val top = 8f
-            val bottom = height.toFloat()  - 8f
+            val bottom = height.toFloat() - 8f
             paint.style = Paint.Style.STROKE
             paint.color = Color.BLACK
             paint.strokeWidth = 2f
@@ -70,7 +68,7 @@ class GradientPlate : View {
                 val left = i * space + if (i == 0) 8 else 4
                 val right = (i + 1) * space - if (i == size - 1) 8 else 4
                 val top = 8f
-                val bottom = height.toFloat()  - 8f
+                val bottom = height.toFloat() - 8f
                 paint.style = Paint.Style.FILL
                 paint.color = Color.GREEN
                 paint.isAntiAlias = true
@@ -89,7 +87,12 @@ class GradientPlate : View {
             paint.textSize = space * 0.6f
             val text = ('A' + i).toString()
             val textWidth = paint.measureText(text)
-            canvas?.drawText(text, left + (right - left - textWidth) / 2, height.toFloat() - 16, paint)
+            canvas?.drawText(
+                text,
+                left + (right - left - textWidth) / 2,
+                height.toFloat() - 16,
+                paint
+            )
         }
 
         for (i in 0 until size) {
@@ -98,7 +101,7 @@ class GradientPlate : View {
                 val left = i * space + if (i == 0) 8 else 4
                 val right = (i + 1) * space - if (i == size - 1) 8 else 4
                 val top = 8f
-                val bottom = height.toFloat()  - 8f
+                val bottom = height.toFloat() - 8f
                 paint.style = Paint.Style.FILL
                 paint.color = Color.BLACK
                 paint.strokeWidth = 1f

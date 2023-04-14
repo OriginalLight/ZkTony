@@ -1,7 +1,7 @@
 package com.zktony.gpio
 
 import java.io.File
-import java.util.*
+import java.util.Locale
 
 /**
  * @author 刘贺贺

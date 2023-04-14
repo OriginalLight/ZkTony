@@ -1,32 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data/>
+    <data />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        android:orientation="vertical"
         android:background="@color/dark_onBackground"
+        android:orientation="vertical"
         tools:context=".ui.tec.TecFragment">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/title_tec"
-            android:textSize="48sp"
-            android:textColor="@color/black"
             android:background="@color/light_onPrimary"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:text="@string/title_tec"
+            android:textColor="@color/black"
+            android:textSize="48sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"

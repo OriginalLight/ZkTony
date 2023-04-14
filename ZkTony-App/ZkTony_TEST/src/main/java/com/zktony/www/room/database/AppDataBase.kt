@@ -1,8 +1,6 @@
 package com.zktony.www.room.database
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.zktony.room.converters.DateConverters
 import com.zktony.www.room.dao.TestDao
 import com.zktony.www.room.entity.Test

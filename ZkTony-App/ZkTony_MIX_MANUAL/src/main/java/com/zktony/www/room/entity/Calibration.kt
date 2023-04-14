@@ -3,7 +3,7 @@ package com.zktony.www.room.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.zktony.core.utils.Snowflake
-import java.util.*
+import java.util.Date
 
 /**
  * @author: 刘贺贺

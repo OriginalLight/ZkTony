@@ -2,10 +2,7 @@ package com.zktony.www.ui.home
 
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.koin.java.KoinJavaComponent.inject
 
 /**

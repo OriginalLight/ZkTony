@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import com.google.android.material.tabs.TabLayout
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseFragment

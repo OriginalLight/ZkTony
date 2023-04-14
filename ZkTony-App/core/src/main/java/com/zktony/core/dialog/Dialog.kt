@@ -7,9 +7,7 @@ import android.view.Gravity
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.*
@@ -36,31 +34,31 @@ fun aboutDialog(block: () -> Unit) {
 
 fun authDialog(block: () -> Unit) {
     CustomDialog.build()
-    .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_input) {
-        override fun onBind(dialog: CustomDialog, v: View) {
-            val tvTitle = v.findViewById<TextView>(R.id.title)
-            val etInput = v.findViewById<EditText>(R.id.input)
-            val btnOk = v.findViewById<MaterialButton>(R.id.ok)
-            val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
-            tvTitle.text = "权限认证"
-            etInput.hint = "请输入密码"
-            etInput.inputType = InputType.TYPE_CLASS_TEXT
-            btnOk.clickNoRepeat {
-                if (etInput.text.isBlank().not() && etInput.text.toString() == "123456") {
-                    block()
+        .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_input) {
+            override fun onBind(dialog: CustomDialog, v: View) {
+                val tvTitle = v.findViewById<TextView>(R.id.title)
+                val etInput = v.findViewById<EditText>(R.id.input)
+                val btnOk = v.findViewById<MaterialButton>(R.id.ok)
+                val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
+                tvTitle.text = "权限认证"
+                etInput.hint = "请输入密码"
+                etInput.inputType = InputType.TYPE_CLASS_TEXT
+                btnOk.clickNoRepeat {
+                    if (etInput.text.isBlank().not() && etInput.text.toString() == "123456") {
+                        block()
+                        dialog.dismiss()
+                    } else {
+                        PopTip.show("密码错误")
+                    }
+                }
+                btnCancel.clickNoRepeat {
                     dialog.dismiss()
-                } else {
-                    PopTip.show("密码错误")
                 }
             }
-            btnCancel.clickNoRepeat {
-                dialog.dismiss()
-            }
-        }
-    })
-    .setCancelable(false)
-    .setMaskColor(Color.parseColor("#4D000000"))
-    .show()
+        })
+        .setCancelable(false)
+        .setMaskColor(Color.parseColor("#4D000000"))
+        .show()
 }
 
 fun deviceDialog(code: String) {

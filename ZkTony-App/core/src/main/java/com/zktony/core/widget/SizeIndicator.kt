@@ -2,9 +2,7 @@ package com.zktony.core.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 
@@ -85,7 +83,8 @@ class SizeIndicator : View {
         paint.isAntiAlias = true
         paint.style = Paint.Style.FILL
         val x = (width - paint.measureText(text)) / 2
-        val y = height / 2 + (paint.fontMetrics.bottom - paint.fontMetrics.top) / 2 - paint.fontMetrics.bottom
+        val y =
+            height / 2 + (paint.fontMetrics.bottom - paint.fontMetrics.top) / 2 - paint.fontMetrics.bottom
         canvas?.drawText(text, x, y, paint)
     }
 

@@ -1,14 +1,9 @@
 package com.zktony.serialport
 
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Message
+import android.os.*
 import com.zktony.serialport.core.SerialPort
 import com.zktony.serialport.ext.DataConversion.bytesToHexString
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.*
 import java.security.InvalidParameterException
 
 /**

@@ -305,8 +305,8 @@
                                 android:id="@+id/speed"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
-                                android:background="@color/light_onPrimary"
                                 android:layout_marginStart="128dp"
+                                android:background="@color/light_onPrimary"
                                 android:cursorVisible="true"
                                 android:gravity="center"
                                 android:inputType="number"
@@ -358,13 +358,13 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
                                 android:layout_marginStart="128dp"
+                                android:background="@color/light_onPrimary"
                                 android:cursorVisible="true"
                                 android:gravity="center"
-                                android:background="@color/light_onPrimary"
+                                android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp"
-                                android:inputType="number"
                                 tools:ignore="Autofill,LabelFor,MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
 
@@ -409,15 +409,15 @@
                                 android:id="@+id/acceleration"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
-                                android:background="@color/light_onPrimary"
                                 android:layout_marginStart="128dp"
-                                android:gravity="center"
+                                android:background="@color/light_onPrimary"
                                 android:cursorVisible="true"
+                                android:gravity="center"
+                                android:importantForAutofill="no"
+                                android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp"
-                                android:importantForAutofill="no"
-                                android:inputType="number"
                                 tools:ignore="LabelFor,MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
 
@@ -463,13 +463,13 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
                                 android:layout_marginStart="128dp"
-                                android:cursorVisible="true"
                                 android:background="@color/light_onPrimary"
+                                android:cursorVisible="true"
+                                android:gravity="center"
                                 android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp"
-                                android:gravity="center"
                                 tools:ignore="Autofill,LabelFor,MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
 

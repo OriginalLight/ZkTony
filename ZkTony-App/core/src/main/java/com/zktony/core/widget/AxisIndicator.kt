@@ -2,9 +2,7 @@ package com.zktony.core.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -71,6 +69,7 @@ class AxisIndicator : View {
                 scaleX = 0.9f
                 scaleY = 0.9f
             }
+
             MotionEvent.ACTION_UP -> {
                 scaleX = 1f
                 scaleY = 1f

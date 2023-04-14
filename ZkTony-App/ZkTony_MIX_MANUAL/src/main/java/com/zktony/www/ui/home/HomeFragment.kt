@@ -2,9 +2,7 @@ package com.zktony.www.ui.home
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.R.mipmap
 import com.zktony.core.base.BaseFragment
@@ -67,7 +65,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             timeText.text = it.time.getTimeFormat()
                             fillCoagulantImage.setBackgroundResource(if (it.fillCoagulant) mipmap.close else mipmap.right)
                             recaptureCoagulantImage.setBackgroundResource(if (it.recaptureCoagulant) mipmap.close else mipmap.left)
-                            fillCoagulantText.text = if (it.fillCoagulant) "停止" else "填充(促凝剂)"
+                            fillCoagulantText.text =
+                                if (it.fillCoagulant) "停止" else "填充(促凝剂)"
                             recaptureCoagulantText.text =
                                 if (it.recaptureCoagulant) "停止" else "回吸(促凝剂)"
                         }

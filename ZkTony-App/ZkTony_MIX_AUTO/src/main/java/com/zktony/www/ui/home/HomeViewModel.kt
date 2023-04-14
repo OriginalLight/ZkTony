@@ -9,17 +9,11 @@ import com.zktony.core.ext.getTimeFormat
 import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
-import com.zktony.www.room.dao.LogDao
-import com.zktony.www.room.dao.PointDao
-import com.zktony.www.room.dao.ProgramDao
-import com.zktony.www.room.entity.Log
-import com.zktony.www.room.entity.Point
-import com.zktony.www.room.entity.Program
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import com.zktony.www.room.dao.*
+import com.zktony.www.room.entity.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class HomeViewModel constructor(
     private val logDao: LogDao,
@@ -127,6 +121,7 @@ class HomeViewModel constructor(
                                 )
                             )
                         }
+
                         is ExecutorEvent.FinishList -> {
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
@@ -134,6 +129,7 @@ class HomeViewModel constructor(
                                 )
                             )
                         }
+
                         is ExecutorEvent.Progress -> {
                             val time = _uiState.value.time + 1
                             val percent = it.complete.toFloat() / it.total.toFloat()
@@ -148,16 +144,23 @@ class HomeViewModel constructor(
                             )
 
                         }
+
                         is ExecutorEvent.Log -> {
                             _uiState.value.log?.let { l ->
                                 updateLog(l.copy(content = l.content + it.log))
                             }
                         }
+
                         is ExecutorEvent.Finish -> {
                             completeDialog(
                                 name = _uiState.value.program?.name ?: "错误",
                                 time = _uiState.value.time.getTimeFormat(),
-                                speed = "${String.format("%.2f", _uiState.value.info.speed)} 孔/分钟",
+                                speed = "${
+                                    String.format(
+                                        "%.2f",
+                                        _uiState.value.info.speed
+                                    )
+                                } 孔/分钟",
                             )
                             launch {
                                 _uiState.value.log?.let { l ->
@@ -247,14 +250,14 @@ class HomeViewModel constructor(
                                 index = 3,
                                 hex = V1(pa = "0B", data = "0301").toHex()
                             )
-                            delay(7000L)
+                            delay(8500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
                             serialManager.sendHex(
                                 index = 3,
                                 hex = V1(pa = "0B", data = "0305").toHex()
                             )
-                            delay(6500L)
+                            delay(9000L)
                         }
                     }
 
@@ -299,14 +302,14 @@ class HomeViewModel constructor(
                                 index = 3,
                                 hex = V1(pa = "0B", data = "0303").toHex()
                             )
-                            delay(6500L)
+                            delay(8500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
                             serialManager.sendHex(
                                 index = 3,
-                                hex = V1(pa = "0B", data = "0305").toHex()
+                                hex = V1(pa = "0B", data = "0304").toHex()
                             )
-                            delay(6500L)
+                            delay(9000L)
                         }
                     }
 

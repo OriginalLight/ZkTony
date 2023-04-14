@@ -6,9 +6,7 @@ import android.provider.Settings
 import androidx.core.view.isVisible
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.*
@@ -139,7 +137,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             with(about) {
                 clickScale()
                 clickNoRepeat {
-                    aboutDialog() { webDialog() }
+                    aboutDialog { webDialog() }
                 }
             }
             with(device) {

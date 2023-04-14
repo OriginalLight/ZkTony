@@ -68,7 +68,14 @@ class ProgramPointViewModel constructor(
                 viewModelScope.launch {
                     val list1 = mutableListOf<Point>()
                     list.forEach {
-                        list1.add(it.copy(v1 = point.v1, v2 = point.v2, v3 = point.v3, v4 = point.v4))
+                        list1.add(
+                            it.copy(
+                                v1 = point.v1,
+                                v2 = point.v2,
+                                v3 = point.v3,
+                                v4 = point.v4
+                            )
+                        )
                     }
                     dao.updateAll(list1)
                 }

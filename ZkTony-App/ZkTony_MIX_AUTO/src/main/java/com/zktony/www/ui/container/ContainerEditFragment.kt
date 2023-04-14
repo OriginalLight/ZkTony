@@ -7,9 +7,7 @@ import android.text.InputType
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
@@ -17,9 +15,7 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.dialog.inputDialog
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.removeZero
+import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentContainerEditBinding
 import kotlinx.coroutines.launch

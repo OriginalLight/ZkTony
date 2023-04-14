@@ -1,6 +1,6 @@
 package com.zktony.serialport.ext
 
-import java.util.*
+import java.util.Locale
 
 /**
  * @author lwt
@@ -23,6 +23,7 @@ import java.util.*
 object CRC16 {
     //CRC寄存器全为1
     var CRC = 0x0000ffff
+
     //多项式校验值
     var POLYNOMIAL = 0x00008408
 

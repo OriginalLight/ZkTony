@@ -1,4 +1,5 @@
 <resources translatable="false">
+    <string name="a">A</string>
     <string name="about">使用说明</string>
     <string name="actions">程序流程</string>
     <string name="actual_volume">实际加液体积/μL</string>
@@ -19,6 +20,7 @@
     <string name="check_update">检查更新</string>
     <string name="checked">选中</string>
     <string name="current_version">当前软件版本</string>
+    <string name="fill">填充洗涤液</string>
     <string name="height">高度</string>
     <string name="hint_acceleration">加速度</string>
     <string name="hint_count">执行次数</string>
@@ -46,12 +48,14 @@
     <string name="pump_name">泵名</string>
     <string name="pump_one">泵一</string>
     <string name="recycle">回收</string>
+    <string name="recycle_antibody">回收一抗</string>
     <string name="recycle_z">回收高度</string>
     <string name="reset">复    位</string>
     <string name="save">保存</string>
     <string name="save_config">保存配置</string>
     <string name="setting">参数调整</string>
     <string name="start">开 始</string>
+    <string name="start_time">开始时间</string>
     <string name="status">状态</string>
     <string name="stop">停 止</string>
     <string name="subdivision">细分</string>
@@ -80,8 +84,4 @@
     <string name="wash_tank">洗涤液</string>
     <string name="waste_tank">废液槽</string>
     <string name="wifi_setting">WIFI设置</string>
-    <string name="a">A</string>
-    <string name="start_time">开始时间</string>
-    <string name="recycle_antibody">回收一抗</string>
-    <string name="fill">填充洗涤液</string>
 </resources>

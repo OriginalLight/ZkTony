@@ -7,12 +7,9 @@ import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
 import com.zktony.www.common.ext.toCommand
 import com.zktony.www.manager.protocol.V1
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class SerialManager {
 
@@ -63,6 +60,7 @@ class SerialManager {
                                     lockTime = 0L
                                 }
                             }
+
                             "86" -> {
                                 if (res.pa == "0A") {
                                     _lock.value = false

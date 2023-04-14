@@ -6,12 +6,9 @@ import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
 import com.zktony.www.common.ext.toCommand
 import com.zktony.www.manager.protocol.V1
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class SerialManager {
 
@@ -59,12 +56,14 @@ class SerialManager {
                                 it.hexFormat().logd("串口一 receivedHex: ")
                             }
                         }
+
                         3 -> {
                             data.verifyHex().forEach {
                                 _ttys3Flow.value = it
                                 it.hexFormat().logd("串口三 receivedHex: ")
                             }
                         }
+
                         else -> {}
                     }
                 }
@@ -82,6 +81,7 @@ class SerialManager {
                                     lockTime = 0L
                                 }
                             }
+
                             "86" -> {
                                 if (res.pa == "0A") {
                                     _lock.value = false

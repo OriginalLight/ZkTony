@@ -3,14 +3,10 @@ package com.zktony.www.common.adapter
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.removeZero
-import com.zktony.www.room.entity.CalibrationData
+import androidx.recyclerview.widget.*
+import com.zktony.core.ext.*
 import com.zktony.www.databinding.ItemCalibrationDataBinding
+import com.zktony.www.room.entity.CalibrationData
 
 /**
  * @author: 刘贺贺

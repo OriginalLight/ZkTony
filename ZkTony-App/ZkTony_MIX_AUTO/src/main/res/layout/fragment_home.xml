@@ -10,9 +10,9 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:background="@color/dark_onPrimaryContainer"
+        android:baselineAligned="false"
         android:orientation="horizontal"
-        tools:context=".ui.home.HomeFragment"
-        android:baselineAligned="false">
+        tools:context=".ui.home.HomeFragment">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -25,9 +25,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
-                tools:ignore="NestedWeights"
-                android:baselineAligned="false">
+                tools:ignore="NestedWeights">
 
                 <LinearLayout
                     android:layout_width="480dp"
@@ -45,6 +45,7 @@
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                             android:layout_width="240dp"
                             android:layout_height="wrap_content"
+                            android:backgroundTint="@color/light_onPrimary"
                             android:ellipsize="end"
                             android:gravity="center"
                             android:insetTop="0dp"
@@ -52,13 +53,12 @@
                             android:singleLine="true"
                             android:textAllCaps="false"
                             android:textColor="@color/black"
-                            android:backgroundTint="@color/light_onPrimary"
                             android:textSize="18sp"
                             app:cornerRadius="0dp"
                             app:icon="@mipmap/program"
-                            app:rippleColor="@color/purple_700"
                             app:iconPadding="0dp"
                             app:iconSize="32dp"
+                            app:rippleColor="@color/purple_700"
                             app:strokeColor="@color/light_primary"
                             app:strokeWidth="2dp"
                             tools:ignore="NestedWeights,SpeakableTextPresentCheck" />
@@ -89,11 +89,11 @@
                             android:textColor="@color/black"
                             android:textSize="100sp"
                             android:textStyle="bold"
-                            tools:ignore="HardcodedText"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"/>
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="HardcodedText" />
 
                         <ProgressBar
                             android:id="@+id/progress"
@@ -102,9 +102,9 @@
                             android:layout_height="16dp"
                             android:max="100"
                             android:progressDrawable="@drawable/bg_progress"
-                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"/>
+                            app:layout_constraintStart_toStartOf="parent" />
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -126,15 +126,15 @@
                         android:textSize="22sp"
                         android:textStyle="bold"
                         app:cornerRadius="32dp"
+                        app:icon="@mipmap/play"
+                        app:iconGravity="textStart"
+                        app:iconSize="24dp"
                         app:layout_constraintBottom_toTopOf="@+id/pause"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_weight="1"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:rippleColor="@color/purple_700"
-                        app:icon="@mipmap/play"
-                        app:iconSize="24dp"
-                        app:iconGravity="textStart"
                         tools:ignore="VisualLintButtonSize" />
 
                     <com.google.android.material.button.MaterialButton
@@ -148,15 +148,15 @@
                         android:textSize="22sp"
                         android:textStyle="bold"
                         app:cornerRadius="32dp"
+                        app:icon="@mipmap/pause"
+                        app:iconGravity="textStart"
+                        app:iconSize="24dp"
                         app:layout_constraintBottom_toTopOf="@+id/stop"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_weight="1"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/start"
                         app:rippleColor="@color/purple_700"
-                        app:icon="@mipmap/pause"
-                        app:iconSize="24dp"
-                        app:iconGravity="textStart"
                         tools:ignore="TextContrastCheck,VisualLintButtonSize" />
 
                     <com.google.android.material.button.MaterialButton
@@ -170,15 +170,15 @@
                         android:textSize="22sp"
                         android:textStyle="bold"
                         app:cornerRadius="32dp"
+                        app:icon="@mipmap/close"
+                        app:iconGravity="textStart"
+                        app:iconSize="24dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_weight="1"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/pause"
                         app:rippleColor="@color/purple_700"
-                        app:icon="@mipmap/close"
-                        app:iconSize="24dp"
-                        app:iconGravity="textStart"
                         tools:ignore="VisualLintButtonSize" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

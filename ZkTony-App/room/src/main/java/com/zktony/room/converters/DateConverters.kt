@@ -1,7 +1,7 @@
 package com.zktony.room.converters
 
 import androidx.room.TypeConverter
-import java.util.*
+import java.util.Date
 
 /**
  * @author 刘贺贺

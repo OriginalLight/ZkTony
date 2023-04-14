@@ -6,18 +6,13 @@ import android.provider.Settings
 import androidx.core.view.isVisible
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.*
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.dialog.*
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.installApk
+import com.zktony.core.ext.*
 import com.zktony.core.model.QrCode
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
@@ -132,7 +127,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             with(about) {
                 clickScale()
                 clickNoRepeat {
-                    aboutDialog() { webDialog() }
+                    aboutDialog { webDialog() }
                 }
             }
             with(device) {

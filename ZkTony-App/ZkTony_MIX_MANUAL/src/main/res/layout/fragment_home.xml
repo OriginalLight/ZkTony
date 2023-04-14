@@ -10,9 +10,9 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:background="@color/dark_onPrimaryContainer"
+        android:baselineAligned="false"
         android:orientation="horizontal"
-        tools:context=".ui.home.HomeFragment"
-        android:baselineAligned="false">
+        tools:context=".ui.home.HomeFragment">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -25,9 +25,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
+                android:baselineAligned="false"
                 android:orientation="horizontal"
-                tools:ignore="NestedWeights"
-                android:baselineAligned="false">
+                tools:ignore="NestedWeights">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/normal_container"
@@ -58,8 +58,8 @@
                             android:insetTop="0dp"
                             android:insetBottom="0dp"
                             android:text="@string/colloid"
-                            android:textColor="@color/light_onPrimary"
                             android:textAllCaps="false"
+                            android:textColor="@color/light_onPrimary"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             app:cornerRadius="0dp"
@@ -112,8 +112,8 @@
                             android:insetBottom="0dp"
                             android:singleLine="true"
                             android:text="@string/coagulant"
-                            android:textColor="@color/light_onPrimary"
                             android:textAllCaps="false"
+                            android:textColor="@color/light_onPrimary"
                             android:textSize="18sp"
                             android:textStyle="bold"
                             app:cornerRadius="0dp"
@@ -147,9 +147,8 @@
                     android:id="@+id/previous_container"
                     android:layout_width="480dp"
                     android:layout_height="match_parent"
-                    tools:ignore="VisualLintBounds"
                     android:visibility="gone"
-                    >
+                    tools:ignore="VisualLintBounds">
 
                     <LinearLayout
                         android:id="@+id/previous_colloid"
@@ -319,7 +318,7 @@
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
-                android:layout_height="2dp"/>
+                android:layout_height="2dp" />
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"

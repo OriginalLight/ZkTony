@@ -2,9 +2,7 @@ package com.zktony.www.ui.calibration
 
 import android.os.Bundle
 import android.view.Gravity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.findNavController
 import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.util.TextInfo

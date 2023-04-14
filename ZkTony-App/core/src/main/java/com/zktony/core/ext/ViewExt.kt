@@ -3,21 +3,14 @@
 package com.zktony.core.ext
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
+import android.graphics.*
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.MotionEvent
-import android.view.View
-import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.HorizontalScrollView
-import android.widget.ScrollView
+import android.view.*
+import android.widget.*
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
-import com.zktony.core.ext.logw
 
 /**
  * 设置view显示
@@ -101,11 +94,16 @@ fun View.toBitmap(): Bitmap {
             )
             bmp //return
         }
+
         is ScrollView, is HorizontalScrollView, is NestedScrollView -> {
             //draw first child
             val child = (this as ViewGroup).getChildAt(0)
             val screenshot =
-                Bitmap.createBitmap(child.measuredWidth, child.measuredHeight, Bitmap.Config.ARGB_8888)
+                Bitmap.createBitmap(
+                    child.measuredWidth,
+                    child.measuredHeight,
+                    Bitmap.Config.ARGB_8888
+                )
             val canvas = Canvas(screenshot)
             if (child.background != null) {
                 child.background.setBounds(0, 0, child.measuredWidth, child.measuredHeight)
@@ -116,6 +114,7 @@ fun View.toBitmap(): Bitmap {
             child.draw(canvas)// 将 view 画到画布上
             screenshot //return
         }
+
         else -> {
             val screenshot =
                 Bitmap.createBitmap(measuredWidth, measuredHeight, Bitmap.Config.ARGB_8888)

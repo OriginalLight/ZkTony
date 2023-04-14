@@ -24,12 +24,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="1dp"
+            android:layout_weight="1"
             android:background="@color/light_onPrimary"
             android:ellipsize="end"
             android:gravity="center"
             android:textColor="@color/black"
-            android:textSize="16sp"
-            android:layout_weight="1" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/name"
@@ -37,14 +37,14 @@
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"
             android:layout_marginEnd="1dp"
+            android:layout_weight="2"
             android:background="@color/light_onPrimary"
             android:ellipsize="end"
             android:gravity="center"
             android:singleLine="true"
             android:text="@{program.name}"
             android:textColor="@color/black"
-            android:textSize="16sp"
-            android:layout_weight="2" />
+            android:textSize="16sp" />
 
         <com.zktony.core.widget.MarqueTextView
             android:id="@+id/actions"
@@ -71,9 +71,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="1dp"
-            android:orientation="horizontal"
             android:layout_weight="2"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:id="@+id/delete"
@@ -83,16 +83,16 @@
                 android:layout_marginEnd="1dp"
                 android:layout_weight="1"
                 android:background="@color/light_errorContainer"
-                tools:ignore="NestedWeights"
+                android:gravity="center"
                 android:orientation="vertical"
-                android:gravity="center">
+                tools:ignore="NestedWeights">
 
                 <ImageView
                     android:id="@+id/iv_delete"
                     android:layout_width="30dp"
                     android:layout_height="30dp"
-                    android:background="@mipmap/delete"
                     android:layout_gravity="center"
+                    android:background="@mipmap/delete"
                     tools:ignore="ContentDescription" />
 
 
@@ -105,8 +105,8 @@
                 android:layout_marginStart="1dp"
                 android:layout_weight="1"
                 android:background="@color/dark_secondary"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <ImageView
                     android:id="@+id/iv_edit"

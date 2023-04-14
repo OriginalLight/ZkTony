@@ -62,10 +62,9 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:backgroundTint="@color/light_onPrimary"
                     android:layout_weight="1"
+                    android:backgroundTint="@color/light_onPrimary"
                     android:ellipsize="end"
-                    app:elevation="0dp"
                     android:gravity="center"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
@@ -74,10 +73,11 @@
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:cornerRadius="0dp"
+                    app:elevation="0dp"
                     app:icon="@mipmap/program"
-                    app:rippleColor="@color/purple_700"
                     app:iconPadding="0dp"
                     app:iconSize="32dp"
+                    app:rippleColor="@color/purple_700"
                     tools:ignore="NestedWeights,SpeakableTextPresentCheck" />
 
                 <EditText

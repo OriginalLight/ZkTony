@@ -19,7 +19,7 @@ package com.zktony.www.room.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.zktony.core.utils.Snowflake
-import java.util.*
+import java.util.Date
 
 /**
  * Data class that represent the a table in the database.

@@ -5,9 +5,7 @@ import android.app.DatePickerDialog
 import android.os.Bundle
 import android.widget.TextView
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.dialog.messageDialog

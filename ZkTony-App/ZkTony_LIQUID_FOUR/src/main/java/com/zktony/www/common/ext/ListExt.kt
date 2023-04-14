@@ -19,7 +19,7 @@ fun List<Point>.total(): Int {
 fun List<Point>.list(): List<Int> {
     val list = mutableListOf<Int>()
     for (i in 0..3) {
-        if(any { it.index == i }) {
+        if (any { it.index == i }) {
             list.add(i)
         }
     }

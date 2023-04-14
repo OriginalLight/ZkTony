@@ -2,9 +2,7 @@ package com.zktony.www.ui.program
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseFragment
@@ -187,6 +185,7 @@ class ZmFragment : BaseFragment<ZmViewModel, FragmentZmBinding>(R.layout.fragmen
                         jiaoMaxMin.visibility = View.GONE
                         viewModel.setJiaoKind(0)
                     }
+
                     R.id.radio_jiao_special -> {
                         jiaoNormal.visibility = View.GONE
                         jiaoMaxMin.visibility = View.VISIBLE
@@ -207,6 +206,7 @@ class ZmFragment : BaseFragment<ZmViewModel, FragmentZmBinding>(R.layout.fragmen
                         otherWaterInfo.visibility = View.GONE
                         viewModel.setWaterKind("厂家")
                     }
+
                     R.id.other -> {
                         otherWaterInfo.visibility = View.VISIBLE
                         viewModel.setWaterKind(otherWater.text.toString())

@@ -17,17 +17,11 @@ import com.zktony.core.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.datastore.ext.read
 import com.zktony.www.R
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.room.dao.LogDataDao
-import com.zktony.www.room.dao.LogRecordDao
-import com.zktony.www.room.dao.ProgramDao
-import com.zktony.www.room.entity.LogData
-import com.zktony.www.room.entity.LogRecord
-import com.zktony.www.room.entity.Program
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import com.zktony.www.room.dao.*
+import com.zktony.www.room.entity.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class HomeViewModel constructor(
     private val programDao: ProgramDao,

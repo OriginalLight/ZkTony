@@ -1,19 +1,13 @@
 package com.zktony.www.common.adapter
 
 import android.annotation.SuppressLint
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import android.view.*
+import androidx.recyclerview.widget.*
 import com.zktony.core.R
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.removeZero
+import com.zktony.core.ext.*
+import com.zktony.www.databinding.ItemActionBinding
 import com.zktony.www.room.entity.Action
 import com.zktony.www.room.entity.getActionEnum
-import com.zktony.www.databinding.ItemActionBinding
 
 /**
  * @author: 刘贺贺
@@ -61,10 +55,12 @@ class ActionViewHolder(
                     icon.setBackgroundResource(R.mipmap.box)
                     con4.visibility = View.GONE
                 }
+
                 3 -> {
                     icon.setBackgroundResource(R.mipmap.clean)
                     con4.visibility = View.VISIBLE
                 }
+
                 else -> {
                     icon.setBackgroundResource(R.mipmap.virus)
                     con4.visibility = View.GONE

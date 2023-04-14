@@ -2,9 +2,7 @@ package com.zktony.www.ui.log
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.dialog.messageDialog
 import com.zktony.www.R

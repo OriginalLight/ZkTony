@@ -2,12 +2,8 @@ package com.zktony.datastore.ext
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import java.io.IOException
 
 @Suppress("UNCHECKED_CAST")
@@ -20,36 +16,43 @@ fun DataStore<Preferences>.save(key: String, value: Any) {
                     preferences[stringPreferencesKey(key)] = value
                 }
             }
+
             is Boolean -> {
                 edit { preferences ->
                     preferences[booleanPreferencesKey(key)] = value
                 }
             }
+
             is Int -> {
                 edit { preferences ->
                     preferences[intPreferencesKey(key)] = value
                 }
             }
+
             is Long -> {
                 edit { preferences ->
                     preferences[longPreferencesKey(key)] = value
                 }
             }
+
             is Float -> {
                 edit { preferences ->
                     preferences[floatPreferencesKey(key)] = value
                 }
             }
+
             is Double -> {
                 edit { preferences ->
                     preferences[doublePreferencesKey(key)] = value
                 }
             }
+
             is Set<*> -> {
                 edit { preferences ->
                     preferences[stringSetPreferencesKey(key)] = value as Set<String>
                 }
             }
+
             else -> throw IllegalArgumentException("This type can be saved into DataStore")
         }
     }

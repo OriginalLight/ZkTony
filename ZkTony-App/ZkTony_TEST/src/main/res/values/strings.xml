@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name" translatable="false">Test</string>
-    <string name="title_tec" translatable="false">Tec Test</string>
     <string name="start" translatable="false">开始</string>
-
+    <string name="title_tec" translatable="false">Tec Test</string>
 </resources>

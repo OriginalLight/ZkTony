@@ -6,16 +6,11 @@ import android.provider.Settings
 import androidx.core.view.isVisible
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.aboutDialog
-import com.zktony.core.dialog.deviceDialog
-import com.zktony.core.dialog.updateDialog
-import com.zktony.core.dialog.webDialog
+import com.zktony.core.dialog.*
 import com.zktony.core.ext.*
 import com.zktony.core.model.QrCode
 import com.zktony.core.utils.Constants
@@ -194,7 +189,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             with(about) {
                 clickScale()
                 clickNoRepeat {
-                    aboutDialog() { webDialog() }
+                    aboutDialog { webDialog() }
                 }
             }
 

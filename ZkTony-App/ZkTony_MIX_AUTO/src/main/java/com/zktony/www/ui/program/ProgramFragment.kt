@@ -2,9 +2,7 @@ package com.zktony.www.ui.program
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.dialog.inputDialog

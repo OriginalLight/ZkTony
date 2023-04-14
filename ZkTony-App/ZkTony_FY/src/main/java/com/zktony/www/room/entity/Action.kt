@@ -2,7 +2,8 @@ package com.zktony.www.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.*
+import java.util.Date
+import java.util.UUID
 
 /**
  * @author: 刘贺贺

@@ -1,20 +1,14 @@
 package com.zktony.www.manager
 
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.core.ext.hexToAscii
-import com.zktony.core.ext.hexToInt8
-import com.zktony.core.ext.logi
-import com.zktony.core.ext.verifyHex
+import com.zktony.core.ext.*
 import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
 import com.zktony.www.common.ext.toV1
 import com.zktony.www.manager.protocol.V1
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class SerialManager {
 
@@ -85,19 +79,23 @@ class SerialManager {
                                 _ttys0Flow.value = it
                             }
                         }
+
                         1 -> {
                             data.verifyHex().forEach {
                                 _ttys1Flow.value = it
                             }
                         }
+
                         2 -> {
                             data.verifyHex().forEach {
                                 _ttys2Flow.value = it
                             }
                         }
+
                         3 -> {
                             _ttys3Flow.value = data.hexToAscii()
                         }
+
                         else -> {}
                     }
                 }
@@ -115,6 +113,7 @@ class SerialManager {
                                     lockTime = 0L
                                 }
                             }
+
                             "86" -> {
                                 if (res.pa == "01") {
                                     _drawer.value = res.data.hexToInt8() == 0

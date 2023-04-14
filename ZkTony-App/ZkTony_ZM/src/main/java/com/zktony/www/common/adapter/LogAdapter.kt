@@ -3,13 +3,8 @@ package com.zktony.www.common.adapter
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.removeZero
-import com.zktony.core.ext.simpleDateFormat
+import androidx.recyclerview.widget.*
+import com.zktony.core.ext.*
 import com.zktony.www.databinding.ItemLogBinding
 import com.zktony.www.room.entity.LogRecord
 

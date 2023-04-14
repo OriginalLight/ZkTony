@@ -4,13 +4,11 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.removeZero
-import com.zktony.serialport.SerialHelpers
 import com.zktony.serialport.SerialConfig
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import com.zktony.serialport.SerialHelpers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class TecViewModel : BaseViewModel() {
 
@@ -34,11 +32,13 @@ class TecViewModel : BaseViewModel() {
     fun init() {
         viewModelScope.launch {
             launch {
-                helpers.init(SerialConfig(
-                    index = 3,
-                    device = "/dev/ttyS3",
-                    baudRate = 57600,
-                ))
+                helpers.init(
+                    SerialConfig(
+                        index = 3,
+                        device = "/dev/ttyS3",
+                        baudRate = 57600,
+                    )
+                )
                 helpers.callback = { index, data ->
                     if (index == 3) {
                         _serialFlow.value = data
@@ -139,7 +139,8 @@ class TecViewModel : BaseViewModel() {
         flow.value = flow.value.copy(setTemp = high)
         delay(time * 60 * 1000L)
         if (flow.value.temp > high + offset || flow.value.temp < high - offset) {
-            flow.value = flow.value.copy(error = "制热时温度异常 ${flow.value.temp}, 期望温度 $high")
+            flow.value =
+                flow.value.copy(error = "制热时温度异常 ${flow.value.temp}, 期望温度 $high")
             stop(flag)
             return
         }

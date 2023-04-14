@@ -3,6 +3,7 @@
     <string name="add">添加</string>
     <string name="add_program_rs">程序添加 - 染色</string>
     <string name="add_program_zm">程序添加 - 转膜</string>
+    <string name="app_name">转膜仪</string>
     <string name="audio">语音播报</string>
     <string name="cancel">取消</string>
     <string name="danbai_kd">蛋白大小范围（kD）</string>
@@ -55,5 +56,4 @@
     <string name="voltage_zm">电压（0 ~ 50）V</string>
     <string name="water_kind">缓冲液种类</string>
     <string name="zm">转膜</string>
-    <string name="app_name">转膜仪</string>
 </resources>

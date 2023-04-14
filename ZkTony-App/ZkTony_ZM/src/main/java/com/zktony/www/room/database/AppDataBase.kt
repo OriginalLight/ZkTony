@@ -1,15 +1,9 @@
 package com.zktony.www.room.database
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import androidx.room.*
 import com.zktony.room.converters.DateConverters
-import com.zktony.www.room.dao.LogDataDao
-import com.zktony.www.room.dao.LogRecordDao
-import com.zktony.www.room.dao.ProgramDao
-import com.zktony.www.room.entity.LogData
-import com.zktony.www.room.entity.LogRecord
-import com.zktony.www.room.entity.Program
+import com.zktony.www.room.dao.*
+import com.zktony.www.room.entity.*
 
 /**
  * @author 刘贺贺

@@ -13,11 +13,11 @@ class SerialHelpers {
             return 1
         }
 
-        val baseSerial = SerialHelper(config)
-        baseSerial.callback = { callback(config.index, it)}
-        val openStatus = baseSerial.openDevice()
+        val serialHelper = SerialHelper(config)
+        serialHelper.callback = { callback(config.index, it) }
+        val openStatus = serialHelper.openDevice()
         if (openStatus == 0) {
-            serialMap[config.index] = baseSerial
+            serialMap[config.index] = serialHelper
         }
         return openStatus
     }

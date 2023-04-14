@@ -5,9 +5,7 @@ import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Calibration
 import com.zktony.www.room.entity.Motor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /**
  * @author: 刘贺贺

@@ -66,7 +66,10 @@ class SerialPort
                 Log.i(TAG, "提权命令:$cmd")
                 su.outputStream.write(cmd.toByteArray())
 
-                Log.i(TAG, "提权后重新检测读写权限: 是否可读:${device.canRead()}，是否可写：${device.canWrite()}")
+                Log.i(
+                    TAG,
+                    "提权后重新检测读写权限: 是否可读:${device.canRead()}，是否可写：${device.canWrite()}"
+                )
 
                 if (su.waitFor() != 0 || !device.canRead() || !device.canWrite()) {
                     throw SecurityException()

@@ -13,17 +13,10 @@ import com.zktony.core.utils.Queue
 import com.zktony.datastore.ext.read
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
-import com.zktony.www.room.dao.ActionDao
-import com.zktony.www.room.dao.ContainerDao
-import com.zktony.www.room.dao.LogDao
-import com.zktony.www.room.dao.ProgramDao
+import com.zktony.www.room.dao.*
 import com.zktony.www.room.entity.*
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 class HomeViewModel constructor(
     private val programDao: ProgramDao,
@@ -221,9 +214,11 @@ class HomeViewModel constructor(
                                 action = getActionEnum(it.action.mode).value
                             )
                         }
+
                         is ExecutorEvent.Time -> {
                             state.value = state.value.copy(time = it.time)
                         }
+
                         is ExecutorEvent.Finish -> {
                             state.value.log?.let { log ->
                                 updateLog(module, log.copy(status = 1))
@@ -240,6 +235,7 @@ class HomeViewModel constructor(
                                 )
                             }
                         }
+
                         is ExecutorEvent.Count -> {
                             state.value = state.value.copy(
                                 action = if (state.value.action.startsWith(
@@ -248,9 +244,11 @@ class HomeViewModel constructor(
                                 ) "洗涤 X${it.count}" else state.value.action
                             )
                         }
+
                         is ExecutorEvent.Wait -> {
                             state.value = state.value.copy(time = it.msg)
                         }
+
                         is ExecutorEvent.Log -> {
                             val log = state.value.log
                             log?.let { l ->

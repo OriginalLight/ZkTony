@@ -2,9 +2,7 @@ package com.zktony.www.manager
 
 import com.zktony.core.ext.logi
 import com.zktony.www.manager.protocol.V1
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /**
  * @author: 刘贺贺
@@ -38,11 +36,12 @@ class ExecutionManager constructor(
     fun actuator(vararg gen: String, type: Int = 0) {
         scope.launch {
             val str = gen.joinToString("")
-            when(type) {
+            when (type) {
                 0 -> serialManager.sendHex(
                     hex = V1.mutable(data = str),
                     true
                 )
+
                 1 -> serialManager.sendHex(
                     hex = V1.single(data = str),
                     true

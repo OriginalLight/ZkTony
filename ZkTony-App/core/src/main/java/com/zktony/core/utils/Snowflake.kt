@@ -6,6 +6,7 @@ package com.zktony.core.utils
 class Snowflake(private val workerId: Long) {
     // 机器ID占用位数
     private val workerIdBits = 10L
+
     // 序列号占用位数
     private val sequenceBits = 12L
 

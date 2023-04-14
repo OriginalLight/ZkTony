@@ -8,9 +8,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
@@ -176,7 +174,7 @@ class AdminFragment :
             with(about) {
                 clickScale()
                 clickNoRepeat {
-                    aboutDialog() { webDialog() }
+                    aboutDialog { webDialog() }
                 }
             }
             with(device) {

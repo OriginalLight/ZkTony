@@ -2,9 +2,7 @@ package com.zktony.www.manager
 
 import com.zktony.core.ext.logi
 import com.zktony.serialport.SerialHelpers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class SerialManager {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)

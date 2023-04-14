@@ -7,9 +7,7 @@ import com.zktony.www.ui.calibration.CalibrationViewModel
 import com.zktony.www.ui.container.*
 import com.zktony.www.ui.home.HomeViewModel
 import com.zktony.www.ui.log.LogViewModel
-import com.zktony.www.ui.program.ProgramPointViewModel
-import com.zktony.www.ui.program.ProgramEditViewModel
-import com.zktony.www.ui.program.ProgramViewModel
+import com.zktony.www.ui.program.*
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
 

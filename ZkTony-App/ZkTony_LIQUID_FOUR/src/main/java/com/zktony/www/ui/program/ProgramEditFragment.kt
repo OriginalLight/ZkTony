@@ -2,9 +2,7 @@ package com.zktony.www.ui.program
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.PopTip
@@ -91,7 +89,8 @@ class ProgramEditFragment :
                             val list = it.pointList.filter { point -> point.index == 2 }
                             if (list.isNotEmpty()) {
                                 data = list.map { point -> Triple(point.x, point.y, point.enable) }
-                                holeThree.text = list.filter { point -> point.enable }.size.toString()
+                                holeThree.text =
+                                    list.filter { point -> point.enable }.size.toString()
                                 x = list.maxOf { point -> point.y } + 1
                                 y = list.maxOf { point -> point.x } + 1
                             } else {
@@ -114,7 +113,8 @@ class ProgramEditFragment :
                             val list = it.pointList.filter { point -> point.index == 3 }
                             if (list.isNotEmpty()) {
                                 data = list.map { point -> Triple(point.x, point.y, point.enable) }
-                                holeFour.text = list.filter { point -> point.enable }.size.toString()
+                                holeFour.text =
+                                    list.filter { point -> point.enable }.size.toString()
                                 x = list.maxOf { point -> point.y } + 1
                                 y = list.maxOf { point -> point.x } + 1
                             } else {
@@ -187,13 +187,13 @@ class ProgramEditFragment :
                 if (menu.isEmpty()) {
                     PopTip.show("请先添加容器")
                 } else {
-                   spannerDialog(
-                       view = it,
-                       menu = menu,
-                       block = { _, index ->
-                           viewModel.selectPoint(0, index)
-                       }
-                   )
+                    spannerDialog(
+                        view = it,
+                        menu = menu,
+                        block = { _, index ->
+                            viewModel.selectPoint(0, index)
+                        }
+                    )
                 }
             }
             selectTwo.clickNoRepeat {

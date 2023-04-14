@@ -7,9 +7,7 @@ import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Motor
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class MotorViewModel constructor(
@@ -101,9 +99,11 @@ class MotorViewModel constructor(
                         in 0..1 -> {
                             0
                         }
+
                         in 2..4 -> {
                             3
                         }
+
                         else -> {
                             0
                         }

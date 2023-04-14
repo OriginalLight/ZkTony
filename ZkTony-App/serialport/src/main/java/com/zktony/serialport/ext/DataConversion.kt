@@ -1,6 +1,6 @@
 package com.zktony.serialport.ext
 
-import java.util.*
+import java.util.Locale
 
 /**
  * 数据转换工具

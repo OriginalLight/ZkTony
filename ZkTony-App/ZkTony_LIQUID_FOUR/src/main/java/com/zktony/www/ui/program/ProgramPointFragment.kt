@@ -2,14 +2,10 @@ package com.zktony.www.ui.program
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.findNavController
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.removeZero
+import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentProgramPointBinding
 import kotlinx.coroutines.launch

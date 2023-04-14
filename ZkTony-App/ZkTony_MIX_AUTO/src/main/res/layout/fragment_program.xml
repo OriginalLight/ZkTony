@@ -57,10 +57,10 @@
                 android:text="@string/add"
                 android:textColor="@color/light_onPrimary"
                 android:textSize="18sp"
-                app:rippleColor="#6200EA"
                 app:icon="@mipmap/plus"
-                app:iconSize="24dp"
                 app:iconGravity="textStart"
+                app:iconSize="24dp"
+                app:rippleColor="#6200EA"
                 tools:ignore="TextContrastCheck" />
 
         </LinearLayout>

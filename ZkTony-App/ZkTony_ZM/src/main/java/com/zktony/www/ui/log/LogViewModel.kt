@@ -10,7 +10,7 @@ import com.zktony.www.room.entity.LogRecord
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Date
 
 class LogViewModel constructor(
     private val logRecordDao: LogRecordDao,

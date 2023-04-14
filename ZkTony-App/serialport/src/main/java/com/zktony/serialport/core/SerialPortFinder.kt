@@ -1,9 +1,7 @@
 package com.zktony.serialport.core
 
 import android.util.Log
-import java.io.File
-import java.io.FileReader
-import java.io.LineNumberReader
+import java.io.*
 import java.util.*
 
 /**

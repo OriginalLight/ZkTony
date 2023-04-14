@@ -4,13 +4,11 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
-import com.zktony.www.room.entity.Calibration
 import com.zktony.www.databinding.ItemCalibrationBinding
+import com.zktony.www.room.entity.Calibration
 
 /**
  * @author: 刘贺贺
