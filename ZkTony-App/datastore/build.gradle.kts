@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -13,10 +11,6 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildFeatures {
-        dataBinding = true
     }
 
     compileOptions {

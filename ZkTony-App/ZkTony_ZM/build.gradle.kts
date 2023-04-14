@@ -1,6 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -33,10 +30,7 @@ android {
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".zm.release"
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 

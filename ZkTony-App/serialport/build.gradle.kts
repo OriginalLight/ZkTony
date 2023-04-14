@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
@@ -13,7 +11,7 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
 
         ndk {
-            ndkVersion = libs.versions.ndk.get()
+            version = libs.versions.ndk.get()
             abiFilters += listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
         }
 
@@ -31,6 +29,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    ndkVersion = "25.2.9519653"
 
 }
 

@@ -16,7 +16,6 @@
 
 import com.google.protobuf.gradle.*
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -35,6 +34,11 @@ android {
         versionName = "1.2.0"
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        ndk {
+            version = "25.2.9519653"
+            abiFilters += listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
+        }
+
     }
 
     signingConfigs {
@@ -55,10 +59,7 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("debug")
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
@@ -82,7 +83,12 @@ android {
         kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
 
-    packagingOptions {
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    packaging {
         // Multiple dependency bring these files in. Exclude them to enable
         // our test APK to build (has no effect on our AARs)
 
@@ -92,24 +98,11 @@ android {
 
     }
 
-    ndkVersion = "25.2.9519653"
-
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
                 "zktony-manager-${versionName}-${name}.apk"
         }
-    }
-
-    kotlin {
-        jvmToolchain {
-            languageVersion.set(JavaLanguageVersion.of("11"))
-        }
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
     }
 
 }
