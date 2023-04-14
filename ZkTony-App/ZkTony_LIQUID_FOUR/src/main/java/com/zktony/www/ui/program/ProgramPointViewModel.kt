@@ -60,6 +60,9 @@ class ProgramPointViewModel constructor(
 
     fun setVolume() {
         viewModelScope.launch {
+            if (_uiState.value.custom) {
+                return@launch
+            }
             val list = _uiState.value.list
             volumeDialog(point = list[0]) { point ->
                 viewModelScope.launch {
@@ -108,7 +111,6 @@ class ProgramPointViewModel constructor(
             })
             .setCancelable(false)
             .setMaskColor(Color.parseColor("#4D000000"))
-            .setWidth(600)
             .show()
     }
 }

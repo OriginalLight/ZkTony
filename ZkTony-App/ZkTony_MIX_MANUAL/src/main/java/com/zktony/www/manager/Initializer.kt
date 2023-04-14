@@ -1,9 +1,9 @@
 package com.zktony.www.manager
 
 class Initializer constructor(
-    private val serialManager: SerialManager,
-    private val motorManager: MotorManager,
     private val executionManager: ExecutionManager,
+    private val motorManager: MotorManager,
+    private val serialManager: SerialManager,
 ) {
     fun init() {
         serialManager.init()

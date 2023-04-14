@@ -233,7 +233,7 @@ class HomeViewModel constructor(
                             delay(8500L)
                         } else {
                             _uiState.value = _uiState.value.copy(upOrDown = true)
-                            serialManager.sendHex(hex = V1(pa = "0B", data = "0305").toHex())
+                            serialManager.sendHex(hex = V1(pa = "0B", data = "0304").toHex())
                             delay(9000L)
                         }
                     }

@@ -35,14 +35,14 @@ class ProgramExecutor constructor(
             event(ExecutorEvent.Log("[ ${currentTime()} ]\t 开始执行任务\n"))
             val total = list.total()
             if (total > 0) {
-                for (e in 0..3) {
-                    event(ExecutorEvent.Liquid(e))
-                    list.list().forEach { index ->
-                        event(ExecutorEvent.CurrentContainer(index))
+                list.list().forEach { index ->
+                    event(ExecutorEvent.CurrentContainer(index))
+                    for (e in 0..3) {
+                        event(ExecutorEvent.Liquid(e))
                         event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${e + 1}号液体,${index + 1}号板开始加液\n"))
                         val pointList = list.filter { it.index == index }
-                        val x = pointList.maxByOrNull { it.x }?.x ?: 0
-                        val y = pointList.maxByOrNull { it.y }?.y ?: 0
+                        val x = pointList.maxOf { it.x } + 1
+                        val y = pointList.maxOf { it.y } + 1
                         forEachHole(x, y) { i, j ->
                             pointList.find { it.x == i && it.y == j }?.let {
                                 val volume = when (e) {

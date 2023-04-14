@@ -63,5 +63,5 @@ fun completeDialog(name: String, time: String, speed: String) {
                 tvName.text = name
             }
         })
-        .setMaskColor(Color.parseColor("#4D000000")).setWidth(600).show()
+        .setMaskColor(Color.parseColor("#4D000000")).show()
 }

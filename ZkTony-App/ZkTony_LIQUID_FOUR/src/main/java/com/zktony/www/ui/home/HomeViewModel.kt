@@ -82,8 +82,10 @@ class HomeViewModel constructor(
                 var size: Pair<Int, Int> = Pair(8, 12)
                 if (it.isNotEmpty()) {
                     val minIndex = it.minOf { point -> point.index }
-                    val x = it.filter { point -> point.index == minIndex }.maxOf { point -> point.x } + 1
-                    val y = it.filter { point -> point.index == minIndex }.maxOf { point -> point.y } + 1
+                    val x = it.filter { point -> point.index == minIndex }
+                        .maxOf { point -> point.x } + 1
+                    val y = it.filter { point -> point.index == minIndex }
+                        .maxOf { point -> point.y } + 1
                     size = x to y
                 }
                 _uiState.value = _uiState.value.copy(
@@ -260,8 +262,12 @@ class HomeViewModel constructor(
                 executor.event = {
                     when (it) {
                         is ExecutorEvent.CurrentContainer -> {
-                            val maxX = _uiState.value.pointList.maxOf { point -> point.x } + 1
-                            val maxY = _uiState.value.pointList.maxOf { point -> point.y } + 1
+                            val maxX = _uiState.value.pointList.filter { point ->
+                                point.index == it.index
+                            }.maxOf { point -> point.x } + 1
+                            val maxY = _uiState.value.pointList.filter { point ->
+                                point.index == it.index
+                            }.maxOf { point -> point.y } + 1
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
                                     index = when (it.index) {
@@ -275,6 +281,7 @@ class HomeViewModel constructor(
                                 )
                             )
                         }
+
                         is ExecutorEvent.Liquid -> {
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
@@ -295,6 +302,7 @@ class HomeViewModel constructor(
                                 )
                             )
                         }
+
                         is ExecutorEvent.PointList -> {
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
@@ -302,6 +310,7 @@ class HomeViewModel constructor(
                                 )
                             )
                         }
+
                         is ExecutorEvent.Progress -> {
                             val time = _uiState.value.time + 1
                             val percent = it.complete.toFloat() / it.total.toFloat()
@@ -316,17 +325,24 @@ class HomeViewModel constructor(
                             )
 
                         }
+
                         is ExecutorEvent.Log -> {
                             _uiState.value.log?.let { l ->
                                 updateLog(l.copy(content = l.content + it.log))
                             }
                         }
+
                         is ExecutorEvent.Finish -> {
                             reset()
                             completeDialog(
                                 name = _uiState.value.program?.name ?: "错误",
                                 time = _uiState.value.time.getTimeFormat(),
-                                speed = "${String.format("%.2f", _uiState.value.info.speed)} 孔/分钟",
+                                speed = "${
+                                    String.format(
+                                        "%.2f",
+                                        _uiState.value.info.speed
+                                    )
+                                } 孔/分钟",
                             )
                             launch {
                                 _uiState.value.log?.let { l ->
@@ -352,8 +368,10 @@ class HomeViewModel constructor(
     fun stop() {
         _uiState.value.job?.cancel()
         val minIndex = _uiState.value.pointList.minOf { point -> point.index }
-        val maxX = _uiState.value.pointList.filter { point -> point.index == minIndex }.maxOf { point -> point.x } + 1
-        val maxY = _uiState.value.pointList.filter { point -> point.index == minIndex }.maxOf { point -> point.y } + 1
+        val maxX = _uiState.value.pointList.filter { point -> point.index == minIndex }
+            .maxOf { point -> point.x } + 1
+        val maxY = _uiState.value.pointList.filter { point -> point.index == minIndex }
+            .maxOf { point -> point.y } + 1
         _uiState.value = _uiState.value.copy(
             job = null,
             log = null,

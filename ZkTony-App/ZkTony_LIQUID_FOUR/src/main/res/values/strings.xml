@@ -1,14 +1,17 @@
 <resources translatable="false">
+    <string name="about">使用说明</string>
     <string name="actual_volume">实际加液体积/μL</string>
     <string name="add">添加</string>
     <string name="add_liquid">加液</string>
     <string name="app_name">四通道加液</string>
+    <string name="axis_input">坐标编辑</string>
     <string name="bar">导航栏</string>
     <string name="before_volume">预计加液体积/μL</string>
     <string name="button">Button</string>
     <string name="calibration_name">校准程序名</string>
     <string name="check_update">检查更新</string>
     <string name="checked">选中</string>
+    <string name="container_name">容器名</string>
     <string name="current_version">当前软件版本</string>
     <string name="custom_disable">自定义：关</string>
     <string name="fill">填充</string>
@@ -21,7 +24,9 @@
     <string name="input_v3">泵三加液量 μL</string>
     <string name="input_v4">泵四加液量 μL</string>
     <string name="input_x">横坐标:</string>
+    <string name="input_x_size">横坐标尺寸:</string>
     <string name="input_y">纵坐标:</string>
+    <string name="input_y_size">纵坐标尺寸:</string>
     <string name="mode">模式</string>
     <string name="move">移动</string>
     <string name="needle_space">针头间距</string>
@@ -36,6 +41,7 @@
     <string name="save_config">保存配置</string>
     <string name="select_all">全选</string>
     <string name="setting">参数调整</string>
+    <string name="size_input">尺寸编辑</string>
     <string name="start">开 始</string>
     <string name="start_time">开始时间</string>
     <string name="status">状态</string>
@@ -56,15 +62,9 @@
     <string name="volume_input">加液量编辑</string>
     <string name="wash">管路清洗</string>
     <string name="wash_time">清洗时间/秒</string>
+    <string name="waste">废液槽</string>
     <string name="wifi_setting">WIFI设置</string>
     <string name="work_hole">孔位编辑</string>
     <string name="work_name">加液程序名</string>
     <string name="work_plate">加液板编辑</string>
-    <string name="about">使用说明</string>
-    <string name="waste">废液槽</string>
-    <string name="container_name">容器名</string>
-    <string name="axis_input">坐标编辑</string>
-    <string name="input_x_size">横坐标尺寸:</string>
-    <string name="input_y_size">纵坐标尺寸:</string>
-    <string name="size_input">尺寸编辑</string>
 </resources>
