@@ -70,6 +70,7 @@
     <string name="title_log">日志</string>
     <string name="title_program">孵育程序</string>
     <string name="title_program_edit">程序编辑页面</string>
+    <string name="to">~</string>
     <string name="to_block_y">封闭液槽位置</string>
     <string name="to_block_z">封闭液槽高度</string>
     <string name="to_one_y">一抗槽位置</string>

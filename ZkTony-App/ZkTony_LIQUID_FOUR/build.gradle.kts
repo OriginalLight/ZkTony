@@ -22,14 +22,14 @@ android {
         debug {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".liquid.debug"
+            applicationIdSuffix = ".liquid.four.debug"
         }
 
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".liquid.release"
+            applicationIdSuffix = ".liquid.four.release"
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -64,7 +64,7 @@ android {
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-liquid-${versionName}-${name}.apk"
+                "zktony-liquid-four-${versionName}-${name}.apk"
         }
     }
 }

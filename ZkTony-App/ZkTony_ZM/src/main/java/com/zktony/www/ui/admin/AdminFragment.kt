@@ -43,35 +43,19 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.uiState.collect {
-                        if (it.file != null) {
-                            updateDialog(
-                                title = "发现本地新版本",
-                                message = "是否更新？",
-                                block = {
-                                    requireContext().installApk(it.file)
-                                    viewModel.cleanUpdate()
-                                }, block1 = {
-                                    viewModel.cleanUpdate()
-                                })
-                        }
-                        if (it.application != null) {
-                            updateDialog(
-                                title = "发现在线新版本",
-                                message = it.application.description + "\n是否升级？",
-                                block = {
-                                    viewModel.doRemoteUpdate(it.application)
-                                    viewModel.cleanUpdate()
-                                },
-                                block1 = {
-                                    viewModel.cleanUpdate()
-                                })
-                        }
                         binding.apply {
                             progress.apply {
                                 progress = it.progress
                                 isVisible = it.progress != 0
                             }
                             tvUpdate.text = if (it.progress == 0) "检查更新" else "${it.progress}%"
+                            it.application?.let { app ->
+                                if (app.versionCode > BuildConfig.VERSION_CODE) {
+                                    update.setBackgroundResource(com.zktony.core.R.mipmap.new_icon)
+                                    tvUpdate.text =
+                                        if (it.progress == 0) "发现新版本" else "${it.progress}%"
+                                }
+                            }
                         }
                     }
                 }

@@ -53,12 +53,4 @@ interface LogDao : BaseDao<Log> {
     )
     fun getByDate(start: Date, end: Date): Flow<List<Log>>
 
-    @Query(
-        """
-        SELECT * FROM log
-        WHERE upload = 0
-        LIMIT 20
-        """
-    )
-    fun withoutUpload(): Flow<List<Log>>
 }

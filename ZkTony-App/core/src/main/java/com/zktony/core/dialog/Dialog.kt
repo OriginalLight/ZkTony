@@ -196,7 +196,12 @@ fun messageDialog(
 }
 
 
-fun updateDialog(title: String, message: String, block: () -> Unit, block1: () -> Unit) {
+fun updateDialog(
+    title: String,
+    message: String,
+    block: () -> Unit,
+    block1: () -> Unit = {}
+) {
     CustomDialog.build()
         .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_update_dialog) {
             override fun onBind(dialog: CustomDialog, v: View) {

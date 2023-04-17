@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
+import com.zktony.core.dialog.updateDialog
 import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.save
@@ -24,6 +25,23 @@ class AdminViewModel constructor(
 
     private val _uiState = MutableStateFlow(AdminUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            if (Ext.ctx.isNetworkAvailable()) {
+                AG.getByApplicationId(BuildConfig.APPLICATION_ID)
+                    .catch {
+                        _uiState.value = _uiState.value.copy(
+                            application = null
+                        )
+                    }.collect {
+                        _uiState.value = _uiState.value.copy(
+                            application = it
+                        )
+                    }
+            }
+        }
+    }
 
 
     /**
@@ -43,27 +61,18 @@ class AdminViewModel constructor(
     }
 
     /**
-     * 取消或确认更新时清空标志
-     * 防止重进进入时显示更新提示
-     */
-    fun cleanUpdate() {
-        _uiState.value = _uiState.value.copy(
-            file = null,
-            application = null,
-            loading = false
-        )
-    }
-
-    /**
      * 检查更新
      */
     fun checkUpdate() {
         viewModelScope.launch {
             val apk = checkLocalUpdate()
             if (apk != null) {
-                _uiState.value = uiState.value.copy(
-                    file = apk,
-                )
+                updateDialog(
+                    title = "发现本地新版本",
+                    message = "是否更新？",
+                    block = {
+                        Ext.ctx.installApk(apk)
+                    })
             } else {
                 checkRemoteUpdate()
             }
@@ -72,8 +81,9 @@ class AdminViewModel constructor(
 
     /**
      *  下载apk
+     *  @param application [Application]
      */
-    fun doRemoteUpdate(application: Application) {
+    private fun downloadApk(application: Application) {
         viewModelScope.launch {
             PopTip.show("开始下载")
             application.downloadUrl.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
@@ -110,26 +120,46 @@ class AdminViewModel constructor(
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (Ext.ctx.isNetworkAvailable()) {
-                _uiState.value = _uiState.value.copy(
-                    loading = true
-                )
-                AG.getByApplicationId(BuildConfig.APPLICATION_ID).catch {
-                    PopTip.show("获取版本信息失败,请重试!")
-                    _uiState.value = _uiState.value.copy(
-                        loading = false
-                    )
-                }.collect {
-                    if (it.versionCode > BuildConfig.VERSION_CODE) {
-                        _uiState.value = _uiState.value.copy(
-                            application = it,
-                            loading = false
-                        )
+                val application = _uiState.value.application
+                if (application != null) {
+                    if (application.versionCode > BuildConfig.VERSION_CODE) {
+                        updateDialog(
+                            title = "发现在线新版本",
+                            message = application.description + "\n是否升级？",
+                            block = {
+                                downloadApk(application)
+                            })
                     } else {
                         PopTip.show("已是最新版本")
-                        _uiState.value = _uiState.value.copy(
-                            loading = false
-                        )
                     }
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        loading = true
+                    )
+                    AG.getByApplicationId(BuildConfig.APPLICATION_ID)
+                        .catch {
+                            PopTip.show("获取版本信息失败,请重试!")
+                            _uiState.value = _uiState.value.copy(
+                                loading = false
+                            )
+                        }.collect {
+                            if (it.versionCode > BuildConfig.VERSION_CODE) {
+                                updateDialog(
+                                    title = "发现在线新版本",
+                                    message = it.description + "\n是否升级？",
+                                    block = {
+                                        downloadApk(it)
+                                    })
+                                _uiState.value = _uiState.value.copy(
+                                    loading = false
+                                )
+                            } else {
+                                PopTip.show("已是最新版本")
+                                _uiState.value = _uiState.value.copy(
+                                    loading = false
+                                )
+                            }
+                        }
                 }
             } else {
                 PopTip.show("请连接网络或插入升级U盘")
@@ -144,7 +174,7 @@ class AdminViewModel constructor(
     private fun checkLocalUpdate(): File? {
         File("/storage").listFiles()?.forEach {
             it.listFiles()?.forEach { apk ->
-                if (apk.name.endsWith(".apk") && apk.name.contains("zktony-liquid")) {
+                if (apk.name.endsWith(".apk") && apk.name.contains("zktony-liquid-four")) {
                     return apk
                 }
             }
@@ -173,7 +203,6 @@ class AdminViewModel constructor(
 
 
 data class AdminUiState(
-    val file: File? = null,
     val application: Application? = null,
     val progress: Int = 0,
     val loading: Boolean = false

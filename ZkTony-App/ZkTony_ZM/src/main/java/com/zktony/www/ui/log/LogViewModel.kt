@@ -1,6 +1,7 @@
 package com.zktony.www.ui.log
 
 import androidx.lifecycle.viewModelScope
+import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.getDayEnd
 import com.zktony.core.ext.getDayStart
@@ -17,8 +18,8 @@ class LogViewModel constructor(
     private val LDD: LogDataDao
 ) : BaseViewModel() {
 
-    private val _logList = MutableStateFlow(emptyList<LogRecord>())
-    val logList = _logList.asStateFlow()
+    private val _uiState = MutableStateFlow(LogUiState())
+    val uiState = _uiState.asStateFlow()
 
     /**
      * 获取所有记录
@@ -26,21 +27,24 @@ class LogViewModel constructor(
     init {
         viewModelScope.launch {
             LRD.getAll().collect {
-                _logList.value = it
+                _uiState.value = _uiState.value.copy(list = it)
             }
         }
     }
 
     /**
      * 获取日志记录
-     * @param start 开始时间
-     * @param end 结束时间
      */
-    fun changeLogRecord(start: Date, end: Date) {
+    fun search() {
         viewModelScope.launch {
+            val start = _uiState.value.startTime
+            val end = _uiState.value.endTime
             LRD.getByDate(start.getDayStart(), end.getDayEnd())
                 .collect {
-                    _logList.value = it
+                    _uiState.value = _uiState.value.copy(list = it)
+                    if (it.isEmpty()) {
+                        PopTip.show("没有找到相关日志")
+                    }
                 }
         }
     }
@@ -55,4 +59,27 @@ class LogViewModel constructor(
             LDD.deleteByRecordId(logRecord.id)
         }
     }
+
+    /**
+     * 切换搜索栏
+     */
+    fun showSearchBar() {
+        val search = _uiState.value.bar
+        _uiState.value = _uiState.value.copy(bar = !search)
+    }
+
+    fun setStartTime(date: Date) {
+        _uiState.value = _uiState.value.copy(startTime = date)
+    }
+
+    fun setEndTime(date: Date) {
+        _uiState.value = _uiState.value.copy(endTime = date)
+    }
 }
+
+data class LogUiState(
+    val list: List<LogRecord> = emptyList(),
+    val bar: Boolean = false,
+    val startTime : Date = Date(System.currentTimeMillis()),
+    val endTime : Date = Date(System.currentTimeMillis())
+)

@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
+import com.zktony.core.R.mipmap
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.dialog.messageDialog
 import com.zktony.core.ext.*
@@ -31,14 +32,19 @@ class LogFragment :
     }
 
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.logList.collect {
-                    adapter.submitList(it)
+                viewModel.uiState.collect {
+                    adapter.submitList(it.list)
                     binding.apply {
-                        empty.isVisible = it.isEmpty()
-                        recyclerView.isVisible = it.isNotEmpty()
+                        empty.isVisible = it.list.isEmpty()
+                        recycleView.isVisible = it.list.isNotEmpty()
+                        showSearch.setIconResource(if (it.bar) mipmap.collapse_arrow else mipmap.search)
+                        searchBar.isVisible = it.bar
+                        startTime.text = it.startTime.simpleDateFormat("MM 月 dd 日")
+                        endTime.text = it.endTime.simpleDateFormat("MM 月 dd 日")
                     }
                 }
             }
@@ -61,12 +67,29 @@ class LogFragment :
             )
         }
         binding.apply {
-            recyclerView.adapter = adapter
-            with(datePicker) {
+            recycleView.adapter = adapter
+            with(showSearch) {
                 clickScale()
-                text = Date(System.currentTimeMillis()).simpleDateFormat("MM 月 dd 日")
                 clickNoRepeat {
-                    showDatePickerDialog(0, binding.datePicker, Calendar.getInstance())
+                    viewModel.showSearchBar()
+                }
+            }
+            with(startTime) {
+                clickScale()
+                clickNoRepeat {
+                    showDatePickerDialog(0, this, Calendar.getInstance(), 0)
+                }
+            }
+            with(endTime) {
+                clickScale()
+                clickNoRepeat {
+                    showDatePickerDialog(0, this, Calendar.getInstance(), 1)
+                }
+            }
+            with(search) {
+                clickScale()
+                clickNoRepeat {
+                    viewModel.search()
                 }
             }
         }
@@ -82,7 +105,8 @@ class LogFragment :
     fun showDatePickerDialog(
         themeResId: Int,
         tv: TextView,
-        calendar: Calendar
+        calendar: Calendar,
+        index: Int = 0
     ) {
         DatePickerDialog(
             requireActivity(),
@@ -91,7 +115,7 @@ class LogFragment :
                 val dateStr = year.toString() + "-" + (monthOfYear + 1) + "-" + dayOfMonth
                 val date = dateStr.simpleDateFormat("yyyy-MM-dd")
                 tv.text = date?.simpleDateFormat("MM 月 dd 日")
-                date?.run { viewModel.changeLogRecord(date.getDayStart(), date.getDayEnd()) }
+                date?.let { if (index == 0) viewModel.setStartTime(it) else viewModel.setEndTime(it) }
             },
             calendar[Calendar.YEAR],
             calendar[Calendar.MONTH],

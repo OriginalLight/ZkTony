@@ -39,8 +39,17 @@ interface LogDao : BaseDao<Log> {
         """
         SELECT * FROM log
         ORDER BY createTime DESC 
-        LIMIT 40
+        LIMIT 20
         """
     )
     fun getAll(): Flow<List<Log>>
+
+    @Query(
+        """
+        SELECT * FROM log
+        WHERE createTime BETWEEN :start AND :end
+        ORDER BY createTime DESC
+        """
+    )
+    fun getByDate(start: Date, end: Date): Flow<List<Log>>
 }

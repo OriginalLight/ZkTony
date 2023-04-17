@@ -5,139 +5,182 @@
 
     <data />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
+        android:background="@color/dark_onBackground"
+        android:orientation="vertical"
         tools:context=".ui.log.LogFragment">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:background="@color/dark_onBackground"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+        <LinearLayout
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="2dp"
+            android:orientation="horizontal">
 
-            <LinearLayout
-                android:id="@+id/title"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/order"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="2dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="1dp"
-                    android:layout_weight="1"
-                    android:background="@color/light_onPrimary"
-                    android:gravity="center"
-                    android:text="@string/order"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="2"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/program_name"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="1dp"
-                    android:layout_weight="2"
-                    android:background="@color/light_onPrimary"
-                    android:gravity="center"
-                    android:text="@string/program_name"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="2"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/start_time"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="1dp"
-                    android:layout_weight="2"
-                    android:background="@color/light_onPrimary"
-                    android:gravity="center"
-                    android:text="@string/start_time"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/module"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="1dp"
-                    android:layout_weight="1"
-                    android:background="@color/light_onPrimary"
-                    android:gravity="center"
-                    android:text="@string/module"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/status"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="1dp"
-                    android:layout_weight="1"
-                    android:background="@color/light_onPrimary"
-                    android:gravity="center"
-                    android:text="@string/status"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/show_search"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_weight="1"
+                android:backgroundTint="@color/light_onPrimary"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="0dp"
+                app:icon="@mipmap/search"
+                app:iconGravity="textStart"
+                app:iconSize="32dp"
+                app:iconTint="@null"
+                app:rippleColor="@color/purple_700"
+                tools:ignore="SpeakableTextPresentCheck" />
+        </LinearLayout>
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="2dp"
-                    android:layout_weight="1"
-                    android:background="@color/light_onPrimary"
-                    android:gravity="center"
-                    android:text="@string/operate"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-            </LinearLayout>
+        <LinearLayout
+            android:id="@+id/search_bar"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="2dp"
+            android:orientation="horizontal"
+            android:visibility="gone">
 
-            <ImageView
-                android:id="@+id/empty"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@mipmap/empty"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/title"
-                tools:ignore="ContentDescription" />
+            <TextView
+                android:id="@+id/start_time"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="3"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/about"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycle_view"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/title"
-                app:layout_constraintVertical_bias="0.0"
-                tools:listitem="@layout/item_log">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="1"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/to"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
-            </androidx.recyclerview.widget.RecyclerView>
+            <TextView
+                android:id="@+id/end_time"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="3"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/about"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageButton
+                android:id="@+id/search"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_weight="1"
+                android:background="@color/light_onPrimary"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/search"
+                tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/empty"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycle_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+            app:layout_constraintVertical_bias="0.0"
+            tools:listitem="@layout/item_log" />
+
+
+    </LinearLayout>
 
 </layout>
 

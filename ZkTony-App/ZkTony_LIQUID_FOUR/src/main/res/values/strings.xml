@@ -59,6 +59,7 @@
     <string name="title_home">主界面</string>
     <string name="title_log">日志</string>
     <string name="title_program">分液程序</string>
+    <string name="to">~</string>
     <string name="volume_input">加液量编辑</string>
     <string name="wash">管路清洗</string>
     <string name="wash_time">清洗时间/秒</string>
