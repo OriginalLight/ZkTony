@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.*
 import com.zktony.core.ext.*
+import com.zktony.www.R
 import com.zktony.www.databinding.ItemLogBinding
 import com.zktony.www.room.entity.LogRecord
 
@@ -68,12 +69,14 @@ class LogViewHolder(
             str.append(item.time.toString().removeZero())
             str.append("MIN")
             parameter.text = str.toString()
+            val zm = itemView.context.getString(R.string.zm)
+            val rs = itemView.context.getString(R.string.rs)
             model.text = when (item.model) {
-                0 -> "A-转膜"
-                1 -> "A-染色"
-                2 -> "B-转膜"
-                3 -> "B-染色"
-                else -> "未知"
+                0 -> "A-$zm"
+                1 -> "A-$rs"
+                2 -> "B-$zm"
+                3 -> "B-$rs"
+                else -> zm
             }
             delete.run {
                 this.clickScale()
