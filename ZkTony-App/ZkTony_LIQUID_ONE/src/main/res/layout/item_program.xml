@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="program"
+            type="com.zktony.www.room.entity.Program" />
+    </data>
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="2dp"
+        android:background="@color/dark_onBackground"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/order"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="1dp"
+            android:layout_weight="1"
+            android:background="@color/light_onPrimary"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_weight="4"
+            android:background="@color/light_onPrimary"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@{program.name}"
+            android:textColor="@color/black"
+            android:textSize="16sp" />
+
+
+        <LinearLayout
+            android:id="@+id/con_operate"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="1dp"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:id="@+id/delete"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/light_errorContainer"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:ignore="NestedWeights">
+
+                <ImageView
+                    android:id="@+id/iv_delete"
+                    android:layout_width="29dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@mipmap/delete"
+                    tools:ignore="ContentDescription" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/edit"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/dark_secondary"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/iv_edit"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:background="@mipmap/forward"
+                    tools:ignore="ContentDescription,ImageContrastCheck" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

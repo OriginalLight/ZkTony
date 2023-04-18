@@ -215,8 +215,7 @@ object DataConversion {
         val d = ByteArray(length)
         for (i in 0 until length) {
             val pos = i * 2
-            d[i] =
-                (charToByte(hexChars[pos]).toInt() shl 4 or charToByte(hexChars[pos + 1]).toInt()).toByte()
+            d[i] = (charToByte(hexChars[pos]).toInt() shl 4 or charToByte(hexChars[pos + 1]).toInt()).toByte()
         }
         return d
     }
