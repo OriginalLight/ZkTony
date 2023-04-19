@@ -1,16 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="active">Active</string>
     <string name="add_calibration">Add a calibration program</string>
     <string name="app_name">Semi-automatic gradient mixer</string>
-    <string name="back_coagulant">Back Coagulan</string>
+    <string name="back_coagulant">Back Coagulant</string>
     <string name="back_colloid">Back Colloid</string>
     <string name="button">Button</string>
     <string name="calibration_name">Name</string>
     <string name="coagulant">Coagulant μL:</string>
     <string name="colloid">Colloid μL:</string>
     <string name="delete_calibration">Delete the calibration program</string>
-    <string name="fill_coagulant">Fill Coagulan</string>
+    <string name="fill_coagulant">Fill Coagulant</string>
     <string name="fill_colloid">Fill Colloid</string>
     <string name="input_calibration_name">Please input a program name</string>
     <string name="motor_setting">Motor Setting</string>
@@ -31,7 +30,7 @@
     <string name="title_home">Home</string>
     <string name="title_log">Log</string>
     <string name="title_motor">Motor</string>
-    <string name="volume_coagulant">Coagulan volume (μL)</string>
+    <string name="volume_coagulant">Coagulant volume (μL)</string>
     <string name="volume_colloid">Colloid volume (μL)</string>
     <string name="volume_edit">Volume edit</string>
     <string name="whether_delete">Whether to delete</string>

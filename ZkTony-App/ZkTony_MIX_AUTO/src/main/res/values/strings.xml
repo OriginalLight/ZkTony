@@ -1,10 +1,8 @@
 <resources translatable="false">
-    <string name="actual_volume">实际加液体积/μL</string>
     <string name="add">添加</string>
     <string name="add_liquid">加液</string>
     <string name="app_name">全自动梯度混合仪</string>
     <string name="axis_input">容器坐标编辑</string>
-    <string name="before_volume">预计加液体积/μL</string>
     <string name="button">Button</string>
     <string name="calibration_name">校准程序名</string>
     <string name="checked">选中</string>

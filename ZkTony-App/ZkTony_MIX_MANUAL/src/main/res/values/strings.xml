@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="active">选中</string>
     <string name="add_calibration">添加校准程序</string>
     <string name="app_name">半自动梯度混合仪</string>
     <string name="back_coagulant">回吸促凝剂</string>

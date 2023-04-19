@@ -3,6 +3,7 @@
     <string name="acceleration">加速度</string>
     <string name="acceleration_exception">加速度范围为10–100</string>
     <string name="action">操作</string>
+    <string name="active">选中</string>
     <string name="actual_volume">"实际加液体积 (μL) "</string>
     <string name="add">添加</string>
     <string name="add_liquid">加液</string>
