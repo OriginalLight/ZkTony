@@ -47,8 +47,8 @@ class CalibrationFragment :
             onCheckedClick = { viewModel.enable(it) }
             onDeleteButtonClick = {
                 messageDialog(
-                    title = "删除校准程序",
-                    message = "删除后将无法恢复，是否删除${it.name}？",
+                    title = getString(R.string.delete_calibration),
+                    message = "${getString(R.string.whether_delete)} ${it.name}？",
                     block = { viewModel.delete(it) }
                 )
             }
@@ -65,8 +65,8 @@ class CalibrationFragment :
                 clickScale()
                 clickNoRepeat {
                     inputDialog(
-                        title = "添加校准程序",
-                        hint = "请输入校准程序名称",
+                        title = getString(R.string.add_calibration),
+                        hint = getString(R.string.input_calibration_name),
                         block = {
                             viewModel.insert(it) { id ->
                                 findNavController().navigate(

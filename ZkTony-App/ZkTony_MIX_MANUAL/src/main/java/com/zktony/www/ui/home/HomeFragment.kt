@@ -45,7 +45,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             start.isEnabled =
                                 it.coagulant > 0 && it.colloid > 0 && it.job == null && !it.start
                             previous.isEnabled =
-                                it.coagulant > 0 && it.colloid > 0 && it.job == null
+                                it.previousCoagulant > 0 && it.previousColloid > 0 && it.job == null
 
                             previous.isVisible = it.previous
                             start.isVisible = !it.previous
@@ -66,9 +66,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             fillCoagulantImage.setBackgroundResource(if (it.fillCoagulant) mipmap.close else mipmap.right)
                             recaptureCoagulantImage.setBackgroundResource(if (it.recaptureCoagulant) mipmap.close else mipmap.left)
                             fillCoagulantText.text =
-                                if (it.fillCoagulant) "停止" else "填充(促凝剂)"
+                                if (it.fillCoagulant) getString(com.zktony.core.R.string.stop) else getString(
+                                    R.string.fill_coagulant
+                                )
                             recaptureCoagulantText.text =
-                                if (it.recaptureCoagulant) "停止" else "回吸(促凝剂)"
+                                if (it.recaptureCoagulant) getString(com.zktony.core.R.string.stop) else getString(
+                                    R.string.back_coagulant
+                                )
                         }
                     }
                 }
@@ -87,7 +91,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             with(reset) {
                 clickScale()
                 clickNoRepeat {
-                    PopTip.show("长按复位")
+                    PopTip.show(getString(com.zktony.core.R.string.press_and_hold_to_reset))
                 }
                 setOnLongClickListener {
                     viewModel.reset()
@@ -152,7 +156,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 clickNoRepeat {
                     val menu = viewModel.uiState.value.coagulantHistory.toList().reversed()
                     if (menu.isEmpty()) {
-                        PopTip.show("历史记录为空")
                         return@clickNoRepeat
                     }
                     spannerDialog(
@@ -169,7 +172,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 clickNoRepeat {
                     val menu = viewModel.uiState.value.previousCoagulantHistory.toList().reversed()
                     if (menu.isEmpty()) {
-                        PopTip.show("历史记录为空")
                         return@clickNoRepeat
                     }
                     spannerDialog(
@@ -186,7 +188,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 clickNoRepeat {
                     val menu = viewModel.uiState.value.colloidHistory.toList().reversed()
                     if (menu.isEmpty()) {
-                        PopTip.show("历史记录为空")
                         return@clickNoRepeat
                     }
                     spannerDialog(
@@ -203,7 +204,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 clickNoRepeat {
                     val menu = viewModel.uiState.value.previousColloidHistory.toList().reversed()
                     if (menu.isEmpty()) {
-                        PopTip.show("历史记录为空")
                         return@clickNoRepeat
                     }
                     spannerDialog(

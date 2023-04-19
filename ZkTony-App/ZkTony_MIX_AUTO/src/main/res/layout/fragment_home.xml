@@ -144,7 +144,7 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
                         android:backgroundTint="#FBF12D"
-                        android:text="@string/suspend"
+                        android:text="@string/pause"
                         android:textSize="22sp"
                         android:textStyle="bold"
                         app:cornerRadius="32dp"

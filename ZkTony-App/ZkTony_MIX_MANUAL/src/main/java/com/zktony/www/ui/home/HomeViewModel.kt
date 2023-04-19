@@ -5,8 +5,10 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.Ext
 import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
+import com.zktony.www.R
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.*
@@ -78,14 +80,10 @@ class HomeViewModel constructor(
     fun reset() {
         viewModelScope.launch {
             if (_uiState.value.job == null) {
-                if (SM.lock.value) {
-                    PopTip.show("运动中禁止复位")
-                } else {
-                    SM.reset()
-                    PopTip.show("复位-已下发")
-                }
+                SM.reset()
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.resetting))
             } else {
-                PopTip.show("请中止所有运行中程序")
+                PopTip.show(Ext.ctx.getString(R.string.stop_all))
             }
         }
     }
@@ -168,7 +166,7 @@ class HomeViewModel constructor(
             } else {
                 if (SM.reset.value) {
                     if (_uiState.value.recaptureCoagulant) {
-                        PopTip.show("请先停止回吸")
+                        PopTip.show(Ext.ctx.getString(R.string.stop_back))
                         return@launch
                     }
                     _uiState.value = _uiState.value.copy(
@@ -191,7 +189,7 @@ class HomeViewModel constructor(
                     }
 
                 } else {
-                    PopTip.show("请先复位")
+                    PopTip.show(Ext.ctx.getString(R.string.reset_first))
                 }
             }
         }
@@ -214,7 +212,7 @@ class HomeViewModel constructor(
             } else {
                 if (SM.reset.value) {
                     if (_uiState.value.fillCoagulant) {
-                        PopTip.show("请先停止填充")
+                        PopTip.show(Ext.ctx.getString(R.string.stop_fill))
                         return@launch
                     }
                     _uiState.value = _uiState.value.copy(
@@ -237,7 +235,7 @@ class HomeViewModel constructor(
                     }
 
                 } else {
-                    PopTip.show("请先复位")
+                    PopTip.show(Ext.ctx.getString(R.string.reset_first))
                 }
             }
         }

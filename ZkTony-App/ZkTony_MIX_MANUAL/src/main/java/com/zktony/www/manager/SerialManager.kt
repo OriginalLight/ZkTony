@@ -1,8 +1,7 @@
 package com.zktony.www.manager
 
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.core.ext.hexToInt8
-import com.zktony.core.ext.logi
+import com.zktony.core.ext.*
 import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
 import com.zktony.www.common.ext.toV1
@@ -66,7 +65,7 @@ class SerialManager {
                                     _lock.value = false
                                     lockTime = 0L
                                     _reset.value = true
-                                    PopTip.show("复位成功")
+                                    PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.reset_success))
                                 }
                             }
                         }

@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.*
 import com.zktony.core.ext.*
+import com.zktony.www.R
 import com.zktony.www.databinding.ItemCalibrationDataBinding
 import com.zktony.www.room.entity.CalibrationData
 
@@ -63,11 +64,10 @@ class CalibrationDataViewHolder(
             cali = item
             order.text = (layoutPosition + 1).toString()
             name.text = when (item.pumpId) {
-                0 -> "泵一"
-                1 -> "泵二"
-                2 -> "泵三"
-                3 -> "泵四"
-                else -> "未知"
+                0 -> itemView.context.getString(R.string.pump_one)
+                1 -> itemView.context.getString(R.string.pump_two)
+                2 -> itemView.context.getString(R.string.pump_three)
+                else -> itemView.context.getString(R.string.pump_one)
             }
             expect.text = item.expect.toString().removeZero()
             actual.text = item.actual.toString().removeZero()

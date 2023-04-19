@@ -312,7 +312,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="@string/glue_concentration_noraml"
+                        android:text="@string/glue_concentration_normal"
                         android:textColor="@color/black"
                         android:textSize="22sp" />
 
@@ -425,7 +425,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="@string/glue_thinkness"
+                        android:text="@string/glue_thickness"
                         android:textColor="@color/black"
                         android:textSize="22sp" />
 

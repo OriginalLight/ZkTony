@@ -297,7 +297,7 @@
                         android:layout_height="64dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        android:text="@string/previous"
+                        android:text="@string/pre_drainage"
                         android:textSize="22sp"
                         android:textStyle="bold"
                         app:cornerRadius="32dp"
@@ -420,7 +420,7 @@
                     android:id="@+id/recapture_coagulant_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/recapture_coagulant"
+                    android:text="@string/back_coagulant"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
 
@@ -472,7 +472,7 @@
                     android:id="@+id/recapture_colloid_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/recapture_colloid"
+                    android:text="@string/back_colloid"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
 

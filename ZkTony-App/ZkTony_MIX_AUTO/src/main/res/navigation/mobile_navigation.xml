@@ -112,7 +112,7 @@
     <fragment
         android:id="@+id/navigation_motor"
         android:name="com.zktony.www.ui.admin.MotorFragment"
-        android:label="@string/title_adjust"
+        android:label="@string/title_motor"
         tools:layout="@layout/fragment_motor">
         <action
             android:id="@+id/action_navigation_motor_to_navigation_admin"

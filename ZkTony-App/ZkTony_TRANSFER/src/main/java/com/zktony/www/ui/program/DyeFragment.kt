@@ -51,7 +51,7 @@ class DyeFragment : BaseFragment<DyeViewModel, FragmentDyeBinding>(R.layout.frag
             cancel.clickNoRepeat { findNavController().navigateUp() }
             save.clickNoRepeat {
                 viewModel.save {
-                    PopTip.show(getString(R.string.save_success))
+                    PopTip.show(getString(com.zktony.core.R.string.save_success))
                     findNavController().navigateUp()
                 }
             }

@@ -40,15 +40,15 @@ fun authDialog(block: () -> Unit) {
                 val etInput = v.findViewById<EditText>(R.id.input)
                 val btnOk = v.findViewById<MaterialButton>(R.id.ok)
                 val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
-                tvTitle.text = "权限认证"
-                etInput.hint = "请输入密码"
-                etInput.inputType = InputType.TYPE_CLASS_TEXT
+                tvTitle.text = Ext.ctx.getString(R.string.permission_authentication)
+                etInput.hint = Ext.ctx.getString(R.string.input_password)
+                etInput.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                 btnOk.clickNoRepeat {
                     if (etInput.text.isBlank().not() && etInput.text.toString() == "123456") {
                         block()
                         dialog.dismiss()
                     } else {
-                        PopTip.show("密码错误")
+                        PopTip.show(Ext.ctx.getString(R.string.password_incorrect))
                     }
                 }
                 btnCancel.clickNoRepeat {
@@ -78,7 +78,7 @@ fun deviceDialog(code: String) {
                     color_white = Color.WHITE
                 )
                 if (image == null) {
-                    PopTip.show("生成二维码失败")
+                    PopTip.show(Ext.ctx.getString(R.string.failed_generate_qrcode))
                     dialog.dismiss()
                 }
                 device.setImageBitmap(image)

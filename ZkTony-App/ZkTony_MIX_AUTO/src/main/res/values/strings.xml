@@ -1,15 +1,12 @@
 <resources translatable="false">
-    <string name="about">使用说明</string>
     <string name="actual_volume">实际加液体积/μL</string>
     <string name="add">添加</string>
     <string name="add_liquid">加液</string>
     <string name="app_name">全自动梯度混合仪</string>
     <string name="axis_input">容器坐标编辑</string>
-    <string name="bar">导航栏</string>
     <string name="before_volume">预计加液体积/μL</string>
     <string name="button">Button</string>
     <string name="calibration_name">校准程序名</string>
-    <string name="check_update">检查更新</string>
     <string name="checked">选中</string>
     <string name="container_name">容器名</string>
     <string name="current_version">当前软件版本</string>
@@ -40,14 +37,12 @@
     <string name="save">保存</string>
     <string name="save_config">保存配置</string>
     <string name="select_all">全选</string>
-    <string name="setting">参数调整</string>
     <string name="start">开 始</string>
     <string name="start_time">开始时间</string>
     <string name="status">状态</string>
     <string name="stop">停 止</string>
     <string name="subdivision">细分</string>
-    <string name="suspend">暂 停</string>
-    <string name="title_adjust">管理员</string>
+    <string name="pause">暂 停</string>
     <string name="title_admin">管理员</string>
     <string name="title_calibration">校准管理</string>
     <string name="title_calibration_data">校准数据</string>
@@ -58,5 +53,6 @@
     <string name="title_program_edit">程序编辑</string>
     <string name="to">~</string>
     <string name="volume_input">加液量编辑</string>
-    <string name="wifi_setting">WIFI设置</string>
+    <string name="title_motor">电机</string>
+    <string name="motor_setting">电机设置</string>
 </resources>

@@ -62,7 +62,7 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_bar"
-                            android:text="@string/bar"
+                            android:text="@string/navigation"
                             android:textColor="@color/black"
                             android:textSize="16sp"
                             tools:ignore="RelativeOverlap,VisualLintOverlap" />
@@ -163,7 +163,7 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_version"
-                            android:text="@string/current_version"
+                            android:text="@string/version"
                             android:textColor="@color/black"
                             android:textSize="16sp"
                             tools:ignore="RelativeOverlap,VisualLintOverlap" />
@@ -205,10 +205,10 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_device"
-                            android:text="设备信息"
+                            android:text="@string/device_info"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="HardcodedText,VisualLintOverlap" />
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                         <TextView
                             android:id="@+id/tv_device_name"
@@ -247,7 +247,7 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_about"
-                            android:text="@string/about"
+                            android:text="@string/instructions_for_use"
                             android:textColor="@color/black"
                             android:textSize="16sp"
                             tools:ignore="RelativeOverlap" />
@@ -305,7 +305,7 @@
                     android:layout_below="@+id/setting"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
-                    android:text="@string/setting"
+                    android:text="@string/protected_settings"
                     android:textSize="16sp" />
 
             </RelativeLayout>

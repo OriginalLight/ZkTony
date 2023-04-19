@@ -192,7 +192,7 @@
                             android:text="@string/auto_clean_interval"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="VisualLintOverlap" />
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                         <EditText
                             android:id="@+id/interval"
@@ -232,7 +232,7 @@
                             android:text="@string/auto_clean_duration"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="HardcodedText,VisualLintOverlap" />
+                            tools:ignore="HardcodedText,RelativeOverlap,VisualLintOverlap" />
 
                         <EditText
                             android:id="@+id/duration"
@@ -273,7 +273,7 @@
                             android:text="@string/fill_back_speed"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="HardcodedText,VisualLintOverlap" />
+                            tools:ignore="HardcodedText,RelativeOverlap,VisualLintOverlap" />
 
                         <EditText
                             android:id="@+id/motor_speed"
@@ -332,7 +332,7 @@
                             android:text="@string/version"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="VisualLintOverlap" />
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                         <TextView
                             android:id="@+id/tv_version_name"
@@ -374,7 +374,7 @@
                             android:text="@string/device_info"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="VisualLintOverlap" />
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                         <TextView
                             android:id="@+id/tv_device_name"
@@ -413,7 +413,7 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_about"
-                            android:text="@string/about"
+                            android:text="@string/instructions_for_use"
                             android:textColor="@color/black"
                             android:textSize="16sp"
                             tools:ignore="RelativeOverlap" />

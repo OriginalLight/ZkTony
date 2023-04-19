@@ -3,6 +3,7 @@ package com.zktony.www.ui.calibration
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.Ext
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.CalibrationDataDao
 import com.zktony.www.room.entity.Calibration
@@ -28,12 +29,12 @@ class CalibrationViewModel constructor(
     fun insert(name: String, block: (Long) -> Unit) {
         viewModelScope.launch {
             if (name.isEmpty()) {
-                PopTip.show("校准程序名不能为空")
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.not_empty))
                 return@launch
             }
             val cali = _uiState.value?.find { it.name == name }
             if (cali != null) {
-                PopTip.show("校准程序名已存在")
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_exists))
             } else {
                 val model = Calibration(name = name)
                 CD.insert(model)
@@ -47,7 +48,8 @@ class CalibrationViewModel constructor(
             CD.delete(calibration)
             CDD.deleteBySubId(calibration.id)
             if (calibration.enable == 1) {
-                val cali = _uiState.value?.find { it.name == "默认" }
+                val cali =
+                    _uiState.value?.find { it.name == Ext.ctx.getString(com.zktony.core.R.string.def) }
                 cali?.let { CD.update(it.copy(enable = 1)) }
             }
         }
