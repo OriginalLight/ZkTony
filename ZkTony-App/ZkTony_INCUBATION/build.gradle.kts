@@ -12,8 +12,8 @@ android {
         applicationId = "com.zktony.www"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 4
-        versionName = "1.1.2"
+        versionCode = 1
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -22,14 +22,14 @@ android {
         debug {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".fy.debug"
+            applicationIdSuffix = ".incubation.debug"
         }
 
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".fy.release"
+            applicationIdSuffix = ".incubation.release"
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -64,7 +64,7 @@ android {
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-fy-${versionName}-${name}.apk"
+                "zktony-incubation-${versionName}-${name}.apk"
         }
     }
 }
