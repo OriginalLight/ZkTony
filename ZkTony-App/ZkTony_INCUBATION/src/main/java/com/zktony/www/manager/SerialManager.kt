@@ -9,6 +9,7 @@ import com.zktony.www.manager.protocol.V1
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.util.concurrent.atomic.AtomicBoolean
 
 class SerialManager {
 
@@ -22,14 +23,6 @@ class SerialManager {
 
     // 下位机机构运行状态
     private val _lock = MutableStateFlow(false)
-
-    // 程序运行状态
-    private val _run = MutableStateFlow(false)
-
-    // 抽屉状态
-    private val _drawer = MutableStateFlow(false)
-
-    // 摇床状态
     private val _swing = MutableStateFlow(false)
 
     val ttys0Flow = _ttys0Flow.asStateFlow()
@@ -37,9 +30,10 @@ class SerialManager {
     val ttys2Flow = _ttys2Flow.asStateFlow()
     val ttys3Flow = _ttys3Flow.asStateFlow()
     val lock = _lock.asStateFlow()
-    val run = _run.asStateFlow()
-    val drawer = _drawer.asStateFlow()
     val swing = _swing.asStateFlow()
+
+    val run = AtomicBoolean(false)
+    val drawer = AtomicBoolean(false)
 
     // 机构运行已经等待的时间
     private var lockTime = 0L
@@ -116,7 +110,7 @@ class SerialManager {
 
                             "86" -> {
                                 if (res.pa == "01") {
-                                    _drawer.value = res.data.hexToInt8() == 0
+                                    drawer.set(res.data.hexToInt8() == 0)
                                 }
                                 if (res.pa == "0A") {
                                     _lock.value = false
@@ -131,7 +125,6 @@ class SerialManager {
             launch {
                 while (true) {
                     delay(1000L)
-                    //Logger.d(msg = "lock: ${lock.value}, lock: ${lock.value}, run: ${run.value}, drawer: ${drawer.value}")
                     // 如果正在运行，计时
                     if (lock.value) {
                         lockTime += 1L
@@ -141,13 +134,7 @@ class SerialManager {
                         lockTime = 0L
                         _lock.value = false
                     }
-                    if (_drawer.value) {
-                        sendHex(0, V1.queryDrawer())
-                    }
                 }
-            }
-            launch {
-                run.collect { shakeBed(it) }
             }
         }
     }
@@ -193,28 +180,30 @@ class SerialManager {
         }
     }
 
+    fun lock(flag: Boolean) {
+        _lock.value = flag
+        lockTime = 0L
+    }
+
     fun run(flag: Boolean) {
-        _run.value = flag
+        if (run.get() != flag) {
+            swing(flag)
+            run.set(flag)
+        }
+    }
+
+    suspend fun drawer() {
+        sendHex(0, V1.queryDrawer())
+        delay(500L)
     }
 
     fun swing(flag: Boolean) {
-        _swing.value = flag
-    }
-
-    private suspend fun shakeBed(flag: Boolean) {
         if (flag) {
-            while (lock.value) {
-                delay(500L)
-            }
             sendHex(0, V1.resumeShakeBed())
-            _swing.value = true
         } else {
-            while (lock.value) {
-                delay(500L)
-            }
             sendHex(0, V1.pauseShakeBed())
-            _swing.value = false
         }
+        _swing.value = flag
     }
 
     fun initializer() {

@@ -317,7 +317,7 @@ class HomeViewModel constructor(
     fun reset() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (!SM.run.value) {
+            if (!SM.run.get()) {
                 if (SM.lock.value) {
                     PopTip.show("运动中禁止复位")
                 } else {
@@ -349,17 +349,11 @@ class HomeViewModel constructor(
      */
     fun shakeBed() {
         viewModelScope.launch {
-            if (!SM.lock.value) {
-                val swing = SM.swing.value
-                PopTip.show(
-                    if (swing) "摇床-已暂停" else "摇床-已恢复"
-                )
-                SM.sendHex(
-                    index = 0, hex = if (swing) V1.pauseShakeBed() else V1.resumeShakeBed()
-                )
-                // 更新状态
-                SM.swing(!swing)
-            }
+            val swing = SM.swing.value
+            PopTip.show(
+                if (swing) "摇床-已暂停" else "摇床-已恢复"
+            )
+            SM.swing(!swing)
         }
     }
 

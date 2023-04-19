@@ -19,8 +19,8 @@ class CommandExecutor constructor(
     private val event: (String) -> Unit = { }
 ) {
     private lateinit var action: Action
-    private val serialManager: SerialManager by inject(SerialManager::class.java)
-    private val executionManager: ExecutionManager by inject(ExecutionManager::class.java)
+    private val sm: SerialManager by inject(SerialManager::class.java)
+    private val em: ExecutionManager by inject(ExecutionManager::class.java)
 
     fun initAction(action: Action) {
         this.action = action
@@ -31,18 +31,16 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
-        serialManager.sendHex(0, V1.queryDrawer())
-        delay(500L)
         waitForFree {
             // 设置温度
-            serialManager.setTemp(
+            sm.setTemp(
                 addr = module + 1,
                 temp = action.temperature.toString()
             )
             addLiquid(y = con.blockY, z = con.blockZ)
             event("加液中")
             delay(100L)
-            while (serialManager.lock.value) {
+            while (sm.lock.value) {
                 delay(20L)
             }
             block.invoke()
@@ -54,18 +52,16 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
-        serialManager.sendHex(0, V1.queryDrawer())
-        delay(500L)
         waitForFree {
             // 设置温度
-            serialManager.setTemp(
+            sm.setTemp(
                 addr = module + 1,
                 temp = action.temperature.toString()
             )
             addLiquid(y = con.oneY, z = con.oneZ)
             event("加液中")
             delay(100L)
-            while (serialManager.lock.value) {
+            while (sm.lock.value) {
                 delay(20L)
             }
             block.invoke()
@@ -77,18 +73,20 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
-        serialManager.sendHex(0, V1.queryDrawer())
-        delay(500L)
         waitForFree {
+            sm.swing(false)
+            delay(100L)
             recycleLiquid(
                 y = if (settings.recycle) con.oneY else con.wasteY,
                 z = if (settings.recycle) con.recycleOneZ else con.wasteZ
             )
             event("回收中")
             delay(100L)
-            while (serialManager.lock.value) {
+            while (sm.lock.value) {
                 delay(20L)
             }
+            sm.swing(true)
+            delay(100L)
             block.invoke()
         }
     }
@@ -98,18 +96,16 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
-        serialManager.sendHex(0, V1.queryDrawer())
-        delay(500L)
         waitForFree {
             // 设置温度
-            serialManager.setTemp(
+            sm.setTemp(
                 addr = module + 1,
                 temp = action.temperature.toString()
             )
             addLiquid(y = con.twoY, z = con.twoZ)
             event("加液中")
             delay(100L)
-            while (serialManager.lock.value) {
+            while (sm.lock.value) {
                 delay(20L)
             }
             block.invoke()
@@ -121,11 +117,9 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
-        serialManager.sendHex(0, V1.queryDrawer())
-        delay(500L)
         waitForFree {
             // 设置温度
-            serialManager.setTemp(
+            sm.setTemp(
                 addr = module + 1,
                 temp = action.temperature.toString()
             )
@@ -133,7 +127,7 @@ class CommandExecutor constructor(
             addLiquid(y = con.washY, z = con.washZ)
             event("加液中")
             delay(100L)
-            while (serialManager.lock.value) {
+            while (sm.lock.value) {
                 delay(20L)
             }
             block.invoke()
@@ -146,15 +140,17 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
-        serialManager.sendHex(0, V1.queryDrawer())
-        delay(500L)
         waitForFree {
+            sm.swing(false)
+            delay(100L)
             recycleLiquid(y = con.wasteY, z = con.wasteZ)
             event("清理中")
             delay(100L)
-            while (serialManager.lock.value) {
+            while (sm.lock.value) {
                 delay(20L)
             }
+            sm.swing(true)
+            delay(100L)
             block.invoke()
         }
     }
@@ -163,9 +159,9 @@ class CommandExecutor constructor(
      * 主机命令生成器
      */
     private fun addLiquid(y: Float, z: Float) {
-        executionManager.actuator(
-            executionManager.builder(y = y),
-            executionManager.builder(
+        em.actuator(
+            em.builder(y = y),
+            em.builder(
                 y = y,
                 z = z,
                 v1 = if (module == 0) action.liquidVolume else 0f,
@@ -174,7 +170,7 @@ class CommandExecutor constructor(
                 v4 = if (module == 3) action.liquidVolume else 0f,
                 v5 = if (action.mode == 3) action.liquidVolume else 0f
             ),
-            executionManager.builder(
+            em.builder(
                 y = y,
                 v1 = if (module == 0) 15000f else 0f,
                 v2 = if (module == 1) 15000f else 0f,
@@ -190,9 +186,9 @@ class CommandExecutor constructor(
      */
     private fun recycleLiquid(y: Float, z: Float) {
         val volume = -(action.liquidVolume + 20000f)
-        executionManager.actuator(
-            executionManager.builder(y = y),
-            executionManager.builder(
+        em.actuator(
+            em.builder(y = y),
+            em.builder(
                 y = y,
                 z = z,
                 v1 = if (module == 0) volume else 0f,
@@ -201,7 +197,7 @@ class CommandExecutor constructor(
                 v4 = if (module == 3) volume else 0f,
                 v6 = action.liquidVolume + 20000f
             ),
-            executionManager.builder(y = y)
+            em.builder(y = y)
         )
     }
 
@@ -210,19 +206,20 @@ class CommandExecutor constructor(
      * @param block suspend () -> Unit 代码块
      */
     private suspend fun waitForFree(block: suspend () -> Unit) {
-        if (serialManager.drawer.value) {
-            event("抽屉未关闭")
+        while (sm.lock.value) {
+            event("等待中")
             delay(1000L)
-            waitForFree(block)
-        } else {
-            if (serialManager.lock.value) {
-                event("等待中")
-                delay(1000L)
-                waitForFree(block)
-            } else {
-                block.invoke()
-            }
         }
+        sm.lock(true)
+        sm.drawer()
+        delay(500L)
+        while (sm.drawer.get()) {
+            sm.lock(true)
+            event("抽屉未关闭")
+            delay(500L)
+            sm.drawer()
+        }
+        block.invoke()
     }
 }
 

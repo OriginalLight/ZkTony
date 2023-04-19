@@ -42,9 +42,6 @@ class ExecutionManager(
             val str1 = gen.joinToString("") { it.first }
             val str2 = gen.joinToString("") { it.second }
             val str3 = gen.joinToString("") { it.third }
-            while (SM.lock.value) {
-                delay(100L)
-            }
             SM.sendHex(
                 index = 0,
                 hex = V1.complex(data = str1)
