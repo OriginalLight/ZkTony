@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="500dp"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/zm"
+        android:layout_width="0dp"
+        android:layout_height="128dp"
+        android:layout_weight="1"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/transfer"
+        android:textSize="32sp"
+        app:cornerRadius="0dp"
+        app:rippleColor="@color/purple_700" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/rs"
+        android:layout_width="0dp"
+        android:layout_height="128dp"
+        android:layout_weight="1"
+        android:backgroundTint="@color/purple_700"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/dye"
+        android:textSize="32sp"
+        app:cornerRadius="0dp"
+        app:rippleColor="@color/light_primary" />
+
+</LinearLayout>
