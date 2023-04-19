@@ -97,7 +97,7 @@ fun noticeDialog(text: String) {
                     dialog.dismiss()
                 }
             }
-        }).setMaskColor(Color.parseColor("#4D000000")).setWidth(500).show()
+        }).setMaskColor(Color.parseColor("#4D000000")).show()
 }
 
 fun webDialog() {

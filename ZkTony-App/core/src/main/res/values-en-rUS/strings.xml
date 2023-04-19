@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="qrcode">Scan QrCode</string>
-    <string name="website">Website</string>
-    <string name="close">Close</string>
-    <string name="device_info">Device Info</string>
-    <string name="notice">Notice</string>
-    <string name="confirm">Confirm</string>
+    <string name="already_latest_version">It is the latest version</string>
     <string name="cancel">Cancel</string>
+    <string name="check_update">Check Update</string>
+    <string name="checking_for_updates">Checking for updates</string>
+    <string name="close">Close</string>
+    <string name="confirm">Confirm</string>
+    <string name="device_info">Device Info</string>
+    <string name="download_failed">Download failed, please try again!</string>
+    <string name="failed_get_version_information">Failed to get version information, please try again!</string>
+    <string name="finish">Finish</string>
+    <string name="navigation">Navigaion</string>
+    <string name="new_local_update">Discover the new local version</string>
+    <string name="new_remote_update">Discover the new version online</string>
+    <string name="new_version">New Version</string>
+    <string name="no_network_usb">Please connect to the network or insert the upgrade USB flash drive</string>
+    <string name="notice">Notice</string>
+    <string name="qrcode">Scan QrCode</string>
+    <string name="start_downloading">Start downloading</string>
+    <string name="updating">Updating</string>
     <string name="upgrade">Upgrade</string>
+    <string name="version">Version</string>
+    <string name="website">Website</string>
+    <string name="whether_to_update">Whether to update?</string>
+    <string name="wifi_setting">Wifi Setting</string>
 </resources>
