@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="500dp"
+    android:layout_width="600dp"
     android:layout_height="wrap_content"
     android:background="@color/light_onPrimary"
     android:orientation="vertical">
@@ -18,20 +18,23 @@
         android:textColor="@color/light_primary"
         android:textSize="26sp"
         tools:ignore="RelativeOverlap" />
-
-    <TextView
-        android:id="@+id/content"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:lineSpacingExtra="8dp"
-        android:paddingStart="16dp"
-        android:textAlignment="textStart"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        tools:ignore="RtlSymmetry" />
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="8dp"
+            android:lineSpacingExtra="8dp"
+            android:paddingStart="16dp"
+            android:textAlignment="textStart"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            tools:ignore="RtlSymmetry" />
+    </ScrollView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_ok"
@@ -46,5 +49,6 @@
         app:cornerRadius="0dp"
         app:rippleColor="@color/purple_500"
         app:strokeColor="@color/light_primary"
-        app:strokeWidth="3dp" />
+        app:strokeWidth="3dp"
+        tools:ignore="VisualLintButtonSize" />
 </LinearLayout>
