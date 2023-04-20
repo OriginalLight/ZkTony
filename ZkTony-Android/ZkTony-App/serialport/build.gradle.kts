@@ -11,9 +11,10 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
 
         ndk {
-            version = libs.versions.ndk.get()
             abiFilters += listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
         }
+
+        ndkVersion = libs.versions.ndk.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
