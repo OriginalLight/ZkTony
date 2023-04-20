@@ -41,7 +41,7 @@ class ContainerEditFragment :
                 viewModel.uiState.collect {
                     binding.apply {
                         size.text = "${it.container?.size ?: 10}"
-                        title.text = it.container?.name ?: "容器管理"
+                        title.text = it.container?.name ?: getString(R.string.title_container)
                         gradientPlate.size = it.container?.size ?: 10
                         gradientPlate.axis =
                             it.list.map { point -> Triple(point.index, point.axis, point.waste) }
@@ -68,8 +68,7 @@ class ContainerEditFragment :
             }
             size.clickNoRepeat {
                 inputDialog(
-                    title = "尺寸调整",
-                    hint = "请输入加液板尺寸",
+                    title = getString(com.zktony.core.R.string.edit),
                     value = size.text,
                     inputType = InputType.TYPE_CLASS_NUMBER,
                     block = { viewModel.reSize(it.toIntOrNull() ?: 10) }
@@ -88,7 +87,7 @@ class ContainerEditFragment :
                             val btnMoveWaste = v.findViewById<MaterialButton>(R.id.move_waste)
                             val btnOk = v.findViewById<MaterialButton>(R.id.ok)
                             val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
-                            tvTitle.text = "请输入 ${'A' + index} 横坐标"
+                            tvTitle.text = "${'A' + index} ${getString(R.string.coordinate)}"
                             val point = viewModel.uiState.value.list.find { it.index == index }
                             inputAxis.setText(point?.axis?.removeZero() ?: "0")
                             inputWaste.setText(point?.waste?.removeZero() ?: "0")
@@ -96,7 +95,7 @@ class ContainerEditFragment :
                             btnMoveAxis.clickNoRepeat {
                                 val axis = inputAxis.text.toString().toFloatOrNull() ?: 0f
                                 if (axis > 250f) {
-                                    PopTip.show("坐标不能大于250")
+                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 250")
                                 } else {
                                     viewModel.move(axis)
                                 }
@@ -105,7 +104,7 @@ class ContainerEditFragment :
                             btnMoveWaste.clickNoRepeat {
                                 val waste = inputWaste.text.toString().toFloatOrNull() ?: 0f
                                 if (waste > 250f) {
-                                    PopTip.show("坐标不能大于250")
+                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 250")
                                 } else {
                                     viewModel.move(waste)
                                 }
@@ -115,7 +114,7 @@ class ContainerEditFragment :
                                 val axis = inputAxis.text.toString().toFloatOrNull() ?: 0f
                                 val waste = inputWaste.text.toString().toFloatOrNull() ?: 0f
                                 if (axis > 250f || waste > 250f) {
-                                    PopTip.show("坐标不能大于250")
+                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 250")
                                 } else {
                                     viewModel.setPointPosition(index, axis, waste)
                                     dialog.dismiss()

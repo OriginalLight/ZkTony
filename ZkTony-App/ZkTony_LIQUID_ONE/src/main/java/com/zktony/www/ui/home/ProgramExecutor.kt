@@ -1,5 +1,6 @@
 package com.zktony.www.ui.home
 
+import com.zktony.core.ext.Ext
 import com.zktony.core.ext.currentTime
 import com.zktony.www.common.ext.list
 import com.zktony.www.common.ext.total
@@ -29,7 +30,7 @@ class ProgramExecutor constructor(
     suspend fun execute() {
         scope.launch {
             delay(100L)
-            event(ExecutorEvent.Log("[ ${currentTime()} ]\t 开始执行任务\n"))
+            event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${Ext.ctx.getString(com.zktony.core.R.string.start)}\n"))
             val total = list.total()
             if (total > 0) {
                 list.list().forEach { index ->
@@ -84,7 +85,7 @@ class ProgramExecutor constructor(
                 }
             }
             event(ExecutorEvent.Finish)
-            event(ExecutorEvent.Log("[ ${currentTime()} ]\t 任务执行完毕"))
+            event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${Ext.ctx.getString(com.zktony.core.R.string.complete)}"))
         }
     }
 

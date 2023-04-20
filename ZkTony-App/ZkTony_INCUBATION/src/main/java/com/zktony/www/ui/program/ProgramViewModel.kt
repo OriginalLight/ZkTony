@@ -3,6 +3,7 @@ package com.zktony.www.ui.program
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.Ext
 import com.zktony.www.room.dao.ActionDao
 import com.zktony.www.room.dao.ProgramDao
 import com.zktony.www.room.entity.Program
@@ -31,11 +32,11 @@ class ProgramViewModel constructor(
     fun insert(name: String, block: (String) -> Unit) {
         viewModelScope.launch {
             if (name.isEmpty()) {
-                PopTip.show("程序名不能为空")
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.not_empty))
                 return@launch
             }
             PD.getByName(name).firstOrNull()?.let {
-                PopTip.show("程序名已存在")
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_exists))
                 return@launch
             }
             val program = Program(name = name)

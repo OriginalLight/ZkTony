@@ -71,7 +71,6 @@ class ProgramEditFragment :
             select.clickNoRepeat {
                 val menu = viewModel.uiState.value.containerList.map { n -> n.name }
                 if (menu.isEmpty()) {
-                    PopTip.show("没有更多类型的容器")
                     return@clickNoRepeat
                 }
                 spannerDialog(
@@ -89,7 +88,6 @@ class ProgramEditFragment :
             volume.clickNoRepeat {
                 val pointList = viewModel.uiState.value.pointList
                 if (pointList.isEmpty()) {
-                    PopTip.show("请先选择容器")
                     return@clickNoRepeat
                 }
                 val point = pointList[0]
@@ -114,7 +112,7 @@ class ProgramEditFragment :
                                 val v3 = inputV3.text.toString().toIntOrNull() ?: 0
                                 val v4 = inputV4.text.toString().toIntOrNull() ?: 0
                                 if (v1 > 800 || v3 > 800) {
-                                    PopTip.show("促凝剂大容量为800μL")
+                                    PopTip.show("${getString(R.string.over_the_volume)} 800μL")
                                 } else {
                                     viewModel.updateVolume(v1, v2, v3, v4)
                                     dialog.dismiss()

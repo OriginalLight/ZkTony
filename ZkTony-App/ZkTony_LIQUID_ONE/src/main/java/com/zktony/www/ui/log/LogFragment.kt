@@ -43,8 +43,8 @@ class LogFragment :
                             recycleView.isVisible = it.list.isNotEmpty()
                             showSearch.setIconResource(if (it.bar) com.zktony.core.R.mipmap.collapse_arrow else com.zktony.core.R.mipmap.search)
                             searchBar.isVisible = it.bar
-                            startTime.text = it.startTime.simpleDateFormat("MM 月 dd 日")
-                            endTime.text = it.endTime.simpleDateFormat("MM 月 dd 日")
+                            startTime.text = it.startTime.simpleDateFormat("yyyy-MM-dd")
+                            endTime.text = it.endTime.simpleDateFormat("yyyy-MM-dd")
                         }
                     }
                 }
@@ -55,8 +55,8 @@ class LogFragment :
     private fun initView() {
         adapter.onDeleteButtonClick = {
             messageDialog(
-                title = "删除日志",
-                message = "是否删除该日志？",
+                title = getString(com.zktony.core.R.string.delete),
+                message = "${getString(com.zktony.core.R.string.whether_delete)}？",
                 block = { viewModel.delete(it) }
             )
         }
@@ -109,7 +109,7 @@ class LogFragment :
             { _, year, monthOfYear, dayOfMonth ->
                 val dateStr = year.toString() + "-" + (monthOfYear + 1) + "-" + dayOfMonth
                 val date = dateStr.simpleDateFormat("yyyy-MM-dd")
-                tv.text = date?.simpleDateFormat("MM 月 dd 日")
+                tv.text = date?.simpleDateFormat("yyyy-MM-dd")
                 date?.let { if (index == 0) viewModel.setStartTime(it) else viewModel.setEndTime(it) }
             },
             calendar[Calendar.YEAR],

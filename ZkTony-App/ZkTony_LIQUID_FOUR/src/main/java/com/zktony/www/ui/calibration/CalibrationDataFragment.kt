@@ -31,7 +31,12 @@ class CalibrationDataFragment :
                 viewModel.uiState.collect {
                     adapter.submitList(it.caliData)
                     binding.apply {
-                        select.text = listOf("泵一", "泵二", "泵三", "泵四")[it.pumpId]
+                        select.text = listOf(
+                            getString(R.string.pump_one),
+                            getString(R.string.pump_two),
+                            getString(R.string.pump_three),
+                            getString(R.string.pump_four)
+                        )[it.pumpId]
                         if (it.expect > 0f) {
                             expect.setEqualText(it.expect.toString().removeZero())
                         }
@@ -75,7 +80,12 @@ class CalibrationDataFragment :
             }
 
             select.clickNoRepeat {
-                val menuList = listOf("泵一", "泵二", "泵三", "泵四")
+                val menuList = listOf(
+                    getString(R.string.pump_one),
+                    getString(R.string.pump_two),
+                    getString(R.string.pump_three),
+                    getString(R.string.pump_four)
+                )
                 PopMenu.show(it, menuList).setMenuTextInfo(TextInfo().apply {
                     gravity = Gravity.CENTER
                     fontSize = 16

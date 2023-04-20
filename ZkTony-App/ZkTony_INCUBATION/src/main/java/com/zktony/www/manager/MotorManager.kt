@@ -1,7 +1,7 @@
 package com.zktony.www.manager
 
-import com.zktony.core.ext.int8ToHex
-import com.zktony.core.ext.logi
+import com.zktony.core.ext.*
+import com.zktony.www.R
 import com.zktony.www.common.ext.toMotor
 import com.zktony.www.common.ext.toV1
 import com.zktony.www.manager.protocol.V1
@@ -40,17 +40,69 @@ class MotorManager(
                         }
                     } else {
                         val list = mutableListOf<Motor>()
-                        list.add(Motor(id = 0, name = "X轴", address = 1))
-                        list.add(Motor(id = 1, name = "Y轴", address = 2))
-                        list.add(Motor(id = 2, name = "Z轴", address = 3))
-                        for (i in 1..6) {
-                            val motor = Motor(
-                                id = i + 2,
-                                name = "泵$i",
-                                address = if (i <= 3) i else i - 3,
+                        list.add(
+                            Motor(
+                                id = 0,
+                                name = Ext.ctx.getString(R.string.x_axis),
+                                address = 1
                             )
-                            list.add(motor)
-                        }
+                        )
+                        list.add(
+                            Motor(
+                                id = 1,
+                                name = Ext.ctx.getString(R.string.y_axis),
+                                address = 2
+                            )
+                        )
+                        list.add(
+                            Motor(
+                                id = 2,
+                                name = Ext.ctx.getString(R.string.z_axis),
+                                address = 3
+                            )
+                        )
+                        list.add(
+                            Motor(
+                                id = 3,
+                                name = Ext.ctx.getString(R.string.pump_one),
+                                address = 1
+                            )
+                        )
+                        list.add(
+                            Motor(
+                                id = 4,
+                                name = Ext.ctx.getString(R.string.pump_two),
+                                address = 2
+                            )
+                        )
+                        list.add(
+                            Motor(
+                                id = 5,
+                                name = Ext.ctx.getString(R.string.pump_three),
+                                address = 3
+                            )
+                        )
+                        list.add(
+                            Motor(
+                                id = 6,
+                                name = Ext.ctx.getString(R.string.pump_four),
+                                address = 1
+                            )
+                        )
+                        list.add(
+                            Motor(
+                                id = 7,
+                                name = Ext.ctx.getString(R.string.pump_five),
+                                address = 2
+                            )
+                        )
+                        list.add(
+                            Motor(
+                                id = 8,
+                                name = Ext.ctx.getString(R.string.pump_six),
+                                address = 3
+                            )
+                        )
                         MD.insertAll(list)
                     }
                 }
@@ -71,7 +123,12 @@ class MotorManager(
                             hpc[8] = c.v6
                         }
                     } else {
-                        CD.insert(Calibration(enable = 1))
+                        CD.insert(
+                            Calibration(
+                                name = Ext.ctx.getString(com.zktony.core.R.string.def),
+                                enable = 1
+                            )
+                        )
                     }
                 }
             }

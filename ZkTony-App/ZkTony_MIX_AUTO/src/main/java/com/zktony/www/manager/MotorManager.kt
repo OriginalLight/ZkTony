@@ -1,7 +1,7 @@
 package com.zktony.www.manager
 
-import com.zktony.core.ext.int8ToHex
-import com.zktony.core.ext.logi
+import com.zktony.core.ext.*
+import com.zktony.www.R
 import com.zktony.www.common.ext.toCommand
 import com.zktony.www.common.ext.toMotor
 import com.zktony.www.manager.protocol.V1
@@ -41,10 +41,26 @@ class MotorManager constructor(
                     } else {
                         MD.insertAll(
                             listOf(
-                                Motor(id = 0, name = "Y轴", address = 2),
-                                Motor(id = 1, name = "泵一", address = 1),
-                                Motor(id = 2, name = "泵二", address = 2),
-                                Motor(id = 3, name = "泵三", address = 3),
+                                Motor(
+                                    id = 0,
+                                    name = Ext.ctx.getString(R.string.x_axis),
+                                    address = 2
+                                ),
+                                Motor(
+                                    id = 1,
+                                    name = Ext.ctx.getString(R.string.pump_one),
+                                    address = 1
+                                ),
+                                Motor(
+                                    id = 2,
+                                    name = Ext.ctx.getString(R.string.pump_two),
+                                    address = 2
+                                ),
+                                Motor(
+                                    id = 3,
+                                    name = Ext.ctx.getString(R.string.pump_three),
+                                    address = 3
+                                ),
                             )
                         )
                     }
@@ -61,7 +77,12 @@ class MotorManager constructor(
                             hpc[3] = c.v3
                         }
                     } else {
-                        CD.insert(Calibration(enable = 1))
+                        CD.insert(
+                            Calibration(
+                                name = Ext.ctx.getString(com.zktony.core.R.string.def),
+                                enable = 1
+                            )
+                        )
                     }
                 }
             }

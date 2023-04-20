@@ -87,7 +87,7 @@ class SerialManager {
                                     _lock.value = false
                                     lockTime = 0L
                                     _reset.value = true
-                                    PopTip.show("复位成功")
+                                    PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.reset_success))
                                 }
                             }
                         }

@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.*
 import com.google.android.material.tabs.TabLayout
-import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.dialog.spannerDialog
 import com.zktony.core.ext.*

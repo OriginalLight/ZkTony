@@ -5,7 +5,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.*
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.dialog.spannerDialog
 import com.zktony.core.ext.clickNoRepeat
@@ -184,9 +183,7 @@ class ProgramEditFragment :
                 val menu = viewModel.uiState.value.containerList.map { container ->
                     container.name
                 }
-                if (menu.isEmpty()) {
-                    PopTip.show("请先添加容器")
-                } else {
+                if (menu.isNotEmpty()) {
                     spannerDialog(
                         view = it,
                         menu = menu,
@@ -200,9 +197,7 @@ class ProgramEditFragment :
                 val menu = viewModel.uiState.value.containerList.map { container ->
                     container.name
                 }
-                if (menu.isEmpty()) {
-                    PopTip.show("请先添加容器")
-                } else {
+                if (menu.isNotEmpty()) {
                     spannerDialog(
                         view = it,
                         menu = menu,
@@ -216,9 +211,7 @@ class ProgramEditFragment :
                 val menu = viewModel.uiState.value.containerList.map { container ->
                     container.name
                 }
-                if (menu.isEmpty()) {
-                    PopTip.show("请先添加容器")
-                } else {
+                if (menu.isNotEmpty()) {
                     spannerDialog(
                         view = it,
                         menu = menu,
@@ -232,9 +225,7 @@ class ProgramEditFragment :
                 val menu = viewModel.uiState.value.containerList.map { container ->
                     container.name
                 }
-                if (menu.isEmpty()) {
-                    PopTip.show("请先添加容器")
-                } else {
+                if (menu.isNotEmpty()) {
                     spannerDialog(
                         view = it,
                         menu = menu,

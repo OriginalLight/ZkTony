@@ -42,7 +42,7 @@
                 android:layout_weight="4"
                 android:background="@color/light_onPrimary"
                 android:gravity="center"
-                android:text="@string/work_name"
+                android:text="@string/program_name"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 

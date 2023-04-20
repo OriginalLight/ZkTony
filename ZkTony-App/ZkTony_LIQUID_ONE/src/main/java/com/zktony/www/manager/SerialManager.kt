@@ -84,7 +84,7 @@ class SerialManager {
                                 if (res.pa == "0A") {
                                     _lock.value = false
                                     lockTime = 0L
-                                    PopTip.show("复位成功")
+                                    PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.reset_success))
                                 }
                             }
                         }

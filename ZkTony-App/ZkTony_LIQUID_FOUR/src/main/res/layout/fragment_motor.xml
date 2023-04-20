@@ -37,6 +37,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="monospace"
                 android:text="@string/motor_setting"
                 android:textAlignment="center"
                 android:textColor="@color/black"
@@ -154,6 +155,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
+                                android:fontFamily="monospace"
                                 android:text="@string/mode"
                                 android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -170,6 +172,7 @@
                                 android:backgroundTint="@color/light_onPrimary"
                                 android:dropDownWidth="match_parent"
                                 android:ellipsize="end"
+                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:includeFontPadding="false"
                                 android:insetTop="0dp"
@@ -191,7 +194,7 @@
                                 app:layout_constraintStart_toEndOf="@+id/tv_mode"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:rippleColor="@color/light_primary"
-                                tools:ignore="SpeakableTextPresentCheck,VisualLintButtonSize" />
+                                tools:ignore="SpeakableTextPresentCheck,VisualLintButtonSize,VisualLintLocaleText" />
 
                             <View
                                 android:layout_width="match_parent"
@@ -214,6 +217,7 @@
                                 android:layout_height="32dp"
                                 android:layout_marginStart="8dp"
                                 android:background="@mipmap/subdivision"
+                                android:fontFamily="monospace"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent"
@@ -224,6 +228,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
+                                android:fontFamily="monospace"
                                 android:text="@string/subdivision"
                                 android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
@@ -240,6 +245,7 @@
                                 android:backgroundTint="@color/light_onPrimary"
                                 android:dropDownWidth="match_parent"
                                 android:ellipsize="end"
+                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:includeFontPadding="false"
                                 android:insetTop="0dp"
@@ -261,7 +267,7 @@
                                 app:layout_constraintStart_toEndOf="@+id/tv_subdivision"
                                 app:layout_constraintTop_toTopOf="parent"
                                 app:rippleColor="@color/light_primary"
-                                tools:ignore="SpeakableTextPresentCheck,VisualLintButtonSize" />
+                                tools:ignore="SpeakableTextPresentCheck,VisualLintButtonSize,VisualLintLocaleText" />
 
                             <View
                                 android:layout_width="match_parent"
@@ -294,7 +300,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
-                                android:text="@string/hint_speed"
+                                android:fontFamily="monospace"
+                                android:text="@string/speed"
                                 android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/icon_speed"
@@ -305,14 +312,15 @@
                                 android:id="@+id/speed"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
-                                android:background="@color/light_onPrimary"
                                 android:layout_marginStart="128dp"
-                                android:gravity="center"
+                                android:background="@color/light_onPrimary"
                                 android:cursorVisible="true"
+                                android:fontFamily="monospace"
+                                android:gravity="center"
+                                android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp"
-                                android:inputType="number"
                                 tools:ignore="Autofill,LabelFor,MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
 
@@ -346,7 +354,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
-                                android:text="@string/hint_wait_time"
+                                android:fontFamily="monospace"
+                                android:text="@string/wait_time"
                                 android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/icon_wait_time"
@@ -358,13 +367,14 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
                                 android:layout_marginStart="128dp"
-                                android:cursorVisible="true"
-                                android:gravity="center"
                                 android:background="@color/light_onPrimary"
+                                android:cursorVisible="true"
+                                android:fontFamily="monospace"
+                                android:gravity="center"
+                                android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp"
-                                android:inputType="number"
                                 tools:ignore="Autofill,LabelFor,MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
 
@@ -398,7 +408,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
-                                android:text="@string/hint_acceleration"
+                                android:fontFamily="monospace"
+                                android:text="@string/acceleration"
                                 android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/icon_acceleration"
@@ -409,14 +420,15 @@
                                 android:id="@+id/acceleration"
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
-                                android:background="@color/light_onPrimary"
                                 android:layout_marginStart="128dp"
-                                android:gravity="center"
+                                android:background="@color/light_onPrimary"
                                 android:cursorVisible="true"
+                                android:fontFamily="monospace"
+                                android:gravity="center"
+                                android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp"
-                                android:inputType="number"
                                 tools:ignore="Autofill,LabelFor,MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
 
@@ -450,7 +462,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="8dp"
-                                android:text="@string/hint_deceleration"
+                                android:fontFamily="monospace"
+                                android:text="@string/deceleration"
                                 android:textSize="16sp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintStart_toEndOf="@+id/icon_deceleration"
@@ -462,13 +475,14 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="48dp"
                                 android:layout_marginStart="128dp"
-                                android:cursorVisible="true"
                                 android:background="@color/light_onPrimary"
+                                android:cursorVisible="true"
+                                android:fontFamily="monospace"
+                                android:gravity="center"
                                 android:inputType="number"
                                 android:maxLength="50"
                                 android:singleLine="true"
                                 android:textSize="16sp"
-                                android:gravity="center"
                                 tools:ignore="Autofill,LabelFor,MissingConstraints,SpeakableTextPresentCheck,TouchTargetSizeCheck,VisualLintTextFieldSize" />
 
 
@@ -488,7 +502,9 @@
                             android:layout_marginEnd="32dp"
                             android:layout_marginBottom="32dp"
                             android:backgroundTint="@color/light_primary"
-                            android:text="@string/save_config"
+                            android:fontFamily="monospace"
+                            android:text="@string/save"
+                            android:textAllCaps="false"
                             android:textColor="@color/light_onPrimary"
                             android:textSize="20sp"
                             app:cornerRadius="24dp"

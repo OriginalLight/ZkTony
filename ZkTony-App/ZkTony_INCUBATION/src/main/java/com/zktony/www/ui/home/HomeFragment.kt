@@ -60,7 +60,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         binding.e.apply {
                             pause.setBackgroundResource(if (it) mipmap.pause else mipmap.play)
                             with(tvPause) {
-                                text = if (it) "暂停摇床" else "继续摇床"
+                                text = if (it) getString(R.string.pause) else getString(com.zktony.core.R.string.go_on)
                                 setTextColor(
                                     ContextCompat.getColor(
                                         context, if (it) color.dark_outline else color.red

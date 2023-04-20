@@ -3,6 +3,7 @@ package com.zktony.www.ui.container
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.Ext
 import com.zktony.core.utils.Snowflake
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
@@ -79,7 +80,7 @@ class ContainerEditViewModel constructor(
 
     fun move(y: Float) {
         if (SM.lock.value || SM.pause.value) {
-            PopTip.show("机器正在运行中")
+            PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.running))
             return
         }
         EM.actuator(

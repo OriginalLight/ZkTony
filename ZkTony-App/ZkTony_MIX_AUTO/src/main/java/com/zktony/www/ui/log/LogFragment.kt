@@ -55,8 +55,8 @@ class LogFragment :
     private fun initView() {
         adapter.onDeleteButtonClick = {
             messageDialog(
-                title = "删除日志",
-                message = "是否删除该日志？",
+                title = getString(com.zktony.core.R.string.delete),
+                message = "${getString(com.zktony.core.R.string.whether_delete)}？",
                 block = { viewModel.delete(it) }
             )
         }

@@ -22,14 +22,13 @@
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right">
-        </action>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_action"
         android:name="com.zktony.www.ui.program.ActionFragment"
-        android:label="@string/title_program_edit"
+        android:label="@string/title_program"
         tools:layout="@layout/fragment_action">
         <action
             android:id="@+id/action_navigation_action_to_navigation_program"
@@ -64,13 +63,13 @@
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_motor"
         android:name="com.zktony.www.ui.admin.MotorFragment"
-        android:label="@string/title_adjust"
+        android:label="@string/title_motor"
         tools:layout="@layout/fragment_motor">
         <action
             android:id="@+id/action_navigation_motor_to_navigation_admin"
@@ -85,15 +84,14 @@
         android:id="@+id/navigation_calibration"
         android:name="com.zktony.www.ui.calibration.CalibrationFragment"
         android:label="@string/title_calibration"
-        tools:layout="@layout/fragment_calibration" >
+        tools:layout="@layout/fragment_calibration">
         <action
             android:id="@+id/action_navigation_calibration_to_navigation_calibration_data"
             app:destination="@id/navigation_calibration_data"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right">
-        </action>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -107,7 +105,7 @@
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -122,7 +120,7 @@
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
 </navigation>

@@ -18,6 +18,7 @@
             android:id="@+id/btn_close"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:fontFamily="monospace"
             android:gravity="center"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"

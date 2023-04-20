@@ -8,9 +8,11 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.dialog.spannerDialog
+import com.zktony.core.ext.Ext
 import com.zktony.core.ext.getTimeFormat
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
+import com.zktony.www.R
 import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
@@ -92,12 +94,7 @@ class HomeViewModel constructor(
 
     fun select(view: View) {
         val list = uiState.value.programList.map { it.name }
-        if (_uiState.value.job != null) {
-            PopTip.show("请先停止当前程序")
-            return
-        }
-        if (list.isEmpty()) {
-            PopTip.show("请先添加程序")
+        if (_uiState.value.job != null || list.isEmpty()) {
             return
         }
         spannerDialog(
@@ -113,15 +110,11 @@ class HomeViewModel constructor(
     fun reset() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (!SM.pause.value) {
-                if (SM.lock.value) {
-                    PopTip.show("运动中禁止复位")
-                } else {
-                    SM.reset()
-                    PopTip.show("复位-已下发")
-                }
+            if (_uiState.value.job == null) {
+                SM.reset()
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.resetting))
             } else {
-                PopTip.show("请中止所有运行中程序")
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.stop_all))
             }
         }
     }
@@ -244,7 +237,7 @@ class HomeViewModel constructor(
                     }
                 }
                 launch {
-                    updateLog(Log(name = _uiState.value.program?.name ?: "未知程序"))
+                    updateLog(Log(name = _uiState.value.program?.name ?: "None"))
                 }
                 val executor = ProgramExecutor(
                     list = _uiState.value.pointList,
@@ -263,11 +256,11 @@ class HomeViewModel constructor(
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
                                     index = when (it.index) {
-                                        0 -> "一号板"
-                                        1 -> "二号板"
-                                        2 -> "三号板"
-                                        3 -> "四号板"
-                                        else -> "未知板"
+                                        0 -> Ext.ctx.getString(R.string.plate_one)
+                                        1 -> Ext.ctx.getString(R.string.plate_two)
+                                        2 -> Ext.ctx.getString(R.string.plate_three)
+                                        3 -> Ext.ctx.getString(R.string.plate_four)
+                                        else -> "None"
                                     },
                                     size = maxX to maxY,
                                 )
@@ -278,11 +271,11 @@ class HomeViewModel constructor(
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
                                     liquid = when (it.liquid) {
-                                        0 -> "一号泵"
-                                        1 -> "二号泵"
-                                        2 -> "三号泵"
-                                        3 -> "四号泵"
-                                        else -> "一号泵"
+                                        0 -> Ext.ctx.getString(R.string.pump_one)
+                                        1 -> Ext.ctx.getString(R.string.pump_two)
+                                        2 -> Ext.ctx.getString(R.string.pump_three)
+                                        3 -> Ext.ctx.getString(R.string.pump_four)
+                                        else -> "None"
                                     },
                                     color = when (it.liquid) {
                                         0 -> Color.BLUE
@@ -327,14 +320,12 @@ class HomeViewModel constructor(
                         is ExecutorEvent.Finish -> {
                             reset()
                             completeDialog(
-                                name = _uiState.value.program?.name ?: "错误",
+                                name = _uiState.value.program?.name ?: "None",
                                 time = _uiState.value.time.getTimeFormat(),
-                                speed = "${
-                                    String.format(
-                                        "%.2f",
-                                        _uiState.value.info.speed
-                                    )
-                                } 孔/分钟",
+                                speed = String.format(
+                                    "%.2f",
+                                    _uiState.value.info.speed
+                                ),
                             )
                             launch {
                                 _uiState.value.log?.let { l ->

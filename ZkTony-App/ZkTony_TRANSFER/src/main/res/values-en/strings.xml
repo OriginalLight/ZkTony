@@ -5,8 +5,8 @@
     <string name="anomaly_detection">Anomaly detection</string>
     <string name="app_name">Transfer</string>
     <string name="audio">Audio</string>
-    <string name="auto_clean_duration">Auto clean duration (Sec)</string>
-    <string name="auto_clean_interval">Auto clean interval (Min)</string>
+    <string name="auto_clean_duration">Clean duration</string>
+    <string name="auto_clean_interval">Clean interval</string>
     <string name="buffer_type">Buffer type</string>
     <string name="chart_description">The X axis is time, the left Y axis is voltage, and the right Y axis is current</string>
     <string name="current_hint">Current A</string>
@@ -17,7 +17,7 @@
     <string name="dye">Dye</string>
     <string name="experiment_time">Date</string>
     <string name="factory">Factory</string>
-    <string name="fill_back_speed">Fill/Back speed (RPM)</string>
+    <string name="fill_back_speed">Fill speed</string>
     <string name="glue_075">0.75</string>
     <string name="glue_10">1.0</string>
     <string name="glue_15">1.5</string>

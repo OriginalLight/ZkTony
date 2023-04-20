@@ -66,25 +66,15 @@ class ActionFragment :
                         } else {
                             count.setEqualText(it.count.toString())
                         }
-                        with(btnAdd) {
-                            if (viewModel.validate()) {
-                                isEnabled = true
-                                alpha = 1f
-                                text = resources.getString(R.string.add)
-                            } else {
-                                isEnabled = false
-                                alpha = 0.5f
-                                text = resources.getString(R.string.add_ban)
-                            }
-                        }
+                        btnAdd.isEnabled = viewModel.validate()
                         if (it.action == ActionEnum.WASHING.index) {
                             llCount.visibility = View.VISIBLE
                             dividerCount.visibility = View.VISIBLE
-                            tvTime.text = resources.getString(R.string.hint_time_min)
+                            tvTime.text = resources.getString(R.string.time_min)
                         } else {
                             llCount.visibility = View.GONE
                             dividerCount.visibility = View.GONE
-                            tvTime.text = resources.getString(R.string.hint_time_hour)
+                            tvTime.text = resources.getString(R.string.time_hour)
                         }
 
                     }

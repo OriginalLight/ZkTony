@@ -184,9 +184,7 @@ class ProgramEditFragment :
                 val menu = viewModel.uiState.value.containerList.map { container ->
                     container.name
                 }
-                if (menu.isEmpty()) {
-                    PopTip.show("请先添加容器")
-                } else {
+                if (menu.isNotEmpty()) {
                     spannerDialog(
                         view = it,
                         menu = menu,
@@ -200,9 +198,7 @@ class ProgramEditFragment :
                 val menu = viewModel.uiState.value.containerList.map { container ->
                     container.name
                 }
-                if (menu.isEmpty()) {
-                    PopTip.show("请先添加容器")
-                } else {
+                if (menu.isNotEmpty()) {
                     spannerDialog(
                         view = it,
                         menu = menu,
@@ -216,9 +212,7 @@ class ProgramEditFragment :
                 val menu = viewModel.uiState.value.containerList.map { container ->
                     container.name
                 }
-                if (menu.isEmpty()) {
-                    PopTip.show("请先添加容器")
-                } else {
+                if (menu.isNotEmpty()) {
                     spannerDialog(
                         view = it,
                         menu = menu,
@@ -232,9 +226,7 @@ class ProgramEditFragment :
                 val menu = viewModel.uiState.value.containerList.map { container ->
                     container.name
                 }
-                if (menu.isEmpty()) {
-                    PopTip.show("请先添加容器")
-                } else {
+                if (menu.isNotEmpty()) {
                     spannerDialog(
                         view = it,
                         menu = menu,

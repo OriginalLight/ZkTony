@@ -35,7 +35,9 @@ class MotorFragment : BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layou
                         if (it.motor != null) {
                             binding.apply {
                                 tvTitle.text = it.motor.name
-                                mode.text = if (it.motor.mode == 0) "增量模式" else "坐标模式"
+                                mode.text = if (it.motor.mode == 0) getString(com.zktony.core.R.string.incremental_mode) else getString(
+                                    com.zktony.core.R.string.coordinate_mode
+                                )
                                 subdivision.text = it.motor.subdivision.toString()
                                 speed.setEqualText(it.motor.speed.toString())
                                 acceleration.setEqualText(it.motor.acceleration.toString())
@@ -61,7 +63,10 @@ class MotorFragment : BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layou
             mode.clickNoRepeat {
                 spannerDialog(
                     view = it,
-                    menu = listOf("增量模式", "坐标模式"),
+                    menu = listOf(
+                        getString(com.zktony.core.R.string.incremental_mode),
+                        getString(com.zktony.core.R.string.coordinate_mode)
+                    ),
                     block = { _, index -> viewModel.model(index) }
 
                 )

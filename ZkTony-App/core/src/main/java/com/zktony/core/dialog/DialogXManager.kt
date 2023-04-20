@@ -3,6 +3,7 @@ package com.zktony.core.dialog
 import android.app.Application
 import com.kongzue.dialogx.DialogX
 import com.kongzue.dialogx.style.MaterialStyle
+import com.kongzue.dialogx.util.TextInfo
 import com.zktony.core.BuildConfig
 
 /**

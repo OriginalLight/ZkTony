@@ -26,7 +26,9 @@ class ProgramPointFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     binding.apply {
-                        custom.text = "自定义：${if (it.custom) '开' else '关'}"
+                        custom.text = if (it.custom) getString(R.string.custom_on) else getString(
+                            R.string.custom_off
+                        )
                         if (it.list.isEmpty()) {
                             selectAll.isEnabled = false
                             volume.text = "/"
@@ -41,13 +43,13 @@ class ProgramPointFragment :
                                 it.list[0].v3.toString().removeZero()
                             } μL, ${
                                 it.list[0].v4.toString().removeZero()
-                            } μL ]" else "自定义,请单独设置每孔加液量！"
+                            } μL ]" else "/"
                             title.text = when (it.list[0].index) {
-                                0 -> "一号孔板"
-                                1 -> "二号孔板"
-                                2 -> "三号孔板"
-                                3 -> "四号孔板"
-                                else -> "孔板"
+                                0 -> getString(R.string.plate_one)
+                                1 -> getString(R.string.plate_two)
+                                2 -> getString(R.string.plate_three)
+                                3 -> getString(R.string.plate_four)
+                                else -> getString(R.string.plate_one)
                             }
                             with(dynamicPlate) {
                                 x = it.list.maxOf { point -> point.y } + 1

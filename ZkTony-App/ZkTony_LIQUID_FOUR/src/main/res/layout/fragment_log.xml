@@ -10,15 +10,15 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:background="@color/dark_onBackground"
-        tools:context=".ui.log.LogFragment"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:context=".ui.log.LogFragment">
 
         <LinearLayout
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginTop="2dp"
             android:layout_marginStart="2dp"
+            android:layout_marginTop="2dp"
             android:layout_marginEnd="2dp"
             android:orientation="horizontal">
 
@@ -28,6 +28,7 @@
                 android:layout_marginEnd="1dp"
                 android:layout_weight="2"
                 android:background="@color/light_onPrimary"
+                android:fontFamily="monospace"
                 android:gravity="center"
                 android:text="@string/order"
                 android:textColor="@color/black"
@@ -40,6 +41,7 @@
                 android:layout_marginEnd="1dp"
                 android:layout_weight="3"
                 android:background="@color/light_onPrimary"
+                android:fontFamily="monospace"
                 android:gravity="center"
                 android:text="@string/program_name"
                 android:textColor="@color/black"
@@ -52,6 +54,7 @@
                 android:layout_marginEnd="1dp"
                 android:layout_weight="3"
                 android:background="@color/light_onPrimary"
+                android:fontFamily="monospace"
                 android:gravity="center"
                 android:text="@string/start_time"
                 android:textColor="@color/black"
@@ -64,6 +67,7 @@
                 android:layout_marginEnd="1dp"
                 android:layout_weight="2"
                 android:background="@color/light_onPrimary"
+                android:fontFamily="monospace"
                 android:gravity="center"
                 android:text="@string/status"
                 android:textColor="@color/black"
@@ -107,6 +111,7 @@
                 android:layout_marginEnd="1dp"
                 android:layout_weight="2"
                 android:background="@color/light_onPrimary"
+                android:fontFamily="monospace"
                 android:gravity="center"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
@@ -118,6 +123,7 @@
                 android:layout_marginEnd="1dp"
                 android:layout_weight="1"
                 android:background="@color/light_onPrimary"
+                android:fontFamily="monospace"
                 android:gravity="center"
                 android:text="@string/to"
                 android:textColor="@color/black"
@@ -131,6 +137,7 @@
                 android:layout_marginEnd="1dp"
                 android:layout_weight="2"
                 android:background="@color/light_onPrimary"
+                android:fontFamily="monospace"
                 android:gravity="center"
                 android:textColor="@color/black"
                 android:textSize="16sp" />

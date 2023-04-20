@@ -1,5 +1,6 @@
 package com.zktony.www.manager
 
+import com.zktony.core.ext.Ext
 import com.zktony.core.ext.logi
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.entity.Container
@@ -14,7 +15,7 @@ class ContainerManager constructor(
         scope.launch {
             CD.getByType(0).collect {
                 if (it.isEmpty()) {
-                    CD.insert(Container(name = "废液槽"))
+                    CD.insert(Container(name = Ext.ctx.getString(com.zktony.core.R.string.waste_tank)))
                 }
             }
         }

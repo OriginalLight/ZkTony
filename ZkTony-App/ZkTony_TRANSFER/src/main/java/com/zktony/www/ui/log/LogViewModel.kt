@@ -80,6 +80,6 @@ class LogViewModel constructor(
 data class LogUiState(
     val list: List<LogRecord> = emptyList(),
     val bar: Boolean = false,
-    val startTime : Date = Date(System.currentTimeMillis()),
-    val endTime : Date = Date(System.currentTimeMillis())
+    val startTime: Date = Date(System.currentTimeMillis()),
+    val endTime: Date = Date(System.currentTimeMillis())
 )

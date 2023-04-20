@@ -54,9 +54,9 @@ class ProgramFragment :
 
         adapter.onDeleteButtonClick = {
             messageDialog(
-                title = "删除程序",
-                message = "是否删除${it.name}？",
-                block = { viewModel.delete(it) },
+                title = getString(com.zktony.core.R.string.delete),
+                message = "${getString(com.zktony.core.R.string.whether_delete)} ${it.name} ?",
+                block = { viewModel.delete(it) }
             )
         }
 
@@ -67,8 +67,8 @@ class ProgramFragment :
                 clickScale()
                 clickNoRepeat {
                     inputDialog(
-                        title = "添加程序",
-                        hint = "请输入程序名称",
+                        title = getString(com.zktony.core.R.string.add),
+                        hint = getString(com.zktony.core.R.string.input_name),
                         block = {
                             viewModel.insert(it) { id ->
                                 findNavController().navigate(

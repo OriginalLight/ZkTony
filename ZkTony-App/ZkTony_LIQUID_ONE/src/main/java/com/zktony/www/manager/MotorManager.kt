@@ -1,9 +1,9 @@
 package com.zktony.www.manager
 
-import com.zktony.core.ext.int8ToHex
-import com.zktony.core.ext.logi
-import com.zktony.www.common.ext.toV1
+import com.zktony.core.ext.*
+import com.zktony.www.R
 import com.zktony.www.common.ext.toMotor
+import com.zktony.www.common.ext.toV1
 import com.zktony.www.manager.protocol.V1
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.MotorDao
@@ -41,12 +41,36 @@ class MotorManager(
                     } else {
                         MD.insertAll(
                             listOf(
-                                Motor(id = 0, name = "X轴", address = 1),
-                                Motor(id = 1, name = "Y轴", address = 2),
-                                Motor(id = 2, name = "泵一", address = 3),
-                                Motor(id = 3, name = "泵二", address = 1),
-                                Motor(id = 4, name = "泵三", address = 2),
-                                Motor(id = 5, name = "泵四", address = 3)
+                                Motor(
+                                    id = 0,
+                                    name = Ext.ctx.getString(R.string.x_axis),
+                                    address = 1
+                                ),
+                                Motor(
+                                    id = 1,
+                                    name = Ext.ctx.getString(R.string.y_axis),
+                                    address = 2
+                                ),
+                                Motor(
+                                    id = 2,
+                                    name = Ext.ctx.getString(R.string.pump_one),
+                                    address = 3
+                                ),
+                                Motor(
+                                    id = 3,
+                                    name = Ext.ctx.getString(R.string.pump_two),
+                                    address = 1
+                                ),
+                                Motor(
+                                    id = 4,
+                                    name = Ext.ctx.getString(R.string.pump_three),
+                                    address = 2
+                                ),
+                                Motor(
+                                    id = 5,
+                                    name = Ext.ctx.getString(R.string.pump_four),
+                                    address = 3
+                                )
                             )
                         )
                     }
@@ -65,7 +89,12 @@ class MotorManager(
                             hpc[5] = c.v4
                         }
                     } else {
-                        CD.insert(Calibration(enable = 1))
+                        CD.insert(
+                            Calibration(
+                                name = Ext.ctx.getString(com.zktony.core.R.string.def),
+                                enable = 1
+                            )
+                        )
                     }
                 }
             }

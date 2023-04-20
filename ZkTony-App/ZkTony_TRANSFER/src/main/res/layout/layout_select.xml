@@ -10,9 +10,11 @@
         android:layout_width="0dp"
         android:layout_height="128dp"
         android:layout_weight="1"
+        android:fontFamily="monospace"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/transfer"
+        android:textAllCaps="false"
         android:textSize="32sp"
         app:cornerRadius="0dp"
         app:rippleColor="@color/purple_700" />
@@ -23,9 +25,11 @@
         android:layout_height="128dp"
         android:layout_weight="1"
         android:backgroundTint="@color/purple_700"
+        android:fontFamily="monospace"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/dye"
+        android:textAllCaps="false"
         android:textSize="32sp"
         app:cornerRadius="0dp"
         app:rippleColor="@color/light_primary" />

@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
+        android:fontFamily="monospace"
         android:text="@string/device_info"
         android:textAlignment="center"
         android:textColor="@color/black"

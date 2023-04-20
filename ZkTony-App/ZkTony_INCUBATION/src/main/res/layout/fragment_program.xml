@@ -29,6 +29,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginEnd="1dp"
                 android:background="@color/light_onPrimary"
+                android:fontFamily="monospace"
                 android:gravity="center"
                 android:text="@string/order"
                 android:textColor="@color/black"
@@ -46,6 +47,7 @@
                 android:layout_marginStart="1dp"
                 android:layout_marginEnd="1dp"
                 android:background="@color/light_onPrimary"
+                android:fontFamily="monospace"
                 android:gravity="center"
                 android:text="@string/program_name"
                 android:textColor="@color/black"
@@ -63,8 +65,9 @@
                 android:layout_marginStart="1dp"
                 android:layout_marginEnd="1dp"
                 android:background="@color/light_onPrimary"
+                android:fontFamily="monospace"
                 android:gravity="center"
-                android:text="@string/actions"
+                android:text="@string/process"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -80,8 +83,10 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="1dp"
                 android:background="@color/dark_secondary"
+                android:fontFamily="monospace"
                 android:gravity="center"
                 android:text="@string/add"
+                android:textAllCaps="false"
                 android:textColor="@color/light_onPrimary"
                 android:textSize="16sp"
                 app:icon="@mipmap/plus"
@@ -92,7 +97,7 @@
                 app:layout_constraintHorizontal_weight="2"
                 app:layout_constraintStart_toEndOf="@+id/actions"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="TextContrastCheck,VisualLintButtonSize" />
+                tools:ignore="TextContrastCheck,VisualLintButtonSize,VisualLintLocaleText" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

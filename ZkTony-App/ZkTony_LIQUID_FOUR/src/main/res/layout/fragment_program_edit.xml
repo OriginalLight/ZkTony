@@ -36,7 +36,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:text="@string/work_plate"
+                android:fontFamily="monospace"
+                android:text="@string/edit"
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="24sp" />
@@ -71,7 +72,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:text="一号板"
+                    android:fontFamily="monospace"
+                    android:text="@string/plate_one"
                     android:textColor="@color/black"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -81,6 +83,7 @@
                     android:id="@+id/hole_one"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
                     android:textColor="@color/black"
                     app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_one"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -115,9 +118,10 @@
                     android:layout_width="196dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
+                    android:fontFamily="monospace"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
-                    android:text="@string/button"
+                    android:textAllCaps="false"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:cornerRadius="0dp"
@@ -132,7 +136,7 @@
                     app:rippleColor="@color/purple_700"
                     app:strokeColor="@color/light_primary"
                     app:strokeWidth="2dp"
-                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck,TouchTargetSizeCheck" />
+                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -155,7 +159,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:text="二号板"
+                    android:fontFamily="monospace"
+                    android:text="@string/plate_two"
                     android:textColor="@color/black"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -165,6 +170,7 @@
                     android:id="@+id/hole_two"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
                     android:textColor="@color/black"
                     app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_two"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -199,9 +205,10 @@
                     android:layout_width="196dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
+                    android:fontFamily="monospace"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
-                    android:text="@string/button"
+                    android:textAllCaps="false"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:cornerRadius="0dp"
@@ -216,7 +223,7 @@
                     app:rippleColor="@color/purple_700"
                     app:strokeColor="@color/light_primary"
                     app:strokeWidth="2dp"
-                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck" />
+                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -239,7 +246,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:text="三号板"
+                    android:fontFamily="monospace"
+                    android:text="@string/plate_three"
                     android:textColor="@color/black"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -249,6 +257,7 @@
                     android:id="@+id/hole_three"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
                     android:textColor="@color/black"
                     app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_three"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -283,9 +292,10 @@
                     android:layout_width="196dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
+                    android:fontFamily="monospace"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
-                    android:text="@string/button"
+                    android:textAllCaps="false"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:cornerRadius="0dp"
@@ -300,7 +310,7 @@
                     app:rippleColor="@color/purple_700"
                     app:strokeColor="@color/light_primary"
                     app:strokeWidth="2dp"
-                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck" />
+                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -323,7 +333,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:text="四号板"
+                    android:fontFamily="monospace"
+                    android:text="@string/plate_four"
                     android:textColor="@color/black"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -333,6 +344,7 @@
                     android:id="@+id/hole_four"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
                     android:textColor="@color/black"
                     app:layout_constraintBottom_toTopOf="@+id/dynamic_plate_four"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -367,9 +379,10 @@
                     android:layout_width="196dp"
                     android:layout_height="40dp"
                     android:layout_gravity="center"
+                    android:fontFamily="monospace"
                     android:insetTop="0dp"
                     android:insetBottom="0dp"
-                    android:text="@string/button"
+                    android:textAllCaps="false"
                     android:textColor="@color/black"
                     android:textSize="18sp"
                     app:cornerRadius="0dp"
@@ -384,7 +397,7 @@
                     app:rippleColor="@color/purple_700"
                     app:strokeColor="@color/light_primary"
                     app:strokeWidth="2dp"
-                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck" />
+                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

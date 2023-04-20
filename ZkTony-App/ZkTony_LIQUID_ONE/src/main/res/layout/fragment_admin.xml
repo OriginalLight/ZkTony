@@ -200,15 +200,15 @@
                             tools:ignore="ContentDescription,ImageContrastCheck" />
 
                         <TextView
-                            android:layout_width="53dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_centerVertical="true"
-                            android:layout_marginStart="19dp"
+                            android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_device"
                             android:text="@string/device_info"
                             android:textColor="@color/black"
                             android:textSize="16sp"
-                            tools:ignore="VisualLintOverlap" />
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                         <TextView
                             android:id="@+id/tv_device_name"

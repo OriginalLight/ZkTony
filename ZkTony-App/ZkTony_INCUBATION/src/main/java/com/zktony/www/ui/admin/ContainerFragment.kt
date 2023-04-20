@@ -34,35 +34,35 @@ class ContainerFragment :
                 launch {
                     viewModel.container.collect {
                         binding.apply {
-                            wasteY.setEqualText(it.wasteY.toString().removeZero())
-                            wasteZ.setEqualText(it.wasteZ.toString().removeZero())
-                            washY.setEqualText(it.washY.toString().removeZero())
-                            washZ.setEqualText(it.washZ.toString().removeZero())
-                            blockY.setEqualText(it.blockY.toString().removeZero())
-                            blockZ.setEqualText(it.blockZ.toString().removeZero())
-                            oneY.setEqualText(it.oneY.toString().removeZero())
-                            oneZ.setEqualText(it.oneZ.toString().removeZero())
-                            recycleOneZ.setEqualText(it.recycleOneZ.toString().removeZero())
-                            twoY.setEqualText(it.twoY.toString().removeZero())
-                            twoZ.setEqualText(it.twoZ.toString().removeZero())
+                            wastePosition.setEqualText(it.wasteY.toString().removeZero())
+                            wasteHeight.setEqualText(it.wasteZ.toString().removeZero())
+                            washPosition.setEqualText(it.washY.toString().removeZero())
+                            washHeight.setEqualText(it.washZ.toString().removeZero())
+                            blockingLiquidPosition.setEqualText(it.blockY.toString().removeZero())
+                            blockingLiquidHeight.setEqualText(it.blockZ.toString().removeZero())
+                            antibodyOnePosition.setEqualText(it.oneY.toString().removeZero())
+                            antibodyOneHeight.setEqualText(it.oneZ.toString().removeZero())
+                            antibodyOneRecycle.setEqualText(it.recycleOneZ.toString().removeZero())
+                            antibodyTwoPosition.setEqualText(it.twoY.toString().removeZero())
+                            antibodyTwoHeight.setEqualText(it.twoZ.toString().removeZero())
                         }
                     }
                 }
                 launch {
                     serialManager.lock.collect {
                         binding.apply {
-                            toWashY.isEnabled = !it
-                            toWashZ.isEnabled = !it
-                            toWasteY.isEnabled = !it
-                            toWasteZ.isEnabled = !it
-                            toBlockY.isEnabled = !it
-                            toBlockZ.isEnabled = !it
-                            toOneY.isEnabled = !it
-                            toOneZ.isEnabled = !it
-                            toRecycleOneZ.isEnabled = !it
-                            toTwoY.isEnabled = !it
-                            toTwoZ.isEnabled = !it
-                            toZero.isEnabled = !it
+                            moveWastePosition.isEnabled = !it
+                            moveWasteHeight.isEnabled = !it
+                            moveWashPosition.isEnabled = !it
+                            moveWashHeight.isEnabled = !it
+                            moveBlockingLiquidPosition.isEnabled = !it
+                            moveBlockingLiquidHeight.isEnabled = !it
+                            moveAntibodyOnePosition.isEnabled = !it
+                            moveAntibodyOneHeight.isEnabled = !it
+                            moveAntibodyOneRecycle.isEnabled = !it
+                            moveAntibodyTwoPosition.isEnabled = !it
+                            moveAntibodyTwoHeight.isEnabled = !it
+                            zero.isEnabled = !it
                         }
                     }
                 }
@@ -81,32 +81,32 @@ class ContainerFragment :
                     findNavController().navigateUp()
                 }
             }
-            toWashY.clickNoRepeat { viewModel.toWashY() }
-            toWashZ.clickNoRepeat { viewModel.toWashZ() }
-            toWasteY.clickNoRepeat { viewModel.toWasteY() }
-            toWasteZ.clickNoRepeat { viewModel.toWasteZ() }
-            toBlockY.clickNoRepeat { viewModel.toBlockY() }
-            toBlockZ.clickNoRepeat { viewModel.toBlockZ() }
-            toOneY.clickNoRepeat { viewModel.toOneY() }
-            toOneZ.clickNoRepeat { viewModel.toOneZ() }
-            toRecycleOneZ.clickNoRepeat { viewModel.toRecycleOneZ() }
-            toTwoY.clickNoRepeat { viewModel.toTwoY() }
-            toTwoZ.clickNoRepeat { viewModel.toTwoZ() }
-            toZero.clickNoRepeat { viewModel.toZero() }
+            moveWashPosition.clickNoRepeat { viewModel.toWashY() }
+            moveWashHeight.clickNoRepeat { viewModel.toWashZ() }
+            moveWastePosition.clickNoRepeat { viewModel.toWasteY() }
+            moveWasteHeight.clickNoRepeat { viewModel.toWasteZ() }
+            moveBlockingLiquidPosition.clickNoRepeat { viewModel.toBlockY() }
+            moveBlockingLiquidHeight.clickNoRepeat { viewModel.toBlockZ() }
+            moveAntibodyOnePosition.clickNoRepeat { viewModel.toOneY() }
+            moveAntibodyOneHeight.clickNoRepeat { viewModel.toOneZ() }
+            moveAntibodyOneRecycle.clickNoRepeat { viewModel.toRecycleOneZ() }
+            moveAntibodyTwoPosition.clickNoRepeat { viewModel.toTwoY() }
+            moveAntibodyTwoHeight.clickNoRepeat { viewModel.toTwoZ() }
+            zero.clickNoRepeat { viewModel.toZero() }
             update.clickNoRepeat {
                 viewModel.update(
                     Container().copy(
-                        wasteY = binding.wasteY.text.toString().toFloat(),
-                        wasteZ = binding.wasteZ.text.toString().toFloat(),
-                        washY = binding.washY.text.toString().toFloat(),
-                        washZ = binding.washZ.text.toString().toFloat(),
-                        blockY = binding.blockY.text.toString().toFloat(),
-                        blockZ = binding.blockZ.text.toString().toFloat(),
-                        oneY = binding.oneY.text.toString().toFloat(),
-                        oneZ = binding.oneZ.text.toString().toFloat(),
-                        recycleOneZ = binding.recycleOneZ.text.toString().toFloat(),
-                        twoY = binding.twoY.text.toString().toFloat(),
-                        twoZ = binding.twoZ.text.toString().toFloat(),
+                        wasteY = binding.wastePosition.text.toString().toFloat(),
+                        wasteZ = binding.wasteHeight.text.toString().toFloat(),
+                        washY = binding.washPosition.text.toString().toFloat(),
+                        washZ = binding.washHeight.text.toString().toFloat(),
+                        blockY = binding.blockingLiquidPosition.text.toString().toFloat(),
+                        blockZ = binding.blockingLiquidHeight.text.toString().toFloat(),
+                        oneY = binding.antibodyOnePosition.text.toString().toFloat(),
+                        oneZ = binding.antibodyOneHeight.text.toString().toFloat(),
+                        recycleOneZ = binding.antibodyOneRecycle.text.toString().toFloat(),
+                        twoY = binding.antibodyTwoPosition.text.toString().toFloat(),
+                        twoZ = binding.antibodyTwoHeight.text.toString().toFloat(),
                     )
                 )
             }

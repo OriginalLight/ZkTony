@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
+        android:fontFamily="monospace"
         android:text="@string/qrcode"
         android:textAlignment="center"
         android:textColor="@color/black"
@@ -25,6 +26,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="32dp"
+        android:fontFamily="monospace"
         android:src="@mipmap/qrcode"
         tools:ignore="ContentDescription" />
 
@@ -32,9 +34,11 @@
         android:id="@+id/btn_web"
         android:layout_width="match_parent"
         android:layout_height="48dp"
+        android:fontFamily="monospace"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/website"
+        android:textAllCaps="false"
         android:textSize="16sp"
         android:textStyle="bold"
         app:cornerRadius="0dp"

@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:text="@string/program_edit"
+                android:text="@string/edit"
                 android:textAlignment="center"
                 android:textColor="@color/black"
                 android:textSize="24sp" />
@@ -109,7 +109,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:gravity="center"
-                            android:text="@string/add_action"
+                            android:text="@string/process"
                             android:textAlignment="center"
                             android:textColor="@color/black"
                             android:textSize="22sp" />
@@ -188,11 +188,12 @@
                                 tools:ignore="ContentDescription,ImageContrastCheck" />
 
                             <TextView
-                                android:layout_width="96dp"
+                                android:layout_width="128dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="4dp"
-                                android:gravity="start|center_vertical"
-                                android:text="@string/hint_order"
+                                android:fontFamily="monospace"
+                                android:gravity="center"
+                                android:text="@string/order"
                                 android:textSize="16sp" />
 
                             <EditText
@@ -200,8 +201,8 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:background="@color/light_onPrimary"
                                 android:cursorVisible="true"
+                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:inputType="number"
                                 android:maxLength="50"
@@ -236,11 +237,12 @@
 
                             <TextView
                                 android:id="@+id/tv_time"
-                                android:layout_width="96dp"
+                                android:layout_width="128dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="4dp"
-                                android:gravity="start|center_vertical"
-                                android:text="@string/hint_time_min"
+                                android:fontFamily="monospace"
+                                android:gravity="center"
+                                android:text="@string/time_min"
                                 android:textSize="16sp"
                                 tools:ignore="TextSizeCheck" />
 
@@ -249,8 +251,8 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:background="@color/light_onPrimary"
                                 android:cursorVisible="true"
+                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:inputType="numberDecimal"
                                 android:maxLength="50"
@@ -284,11 +286,12 @@
                                 tools:ignore="ContentDescription,ImageContrastCheck" />
 
                             <TextView
-                                android:layout_width="96dp"
+                                android:layout_width="128dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="4dp"
-                                android:gravity="start|center_vertical"
-                                android:text="@string/hint_temperature"
+                                android:fontFamily="monospace"
+                                android:gravity="center"
+                                android:text="@string/temperature"
                                 android:textSize="16sp" />
 
                             <EditText
@@ -296,8 +299,8 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:background="@color/light_onPrimary"
                                 android:cursorVisible="true"
+                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:inputType="numberDecimal"
                                 android:maxLength="50"
@@ -331,11 +334,12 @@
                                 tools:ignore="ContentDescription,ImageContrastCheck" />
 
                             <TextView
-                                android:layout_width="96dp"
+                                android:layout_width="128dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="4dp"
-                                android:gravity="start|center_vertical"
-                                android:text="@string/hint_liquid_volume"
+                                android:fontFamily="monospace"
+                                android:gravity="center"
+                                android:text="@string/volume"
                                 android:textSize="16sp"
                                 tools:ignore="TextSizeCheck" />
 
@@ -344,8 +348,8 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:background="@color/light_onPrimary"
                                 android:cursorVisible="true"
+                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:inputType="number"
                                 android:maxLength="50"
@@ -380,11 +384,12 @@
                                 tools:ignore="ContentDescription" />
 
                             <TextView
-                                android:layout_width="96dp"
+                                android:layout_width="128dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="4dp"
-                                android:gravity="start|center_vertical"
-                                android:text="@string/hint_count"
+                                android:fontFamily="monospace"
+                                android:gravity="center"
+                                android:text="@string/count"
                                 android:textSize="16sp" />
 
                             <EditText
@@ -392,8 +397,8 @@
                                 android:layout_width="0dp"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
-                                android:background="@color/light_onPrimary"
                                 android:cursorVisible="true"
+                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:inputType="number"
                                 android:maxLength="50"
@@ -420,7 +425,9 @@
                             android:layout_marginBottom="32dp"
                             android:backgroundTint="@color/light_primary"
                             android:enabled="false"
-                            android:text="@string/add_ban"
+                            android:fontFamily="monospace"
+                            android:text="@string/add"
+                            android:textAllCaps="false"
                             android:textColor="@color/light_onPrimary"
                             android:textSize="20sp"
                             app:cornerRadius="24dp"

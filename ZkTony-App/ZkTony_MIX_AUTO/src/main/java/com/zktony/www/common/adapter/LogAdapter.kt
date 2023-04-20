@@ -56,9 +56,9 @@ class LogViewHolder(
             name.text = item.name
             time.text = item.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss")
             status.text = when (item.status) {
-                0 -> "未完成"
-                1 -> "完成"
-                else -> "未完成"
+                0 -> "/"
+                1 -> "OK"
+                else -> "/"
             }
             status.setTextColor(
                 when (item.status) {

@@ -53,8 +53,14 @@ class AdminViewModel constructor(
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 //是否显示button bar
                 putExtra("extra_prefs_show_button_bar", true)
-                putExtra("extra_prefs_set_next_text", "完成")
-                putExtra("extra_prefs_set_back_text", "返回")
+                putExtra(
+                    "extra_prefs_set_next_text",
+                    Ext.ctx.getString(com.zktony.core.R.string.finish)
+                )
+                putExtra(
+                    "extra_prefs_set_back_text",
+                    Ext.ctx.getString(com.zktony.core.R.string.cancel)
+                )
             }
             Ext.ctx.startActivity(intent)
         }
@@ -68,8 +74,8 @@ class AdminViewModel constructor(
             val apk = checkLocalUpdate()
             if (apk != null) {
                 updateDialog(
-                    title = "发现本地新版本",
-                    message = "是否更新？",
+                    title = Ext.ctx.getString(com.zktony.core.R.string.new_local_update),
+                    message = Ext.ctx.getString(com.zktony.core.R.string.whether_to_update),
                     block = {
                         Ext.ctx.installApk(apk)
                     })
@@ -85,7 +91,7 @@ class AdminViewModel constructor(
      */
     private fun downloadApk(application: Application) {
         viewModelScope.launch {
-            PopTip.show("开始下载")
+            PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.start_downloading))
             application.downloadUrl.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
                 .collect {
                     when (it) {
@@ -100,7 +106,8 @@ class AdminViewModel constructor(
                             _uiState.value = _uiState.value.copy(
                                 progress = 0
                             )
-                            PopTip.show("下载失败,请重试!").showLong()
+                            PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.download_failed))
+                                .showLong()
                         }
 
                         is DownloadState.Progress -> {
@@ -124,13 +131,13 @@ class AdminViewModel constructor(
                 if (application != null) {
                     if (application.versionCode > BuildConfig.VERSION_CODE) {
                         updateDialog(
-                            title = "发现在线新版本",
-                            message = application.description + "\n是否升级？",
+                            title = Ext.ctx.getString(com.zktony.core.R.string.new_remote_update),
+                            message = application.description + "\n${Ext.ctx.getString(com.zktony.core.R.string.whether_to_update)}",
                             block = {
                                 downloadApk(application)
                             })
                     } else {
-                        PopTip.show("已是最新版本")
+                        PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_latest_version))
                     }
                 } else {
                     _uiState.value = _uiState.value.copy(
@@ -138,15 +145,15 @@ class AdminViewModel constructor(
                     )
                     AG.getByApplicationId(BuildConfig.APPLICATION_ID)
                         .catch {
-                            PopTip.show("获取版本信息失败,请重试!")
+                            PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.failed_get_version_information))
                             _uiState.value = _uiState.value.copy(
                                 loading = false
                             )
                         }.collect {
                             if (it.versionCode > BuildConfig.VERSION_CODE) {
                                 updateDialog(
-                                    title = "发现在线新版本",
-                                    message = it.description + "\n是否升级？",
+                                    title = Ext.ctx.getString(com.zktony.core.R.string.new_remote_update),
+                                    message = it.description + "\n${Ext.ctx.getString(com.zktony.core.R.string.whether_to_update)}",
                                     block = {
                                         downloadApk(it)
                                     })
@@ -154,7 +161,7 @@ class AdminViewModel constructor(
                                     loading = false
                                 )
                             } else {
-                                PopTip.show("已是最新版本")
+                                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_latest_version))
                                 _uiState.value = _uiState.value.copy(
                                     loading = false
                                 )
@@ -162,7 +169,7 @@ class AdminViewModel constructor(
                         }
                 }
             } else {
-                PopTip.show("请连接网络或插入升级U盘")
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.no_network_usb))
             }
         }
     }

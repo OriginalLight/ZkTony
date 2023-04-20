@@ -15,7 +15,8 @@ import com.zktony.www.databinding.FragmentTransferBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class TransferFragment : BaseFragment<TransferViewModel, FragmentTransferBinding>(R.layout.fragment_transfer) {
+class TransferFragment :
+    BaseFragment<TransferViewModel, FragmentTransferBinding>(R.layout.fragment_transfer) {
 
     override val viewModel: TransferViewModel by viewModel()
 

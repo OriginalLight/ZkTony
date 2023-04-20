@@ -62,7 +62,7 @@ class CalibrationViewHolder(
         binding.apply {
             cali = item
             order.text = (layoutPosition + 1).toString()
-            delete.isVisible = item.name != "默认"
+            delete.isVisible = item.name != itemView.context.getString(com.zktony.core.R.string.def)
             with(select) {
                 clickScale()
                 clickNoRepeat {

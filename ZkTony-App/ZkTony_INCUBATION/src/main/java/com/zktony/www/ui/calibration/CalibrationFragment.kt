@@ -50,8 +50,8 @@ class CalibrationFragment :
             onCheckedClick = { viewModel.enable(it) }
             onDeleteButtonClick = {
                 messageDialog(
-                    title = "删除校准程序",
-                    message = "删除后将无法恢复，是否删除${it.name}？",
+                    title = getString(com.zktony.core.R.string.delete),
+                    message = "${getString(com.zktony.core.R.string.whether_delete)} ${it.name}？",
                     block = { viewModel.delete(it) }
                 )
             }
@@ -69,8 +69,8 @@ class CalibrationFragment :
                 clickScale()
                 clickNoRepeat {
                     inputDialog(
-                        title = "添加校准程序",
-                        hint = "请输入校准程序名称",
+                        title = getString(com.zktony.core.R.string.add),
+                        hint = getString(com.zktony.core.R.string.input_name),
                         block = {
                             viewModel.insert(it) { id ->
                                 findNavController().navigate(

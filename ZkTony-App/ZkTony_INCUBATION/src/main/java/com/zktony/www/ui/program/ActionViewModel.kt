@@ -1,7 +1,6 @@
 package com.zktony.www.ui.program
 
 import androidx.lifecycle.viewModelScope
-import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.www.room.dao.ActionDao
 import com.zktony.www.room.dao.ProgramDao
@@ -71,7 +70,6 @@ class ActionViewModel constructor(
         viewModelScope.launch {
             AD.delete(action)
             delay(500L)
-            PopTip.show("已删除")
             updateActions()
         }
     }
@@ -91,7 +89,7 @@ class ActionViewModel constructor(
                         }
                     }
                 } else {
-                    str.append("没有任何操作，去添加吧...")
+                    str.append("/")
                 }
                 PD.getById(_uiState.value.programId).firstOrNull()?.let { program ->
                     PD.update(

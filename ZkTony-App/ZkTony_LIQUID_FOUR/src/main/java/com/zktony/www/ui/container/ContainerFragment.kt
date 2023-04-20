@@ -42,8 +42,8 @@ class ContainerFragment :
     private fun initView() {
         adapter.onDeleteButtonClick = {
             messageDialog(
-                title = "删除容器",
-                message = "是否删除容器 ${it.name} ?",
+                title = getString(com.zktony.core.R.string.delete),
+                message = "${getString(com.zktony.core.R.string.whether_delete)} ${it.name} ?",
                 block = { viewModel.delete(it) }
             )
         }
@@ -61,8 +61,8 @@ class ContainerFragment :
                 clickScale()
                 clickNoRepeat {
                     inputDialog(
-                        title = "添加容器",
-                        hint = "请输入容器名称",
+                        title = getString(com.zktony.core.R.string.add),
+                        hint = getString(com.zktony.core.R.string.input_name),
                         block = {
                             viewModel.insert(it) {
                                 findNavController().navigate(

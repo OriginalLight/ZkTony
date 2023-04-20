@@ -47,12 +47,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                                 progress = it.progress
                                 isVisible = it.progress != 0
                             }
-                            tvUpdate.text = if (it.progress == 0) "检查更新" else "${it.progress}%"
+                            tvUpdate.text =
+                                if (it.progress == 0) resources.getString(com.zktony.core.R.string.check_update) else "${it.progress}%"
                             it.application?.let { app ->
                                 if (app.versionCode > BuildConfig.VERSION_CODE) {
                                     update.setBackgroundResource(com.zktony.core.R.mipmap.new_icon)
                                     tvUpdate.text =
-                                        if (it.progress == 0) "发现新版本" else "${it.progress}%"
+                                        if (it.progress == 0) resources.getString(com.zktony.core.R.string.new_version) else "${it.progress}%"
                                 }
                             }
                         }
@@ -92,11 +93,11 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 clickScale()
                 clickNoRepeat {
                     if (viewModel.uiState.value.progress > 0) {
-                        PopTip.show("正在更新中")
+                        PopTip.show(resources.getString(com.zktony.core.R.string.updating))
                         return@clickNoRepeat
                     }
                     if (viewModel.uiState.value.loading) {
-                        PopTip.show("正在检查更新中")
+                        PopTip.show(resources.getString(com.zktony.core.R.string.checking_for_updates))
                         return@clickNoRepeat
                     }
                     viewModel.checkUpdate()
@@ -105,7 +106,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             with(version) {
                 clickScale()
                 clickNoRepeat {
-                    PopTip.show("当前软件版本号 ${BuildConfig.VERSION_NAME}")
+                    PopTip.show("${resources.getString(com.zktony.core.R.string.version)} ${BuildConfig.VERSION_NAME}")
                 }
             }
             with(about) {

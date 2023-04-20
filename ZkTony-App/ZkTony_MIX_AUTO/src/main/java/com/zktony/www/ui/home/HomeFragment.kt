@@ -31,7 +31,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         start.isVisible = it.job == null && it.pointList.total() > 0
                         with(pause) {
                             isVisible = it.job != null
-                            text = if (!it.pause) "暂停" else "继续"
+                            text =
+                                if (!it.pause) getString(com.zktony.core.R.string.pause) else getString(
+                                    com.zktony.core.R.string.go_on
+                                )
                             setIconResource(if (!it.pause) mipmap.pause else mipmap.play)
                         }
                         if (it.program != null) {
@@ -55,9 +58,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
                         fillCoagulantImage.setBackgroundResource(if (it.fillCoagulant) mipmap.close else mipmap.right)
                         recaptureCoagulantImage.setBackgroundResource(if (it.recaptureCoagulant) mipmap.close else mipmap.left)
-                        fillCoagulantText.text = if (it.fillCoagulant) "停止" else "填充(促凝剂)"
+                        fillCoagulantText.text =
+                            if (it.fillCoagulant) getString(com.zktony.core.R.string.stop) else getString(
+                                R.string.fill_coagulant
+                            )
                         recaptureCoagulantText.text =
-                            if (it.recaptureCoagulant) "停止" else "回吸(促凝剂)"
+                            if (it.recaptureCoagulant) getString(com.zktony.core.R.string.stop) else getString(
+                                R.string.back_coagulant
+                            )
                     }
                 }
             }
@@ -67,7 +75,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun initView() {
         binding.apply {
             holeNumber.clickNoRepeat {
-                PopTip.show("加液总数: ${holeNumber.text}")
+                PopTip.show("${getString(com.zktony.core.R.string.total)}: ${holeNumber.text}")
             }
             with(select) {
                 iconTint = null
@@ -87,7 +95,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             with(reset) {
                 clickScale()
                 clickNoRepeat {
-                    PopTip.show("长按复位")
+                    PopTip.show(getString(com.zktony.core.R.string.press_and_hold_to_reset))
                 }
                 setOnLongClickListener {
                     viewModel.reset()

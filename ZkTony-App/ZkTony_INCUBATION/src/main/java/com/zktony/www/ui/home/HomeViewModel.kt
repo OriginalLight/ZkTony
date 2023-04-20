@@ -29,10 +29,10 @@ class HomeViewModel constructor(
 
 
     private val _programFlow = MutableStateFlow<List<Program>>(emptyList())
-    private val _aFlow = MutableStateFlow(ModuleUiState(status = "A模块已就绪"))
-    private val _bFlow = MutableStateFlow(ModuleUiState(status = "B模块已就绪"))
-    private val _cFlow = MutableStateFlow(ModuleUiState(status = "C模块已就绪"))
-    private val _dFlow = MutableStateFlow(ModuleUiState(status = "D模块已就绪"))
+    private val _aFlow = MutableStateFlow(ModuleUiState(status = "A Active"))
+    private val _bFlow = MutableStateFlow(ModuleUiState(status = "B Active"))
+    private val _cFlow = MutableStateFlow(ModuleUiState(status = "C Active"))
+    private val _dFlow = MutableStateFlow(ModuleUiState(status = "D Active"))
     private val _buttonFlow = MutableStateFlow(UiState())
     private val _settings = MutableStateFlow(Settings())
     val programFlow = _programFlow.asStateFlow()
@@ -171,7 +171,7 @@ class HomeViewModel constructor(
             state.value = state.value.copy(
                 program = _programFlow.value[index],
                 startEnable = _programFlow.value[index].actionCount > 0,
-                status = "已就绪",
+                status = "Active",
                 time = Constants.ZERO_TIME,
             )
         }
@@ -190,7 +190,7 @@ class HomeViewModel constructor(
                 startVisible = View.GONE,
                 stopVisible = View.VISIBLE,
                 selectEnable = false,
-                status = "运行中",
+                status = "Running",
             )
             // 创建job
             val job = launch {
@@ -415,7 +415,7 @@ data class ModuleUiState(
     val startVisible: Int = View.VISIBLE,
     val stopVisible: Int = View.GONE,
     val time: String = Constants.ZERO_TIME,
-    val status: String = "已就绪",
+    val status: String = "Active",
     val action: String = "/",
     val temp: String = "0.0℃",
 )

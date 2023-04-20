@@ -3,6 +3,7 @@ package com.zktony.www.ui.admin
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.Ext
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
 import com.zktony.www.room.dao.MotorDao
@@ -96,15 +97,23 @@ class MotorViewModel constructor(
                 if (validateMotor(it)) {
                     MD.update(it)
                     val serial = when (it.id) {
-                        in 0..2 -> { 0 }
-                        in 3..5 -> { 3 }
-                        else -> { 0 }
+                        in 0..2 -> {
+                            0
+                        }
+
+                        in 3..5 -> {
+                            3
+                        }
+
+                        else -> {
+                            0
+                        }
                     }
                     SM.sendHex(
                         index = serial,
                         hex = V1(pa = "04", data = it.toHex()).toHex()
                     )
-                    PopTip.show("更新成功")
+                    PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.update_success))
                 }
             }
         }
@@ -118,19 +127,19 @@ class MotorViewModel constructor(
     private fun validateMotor(motor: Motor): Boolean {
         if (motor.speed <= 0) {
             viewModelScope.launch {
-                PopTip.show("速度不能小于0")
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.speed_exception))
             }
             return false
         }
         if (motor.acceleration > 100 || motor.acceleration < 10) {
             viewModelScope.launch {
-                PopTip.show("加速度范围为10-100")
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.acceleration_exception))
             }
             return false
         }
         if (motor.deceleration > 100 || motor.deceleration < 10) {
             viewModelScope.launch {
-                PopTip.show("减速度范围为10-100")
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.deceleration_exception))
             }
             return false
         }

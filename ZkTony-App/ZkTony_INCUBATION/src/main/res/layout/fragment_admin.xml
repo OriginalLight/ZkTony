@@ -61,6 +61,7 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_bar"
+                            android:fontFamily="monospace"
                             android:text="@string/navigation"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -103,6 +104,7 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_recycle"
+                            android:fontFamily="monospace"
                             android:text="@string/recycle_antibody"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -145,7 +147,8 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_temp"
-                            android:text="@string/antibody_holding_temperature"
+                            android:fontFamily="monospace"
+                            android:text="@string/antibody_temp"
                             android:textColor="@color/black"
                             android:textSize="16sp"
                             tools:ignore="RelativeOverlap,VisualLintOverlap" />
@@ -203,6 +206,7 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_version"
+                            android:fontFamily="monospace"
                             android:text="@string/version"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -215,6 +219,7 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
+                            android:fontFamily="monospace"
                             android:gravity="center"
                             android:textSize="20sp"
                             android:textStyle="italic" />
@@ -245,6 +250,7 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_device"
+                            android:fontFamily="monospace"
                             android:text="@string/device_info"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -257,6 +263,7 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
+                            android:fontFamily="monospace"
                             android:gravity="center"
                             android:textSize="20sp"
                             android:textStyle="italic" />
@@ -287,6 +294,7 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_about"
+                            android:fontFamily="monospace"
                             android:text="@string/instructions_for_use"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -344,9 +352,11 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/setting"
                     android:layout_centerHorizontal="true"
+                    android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/protected_settings"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    tools:ignore="VisualLintLocaleText" />
 
             </RelativeLayout>
 
@@ -369,6 +379,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/wifi"
                     android:layout_centerHorizontal="true"
+                    android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/wifi_setting"
                     android:textSize="16sp" />
@@ -395,6 +406,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/update"
                     android:layout_centerHorizontal="true"
+                    android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/check_update"
                     android:textSize="16sp" />

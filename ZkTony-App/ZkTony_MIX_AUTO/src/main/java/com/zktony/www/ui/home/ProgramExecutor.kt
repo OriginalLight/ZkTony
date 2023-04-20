@@ -1,6 +1,8 @@
 package com.zktony.www.ui.home
 
+import com.zktony.core.ext.Ext
 import com.zktony.core.ext.currentTime
+import com.zktony.www.R
 import com.zktony.www.common.ext.total
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
@@ -27,7 +29,7 @@ class ProgramExecutor constructor(
     suspend fun execute() {
         scope.launch {
             delay(100L)
-            event(ExecutorEvent.Log("[ ${currentTime()} ]\t 开始执行任务\n"))
+            event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${Ext.ctx.getString(com.zktony.core.R.string.start)}\n"))
             val total = list.total()
             if (total > 0) {
                 for (i in list.indices) {
@@ -39,7 +41,15 @@ class ProgramExecutor constructor(
                         event(ExecutorEvent.CurrentPoint(point))
 
                         if (point.v3 > 0 && point.v4 > 0) {
-                            event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${point.index + 1} 号孔排液\n"))
+                            event(
+                                ExecutorEvent.Log(
+                                    "[ ${currentTime()} ]\t ${point.index + 1} ${
+                                        Ext.ctx.getString(
+                                            R.string.pre_drainage
+                                        )
+                                    }\n"
+                                )
+                            )
                             executionManager.actuator(
                                 executionManager.builder(
                                     y = point.waste,
@@ -57,7 +67,15 @@ class ProgramExecutor constructor(
                         event(ExecutorEvent.FinishList(currentList))
 
                         if (point.v1 > 0 && point.v2 > 0) {
-                            event(ExecutorEvent.Log("[ ${currentTime()} ]\t 执行孔位：${point.index + 1} 号孔\n"))
+                            event(
+                                ExecutorEvent.Log(
+                                    "[ ${currentTime()} ]\t ${point.index + 1} ${
+                                        Ext.ctx.getString(
+                                            R.string.glue_making
+                                        )
+                                    }\n"
+                                )
+                            )
                             executionManager.actuator(
                                 executionManager.builder(
                                     y = point.axis
@@ -84,7 +102,7 @@ class ProgramExecutor constructor(
                 }
             }
             event(ExecutorEvent.Finish)
-            event(ExecutorEvent.Log("[ ${currentTime()} ]\t 任务执行完毕"))
+            event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${Ext.ctx.getString(com.zktony.core.R.string.complete)}"))
         }
     }
 }

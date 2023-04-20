@@ -35,7 +35,7 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
                 viewModel.uiState.collect {
                     binding.apply {
                         washPlate.text = (it?.axis ?: 0f).removeZero()
-                        title.text = it?.name ?: "容器管理"
+                        title.text = it?.name ?: getString(R.string.title_container)
                     }
                 }
             }
@@ -65,7 +65,7 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
                             btnMove.clickNoRepeat {
                                 val axis = input.text.toString().toFloatOrNull() ?: 0f
                                 if (axis > 250f) {
-                                    PopTip.show("坐标不能大于250")
+                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 250")
                                 } else {
                                     viewModel.move(axis)
                                 }
@@ -74,7 +74,7 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
                             btnOk.clickNoRepeat {
                                 val axis = input.text.toString().toFloatOrNull() ?: 0f
                                 if (axis > 250f) {
-                                    PopTip.show("坐标不能大于250")
+                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 250")
                                 } else {
                                     viewModel.save(axis)
                                     dialog.dismiss()

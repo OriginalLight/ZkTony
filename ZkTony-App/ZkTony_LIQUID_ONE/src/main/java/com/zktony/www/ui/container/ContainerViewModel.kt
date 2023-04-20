@@ -3,6 +3,7 @@ package com.zktony.www.ui.container
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
+import com.zktony.core.ext.Ext
 import com.zktony.core.utils.Snowflake
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.dao.PointDao
@@ -37,10 +38,14 @@ class ContainerViewModel constructor(
 
     fun insert(name: String, function: (Long) -> Unit) {
         viewModelScope.launch {
+            if (name.isEmpty()) {
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.not_empty))
+                return@launch
+            }
             val container = _uiState.value.list.find { it.name == name }
             val snowflake = Snowflake(1)
             if (container != null) {
-                PopTip.show("容器名已存在")
+                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_exists))
             } else {
                 val con = Container(
                     id = snowflake.nextId(),

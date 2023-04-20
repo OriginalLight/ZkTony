@@ -67,10 +67,10 @@ class ActionViewHolder(
                 }
             }
             model.text = getActionEnum(item.mode).value
-            time.text = item.time.removeZero() + if (item.mode == 3) " 分钟" else " 小时"
+            time.text = item.time.removeZero() + if (item.mode == 3) " Min" else " Hour"
             temperature.text = item.temperature.removeZero() + " ℃"
-            water.text = item.liquidVolume.removeZero() + " 微升"
-            counter.text = item.count.toString() + " 次"
+            water.text = item.liquidVolume.removeZero() + " μL"
+            counter.text = item.count.toString() + " Freq"
             cardView.clickNoRepeat {
             }
             with(delete) {

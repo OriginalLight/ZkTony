@@ -47,8 +47,8 @@ class CalibrationFragment :
             onCheckedClick = { viewModel.enable(it) }
             onDeleteButtonClick = {
                 messageDialog(
-                    title = getString(R.string.delete_calibration),
-                    message = "${getString(R.string.whether_delete)} ${it.name}？",
+                    title = getString(com.zktony.core.R.string.delete),
+                    message = "${getString(com.zktony.core.R.string.whether_delete)} ${it.name}？",
                     block = { viewModel.delete(it) }
                 )
             }
@@ -65,8 +65,8 @@ class CalibrationFragment :
                 clickScale()
                 clickNoRepeat {
                     inputDialog(
-                        title = getString(R.string.add_calibration),
-                        hint = getString(R.string.input_calibration_name),
+                        title = getString(com.zktony.core.R.string.add),
+                        hint = getString(com.zktony.core.R.string.input_name),
                         block = {
                             viewModel.insert(it) { id ->
                                 findNavController().navigate(

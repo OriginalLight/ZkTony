@@ -41,7 +41,7 @@ class LogViewModel constructor(
                 .collect {
                     _uiState.value = _uiState.value.copy(list = it)
                     if (it.isEmpty()) {
-                        PopTip.show("没有找到相关日志")
+                        PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.not_found))
                     }
                 }
         }
