@@ -5,13 +5,13 @@ on:
     branches:
       - master
     paths:
-      - "ZkTony-App/**"
+      - "ZkTony-Android/ZkTony-App/**"
   pull_request:
     paths:
-      - "ZkTony-App/**"
+      - "ZkTony-Android/ZkTony-App/**"
 
 env:
-  SAMPLE_PATH: ZkTony-App
+  SAMPLE_PATH: ZkTony-Android/ZkTony-App
 
 jobs:
   build:
