@@ -1,4 +1,4 @@
-name: ZkTony-Manager
+name: Grpc
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -12,15 +12,15 @@ on:
     tags:
       - 'v*'
     paths:
-      - 'ZkTony-Backend/ZkTony-Manager/**'
+      - 'Rust/Grpc/**'
 
 
 env:
-  SAMPLE_PATH: ZkTony-Backend/ZkTony-Manager
+  SAMPLE_PATH: Rust/Grpc
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: zktony/manager
+  IMAGE_NAME: zktony/grpc
 
 
 jobs:
