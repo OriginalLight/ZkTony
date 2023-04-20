@@ -23,12 +23,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let tx = tx.clone();
         tracing::info!("Starting {} at {}", &CFG.server.name, addr);
 
-        let health_svc = health_svc().await;
-
         let serve = Server::builder()
             .enable_ssl()?
             .add_grpc_service(db_conn.clone())
-            .add_service(health_svc)
+            .add_service(health_svc().await)
             .serve_with_shutdown(addr, shutdown_signal(addr));
 
         tokio::spawn(async move {
