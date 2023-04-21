@@ -9,8 +9,7 @@ import android.view.View
 import android.widget.TextView
 
 /**
- * Description: span相关
- * Create by lxj, at 2018/12/5
+ * Description: span相关的扩展函数
  */
 
 /**
@@ -22,8 +21,8 @@ fun CharSequence.toSizeSpan(range: IntRange, scale: Float = 1.5f): CharSequence 
     return SpannableString(this).apply {
         setSpan(
             RelativeSizeSpan(scale),
-            range.start,
-            range.endInclusive,
+            range.first,
+            range.last,
             Spannable.SPAN_INCLUSIVE_EXCLUSIVE
         )
     }
@@ -38,8 +37,8 @@ fun CharSequence.toColorSpan(range: IntRange, color: Int = Color.RED): CharSeque
     return SpannableString(this).apply {
         setSpan(
             ForegroundColorSpan(color),
-            range.start,
-            range.endInclusive,
+            range.first,
+            range.last,
             Spannable.SPAN_INCLUSIVE_EXCLUSIVE
         )
     }
@@ -54,8 +53,8 @@ fun CharSequence.toBackgroundColorSpan(range: IntRange, color: Int = Color.RED):
     return SpannableString(this).apply {
         setSpan(
             BackgroundColorSpan(color),
-            range.start,
-            range.endInclusive,
+            range.first,
+            range.last,
             Spannable.SPAN_INCLUSIVE_EXCLUSIVE
         )
     }
@@ -69,8 +68,8 @@ fun CharSequence.toStrikeThrougthSpan(range: IntRange): CharSequence {
     return SpannableString(this).apply {
         setSpan(
             StrikethroughSpan(),
-            range.start,
-            range.endInclusive,
+            range.first,
+            range.last,
             Spannable.SPAN_INCLUSIVE_EXCLUSIVE
         )
     }
@@ -97,7 +96,7 @@ fun CharSequence.toClickSpan(
                 ds.isUnderlineText = isUnderlineText
             }
         }
-        setSpan(clickableSpan, range.start, range.endInclusive, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
+        setSpan(clickableSpan, range.first, range.last, Spannable.SPAN_INCLUSIVE_EXCLUSIVE)
     }
 }
 
@@ -109,8 +108,8 @@ fun CharSequence.toStyleSpan(style: Int = Typeface.BOLD, range: IntRange): CharS
     return SpannableString(this).apply {
         setSpan(
             StyleSpan(style),
-            range.start,
-            range.endInclusive,
+            range.first,
+            range.last,
             Spannable.SPAN_INCLUSIVE_EXCLUSIVE
         )
     }
@@ -118,7 +117,7 @@ fun CharSequence.toStyleSpan(style: Int = Typeface.BOLD, range: IntRange): CharS
 
 /** TextView的扩展 **/
 fun TextView.sizeSpan(str: String = "", range: IntRange, scale: Float = 1.5f): TextView {
-    text = (if (str.isEmpty()) text else str).toSizeSpan(range, scale)
+    text = (str.ifEmpty { text }).toSizeSpan(range, scale)
     return this
 }
 
@@ -128,7 +127,7 @@ fun TextView.appendSizeSpan(str: String = "", scale: Float = 1.5f): TextView {
 }
 
 fun TextView.colorSpan(str: String = "", range: IntRange, color: Int = Color.RED): TextView {
-    text = (if (str.isEmpty()) text else str).toColorSpan(range, color)
+    text = (str.ifEmpty { text }).toColorSpan(range, color)
     return this
 }
 
@@ -142,7 +141,7 @@ fun TextView.backgroundColorSpan(
     range: IntRange,
     color: Int = Color.RED
 ): TextView {
-    text = (if (str.isEmpty()) text else str).toBackgroundColorSpan(range, color)
+    text = (str.ifEmpty { text }).toBackgroundColorSpan(range, color)
     return this
 }
 
@@ -152,7 +151,7 @@ fun TextView.appendBackgroundColorSpan(str: String = "", color: Int = Color.RED)
 }
 
 fun TextView.strikeThrougthSpan(str: String = "", range: IntRange): TextView {
-    text = (if (str.isEmpty()) text else str).toStrikeThrougthSpan(range)
+    text = (str.ifEmpty { text }).toStrikeThrougthSpan(range)
     return this
 }
 
@@ -168,7 +167,7 @@ fun TextView.clickSpan(
     movementMethod = LinkMovementMethod.getInstance()
     highlightColor = Color.TRANSPARENT  // remove click bg color
     text =
-        (if (str.isEmpty()) text else str).toClickSpan(range, color, isUnderlineText, clickAction)
+        (str.ifEmpty { text }).toClickSpan(range, color, isUnderlineText, clickAction)
     return this
 }
 

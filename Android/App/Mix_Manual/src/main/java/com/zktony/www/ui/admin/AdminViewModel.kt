@@ -16,9 +16,11 @@ import com.zktony.core.ext.download
 import com.zktony.core.ext.installApk
 import com.zktony.core.ext.isNetworkAvailable
 import com.zktony.core.utils.Constants
+import com.zktony.datastore.ext.save
 import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.www.BuildConfig
+import com.zktony.www.MainActivity
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -211,6 +213,22 @@ class AdminViewModel constructor(
             putExtra("cmd", if (bar) "show" else "hide")
         }
         Ext.ctx.sendBroadcast(intent)
+    }
+
+    /**
+     * 设置语言
+     * @param index [Int]
+     */
+    fun setLanguage(index: Int) {
+        val language = when (index) {
+            0 -> "zh"
+            1 -> "en"
+            else -> "zh"
+        }
+        DS.save(Constants.LANGUAGE, language)
+        Ext.ctx.startActivity(Intent(Ext.ctx, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        })
     }
 
 }

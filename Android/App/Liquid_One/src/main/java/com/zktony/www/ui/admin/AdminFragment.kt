@@ -70,6 +70,15 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                             binding.needleSpace.setEqualText(it.toString().removeZero())
                         }
                     }
+                    launch {
+                        dataStore.read(Constants.LANGUAGE, "zh").collect {
+                            binding.btnLanguage.text = when (it) {
+                                "zh" -> "简体中文"
+                                "en" -> "English"
+                                else -> "简体中文"
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -84,21 +93,35 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             swBar.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.toggleNavigationBar(isChecked)
             }
+
+            btnLanguage.clickNoRepeat {
+                spannerDialog(
+                    it,
+                    menu = listOf(
+                        "简体中文", "English"
+                    ),
+                    block = { _, index -> viewModel.setLanguage(index) }
+                )
+            }
+
             needleSpace.afterTextChange {
                 viewModel.setNeedleSpace(it.toFloatOrNull() ?: 12f)
             }
+
             with(setting) {
                 clickScale()
                 clickNoRepeat {
                     authDialog { findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor) }
                 }
             }
+
             with(wifi) {
                 clickScale()
                 clickNoRepeat {
                     viewModel.wifiSetting()
                 }
             }
+
             with(update) {
                 clickScale()
                 clickNoRepeat {
@@ -113,18 +136,21 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     viewModel.checkUpdate()
                 }
             }
+
             with(version) {
                 clickScale()
                 clickNoRepeat {
                     PopTip.show("${resources.getString(com.zktony.core.R.string.version)} ${BuildConfig.VERSION_NAME}")
                 }
             }
+
             with(about) {
                 clickScale()
                 clickNoRepeat {
                     aboutDialog { webDialog() }
                 }
             }
+
             with(device) {
                 clickScale()
                 clickNoRepeat {

@@ -60,7 +60,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         binding.e.apply {
                             pause.setBackgroundResource(if (it) mipmap.pause else mipmap.play)
                             with(tvPause) {
-                                text = if (it) getString(R.string.pause) else getString(com.zktony.core.R.string.go_on)
+                                text =
+                                    if (it) getString(R.string.pause) else getString(com.zktony.core.R.string.go_on)
                                 setTextColor(
                                     ContextCompat.getColor(
                                         context, if (it) color.dark_outline else color.red
@@ -79,21 +80,31 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             val bind = getBind(i)
             bind.apply {
                 actions.clickNoRepeat { PopTip.show((it as TextView).text) }
-                start.clickNoRepeat { viewModel.start(i) }
-                with(select) {
-                    iconTint = null
-                    clickNoRepeat { selectDialog(i) }
-                }
-                with(stop) {
-                    clickNoRepeat { PopTip.show("长按停止") }
-                    setOnLongClickListener {
-                        viewModel.stop(i)
-                        true
+                with(startStop) {
+                    clickScale()
+                    clickNoRepeat {
+                        val job = when (i) {
+                            0 -> viewModel.aFlow.value.job
+                            1 -> viewModel.bFlow.value.job
+                            2 -> viewModel.cFlow.value.job
+                            3 -> viewModel.dFlow.value.job
+                            else -> viewModel.aFlow.value.job
+                        }
+                        if (job == null) {
+                            viewModel.start(i)
+                        } else {
+                            viewModel.stop(i)
+                        }
                     }
                 }
+                select.clickNoRepeat { selectDialog(i) }
             }
         }
         binding.apply {
+            a.tvIcon.apply {
+                text = "A"
+                setTextColor(Color.parseColor("#D50000"))
+            }
             b.tvIcon.apply {
                 text = "B"
                 setTextColor(Color.parseColor("#6200EA"))
@@ -177,7 +188,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             action.text = state.action
             temp.text = state.temp
             time.text = state.time
-            stop.visibility = state.stopVisible
 
             if (state.program != null) {
                 if (actions.text.toString() != state.program.actions) {
@@ -188,14 +198,21 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
 
             with(select) {
-                isEnabled = state.selectEnable
+                isEnabled = state.job == null
                 text = state.program?.name ?: "/"
-                alpha = if (state.selectEnable) 1f else 0.5f
             }
-            with(start) {
-                isEnabled = state.startEnable
-                visibility = state.startVisible
-                alpha = if (state.startEnable) 1f else 0.5f
+
+            with(startStop) {
+                if (state.job == null) {
+                    val enable = state.program != null && state.program.actionCount > 0
+                    isEnabled = enable
+                    alpha = if (enable) 1f else 0.3f
+                    background = ContextCompat.getDrawable(context, mipmap.play)
+                } else {
+                    isEnabled = true
+                    alpha = 1f
+                    background = ContextCompat.getDrawable(context, mipmap.stop)
+                }
             }
         }
     }

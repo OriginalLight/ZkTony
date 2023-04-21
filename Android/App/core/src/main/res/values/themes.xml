@@ -29,5 +29,6 @@
         <item name="colorPrimaryInverse">@color/light_inversePrimary</item>
         <item name="android:windowFullscreen">true</item>
         <item name="android:actionMenuTextColor">@color/light_primary</item>
+        <item name="android:typeface">sans</item>
     </style>
 </resources>

@@ -42,7 +42,8 @@ fun authDialog(block: () -> Unit) {
                 val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
                 tvTitle.text = Ext.ctx.getString(R.string.permission_authentication)
                 etInput.hint = Ext.ctx.getString(R.string.input_password)
-                etInput.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+                etInput.inputType =
+                    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
                 btnOk.clickNoRepeat {
                     if (etInput.text.isBlank().not() && etInput.text.toString() == "123456") {
                         block()

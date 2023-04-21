@@ -1,6 +1,5 @@
 package com.zktony.www.ui.home
 
-import android.view.View
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
@@ -95,7 +94,7 @@ class HomeViewModel constructor(
                             index = 3, text = V1.queryTemp(i.toString())
                         )
                     }
-                    delay(3 * 1000L)
+                    delay(4 * 1000L)
                 }
             }
             launch {
@@ -136,27 +135,24 @@ class HomeViewModel constructor(
                 if (state.value.program == null) {
                     state.value = state.value.copy(
                         program = programList[0],
-                        startEnable = programList[0].actionCount > 0,
                     )
                 } else {
                     if (programList.find { it.id == state.value.program!!.id } == null) {
                         state.value = state.value.copy(
                             program = programList[0],
-                            startEnable = programList[0].actionCount > 0,
                         )
                     } else {
                         state.value = state.value.copy(
                             program = programList.find { it.id == state.value.program!!.id },
-                            startEnable = programList.find { it.id == state.value.program!!.id }!!.actionCount > 0
                         )
                     }
                 }
             }
         } else {
-            _aFlow.value = _aFlow.value.copy(program = null, startEnable = false)
-            _bFlow.value = _bFlow.value.copy(program = null, startEnable = false)
-            _cFlow.value = _cFlow.value.copy(program = null, startEnable = false)
-            _dFlow.value = _dFlow.value.copy(program = null, startEnable = false)
+            _aFlow.value = _aFlow.value.copy(program = null)
+            _bFlow.value = _bFlow.value.copy(program = null)
+            _cFlow.value = _cFlow.value.copy(program = null)
+            _dFlow.value = _dFlow.value.copy(program = null)
         }
     }
 
@@ -170,7 +166,6 @@ class HomeViewModel constructor(
             val state = flow(module)
             state.value = state.value.copy(
                 program = _programFlow.value[index],
-                startEnable = _programFlow.value[index].actionCount > 0,
                 status = "Active",
                 time = Constants.ZERO_TIME,
             )
@@ -187,9 +182,6 @@ class HomeViewModel constructor(
             val state = flow(module)
             // 更新状态
             state.value = state.value.copy(
-                startVisible = View.GONE,
-                stopVisible = View.VISIBLE,
-                selectEnable = false,
                 status = "Running",
             )
             // 创建job
@@ -298,9 +290,6 @@ class HomeViewModel constructor(
             // 更新状态
             state.value = state.value.copy(
                 job = null,
-                startVisible = View.VISIBLE,
-                stopVisible = View.GONE,
-                selectEnable = true,
                 status = if (state.value.status != "已完成") "已就绪" else state.value.status,
                 action = "/",
                 time = if (state.value.status != "已完成") Constants.ZERO_TIME else state.value.time,
@@ -410,10 +399,6 @@ data class ModuleUiState(
     val job: Job? = null,
     val program: Program? = null,
     val log: Log? = null,
-    val selectEnable: Boolean = true,
-    val startEnable: Boolean = false,
-    val startVisible: Int = View.VISIBLE,
-    val stopVisible: Int = View.GONE,
     val time: String = Constants.ZERO_TIME,
     val status: String = "Active",
     val action: String = "/",

@@ -34,6 +34,7 @@
     <string name="input_name">请输入名字</string>
     <string name="input_password">请输入密码</string>
     <string name="instructions_for_use">使用说明</string>
+    <string name="language">语言</string>
     <string name="mode">模式</string>
     <string name="motor">电机</string>
     <string name="move">移动</string>

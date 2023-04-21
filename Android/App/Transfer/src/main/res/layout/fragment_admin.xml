@@ -48,6 +48,51 @@
                         android:background="@drawable/bg_line_bottom">
 
                         <ImageView
+                            android:id="@+id/iv_language"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/language"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toEndOf="@+id/iv_language"
+                            android:text="@string/language"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_language"
+                            android:layout_width="128dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="16dp"
+                            android:backgroundTint="@color/light_onPrimary"
+                            android:checked="true"
+                            android:textAllCaps="false"
+                            android:textColor="@color/black"
+                            app:thumbTint="@color/light_primary"
+                            app:trackTint="@color/dark_surfaceTint"
+                            tools:ignore="DuplicateSpeakableTextCheck,RelativeOverlap,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_line_bottom">
+
+                        <ImageView
                             android:id="@+id/iv_bar"
                             android:layout_width="36dp"
                             android:layout_height="36dp"
@@ -62,7 +107,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_bar"
-                            android:fontFamily="monospace"
                             android:text="@string/navigation"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -105,7 +149,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_audio"
-                            android:fontFamily="monospace"
                             android:text="@string/audio"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -147,7 +190,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_detect"
-                            android:fontFamily="monospace"
                             android:text="@string/anomaly_detection"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -190,7 +232,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_interval"
-                            android:fontFamily="monospace"
                             android:text="@string/auto_clean_interval"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -202,7 +243,6 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_marginEnd="16dp"
-                            android:fontFamily="monospace"
                             android:gravity="center"
                             android:inputType="number"
                             android:minHeight="48dp"
@@ -232,7 +272,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_duration"
-                            android:fontFamily="monospace"
                             android:text="@string/auto_clean_duration"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -245,7 +284,6 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
-                            android:fontFamily="monospace"
                             android:gravity="center"
                             android:inputType="number"
                             android:minHeight="48dp"
@@ -275,7 +313,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_motor"
-                            android:fontFamily="monospace"
                             android:text="@string/fill_back_speed"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -288,7 +325,6 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
-                            android:fontFamily="monospace"
                             android:gravity="center"
                             android:inputType="number"
                             android:minHeight="48dp"
@@ -336,7 +372,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_version"
-                            android:fontFamily="monospace"
                             android:text="@string/version"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -349,7 +384,6 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
-                            android:fontFamily="monospace"
                             android:gravity="center"
                             android:textSize="20sp"
                             android:textStyle="italic" />
@@ -380,7 +414,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_device"
-                            android:fontFamily="monospace"
                             android:text="@string/device_info"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -393,7 +426,6 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
-                            android:fontFamily="monospace"
                             android:gravity="center"
                             android:textSize="20sp"
                             android:textStyle="italic" />
@@ -424,7 +456,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_about"
-                            android:fontFamily="monospace"
                             android:text="@string/instructions_for_use"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -482,7 +513,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/reset"
                     android:layout_centerHorizontal="true"
-                    android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/reset"
                     android:textSize="16sp"
@@ -509,7 +539,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/pump"
                     android:layout_centerHorizontal="true"
-                    android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/manual_pumping"
                     android:textSize="16sp"
@@ -534,7 +563,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/wifi"
                     android:layout_centerHorizontal="true"
-                    android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/wifi_setting"
                     android:textSize="16sp" />
@@ -559,7 +587,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/update"
                     android:layout_centerHorizontal="true"
-                    android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/check_update"
                     android:textSize="16sp" />

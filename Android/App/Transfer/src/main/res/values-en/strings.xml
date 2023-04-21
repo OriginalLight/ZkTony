@@ -13,7 +13,7 @@
     <string name="delete_log">Delete Log</string>
     <string name="delete_program">Delete Program</string>
     <string name="duration_hint">Duration MIN</string>
-    <string name="duration_min">Duration（0 ~ 99）</string>
+    <string name="duration_min">Duration</string>
     <string name="dye">Dye</string>
     <string name="experiment_time">Date</string>
     <string name="factory">Factory</string>
@@ -21,9 +21,9 @@
     <string name="glue_075">0.75</string>
     <string name="glue_10">1.0</string>
     <string name="glue_15">1.5</string>
-    <string name="glue_concentration">Concentration（%）</string>
-    <string name="glue_concentration_normal">Concentration（%）</string>
-    <string name="glue_thickness">Thickness（mm）</string>
+    <string name="glue_concentration">Concentration</string>
+    <string name="glue_concentration_normal">Concentration</string>
+    <string name="glue_thickness">Thickness</string>
     <string name="glue_type">Glue type</string>
     <string name="gradient_glue">Gradient glue</string>
     <string name="hide">Hide</string>
@@ -44,9 +44,9 @@
     <string name="parameter">Parameter</string>
     <string name="program_name">Name</string>
     <string name="protein_name">Protein name</string>
-    <string name="protein_size">Protein size（kD）</string>
+    <string name="protein_size">Protein size</string>
     <string name="show">Show</string>
-    <string name="speed">Speed（0 ~ 250）</string>
+    <string name="speed">Speed</string>
     <string name="speed_hint">Speed RPM</string>
     <string name="title_admin">Admin</string>
     <string name="title_dye">Dye</string>
@@ -56,9 +56,9 @@
     <string name="title_program">Program</string>
     <string name="title_transfer">Transfer</string>
     <string name="transfer">Transfer</string>
-    <string name="voltage_dye">Voltage（0 ~ 30）</string>
+    <string name="voltage_dye">Voltage</string>
     <string name="voltage_hint">Voltage V</string>
-    <string name="voltage_transfer">Voltage（0 ~ 50）</string>
+    <string name="voltage_transfer">Voltage</string>
     <string name="wash">Wash</string>
     <string name="weather_delete">Weather delete</string>
 </resources>

@@ -47,6 +47,49 @@
                         android:background="@drawable/bg_line_bottom">
 
                         <ImageView
+                            android:id="@+id/iv_language"
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:src="@mipmap/language"
+                            tools:ignore="ContentDescription" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="8dp"
+                            android:layout_toEndOf="@+id/iv_language"
+                            android:text="@string/language"
+                            android:textColor="@color/black"
+                            android:textSize="16sp"
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btn_language"
+                            android:layout_width="128dp"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="16dp"
+                            android:backgroundTint="@color/light_onPrimary"
+                            android:textAllCaps="false"
+                            android:textColor="@color/black"
+                            app:rippleColor="@color/purple_700"
+                            tools:ignore="DuplicateSpeakableTextCheck,RelativeOverlap,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
+
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/bg_line_bottom">
+
+                        <ImageView
                             android:id="@+id/iv_bar"
                             android:layout_width="36dp"
                             android:layout_height="36dp"
@@ -61,7 +104,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_bar"
-                            android:fontFamily="monospace"
                             android:text="@string/navigation"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -104,7 +146,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_recycle"
-                            android:fontFamily="monospace"
                             android:text="@string/recycle_antibody"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -147,7 +188,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_temp"
-                            android:fontFamily="monospace"
                             android:text="@string/antibody_temp"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -206,7 +246,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_version"
-                            android:fontFamily="monospace"
                             android:text="@string/version"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -219,7 +258,6 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
-                            android:fontFamily="monospace"
                             android:gravity="center"
                             android:textSize="20sp"
                             android:textStyle="italic" />
@@ -250,7 +288,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_device"
-                            android:fontFamily="monospace"
                             android:text="@string/device_info"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -263,7 +300,6 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
-                            android:fontFamily="monospace"
                             android:gravity="center"
                             android:textSize="20sp"
                             android:textStyle="italic" />
@@ -294,7 +330,6 @@
                             android:layout_centerVertical="true"
                             android:layout_marginStart="8dp"
                             android:layout_toEndOf="@+id/iv_about"
-                            android:fontFamily="monospace"
                             android:text="@string/instructions_for_use"
                             android:textColor="@color/black"
                             android:textSize="16sp"
@@ -352,7 +387,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/setting"
                     android:layout_centerHorizontal="true"
-                    android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/protected_settings"
                     android:textSize="16sp"
@@ -379,7 +413,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/wifi"
                     android:layout_centerHorizontal="true"
-                    android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/wifi_setting"
                     android:textSize="16sp" />
@@ -406,7 +439,6 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/update"
                     android:layout_centerHorizontal="true"
-                    android:fontFamily="monospace"
                     android:gravity="center"
                     android:text="@string/check_update"
                     android:textSize="16sp" />

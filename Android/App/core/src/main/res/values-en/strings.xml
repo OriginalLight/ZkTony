@@ -34,6 +34,7 @@
     <string name="input_name">Please input a name</string>
     <string name="input_password">Please enter a password</string>
     <string name="instructions_for_use">Instructions for use</string>
+    <string name="language">Language</string>
     <string name="mode">Mode</string>
     <string name="motor">Motor</string>
     <string name="move">Move</string>

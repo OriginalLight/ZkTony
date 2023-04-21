@@ -91,6 +91,15 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                             if (it > 0) binding.motorSpeed.setEqualText(it.toString())
                         }
                     }
+                    launch {
+                        dataStore.read(Constants.LANGUAGE, "zh").collect {
+                            binding.btnLanguage.text = when (it) {
+                                "zh" -> "简体中文"
+                                "en" -> "English"
+                                else -> "简体中文"
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -114,6 +123,16 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 it.scaleY = 1f
                 viewModel.touchPump(false)
             })
+
+            btnLanguage.clickNoRepeat {
+                spannerDialog(
+                    it,
+                    menu = listOf(
+                        "简体中文", "English"
+                    ),
+                    block = { _, index -> viewModel.setLanguage(index) }
+                )
+            }
 
             interval.afterTextChange {
                 viewModel.toggleInterval(it.toIntOrNull() ?: 0)

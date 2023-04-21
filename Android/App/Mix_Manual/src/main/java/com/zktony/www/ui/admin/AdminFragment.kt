@@ -60,8 +60,19 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     }
                 }
                 launch {
-                    dataStore.read(Constants.BAR, false).collect {
-                        binding.swBar.isChecked = it
+                    launch {
+                        dataStore.read(Constants.BAR, false).collect {
+                            binding.swBar.isChecked = it
+                        }
+                    }
+                    launch {
+                        dataStore.read(Constants.LANGUAGE, "zh").collect {
+                            binding.btnLanguage.text = when (it) {
+                                "zh" -> "简体中文"
+                                "en" -> "English"
+                                else -> "简体中文"
+                            }
+                        }
                     }
                 }
             }
@@ -76,6 +87,16 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
 
             swBar.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.toggleNavigationBar(isChecked)
+            }
+
+            btnLanguage.clickNoRepeat {
+                spannerDialog(
+                    it,
+                    menu = listOf(
+                        "简体中文", "English"
+                    ),
+                    block = { _, index -> viewModel.setLanguage(index) }
+                )
             }
             with(setting) {
                 clickScale()

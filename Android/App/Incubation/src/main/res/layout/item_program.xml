@@ -27,7 +27,6 @@
             android:layout_weight="1"
             android:background="@color/light_onPrimary"
             android:ellipsize="end"
-            android:fontFamily="monospace"
             android:gravity="center"
             android:textColor="@color/black"
             android:textSize="16sp" />
@@ -41,7 +40,6 @@
             android:layout_weight="2"
             android:background="@color/light_onPrimary"
             android:ellipsize="end"
-            android:fontFamily="monospace"
             android:gravity="center"
             android:singleLine="true"
             android:text="@{program.name}"
@@ -59,7 +57,6 @@
             android:ellipsize="marquee"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            android:fontFamily="monospace"
             android:gravity="center"
             android:marqueeRepeatLimit="marquee_forever"
             android:scrollHorizontally="true"

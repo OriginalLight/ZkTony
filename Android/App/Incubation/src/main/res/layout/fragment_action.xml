@@ -191,7 +191,6 @@
                                 android:layout_width="128dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="4dp"
-                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:text="@string/order"
                                 android:textSize="16sp" />
@@ -202,7 +201,6 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:cursorVisible="true"
-                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:inputType="number"
                                 android:maxLength="50"
@@ -218,7 +216,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="2dp"
                             android:layout_marginStart="32dp"
-                            android:layout_marginEnd="32dp" />
+                            android:layout_marginEnd="32dp"
+                            tools:ignore="TextSizeCheck" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -240,7 +239,6 @@
                                 android:layout_width="128dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="4dp"
-                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:text="@string/time_min"
                                 android:textSize="16sp"
@@ -252,7 +250,6 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:cursorVisible="true"
-                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:inputType="numberDecimal"
                                 android:maxLength="50"
@@ -268,7 +265,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="2dp"
                             android:layout_marginStart="32dp"
-                            android:layout_marginEnd="32dp" />
+                            android:layout_marginEnd="32dp"
+                            tools:ignore="TextSizeCheck" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -289,7 +287,6 @@
                                 android:layout_width="128dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="4dp"
-                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:text="@string/temperature"
                                 android:textSize="16sp" />
@@ -300,7 +297,6 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:cursorVisible="true"
-                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:inputType="numberDecimal"
                                 android:maxLength="50"
@@ -316,7 +312,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="2dp"
                             android:layout_marginStart="32dp"
-                            android:layout_marginEnd="32dp" />
+                            android:layout_marginEnd="32dp"
+                            tools:ignore="TextSizeCheck" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -337,7 +334,6 @@
                                 android:layout_width="128dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="4dp"
-                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:text="@string/volume"
                                 android:textSize="16sp"
@@ -349,7 +345,6 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:cursorVisible="true"
-                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:inputType="number"
                                 android:maxLength="50"
@@ -365,7 +360,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="2dp"
                             android:layout_marginStart="32dp"
-                            android:layout_marginEnd="32dp" />
+                            android:layout_marginEnd="32dp"
+                            tools:ignore="TextSizeCheck" />
 
                         <LinearLayout
                             android:id="@+id/ll_count"
@@ -387,7 +383,6 @@
                                 android:layout_width="128dp"
                                 android:layout_height="match_parent"
                                 android:layout_marginStart="4dp"
-                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:text="@string/count"
                                 android:textSize="16sp" />
@@ -398,7 +393,6 @@
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:cursorVisible="true"
-                                android:fontFamily="monospace"
                                 android:gravity="center"
                                 android:inputType="number"
                                 android:maxLength="50"
@@ -413,7 +407,8 @@
                             android:layout_width="match_parent"
                             android:layout_height="2dp"
                             android:layout_marginStart="32dp"
-                            android:layout_marginEnd="32dp" />
+                            android:layout_marginEnd="32dp"
+                            tools:ignore="TextSizeCheck" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btn_add"
@@ -425,7 +420,6 @@
                             android:layout_marginBottom="32dp"
                             android:backgroundTint="@color/light_primary"
                             android:enabled="false"
-                            android:fontFamily="monospace"
                             android:text="@string/add"
                             android:textAllCaps="false"
                             android:textColor="@color/light_onPrimary"

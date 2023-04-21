@@ -5,8 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
+import com.zktony.core.ext.*
 import com.zktony.www.databinding.ItemContainerBinding
 import com.zktony.www.room.entity.Container
 
@@ -60,7 +59,7 @@ class ContainerViewHolder(
         binding.apply {
             container = item
             order.text = (layoutPosition + 1).toString()
-            delete.isVisible = item.type == 1
+            delete.isVisible = item.name != Ext.ctx.getString(com.zktony.core.R.string.waste_tank)
             with(edit) {
                 clickScale()
                 clickNoRepeat {

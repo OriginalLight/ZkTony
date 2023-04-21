@@ -35,7 +35,6 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:fontFamily="monospace"
                 android:text="@string/title_log_chart"
                 android:textAlignment="center"
                 android:textColor="@color/black"

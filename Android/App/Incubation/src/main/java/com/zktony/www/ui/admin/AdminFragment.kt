@@ -82,6 +82,15 @@ class AdminFragment :
                             binding.swRecycle.isChecked = it
                         }
                     }
+                    launch {
+                        dataStore.read(Constants.LANGUAGE, "zh").collect {
+                            binding.btnLanguage.text = when (it) {
+                                "zh" -> "简体中文"
+                                "en" -> "English"
+                                else -> "简体中文"
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -95,6 +104,16 @@ class AdminFragment :
 
             etTemp.afterTextChange {
                 viewModel.setAntibodyTemp(it.toFloatOrNull() ?: 3f)
+            }
+
+            btnLanguage.clickNoRepeat {
+                spannerDialog(
+                    it,
+                    menu = listOf(
+                        "简体中文", "English"
+                    ),
+                    block = { _, index -> viewModel.setLanguage(index) }
+                )
             }
 
             swBar.setOnCheckedChangeListener { _, isChecked ->

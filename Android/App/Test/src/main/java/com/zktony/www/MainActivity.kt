@@ -17,6 +17,5 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         binding.navView.setupWithNavController(navController)
 
-
     }
 }

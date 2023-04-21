@@ -40,8 +40,8 @@
     <string name="title_motor">Motor</string>
     <string name="title_program">Program</string>
     <string name="title_program_edit">Program Edit</string>
-    <string name="volume_coagulant">Coagulant volume (μL)</string>
-    <string name="volume_colloid">Colloid volume (μL)</string>
+    <string name="volume_coagulant">Coagulant μL</string>
+    <string name="volume_colloid">Colloid μL</string>
     <string name="volume_edit">Volume Edit</string>
     <string name="x_axis">XAxis</string>
 </resources>

@@ -14,6 +14,7 @@ import com.zktony.datastore.ext.save
 import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.www.BuildConfig
+import com.zktony.www.MainActivity
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
@@ -212,6 +213,22 @@ class AdminViewModel constructor(
      */
     fun setAntibodyTemp(temp: Float) {
         DS.save(Constants.TEMP, temp)
+    }
+
+    /**
+     * 设置语言
+     * @param index [Int]
+     */
+    fun setLanguage(index: Int) {
+        val language = when (index) {
+            0 -> "zh"
+            1 -> "en"
+            else -> "zh"
+        }
+        DS.save(Constants.LANGUAGE, language)
+        Ext.ctx.startActivity(Intent(Ext.ctx, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        })
     }
 
 }

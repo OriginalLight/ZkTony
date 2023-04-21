@@ -47,14 +47,13 @@
                             android:layout_height="wrap_content"
                             android:backgroundTint="@color/light_onPrimary"
                             android:ellipsize="end"
-                            android:fontFamily="monospace"
                             android:gravity="center"
                             android:insetTop="0dp"
                             android:insetBottom="0dp"
                             android:singleLine="true"
                             android:textAllCaps="false"
                             android:textColor="@color/black"
-                            android:textSize="18sp"
+                            android:textSize="16sp"
                             app:cornerRadius="0dp"
                             app:icon="@mipmap/program"
                             app:iconPadding="0dp"
@@ -69,7 +68,6 @@
                             android:layout_width="238dp"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center_vertical"
-                            android:fontFamily="monospace"
                             android:gravity="center"
                             android:textColor="@color/black"
                             android:textSize="20sp" />
@@ -89,7 +87,7 @@
                             android:gravity="center"
                             android:text="00:00:00"
                             android:textColor="@color/black"
-                            android:textSize="100sp"
+                            android:textSize="80sp"
                             android:textStyle="bold"
                             app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
@@ -124,7 +122,6 @@
                         android:layout_height="64dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        android:fontFamily="monospace"
                         android:text="@string/start"
                         android:textAllCaps="false"
                         android:textSize="22sp"
@@ -148,7 +145,6 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
                         android:backgroundTint="#FBF12D"
-                        android:fontFamily="monospace"
                         android:text="@string/pause"
                         android:textAllCaps="false"
                         android:textSize="22sp"
@@ -172,7 +168,6 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
                         android:backgroundTint="@color/light_error"
-                        android:fontFamily="monospace"
                         android:text="@string/stop"
                         android:textAllCaps="false"
                         android:textSize="22sp"
@@ -244,7 +239,6 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginBottom="2dp"
-                        android:fontFamily="monospace"
                         android:text="@string/plate"
                         tools:ignore="TextContrastCheck,VisualLintBounds" />
 
@@ -256,7 +250,6 @@
                         android:layout_marginEnd="16dp"
                         android:layout_weight="1"
                         android:background="@color/light_onPrimary"
-                        android:fontFamily="monospace"
                         android:gravity="center"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -270,7 +263,6 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginBottom="2dp"
-                        android:fontFamily="monospace"
                         android:text="@string/pump"
                         tools:ignore="TextContrastCheck,VisualLintBounds" />
 
@@ -282,7 +274,6 @@
                         android:layout_marginEnd="16dp"
                         android:layout_weight="1"
                         android:background="@color/light_onPrimary"
-                        android:fontFamily="monospace"
                         android:gravity="center"
                         android:textAlignment="center"
                         android:textColor="@color/black"
@@ -296,7 +287,6 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginBottom="2dp"
-                        android:fontFamily="monospace"
                         android:text="@string/speed_liquid"
                         tools:ignore="TextContrastCheck,VisualLintBounds" />
 
@@ -308,7 +298,6 @@
                         android:layout_marginEnd="16dp"
                         android:layout_weight="1"
                         android:background="@color/light_onPrimary"
-                        android:fontFamily="monospace"
                         android:gravity="center"
                         android:text="16.3"
                         android:textAlignment="center"
@@ -323,7 +312,6 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
                         android:layout_marginBottom="2dp"
-                        android:fontFamily="monospace"
                         android:text="@string/time_remaining"
                         tools:ignore="TextContrastCheck,VisualLintBounds" />
 
@@ -336,7 +324,6 @@
                         android:layout_marginBottom="8dp"
                         android:layout_weight="1"
                         android:background="@color/light_onPrimary"
-                        android:fontFamily="monospace"
                         android:gravity="center"
                         android:text="00:30:65"
                         android:textAlignment="center"
@@ -378,7 +365,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
                     android:text="@string/reset"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
@@ -403,7 +389,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
                     android:text="@string/waste_tank"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
@@ -428,7 +413,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
                     android:text="@string/line_cleaning"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
@@ -453,7 +437,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
                     android:text="@string/fill"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
@@ -478,7 +461,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:fontFamily="monospace"
                     android:text="@string/back"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
