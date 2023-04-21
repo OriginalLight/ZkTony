@@ -10,6 +10,7 @@ import com.zktony.core.base.BaseViewModel
 import com.zktony.core.dialog.updateDialog
 import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
+import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
 import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
@@ -212,15 +213,20 @@ class AdminViewModel constructor(
      * @param index [Int]
      */
     fun setLanguage(index: Int) {
-        val language = when (index) {
-            0 -> "zh"
-            1 -> "en"
-            else -> "zh"
+        viewModelScope.launch {
+            val language = when (index) {
+                0 -> "zh"
+                1 -> "en"
+                else -> "zh"
+            }
+            DS.save(Constants.LANGUAGE, language)
+            val old = DS.read(Constants.LANGUAGE, "zh").first()
+            if (old != language) {
+                Ext.ctx.startActivity(Intent(Ext.ctx, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            }
         }
-        DS.save(Constants.LANGUAGE, language)
-        Ext.ctx.startActivity(Intent(Ext.ctx, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        })
     }
 }
 

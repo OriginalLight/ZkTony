@@ -16,14 +16,13 @@ import com.zktony.core.ext.download
 import com.zktony.core.ext.installApk
 import com.zktony.core.ext.isNetworkAvailable
 import com.zktony.core.utils.Constants
+import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
 import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.www.BuildConfig
 import com.zktony.www.MainActivity
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -220,15 +219,20 @@ class AdminViewModel constructor(
      * @param index [Int]
      */
     fun setLanguage(index: Int) {
-        val language = when (index) {
-            0 -> "zh"
-            1 -> "en"
-            else -> "zh"
+        viewModelScope.launch {
+            val language = when (index) {
+                0 -> "zh"
+                1 -> "en"
+                else -> "zh"
+            }
+            DS.save(Constants.LANGUAGE, language)
+            val old = DS.read(Constants.LANGUAGE, "zh").first()
+            if (old != language) {
+                Ext.ctx.startActivity(Intent(Ext.ctx, MainActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+            }
         }
-        DS.save(Constants.LANGUAGE, language)
-        Ext.ctx.startActivity(Intent(Ext.ctx, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        })
     }
 
 }
