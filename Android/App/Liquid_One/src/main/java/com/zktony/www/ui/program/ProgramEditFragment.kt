@@ -2,14 +2,15 @@ package com.zktony.www.ui.program
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
-import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.spannerDialog
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
+import com.zktony.core.ext.spannerDialog
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentProgramEditBinding
 import kotlinx.coroutines.launch

@@ -7,7 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.zktony.core.base.BaseActivity
-import com.zktony.core.dialog.noticeDialog
+import com.zktony.core.ext.noticeDialog
 import com.zktony.core.ext.setLanguage
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read

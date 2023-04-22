@@ -1,11 +1,14 @@
 package com.zktony.www
 
 import android.app.Application
-import com.zktony.core.dialog.DialogXManager
 import com.zktony.core.ext.Ext
+import com.zktony.core.ext.initDialogX
 import com.zktony.core.ext.initTypeface
 import com.zktony.datastore.DataStoreFactory
-import com.zktony.www.di.*
+import com.zktony.www.di.localModule
+import com.zktony.www.di.managerModule
+import com.zktony.www.di.remoteModule
+import com.zktony.www.di.viewModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.workmanager.koin.workManagerFactory
@@ -24,7 +27,7 @@ class App : Application(), KoinComponent {
         Ext.with(this)
         this.initTypeface()
         DataStoreFactory.init(this)
-        DialogXManager.init(this)
+        initDialogX(this)
 
         startKoin {
             androidContext(this@App)

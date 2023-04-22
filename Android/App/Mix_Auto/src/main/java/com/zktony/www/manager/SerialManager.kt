@@ -1,14 +1,22 @@
 package com.zktony.www.manager
 
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.core.ext.*
+import com.zktony.core.ext.Ext
+import com.zktony.core.ext.hexFormat
+import com.zktony.core.ext.hexToInt8
+import com.zktony.core.ext.logd
+import com.zktony.core.ext.logi
+import com.zktony.core.ext.verifyHex
 import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
 import com.zktony.www.common.ext.toCommand
 import com.zktony.www.manager.protocol.V1
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class SerialManager {
 

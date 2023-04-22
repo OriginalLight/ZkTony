@@ -4,7 +4,9 @@ import com.zktony.www.ui.admin.AdminViewModel
 import com.zktony.www.ui.home.HomeViewModel
 import com.zktony.www.ui.log.LogChartViewModel
 import com.zktony.www.ui.log.LogViewModel
-import com.zktony.www.ui.program.*
+import com.zktony.www.ui.program.DyeViewModel
+import com.zktony.www.ui.program.ProgramViewModel
+import com.zktony.www.ui.program.TransferViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
 

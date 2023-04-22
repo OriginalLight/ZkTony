@@ -1,5 +1,3 @@
-@file:Suppress("DEPRECATION")
-
 package com.zktony.core.ext
 
 import android.annotation.SuppressLint

@@ -1,6 +1,8 @@
 package com.zktony.www.di
 
-import com.zktony.www.ui.admin.*
+import com.zktony.www.ui.admin.AdminViewModel
+import com.zktony.www.ui.admin.ContainerViewModel
+import com.zktony.www.ui.admin.MotorViewModel
 import com.zktony.www.ui.calibration.CalibrationDataViewModel
 import com.zktony.www.ui.calibration.CalibrationViewModel
 import com.zktony.www.ui.home.HomeViewModel

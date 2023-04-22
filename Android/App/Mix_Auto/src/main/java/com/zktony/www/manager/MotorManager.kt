@@ -1,6 +1,8 @@
 package com.zktony.www.manager
 
-import com.zktony.core.ext.*
+import com.zktony.core.ext.Ext
+import com.zktony.core.ext.int8ToHex
+import com.zktony.core.ext.logi
 import com.zktony.www.R
 import com.zktony.www.common.ext.toCommand
 import com.zktony.www.common.ext.toMotor
@@ -9,8 +11,11 @@ import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Calibration
 import com.zktony.www.room.entity.Motor
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺

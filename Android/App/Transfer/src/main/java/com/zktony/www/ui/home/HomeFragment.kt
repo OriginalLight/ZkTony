@@ -7,7 +7,6 @@ import android.view.View
 import androidx.lifecycle.*
 import com.google.android.material.tabs.TabLayout
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.spannerDialog
 import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
 import com.zktony.core.utils.Constants.MAX_MOTOR

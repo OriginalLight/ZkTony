@@ -2,11 +2,16 @@ package com.zktony.www.ui.home
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.R.mipmap
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.*
+import com.zktony.core.ext.addTouchEvent
+import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.clickScale
+import com.zktony.core.ext.getTimeFormat
 import com.zktony.www.R
 import com.zktony.www.common.ext.total
 import com.zktony.www.common.ext.washDialog
@@ -35,7 +40,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 it.job == null && it.pointList.total() > 0
                             with(pause) {
                                 isVisible = it.job != null
-                                text = if (!it.pause) getString(com.zktony.core.R.string.pause) else getString(com.zktony.core.R.string.go_on)
+                                text =
+                                    if (!it.pause) getString(com.zktony.core.R.string.pause) else getString(
+                                        com.zktony.core.R.string.go_on
+                                    )
                                 setIconResource(if (!it.pause) mipmap.pause else mipmap.play)
                             }
                             if (it.program != null) {

@@ -3,7 +3,9 @@ package com.zktony.www.ui.log
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.ext.*
+import com.zktony.core.ext.Ext
+import com.zktony.core.ext.getDayEnd
+import com.zktony.core.ext.getDayStart
 import com.zktony.www.R
 import com.zktony.www.room.dao.LogDataDao
 import com.zktony.www.room.dao.LogRecordDao

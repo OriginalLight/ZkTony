@@ -1,22 +1,48 @@
-package com.zktony.core.dialog
+package com.zktony.core.ext
 
 import android.annotation.SuppressLint
+import android.app.Application
 import android.graphics.Color
 import android.text.InputType
 import android.view.Gravity
 import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.*
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
-import com.kongzue.dialogx.dialogs.*
+import com.kongzue.dialogx.DialogX
+import com.kongzue.dialogx.dialogs.CustomDialog
+import com.kongzue.dialogx.dialogs.FullScreenDialog
+import com.kongzue.dialogx.dialogs.PopMenu
+import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
+import com.kongzue.dialogx.style.MaterialStyle
 import com.kongzue.dialogx.util.TextInfo
+import com.zktony.core.BuildConfig
 import com.zktony.core.R
-import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
 
+fun initDialogX(application: Application) {
+
+    DialogX.init(application)
+    //开启调试模式，在部分情况下会使用 Log 输出日志信息
+    DialogX.DEBUGMODE = BuildConfig.DEBUG
+
+    //设置主题样式
+    DialogX.globalStyle = MaterialStyle.style()
+
+    //设置亮色/暗色（在启动下一个对话框时生效）
+    DialogX.globalTheme = DialogX.THEME.LIGHT
+
+    //设置对话框最大宽度（单位为像素）
+    DialogX.dialogMaxWidth = 450
+
+    //设置 InputDialog 自动弹出键盘
+    DialogX.autoShowInputKeyboard = true
+}
 
 fun aboutDialog(block: () -> Unit) {
     CustomDialog.build()

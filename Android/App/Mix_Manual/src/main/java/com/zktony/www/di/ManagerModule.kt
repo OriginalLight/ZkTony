@@ -1,6 +1,9 @@
 package com.zktony.www.di
 
-import com.zktony.www.manager.*
+import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.manager.Initializer
+import com.zktony.www.manager.MotorManager
+import com.zktony.www.manager.SerialManager
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 

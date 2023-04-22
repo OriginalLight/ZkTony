@@ -7,7 +7,9 @@ import com.zktony.core.ext.Ext
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.CalibrationDataDao
 import com.zktony.www.room.entity.Calibration
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class CalibrationViewModel constructor(
@@ -48,7 +50,8 @@ class CalibrationViewModel constructor(
             CD.delete(calibration)
             CDD.deleteBySubId(calibration.id)
             if (calibration.enable == 1) {
-                val cali = _uiState.value?.find { it.name == Ext.ctx.getString(com.zktony.core.R.string.def) }
+                val cali =
+                    _uiState.value?.find { it.name == Ext.ctx.getString(com.zktony.core.R.string.def) }
                 cali?.let { CD.update(it.copy(enable = 1)) }
             }
         }

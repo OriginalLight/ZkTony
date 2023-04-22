@@ -7,9 +7,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.dialog.spannerDialog
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.getTimeFormat
+import com.zktony.core.ext.spannerDialog
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
 import com.zktony.www.R
@@ -17,11 +17,19 @@ import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.manager.protocol.V1
-import com.zktony.www.room.dao.*
-import com.zktony.www.room.entity.*
-import kotlinx.coroutines.*
+import com.zktony.www.room.dao.ContainerDao
+import com.zktony.www.room.dao.LogDao
+import com.zktony.www.room.dao.PointDao
+import com.zktony.www.room.dao.ProgramDao
+import com.zktony.www.room.entity.Container
+import com.zktony.www.room.entity.Log
+import com.zktony.www.room.entity.Point
+import com.zktony.www.room.entity.Program
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class HomeViewModel constructor(
     private val CD: ContainerDao,

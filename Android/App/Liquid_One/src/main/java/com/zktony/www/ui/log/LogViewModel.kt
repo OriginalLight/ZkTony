@@ -3,7 +3,10 @@ package com.zktony.www.ui.log
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.ext.*
+import com.zktony.core.ext.Ext
+import com.zktony.core.ext.getDayEnd
+import com.zktony.core.ext.getDayStart
+import com.zktony.core.ext.logi
 import com.zktony.www.room.dao.LogDao
 import com.zktony.www.room.entity.Log
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,6 +79,6 @@ class LogViewModel constructor(
 data class LogUiState(
     val list: List<Log> = emptyList(),
     val bar: Boolean = false,
-    val startTime : Date = Date(System.currentTimeMillis()),
-    val endTime : Date = Date(System.currentTimeMillis())
+    val startTime: Date = Date(System.currentTimeMillis()),
+    val endTime: Date = Date(System.currentTimeMillis())
 )

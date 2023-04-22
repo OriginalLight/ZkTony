@@ -7,7 +7,9 @@ import com.zktony.core.ext.Ext
 import com.zktony.www.room.dao.PointDao
 import com.zktony.www.room.dao.ProgramDao
 import com.zktony.www.room.entity.Program
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class ProgramViewModel constructor(

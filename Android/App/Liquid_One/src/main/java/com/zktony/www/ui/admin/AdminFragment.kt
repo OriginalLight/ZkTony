@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.*
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.*
 import com.zktony.core.ext.*
 import com.zktony.core.model.QrCode
 import com.zktony.core.utils.Constants

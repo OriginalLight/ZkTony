@@ -14,7 +14,6 @@ import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.inputDialog
 import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentContainerEditBinding

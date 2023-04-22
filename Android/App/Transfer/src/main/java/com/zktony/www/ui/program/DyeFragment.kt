@@ -2,11 +2,17 @@ package com.zktony.www.ui.program
 
 import android.os.Bundle
 import android.view.View
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.*
+import com.zktony.core.ext.afterTextChange
+import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.clickScale
+import com.zktony.core.ext.removeZero
+import com.zktony.core.ext.setEqualText
 import com.zktony.core.utils.Constants.MAX_TIME
 import com.zktony.core.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.www.R

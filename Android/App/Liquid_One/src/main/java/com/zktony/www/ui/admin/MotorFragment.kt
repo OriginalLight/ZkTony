@@ -1,11 +1,16 @@
 package com.zktony.www.ui.admin
 
 import android.os.Bundle
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.spannerDialog
-import com.zktony.core.ext.*
+import com.zktony.core.ext.afterTextChange
+import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.clickScale
+import com.zktony.core.ext.setEqualText
+import com.zktony.core.ext.spannerDialog
 import com.zktony.www.R
 import com.zktony.www.common.adapter.MotorAdapter
 import com.zktony.www.databinding.FragmentMotorBinding
@@ -35,9 +40,10 @@ class MotorFragment : BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layou
                         if (it.motor != null) {
                             binding.apply {
                                 tvTitle.text = it.motor.name
-                                mode.text = if (it.motor.mode == 0) getString(com.zktony.core.R.string.incremental_mode) else getString(
-                                    com.zktony.core.R.string.coordinate_mode
-                                )
+                                mode.text =
+                                    if (it.motor.mode == 0) getString(com.zktony.core.R.string.incremental_mode) else getString(
+                                        com.zktony.core.R.string.coordinate_mode
+                                    )
                                 subdivision.text = it.motor.subdivision.toString()
                                 speed.setEqualText(it.motor.speed.toString())
                                 acceleration.setEqualText(it.motor.acceleration.toString())

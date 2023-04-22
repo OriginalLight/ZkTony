@@ -5,10 +5,14 @@ import android.app.DatePickerDialog
 import android.os.Bundle
 import android.widget.TextView
 import androidx.core.view.isVisible
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.dialog.messageDialog
-import com.zktony.core.ext.*
+import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.clickScale
+import com.zktony.core.ext.messageDialog
+import com.zktony.core.ext.simpleDateFormat
 import com.zktony.www.R
 import com.zktony.www.common.adapter.LogAdapter
 import com.zktony.www.databinding.FragmentLogBinding
