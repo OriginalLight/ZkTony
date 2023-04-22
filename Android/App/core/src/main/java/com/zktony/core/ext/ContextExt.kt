@@ -1,6 +1,7 @@
 package com.zktony.core.ext
 
 import android.annotation.SuppressLint
+import android.app.LocaleManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
@@ -8,6 +9,7 @@ import android.net.*
 import android.os.Build
 import android.os.LocaleList
 import androidx.core.content.FileProvider
+import androidx.core.content.getSystemService
 import java.io.File
 import java.util.Locale
 
@@ -54,20 +56,22 @@ fun Context.isNetworkAvailable(): Boolean {
     return false
 }
 
-/**
- * 设置语言
- * @param language String
- */
+
 @Suppress("DEPRECATION")
 fun Context.setLanguage(language: String): Context {
     val resources = this.resources
     val config = resources.configuration
-    config.setLocale(Locale(language))
+    config.locale = Locale(language)
     config.setLocales(
         LocaleList(
             Locale(language)
         )
     )
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        this.getSystemService<LocaleManager>()?.applicationLocales = LocaleList(
+            Locale(language)
+        )
+    }
     resources.updateConfiguration(config, resources.displayMetrics)
     return this.createConfigurationContext(config)
 }
