@@ -2,24 +2,20 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
-import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.common.ext.execute
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.CalibrationDataDao
 import com.zktony.www.room.entity.Calibration
 import com.zktony.www.room.entity.CalibrationData
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CalibrationDataViewModel constructor(
     private val CD: CalibrationDao,
     private val CDD: CalibrationDataDao,
     private val SM: SerialManager,
-    private val EM: ExecutionManager
 ) : BaseViewModel() {
 
 
@@ -61,14 +57,13 @@ class CalibrationDataViewModel constructor(
     fun addLiquid() {
         viewModelScope.launch {
             val state = _uiState.value
-            EM.actuator(
-                EM.builder(
-                    v1 = if (state.pumpId == 0) state.expect else 0f,
-                    v2 = if (state.pumpId == 1) state.expect else 0f,
-                    v3 = if (state.pumpId == 2) state.expect else 0f,
-                ),
-                type = 1
-            )
+            execute {
+                step {
+                    v1 = if (state.pumpId == 0) state.expect else 0f
+                    v2 = if (state.pumpId == 1) state.expect else 0f
+                    v3 = if (state.pumpId == 2) state.expect else 0f
+                }
+            }
             if (state.pumpId == 2) {
                 delay(100L)
                 while (SM.lock.value) {

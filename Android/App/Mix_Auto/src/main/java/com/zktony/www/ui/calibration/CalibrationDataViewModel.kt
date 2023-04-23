@@ -2,26 +2,18 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
-import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.common.ext.execute
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.room.dao.CalibrationDao
-import com.zktony.www.room.dao.CalibrationDataDao
-import com.zktony.www.room.dao.ContainerDao
-import com.zktony.www.room.entity.Calibration
-import com.zktony.www.room.entity.CalibrationData
-import com.zktony.www.room.entity.Container
+import com.zktony.www.room.dao.*
+import com.zktony.www.room.entity.*
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CalibrationDataViewModel constructor(
     private val CD: ContainerDao,
     private val CDD: CalibrationDataDao,
     private val CLD: CalibrationDao,
-    private val EM: ExecutionManager,
     private val SM: SerialManager,
 ) : BaseViewModel() {
 
@@ -71,17 +63,26 @@ class CalibrationDataViewModel constructor(
     fun addLiquid() {
         val state = _uiState.value
         val con = state.container
-        val gen = when (state.pumpId) {
-            0 -> listOf(EM.builder(y = con.axis, v1 = state.expect))
-            1 -> listOf(EM.builder(y = con.axis, v2 = state.expect))
-            2 -> listOf(
-                EM.builder(y = con.axis, v3 = state.expect),
-                EM.builder(y = con.axis, v3 = -state.expect)
-            )
-
-            else -> return
+        execute {
+            if (state.pumpId == 2) {
+                step {
+                    y = con.axis
+                    v3 = state.expect
+                }
+                step {
+                    y = con.axis
+                    v3 = -state.expect
+                }
+            } else {
+                step {
+                    y = con.axis
+                    when (state.pumpId) {
+                        0 -> v1 = state.expect
+                        1 -> v2 = state.expect
+                    }
+                }
+            }
         }
-        EM.actuator(gen)
     }
 
     fun save() {

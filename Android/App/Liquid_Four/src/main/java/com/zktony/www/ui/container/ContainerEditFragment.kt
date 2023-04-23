@@ -79,122 +79,136 @@ class ContainerEditFragment :
                 clickScale()
                 clickNoRepeat { findNavController().navigateUp() }
             }
-            size.clickNoRepeat {
-                CustomDialog.build()
-                    .setCustomView(object :
-                        OnBindView<CustomDialog>(R.layout.layout_size) {
-                        @SuppressLint("SetTextI18n")
-                        override fun onBind(dialog: CustomDialog, v: View) {
-                            val inputX = v.findViewById<EditText>(R.id.input_x)
-                            val inputY = v.findViewById<EditText>(R.id.input_y)
-                            val btnOk = v.findViewById<MaterialButton>(R.id.ok)
-                            val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
+            with(size) {
+                setUnderLine()
+                clickNoRepeat {
+                    CustomDialog.build()
+                        .setCustomView(object :
+                            OnBindView<CustomDialog>(R.layout.layout_size) {
+                            @SuppressLint("SetTextI18n")
+                            override fun onBind(dialog: CustomDialog, v: View) {
+                                val inputX = v.findViewById<EditText>(R.id.input_x)
+                                val inputY = v.findViewById<EditText>(R.id.input_y)
+                                val btnOk = v.findViewById<MaterialButton>(R.id.ok)
+                                val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
 
-                            val con = viewModel.uiState.value.container
-                            inputX.setText(con?.x?.toString() ?: "0")
-                            inputY.setText(con?.y?.toString() ?: "0")
+                                val con = viewModel.uiState.value.container
+                                inputX.setText(con?.x?.toString() ?: "0")
+                                inputY.setText(con?.y?.toString() ?: "0")
 
-                            btnOk.clickNoRepeat {
-                                val x = inputX.text.toString().toIntOrNull() ?: 0
-                                val y = inputY.text.toString().toIntOrNull() ?: 0
-                                viewModel.setXY(x, y)
-                                dialog.dismiss()
-                            }
-                            btnCancel.clickNoRepeat { dialog.dismiss() }
-                        }
-                    })
-                    .setCancelable(false)
-                    .setMaskColor(Color.parseColor("#4D000000"))
-                    .show()
-            }
-            x0y0.clickNoRepeat {
-                CustomDialog.build()
-                    .setCustomView(object :
-                        OnBindView<CustomDialog>(R.layout.layout_axis) {
-                        @SuppressLint("SetTextI18n")
-                        override fun onBind(dialog: CustomDialog, v: View) {
-                            val inputX = v.findViewById<EditText>(R.id.input_x)
-                            val inputY = v.findViewById<EditText>(R.id.input_y)
-                            val move = v.findViewById<MaterialButton>(R.id.move)
-                            val btnOk = v.findViewById<MaterialButton>(R.id.ok)
-                            val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
-
-                            val con = viewModel.uiState.value.container
-                            inputX.setText(con?.xAxis?.removeZero() ?: "0")
-                            inputY.setText(con?.yAxis?.removeZero() ?: "0")
-
-                            move.clickNoRepeat {
-                                val x = inputX.text.toString().toFloatOrNull() ?: 0f
-                                val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                                if (x > 240f || y > 320f) {
-                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
-                                } else {
-                                    viewModel.move(x, y)
-                                }
-                            }
-
-                            btnOk.clickNoRepeat {
-                                val x = inputX.text.toString().toFloatOrNull() ?: 0f
-                                val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                                if (x > 240f || y > 320f) {
-                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
-                                } else {
-                                    viewModel.save(x, y, 0)
+                                btnOk.clickNoRepeat {
+                                    val x = inputX.text.toString().toIntOrNull() ?: 0
+                                    val y = inputY.text.toString().toIntOrNull() ?: 0
+                                    viewModel.setXY(x, y)
                                     dialog.dismiss()
                                 }
+                                btnCancel.clickNoRepeat { dialog.dismiss() }
                             }
-                            btnCancel.clickNoRepeat { dialog.dismiss() }
-                        }
-                    })
-                    .setCancelable(false)
-                    .setMaskColor(Color.parseColor("#4D000000"))
-                    .show()
+                        })
+                        .setCancelable(false)
+                        .setMaskColor(Color.parseColor("#4D000000"))
+                        .show()
+                }
+            }
+            with(x0y0) {
+                setUnderLine()
+                clickNoRepeat {
+                    CustomDialog.build()
+                        .setCustomView(object :
+                            OnBindView<CustomDialog>(R.layout.layout_axis) {
+                            @SuppressLint("SetTextI18n")
+                            override fun onBind(dialog: CustomDialog, v: View) {
+                                val inputX = v.findViewById<EditText>(R.id.input_x)
+                                val inputY = v.findViewById<EditText>(R.id.input_y)
+                                val move = v.findViewById<MaterialButton>(R.id.move)
+                                val btnOk = v.findViewById<MaterialButton>(R.id.ok)
+                                val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
+
+                                val list = viewModel.uiState.value.list
+                                val pX0y0 = list.find { p -> p.x == 0 && p.y == 0 }
+                                inputX.setText(pX0y0?.xAxis?.removeZero() ?: "0")
+                                inputY.setText(pX0y0?.yAxis?.removeZero() ?: "0")
+
+                                move.clickNoRepeat {
+                                    val x = inputX.text.toString().toFloatOrNull() ?: 0f
+                                    val y = inputY.text.toString().toFloatOrNull() ?: 0f
+                                    if (x > 240f || y > 320f) {
+                                        PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
+                                    } else {
+                                        viewModel.move(x, y)
+                                    }
+                                }
+
+                                btnOk.clickNoRepeat {
+                                    val x = inputX.text.toString().toFloatOrNull() ?: 0f
+                                    val y = inputY.text.toString().toFloatOrNull() ?: 0f
+                                    if (x > 240f || y > 320f) {
+                                        PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
+                                    } else {
+                                        viewModel.save(x, y, 0)
+                                        dialog.dismiss()
+                                    }
+                                }
+                                btnCancel.clickNoRepeat { dialog.dismiss() }
+                            }
+                        })
+                        .setCancelable(false)
+                        .setMaskColor(Color.parseColor("#4D000000"))
+                        .show()
+                }
             }
 
-            xmyn.clickNoRepeat {
-                CustomDialog.build()
-                    .setCustomView(object :
-                        OnBindView<CustomDialog>(R.layout.layout_axis) {
-                        @SuppressLint("SetTextI18n")
-                        override fun onBind(dialog: CustomDialog, v: View) {
-                            val inputX = v.findViewById<EditText>(R.id.input_x)
-                            val inputY = v.findViewById<EditText>(R.id.input_y)
-                            val move = v.findViewById<MaterialButton>(R.id.move)
-                            val btnOk = v.findViewById<MaterialButton>(R.id.ok)
-                            val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
+            with(xmyn) {
+                setUnderLine()
+                clickNoRepeat {
+                    CustomDialog.build()
+                        .setCustomView(object :
+                            OnBindView<CustomDialog>(R.layout.layout_axis) {
+                            @SuppressLint("SetTextI18n")
+                            override fun onBind(dialog: CustomDialog, v: View) {
+                                val inputX = v.findViewById<EditText>(R.id.input_x)
+                                val inputY = v.findViewById<EditText>(R.id.input_y)
+                                val move = v.findViewById<MaterialButton>(R.id.move)
+                                val btnOk = v.findViewById<MaterialButton>(R.id.ok)
+                                val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
 
-                            val con = viewModel.uiState.value.container
-                            inputX.setText(con?.xAxis?.removeZero() ?: "0")
-                            inputY.setText(con?.yAxis?.removeZero() ?: "0")
-
-                            move.clickNoRepeat {
-                                val x = inputX.text.toString().toFloatOrNull() ?: 0f
-                                val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                                if (x > 240f || y > 320f) {
-                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
-                                } else {
-                                    viewModel.move(x, y)
+                                val c1 = viewModel.uiState.value.container
+                                val list = viewModel.uiState.value.list
+                                c1?.let {
+                                    val pXmyn =
+                                        list.find { p -> p.x == c1.x - 1 && p.y == c1.y - 1 }
+                                    inputX.setText(pXmyn?.xAxis?.removeZero() ?: "0")
+                                    inputY.setText(pXmyn?.yAxis?.removeZero() ?: "0")
                                 }
-                            }
 
-                            btnOk.clickNoRepeat {
-                                val x = inputX.text.toString().toFloatOrNull() ?: 0f
-                                val y = inputY.text.toString().toFloatOrNull() ?: 0f
-                                if (x > 240f || y > 320f) {
-                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
-                                } else {
-                                    viewModel.save(x, y, 1)
-                                    dialog.dismiss()
+                                move.clickNoRepeat {
+                                    val x = inputX.text.toString().toFloatOrNull() ?: 0f
+                                    val y = inputY.text.toString().toFloatOrNull() ?: 0f
+                                    if (x > 240f || y > 320f) {
+                                        PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
+                                    } else {
+                                        viewModel.move(x, y)
+                                    }
                                 }
+
+                                btnOk.clickNoRepeat {
+                                    val x = inputX.text.toString().toFloatOrNull() ?: 0f
+                                    val y = inputY.text.toString().toFloatOrNull() ?: 0f
+                                    if (x > 240f || y > 320f) {
+                                        PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
+                                    } else {
+                                        viewModel.save(x, y, 1)
+                                        dialog.dismiss()
+                                    }
+                                }
+                                btnCancel.clickNoRepeat { dialog.dismiss() }
                             }
-                            btnCancel.clickNoRepeat { dialog.dismiss() }
-                        }
-                    })
-                    .setCancelable(false)
-                    .setMaskColor(Color.parseColor("#4D000000"))
-                    .show()
+                        })
+                        .setCancelable(false)
+                        .setMaskColor(Color.parseColor("#4D000000"))
+                        .show()
+                }
             }
-
         }
     }
 }

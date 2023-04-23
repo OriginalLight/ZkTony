@@ -16,7 +16,7 @@ import com.zktony.core.ext.int8ToHex
 /**
  * @author 刘贺贺
  */
-class V1 {
+class Protocol {
 
     // 电压系数
     private val voltageCoefficient = 22.727f

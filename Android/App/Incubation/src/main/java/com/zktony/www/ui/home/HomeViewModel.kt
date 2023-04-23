@@ -11,7 +11,7 @@ import com.zktony.core.utils.Constants
 import com.zktony.core.utils.Queue
 import com.zktony.datastore.ext.read
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
+import com.zktony.serialport.protocol.V1
 import com.zktony.www.room.dao.ActionDao
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.dao.LogDao
@@ -102,7 +102,7 @@ class HomeViewModel constructor(
                     for (i in 0..4) {
                         delay(300L)
                         SM.sendText(
-                            index = 3, text = V1.queryTemp(i.toString())
+                            index = 3, text = "TC1:TCACTUALTEMP?@$$i\r"
                         )
                     }
                     delay(4 * 1000L)
@@ -382,14 +382,14 @@ class HomeViewModel constructor(
                 lock = false
             )
             SM.sendHex(
-                index = 0, hex = V1.openLock()
+                index = 0, hex = V1(pa = "0D").toHex()
             )
             delay(10 * 1000L)
             _buttonFlow.value = _buttonFlow.value.copy(
                 lock = true
             )
             SM.sendHex(
-                index = 0, hex = V1.closeLock()
+                index = 0, hex = V1(pa = "0E").toHex()
             )
         }
     }

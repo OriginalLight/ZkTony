@@ -15,10 +15,10 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"
             android:baselineAligned="false"
             android:orientation="horizontal"
             app:layout_constraintBottom_toTopOf="@+id/con_btn"
@@ -29,7 +29,7 @@
             <ScrollView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginEnd="4dp"
+                android:layout_marginEnd="2dp"
                 android:layout_weight="1"
                 android:background="@color/light_onPrimary">
 
@@ -74,11 +74,9 @@
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
                             android:backgroundTint="@color/light_onPrimary"
-                            android:checked="true"
                             android:textAllCaps="false"
                             android:textColor="@color/black"
-                            app:thumbTint="@color/light_primary"
-                            app:trackTint="@color/dark_surfaceTint"
+                            app:rippleColor="@color/purple_700"
                             tools:ignore="DuplicateSpeakableTextCheck,RelativeOverlap,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
                     </RelativeLayout>
@@ -175,7 +173,7 @@
             <ScrollView
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginStart="4dp"
+                android:layout_marginStart="2dp"
                 android:layout_weight="1"
                 android:background="@color/light_onPrimary">
 
@@ -319,10 +317,10 @@
         <LinearLayout
             android:id="@+id/con_btn"
             android:layout_width="match_parent"
-            android:layout_height="128dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_height="112dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
             android:background="@color/light_onPrimary"
             android:baselineAligned="false"
             android:orientation="horizontal"
@@ -337,8 +335,8 @@
 
                 <ImageButton
                     android:id="@+id/setting"
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
                     android:background="@mipmap/settings"
@@ -350,8 +348,7 @@
                     android:layout_below="@+id/setting"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
-                    android:text="@string/protected_settings"
-                    android:textSize="16sp" />
+                    android:text="@string/protected_settings" />
 
             </RelativeLayout>
 
@@ -362,8 +359,8 @@
 
                 <ImageButton
                     android:id="@+id/wifi"
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
                     android:background="@mipmap/wifi"
@@ -375,8 +372,7 @@
                     android:layout_below="@+id/wifi"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
-                    android:text="@string/wifi_setting"
-                    android:textSize="16sp" />
+                    android:text="@string/wifi_setting" />
 
             </RelativeLayout>
 
@@ -387,8 +383,8 @@
 
                 <ImageButton
                     android:id="@+id/update"
-                    android:layout_width="96dp"
-                    android:layout_height="96dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="4dp"
                     android:background="@mipmap/update"
@@ -401,8 +397,7 @@
                     android:layout_below="@+id/update"
                     android:layout_centerHorizontal="true"
                     android:gravity="center"
-                    android:text="@string/check_update"
-                    android:textSize="16sp" />
+                    android:text="@string/check_update" />
 
             </RelativeLayout>
 
@@ -412,9 +407,9 @@
             android:id="@+id/progress"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
-            android:layout_height="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_height="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:max="100"
             android:progressDrawable="@drawable/bg_progress"
             android:visibility="invisible"

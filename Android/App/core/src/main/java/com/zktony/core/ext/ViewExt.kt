@@ -147,6 +147,14 @@ fun View.clickNoRepeat(interval: Long = 500, action: (view: View) -> Unit) {
     }
 }
 
+/**
+ * TextView 设置下划线 类似链接
+ */
+fun TextView.setUnderLine() {
+    paint.flags = Paint.UNDERLINE_TEXT_FLAG
+    paint.isAntiAlias = true
+}
+
 @SuppressLint("ClickableViewAccessibility")
 fun View.clickScale() {
     this.setOnTouchListener { v, event ->

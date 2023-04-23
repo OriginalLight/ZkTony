@@ -3,14 +3,11 @@ package com.zktony.www.ui.home
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.currentTime
 import com.zktony.www.R
+import com.zktony.www.common.ext.execute
 import com.zktony.www.common.ext.total
-import com.zktony.www.manager.ExecutionManager
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.room.entity.Point
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.koin.java.KoinJavaComponent.inject
 
 /**
@@ -24,7 +21,6 @@ class ProgramExecutor constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var event: (ExecutorEvent) -> Unit = {}
-    private val executionManager: ExecutionManager by inject(ExecutionManager::class.java)
     private val serialManager: SerialManager by inject(SerialManager::class.java)
     private var complete: Int = 0
     private val currentList: MutableList<Pair<Int, Boolean>> = mutableListOf()
@@ -53,13 +49,13 @@ class ProgramExecutor constructor(
                                     }\n"
                                 )
                             )
-                            executionManager.actuator(
-                                executionManager.builder(
-                                    y = point.waste,
-                                    v1 = point.v4.toFloat(),
-                                    v3 = point.v3.toFloat(),
-                                )
-                            )
+                            execute {
+                                step {
+                                    y = point.waste
+                                    v1 = point.v4.toFloat()
+                                    v3 = point.v3.toFloat()
+                                }
+                            }
                             delay(100L)
                             while (serialManager.lock.value) {
                                 delay(100L)
@@ -79,21 +75,21 @@ class ProgramExecutor constructor(
                                     }\n"
                                 )
                             )
-                            executionManager.actuator(
-                                executionManager.builder(
+                            execute {
+                                step {
                                     y = point.axis
-                                ),
-                                executionManager.builder(
-                                    y = point.axis,
-                                    v1 = point.v2 / 2f,
-                                    v2 = point.v2 / 2f,
-                                    v3 = point.v1.toFloat(),
-                                ),
-                                executionManager.builder(
-                                    y = point.axis,
-                                    v3 = -point.v1.toFloat(),
-                                ),
-                            )
+                                }
+                                step {
+                                    y = point.axis
+                                    v1 = point.v2 / 2f
+                                    v2 = point.v2 / 2f
+                                    v3 = point.v1.toFloat()
+                                }
+                                step {
+                                    y = point.axis
+                                    v3 = -point.v1.toFloat()
+                                }
+                            }
                             delay(100L)
                             while (serialManager.lock.value) {
                                 delay(100L)

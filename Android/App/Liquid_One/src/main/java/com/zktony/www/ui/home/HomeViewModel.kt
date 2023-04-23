@@ -13,28 +13,18 @@ import com.zktony.core.ext.spannerDialog
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
 import com.zktony.www.R
-import com.zktony.www.common.ext.completeDialog
-import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.common.ext.*
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
-import com.zktony.www.room.dao.ContainerDao
-import com.zktony.www.room.dao.LogDao
-import com.zktony.www.room.dao.PointDao
-import com.zktony.www.room.dao.ProgramDao
-import com.zktony.www.room.entity.Container
-import com.zktony.www.room.entity.Log
-import com.zktony.www.room.entity.Point
-import com.zktony.www.room.entity.Program
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import com.zktony.serialport.protocol.V1
+import com.zktony.www.room.dao.*
+import com.zktony.www.room.entity.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class HomeViewModel constructor(
     private val CD: ContainerDao,
     private val DS: DataStore<Preferences>,
-    private val EM: ExecutionManager,
     private val LD: LogDao,
     private val PD: PointDao,
     private val PGD: ProgramDao,
@@ -63,10 +53,10 @@ class HomeViewModel constructor(
                 }
             }
             launch {
-                CD.getById(1L).collect {
-                    _uiState.value = _uiState.value.copy(
-                        container = it
-                    )
+                CD.getByType(0).collect {
+                    if (it.isNotEmpty()) {
+                        _uiState.value = _uiState.value.copy(container = it[0])
+                    }
                 }
             }
             launch {
@@ -134,12 +124,12 @@ class HomeViewModel constructor(
                 PopTip.show("运动中")
             } else {
                 _uiState.value.container?.let {
-                    EM.actuator(
-                        EM.builder(
-                            x = it.xAxis,
-                            y = it.yAxis,
-                        )
-                    )
+                    execute {
+                        step {
+                            x = it.xAxis
+                            y = it.yAxis
+                        }
+                    }
                 }
             }
         }

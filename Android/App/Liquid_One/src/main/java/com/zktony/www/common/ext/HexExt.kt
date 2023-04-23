@@ -2,7 +2,7 @@ package com.zktony.www.common.ext
 
 import com.zktony.core.ext.hex2ToInt16
 import com.zktony.core.ext.hexToInt8
-import com.zktony.www.manager.protocol.V1
+import com.zktony.serialport.protocol.V1
 import com.zktony.www.room.entity.Motor
 
 /**
@@ -27,8 +27,8 @@ fun String.toMotor(): Motor {
  */
 fun String.toV1(): V1 {
     return V1(
-        header = this.substring(0, 2),
-        address = this.substring(2, 4),
+        head = this.substring(0, 2),
+        addr = this.substring(2, 4),
         fn = this.substring(4, 6),
         pa = this.substring(6, 8),
         data = this.substring(8, this.length - 8),

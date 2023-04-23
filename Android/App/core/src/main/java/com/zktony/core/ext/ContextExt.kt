@@ -61,12 +61,14 @@ fun Context.isNetworkAvailable(): Boolean {
 fun Context.setLanguage(language: String): Context {
     val resources = this.resources
     val config = resources.configuration
-    config.locale = Locale(language)
-    config.setLocales(
-        LocaleList(
-            Locale(language)
+    config.setLocale(Locale(language))
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        config.setLocales(
+            LocaleList(
+                Locale(language)
+            )
         )
-    )
+    }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
         this.getSystemService<LocaleManager>()?.applicationLocales = LocaleList(
             Locale(language)

@@ -71,7 +71,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:text="一号板"
+                    android:text="@string/plate_one"
                     android:textColor="@color/black"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -111,15 +111,13 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/select_one"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="196dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
+                    android:backgroundTint="@color/light_onPrimary"
+                    android:textAllCaps="false"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
-                    app:cornerRadius="0dp"
+                    android:textSize="16sp"
                     app:icon="@mipmap/expand_arrow"
                     app:iconPadding="0dp"
                     app:iconSize="24dp"
@@ -129,9 +127,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:rippleColor="@color/purple_700"
-                    app:strokeColor="@color/light_primary"
-                    app:strokeWidth="2dp"
-                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck,TouchTargetSizeCheck" />
+                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -154,7 +150,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:text="二号板"
+                    android:text="@string/plate_two"
                     android:textColor="@color/black"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -194,15 +190,13 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/select_two"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="196dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
+                    android:backgroundTint="@color/light_onPrimary"
+                    android:textAllCaps="false"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
-                    app:cornerRadius="0dp"
+                    android:textSize="16sp"
                     app:icon="@mipmap/expand_arrow"
                     app:iconPadding="0dp"
                     app:iconSize="24dp"
@@ -212,9 +206,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:rippleColor="@color/purple_700"
-                    app:strokeColor="@color/light_primary"
-                    app:strokeWidth="2dp"
-                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck" />
+                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -237,7 +229,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:text="三号板"
+                    android:text="@string/plate_three"
                     android:textColor="@color/black"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -277,15 +269,13 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/select_three"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="196dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
+                    android:backgroundTint="@color/light_onPrimary"
+                    android:textAllCaps="false"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
-                    app:cornerRadius="0dp"
+                    android:textSize="16sp"
                     app:icon="@mipmap/expand_arrow"
                     app:iconPadding="0dp"
                     app:iconSize="24dp"
@@ -295,9 +285,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:rippleColor="@color/purple_700"
-                    app:strokeColor="@color/light_primary"
-                    app:strokeWidth="2dp"
-                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck" />
+                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -320,7 +308,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="4dp"
-                    android:text="四号板"
+                    android:text="@string/plate_four"
                     android:textColor="@color/black"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
@@ -360,15 +348,13 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/select_four"
-                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="196dp"
-                    android:layout_height="40dp"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
+                    android:backgroundTint="@color/light_onPrimary"
+                    android:textAllCaps="false"
                     android:textColor="@color/black"
-                    android:textSize="18sp"
-                    app:cornerRadius="0dp"
+                    android:textSize="16sp"
                     app:icon="@mipmap/expand_arrow"
                     app:iconPadding="0dp"
                     app:iconSize="24dp"
@@ -378,11 +364,10 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:rippleColor="@color/purple_700"
-                    app:strokeColor="@color/light_primary"
-                    app:strokeWidth="2dp"
-                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck" />
+                    tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>

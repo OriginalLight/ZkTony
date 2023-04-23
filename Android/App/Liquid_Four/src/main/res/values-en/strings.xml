@@ -25,6 +25,7 @@
     <string name="pump_three">Pump three</string>
     <string name="pump_two">Pump two</string>
     <string name="select_all">Select all</string>
+    <string name="size">Size</string>
     <string name="speed_liquid">Speed wells/min</string>
     <string name="start_time">Start time</string>
     <string name="time_remaining">Time remaining</string>

@@ -40,10 +40,23 @@
                 android:layout_height="match_parent"
                 android:layout_marginStart="1dp"
                 android:layout_marginEnd="1dp"
-                android:layout_weight="4"
+                android:layout_weight="2"
                 android:background="@color/light_onPrimary"
                 android:gravity="center"
                 android:text="@string/container_name"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/size"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="1dp"
+                android:layout_marginEnd="1dp"
+                android:layout_weight="2"
+                android:background="@color/light_onPrimary"
+                android:gravity="center"
+                android:text="@string/size"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 

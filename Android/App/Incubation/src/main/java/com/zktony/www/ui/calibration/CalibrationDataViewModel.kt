@@ -2,18 +2,11 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
-import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.common.ext.execute
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.room.dao.CalibrationDao
-import com.zktony.www.room.dao.CalibrationDataDao
-import com.zktony.www.room.dao.ContainerDao
-import com.zktony.www.room.entity.Calibration
-import com.zktony.www.room.entity.CalibrationData
-import com.zktony.www.room.entity.Container
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.firstOrNull
+import com.zktony.www.room.dao.*
+import com.zktony.www.room.entity.*
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class CalibrationDataViewModel constructor(
@@ -21,7 +14,6 @@ class CalibrationDataViewModel constructor(
     private val CDD: CalibrationDataDao,
     private val COND: ContainerDao,
     private val SM: SerialManager,
-    private val EM: ExecutionManager,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(CalibrationDataUiState())
@@ -75,34 +67,36 @@ class CalibrationDataViewModel constructor(
         val liquid = _uiState.value.expect
         val motorId = _uiState.value.pumpId
         if (motorId < 4) {
-            EM.actuator(
-                EM.builder(y = con.washY),
-                EM.builder(
-                    y = con.washY,
-                    z = con.washZ,
-                    v1 = if (motorId == 0) liquid else 0f,
-                    v2 = if (motorId == 1) liquid else 0f,
-                    v3 = if (motorId == 2) liquid else 0f,
-                    v4 = if (motorId == 3) liquid else 0f,
-                ),
-                EM.builder(
-                    y = con.washY,
-                    v1 = if (motorId == 0) 15000f else 0f,
-                    v2 = if (motorId == 1) 15000f else 0f,
-                    v3 = if (motorId == 2) 15000f else 0f,
-                    v4 = if (motorId == 3) 15000f else 0f,
-                ),
-                EM.builder()
-            )
+            execute {
+                step {
+                    y = con.washY
+                }
+                step {
+                    y = con.washY
+                    z = con.washZ
+                    v1 = if (motorId == 0) liquid else 0f
+                    v2 = if (motorId == 1) liquid else 0f
+                    v3 = if (motorId == 2) liquid else 0f
+                    v4 = if (motorId == 3) liquid else 0f
+                }
+                step {
+                    y = con.washY
+                    v1 = if (motorId == 0) 15000f else 0f
+                    v2 = if (motorId == 1) 15000f else 0f
+                    v3 = if (motorId == 2) 15000f else 0f
+                    v4 = if (motorId == 3) 15000f else 0f
+                }
+                step {}
+            }
         } else {
-            EM.actuator(
-                EM.builder(),
-                EM.builder(
-                    v5 = if (motorId == 4) liquid else 0f,
-                    v6 = if (motorId == 5) liquid else 0f,
-                ),
-                EM.builder()
-            )
+            execute {
+                step {}
+                step {
+                    v5 = if (motorId == 4) liquid else 0f
+                    v6 = if (motorId == 5) liquid else 0f
+                }
+                step {}
+            }
         }
     }
 

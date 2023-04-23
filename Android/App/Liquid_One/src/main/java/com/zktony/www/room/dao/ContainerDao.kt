@@ -23,6 +23,7 @@ interface ContainerDao : BaseDao<Container> {
     @Query(
         """
         SELECT * FROM container
+        ORDER BY type ASC
         """
     )
     fun getAll(): Flow<List<Container>>

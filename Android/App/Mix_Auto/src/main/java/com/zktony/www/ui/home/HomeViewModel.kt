@@ -10,7 +10,7 @@ import com.zktony.core.ext.spannerDialog
 import com.zktony.www.R
 import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
+import com.zktony.serialport.protocol.V1
 import com.zktony.www.room.dao.LogDao
 import com.zktony.www.room.dao.PointDao
 import com.zktony.www.room.dao.ProgramDao

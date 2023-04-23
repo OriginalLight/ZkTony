@@ -489,6 +489,7 @@
                             android:layout_marginBottom="32dp"
                             android:backgroundTint="@color/light_primary"
                             android:text="@string/save"
+                            android:textAllCaps="false"
                             android:textColor="@color/light_onPrimary"
                             android:textSize="20sp"
                             app:cornerRadius="24dp"

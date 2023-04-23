@@ -1,11 +1,8 @@
 package com.zktony.www.ui.home
 
-import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.common.ext.execute
 import com.zktony.www.manager.SerialManager
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.koin.java.KoinJavaComponent.inject
 
 /**
@@ -20,7 +17,6 @@ class ProgramExecutor constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var finish: () -> Unit = {}
-    private val ex: ExecutionManager by inject(ExecutionManager::class.java)
     private val serial: SerialManager by inject(SerialManager::class.java)
 
 
@@ -29,14 +25,13 @@ class ProgramExecutor constructor(
             while (serial.lock.value) {
                 delay(100L)
             }
-            ex.actuator(
-                ex.builder(
-                    v1 = colloid / 2f,
-                    v2 = colloid / 2f,
-                    v3 = coagulant.toFloat(),
-                ),
-                type = 1
-            )
+            execute {
+                step {
+                    v1 = colloid / 2f
+                    v2 = colloid / 2f
+                    v3 = coagulant.toFloat()
+                }
+            }
             delay(100L)
             while (serial.lock.value) {
                 delay(100L)
@@ -51,13 +46,13 @@ class ProgramExecutor constructor(
             while (serial.lock.value) {
                 delay(100L)
             }
-            ex.actuator(
-                ex.builder(
-                    v1 = colloid.toFloat(),
-                    v3 = coagulant.toFloat(),
-                )
-
-            )
+            execute {
+                type(0)
+                step {
+                    v1 = colloid.toFloat()
+                    v3 = coagulant.toFloat()
+                }
+            }
             delay(100L)
             while (serial.lock.value) {
                 delay(100L)

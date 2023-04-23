@@ -44,5 +44,4 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             newBase?.setLanguage(language)
         )
     }
-
 }

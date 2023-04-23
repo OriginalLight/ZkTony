@@ -25,6 +25,7 @@
     <string name="pump_three">泵三</string>
     <string name="pump_two">泵二</string>
     <string name="select_all">全选</string>
+    <string name="size">规格</string>
     <string name="speed_liquid">加液速度 孔/分钟</string>
     <string name="start_time">开始时间</string>
     <string name="time_remaining">剩余时间</string>

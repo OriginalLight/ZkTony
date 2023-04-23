@@ -1,6 +1,6 @@
 package com.zktony.www.ui.home
 
-import com.zktony.www.manager.ExecutionManager
+import com.zktony.www.common.ext.execute
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.room.entity.Action
 import com.zktony.www.room.entity.Container
@@ -19,7 +19,6 @@ class CommandExecutor constructor(
 ) {
     private lateinit var action: Action
     private val sm: SerialManager by inject(SerialManager::class.java)
-    private val em: ExecutionManager by inject(ExecutionManager::class.java)
 
     fun initAction(action: Action) {
         this.action = action
@@ -36,7 +35,7 @@ class CommandExecutor constructor(
                 addr = module + 1,
                 temp = action.temperature.toString()
             )
-            addLiquid(y = con.blockY, z = con.blockZ)
+            addLiquid(yAxis = con.blockY, zAxis = con.blockZ)
             event("加液中")
             delay(100L)
             while (sm.lock.value) {
@@ -57,7 +56,7 @@ class CommandExecutor constructor(
                 addr = module + 1,
                 temp = action.temperature.toString()
             )
-            addLiquid(y = con.oneY, z = con.oneZ)
+            addLiquid(yAxis = con.oneY, zAxis = con.oneZ)
             event("加液中")
             delay(100L)
             while (sm.lock.value) {
@@ -76,8 +75,8 @@ class CommandExecutor constructor(
             sm.swing(false)
             delay(100L)
             recycleLiquid(
-                y = if (settings.recycle) con.oneY else con.wasteY,
-                z = if (settings.recycle) con.recycleOneZ else con.wasteZ
+                yAxis = if (settings.recycle) con.oneY else con.wasteY,
+                zAxis = if (settings.recycle) con.recycleOneZ else con.wasteZ
             )
             event("回收中")
             delay(100L)
@@ -101,7 +100,7 @@ class CommandExecutor constructor(
                 addr = module + 1,
                 temp = action.temperature.toString()
             )
-            addLiquid(y = con.twoY, z = con.twoZ)
+            addLiquid(yAxis = con.twoY, zAxis = con.twoZ)
             event("加液中")
             delay(100L)
             while (sm.lock.value) {
@@ -123,7 +122,7 @@ class CommandExecutor constructor(
                 temp = action.temperature.toString()
             )
             // 主板运动
-            addLiquid(y = con.washY, z = con.washZ)
+            addLiquid(yAxis = con.washY, zAxis = con.washZ)
             event("加液中")
             delay(100L)
             while (sm.lock.value) {
@@ -142,7 +141,7 @@ class CommandExecutor constructor(
         waitForFree {
             sm.swing(false)
             delay(100L)
-            recycleLiquid(y = con.wasteY, z = con.wasteZ)
+            recycleLiquid(yAxis = con.wasteY, zAxis = con.wasteZ)
             event("清理中")
             delay(100L)
             while (sm.lock.value) {
@@ -157,47 +156,54 @@ class CommandExecutor constructor(
     /**
      * 主机命令生成器
      */
-    private fun addLiquid(y: Float, z: Float) {
-        em.actuator(
-            em.builder(y = y),
-            em.builder(
-                y = y,
-                z = z,
-                v1 = if (module == 0) action.liquidVolume else 0f,
-                v2 = if (module == 1) action.liquidVolume else 0f,
-                v3 = if (module == 2) action.liquidVolume else 0f,
-                v4 = if (module == 3) action.liquidVolume else 0f,
+    private fun addLiquid(yAxis: Float, zAxis: Float) {
+        execute {
+            step {
+                y = yAxis
+            }
+            step {
+                y = yAxis
+                z = zAxis
+                v1 = if (module == 0) action.liquidVolume else 0f
+                v2 = if (module == 1) action.liquidVolume else 0f
+                v3 = if (module == 2) action.liquidVolume else 0f
+                v4 = if (module == 3) action.liquidVolume else 0f
                 v5 = if (action.mode == 3) action.liquidVolume else 0f
-            ),
-            em.builder(
-                y = y,
-                v1 = if (module == 0) 15000f else 0f,
-                v2 = if (module == 1) 15000f else 0f,
-                v3 = if (module == 2) 15000f else 0f,
-                v4 = if (module == 3) 15000f else 0f,
-            )
-        )
+            }
+            step {
+                y = yAxis
+                v1 = if (module == 0) 15000f else 0f
+                v2 = if (module == 1) 15000f else 0f
+                v3 = if (module == 2) 15000f else 0f
+                v4 = if (module == 3) 15000f else 0f
+                v5 = if (action.mode == 3) 15000f else 0f
+            }
+        }
     }
 
     /**
      * 从机排液命令生成器
      * @return [List]<[String]>
      */
-    private fun recycleLiquid(y: Float, z: Float) {
+    private fun recycleLiquid(yAxis: Float, zAxis: Float) {
         val volume = -(action.liquidVolume + 20000f)
-        em.actuator(
-            em.builder(y = y),
-            em.builder(
-                y = y,
-                z = z,
-                v1 = if (module == 0) volume else 0f,
-                v2 = if (module == 1) volume else 0f,
-                v3 = if (module == 2) volume else 0f,
-                v4 = if (module == 3) volume else 0f,
+        execute {
+            step {
+                y = yAxis
+            }
+            step {
+                y = yAxis
+                z = zAxis
+                v1 = if (module == 0) volume else 0f
+                v2 = if (module == 1) volume else 0f
+                v3 = if (module == 2) volume else 0f
+                v4 = if (module == 3) volume else 0f
                 v6 = action.liquidVolume + 20000f
-            ),
-            em.builder(y = y)
-        )
+            }
+            step {
+                y = yAxis
+            }
+        }
     }
 
     /**

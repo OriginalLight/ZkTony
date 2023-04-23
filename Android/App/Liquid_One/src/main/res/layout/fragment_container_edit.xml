@@ -47,64 +47,41 @@
             android:layout_height="0dp"
             android:layout_weight="1">
 
-            <com.google.android.material.button.MaterialButton
+            <TextView
                 android:id="@+id/size"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="196dp"
-                android:layout_height="48dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="8dp"
                 android:textColor="@color/black"
-                android:textSize="18sp"
-                app:cornerRadius="0dp"
-                app:iconPadding="0dp"
+                android:textSize="22sp"
                 app:layout_constraintBottom_toTopOf="@+id/dynamic_plate"
                 app:layout_constraintStart_toStartOf="@+id/dynamic_plate"
-                app:rippleColor="@color/purple_700"
-                app:strokeColor="@color/black"
-                app:strokeWidth="2dp"
-                tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds" />
+                tools:ignore="VisualLintBounds" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/x0y0"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="196dp"
-                android:layout_height="48dp"
+            <TextView
+                android:id="@+id/xmyn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="8dp"
                 android:textColor="@color/black"
-                android:textSize="18sp"
-                app:cornerRadius="0dp"
-                app:icon="@mipmap/circle"
-                app:iconPadding="0dp"
-                app:iconSize="36dp"
-                app:iconTint="#00FF6A"
+                android:textSize="22sp"
                 app:layout_constraintBottom_toTopOf="@+id/dynamic_plate"
                 app:layout_constraintEnd_toEndOf="@+id/dynamic_plate"
-                app:rippleColor="@color/purple_700"
-                app:strokeColor="@color/black"
-                app:strokeWidth="2dp"
-                tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds" />
+                tools:ignore="VisualLintBounds" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/xmyn"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="196dp"
-                android:layout_height="48dp"
+            <TextView
+                android:id="@+id/x0y0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
                 android:textColor="@color/black"
-                android:textSize="18sp"
-                app:cornerRadius="0dp"
-                app:icon="@mipmap/circle"
-                app:iconPadding="0dp"
-                app:iconSize="36dp"
+                android:textSize="22sp"
                 app:layout_constraintStart_toStartOf="@+id/dynamic_plate"
                 app:layout_constraintTop_toBottomOf="@+id/dynamic_plate"
-                app:rippleColor="@color/purple_700"
-                app:strokeColor="@color/black"
-                app:strokeWidth="2dp"
-                tools:ignore="NestedWeights,VisualLintButtonSize,DuplicateSpeakableTextCheck,VisualLintBounds" />
+                tools:ignore="VisualLintBounds" />
 
             <com.zktony.core.widget.DynamicPlate
                 android:id="@+id/dynamic_plate"

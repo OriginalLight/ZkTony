@@ -10,7 +10,7 @@ import com.zktony.core.ext.verifyHex
 import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
 import com.zktony.www.common.ext.toCommand
-import com.zktony.www.manager.protocol.V1
+import com.zktony.serialport.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay

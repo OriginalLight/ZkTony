@@ -3,7 +3,7 @@ package com.zktony.www.manager
 import com.zktony.core.ext.logi
 import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
-import com.zktony.www.manager.protocol.V1
+import com.zktony.www.manager.protocol.Protocol
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -18,9 +18,9 @@ import kotlinx.coroutines.launch
 class SerialManager {
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-    private val _send = MutableStateFlow(V1())
+    private val _send = MutableStateFlow(Protocol())
     val send = _send.asStateFlow()
-    private val _received = MutableStateFlow(V1())
+    private val _received = MutableStateFlow(Protocol())
     val received = _received.asStateFlow()
 
     private val helpers by lazy { SerialHelpers() }
@@ -39,9 +39,9 @@ class SerialManager {
             launch {
                 helpers.callback = { index, data ->
                     if (index == 4) {
-                        val v1 = V1(data)
-                        if (v1.cmd == 2) {
-                            _received.value = v1
+                        val protocol = Protocol(data)
+                        if (protocol.cmd == 2) {
+                            _received.value = protocol
                         }
                     }
                 }
@@ -49,7 +49,7 @@ class SerialManager {
             launch {
                 while (true) {
                     delay(1000L)
-                    helpers.sendHex(4, V1.QUERY_HEX)
+                    helpers.sendHex(4, Protocol.QUERY_HEX)
                 }
             }
         }
@@ -57,13 +57,13 @@ class SerialManager {
 
     /**
      * 发送指令
-     * @param v1 [V1] 指令
+     * @param protocol [Protocol] 指令
      */
-    fun send(v1: V1) {
+    fun send(protocol: Protocol) {
         scope.launch {
             scope.launch {
-                _send.value = v1
-                helpers.sendHex(4, v1.genHex())
+                _send.value = protocol
+                helpers.sendHex(4, protocol.genHex())
             }
         }
     }

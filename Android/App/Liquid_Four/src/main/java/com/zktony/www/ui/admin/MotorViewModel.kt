@@ -5,7 +5,7 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
+import com.zktony.serialport.protocol.V1
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Motor
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -10,7 +10,7 @@ import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
 import com.zktony.www.R
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.manager.protocol.V1
+import com.zktony.serialport.protocol.V1
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow

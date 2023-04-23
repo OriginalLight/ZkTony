@@ -70,6 +70,7 @@
                 android:background="@color/dark_secondary"
                 android:gravity="center"
                 android:text="@string/add"
+                android:textAllCaps="false"
                 android:textColor="@color/light_onPrimary"
                 android:textSize="16sp"
                 tools:ignore="TextContrastCheck" />

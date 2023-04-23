@@ -9,7 +9,7 @@ import com.zktony.core.ext.verifyHex
 import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
 import com.zktony.www.common.ext.toV1
-import com.zktony.www.manager.protocol.V1
+import com.zktony.serialport.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -200,15 +200,15 @@ class SerialManager {
     }
 
     suspend fun drawer() {
-        sendHex(0, V1.queryDrawer())
+        sendHex(0, V1(pa = "0C").toHex())
         delay(500L)
     }
 
     fun swing(flag: Boolean) {
         if (flag) {
-            sendHex(0, V1.resumeShakeBed())
+            sendHex(0, V1(pa = "0B", data = "0101").toHex())
         } else {
-            sendHex(0, V1.pauseShakeBed())
+            sendHex(0, V1(pa = "0B", data = "0100").toHex())
         }
         _swing.value = flag
     }

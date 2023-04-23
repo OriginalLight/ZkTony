@@ -10,7 +10,7 @@ import com.zktony.core.ext.verifyHex
 import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
 import com.zktony.www.common.ext.toV1
-import com.zktony.www.manager.protocol.V1
+import com.zktony.serialport.protocol.V1
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -143,6 +143,8 @@ class SerialManager {
             _lock.value = true
             lockTime = 0L
         }
+        index.toString().logi("串口发送：")
+        hex.hexFormat().logi()
     }
 
     fun initializer() {
