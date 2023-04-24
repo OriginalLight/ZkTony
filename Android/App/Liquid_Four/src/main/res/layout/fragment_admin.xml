@@ -77,6 +77,8 @@
                             android:textAllCaps="false"
                             android:textColor="@color/black"
                             app:rippleColor="@color/purple_700"
+                            app:strokeColor="@color/dark_background"
+                            app:strokeWidth="1dp"
                             tools:ignore="DuplicateSpeakableTextCheck,RelativeOverlap,TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
                     </RelativeLayout>

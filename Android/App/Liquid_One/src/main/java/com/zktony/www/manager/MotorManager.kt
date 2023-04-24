@@ -1,21 +1,16 @@
 package com.zktony.www.manager
 
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.int8ToHex
-import com.zktony.core.ext.logi
+import com.zktony.core.ext.*
+import com.zktony.serialport.protocol.V1
 import com.zktony.www.R
 import com.zktony.www.common.ext.toMotor
 import com.zktony.www.common.ext.toV1
-import com.zktony.serialport.protocol.V1
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Calibration
 import com.zktony.www.room.entity.Motor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺
@@ -29,7 +24,7 @@ class MotorManager(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     /**
-     *  0: X轴 1: Y轴 2: 泵1 3: 泵2 4: 泵3 5: 泵4
+     *  0: X轴 1: Y轴 2: 泵1
      */
     private val hpm: MutableMap<Int, Motor> = HashMap()
     private val hpc: MutableMap<Int, Float> = HashMap()
@@ -60,21 +55,6 @@ class MotorManager(
                                     id = 2,
                                     name = Ext.ctx.getString(R.string.pump_one),
                                     address = 3
-                                ),
-                                Motor(
-                                    id = 3,
-                                    name = Ext.ctx.getString(R.string.pump_two),
-                                    address = 1
-                                ),
-                                Motor(
-                                    id = 4,
-                                    name = Ext.ctx.getString(R.string.pump_three),
-                                    address = 2
-                                ),
-                                Motor(
-                                    id = 5,
-                                    name = Ext.ctx.getString(R.string.pump_four),
-                                    address = 3
                                 )
                             )
                         )
@@ -89,9 +69,6 @@ class MotorManager(
                             hpc[0] = c.x
                             hpc[1] = c.y
                             hpc[2] = c.v1
-                            hpc[3] = c.v2
-                            hpc[4] = c.v3
-                            hpc[5] = c.v4
                         }
                     } else {
                         CD.insert(
@@ -106,40 +83,21 @@ class MotorManager(
             launch {
                 delay(5000L)
                 if (!SM.lock.value) {
-                    for (i in 0..1) {
-                        for (j in 1..3) {
-                            val serial = when (i) {
-                                0 -> 0
-                                else -> 3
-                            }
-                            SM.sendHex(
-                                index = serial,
-                                hex = V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex()
-                            )
-                            delay(100L)
-                        }
+                    for (j in 1..3) {
+                        SM.sendHex(
+                            hex = V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex()
+                        )
+                        delay(100L)
                     }
                 }
             }
             launch {
-                SM.ttys0Flow.collect {
+                SM.callback.collect {
                     it?.let {
                         it.toV1().run {
                             if (fn == "03" && pa == "04") {
                                 val motor = data.toMotor()
                                 sync(motor.copy(id = motor.address - 1))
-                            }
-                        }
-                    }
-                }
-            }
-            launch {
-                SM.ttys3Flow.collect {
-                    it?.let {
-                        it.toV1().run {
-                            if (fn == "03" && pa == "04") {
-                                val motor = data.toMotor()
-                                sync(motor.copy(id = motor.address + 2))
                             }
                         }
                     }

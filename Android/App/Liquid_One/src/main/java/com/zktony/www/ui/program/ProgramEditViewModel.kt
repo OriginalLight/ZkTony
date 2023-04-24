@@ -7,9 +7,8 @@ import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.dao.PointDao
 import com.zktony.www.room.entity.Container
 import com.zktony.www.room.entity.Point
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class ProgramEditViewModel constructor(
@@ -27,48 +26,85 @@ class ProgramEditViewModel constructor(
             launch {
                 CD.getByType(1).collect {
                     _uiState.value = _uiState.value.copy(containerList = it)
+                    if (it.isNotEmpty() && _uiState.value.container == null) {
+                        _uiState.value = _uiState.value.copy(container = it[0])
+                    }
                 }
             }
             launch {
+                delay(200L)
                 PD.getBySubId(id).collect {
-                    _uiState.value = _uiState.value.copy(pointList = it)
+                    _uiState.value = _uiState.value.copy(list = it)
+                    if (it.isEmpty()) {
+                        val c1 = _uiState.value.container
+                        if (c1 != null) {
+                            delay(200L)
+                            buildPoint(c1.id)
+                        }
+                    } else {
+                        val c1 = _uiState.value.containerList.find { c -> c.id == it[0].thirdId }
+                        if (c1 != null) {
+                            _uiState.value = _uiState.value.copy(container = c1)
+                        }
+                    }
                 }
             }
         }
     }
 
-    fun selectPoint(index: Int, cIndex: Int) {
+    private fun buildPoint(id: Long) {
         viewModelScope.launch {
-            val c1 = _uiState.value.containerList[cIndex]
-            val l1 = PD.getBySubId(c1.id).firstOrNull()
-            l1?.let {
+            val pid = _uiState.value.id
+            val list = PD.getBySubId(id).firstOrNull()
+            list?.let { it1 ->
                 val snowflake = Snowflake(1)
-                val list = mutableListOf<Point>()
-                it.forEach { p ->
-                    list.add(
-                        p.copy(
-                            id = snowflake.nextId(),
-                            subId = _uiState.value.id,
-                            thirdId = c1.id,
-                            index = index,
-                        )
-                    )
+                val list1 = mutableListOf<Point>()
+                it1.forEach { point ->
+                    list1.add(point.copy(id = snowflake.nextId(), subId = pid, thirdId = id))
                 }
-                PD.insertAll(list)
+                PD.insertAll(list1)
             }
         }
     }
 
-    fun deletePoint(index: Int) {
+    fun enablePoint(x: Int, y: Int) {
         viewModelScope.launch {
-            val list = _uiState.value.pointList.filter { it.index == index }
-            PD.deleteAll(list)
+            _uiState.value.list.find { it.x == x && it.y == y }?.let {
+                PD.update(it.copy(enable = !it.enable))
+            }
+        }
+    }
+
+    fun enableAll() {
+        viewModelScope.launch {
+            PD.updateAll(_uiState.value.list.map { it.copy(enable = true) })
+        }
+    }
+
+    fun updateVolume(v1: Int) {
+        viewModelScope.launch {
+            PD.updateAll(_uiState.value.list.map { it.copy(v1 = v1) })
+        }
+    }
+
+    fun selectContainer(index: Int) {
+        viewModelScope.launch {
+            val c1 = _uiState.value.containerList.getOrNull(index) ?: return@launch
+            val c2 = _uiState.value.container ?: return@launch
+            if (c1.id == c2.id) return@launch
+
+            _uiState.value = _uiState.value.copy(container = c1)
+
+            delay(200L)
+            val pid = _uiState.value.id
+            PD.deleteBySubId(pid)
         }
     }
 }
 
 data class ProgramEditUiState(
     val id: Long = 0L,
+    val container: Container? = null,
     val containerList: List<Container> = emptyList(),
-    val pointList: List<Point> = emptyList(),
+    val list: List<Point> = emptyList(),
 )

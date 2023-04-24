@@ -1,35 +1,25 @@
 package com.zktony.www.manager
 
 import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.hexFormat
-import com.zktony.core.ext.hexToInt8
-import com.zktony.core.ext.logd
-import com.zktony.core.ext.logi
-import com.zktony.core.ext.verifyHex
+import com.zktony.core.ext.*
 import com.zktony.serialport.SerialConfig
 import com.zktony.serialport.SerialHelpers
-import com.zktony.www.common.ext.toV1
 import com.zktony.serialport.protocol.V1
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import com.zktony.www.common.ext.toV1
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class SerialManager {
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
     private val helpers by lazy { SerialHelpers() }
 
-    private val _ttys0Flow = MutableStateFlow<String?>(null)
-    private val _ttys3Flow = MutableStateFlow<String?>(null)
+    private val _callback = MutableStateFlow<String?>(null)
     private val _lock = MutableStateFlow(false)
     private val _pause = MutableStateFlow(false)
 
-    val ttys0Flow = _ttys0Flow.asStateFlow()
-    val ttys3Flow = _ttys3Flow.asStateFlow()
+    val callback = _callback.asStateFlow()
     val lock = _lock.asStateFlow()
     val pause = _pause.asStateFlow()
 
@@ -46,10 +36,6 @@ class SerialManager {
                     SerialConfig(
                         index = 0,
                         device = "/dev/ttyS0",
-                    ),
-                    SerialConfig(
-                        index = 3,
-                        device = "/dev/ttyS3",
                     )
                 )
             }
@@ -58,15 +44,8 @@ class SerialManager {
                     when (index) {
                         0 -> {
                             data.verifyHex().forEach {
-                                _ttys0Flow.value = it
+                                _callback.value = it
                                 it.hexFormat().logd("串口一 receivedHex: ")
-                            }
-                        }
-
-                        3 -> {
-                            data.verifyHex().forEach {
-                                _ttys3Flow.value = it
-                                it.hexFormat().logd("串口三 receivedHex: ")
                             }
                         }
 
@@ -75,7 +54,7 @@ class SerialManager {
                 }
             }
             launch {
-                ttys0Flow.collect {
+                callback.collect {
                     it?.let {
                         val res = it.toV1()
                         when (res.fn) {
@@ -120,12 +99,7 @@ class SerialManager {
         }
         _lock.value = true
         lockTime = 0L
-        sendHex(
-            index = 0,
-            hex = V1(fn = "05", pa = "01", data = "0101302C302C302C302C").toHex()
-        )
-        sendHex(index = 0, hex = V1().toHex())
-
+        sendHex(hex = V1().toHex())
     }
 
     fun pause(pause: Boolean) {
@@ -134,17 +108,14 @@ class SerialManager {
 
     /**
      * 发送Hex
-     * @param index 串口
      * @param hex 命令
      */
-    fun sendHex(index: Int, hex: String, lock: Boolean = false) {
-        helpers.sendHex(index, hex)
+    fun sendHex(hex: String, lock: Boolean = false) {
+        helpers.sendHex(0, hex)
         if (lock) {
             _lock.value = true
             lockTime = 0L
         }
-        index.toString().logi("串口发送：")
-        hex.hexFormat().logi()
     }
 
     fun initializer() {

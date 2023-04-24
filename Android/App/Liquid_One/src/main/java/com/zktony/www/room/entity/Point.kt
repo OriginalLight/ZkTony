@@ -21,9 +21,6 @@ data class Point(
     val xAxis: Float = 0f,
     val yAxis: Float = 0f,
     val v1: Int = 0,
-    val v2: Int = 0,
-    val v3: Int = 0,
-    val v4: Int = 0,
     val enable: Boolean = false,
     val createTime: Date = Date(System.currentTimeMillis()),
 )

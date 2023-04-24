@@ -1,17 +1,17 @@
 package com.zktony.www.ui.home
 
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
+import android.widget.LinearLayout
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
+import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.dialogs.PopTip
+import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.R.mipmap
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.addTouchEvent
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.getTimeFormat
+import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.ext.total
 import com.zktony.www.common.ext.washDialog
@@ -35,7 +35,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 launch {
                     viewModel.uiState.collect {
                         binding.apply {
-                            operate.isVisible = it.job == null
+                            action.isVisible = it.job == null
                             start.isVisible =
                                 it.job == null && it.pointList.total() > 0
                             with(pause) {
@@ -58,12 +58,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 x = it.info.size.second
                                 y = it.info.size.first
                                 data = it.info.tripleList
-                                color = it.info.color
                             }
-                            currentPlate.text = it.info.index
-                            currentLiquid.text = it.info.liquid
-                            currentSpeed.text = String.format("%.2f", it.info.speed)
-                            currentLastTime.text = it.info.lastTime.getTimeFormat()
                             progress.progress = it.info.process
                         }
                     }
@@ -102,43 +97,72 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     true
                 }
             }
-            with(waste) {
+            with(more) {
                 clickScale()
                 clickNoRepeat {
-                    viewModel.waste()
+                    CustomDialog.build()
+                        .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_more) {
+                            override fun onBind(dialog: CustomDialog, v: View) {
+                                val waste = v.findViewById<LinearLayout>(R.id.waste)
+                                val wash = v.findViewById<LinearLayout>(R.id.wash)
+                                val fill = v.findViewById<LinearLayout>(R.id.fill)
+                                val back = v.findViewById<LinearLayout>(R.id.back)
+                                val close = v.findViewById<LinearLayout>(R.id.close)
+
+                                with(waste) {
+                                    clickScale()
+                                    clickNoRepeat {
+                                        viewModel.waste()
+                                    }
+                                }
+                                with(wash) {
+                                    clickScale()
+                                    clickNoRepeat {
+                                        washDialog(
+                                            {
+                                                viewModel.wash(time = it, type = 0)
+                                            },
+                                            {
+                                                viewModel.wash(type = 1)
+                                            }
+                                        )
+                                    }
+                                }
+
+                                fill.addTouchEvent({
+                                    it.scaleX = 0.8f
+                                    it.scaleY = 0.8f
+                                    viewModel.fill(0)
+                                }, {
+                                    it.scaleX = 1f
+                                    it.scaleY = 1f
+                                    viewModel.fill(1)
+                                })
+
+                                back.addTouchEvent({
+                                    it.scaleX = 0.8f
+                                    it.scaleY = 0.8f
+                                    viewModel.back(0)
+                                }, {
+                                    it.scaleX = 1f
+                                    it.scaleY = 1f
+                                    viewModel.back(1)
+                                })
+
+                                with(close) {
+                                    clickScale()
+                                    clickNoRepeat {
+                                        dialog.dismiss()
+                                    }
+                                }
+                            }
+                        })
+                        .setCancelable(false)
+                        .setMaskColor(Color.parseColor("#4D000000"))
+                        .show()
                 }
             }
-            with(wash) {
-                clickScale()
-                clickNoRepeat {
-                    washDialog(
-                        {
-                            viewModel.wash(time = it, type = 0)
-                        },
-                        {
-                            viewModel.wash(type = 1)
-                        }
-                    )
-                }
-            }
-            fill.addTouchEvent({
-                it.scaleX = 0.8f
-                it.scaleY = 0.8f
-                viewModel.fill(0)
-            }, {
-                it.scaleX = 1f
-                it.scaleY = 1f
-                viewModel.fill(1)
-            })
-            suckBack.addTouchEvent({
-                it.scaleX = 0.8f
-                it.scaleY = 0.8f
-                viewModel.suckBack(0)
-            }, {
-                it.scaleX = 1f
-                it.scaleY = 1f
-                viewModel.suckBack(1)
-            })
+
         }
     }
 }

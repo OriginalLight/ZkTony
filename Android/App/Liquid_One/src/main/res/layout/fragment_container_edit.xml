@@ -85,8 +85,8 @@
 
             <com.zktony.core.widget.DynamicPlate
                 android:id="@+id/dynamic_plate"
-                android:layout_width="600dp"
-                android:layout_height="400dp"
+                android:layout_width="480dp"
+                android:layout_height="320dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

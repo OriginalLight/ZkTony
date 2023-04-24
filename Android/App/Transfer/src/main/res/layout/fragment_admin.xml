@@ -78,6 +78,8 @@
                             android:checked="true"
                             android:textAllCaps="false"
                             android:textColor="@color/black"
+                            app:strokeColor="@color/dark_background"
+                            app:strokeWidth="1dp"
                             app:thumbTint="@color/light_primary"
                             app:trackTint="@color/dark_surfaceTint"
                             tools:ignore="DuplicateSpeakableTextCheck,RelativeOverlap,TouchTargetSizeCheck,SpeakableTextPresentCheck" />

@@ -65,11 +65,6 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                         }
                     }
                     launch {
-                        dataStore.read(Constants.NEEDLE_SPACE, 12f).collect {
-                            binding.needleSpace.setEqualText(it.toString().removeZero())
-                        }
-                    }
-                    launch {
                         dataStore.read(Constants.LANGUAGE, "zh").collect {
                             binding.btnLanguage.text = when (it) {
                                 "zh" -> "简体中文"
@@ -89,6 +84,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             tvVersionName.text = BuildConfig.VERSION_NAME
             tvDeviceName.text = BuildConfig.BUILD_TYPE
 
+            with(navigation) {
+                clickScale()
+                clickNoRepeat {
+                    viewModel.toggleNavigationBar(!swBar.isChecked)
+                }
+            }
+
             swBar.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.toggleNavigationBar(isChecked)
             }
@@ -101,10 +103,6 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     ),
                     block = { _, index -> viewModel.setLanguage(index) }
                 )
-            }
-
-            needleSpace.afterTextChange {
-                viewModel.setNeedleSpace(it.toFloatOrNull() ?: 12f)
             }
 
             with(setting) {

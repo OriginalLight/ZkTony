@@ -2,7 +2,7 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
-import com.zktony.www.common.ext.*
+import com.zktony.www.common.ext.execute
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.CalibrationDataDao
@@ -45,10 +45,6 @@ class CalibrationDataViewModel constructor(
         }
     }
 
-    fun selectPump(pumpId: Int) {
-        _uiState.value = _uiState.value.copy(pumpId = pumpId)
-    }
-
     fun delete(data: CalibrationData) {
         viewModelScope.launch {
             CDD.delete(data)
@@ -60,10 +56,7 @@ class CalibrationDataViewModel constructor(
         val state = _uiState.value
         execute {
             step {
-                v1 = if (state.pumpId == 0) state.expect else 0f
-                v2 = if (state.pumpId == 1) state.expect else 0f
-                v3 = if (state.pumpId == 2) state.expect else 0f
-                v4 = if (state.pumpId == 3) state.expect else 0f
+                v1 = state.expect
             }
         }
     }
@@ -71,7 +64,6 @@ class CalibrationDataViewModel constructor(
     fun save() {
         viewModelScope.launch {
             val cali = CalibrationData(
-                pumpId = _uiState.value.pumpId,
                 subId = _uiState.value.cali?.id ?: 0L,
                 expect = _uiState.value.expect,
                 actual = _uiState.value.actual,
@@ -98,38 +90,14 @@ class CalibrationDataViewModel constructor(
         val cali = CD.getById(id).firstOrNull()
         val dataList = CDD.getBySubId(id).firstOrNull()
         var v1 = 200f
-        var v2 = 200f
-        var v3 = 200f
-        var v4 = 200f
         if (!dataList.isNullOrEmpty()) {
-            dataList.filter { it.pumpId == 0 }.let {
-                if (it.isNotEmpty()) {
-                    v1 *= it.map { data -> data.percent }.average().toFloat()
-                }
-            }
-            dataList.filter { it.pumpId == 1 }.let {
-                if (it.isNotEmpty()) {
-                    v2 *= it.map { data -> data.percent }.average().toFloat()
-                }
-            }
-            dataList.filter { it.pumpId == 2 }.let {
-                if (it.isNotEmpty()) {
-                    v3 *= it.map { data -> data.percent }.average().toFloat()
-                }
-            }
-            dataList.filter { it.pumpId == 3 }.let {
-                if (it.isNotEmpty()) {
-                    v4 *= it.map { data -> data.percent }.average().toFloat()
-                }
-            }
+            v1 *= dataList.map { data -> data.percent }.average().toFloat()
         }
-        CD.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3, v4 = v4))
+        CD.update(cali!!.copy(v1 = v1))
     }
-
 }
 
 data class CalibrationDataUiState(
-    val pumpId: Int = 0,
     val cali: Calibration? = null,
     val caliData: List<CalibrationData> = emptyList(),
     val expect: Float = 0f,

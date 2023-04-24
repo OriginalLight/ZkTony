@@ -11,6 +11,7 @@ import android.widget.*
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayout
+import kotlinx.coroutines.*
 
 /**
  * 设置view显示
@@ -155,18 +156,29 @@ fun TextView.setUnderLine() {
     paint.isAntiAlias = true
 }
 
+/**
+ * view 点击出现波浪
+ */
+fun View.clickRipple() {
+    val typedArray = context.obtainStyledAttributes(intArrayOf(android.R.attr.selectableItemBackground))
+    val drawable = typedArray.getDrawable(0)
+    typedArray.recycle()
+    background = drawable
+}
+
 @SuppressLint("ClickableViewAccessibility")
 fun View.clickScale() {
     this.setOnTouchListener { v, event ->
+        val scope = CoroutineScope(Dispatchers.Main)
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                v?.scaleX = 0.8f
-                v?.scaleY = 0.8f
-            }
-
-            MotionEvent.ACTION_UP -> {
-                v?.scaleX = 1f
-                v?.scaleY = 1f
+                scope.launch {
+                    v?.scaleX = 0.8f
+                    v?.scaleY = 0.8f
+                    delay(200L)
+                    v?.scaleX = 1f
+                    v?.scaleY = 1f
+                }
             }
         }
         false

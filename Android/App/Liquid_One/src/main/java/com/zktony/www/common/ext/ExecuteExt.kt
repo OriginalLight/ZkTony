@@ -1,9 +1,9 @@
 package com.zktony.www.common.ext
 
 import com.zktony.core.ext.toHex
+import com.zktony.serialport.protocol.v1
 import com.zktony.www.manager.MotorManager
 import com.zktony.www.manager.SerialManager
-import com.zktony.serialport.protocol.v1
 import org.koin.java.KoinJavaComponent.inject
 
 private val SM: SerialManager by inject(SerialManager::class.java)
@@ -35,55 +35,34 @@ class Execute {
 fun execute(block: Execute.() -> Unit) {
     val list = Execute().apply(block).list()
 
-    val axisStr = StringBuilder()
-    val volumeStr = StringBuilder()
+    val str = StringBuilder()
     list.forEach {
         val l1 = MM.pulse(
-            listOf(it.x, it.y, it.v1, it.v2, it.v3, it.v4),
-            listOf(0, 1, 2, 3, 4, 5)
+            listOf(it.x, it.y, it.v1),
+            listOf(0, 1, 2)
         )
-        axisStr.append("${l1[0]},${l1[1]},${l1[2]},")
-        volumeStr.append("${l1[3]},${l1[4]},${l1[5]},")
+        str.append("${l1[0]},${l1[1]},${l1[2]},")
     }
 
     if (list.size > 1) {
         SM.sendHex(
-            index = 0,
             hex = v1 {
                 fn = "05"
                 pa = "04"
-                data = "0101" + axisStr.toString().toHex()
-            }
-        )
-        SM.sendHex(
-            index = 3,
-            hex = v1 {
-                fn = "05"
-                pa = "04"
-                data = "0101" + volumeStr.toString().toHex()
+                data = "0101" + str.toString().toHex()
             },
             lock = true
         )
     } else {
         SM.sendHex(
-            index = 0,
             hex = v1 {
                 fn = "05"
                 pa = "01"
-                data = "0101" + axisStr.toString().toHex()
-            }
-        )
-        SM.sendHex(
-            index = 3,
-            hex = v1 {
-                fn = "05"
-                pa = "01"
-                data = "0101" + volumeStr.toString().toHex()
+                data = "0101" + str.toString().toHex()
             },
             lock = true
         )
     }
-
 }
 
 

@@ -5,7 +5,8 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
 import com.zktony.core.utils.Snowflake
-import com.zktony.www.common.ext.*
+import com.zktony.www.common.ext.calculateCoordinate
+import com.zktony.www.common.ext.execute
 import com.zktony.www.manager.SerialManager
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.dao.PointDao

@@ -120,12 +120,7 @@ class SerialManager {
         }
         _lock.value = true
         lockTime = 0L
-        sendHex(
-            index = 0,
-            hex = V1(fn = "05", pa = "01", data = "0101302C302C302C302C").toHex()
-        )
         sendHex(index = 0, hex = V1().toHex())
-
     }
 
     fun pause(pause: Boolean) {
@@ -143,8 +138,6 @@ class SerialManager {
             _lock.value = true
             lockTime = 0L
         }
-        index.toString().logi("串口发送：")
-        hex.hexFormat().logi()
     }
 
     fun initializer() {

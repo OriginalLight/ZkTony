@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.*
 import com.zktony.core.ext.*
-import com.zktony.www.R
 import com.zktony.www.databinding.ItemCalibrationDataBinding
 import com.zktony.www.room.entity.CalibrationData
 
@@ -61,15 +60,7 @@ class CalibrationDataViewHolder(
     @SuppressLint("SetTextI18n")
     fun bind(item: CalibrationData) {
         binding.apply {
-            cali = item
             order.text = (layoutPosition + 1).toString()
-            name.text = when (item.pumpId) {
-                0 -> itemView.context.getString(R.string.pump_one)
-                1 -> itemView.context.getString(R.string.pump_two)
-                2 -> itemView.context.getString(R.string.pump_three)
-                3 -> itemView.context.getString(R.string.pump_four)
-                else -> itemView.context.getString(R.string.pump_one)
-            }
             expect.text = item.expect.toString().removeZero()
             actual.text = item.actual.toString().removeZero()
             with(delete) {

@@ -55,7 +55,6 @@ class LogViewHolder(
             log = item
             order.text = (layoutPosition + 1).toString()
             name.text = item.name
-            time.text = item.createTime.simpleDateFormat("yyyy-MM-dd HH:mm:ss")
             status.text = when (item.status) {
                 0 -> "/"
                 1 -> "OK"

@@ -4,11 +4,12 @@
     <string name="abscissa_size">横坐标尺寸</string>
     <string name="app_name">四通道加液</string>
     <string name="calibration_name">校准程序名</string>
-    <string name="cleaning_time">清洗时间 秒</string>
+    <string name="cleaning_time">清洗时间/秒</string>
     <string name="container_name">容器名</string>
     <string name="custom_off">自定义：关</string>
     <string name="custom_on">自定义：开</string>
     <string name="line_cleaning">管路清洗</string>
+    <string name="more">更多操作</string>
     <string name="motor_setting">电机设置</string>
     <string name="needle_space">针头间距</string>
     <string name="notice_content">1. 执行程序前请确认有充足的溶液。\n2. 程序结束后请及时清理容器，避免滋生微生物等问题。\n3. 请阅读说明书后使用，避免误操作。</string>

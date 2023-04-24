@@ -1,19 +1,10 @@
 package com.zktony.www.ui.calibration
 
 import android.os.Bundle
-import android.view.Gravity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.findNavController
-import com.kongzue.dialogx.dialogs.PopMenu
-import com.kongzue.dialogx.util.TextInfo
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.afterTextChange
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.removeZero
-import com.zktony.core.ext.setEqualText
+import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.adapter.CalibrationDataAdapter
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
@@ -37,12 +28,6 @@ class CalibrationDataFragment :
                 viewModel.uiState.collect {
                     adapter.submitList(it.caliData)
                     binding.apply {
-                        select.text = listOf(
-                            getString(R.string.pump_one),
-                            getString(R.string.pump_two),
-                            getString(R.string.pump_three),
-                            getString(R.string.pump_four)
-                        )[it.pumpId]
                         if (it.expect > 0f) {
                             expect.setEqualText(it.expect.toString().removeZero())
                         }
@@ -83,23 +68,6 @@ class CalibrationDataFragment :
 
             actual.afterTextChange {
                 viewModel.actual(it.toFloatOrNull() ?: 0f)
-            }
-
-            select.clickNoRepeat {
-                val menuList = listOf(
-                    getString(R.string.pump_one),
-                    getString(R.string.pump_two),
-                    getString(R.string.pump_three),
-                    getString(R.string.pump_four)
-                )
-                PopMenu.show(it, menuList).setMenuTextInfo(TextInfo().apply {
-                    gravity = Gravity.CENTER
-                    fontSize = 16
-                }).setOnMenuItemClickListener { _, _, index ->
-                    viewModel.selectPump(index)
-                    false
-                }.setOverlayBaseView(false).setRadius(0f).alignGravity =
-                    Gravity.TOP or Gravity.CENTER_HORIZONTAL
             }
 
             with(back) {

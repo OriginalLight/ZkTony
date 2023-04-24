@@ -7,6 +7,7 @@ import android.widget.TextView
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.interfaces.OnBindView
+import com.zktony.core.ext.Ext
 import com.zktony.www.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +34,13 @@ fun washDialog(block: (Int) -> Unit, block1: () -> Unit) {
                     block(time)
                     scope.launch {
                         btnStart.isEnabled = false
-                        delay(time * 1000L)
+                        var i = time
+                        while (i > 0) {
+                            btnStart.text = "$i"
+                            delay(1000L)
+                            i--
+                        }
+                        btnStart.text = Ext.ctx.getString(com.zktony.core.R.string.start)
                         btnStart.isEnabled = true
                     }
                 }

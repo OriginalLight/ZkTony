@@ -2,12 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="cali"
-            type="com.zktony.www.room.entity.CalibrationData" />
-    </data>
+    <data />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,20 +20,6 @@
             android:background="@color/light_onPrimary"
             android:ellipsize="end"
             android:gravity="center"
-            android:textColor="@color/black"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="1dp"
-            android:layout_marginEnd="1dp"
-            android:layout_weight="2"
-            android:background="@color/light_onPrimary"
-            android:ellipsize="end"
-            android:gravity="center"
-            android:singleLine="true"
             android:textColor="@color/black"
             android:textSize="16sp" />
 

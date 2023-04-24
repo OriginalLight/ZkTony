@@ -7,11 +7,9 @@ import android.widget.TextView
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.interfaces.OnBindView
+import com.zktony.core.ext.Ext
 import com.zktony.www.R
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /**
  * @author: 刘贺贺
@@ -33,7 +31,13 @@ fun washDialog(block: (Int) -> Unit, block1: () -> Unit) {
                     block(time)
                     scope.launch {
                         btnStart.isEnabled = false
-                        delay(time * 1000L)
+                        var i = time
+                        while (i > 0) {
+                            btnStart.text = "$i"
+                            delay(1000L)
+                            i--
+                        }
+                        btnStart.text = Ext.ctx.getString(com.zktony.core.R.string.start)
                         btnStart.isEnabled = true
                     }
                 }
@@ -51,14 +55,12 @@ fun washDialog(block: (Int) -> Unit, block1: () -> Unit) {
         .show()
 }
 
-fun completeDialog(name: String, time: String, speed: String) {
+fun completeDialog(name: String, time: String) {
     CustomDialog.build()
         .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_complete) {
             override fun onBind(dialog: CustomDialog, v: View) {
                 val tvName = v.findViewById<TextView>(R.id.name)
                 val tvTime = v.findViewById<TextView>(R.id.time)
-                val tvSpeed = v.findViewById<TextView>(R.id.speed)
-                tvSpeed.text = speed
                 tvTime.text = time
                 tvName.text = name
             }
