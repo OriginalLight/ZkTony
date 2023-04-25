@@ -12,8 +12,7 @@
     <string name="current_hint">Current A</string>
     <string name="delete_log">Delete Log</string>
     <string name="delete_program">Delete Program</string>
-    <string name="duration_hint">Duration MIN</string>
-    <string name="duration_min">Duration</string>
+    <string name="duration">Duration MIN</string>
     <string name="dye">Dye</string>
     <string name="experiment_time">Date</string>
     <string name="factory">Factory</string>
@@ -46,7 +45,7 @@
     <string name="protein_name">Protein name</string>
     <string name="protein_size">Protein size</string>
     <string name="show">Show</string>
-    <string name="speed">Speed</string>
+    <string name="speed">Speed RPM</string>
     <string name="speed_hint">Speed RPM</string>
     <string name="title_admin">Admin</string>
     <string name="title_dye">Dye</string>
@@ -56,9 +55,7 @@
     <string name="title_program">Program</string>
     <string name="title_transfer">Transfer</string>
     <string name="transfer">Transfer</string>
-    <string name="voltage_dye">Voltage</string>
-    <string name="voltage_hint">Voltage V</string>
-    <string name="voltage_transfer">Voltage</string>
+    <string name="voltage">Voltage</string>
     <string name="wash">Wash</string>
     <string name="weather_delete">Weather delete</string>
 </resources>

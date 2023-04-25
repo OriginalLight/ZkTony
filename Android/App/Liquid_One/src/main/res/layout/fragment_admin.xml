@@ -39,7 +39,8 @@
                     android:id="@+id/language"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_line_bottom">
 
                     <ImageView
                         android:id="@+id/iv_language"
@@ -78,15 +79,13 @@
 
                 </RelativeLayout>
 
-                <com.google.android.material.divider.MaterialDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="3dp" />
 
                 <RelativeLayout
                     android:id="@+id/navigation"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_line_bottom">
 
                     <ImageView
                         android:id="@+id/iv_bar"
@@ -122,15 +121,13 @@
 
                 </RelativeLayout>
 
-                <com.google.android.material.divider.MaterialDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="3dp" />
 
                 <RelativeLayout
                     android:id="@+id/version"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_line_bottom">
 
                     <ImageView
                         android:id="@+id/iv_version"
@@ -165,15 +162,13 @@
 
                 </RelativeLayout>
 
-                <com.google.android.material.divider.MaterialDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="3dp" />
 
                 <RelativeLayout
                     android:id="@+id/device"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_line_bottom">
 
                     <ImageView
                         android:id="@+id/iv_device"
@@ -208,15 +203,13 @@
 
                 </RelativeLayout>
 
-                <com.google.android.material.divider.MaterialDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="3dp" />
 
                 <RelativeLayout
                     android:id="@+id/about"
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_line_bottom">
 
                     <ImageView
                         android:id="@+id/iv_about"
@@ -251,9 +244,6 @@
 
                 </RelativeLayout>
 
-                <com.google.android.material.divider.MaterialDivider
-                    android:layout_width="match_parent"
-                    android:layout_height="3dp" />
 
             </LinearLayout>
 

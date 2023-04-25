@@ -45,10 +45,8 @@ class ContainerFragment :
             )
         }
         adapter.onEditButtonClick = {
-            val directions =
-                if (it.type == 0) R.id.action_navigation_container_to_navigation_wash else R.id.action_navigation_container_to_navigation_container_edit
             findNavController().navigate(
-                directions,
+                R.id.action_navigation_container_to_navigation_container_edit,
                 Bundle().apply { putLong("id", it.id) }
             )
         }

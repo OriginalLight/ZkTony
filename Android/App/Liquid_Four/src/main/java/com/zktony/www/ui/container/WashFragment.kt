@@ -65,7 +65,7 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
                                 val x = inputX.text.toString().toFloatOrNull() ?: 0f
                                 val y = inputY.text.toString().toFloatOrNull() ?: 0f
                                 if (x > 240f || y > 320f) {
-                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
+                                    PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} 240,320")
                                 } else {
                                     viewModel.move(x, y)
                                 }
@@ -75,7 +75,7 @@ class WashFragment : BaseFragment<WashViewModel, FragmentWashBinding>(R.layout.f
                                 val x = inputX.text.toString().toFloatOrNull() ?: 0f
                                 val y = inputY.text.toString().toFloatOrNull() ?: 0f
                                 if (x > 240f || y > 320f) {
-                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
+                                    PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} 240,320")
                                 } else {
                                     viewModel.save(x, y)
                                     dialog.dismiss()

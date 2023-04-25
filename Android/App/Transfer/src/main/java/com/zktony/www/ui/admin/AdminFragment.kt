@@ -62,17 +62,17 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 launch {
                     launch {
                         dataStore.read(Constants.AUDIO, true).collect {
-                            binding.audio.isChecked = it
+                            binding.swAudio.isChecked = it
                         }
                     }
                     launch {
                         dataStore.read(Constants.BAR, false).collect {
-                            binding.navigationBar.isChecked = it
+                            binding.swBar.isChecked = it
                         }
                     }
                     launch {
                         dataStore.read(Constants.DETECT, true).collect {
-                            binding.detect.isChecked = it
+                            binding.swDetect.isChecked = it
                         }
                     }
                     launch {
@@ -145,16 +145,31 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 viewModel.toggleMotorSpeed(it.toIntOrNull() ?: 0)
             }
 
-            navigationBar.setOnCheckedChangeListener { _, isChecked ->
+            swBar.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.toggleNavigationBar(isChecked)
             }
 
-            audio.setOnCheckedChangeListener { _, isChecked ->
+            with(navigation) {
+                clickScale()
+                clickNoRepeat { viewModel.toggleNavigationBar(!swBar.isChecked) }
+            }
+
+            swAudio.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.toggleAudio(isChecked)
             }
 
-            detect.setOnCheckedChangeListener { _, isChecked ->
+            with(audio) {
+                clickScale()
+                clickNoRepeat { viewModel.toggleAudio(!swAudio.isChecked) }
+            }
+
+            swDetect.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.toggleDetect(isChecked)
+            }
+
+            with(detect) {
+                clickScale()
+                clickNoRepeat { viewModel.toggleDetect(!swDetect.isChecked) }
             }
 
             with(reset) {

@@ -1,7 +1,5 @@
 package com.zktony.www.ui.home
 
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.currentTime
 import com.zktony.www.common.ext.execute
 import com.zktony.www.common.ext.total
 import com.zktony.www.manager.SerialManager
@@ -27,7 +25,6 @@ class ProgramExecutor constructor(
     suspend fun execute() {
         scope.launch {
             delay(100L)
-            event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${Ext.ctx.getString(com.zktony.core.R.string.start)}\n"))
             val total = list.total()
             if (total > 0) {
                 val xLength = list.maxOf { it.x } + 1
@@ -64,7 +61,6 @@ class ProgramExecutor constructor(
                 event(ExecutorEvent.PointList(currentList))
             }
             event(ExecutorEvent.Finish)
-            event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${Ext.ctx.getString(com.zktony.core.R.string.complete)}"))
         }
     }
 
@@ -87,6 +83,5 @@ class ProgramExecutor constructor(
 sealed class ExecutorEvent {
     data class PointList(val hole: List<Triple<Int, Int, Boolean>>) : ExecutorEvent()
     data class Progress(val total: Int, val complete: Int) : ExecutorEvent()
-    data class Log(val log: String) : ExecutorEvent()
     object Finish : ExecutorEvent()
 }

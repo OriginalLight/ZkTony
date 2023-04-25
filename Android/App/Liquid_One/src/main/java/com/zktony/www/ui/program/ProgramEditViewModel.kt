@@ -24,7 +24,7 @@ class ProgramEditViewModel constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(id = id)
             launch {
-                CD.getByType(1).collect {
+                CD.getAll().collect {
                     _uiState.value = _uiState.value.copy(containerList = it)
                     if (it.isNotEmpty() && _uiState.value.container == null) {
                         _uiState.value = _uiState.value.copy(container = it[0])

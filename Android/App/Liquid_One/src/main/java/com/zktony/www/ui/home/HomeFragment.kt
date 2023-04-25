@@ -36,8 +36,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     viewModel.uiState.collect {
                         binding.apply {
                             action.isVisible = it.job == null
-                            start.isVisible =
-                                it.job == null && it.pointList.total() > 0
+                            start.isVisible = it.job == null
+                            start.isEnabled = it.pointList.total() > 0
                             with(pause) {
                                 isVisible = it.job != null
                                 text =

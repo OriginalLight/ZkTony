@@ -3,8 +3,6 @@ package com.zktony.serialport.ext
 import java.util.Locale
 
 /**
- * @author lwt
- * @date 2018-06-26
  *
  * CRC16校验码计算
  *

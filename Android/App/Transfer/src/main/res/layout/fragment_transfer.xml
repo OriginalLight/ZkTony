@@ -616,7 +616,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="@string/voltage_transfer"
+                        android:text="@string/voltage"
                         android:textColor="@color/black"
                         android:textSize="22sp" />
 
@@ -710,7 +710,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="@string/duration_min"
+                        android:text="@string/duration"
                         android:textColor="@color/black"
                         android:textSize="22sp" />
 

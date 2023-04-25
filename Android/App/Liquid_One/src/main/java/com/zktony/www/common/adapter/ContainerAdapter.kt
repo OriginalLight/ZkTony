@@ -59,13 +59,7 @@ class ContainerViewHolder(
         binding.apply {
             container = item
             order.text = (layoutPosition + 1).toString()
-            if (item.name == Ext.ctx.getString(com.zktony.core.R.string.waste_tank)) {
-                size.text = "/"
-                delete.isVisible = false
-            } else {
-                size.text = "${item.x} x ${item.y}"
-                delete.isVisible = true
-            }
+            size.text = "${item.x} x ${item.y}"
             with(edit) {
                 clickScale()
                 clickNoRepeat {

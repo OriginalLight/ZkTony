@@ -12,8 +12,7 @@
     <string name="current_hint">电流 A</string>
     <string name="delete_log">删除日志</string>
     <string name="delete_program">删除程序</string>
-    <string name="duration_hint">时长 MIN</string>
-    <string name="duration_min">时间（0 ~ 99）MIN</string>
+    <string name="duration">时长 MIN</string>
     <string name="dye">染色</string>
     <string name="experiment_time">实验日期</string>
     <string name="factory">厂家</string>
@@ -21,9 +20,9 @@
     <string name="glue_075">0.75</string>
     <string name="glue_10">1.0</string>
     <string name="glue_15">1.5</string>
-    <string name="glue_concentration">梯度胶浓度（%）</string>
-    <string name="glue_concentration_normal">常规胶浓度（%）</string>
-    <string name="glue_thickness">胶厚度（mm）</string>
+    <string name="glue_concentration">梯度胶浓度</string>
+    <string name="glue_concentration_normal">常规胶浓度</string>
+    <string name="glue_thickness">胶厚度</string>
     <string name="glue_type">胶种类</string>
     <string name="gradient_glue">梯度胶</string>
     <string name="hide">隐藏</string>
@@ -44,9 +43,9 @@
     <string name="parameter">参数(转速-电压-时长)</string>
     <string name="program_name">程序名</string>
     <string name="protein_name">使用蛋白名称</string>
-    <string name="protein_size">蛋白大小范围（kD）</string>
+    <string name="protein_size">蛋白大小范围</string>
     <string name="show">显示</string>
-    <string name="speed">泵速（0 ~ 250）RPM</string>
+    <string name="speed">泵速 RPM</string>
     <string name="speed_hint">转速 RPM</string>
     <string name="title_admin">管理员</string>
     <string name="title_dye">染色</string>
@@ -56,9 +55,7 @@
     <string name="title_program">实验程序</string>
     <string name="title_transfer">转膜</string>
     <string name="transfer">转膜</string>
-    <string name="voltage_dye">电压（0 ~ 30）V</string>
-    <string name="voltage_hint">电压 V</string>
-    <string name="voltage_transfer">电压（0 ~ 50）V</string>
+    <string name="voltage">电压 V</string>
     <string name="wash">洗涤</string>
     <string name="weather_delete">是否删除</string>
 </resources>

@@ -94,7 +94,7 @@ class LogChartFragment :
             chart.data.notifyDataChanged()
             chart.notifyDataSetChanged()
         } else {
-            val voltageSet = LineDataSet(voltageList, getString(R.string.voltage_hint))
+            val voltageSet = LineDataSet(voltageList, getString(R.string.voltage))
             val currentSet = LineDataSet(currentList, getString(R.string.current_hint))
             voltageSet.color = Color.parseColor("#3A50D0") //线条颜色
             voltageSet.setDrawCircles(false)

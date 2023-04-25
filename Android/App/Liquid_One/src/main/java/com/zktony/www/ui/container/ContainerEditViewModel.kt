@@ -1,10 +1,13 @@
 package com.zktony.www.ui.container
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
 import com.zktony.core.utils.Snowflake
+import com.zktony.datastore.ext.read
 import com.zktony.www.common.ext.calculateCoordinate
 import com.zktony.www.common.ext.execute
 import com.zktony.www.manager.SerialManager
@@ -14,12 +17,14 @@ import com.zktony.www.room.entity.Container
 import com.zktony.www.room.entity.Point
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ContainerEditViewModel constructor(
     private val CD: ContainerDao,
     private val PD: PointDao,
     private val SM: SerialManager,
+    private val DS: DataStore<Preferences>
 ) : BaseViewModel() {
 
 
@@ -36,6 +41,16 @@ class ContainerEditViewModel constructor(
             launch {
                 PD.getBySubId(id).collect {
                     _uiState.value = _uiState.value.copy(list = it)
+                }
+            }
+            launch {
+                DS.read("MAX_X_TRIP", 100f).collect {
+                    _uiState.value = _uiState.value.copy(maxXTrip = it)
+                }
+            }
+            launch {
+                DS.read("MAX_Y_TRIP", 100f).collect {
+                    _uiState.value = _uiState.value.copy(maxYTrip = it)
                 }
             }
         }
@@ -91,4 +106,6 @@ class ContainerEditViewModel constructor(
 data class ContainerEditUiState(
     val container: Container? = null,
     val list: List<Point> = emptyList(),
+    val maxXTrip: Float = 100f,
+    val maxYTrip: Float = 100f,
 )

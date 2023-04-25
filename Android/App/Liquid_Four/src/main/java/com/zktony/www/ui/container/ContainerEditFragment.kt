@@ -133,7 +133,7 @@ class ContainerEditFragment :
                                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
                                     if (x > 240f || y > 320f) {
-                                        PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
+                                        PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} 240,320")
                                     } else {
                                         viewModel.move(x, y)
                                     }
@@ -143,7 +143,7 @@ class ContainerEditFragment :
                                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
                                     if (x > 240f || y > 320f) {
-                                        PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
+                                        PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} 240,320")
                                     } else {
                                         viewModel.save(x, y, 0)
                                         dialog.dismiss()
@@ -185,7 +185,7 @@ class ContainerEditFragment :
                                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
                                     if (x > 240f || y > 320f) {
-                                        PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
+                                        PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} 240,320")
                                     } else {
                                         viewModel.move(x, y)
                                     }
@@ -195,7 +195,7 @@ class ContainerEditFragment :
                                     val x = inputX.text.toString().toFloatOrNull() ?: 0f
                                     val y = inputY.text.toString().toFloatOrNull() ?: 0f
                                     if (x > 240f || y > 320f) {
-                                        PopTip.show("${com.zktony.core.R.string.over_the_trip} 240,320")
+                                        PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} 240,320")
                                     } else {
                                         viewModel.save(x, y, 1)
                                         dialog.dismiss()

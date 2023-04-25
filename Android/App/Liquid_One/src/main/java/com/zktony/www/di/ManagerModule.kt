@@ -6,8 +6,6 @@ import org.koin.dsl.module
 
 val managerModule = module {
     singleOf(::SerialManager)
-    singleOf(::WorkerManager)
     singleOf(::MotorManager)
-    singleOf(::ContainerManager)
     singleOf(::Initializer)
 }

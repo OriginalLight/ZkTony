@@ -1,28 +1,29 @@
 package com.zktony.www.ui.home
 
 import android.view.View
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.getTimeFormat
-import com.zktony.core.ext.spannerDialog
+import com.zktony.core.ext.*
+import com.zktony.datastore.ext.read
 import com.zktony.serialport.protocol.V1
 import com.zktony.www.common.ext.completeDialog
 import com.zktony.www.common.ext.execute
 import com.zktony.www.manager.SerialManager
-import com.zktony.www.room.dao.*
-import com.zktony.www.room.entity.*
+import com.zktony.www.room.dao.PointDao
+import com.zktony.www.room.dao.ProgramDao
+import com.zktony.www.room.entity.Point
+import com.zktony.www.room.entity.Program
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 
 class HomeViewModel constructor(
-    private val CD: ContainerDao,
-    private val LD: LogDao,
     private val PD: PointDao,
     private val PGD: ProgramDao,
     private val SM: SerialManager,
+    private val DS: DataStore<Preferences>
 ) : BaseViewModel() {
 
 
@@ -46,10 +47,14 @@ class HomeViewModel constructor(
                 }
             }
             launch {
-                CD.getByType(0).collect {
-                    if (it.isNotEmpty()) {
-                        _uiState.value = _uiState.value.copy(container = it[0])
-                    }
+                DS.read("WASH_X_AXIS", 0f).zip(
+                    DS.read("WASH_Y_AXIS", 0f)
+                ) { x, y ->
+                    Pair(x, y)
+                }.collect {
+                    _uiState.value = _uiState.value.copy(
+                        wash = it
+                    )
                 }
             }
         }
@@ -111,12 +116,10 @@ class HomeViewModel constructor(
             if (SM.lock.value) {
                 PopTip.show("运动中")
             } else {
-                _uiState.value.container?.let {
-                    execute {
-                        step {
-                            x = it.xAxis
-                            y = it.yAxis
-                        }
+                execute {
+                    step {
+                        x = _uiState.value.wash.first
+                        y = _uiState.value.wash.second
                     }
                 }
             }
@@ -172,9 +175,6 @@ class HomeViewModel constructor(
                         }
                     }
                 }
-                launch {
-                    updateLog(Log(name = _uiState.value.program?.name ?: "None"))
-                }
                 val executor = ProgramExecutor(
                     list = _uiState.value.pointList,
                     scope = this,
@@ -198,12 +198,6 @@ class HomeViewModel constructor(
                             )
                         }
 
-                        is ExecutorEvent.Log -> {
-                            _uiState.value.log?.let { l ->
-                                updateLog(l.copy(content = l.content + it.log))
-                            }
-                        }
-
                         is ExecutorEvent.Finish -> {
                             reset()
                             completeDialog(
@@ -211,9 +205,6 @@ class HomeViewModel constructor(
                                 time = _uiState.value.time.getTimeFormat(),
                             )
                             launch {
-                                _uiState.value.log?.let { l ->
-                                    updateLog(l.copy(status = 1))
-                                }
                                 delay(500L)
                                 while (SM.lock.value) {
                                     delay(100L)
@@ -233,17 +224,10 @@ class HomeViewModel constructor(
 
     fun stop() {
         _uiState.value.job?.cancel()
-        val minIndex = _uiState.value.pointList.minOf { point -> point.index }
-        val maxX = _uiState.value.pointList.filter { point -> point.index == minIndex }
-            .maxOf { point -> point.x } + 1
-        val maxY = _uiState.value.pointList.filter { point -> point.index == minIndex }
-            .maxOf { point -> point.y } + 1
         _uiState.value = _uiState.value.copy(
             job = null,
-            log = null,
             time = 0L,
             info = CurrentInfo().copy(
-                size = maxX to maxY,
                 process = 0
             )
         )
@@ -255,20 +239,13 @@ class HomeViewModel constructor(
         SM.pause(_uiState.value.pause)
     }
 
-    private fun updateLog(log: Log) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(log = log)
-            LD.insert(log)
-        }
-    }
 
 }
 
 data class HomeUiState(
-    val container: Container? = null,
+    val wash: Pair<Float, Float> = Pair(0f, 0f),
     val info: CurrentInfo = CurrentInfo(),
     val job: Job? = null,
-    val log: Log? = null,
     val pause: Boolean = false,
     val pointList: List<Point> = emptyList(),
     val program: Program? = null,
