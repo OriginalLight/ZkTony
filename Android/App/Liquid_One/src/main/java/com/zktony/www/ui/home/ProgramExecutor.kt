@@ -42,6 +42,12 @@ class ProgramExecutor constructor(
                                     x = it.xAxis
                                     y = it.yAxis
                                 }
+                            }
+                            delay(100L)
+                            while (serialManager.lock.value || serialManager.pause.value) {
+                                delay(100)
+                            }
+                            execute {
                                 step {
                                     x = it.xAxis
                                     y = it.yAxis
@@ -68,11 +74,11 @@ class ProgramExecutor constructor(
     private suspend fun forEachHole(x: Int, y: Int, block: suspend (Int, Int) -> Unit) {
         for (i in 0 until y) {
             if (i % 2 == 0) {
-                for (j in 0 until x) {
+                for (j in x - 1 downTo 0) {
                     block(j, i)
                 }
             } else {
-                for (j in x - 1 downTo 0) {
+                for (j in 0 until x) {
                     block(j, i)
                 }
             }

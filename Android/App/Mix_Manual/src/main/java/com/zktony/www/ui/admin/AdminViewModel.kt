@@ -3,18 +3,11 @@ package com.zktony.www.ui.admin
 import android.content.Intent
 import android.provider.Settings
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.*
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.ext.DownloadState
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.download
-import com.zktony.core.ext.installApk
-import com.zktony.core.ext.isNetworkAvailable
-import com.zktony.core.ext.updateDialog
+import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
@@ -22,10 +15,7 @@ import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.www.BuildConfig
 import com.zktony.www.MainActivity
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
 

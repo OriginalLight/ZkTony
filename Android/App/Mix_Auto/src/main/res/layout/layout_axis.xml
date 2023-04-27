@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="500dp"
+    android:layout_width="400dp"
     android:layout_height="wrap_content"
     android:background="@color/light_onPrimary"
     android:orientation="vertical">
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
-        android:text="@string/coordinate_edit"
+        android:text="@string/edit"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="16sp" />
@@ -49,19 +49,6 @@
             android:textSize="18sp"
             tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/move"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/move"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            app:cornerRadius="0dp"
-            app:rippleColor="@color/purple_700"
-            tools:ignore="TouchTargetSizeCheck" />
 
     </LinearLayout>
 
@@ -71,6 +58,22 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/move"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/purple_700"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="@string/move"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="0dp"
+            app:rippleColor="@color/purple_700"
+            tools:ignore="TouchTargetSizeCheck" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/ok"

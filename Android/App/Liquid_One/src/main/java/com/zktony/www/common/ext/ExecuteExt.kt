@@ -44,25 +44,14 @@ fun execute(block: Execute.() -> Unit) {
         str.append("${l1[0]},${l1[1]},${l1[2]},")
     }
 
-    if (list.size > 1) {
-        SM.sendHex(
-            hex = v1 {
-                fn = "05"
-                pa = "04"
-                data = "0101" + str.toString().toHex()
-            },
-            lock = true
-        )
-    } else {
-        SM.sendHex(
-            hex = v1 {
-                fn = "05"
-                pa = "01"
-                data = "0101" + str.toString().toHex()
-            },
-            lock = true
-        )
-    }
+    SM.sendHex(
+        hex = v1 {
+            fn = "05"
+            pa = "01"
+            data = "0101" + str.toString().toHex()
+        },
+        lock = true
+    )
 }
 
 

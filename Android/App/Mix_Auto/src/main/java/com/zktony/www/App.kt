@@ -1,14 +1,9 @@
 package com.zktony.www
 
 import android.app.Application
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.initDialogX
-import com.zktony.core.ext.initTypeface
+import com.zktony.core.ext.*
 import com.zktony.datastore.DataStoreFactory
-import com.zktony.www.di.localModule
-import com.zktony.www.di.managerModule
-import com.zktony.www.di.remoteModule
-import com.zktony.www.di.viewModule
+import com.zktony.www.di.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.workmanager.koin.workManagerFactory

@@ -4,30 +4,20 @@ import android.view.View
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.getTimeFormat
-import com.zktony.core.ext.spannerDialog
+import com.zktony.core.ext.*
 import com.zktony.www.R
-import com.zktony.www.common.ext.completeDialog
-import com.zktony.www.manager.SerialManager
-import com.zktony.serialport.protocol.V1
-import com.zktony.www.room.dao.LogDao
+import com.zktony.www.common.ext.*
 import com.zktony.www.room.dao.PointDao
 import com.zktony.www.room.dao.ProgramDao
-import com.zktony.www.room.entity.Log
 import com.zktony.www.room.entity.Point
 import com.zktony.www.room.entity.Program
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 class HomeViewModel constructor(
-    private val LD: LogDao,
     private val PGD: ProgramDao,
     private val PD: PointDao,
-    private val SM: SerialManager,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -78,8 +68,13 @@ class HomeViewModel constructor(
     fun reset() {
         viewModelScope.launch {
             if (_uiState.value.job == null) {
-                SM.reset()
-                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.resetting))
+                waitLock {
+                    asyncHex(0) { }
+                    asyncHex(3) {
+                        pa = "0B"
+                        data = "0305"
+                    }
+                }
             } else {
                 PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.stop_all))
             }
@@ -105,14 +100,15 @@ class HomeViewModel constructor(
                         }
                     }
                 }
-                launch {
-                    updateLog(Log(name = _uiState.value.program?.name ?: "None"))
-                }
                 val executor = ProgramExecutor(
                     list = _uiState.value.pointList,
                     scope = this,
                 )
-                SM.reset(false)
+                launch {
+                    uiState.collect {
+                        executor.pause = it.pause
+                    }
+                }
                 executor.event = {
                     when (it) {
                         is ExecutorEvent.CurrentPoint -> {
@@ -146,12 +142,6 @@ class HomeViewModel constructor(
 
                         }
 
-                        is ExecutorEvent.Log -> {
-                            _uiState.value.log?.let { l ->
-                                updateLog(l.copy(content = l.content + it.log))
-                            }
-                        }
-
                         is ExecutorEvent.Finish -> {
                             completeDialog(
                                 name = _uiState.value.program?.name ?: "None",
@@ -161,13 +151,7 @@ class HomeViewModel constructor(
                                     _uiState.value.info.speed
                                 ),
                             )
-                            launch {
-                                _uiState.value.log?.let { l ->
-                                    updateLog(l.copy(status = 1))
-                                }
-                                delay(500L)
-                                stop()
-                            }
+                            stop()
                         }
                     }
                 }
@@ -182,37 +166,19 @@ class HomeViewModel constructor(
             _uiState.value.job?.cancel()
             _uiState.value = _uiState.value.copy(
                 job = null,
-                log = null,
+                pause = false,
                 time = 0L,
                 info = CurrentInfo().copy(
                     pairs = emptyList(),
                     process = 0
                 )
             )
-            SM.pause(false)
-            SM.sendHex(
-                index = 0,
-                hex = V1(pa = "10").toHex()
-            )
-            delay(1000L)
-            SM.lock(false)
-            while (SM.lock.value) {
-                delay(100L)
-            }
             reset()
         }
     }
 
     fun pause() {
         _uiState.value = _uiState.value.copy(pause = !_uiState.value.pause)
-        this.SM.pause(_uiState.value.pause)
-    }
-
-    private fun updateLog(log: Log) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(log = log)
-            LD.insert(log)
-        }
     }
 
     /**
@@ -225,43 +191,41 @@ class HomeViewModel constructor(
                     upOrDown = true,
                     fillCoagulant = false,
                 )
-                SM.sendHex(
-                    index = 3,
-                    hex = V1(pa = "0B", data = "0300").toHex()
+                asyncHex(3) {
+                    pa = "0B"
+                    data = "0300"
+                }
+                delay(100L)
+                syncHex(3) {
+                    pa = "0B"
+                    data = "0305"
+                }
+            } else {
+                if (_uiState.value.recaptureCoagulant) {
+                    PopTip.show(Ext.ctx.getString(R.string.stop_back))
+                    return@launch
+                }
+                _uiState.value = _uiState.value.copy(
+                    upOrDown = true,
+                    fillCoagulant = true,
                 )
                 delay(100L)
-                reset()
-            } else {
-                if (SM.reset.value) {
-                    if (_uiState.value.recaptureCoagulant) {
-                        PopTip.show(Ext.ctx.getString(R.string.stop_back))
-                        return@launch
-                    }
-                    _uiState.value = _uiState.value.copy(
-                        upOrDown = true,
-                        fillCoagulant = true,
-                    )
-                    delay(100L)
-                    while (_uiState.value.fillCoagulant) {
-                        if (_uiState.value.upOrDown) {
-                            _uiState.value = _uiState.value.copy(upOrDown = false)
-                            SM.sendHex(
-                                index = 3,
-                                hex = V1(pa = "0B", data = "0301").toHex()
-                            )
-                            delay(8500L)
-                        } else {
-                            _uiState.value = _uiState.value.copy(upOrDown = true)
-                            SM.sendHex(
-                                index = 3,
-                                hex = V1(pa = "0B", data = "0305").toHex()
-                            )
-                            delay(9000L)
+                while (_uiState.value.fillCoagulant) {
+                    if (_uiState.value.upOrDown) {
+                        _uiState.value = _uiState.value.copy(upOrDown = false)
+                        asyncHex(3) {
+                            pa = "0B"
+                            data = "0301"
                         }
+                        delay(8500L)
+                    } else {
+                        _uiState.value = _uiState.value.copy(upOrDown = true)
+                        asyncHex(3) {
+                            pa = "0B"
+                            data = "0305"
+                        }
+                        delay(9000L)
                     }
-
-                } else {
-                    PopTip.show(Ext.ctx.getString(R.string.reset_first))
                 }
             }
         }
@@ -277,43 +241,41 @@ class HomeViewModel constructor(
                     upOrDown = true,
                     recaptureCoagulant = false,
                 )
-                SM.sendHex(
-                    index = 3,
-                    hex = V1(pa = "0B", data = "0300").toHex()
+                asyncHex(3) {
+                    pa = "0B"
+                    data = "0300"
+                }
+                delay(100L)
+                syncHex(3) {
+                    pa = "0B"
+                    data = "0305"
+                }
+            } else {
+                if (_uiState.value.fillCoagulant) {
+                    PopTip.show(Ext.ctx.getString(R.string.stop_fill))
+                    return@launch
+                }
+                _uiState.value = _uiState.value.copy(
+                    upOrDown = true,
+                    recaptureCoagulant = true,
                 )
                 delay(100L)
-                reset()
-            } else {
-                if (SM.reset.value) {
-                    if (_uiState.value.fillCoagulant) {
-                        PopTip.show(Ext.ctx.getString(R.string.stop_back))
-                        return@launch
-                    }
-                    _uiState.value = _uiState.value.copy(
-                        upOrDown = true,
-                        recaptureCoagulant = true,
-                    )
-                    delay(100L)
-                    while (_uiState.value.recaptureCoagulant) {
-                        if (_uiState.value.upOrDown) {
-                            _uiState.value = _uiState.value.copy(upOrDown = false)
-                            SM.sendHex(
-                                index = 3,
-                                hex = V1(pa = "0B", data = "0303").toHex()
-                            )
-                            delay(8500L)
-                        } else {
-                            _uiState.value = _uiState.value.copy(upOrDown = true)
-                            SM.sendHex(
-                                index = 3,
-                                hex = V1(pa = "0B", data = "0304").toHex()
-                            )
-                            delay(9000L)
+                while (_uiState.value.recaptureCoagulant) {
+                    if (_uiState.value.upOrDown) {
+                        _uiState.value = _uiState.value.copy(upOrDown = false)
+                        asyncHex(3) {
+                            pa = "0B"
+                            data = "0303"
                         }
+                        delay(8500L)
+                    } else {
+                        _uiState.value = _uiState.value.copy(upOrDown = true)
+                        asyncHex(3) {
+                            pa = "0B"
+                            data = "0304"
+                        }
+                        delay(9000L)
                     }
-
-                } else {
-                    PopTip.show(Ext.ctx.getString(R.string.reset_first))
                 }
             }
         }
@@ -323,11 +285,9 @@ class HomeViewModel constructor(
      * 填充胶体
      */
     fun fillColloid() {
-        viewModelScope.launch {
-            SM.sendHex(
-                index = 3,
-                hex = V1(pa = "0B", data = "0401").toHex()
-            )
+        asyncHex(3) {
+            pa = "0B"
+            data = "0401"
         }
     }
 
@@ -335,11 +295,9 @@ class HomeViewModel constructor(
      * 回吸胶体
      */
     fun recaptureColloid() {
-        viewModelScope.launch {
-            SM.sendHex(
-                index = 3,
-                hex = V1(pa = "0B", data = "0402").toHex()
-            )
+        asyncHex(3) {
+            pa = "0B"
+            data = "0402"
         }
     }
 
@@ -347,11 +305,9 @@ class HomeViewModel constructor(
      * 停止填充和回吸
      */
     fun stopFillAndRecapture() {
-        viewModelScope.launch {
-            SM.sendHex(
-                index = 3,
-                hex = V1(pa = "0B", data = "0400").toHex()
-            )
+        asyncHex(3) {
+            pa = "0B"
+            data = "0400"
         }
     }
 }
@@ -359,7 +315,6 @@ class HomeViewModel constructor(
 data class HomeUiState(
     val programList: List<Program> = emptyList(),
     val pointList: List<Point> = emptyList(),
-    val log: Log? = null,
     val program: Program? = null,
     val job: Job? = null,
     val pause: Boolean = false,

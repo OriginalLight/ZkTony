@@ -25,7 +25,6 @@
     <string name="glue_thickness">胶厚度</string>
     <string name="glue_type">胶种类</string>
     <string name="gradient_glue">梯度胶</string>
-    <string name="hide">隐藏</string>
     <string name="manual_pumping">手动抽水</string>
     <string name="module_a_b_exception">模块A、B同时异常, 请检查！！！</string>
     <string name="module_a_exception">模块A异常, 请检查！！！</string>
@@ -44,7 +43,6 @@
     <string name="program_name">程序名</string>
     <string name="protein_name">使用蛋白名称</string>
     <string name="protein_size">蛋白大小范围</string>
-    <string name="show">显示</string>
     <string name="speed">泵速 RPM</string>
     <string name="speed_hint">转速 RPM</string>
     <string name="title_admin">管理员</string>

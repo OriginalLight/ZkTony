@@ -6,30 +6,23 @@ import android.view.Gravity
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.core.R.color
 import com.zktony.core.R.mipmap
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.addTouchEvent
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
+import com.zktony.core.ext.*
 import com.zktony.www.R
+import com.zktony.www.common.ext.collectLock
 import com.zktony.www.databinding.FragmentHomeBinding
-import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
 
     override val viewModel: HomeViewModel by viewModel()
-
-    private val serialManager: SerialManager by inject()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -48,7 +41,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 launch { viewModel.dFlow.collect { onUiChange(3, it) } }
                 launch { viewModel.buttonFlow.collect { onUiChange(it) } }
                 launch {
-                    serialManager.lock.collect {
+                    collectLock {
                         binding.e.apply {
                             pause.isVisible = !it
                             tvPause.isVisible = !it
@@ -56,22 +49,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             tvLock.isVisible = !it
                             fill.isVisible = !it
                             tvFill.isVisible = !it
-                        }
-                    }
-                }
-                launch {
-                    serialManager.swing.collect {
-                        binding.e.apply {
-                            pause.setBackgroundResource(if (it) mipmap.pause else mipmap.play)
-                            with(tvPause) {
-                                text =
-                                    if (it) getString(R.string.pause) else getString(com.zktony.core.R.string.go_on)
-                                setTextColor(
-                                    ContextCompat.getColor(
-                                        context, if (it) color.dark_outline else color.red
-                                    )
-                                )
-                            }
                         }
                     }
                 }
@@ -180,10 +157,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param state 状态
      */
     private fun onUiChange(module: Int, state: ModuleUiState) {
-        // 正在执行的个数等于job不为null的个数
-        val flag =
-            viewModel.aFlow.value.job != null || viewModel.bFlow.value.job != null || viewModel.cFlow.value.job != null || viewModel.dFlow.value.job != null
-        serialManager.run(flag)
 
         val bind = getBind(module)
 
@@ -241,6 +214,17 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 setTextColor(
                     ContextCompat.getColor(
                         context, if (state.lock) color.dark_outline else color.green
+                    )
+                )
+            }
+
+            pause.setBackgroundResource(if (state.shakeBed) mipmap.pause else mipmap.play)
+            with(tvPause) {
+                text =
+                    if (state.shakeBed) getString(R.string.pause) else getString(com.zktony.core.R.string.go_on)
+                setTextColor(
+                    ContextCompat.getColor(
+                        context, if (state.shakeBed) color.dark_outline else color.red
                     )
                 )
             }

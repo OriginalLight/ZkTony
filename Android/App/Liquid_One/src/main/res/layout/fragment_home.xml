@@ -174,7 +174,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <com.zktony.core.widget.DynamicPlate
+            <com.zktony.www.ui.widget.DynamicPlate
                 android:id="@+id/dynamic_plate"
                 android:layout_width="360dp"
                 android:layout_height="240dp"

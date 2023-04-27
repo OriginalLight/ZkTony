@@ -50,7 +50,6 @@ class ContainerViewModel constructor(
                 val con = Container(
                     id = snowflake.nextId(),
                     name = name,
-                    type = 1
                 )
                 CD.insert(con)
                 val list = mutableListOf<Point>()

@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="add_calibration">添加校准程序</string>
     <string name="app_name">半自动梯度混合仪</string>
     <string name="back_coagulant">回吸促凝剂</string>
     <string name="back_colloid">回吸胶体</string>
-    <string name="button">Button</string>
     <string name="calibration_name">校准程序名</string>
     <string name="coagulant">促凝剂 μL:</string>
     <string name="colloid">胶体 μL:</string>
@@ -17,18 +15,12 @@
     <string name="pump_one">泵一</string>
     <string name="pump_three">泵三</string>
     <string name="pump_two">泵二</string>
-    <string name="reset_first">请先复位</string>
     <string name="stop_all">请中止所有程序</string>
     <string name="stop_back">请先停止回吸</string>
     <string name="stop_fill">请先停止填充</string>
     <string name="title_admin">管理员</string>
     <string name="title_calibration">校准管理</string>
     <string name="title_calibration_data">校准数据</string>
-    <string name="title_container">容器管理</string>
     <string name="title_home">主界面</string>
-    <string name="title_log">日志</string>
     <string name="title_motor">电机</string>
-    <string name="volume_coagulant">促凝剂加液量 μL</string>
-    <string name="volume_colloid">胶体加液量 μL</string>
-    <string name="volume_edit">加液量编辑</string>
 </resources>

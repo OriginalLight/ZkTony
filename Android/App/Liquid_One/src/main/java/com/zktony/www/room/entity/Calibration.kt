@@ -16,9 +16,9 @@ data class Calibration(
     // 校准名称
     val name: String = "默认",
     // x轴电机一圈走的距离
-    val x: Float = 87.6f,
+    val x: Float = 60f,
     // y轴电机一圈走的距离
-    val y: Float = 57.62f,
+    val y: Float = 25f,
     // 蠕动泵一一圈走的进液量
     val v1: Float = 200f,
     // 是否选用

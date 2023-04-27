@@ -1,15 +1,10 @@
 package com.zktony.www.ui.container
 
 import android.os.Bundle
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.inputDialog
-import com.zktony.core.ext.messageDialog
+import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.adapter.ContainerAdapter
 import com.zktony.www.databinding.FragmentContainerBinding
@@ -50,10 +45,8 @@ class ContainerFragment :
             )
         }
         adapter.onEditButtonClick = {
-            val directions =
-                if (it.type == 0) R.id.action_navigation_container_to_navigation_wash else R.id.action_navigation_container_to_navigation_container_edit
             findNavController().navigate(
-                directions,
+                R.id.action_navigation_container_to_navigation_container_edit,
                 Bundle().apply { putLong("id", it.id) }
             )
         }

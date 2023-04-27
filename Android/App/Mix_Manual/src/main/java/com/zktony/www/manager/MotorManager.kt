@@ -1,21 +1,14 @@
 package com.zktony.www.manager
 
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.int8ToHex
-import com.zktony.core.ext.logi
+import com.zktony.core.ext.*
 import com.zktony.www.R
-import com.zktony.www.common.ext.toMotor
-import com.zktony.www.common.ext.toV1
-import com.zktony.serialport.protocol.V1
+import com.zktony.www.common.ext.*
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Calibration
 import com.zktony.www.room.entity.Motor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺
@@ -24,7 +17,6 @@ import kotlinx.coroutines.launch
 class MotorManager constructor(
     private val MD: MotorDao,
     private val CD: CalibrationDao,
-    private val SM: SerialManager,
 ) {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -87,15 +79,21 @@ class MotorManager constructor(
             }
             launch {
                 delay(5000L)
-                if (!SM.lock.value) {
-                    for (i in 1..3) {
-                        SM.sendHex(hex = V1(fn = "03", pa = "04", data = i.int8ToHex()).toHex())
-                        delay(100L)
+                decideLock {
+                    no {
+                        for (i in 1..3) {
+                            asyncHex {
+                                fn = "03"
+                                pa = "04"
+                                data = i.int8ToHex()
+                            }
+                            delay(100L)
+                        }
                     }
                 }
             }
             launch {
-                SM.callback.collect {
+                collectHex {
                     it?.let {
                         it.toV1().run {
                             if (fn == "03" && pa == "04") {

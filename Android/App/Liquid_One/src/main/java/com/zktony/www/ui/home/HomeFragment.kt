@@ -55,8 +55,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             }
                             time.text = it.time.getTimeFormat()
                             with(dynamicPlate) {
-                                x = it.info.size.second
-                                y = it.info.size.first
+                                column = it.info.size.second
+                                row = it.info.size.first
                                 data = it.info.tripleList
                             }
                             progress.progress = it.info.process

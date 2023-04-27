@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="400dp"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/motor"
+        android:layout_width="0dp"
+        android:layout_height="96dp"
+        android:layout_weight="1"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/motor"
+        android:textAllCaps="false"
+        android:textSize="36sp"
+        app:cornerRadius="0dp"
+        app:rippleColor="@color/purple_700" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/config"
+        android:layout_width="0dp"
+        android:layout_height="96dp"
+        android:layout_weight="1"
+        android:backgroundTint="@color/purple_700"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:text="@string/title_config"
+        android:textAllCaps="false"
+        android:textSize="36sp"
+        app:cornerRadius="0dp"
+        app:rippleColor="@color/light_primary" />
+
+</LinearLayout>

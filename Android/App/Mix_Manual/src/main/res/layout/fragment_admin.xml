@@ -86,6 +86,7 @@
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/navigation"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:layout_marginStart="16dp"
@@ -114,13 +115,13 @@
                             android:textSize="16sp"
                             tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
-                        <androidx.appcompat.widget.SwitchCompat
+                        <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/sw_bar"
-                            android:layout_width="50dp"
-                            android:layout_height="36dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
-                            android:layout_marginEnd="35dp"
+                            android:layout_marginEnd="16dp"
                             android:checked="true"
                             app:thumbTint="@color/light_primary"
                             app:trackTint="@color/dark_surfaceTint"

@@ -2,8 +2,7 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
-import com.zktony.www.common.ext.execute
-import com.zktony.www.manager.SerialManager
+import com.zktony.www.common.ext.*
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.CalibrationDataDao
 import com.zktony.www.room.entity.Calibration
@@ -15,7 +14,6 @@ import kotlinx.coroutines.launch
 class CalibrationDataViewModel constructor(
     private val CD: CalibrationDao,
     private val CDD: CalibrationDataDao,
-    private val SM: SerialManager,
 ) : BaseViewModel() {
 
 
@@ -35,7 +33,7 @@ class CalibrationDataViewModel constructor(
                 }
             }
             launch {
-                SM.lock.collect {
+                collectLock {
                     _uiState.value = _uiState.value.copy(lock = it)
                 }
             }
@@ -66,10 +64,10 @@ class CalibrationDataViewModel constructor(
             }
             if (state.pumpId == 2) {
                 delay(100L)
-                while (SM.lock.value) {
-                    delay(100L)
+                waitSyncHex {
+                    pa = "0B"
+                    data = "0305"
                 }
-                SM.reset()
             }
         }
     }

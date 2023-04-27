@@ -25,7 +25,6 @@
     <string name="glue_thickness">Thickness</string>
     <string name="glue_type">Glue type</string>
     <string name="gradient_glue">Gradient glue</string>
-    <string name="hide">Hide</string>
     <string name="manual_pumping">Manual Pumping</string>
     <string name="module_a_b_exception">Module A and B are abnormal at the same time, please check !!!</string>
     <string name="module_a_exception">Module A is abnormal, please check !!!</string>
@@ -44,7 +43,6 @@
     <string name="program_name">Name</string>
     <string name="protein_name">Protein name</string>
     <string name="protein_size">Protein size</string>
-    <string name="show">Show</string>
     <string name="speed">Speed RPM</string>
     <string name="speed_hint">Speed RPM</string>
     <string name="title_admin">Admin</string>

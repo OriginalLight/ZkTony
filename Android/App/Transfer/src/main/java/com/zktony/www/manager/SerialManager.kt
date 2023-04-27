@@ -1,15 +1,12 @@
 package com.zktony.www.manager
 
 import com.zktony.core.ext.logi
-import com.zktony.serialport.SerialConfig
-import com.zktony.serialport.SerialHelpers
-import com.zktony.www.manager.protocol.Protocol
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import com.zktony.serialport.SerialHelper
+import com.zktony.serialport.serialConfig
+import com.zktony.www.manager.protocol.*
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺
@@ -23,33 +20,30 @@ class SerialManager {
     private val _received = MutableStateFlow(Protocol())
     val received = _received.asStateFlow()
 
-    private val helpers by lazy { SerialHelpers() }
+    private val helper by lazy {
+        SerialHelper(serialConfig {
+            device = "/dev/ttyS4"
+            delay = 100L
+        })
+    }
 
     init {
         scope.launch {
             launch {
-                helpers.init(
-                    SerialConfig(
-                        index = 4,
-                        device = "/dev/ttyS4",
-                        delay = 100L
-                    )
-                )
+                helper.openDevice()
             }
             launch {
-                helpers.callback = { index, data ->
-                    if (index == 4) {
-                        val protocol = Protocol(data)
-                        if (protocol.cmd == 2) {
-                            _received.value = protocol
-                        }
+                helper.callback = {
+                    val protocol = it.toProtocol()
+                    if (protocol.cmd == 2) {
+                        _received.value = protocol
                     }
                 }
             }
             launch {
                 while (true) {
                     delay(1000L)
-                    helpers.sendHex(4, Protocol.QUERY_HEX)
+                    helper.sendHex(Protocol.QUERY_HEX)
                 }
             }
         }
@@ -60,12 +54,8 @@ class SerialManager {
      * @param protocol [Protocol] 指令
      */
     fun send(protocol: Protocol) {
-        scope.launch {
-            scope.launch {
-                _send.value = protocol
-                helpers.sendHex(4, protocol.genHex())
-            }
-        }
+        _send.value = protocol
+        helper.sendHex(protocol.toHex())
     }
 
     fun initializer() {

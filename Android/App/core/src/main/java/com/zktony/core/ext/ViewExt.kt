@@ -169,16 +169,14 @@ fun View.clickRipple() {
 @SuppressLint("ClickableViewAccessibility")
 fun View.clickScale() {
     this.setOnTouchListener { v, event ->
-        val scope = CoroutineScope(Dispatchers.Main)
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
-                scope.launch {
-                    v?.scaleX = 0.8f
-                    v?.scaleY = 0.8f
-                    delay(200L)
-                    v?.scaleX = 1f
-                    v?.scaleY = 1f
-                }
+                v?.scaleX = 0.8f
+                v?.scaleY = 0.8f
+            }
+            MotionEvent.ACTION_UP -> {
+                v?.scaleX = 1f
+                v?.scaleY = 1f
             }
         }
         false

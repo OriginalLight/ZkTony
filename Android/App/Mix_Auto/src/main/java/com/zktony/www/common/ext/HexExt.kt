@@ -25,7 +25,7 @@ fun String.toMotor(): Motor {
  * 解析十六进制字符串为Command
  * @return [V1]
  */
-fun String.toCommand(): V1 {
+fun String.toV1(): V1 {
     return V1(
         head = this.substring(0, 2),
         addr = this.substring(2, 4),

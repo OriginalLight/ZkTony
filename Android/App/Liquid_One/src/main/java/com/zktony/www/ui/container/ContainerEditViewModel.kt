@@ -17,7 +17,6 @@ import com.zktony.www.room.entity.Container
 import com.zktony.www.room.entity.Point
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ContainerEditViewModel constructor(
@@ -44,12 +43,12 @@ class ContainerEditViewModel constructor(
                 }
             }
             launch {
-                DS.read("MAX_X_TRIP", 100f).collect {
+                DS.read("MAX_X_TRIP", 160f).collect {
                     _uiState.value = _uiState.value.copy(maxXTrip = it)
                 }
             }
             launch {
-                DS.read("MAX_Y_TRIP", 100f).collect {
+                DS.read("MAX_Y_TRIP", 200f).collect {
                     _uiState.value = _uiState.value.copy(maxYTrip = it)
                 }
             }
@@ -101,11 +100,16 @@ class ContainerEditViewModel constructor(
             PD.updateAll(_uiState.value.list.calculateCoordinate(_uiState.value.container!!))
         }
     }
+
+    fun edit() {
+        _uiState.value = _uiState.value.copy(edit = !_uiState.value.edit)
+    }
 }
 
 data class ContainerEditUiState(
     val container: Container? = null,
+    val edit: Boolean = false,
     val list: List<Point> = emptyList(),
-    val maxXTrip: Float = 100f,
-    val maxYTrip: Float = 100f,
+    val maxXTrip: Float = 160f,
+    val maxYTrip: Float = 200f,
 )

@@ -1,15 +1,9 @@
 package com.zktony.www.manager
 
-import com.kongzue.dialogx.dialogs.PopTip
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.hexToAscii
-import com.zktony.core.ext.hexToInt8
-import com.zktony.core.ext.logi
-import com.zktony.core.ext.verifyHex
-import com.zktony.serialport.SerialConfig
-import com.zktony.serialport.SerialHelpers
-import com.zktony.www.common.ext.toV1
+import com.zktony.core.ext.*
+import com.zktony.serialport.*
 import com.zktony.serialport.protocol.V1
+import com.zktony.www.common.ext.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -23,23 +17,14 @@ class SerialManager {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
     private val helpers by lazy { SerialHelpers() }
 
-    private val _ttys0Flow = MutableStateFlow<String?>(null)
-    private val _ttys1Flow = MutableStateFlow<String?>(null)
-    private val _ttys2Flow = MutableStateFlow<String?>(null)
-    private val _ttys3Flow = MutableStateFlow<String?>(null)
+    private val _callback = MutableStateFlow<Pair<Int, String?>>(Pair(0, null))
 
     // 下位机机构运行状态
     private val _lock = MutableStateFlow(false)
-    private val _swing = MutableStateFlow(false)
 
-    val ttys0Flow = _ttys0Flow.asStateFlow()
-    val ttys1Flow = _ttys1Flow.asStateFlow()
-    val ttys2Flow = _ttys2Flow.asStateFlow()
-    val ttys3Flow = _ttys3Flow.asStateFlow()
+    val callback = _callback.asStateFlow()
     val lock = _lock.asStateFlow()
-    val swing = _swing.asStateFlow()
 
-    val run = AtomicBoolean(false)
     val drawer = AtomicBoolean(false)
 
     // 机构运行已经等待的时间
@@ -53,96 +38,31 @@ class SerialManager {
         scope.launch {
             launch {
                 helpers.init(
-                    SerialConfig(
-                        index = 0,
-                        device = "/dev/ttyS0",
-                    ),
-                    SerialConfig(
-                        index = 1,
-                        device = "/dev/ttyS1",
-                    ),
-                    SerialConfig(
-                        index = 2,
-                        device = "/dev/ttyS2",
-                    ), SerialConfig(
-                        index = 3,
-                        device = "/dev/ttyS3",
-                        baudRate = 57600,
-                    )
-
+                    serialConfig {
+                        index = 0
+                        device = "/dev/ttyS0"
+                    },
+                    serialConfig {
+                        index = 1
+                        device = "/dev/ttyS1"
+                    },
+                    serialConfig {
+                        index = 2
+                        device = "/dev/ttyS2"
+                    },
+                    serialConfig {
+                        index = 3
+                        device = "/dev/ttyS3"
+                        baudRate = 57600
+                    }
                 )
             }
             launch {
-                helpers.callback = { index, data ->
-                    when (index) {
-                        0 -> {
-                            data.verifyHex().forEach {
-                                _ttys0Flow.value = it
-                            }
-                        }
-
-                        1 -> {
-                            data.verifyHex().forEach {
-                                _ttys1Flow.value = it
-                            }
-                        }
-
-                        2 -> {
-                            data.verifyHex().forEach {
-                                _ttys2Flow.value = it
-                            }
-                        }
-
-                        3 -> {
-                            _ttys3Flow.value = data.hexToAscii()
-                        }
-
-                        else -> {}
-                    }
+                helpers.callback = { index, hex ->
+                    hexHandler(index, hex)
                 }
             }
-            launch {
-                ttys0Flow.collect {
-                    it?.let {
-                        val res = it.toV1()
-                        when (res.fn) {
-                            "85" -> {
-                                if (res.pa == "01") {
-                                    val total = res.data.substring(2, 4).hexToInt8()
-                                    val current = res.data.substring(6, 8).hexToInt8()
-                                    _lock.value = total != current
-                                    lockTime = 0L
-                                }
-                            }
-
-                            "86" -> {
-                                if (res.pa == "01") {
-                                    drawer.set(res.data.hexToInt8() == 0)
-                                }
-                                if (res.pa == "0A") {
-                                    _lock.value = false
-                                    lockTime = 0L
-                                    PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.reset_success))
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            launch {
-                while (true) {
-                    delay(1000L)
-                    // 如果正在运行，计时
-                    if (lock.value) {
-                        lockTime += 1L
-                    }
-                    // 如果运行时间超过 60 秒，默认不运行，如果还有任务运行恢复摇床
-                    if (lock.value && lockTime >= waitTime) {
-                        lockTime = 0L
-                        _lock.value = false
-                    }
-                }
-            }
+            launch { timerTask() }
         }
     }
 
@@ -161,56 +81,74 @@ class SerialManager {
 
     /**
      * 发送Text
-     * @param index 串口
      * @param text 命令
      */
-    fun sendText(index: Int, text: String) {
-        helpers.sendText(index, text)
+    fun sendText(text: String) {
+        helpers.sendText(3, text)
     }
 
-    suspend fun reset() {
-        while (lock.value) {
-            delay(500L)
-        }
-        _lock.value = true
-        lockTime = 0L
-        sendHex(index = 0, hex = V1().toHex())
-    }
+    /**
+     * Hex处理器
+     * @param hex 命令
+     */
+    private fun hexHandler(index: Int, hex: String) {
+        if (index != 3) {
+            hex.verifyHex().forEach {
+                _callback.value = Pair(index, hex)
+                val v1 = it.toV1()
+                when (index) {
+                    0 -> {
+                        it.hexFormat().logd("串口一 receivedHex: ")
+                        when (v1.fn) {
+                            "85" -> {
+                                if (v1.pa == "01") {
+                                    val total = v1.data.substring(2, 4).hexToInt8()
+                                    val current = v1.data.substring(6, 8).hexToInt8()
+                                    _lock.value = total != current
+                                    lockTime = 0L
+                                }
+                            }
 
-    fun setTemp(temp: String, addr: Int) {
-        scope.launch {
-            sendText(3, "TC1:TCSW=0@$addr\r")
-            delay(30 * 1000L)
-            sendText(3, "TC1:TCSW=1@$addr\r")
-            delay(1000L)
-            sendText(3, "TC1:TCADJUSTTEMP=$temp@$addr\r")
-        }
-    }
-
-    fun lock(flag: Boolean) {
-        _lock.value = flag
-        lockTime = 0L
-    }
-
-    fun run(flag: Boolean) {
-        if (run.get() != flag) {
-            swing(flag)
-            run.set(flag)
-        }
-    }
-
-    suspend fun drawer() {
-        sendHex(0, V1(pa = "0C").toHex())
-        delay(500L)
-    }
-
-    fun swing(flag: Boolean) {
-        if (flag) {
-            sendHex(0, V1(pa = "0B", data = "0101").toHex())
+                            "86" -> {
+                                if (v1.pa == "01") {
+                                    drawer.set(v1.data.hexToInt8() == 0)
+                                }
+                                if (v1.pa == "0A") {
+                                    _lock.value = false
+                                    lockTime = 0L
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         } else {
-            sendHex(0, V1(pa = "0B", data = "0100").toHex())
+            _callback.value = Pair(index, hex.hexToAscii())
         }
-        _swing.value = flag
+
+    }
+
+    /**
+     * 定时任务
+     *
+     * 每秒钟执行一次 超过 [waitTime] 没有收到串口数据则认为机构已经停止运行
+     */
+    private suspend fun timerTask() {
+        while (true) {
+            delay(1000L)
+            if (_lock.value) {
+                lockTime += 1L
+                if (lockTime >= waitTime) {
+                    _lock.value = false
+                    lockTime = 0L
+                }
+            }
+            if (drawer.get()) {
+                syncHex(0) {
+                    pa = "0C"
+                }
+            }
+        }
     }
 
     fun initializer() {

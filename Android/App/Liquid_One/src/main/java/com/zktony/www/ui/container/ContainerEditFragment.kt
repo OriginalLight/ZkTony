@@ -5,8 +5,9 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
+import androidx.core.view.isVisible
 import androidx.lifecycle.*
-import androidx.navigation.fragment.findNavController
+import androidx.navigation.findNavController
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.dialogs.PopTip
@@ -14,6 +15,7 @@ import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
 import com.zktony.www.R
+import com.zktony.www.common.adapter.PointAdapter
 import com.zktony.www.databinding.FragmentContainerEditBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -22,6 +24,8 @@ class ContainerEditFragment :
     BaseFragment<ContainerEditViewModel, FragmentContainerEditBinding>(R.layout.fragment_container_edit) {
 
     override val viewModel: ContainerEditViewModel by viewModel()
+
+    private val adapter by lazy { PointAdapter() }
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -37,24 +41,27 @@ class ContainerEditFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     binding.apply {
-                        val c1 = it.container
-                        if (c1 != null) {
-                            val pX0y0 = it.list.find { p -> p.x == 0 && p.y == 0 }
-                            val pXmyn = it.list.find { p -> p.x == c1.x - 1 && p.y == c1.y - 1 }
-
-                            size.text = "${c1.x} X ${c1.y}"
-
-                            pX0y0?.let { p ->
-                                x0y0.text = "( ${p.xAxis.removeZero()} , ${p.yAxis.removeZero()} )"
-                            }
-
-                            pXmyn?.let { p ->
-                                xmyn.text = "( ${p.xAxis.removeZero()} , ${p.yAxis.removeZero()} )"
-                            }
-
-                            with(dynamicPlate) {
-                                x = c1.y
-                                y = c1.x
+                        adapter.submitList(it.list)
+                        editForm.isVisible = it.edit
+                        if (it.container != null) {
+                            size.text = "${it.container.x} X ${it.container.y}"
+                            c2Title.text = "${'A' + it.container.x - 1}${it.container.y}"
+                            if (it.list.isNotEmpty()) {
+                                val x1 = it.list.find { c -> c.x == 0 && c.y == 0 }
+                                val x2 =
+                                    it.list.find { c -> c.x == it.container.x - 1 && c.y == it.container.y - 1 }
+                                if (x1 != null) {
+                                    c1.text =
+                                        "( ${x1.xAxis.removeZero()} , ${x1.yAxis.removeZero()} )"
+                                } else {
+                                    c1.text = "( 0 , 0 )"
+                                }
+                                if (x2 != null) {
+                                    c2.text =
+                                        "( ${x2.xAxis.removeZero()} , ${x2.yAxis.removeZero()} )"
+                                } else {
+                                    c1.text = "( 0 , 0 )"
+                                }
                             }
                         }
                     }
@@ -74,13 +81,21 @@ class ContainerEditFragment :
             }
         }
         binding.apply {
-            dynamicPlate.showLocation = true
+            recyclerView.adapter = adapter
             with(back) {
                 clickScale()
-                clickNoRepeat { findNavController().navigateUp() }
+                clickNoRepeat {
+                    findNavController().navigateUp()
+                }
             }
-            with(size) {
-                setUnderLine()
+            with(edit) {
+                clickScale()
+                clickNoRepeat {
+                    viewModel.edit()
+                }
+            }
+            with(sizeForm) {
+                clickScale()
                 clickNoRepeat {
                     CustomDialog.build()
                         .setCustomView(object :
@@ -110,15 +125,14 @@ class ContainerEditFragment :
                         .show()
                 }
             }
-            with(x0y0) {
-                setUnderLine()
+            with(c1Form) {
+                clickScale()
                 clickNoRepeat {
                     setCoordinate(0)
                 }
             }
-
-            with(xmyn) {
-                setUnderLine()
+            with(c2Form) {
+                clickScale()
                 clickNoRepeat {
                     setCoordinate(1)
                 }
@@ -143,8 +157,9 @@ class ContainerEditFragment :
                     val maxXTrip = viewModel.uiState.value.maxXTrip
                     val maxYTrip = viewModel.uiState.value.maxYTrip
                     c1?.let {
-                        val xy = if (index == 1) list.find { p -> p.x == c1.x - 1 && p.y == c1.y - 1 }
-                        else list.find { p -> p.x == 0 && p.y == 0 }
+                        val xy =
+                            if (index == 1) list.find { p -> p.x == c1.x - 1 && p.y == c1.y - 1 }
+                            else list.find { p -> p.x == 0 && p.y == 0 }
                         inputX.setText(xy?.xAxis?.removeZero() ?: "0")
                         inputY.setText(xy?.yAxis?.removeZero() ?: "0")
                     }

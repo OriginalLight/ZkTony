@@ -12,6 +12,7 @@ import com.zktony.core.utils.Queue
 import com.zktony.datastore.ext.read
 import com.zktony.www.manager.SerialManager
 import com.zktony.serialport.protocol.V1
+import com.zktony.www.common.ext.*
 import com.zktony.www.room.dao.ActionDao
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.dao.LogDao
@@ -33,7 +34,6 @@ class HomeViewModel constructor(
     private val AD: ActionDao,
     private val LD: LogDao,
     private val CD: ContainerDao,
-    private val SM: SerialManager,
     private val DS: DataStore<Preferences>,
 ) : BaseViewModel() {
 
@@ -68,14 +68,15 @@ class HomeViewModel constructor(
                 }
             }
             launch {
-                // 串口四flow
-                SM.ttys3Flow.collect {
-                    it?.let {
-                        if (it.startsWith("TC1:TCACTUALTEMP=")) {
+                collectHex {
+                    val index = it.first
+                    val text = it.second
+                    if (index == 3 && text != null) {
+                        if (text.startsWith("TC1:TCACTUALTEMP=")) {
                             // 读取温度
-                            val address = it.substring(it.length - 2, it.length - 1).toInt()
+                            val address = text.substring(text.length - 2, text.length - 1).toInt()
                             val temp =
-                                it.replace("TC1:TCACTUALTEMP=", "").split("@")[0].removeZero()
+                                text.replace("TC1:TCACTUALTEMP=", "").split("@")[0].removeZero()
                             when (address) {
                                 1 -> _aFlow.value = _aFlow.value.copy(temp = "$temp ℃")
                                 2 -> _bFlow.value = _bFlow.value.copy(temp = "$temp ℃")
@@ -91,19 +92,20 @@ class HomeViewModel constructor(
                 // 设置和定时查询温控
                 for (i in 0..4) {
                     delay(500L)
-                    SM.setTemp(
-                        addr = i,
-                        temp = if (i == 0) _settings.value.temp.toString()
-                            .removeZero() else "26"
-                    )
+                    launch {
+                        temp(
+                            addr = i,
+                            temp = if (i == 0) _settings.value.temp.toString()
+                                .removeZero() else "26"
+                        )
+                    }
+
                 }
                 // 每十秒钟查询一次温度
                 while (true) {
                     for (i in 0..4) {
                         delay(300L)
-                        SM.sendText(
-                            index = 3, text = "TC1:TCACTUALTEMP?@$$i\r"
-                        )
+                        asyncText("TC1:TCACTUALTEMP?@$$i\r")
                     }
                     delay(4 * 1000L)
                 }
@@ -307,7 +309,9 @@ class HomeViewModel constructor(
             )
             // 恢复到室温
             delay(200L)
-            SM.setTemp(addr = module + 1, temp = temp)
+            launch {
+                temp(addr = module + 1, temp = temp)
+            }
         }
     }
 
@@ -317,12 +321,16 @@ class HomeViewModel constructor(
     fun reset() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (!SM.run.get()) {
-                if (SM.lock.value) {
-                    PopTip.show("运动中禁止复位")
-                } else {
-                    SM.reset()
-                    PopTip.show("复位-已下发")
+            val run = _aFlow.value.job == null
+                    && _bFlow.value.job == null
+                    && _cFlow.value.job == null
+                    && _dFlow.value.job == null
+            if (run) {
+                decideLock {
+                    yes { PopTip.show("运动中禁止复位") }
+                    no {
+                        syncHex(0) {}
+                    }
                 }
             } else {
                 PopTip.show("请中止所有运行中程序")
@@ -333,13 +341,15 @@ class HomeViewModel constructor(
     fun fill(flag: Int) {
         viewModelScope.launch {
             if (flag == 0) {
-                SM.sendHex(
-                    index = 2, hex = V1(pa = "0B", data = "0201").toHex()
-                )
+                asyncHex(2) {
+                    pa = "0B"
+                    data = "0201"
+                }
             } else {
-                SM.sendHex(
-                    index = 2, hex = V1(pa = "0B", data = "0200").toHex()
-                )
+                asyncHex(2) {
+                    pa = "0B"
+                    data = "0200"
+                }
             }
         }
     }
@@ -349,11 +359,23 @@ class HomeViewModel constructor(
      */
     fun shakeBed() {
         viewModelScope.launch {
-            val swing = SM.swing.value
+            val swing = _buttonFlow.value.shakeBed
             PopTip.show(
                 if (swing) "摇床-已暂停" else "摇床-已恢复"
             )
-            SM.swing(!swing)
+            if (swing) {
+                asyncHex(0) {
+                    pa = "0B"
+                    data = "0100"
+                }
+                _buttonFlow.value = _buttonFlow.value.copy(shakeBed = false)
+            } else {
+                asyncHex(0) {
+                    pa = "0B"
+                    data = "0101"
+                }
+                _buttonFlow.value = _buttonFlow.value.copy(shakeBed = true)
+            }
         }
     }
 
@@ -365,10 +387,12 @@ class HomeViewModel constructor(
             // insulatingEnable false 未保温状态 true 保温状态
             // 发送设置温度命令 -> 更改按钮状态
             // 发送设置温度命令 如果当前是未保温状态发送设置中的温度，否则发送室温26度
-            SM.setTemp(
-                addr = 0, temp = if (_buttonFlow.value.insulating) "26"
-                else _settings.value.temp.toString().removeZero()
-            )
+            launch {
+                temp(
+                    addr = 0, temp = if (_buttonFlow.value.insulating) "26"
+                    else _settings.value.temp.toString().removeZero()
+                )
+            }
             // 更改按钮状态
             _buttonFlow.value = _buttonFlow.value.copy(
                 insulating = !_buttonFlow.value.insulating
@@ -381,16 +405,16 @@ class HomeViewModel constructor(
             _buttonFlow.value = _buttonFlow.value.copy(
                 lock = false
             )
-            SM.sendHex(
-                index = 0, hex = V1(pa = "0D").toHex()
-            )
+            asyncHex(0) {
+                pa = "0D"
+            }
             delay(10 * 1000L)
             _buttonFlow.value = _buttonFlow.value.copy(
                 lock = true
             )
-            SM.sendHex(
-                index = 0, hex = V1(pa = "0E").toHex()
-            )
+            asyncHex(0) {
+                pa = "0E"
+            }
         }
     }
 
@@ -424,6 +448,7 @@ data class UiState(
     val temp: String = "0.0℃",
     val lock: Boolean = true,
     val container: Container = Container(),
+    val shakeBed: Boolean = false,
 )
 
 data class Settings(

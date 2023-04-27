@@ -35,7 +35,7 @@ class SerialManager {
                 helpers.init(
                     SerialConfig(
                         index = 0,
-                        device = "/dev/ttyS0",
+                        device = "/dev/ttyS1",
                     )
                 )
             }
@@ -116,6 +116,7 @@ class SerialManager {
             _lock.value = true
             lockTime = 0L
         }
+        "串口一 sendHex: $hex".logd()
     }
 
     fun initializer() {

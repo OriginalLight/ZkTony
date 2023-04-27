@@ -25,12 +25,12 @@ class ConfigViewModel(
     init {
         viewModelScope.launch {
             launch {
-                DS.read("MAX_X_TRIP", 100f).collect {
+                DS.read("MAX_X_TRIP", 160f).collect {
                     _uiState.value = _uiState.value.copy(maxXTrip = it)
                 }
             }
             launch {
-                DS.read("MAX_Y_TRIP", 100f).collect {
+                DS.read("MAX_Y_TRIP", 200f).collect {
                     _uiState.value = _uiState.value.copy(maxYTrip = it)
                 }
             }
@@ -68,8 +68,8 @@ class ConfigViewModel(
 }
 
 data class ConfigUiStatus(
-    val maxXTrip: Float = 100f,
-    val maxYTrip: Float = 100f,
+    val maxXTrip: Float = 160f,
+    val maxYTrip: Float = 200f,
     val washXAxis: Float = 0f,
     val washYAxis: Float = 0f,
 )

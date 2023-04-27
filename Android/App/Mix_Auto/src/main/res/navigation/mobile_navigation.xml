@@ -23,28 +23,8 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"/>
-        <action
-            android:id="@+id/action_navigation_container_to_navigation_wash"
-            app:destination="@id/navigation_wash"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
 
-    <fragment
-        android:id="@+id/navigation_wash"
-        android:name="com.zktony.www.ui.container.WashFragment"
-        android:label="@string/title_container"
-        tools:layout="@layout/fragment_wash">
-        <action
-            android:id="@+id/action_navigation_wash_to_navigation_container"
-            app:destination="@id/navigation_container"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
-    </fragment>
 
     <fragment
         android:id="@+id/navigation_container_edit"
@@ -88,13 +68,6 @@
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
-
-    <fragment
-        android:id="@+id/navigation_log"
-        android:name="com.zktony.www.ui.log.LogFragment"
-        android:label="@string/title_log"
-        tools:layout="@layout/fragment_log" />
-
     <fragment
         android:id="@+id/navigation_admin"
         android:name="com.zktony.www.ui.admin.AdminFragment"
@@ -103,6 +76,13 @@
         <action
             android:id="@+id/action_navigation_admin_to_navigation_motor"
             app:destination="@id/navigation_motor"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_navigation_admin_to_navigation_config"
+            app:destination="@id/navigation_config"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
@@ -116,6 +96,20 @@
         tools:layout="@layout/fragment_motor">
         <action
             android:id="@+id/action_navigation_motor_to_navigation_admin"
+            app:destination="@id/navigation_admin"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_config"
+        android:name="com.zktony.www.ui.admin.ConfigFragment"
+        android:label="@string/title_config"
+        tools:layout="@layout/fragment_config">
+        <action
+            android:id="@+id/action_navigation_config_to_navigation_admin"
             app:destination="@id/navigation_admin"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"

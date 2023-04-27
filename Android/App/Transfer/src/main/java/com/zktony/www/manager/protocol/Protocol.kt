@@ -19,16 +19,16 @@ import com.zktony.core.ext.int8ToHex
 class Protocol {
 
     // 电压系数
-    private val voltageCoefficient = 22.727f
+    val voltageCoefficient = 22.727f
 
     // 蠕动泵转速系数
-    private val pumpSpeedCoefficient = 2.08f
+    val pumpSpeedCoefficient = 2.08f
 
     // 电流系数
-    private val currentCoefficient = 4.608f
+    val currentCoefficient = 4.608f
 
     // 电流偏移量
-    private val currentOffset = 0.011f
+    val currentOffset = 0.011f
 
     /**
      * 头1
@@ -284,15 +284,62 @@ class Protocol {
      */
     var end4 = 22
 
-    constructor()
-    constructor(hex: String) {
+    companion object {
         /**
-         * 返回命令固定118位
-         * cmd = 2
+         * 查询命令
          */
-        if (hex.length != 118) {
-            return
-        }
+        const val QUERY_HEX = "AA550100000016161616"
+    }
+}
+
+fun protocol(block: Protocol.() -> Unit): Protocol {
+    return Protocol().apply(block)
+}
+
+fun Protocol.toHex(): String {
+    val hex = StringBuilder()
+    hex.append(head1.int8ToHex())
+    hex.append(head2.int8ToHex())
+    hex.append(id.int8ToHex())
+    hex.append(cmd.int8ToHex())
+    hex.append(motorX.int8ToHex())
+    hex.append((stepMotorX * pumpSpeedCoefficient).toInt().int32ToHex4().hexHighLow())
+    hex.append(powerENX.int8ToHex())
+    hex.append(autoX.int8ToHex())
+    hex.append(setVoltageX.float32ToHex4().hexHighLow())
+    hex.append((targetVoltageX / voltageCoefficient).float32ToHex4().hexHighLow())
+    hex.append(getVoltageX.float32ToHex4().hexHighLow())
+    hex.append(getCurrentX.float32ToHex4().hexHighLow())
+    hex.append(inputSensorX.int8ToHex())
+    hex.append(motorY.int8ToHex())
+    hex.append((stepMotorY * pumpSpeedCoefficient).toInt().int32ToHex4().hexHighLow())
+    hex.append(powerENY.int8ToHex())
+    hex.append(autoY.int8ToHex())
+    hex.append(setVoltageY.float32ToHex4().hexHighLow())
+    hex.append((targetVoltageY / voltageCoefficient).float32ToHex4().hexHighLow())
+    hex.append(getVoltageY.float32ToHex4().hexHighLow())
+    hex.append(getCurrentY.float32ToHex4().hexHighLow())
+    hex.append(inputSensorY.int8ToHex())
+    hex.append(inputSensorZ.int8ToHex())
+    hex.append(crc1.int8ToHex())
+    hex.append(crch.int8ToHex())
+    hex.append(end1.int8ToHex())
+    hex.append(end2.int8ToHex())
+    hex.append(end3.int8ToHex())
+    hex.append(end4.int8ToHex())
+    return hex.toString()
+}
+
+fun String.toProtocol(): Protocol {
+    /**
+     * 返回命令固定118位
+     * cmd = 2
+     */
+    if (this.length != 118) {
+        return protocol {  }
+    }
+    val hex = this
+    return protocol {
         head1 = hex.substring(0, 2).hexToInt8()
         head2 = hex.substring(2, 4).hexToInt8()
         id = hex.substring(4, 6).hexToInt8()
@@ -336,46 +383,5 @@ class Protocol {
         end2 = hex.substring(112, 114).hexToInt8()
         end3 = hex.substring(114, 116).hexToInt8()
         end4 = hex.substring(116, 118).hexToInt8()
-    }
-
-    fun genHex(): String {
-        val hex = StringBuilder()
-        hex.append(head1.int8ToHex())
-        hex.append(head2.int8ToHex())
-        hex.append(id.int8ToHex())
-        hex.append(cmd.int8ToHex())
-        hex.append(motorX.int8ToHex())
-        hex.append((stepMotorX * pumpSpeedCoefficient).toInt().int32ToHex4().hexHighLow())
-        hex.append(powerENX.int8ToHex())
-        hex.append(autoX.int8ToHex())
-        hex.append(setVoltageX.float32ToHex4().hexHighLow())
-        hex.append((targetVoltageX / voltageCoefficient).float32ToHex4().hexHighLow())
-        hex.append(getVoltageX.float32ToHex4().hexHighLow())
-        hex.append(getCurrentX.float32ToHex4().hexHighLow())
-        hex.append(inputSensorX.int8ToHex())
-        hex.append(motorY.int8ToHex())
-        hex.append((stepMotorY * pumpSpeedCoefficient).toInt().int32ToHex4().hexHighLow())
-        hex.append(powerENY.int8ToHex())
-        hex.append(autoY.int8ToHex())
-        hex.append(setVoltageY.float32ToHex4().hexHighLow())
-        hex.append((targetVoltageY / voltageCoefficient).float32ToHex4().hexHighLow())
-        hex.append(getVoltageY.float32ToHex4().hexHighLow())
-        hex.append(getCurrentY.float32ToHex4().hexHighLow())
-        hex.append(inputSensorY.int8ToHex())
-        hex.append(inputSensorZ.int8ToHex())
-        hex.append(crc1.int8ToHex())
-        hex.append(crch.int8ToHex())
-        hex.append(end1.int8ToHex())
-        hex.append(end2.int8ToHex())
-        hex.append(end3.int8ToHex())
-        hex.append(end4.int8ToHex())
-        return hex.toString()
-    }
-
-    companion object {
-        /**
-         * 查询命令
-         */
-        const val QUERY_HEX = "AA550100000016161616"
     }
 }

@@ -1,11 +1,9 @@
 package com.zktony.www.ui.home
 
-import com.zktony.www.common.ext.execute
-import com.zktony.www.manager.SerialManager
+import com.zktony.www.common.ext.*
 import com.zktony.www.room.entity.Action
 import com.zktony.www.room.entity.Container
-import kotlinx.coroutines.delay
-import org.koin.java.KoinJavaComponent.inject
+import kotlinx.coroutines.*
 
 /**
  * @author: 刘贺贺
@@ -18,7 +16,7 @@ class CommandExecutor constructor(
     private val event: (String) -> Unit = { }
 ) {
     private lateinit var action: Action
-    private val sm: SerialManager by inject(SerialManager::class.java)
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     fun initAction(action: Action) {
         this.action = action
@@ -31,17 +29,13 @@ class CommandExecutor constructor(
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
         waitForFree {
             // 设置温度
-            sm.setTemp(
-                addr = module + 1,
-                temp = action.temperature.toString()
-            )
+            scope.launch { temp(addr = module + 1, temp = action.temperature.toString()) }
             addLiquid(yAxis = con.blockY, zAxis = con.blockZ)
             event("加液中")
             delay(100L)
-            while (sm.lock.value) {
-                delay(20L)
+            waitLock(20L) {
+                block.invoke()
             }
-            block.invoke()
         }
     }
 
@@ -52,17 +46,13 @@ class CommandExecutor constructor(
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
         waitForFree {
             // 设置温度
-            sm.setTemp(
-                addr = module + 1,
-                temp = action.temperature.toString()
-            )
+            scope.launch { temp(addr = module + 1, temp = action.temperature.toString()) }
             addLiquid(yAxis = con.oneY, zAxis = con.oneZ)
             event("加液中")
             delay(100L)
-            while (sm.lock.value) {
-                delay(20L)
+            waitLock(20L) {
+                block.invoke()
             }
-            block.invoke()
         }
     }
 
@@ -72,7 +62,10 @@ class CommandExecutor constructor(
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
         waitForFree {
-            sm.swing(false)
+            asyncHex(0) {
+                pa = "0B"
+                data = "0100"
+            }
             delay(100L)
             recycleLiquid(
                 yAxis = if (settings.recycle) con.oneY else con.wasteY,
@@ -80,12 +73,14 @@ class CommandExecutor constructor(
             )
             event("回收中")
             delay(100L)
-            while (sm.lock.value) {
-                delay(20L)
+            waitLock(20L) {
+                asyncHex(0) {
+                    pa = "0B"
+                    data = "0101"
+                }
+                delay(100L)
+                block.invoke()
             }
-            sm.swing(true)
-            delay(100L)
-            block.invoke()
         }
     }
 
@@ -96,17 +91,13 @@ class CommandExecutor constructor(
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
         waitForFree {
             // 设置温度
-            sm.setTemp(
-                addr = module + 1,
-                temp = action.temperature.toString()
-            )
+            scope.launch { temp(addr = module + 1, temp = action.temperature.toString()) }
             addLiquid(yAxis = con.twoY, zAxis = con.twoZ)
             event("加液中")
             delay(100L)
-            while (sm.lock.value) {
-                delay(20L)
+            waitLock(20L) {
+                block.invoke()
             }
-            block.invoke()
         }
     }
 
@@ -117,18 +108,14 @@ class CommandExecutor constructor(
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
         waitForFree {
             // 设置温度
-            sm.setTemp(
-                addr = module + 1,
-                temp = action.temperature.toString()
-            )
+            scope.launch { temp(addr = module + 1, temp = action.temperature.toString()) }
             // 主板运动
             addLiquid(yAxis = con.washY, zAxis = con.washZ)
             event("加液中")
             delay(100L)
-            while (sm.lock.value) {
-                delay(20L)
+            waitLock(20L) {
+                block.invoke()
             }
-            block.invoke()
         }
     }
 
@@ -139,17 +126,22 @@ class CommandExecutor constructor(
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
         waitForFree {
-            sm.swing(false)
+            asyncHex(0) {
+                pa = "0B"
+                data = "0100"
+            }
             delay(100L)
             recycleLiquid(yAxis = con.wasteY, zAxis = con.wasteZ)
             event("清理中")
             delay(100L)
-            while (sm.lock.value) {
-                delay(20L)
+            waitLock(20L) {
+                asyncHex(0) {
+                    pa = "0B"
+                    data = "0101"
+                }
+                delay(100L)
+                block.invoke()
             }
-            sm.swing(true)
-            delay(100L)
-            block.invoke()
         }
     }
 
@@ -211,20 +203,17 @@ class CommandExecutor constructor(
      * @param block suspend () -> Unit 代码块
      */
     private suspend fun waitForFree(block: suspend () -> Unit) {
-        while (sm.lock.value) {
-            event("等待中")
-            delay(1000L)
-        }
-        sm.lock(true)
-        sm.drawer()
-        delay(500L)
-        while (sm.drawer.get()) {
-            sm.lock(true)
-            event("抽屉未关闭")
+        event("等待中")
+        waitLock {
+            syncHex(0) {
+                pa = "0C"
+            }
             delay(500L)
-            sm.drawer()
+            waitDrawer(
+                timerTask = { event("抽屉未关闭") },
+                block = { block.invoke() }
+            )
         }
-        block.invoke()
     }
 }
 

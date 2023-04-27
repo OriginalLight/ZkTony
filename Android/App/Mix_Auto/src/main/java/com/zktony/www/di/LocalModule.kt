@@ -15,7 +15,6 @@ val localModule = module {
             "zktony.db"
         ).build()
     }
-    single { get<AppDatabase>().logDao() }
     single { get<AppDatabase>().motorDao() }
     single { get<AppDatabase>().calibrationDao() }
     single { get<AppDatabase>().calibrationDataDao() }

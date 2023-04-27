@@ -5,10 +5,13 @@
     <string name="app_name">Single-channel dosing</string>
     <string name="calibration_name">Name</string>
     <string name="cleaning_time">Cleaning time sec</string>
+    <string name="container">Container</string>
     <string name="container_name">Name</string>
     <string name="custom_off">Custom OFF</string>
     <string name="custom_on">Custom ON</string>
     <string name="line_cleaning">Line cleaning</string>
+    <string name="max_x_trip">Maximum travel on the x-axis</string>
+    <string name="max_y_trip">Maximum travel on the y-axis</string>
     <string name="more">More</string>
     <string name="motor_setting">Motor Setting</string>
     <string name="needle_space">Needle space</string>
@@ -33,6 +36,7 @@
     <string name="title_admin">Admin</string>
     <string name="title_calibration">Calibration</string>
     <string name="title_calibration_data">Calibration Data</string>
+    <string name="title_config">Config</string>
     <string name="title_container">Container</string>
     <string name="title_home">Home</string>
     <string name="title_log">Log</string>
@@ -45,7 +49,4 @@
     <string name="waste_tank">Waste Tank</string>
     <string name="x_axis">XAxis</string>
     <string name="y_axis">YAxis</string>
-    <string name="max_x_trip">Maximum travel on the x-axis</string>
-    <string name="max_y_trip">Maximum travel on the y-axis</string>
-    <string name="title_config">Config</string>
 </resources>

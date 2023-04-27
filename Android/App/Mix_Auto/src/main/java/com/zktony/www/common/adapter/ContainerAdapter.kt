@@ -3,7 +3,6 @@ package com.zktony.www.common.adapter
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
 import com.zktony.core.ext.*
 import com.zktony.www.databinding.ItemContainerBinding
@@ -59,7 +58,6 @@ class ContainerViewHolder(
         binding.apply {
             container = item
             order.text = (layoutPosition + 1).toString()
-            delete.isVisible = item.name != Ext.ctx.getString(com.zktony.core.R.string.waste_tank)
             with(edit) {
                 clickScale()
                 clickNoRepeat {

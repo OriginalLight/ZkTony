@@ -1,13 +1,19 @@
 package com.zktony.www.ui.program
 
+import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
+import android.view.View
 import androidx.core.view.isVisible
 import androidx.lifecycle.*
 import androidx.navigation.findNavController
+import com.kongzue.dialogx.dialogs.CustomDialog
+import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentProgramEditBinding
+import com.zktony.www.ui.widget.DynamicPlate
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -35,8 +41,8 @@ class ProgramEditFragment :
                                 volume.setEqualText("")
                             }
                             with(dynamicPlate) {
-                                x = it.list.maxOf { point -> point.y } + 1
-                                y = it.list.maxOf { point -> point.x } + 1
+                                column = it.list.maxOf { point -> point.y } + 1
+                                row = it.list.maxOf { point -> point.x } + 1
                                 data =
                                     it.list.map { point -> Triple(point.x, point.y, point.enable) }
                             }
@@ -80,8 +86,39 @@ class ProgramEditFragment :
                     viewModel.enableAll()
                 }
             }
-            dynamicPlate.onItemClick = { x, y ->
-                viewModel.enablePoint(x, y)
+            dynamicPlate.onItemClick = { _, _ ->
+                CustomDialog.build()
+                    .setCustomView(object :
+                        OnBindView<CustomDialog>(R.layout.layout_dynamic_plate) {
+                        @SuppressLint("SetTextI18n")
+                        override fun onBind(dialog: CustomDialog, v: View) {
+                            val dynamicPlate = v.findViewById<DynamicPlate>(R.id.dynamic_plate)
+                            val scope = viewLifecycleOwner.lifecycleScope
+
+                            scope.launch {
+                                viewModel.uiState.collect {
+                                    if (it.list.isNotEmpty()) {
+                                        with(dynamicPlate) {
+                                            column = it.list.maxOf { point -> point.y } + 1
+                                            row = it.list.maxOf { point -> point.x } + 1
+                                            data = it.list.map { point ->
+                                                Triple(
+                                                    point.x,
+                                                    point.y,
+                                                    point.enable
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            dynamicPlate.onItemClick = { x, y -> viewModel.enablePoint(x, y) }
+                        }
+                    })
+                    .setCancelable(true)
+                    .setMaskColor(Color.parseColor("#4D000000"))
+                    .show()
             }
             volume.afterTextChange {
                 viewModel.updateVolume(it.toIntOrNull() ?: 0)

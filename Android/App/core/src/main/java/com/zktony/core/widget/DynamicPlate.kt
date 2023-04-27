@@ -77,7 +77,6 @@ class DynamicPlate : View {
             }
         }
 
-        // 画实心圆 从左下角绘制
         paint.style = Paint.Style.FILL
         paint.color = color
         paint.strokeWidth = 1f

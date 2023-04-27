@@ -90,11 +90,12 @@ class ContainerEditFragment :
                             val point = viewModel.uiState.value.list.find { it.index == index }
                             inputAxis.setText(point?.axis?.removeZero() ?: "0")
                             inputWaste.setText(point?.waste?.removeZero() ?: "0")
+                            val maxYTrip = viewModel.uiState.value.maxYTrip
 
                             btnMoveAxis.clickNoRepeat {
                                 val axis = inputAxis.text.toString().toFloatOrNull() ?: 0f
-                                if (axis > 250f) {
-                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 250")
+                                if (axis > maxYTrip) {
+                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} $maxYTrip")
                                 } else {
                                     viewModel.move(axis)
                                 }
@@ -102,8 +103,8 @@ class ContainerEditFragment :
 
                             btnMoveWaste.clickNoRepeat {
                                 val waste = inputWaste.text.toString().toFloatOrNull() ?: 0f
-                                if (waste > 250f) {
-                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 250")
+                                if (waste > maxYTrip) {
+                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} $maxYTrip")
                                 } else {
                                     viewModel.move(waste)
                                 }
@@ -112,8 +113,8 @@ class ContainerEditFragment :
                             btnOk.clickNoRepeat {
                                 val axis = inputAxis.text.toString().toFloatOrNull() ?: 0f
                                 val waste = inputWaste.text.toString().toFloatOrNull() ?: 0f
-                                if (axis > 250f || waste > 250f) {
-                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} 250")
+                                if (axis > maxYTrip || waste > maxYTrip) {
+                                    PopTip.show("${com.zktony.core.R.string.over_the_trip} $maxYTrip")
                                 } else {
                                     viewModel.setPointPosition(index, axis, waste)
                                     dialog.dismiss()

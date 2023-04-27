@@ -9,7 +9,6 @@ import com.zktony.www.room.dao.CalibrationDataDao
 import com.zktony.www.room.entity.Calibration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class CalibrationViewModel constructor(
@@ -22,7 +21,7 @@ class CalibrationViewModel constructor(
 
     init {
         viewModelScope.launch {
-            CD.getAll().distinctUntilChanged().collect {
+            CD.getAll().collect {
                 _uiState.value = it
             }
         }

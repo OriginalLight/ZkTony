@@ -7,7 +7,6 @@ import android.widget.TextView
 import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.interfaces.OnBindView
-import com.zktony.core.ext.Ext
 import com.zktony.www.R
 import kotlinx.coroutines.*
 
@@ -25,24 +24,28 @@ fun washDialog(block: (Int) -> Unit, block1: () -> Unit) {
                 val btnStart = v.findViewById<MaterialButton>(R.id.start)
                 val btnStop = v.findViewById<MaterialButton>(R.id.stop)
                 val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
+                val time = input.text.toString().toIntOrNull() ?: 30
+                val scope = CoroutineScope(Dispatchers.Main)
+                var job: Job? = null
                 btnStart.setOnClickListener {
-                    val scope = CoroutineScope(Dispatchers.Main)
-                    val time = input.text.toString().toIntOrNull() ?: 30
                     block(time)
-                    scope.launch {
+                    job = scope.launch {
                         btnStart.isEnabled = false
                         var i = time
                         while (i > 0) {
-                            btnStart.text = "$i"
+                            input.setText(i.toString())
                             delay(1000L)
                             i--
                         }
-                        btnStart.text = Ext.ctx.getString(com.zktony.core.R.string.start)
+                        block1()
+                        input.setText(time.toString())
                         btnStart.isEnabled = true
                     }
                 }
                 btnStop.setOnClickListener {
                     block1()
+                    job?.cancel()
+                    input.setText(time.toString())
                     btnStart.isEnabled = true
                 }
                 btnCancel.setOnClickListener {

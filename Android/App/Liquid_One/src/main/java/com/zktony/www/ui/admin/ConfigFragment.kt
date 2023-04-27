@@ -5,8 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.*
 import androidx.navigation.findNavController
 import com.google.android.material.button.MaterialButton
@@ -15,12 +13,9 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
-import com.zktony.datastore.ext.save
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentConfigBinding
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ConfigFragment :
@@ -38,13 +33,14 @@ class ConfigFragment :
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-               viewModel.uiState.collect {
+                viewModel.uiState.collect {
                     binding.apply {
-                        maxXTrip.setText(it.maxXTrip.removeZero())
-                        maxYTrip.setText(it.maxYTrip.removeZero())
-                        wash.text = "( ${it.washXAxis.removeZero()} , ${it.washYAxis.removeZero()} )"
+                        maxXTrip.setEqualText(it.maxXTrip.removeZero())
+                        maxYTrip.setEqualText(it.maxYTrip.removeZero())
+                        wash.text =
+                            "( ${it.washXAxis.removeZero()} , ${it.washYAxis.removeZero()} )"
                     }
-               }
+                }
             }
         }
     }
@@ -52,10 +48,10 @@ class ConfigFragment :
     private fun initView() {
         binding.apply {
             maxXTrip.afterTextChange {
-                viewModel.save("MAX_X_TRIP", it.toFloatOrNull() ?: 100f)
+                viewModel.save("MAX_X_TRIP", it.toFloatOrNull() ?: 160f)
             }
             maxYTrip.afterTextChange {
-                viewModel.save("MAX_Y_TRIP", it.toFloatOrNull() ?: 100f)
+                viewModel.save("MAX_Y_TRIP", it.toFloatOrNull() ?: 200f)
             }
             wash.clickNoRepeat {
                 showAxisDialog()

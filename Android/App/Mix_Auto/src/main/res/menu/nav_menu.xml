@@ -29,13 +29,6 @@
             android:title="@string/title_calibration" />
     </group>
 
-    <group android:id="@+id/g_log">
-        <item
-            android:id="@+id/navigation_log"
-            android:icon="@mipmap/log"
-            android:title="@string/title_log" />
-    </group>
-
     <group android:id="@+id/g_admin">
         <item
             android:id="@+id/navigation_admin"

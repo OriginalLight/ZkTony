@@ -129,16 +129,8 @@ class HomeViewModel constructor(
     fun wash(time: Int = 30, type: Int) {
         viewModelScope.launch {
             if (type == 0) {
-                val washJob = launch {
-                    SM.sendHex(hex = V1(pa = "0B", data = "0301").toHex())
-                    delay(time * 1000L)
-                    wash(type = 1)
-                }
-                _uiState.value = _uiState.value.copy(washJob = washJob)
-                washJob.start()
+                SM.sendHex(hex = V1(pa = "0B", data = "0301").toHex())
             } else {
-                _uiState.value.washJob?.cancel()
-                _uiState.value = _uiState.value.copy(washJob = null)
                 SM.sendHex(hex = V1(pa = "0B", data = "0300").toHex())
             }
         }
@@ -227,8 +219,9 @@ class HomeViewModel constructor(
         _uiState.value = _uiState.value.copy(
             job = null,
             time = 0L,
-            info = CurrentInfo().copy(
-                process = 0
+            info = _uiState.value.info.copy(
+                process = 0,
+                tripleList = emptyList()
             )
         )
         SM.pause(false)
@@ -251,7 +244,6 @@ data class HomeUiState(
     val program: Program? = null,
     val programList: List<Program> = emptyList(),
     val time: Long = 0L,
-    val washJob: Job? = null,
 )
 
 data class CurrentInfo(
