@@ -39,7 +39,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 launch { viewModel.bFlow.collect { onUiChange(1, it) } }
                 launch { viewModel.cFlow.collect { onUiChange(2, it) } }
                 launch { viewModel.dFlow.collect { onUiChange(3, it) } }
-                launch { viewModel.buttonFlow.collect { onUiChange(it) } }
+                launch { viewModel.uiState.collect { onUiChange(it) } }
                 launch {
                     collectLock {
                         binding.e.apply {
@@ -128,7 +128,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 with(insulating) {
                     clickScale()
                     clickNoRepeat {
-                        if (viewModel.buttonFlow.value.insulating) {
+                        if (viewModel.uiState.value.insulating) {
                             PopTip.show("已取消保温，再次点击开启")
                         } else {
                             PopTip.show("抗体保温中，再次点击取消")
@@ -139,7 +139,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 with(lock) {
                     clickScale()
                     clickNoRepeat {
-                        if (viewModel.buttonFlow.value.lock) {
+                        if (viewModel.uiState.value.lock) {
                             PopTip.show("已解锁，10秒后上锁")
                             viewModel.unlock()
                         } else {
@@ -196,12 +196,12 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
     /**
      * 操作按钮的ui状态变化
-     * @param state [UiState] 状态
+     * @param state [HomeUiState] 状态
      */
-    private fun onUiChange(state: UiState) {
+    private fun onUiChange(state: HomeUiState) {
         binding.e.apply {
             with(tvInsulating) {
-                text = if (state.insulating) "保温中 ${state.temp}" else "抗体保温"
+                text = if (state.insulating) "保温中 ${state.insulatingTemp}" else "抗体保温"
                 setTextColor(
                     ContextCompat.getColor(
                         context, if (state.insulating) color.red else color.dark_outline
@@ -236,7 +236,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * @param module [Int] 模块
      */
     private fun selectDialog(module: Int) {
-        val menuList = viewModel.programFlow.value.map { it.name }
+        val menuList = viewModel.uiState.value.programList.map { it.name }
         if (menuList.isEmpty()) {
             PopTip.show("请先添加程序")
             return

@@ -8,10 +8,8 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.*
 import com.zktony.datastore.ext.read
-import com.zktony.serialport.protocol.V1
-import com.zktony.www.common.ext.completeDialog
-import com.zktony.www.common.ext.execute
-import com.zktony.www.manager.SerialManager
+import com.zktony.www.R
+import com.zktony.www.common.ext.*
 import com.zktony.www.room.dao.PointDao
 import com.zktony.www.room.dao.ProgramDao
 import com.zktony.www.room.entity.Point
@@ -22,7 +20,6 @@ import kotlinx.coroutines.flow.*
 class HomeViewModel constructor(
     private val PD: PointDao,
     private val PGD: ProgramDao,
-    private val SM: SerialManager,
     private val DS: DataStore<Preferences>
 ) : BaseViewModel() {
 
@@ -53,7 +50,7 @@ class HomeViewModel constructor(
                     Pair(x, y)
                 }.collect {
                     _uiState.value = _uiState.value.copy(
-                        wash = it
+                        washTank = it
                     )
                 }
             }
@@ -101,37 +98,20 @@ class HomeViewModel constructor(
     fun reset() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (_uiState.value.job == null) {
-                SM.reset()
-                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.resetting))
-            } else {
-                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.stop_all))
+            decideLock {
+                yes { PopTip.show(Ext.ctx.getString(R.string.in_operation)) }
+                no { syncHex { } }
             }
         }
     }
 
     fun waste() {
         viewModelScope.launch {
-            // 如果有正在执行的程序，提示用户
-            if (SM.lock.value) {
-                PopTip.show("运动中")
-            } else {
-                execute {
-                    step {
-                        x = _uiState.value.wash.first
-                        y = _uiState.value.wash.second
-                    }
+            execute {
+                step {
+                    x = _uiState.value.washTank.first
+                    y = _uiState.value.washTank.second
                 }
-            }
-        }
-    }
-
-    fun wash(time: Int = 30, type: Int) {
-        viewModelScope.launch {
-            if (type == 0) {
-                SM.sendHex(hex = V1(pa = "0B", data = "0301").toHex())
-            } else {
-                SM.sendHex(hex = V1(pa = "0B", data = "0300").toHex())
             }
         }
     }
@@ -139,9 +119,15 @@ class HomeViewModel constructor(
     fun fill(type: Int) {
         viewModelScope.launch {
             if (type == 0) {
-                SM.sendHex(hex = V1(pa = "0B", data = "0301").toHex())
+                asyncHex {
+                    pa = "0B"
+                    data = "0301"
+                }
             } else {
-                SM.sendHex(hex = V1(pa = "0B", data = "0300").toHex())
+                asyncHex {
+                    pa = "0B"
+                    data = "0300"
+                }
             }
         }
     }
@@ -149,9 +135,15 @@ class HomeViewModel constructor(
     fun back(type: Int) {
         viewModelScope.launch {
             if (type == 0) {
-                SM.sendHex(hex = V1(pa = "0B", data = "0302").toHex())
+                asyncHex {
+                    pa = "0B"
+                    data = "0302"
+                }
             } else {
-                SM.sendHex(hex = V1(pa = "0B", data = "0300").toHex())
+                asyncHex {
+                    pa = "0B"
+                    data = "0300"
+                }
             }
         }
     }
@@ -171,6 +163,11 @@ class HomeViewModel constructor(
                     list = _uiState.value.pointList,
                     scope = this,
                 )
+                launch {
+                    uiState.collect {
+                        executor.pause = it.pause
+                    }
+                }
                 executor.event = {
                     when (it) {
 
@@ -191,17 +188,15 @@ class HomeViewModel constructor(
                         }
 
                         is ExecutorEvent.Finish -> {
-                            reset()
                             completeDialog(
                                 name = _uiState.value.program?.name ?: "None",
                                 time = _uiState.value.time.getTimeFormat(),
                             )
                             launch {
                                 delay(500L)
-                                while (SM.lock.value) {
-                                    delay(100L)
+                                waitLock {
+                                    waste()
                                 }
-                                waste()
                                 delay(500L)
                                 stop()
                             }
@@ -224,19 +219,17 @@ class HomeViewModel constructor(
                 tripleList = emptyList()
             )
         )
-        SM.pause(false)
     }
 
     fun pause() {
         _uiState.value = _uiState.value.copy(pause = !_uiState.value.pause)
-        SM.pause(_uiState.value.pause)
     }
 
 
 }
 
 data class HomeUiState(
-    val wash: Pair<Float, Float> = Pair(0f, 0f),
+    val washTank: Pair<Float, Float> = Pair(0f, 0f),
     val info: CurrentInfo = CurrentInfo(),
     val job: Job? = null,
     val pause: Boolean = false,

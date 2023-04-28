@@ -42,6 +42,13 @@ class HomeViewModel constructor(
         viewModelScope.launch {
             PD.getBySubId(id).collect {
                 _uiState.value = _uiState.value.copy(pointList = it)
+                if (it.isNotEmpty()) {
+                    _uiState.value = _uiState.value.copy(
+                        info = _uiState.value.info.copy(
+                            volume = it.last().v1 to it.last().v2,
+                        )
+                    )
+                }
             }
         }
     }
@@ -111,10 +118,10 @@ class HomeViewModel constructor(
                 }
                 executor.event = {
                     when (it) {
-                        is ExecutorEvent.CurrentPoint -> {
+                        is ExecutorEvent.Volume -> {
                             _uiState.value = _uiState.value.copy(
                                 info = _uiState.value.info.copy(
-                                    point = it.point
+                                    volume = it.volume
                                 )
                             )
                         }
@@ -168,9 +175,11 @@ class HomeViewModel constructor(
                 job = null,
                 pause = false,
                 time = 0L,
-                info = CurrentInfo().copy(
+                info = _uiState.value.info.copy(
+                    speed = 0f,
+                    lastTime = 0L,
+                    process = 0,
                     pairs = emptyList(),
-                    process = 0
                 )
             )
             reset()
@@ -326,7 +335,7 @@ data class HomeUiState(
 )
 
 data class CurrentInfo(
-    val point: Point = Point(),
+    val volume: Pair<Int, Int> = Pair(0, 0),
     val pairs: List<Pair<Int, Boolean>> = emptyList(),
     val speed: Float = 0f,
     val lastTime: Long = 0L,

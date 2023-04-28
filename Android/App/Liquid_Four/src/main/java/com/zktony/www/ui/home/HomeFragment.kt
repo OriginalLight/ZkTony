@@ -2,16 +2,11 @@ package com.zktony.www.ui.home
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.R.mipmap
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.addTouchEvent
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.getTimeFormat
+import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.ext.total
 import com.zktony.www.common.ext.washDialog
@@ -55,8 +50,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             }
                             time.text = it.time.getTimeFormat()
                             with(dynamicPlate) {
-                                x = it.info.size.second
-                                y = it.info.size.first
+                                column = it.info.size.second
+                                row = it.info.size.first
                                 data = it.info.tripleList
                                 color = it.info.color
                             }

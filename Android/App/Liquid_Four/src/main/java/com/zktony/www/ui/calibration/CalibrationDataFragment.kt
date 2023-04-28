@@ -2,18 +2,12 @@ package com.zktony.www.ui.calibration
 
 import android.os.Bundle
 import android.view.Gravity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.findNavController
 import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.afterTextChange
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.removeZero
-import com.zktony.core.ext.setEqualText
+import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.adapter.CalibrationDataAdapter
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
@@ -49,7 +43,7 @@ class CalibrationDataFragment :
                         if (it.actual > 0f) {
                             actual.setEqualText(it.actual.toString().removeZero())
                         }
-                        addLiquid.isEnabled = it.expect > 0f && !it.lock && !it.work
+                        addLiquid.isEnabled = it.expect > 0f && !it.lock
                         save.isEnabled = it.expect > 0f && it.actual > 0f
                     }
                 }

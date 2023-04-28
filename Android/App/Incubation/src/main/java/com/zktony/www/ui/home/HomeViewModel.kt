@@ -10,24 +10,11 @@ import com.zktony.core.ext.removeZero
 import com.zktony.core.utils.Constants
 import com.zktony.core.utils.Queue
 import com.zktony.datastore.ext.read
-import com.zktony.www.manager.SerialManager
-import com.zktony.serialport.protocol.V1
 import com.zktony.www.common.ext.*
-import com.zktony.www.room.dao.ActionDao
-import com.zktony.www.room.dao.ContainerDao
-import com.zktony.www.room.dao.LogDao
-import com.zktony.www.room.dao.ProgramDao
-import com.zktony.www.room.entity.Action
-import com.zktony.www.room.entity.Container
-import com.zktony.www.room.entity.Log
-import com.zktony.www.room.entity.Program
-import com.zktony.www.room.entity.getActionEnum
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import com.zktony.www.room.dao.*
+import com.zktony.www.room.entity.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 
 class HomeViewModel constructor(
     private val PD: ProgramDao,
@@ -38,32 +25,29 @@ class HomeViewModel constructor(
 ) : BaseViewModel() {
 
 
-    private val _programFlow = MutableStateFlow<List<Program>>(emptyList())
-    private val _aFlow = MutableStateFlow(ModuleUiState(status = "A Active"))
-    private val _bFlow = MutableStateFlow(ModuleUiState(status = "B Active"))
-    private val _cFlow = MutableStateFlow(ModuleUiState(status = "C Active"))
-    private val _dFlow = MutableStateFlow(ModuleUiState(status = "D Active"))
-    private val _buttonFlow = MutableStateFlow(UiState())
-    private val _settings = MutableStateFlow(Settings())
-    val programFlow = _programFlow.asStateFlow()
+    private val _aFlow = MutableStateFlow(ModuleUiState())
+    private val _bFlow = MutableStateFlow(ModuleUiState())
+    private val _cFlow = MutableStateFlow(ModuleUiState())
+    private val _dFlow = MutableStateFlow(ModuleUiState())
+    private val _uiState = MutableStateFlow(HomeUiState())
     val aFlow = _aFlow.asStateFlow()
     val bFlow = _bFlow.asStateFlow()
     val cFlow = _cFlow.asStateFlow()
     val dFlow = _dFlow.asStateFlow()
-    val buttonFlow = _buttonFlow.asStateFlow()
+    val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             launch {
                 PD.getAll().collect {
-                    _programFlow.value = it
+                    _uiState.value = _uiState.value.copy(programList = it)
                     onProgramChange(it)
                 }
             }
             launch {
                 CD.getAll().collect {
                     if (it.isNotEmpty()) {
-                        _buttonFlow.value = _buttonFlow.value.copy(container = it[0])
+                        _uiState.value = _uiState.value.copy(container = it[0])
                     }
                 }
             }
@@ -82,7 +66,8 @@ class HomeViewModel constructor(
                                 2 -> _bFlow.value = _bFlow.value.copy(temp = "$temp ℃")
                                 3 -> _cFlow.value = _cFlow.value.copy(temp = "$temp ℃")
                                 4 -> _dFlow.value = _dFlow.value.copy(temp = "$temp ℃")
-                                0 -> _buttonFlow.value = _buttonFlow.value.copy(temp = "$temp ℃")
+                                0 -> _uiState.value =
+                                    _uiState.value.copy(insulatingTemp = "$temp ℃")
                             }
                         }
                     }
@@ -95,7 +80,7 @@ class HomeViewModel constructor(
                     launch {
                         temp(
                             addr = i,
-                            temp = if (i == 0) _settings.value.temp.toString()
+                            temp = if (i == 0) _uiState.value.temp.toString()
                                 .removeZero() else "26"
                         )
                     }
@@ -113,12 +98,12 @@ class HomeViewModel constructor(
             launch {
                 launch {
                     DS.read(Constants.TEMP, 3.0f).collect {
-                        _settings.value = _settings.value.copy(temp = it)
+                        _uiState.value = _uiState.value.copy(temp = it)
                     }
                 }
                 launch {
                     DS.read(Constants.RECYCLE, true).collect {
-                        _settings.value = _settings.value.copy(recycle = it)
+                        _uiState.value = _uiState.value.copy(recycle = it)
                     }
                 }
             }
@@ -178,7 +163,7 @@ class HomeViewModel constructor(
         viewModelScope.launch {
             val state = flow(module)
             state.value = state.value.copy(
-                program = _programFlow.value[index],
+                program = _uiState.value.programList[index],
                 status = "Active",
                 time = Constants.ZERO_TIME,
             )
@@ -197,6 +182,18 @@ class HomeViewModel constructor(
             state.value = state.value.copy(
                 status = "Running",
             )
+            val run = _aFlow.value.job == null
+                    && _bFlow.value.job == null
+                    && _cFlow.value.job == null
+                    && _dFlow.value.job == null
+            if (!run) {
+                asyncHex(0) {
+                    pa = "0B"
+                    data = "0100"
+                }
+                _uiState.value = _uiState.value.copy(shakeBed = false)
+                delay(100L)
+            }
             // 创建job
             val job = launch {
                 // 将程序中的所有步骤排序放入队列
@@ -208,8 +205,8 @@ class HomeViewModel constructor(
                 val executor = ProgramExecutor(
                     queue = actionQueue,
                     module = module,
-                    container = _buttonFlow.value.container,
-                    settings = _settings.value,
+                    container = _uiState.value.container,
+                    recycle = _uiState.value.recycle,
                 )
                 // 收集执行者的状态
                 executor.event = {
@@ -236,7 +233,7 @@ class HomeViewModel constructor(
                                 delay(100L)
                                 stop(
                                     it.module,
-                                    _settings.value.temp.toString().removeZero()
+                                    _uiState.value.temp.toString().removeZero()
                                 )
                             }
                         }
@@ -307,6 +304,19 @@ class HomeViewModel constructor(
                 action = "/",
                 time = if (state.value.status != "已完成") Constants.ZERO_TIME else state.value.time,
             )
+            // 如果有正在执行的程序，提示用户
+            val run = _aFlow.value.job == null
+                    && _bFlow.value.job == null
+                    && _cFlow.value.job == null
+                    && _dFlow.value.job == null
+            if (!run) {
+                asyncHex(0) {
+                    pa = "0B"
+                    data = "0100"
+                }
+                _uiState.value = _uiState.value.copy(shakeBed = false)
+                delay(100L)
+            }
             // 恢复到室温
             delay(200L)
             launch {
@@ -359,7 +369,7 @@ class HomeViewModel constructor(
      */
     fun shakeBed() {
         viewModelScope.launch {
-            val swing = _buttonFlow.value.shakeBed
+            val swing = _uiState.value.shakeBed
             PopTip.show(
                 if (swing) "摇床-已暂停" else "摇床-已恢复"
             )
@@ -368,13 +378,13 @@ class HomeViewModel constructor(
                     pa = "0B"
                     data = "0100"
                 }
-                _buttonFlow.value = _buttonFlow.value.copy(shakeBed = false)
+                _uiState.value = _uiState.value.copy(shakeBed = false)
             } else {
                 asyncHex(0) {
                     pa = "0B"
                     data = "0101"
                 }
-                _buttonFlow.value = _buttonFlow.value.copy(shakeBed = true)
+                _uiState.value = _uiState.value.copy(shakeBed = true)
             }
         }
     }
@@ -389,27 +399,27 @@ class HomeViewModel constructor(
             // 发送设置温度命令 如果当前是未保温状态发送设置中的温度，否则发送室温26度
             launch {
                 temp(
-                    addr = 0, temp = if (_buttonFlow.value.insulating) "26"
-                    else _settings.value.temp.toString().removeZero()
+                    addr = 0, temp = if (_uiState.value.insulating) "26"
+                    else _uiState.value.temp.toString().removeZero()
                 )
             }
             // 更改按钮状态
-            _buttonFlow.value = _buttonFlow.value.copy(
-                insulating = !_buttonFlow.value.insulating
+            _uiState.value = _uiState.value.copy(
+                insulating = !_uiState.value.insulating
             )
         }
     }
 
     fun unlock() {
         viewModelScope.launch {
-            _buttonFlow.value = _buttonFlow.value.copy(
+            _uiState.value = _uiState.value.copy(
                 lock = false
             )
             asyncHex(0) {
                 pa = "0D"
             }
             delay(10 * 1000L)
-            _buttonFlow.value = _buttonFlow.value.copy(
+            _uiState.value = _uiState.value.copy(
                 lock = true
             )
             asyncHex(0) {
@@ -443,15 +453,13 @@ data class ModuleUiState(
 /**
  * 右侧按钮的状态
  */
-data class UiState(
+data class HomeUiState(
+    val programList: List<Program> = emptyList(),
     val insulating: Boolean = true,
-    val temp: String = "0.0℃",
+    val insulatingTemp: String = "0.0℃",
     val lock: Boolean = true,
     val container: Container = Container(),
     val shakeBed: Boolean = false,
-)
-
-data class Settings(
-    val temp: Float = 5f,
     val recycle: Boolean = true,
+    val temp: Float = 5f,
 )

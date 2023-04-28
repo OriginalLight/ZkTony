@@ -16,7 +16,7 @@ import kotlinx.coroutines.*
  */
 
 
-fun washDialog(block: (Int) -> Unit, block1: () -> Unit) {
+fun washDialog(block: () -> Unit, block1: () -> Unit) {
     CustomDialog.build()
         .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_wash) {
             override fun onBind(dialog: CustomDialog, v: View) {
@@ -28,7 +28,7 @@ fun washDialog(block: (Int) -> Unit, block1: () -> Unit) {
                 val scope = CoroutineScope(Dispatchers.Main)
                 var job: Job? = null
                 btnStart.setOnClickListener {
-                    block(time)
+                    block()
                     job = scope.launch {
                         btnStart.isEnabled = false
                         var i = time

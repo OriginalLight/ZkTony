@@ -1,12 +1,12 @@
 package com.zktony.protobuf.grpc
 
-import com.zktony.proto.LogDetail
-import com.zktony.proto.LogDetailServiceGrpcKt
-import com.zktony.proto.logDetailList
+import com.zktony.proto.*
+import com.zktony.protobuf.utils.Constants
 import io.grpc.ManagedChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withTimeout
 
 class LogDetailGrpc constructor(
     private val channel: ManagedChannel,
@@ -15,7 +15,9 @@ class LogDetailGrpc constructor(
 
     suspend fun addLogDetails(logs: List<LogDetail>) = flow {
         try {
-            emit(stub.addLogDetails(logDetailList { list.addAll(logs) }))
+            withTimeout(Constants.TIME_OUT) {
+                emit(stub.addLogDetails(logDetailList { list.addAll(logs) }))
+            }
         } catch (e: Exception) {
             throw e
         }

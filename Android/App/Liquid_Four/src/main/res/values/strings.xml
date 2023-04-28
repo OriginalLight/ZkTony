@@ -9,6 +9,8 @@
     <string name="custom_off">自定义：关</string>
     <string name="custom_on">自定义：开</string>
     <string name="line_cleaning">管路清洗</string>
+    <string name="max_x_trip">X轴最大行程</string>
+    <string name="max_y_trip">Y轴最大行程</string>
     <string name="motor_setting">电机设置</string>
     <string name="needle_space">针头间距</string>
     <string name="notice_content">1. 执行程序前请确认有充足的溶液。\n2. 程序结束后请及时清理容器，避免滋生微生物等问题。\n3. 请阅读说明书后使用，避免误操作。</string>
@@ -27,14 +29,13 @@
     <string name="select_all">全选</string>
     <string name="size">规格</string>
     <string name="speed_liquid">加液速度 孔/分钟</string>
-    <string name="start_time">开始时间</string>
     <string name="time_remaining">剩余时间</string>
     <string name="title_admin">管理员</string>
     <string name="title_calibration">校准管理</string>
     <string name="title_calibration_data">校准数据</string>
+    <string name="title_config">参数</string>
     <string name="title_container">容器管理</string>
     <string name="title_home">主界面</string>
-    <string name="title_log">日志</string>
     <string name="title_motor">电机</string>
     <string name="title_program">分液程序</string>
     <string name="volume_four">泵四加液量 μL</string>

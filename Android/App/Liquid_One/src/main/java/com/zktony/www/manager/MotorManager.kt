@@ -1,10 +1,8 @@
 package com.zktony.www.manager
 
 import com.zktony.core.ext.*
-import com.zktony.serialport.protocol.V1
 import com.zktony.www.R
-import com.zktony.www.common.ext.toMotor
-import com.zktony.www.common.ext.toV1
+import com.zktony.www.common.ext.*
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Calibration
@@ -19,7 +17,6 @@ import kotlinx.coroutines.flow.firstOrNull
 class MotorManager(
     private val MD: MotorDao,
     private val CD: CalibrationDao,
-    private val SM: SerialManager,
 ) {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -82,17 +79,22 @@ class MotorManager(
             }
             launch {
                 delay(5000L)
-                if (!SM.lock.value) {
-                    for (j in 1..3) {
-                        SM.sendHex(
-                            hex = V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex()
-                        )
-                        delay(100L)
+                decideLock {
+                    no {
+                        for (j in 1..3) {
+                            asyncHex {
+                                fn = "03"
+                                pa = "04"
+                                data = j.int8ToHex()
+                            }
+                            delay(100L)
+                        }
                     }
                 }
             }
             launch {
-                SM.callback.collect {
+
+                collectHex {
                     it?.let {
                         it.toV1().run {
                             if (fn == "03" && pa == "04") {

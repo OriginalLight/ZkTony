@@ -12,7 +12,7 @@ import kotlinx.coroutines.*
 class CommandExecutor constructor(
     private val module: Int,
     private val con: Container,
-    private val settings: Settings,
+    private val recycle: Boolean,
     private val event: (String) -> Unit = { }
 ) {
     private lateinit var action: Action
@@ -68,8 +68,8 @@ class CommandExecutor constructor(
             }
             delay(100L)
             recycleLiquid(
-                yAxis = if (settings.recycle) con.oneY else con.wasteY,
-                zAxis = if (settings.recycle) con.recycleOneZ else con.wasteZ
+                yAxis = if (recycle) con.oneY else con.wasteY,
+                zAxis = if (recycle) con.recycleOneZ else con.wasteZ
             )
             event("回收中")
             delay(100L)

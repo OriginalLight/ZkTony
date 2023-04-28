@@ -7,40 +7,33 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.getTimeFormat
-import com.zktony.core.ext.spannerDialog
+import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
 import com.zktony.www.R
 import com.zktony.www.common.ext.*
-import com.zktony.www.manager.SerialManager
-import com.zktony.serialport.protocol.V1
-import com.zktony.www.room.dao.*
-import com.zktony.www.room.entity.*
+import com.zktony.www.room.dao.PointDao
+import com.zktony.www.room.dao.ProgramDao
+import com.zktony.www.room.entity.Point
+import com.zktony.www.room.entity.Program
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 
 class HomeViewModel constructor(
-    private val CD: ContainerDao,
     private val DS: DataStore<Preferences>,
-    private val LD: LogDao,
     private val PD: PointDao,
     private val PGD: ProgramDao,
-    private val SM: SerialManager,
 ) : BaseViewModel() {
 
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
-    private val _settings = MutableStateFlow(Settings())
 
     init {
         viewModelScope.launch {
             launch {
                 delay(1000L)
-                waste()
+                waitLock { waste() }
             }
             launch {
                 PGD.getAll().collect {
@@ -53,15 +46,17 @@ class HomeViewModel constructor(
                 }
             }
             launch {
-                CD.getByType(0).collect {
-                    if (it.isNotEmpty()) {
-                        _uiState.value = _uiState.value.copy(container = it[0])
-                    }
+                DS.read("WASH_X_AXIS", 0f).zip(
+                    DS.read("WASH_Y_AXIS", 0f)
+                ) { x, y ->
+                    x to y
+                }.collect {
+                    _uiState.value = _uiState.value.copy(washTank = it)
                 }
             }
             launch {
                 DS.read(Constants.NEEDLE_SPACE, 12f).collect {
-                    _settings.value = _settings.value.copy(needleSpace = it)
+                    _uiState.value = _uiState.value.copy(needleSpace = it)
                 }
             }
         }
@@ -107,12 +102,9 @@ class HomeViewModel constructor(
 
     fun reset() {
         viewModelScope.launch {
-            // 如果有正在执行的程序，提示用户
-            if (_uiState.value.job == null) {
-                SM.reset()
-                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.resetting))
-            } else {
-                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.stop_all))
+            decideLock {
+                yes { PopTip.show(com.zktony.core.R.string.running) }
+                no { asyncHex(0) {} }
             }
         }
     }
@@ -120,16 +112,10 @@ class HomeViewModel constructor(
     fun waste() {
         viewModelScope.launch {
             // 如果有正在执行的程序，提示用户
-            if (SM.lock.value) {
-                PopTip.show("运动中")
-            } else {
-                _uiState.value.container?.let {
-                    execute {
-                        step {
-                            x = it.xAxis
-                            y = it.yAxis
-                        }
-                    }
+            execute {
+                step {
+                    x = _uiState.value.washTank.first
+                    y = _uiState.value.washTank.second
                 }
             }
         }
@@ -139,14 +125,14 @@ class HomeViewModel constructor(
         viewModelScope.launch {
             if (type == 0) {
                 val washJob = launch {
-                    SM.sendHex(
-                        index = 0,
-                        hex = V1(pa = "0B", data = "0301").toHex()
-                    )
-                    SM.sendHex(
-                        index = 3,
-                        hex = V1(pa = "0B", data = "0401").toHex()
-                    )
+                    asyncHex(0) {
+                        pa = "0B"
+                        data = "0301"
+                    }
+                    asyncHex(3) {
+                        pa = "0B"
+                        data = "0401"
+                    }
                     delay(time * 1000L)
                     wash(type = 1)
                 }
@@ -155,14 +141,14 @@ class HomeViewModel constructor(
             } else {
                 _uiState.value.washJob?.cancel()
                 _uiState.value = _uiState.value.copy(washJob = null)
-                SM.sendHex(
-                    index = 0,
-                    hex = V1(pa = "0B", data = "0300").toHex()
-                )
-                SM.sendHex(
-                    index = 3,
-                    hex = V1(pa = "0B", data = "0400").toHex()
-                )
+                asyncHex(0) {
+                    pa = "0B"
+                    data = "0300"
+                }
+                asyncHex(3) {
+                    pa = "0B"
+                    data = "0400"
+                }
             }
         }
     }
@@ -170,23 +156,23 @@ class HomeViewModel constructor(
     fun fill(type: Int) {
         viewModelScope.launch {
             if (type == 0) {
-                SM.sendHex(
-                    index = 0,
-                    hex = V1(pa = "0B", data = "0301").toHex()
-                )
-                SM.sendHex(
-                    index = 3,
-                    hex = V1(pa = "0B", data = "0401").toHex()
-                )
+                asyncHex(0) {
+                    pa = "0B"
+                    data = "0301"
+                }
+                asyncHex(3) {
+                    pa = "0B"
+                    data = "0401"
+                }
             } else {
-                SM.sendHex(
-                    index = 0,
-                    hex = V1(pa = "0B", data = "0300").toHex()
-                )
-                SM.sendHex(
-                    index = 3,
-                    hex = V1(pa = "0B", data = "0400").toHex()
-                )
+                asyncHex(0) {
+                    pa = "0B"
+                    data = "0300"
+                }
+                asyncHex(3) {
+                    pa = "0B"
+                    data = "0400"
+                }
             }
         }
     }
@@ -194,30 +180,30 @@ class HomeViewModel constructor(
     fun suckBack(type: Int) {
         viewModelScope.launch {
             if (type == 0) {
-                SM.sendHex(
-                    index = 0,
-                    hex = V1(pa = "0B", data = "0302").toHex()
-                )
-                SM.sendHex(
-                    index = 3,
-                    hex = V1(pa = "0B", data = "0402").toHex()
-                )
+                asyncHex(0) {
+                    pa = "0B"
+                    data = "0302"
+                }
+                asyncHex(3) {
+                    pa = "0B"
+                    data = "0402"
+                }
             } else {
-                SM.sendHex(
-                    index = 0,
-                    hex = V1(pa = "0B", data = "0300").toHex()
-                )
-                SM.sendHex(
-                    index = 3,
-                    hex = V1(pa = "0B", data = "0400").toHex()
-                )
+                asyncHex(0) {
+                    pa = "0B"
+                    data = "0300"
+                }
+                asyncHex(3) {
+                    pa = "0B"
+                    data = "0400"
+                }
             }
         }
     }
 
     fun start() {
         viewModelScope.launch {
-            val job = launch {
+            val job = launch(start = CoroutineStart.LAZY) {
                 launch {
                     while (true) {
                         delay(1000L)
@@ -234,14 +220,16 @@ class HomeViewModel constructor(
                         }
                     }
                 }
-                launch {
-                    updateLog(Log(name = _uiState.value.program?.name ?: "None"))
-                }
                 val executor = ProgramExecutor(
                     list = _uiState.value.pointList,
-                    settings = _settings.value,
+                    space = _uiState.value.needleSpace,
                     scope = this,
                 )
+                launch {
+                    uiState.collect {
+                        executor.pause = it.pause
+                    }
+                }
                 executor.event = {
                     when (it) {
                         is ExecutorEvent.CurrentContainer -> {
@@ -309,14 +297,7 @@ class HomeViewModel constructor(
 
                         }
 
-                        is ExecutorEvent.Log -> {
-                            _uiState.value.log?.let { l ->
-                                updateLog(l.copy(content = l.content + it.log))
-                            }
-                        }
-
                         is ExecutorEvent.Finish -> {
-                            reset()
                             completeDialog(
                                 name = _uiState.value.program?.name ?: "None",
                                 time = _uiState.value.time.getTimeFormat(),
@@ -326,14 +307,10 @@ class HomeViewModel constructor(
                                 ),
                             )
                             launch {
-                                _uiState.value.log?.let { l ->
-                                    updateLog(l.copy(status = 1))
-                                }
                                 delay(500L)
-                                while (SM.lock.value) {
-                                    delay(100L)
+                                waitLock {
+                                    waste()
                                 }
-                                waste()
                                 delay(500L)
                                 stop()
                             }
@@ -342,54 +319,39 @@ class HomeViewModel constructor(
                 }
                 executor.execute()
             }
+            job.start()
             _uiState.value = _uiState.value.copy(job = job)
         }
     }
 
     fun stop() {
         _uiState.value.job?.cancel()
-        val minIndex = _uiState.value.pointList.minOf { point -> point.index }
-        val maxX = _uiState.value.pointList.filter { point -> point.index == minIndex }
-            .maxOf { point -> point.x } + 1
-        val maxY = _uiState.value.pointList.filter { point -> point.index == minIndex }
-            .maxOf { point -> point.y } + 1
         _uiState.value = _uiState.value.copy(
             job = null,
-            log = null,
             time = 0L,
-            info = CurrentInfo().copy(
-                size = maxX to maxY,
+            info = _uiState.value.info.copy(
                 process = 0
             )
         )
-        SM.pause(false)
     }
 
     fun pause() {
         _uiState.value = _uiState.value.copy(pause = !_uiState.value.pause)
-        SM.pause(_uiState.value.pause)
-    }
-
-    private fun updateLog(log: Log) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(log = log)
-            LD.insert(log)
-        }
     }
 
 }
 
 data class HomeUiState(
-    val container: Container? = null,
+    val washTank: Pair<Float, Float> = Pair(0f, 0f),
     val info: CurrentInfo = CurrentInfo(),
     val job: Job? = null,
-    val log: Log? = null,
     val pause: Boolean = false,
     val pointList: List<Point> = emptyList(),
     val program: Program? = null,
     val programList: List<Program> = emptyList(),
     val time: Long = 0L,
     val washJob: Job? = null,
+    val needleSpace: Float = 12f,
 )
 
 data class CurrentInfo(
@@ -401,8 +363,4 @@ data class CurrentInfo(
     val size: Pair<Int, Int> = Pair(8, 12),
     val speed: Float = 0f,
     val tripleList: List<Triple<Int, Int, Boolean>> = emptyList(),
-)
-
-data class Settings(
-    val needleSpace: Float = 12f,
 )

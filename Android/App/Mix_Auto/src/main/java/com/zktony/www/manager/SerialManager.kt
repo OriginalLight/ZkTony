@@ -59,7 +59,6 @@ class SerialManager {
             _lock.value = true
             lockTime = 0L
         }
-        hex.hexFormat().logi("${index}发送Hex: ")
     }
 
     /**

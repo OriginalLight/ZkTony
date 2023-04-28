@@ -6,7 +6,6 @@ import com.zktony.serialport.protocol.v1
 import com.zktony.www.manager.MotorManager
 import com.zktony.www.manager.SerialManager
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 
 private val SM: SerialManager by inject(SerialManager::class.java)
@@ -67,31 +66,23 @@ fun execute(block: Execute.() -> Unit) {
         s3.append("${l1[6]},${l1[7]},${l1[8]},")
     }
 
-    SM.sendHex(
-        index = 0,
-        hex = v1 {
-            fn = "05"
-            pa = "04"
-            data = "0101" + s1.toString().toHex()
-        }
-    )
-    SM.sendHex(
-        index = 1,
-        hex = v1 {
-            fn = "05"
-            pa = "04"
-            data = "0101" + s2.toString().toHex()
-        }
-    )
-    SM.sendHex(
-        index = 2,
-        hex = v1 {
-            fn = "05"
-            pa = "04"
-            data = "0101" + s3.toString().toHex()
-        },
-        lock = true
-    )
+    asyncHex(0) {
+        fn = "05"
+        pa = "04"
+        data = "0101" + s1.toString().toHex()
+    }
+
+    asyncHex(1) {
+        fn = "05"
+        pa = "04"
+        data = "0101" + s2.toString().toHex()
+    }
+
+    syncHex(2) {
+        fn = "05"
+        pa = "04"
+        data = "0101" + s3.toString().toHex()
+    }
 }
 
 /**

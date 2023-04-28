@@ -30,6 +30,11 @@ class GradientPlate : View {
             field = value
             invalidate()
         }
+    var checked = listOf<Pair<Int, Boolean>>()
+        set(value) {
+            field = value
+            invalidate()
+        }
     var axis = listOf<Triple<Int, Float, Float>>()
 
     var onItemClick: (Int) -> Unit = { _ -> }
@@ -93,6 +98,28 @@ class GradientPlate : View {
                 height.toFloat() - 16,
                 paint
             )
+        }
+
+        // 每个矩形中竖着写字A B C D E F G H I J
+        for (i in 0 until size) {
+            val checked = checked.find { it.first == i }?.second ?: false
+            if (checked) {
+                val left = i * space + if (i == 0) 8 else 4
+                val right = (i + 1) * space - if (i == size - 1) 8 else 4
+                paint.style = Paint.Style.FILL
+                paint.color = Color.BLACK
+                paint.strokeWidth = 2f
+                paint.isAntiAlias = true
+                paint.textSize = space * 0.5f
+                val text = "√"
+                val textWidth = paint.measureText(text)
+                canvas?.drawText(
+                    text,
+                    left + (right - left - textWidth) / 2,
+                    32f,
+                    paint
+                )
+            }
         }
 
         for (i in 0 until size) {

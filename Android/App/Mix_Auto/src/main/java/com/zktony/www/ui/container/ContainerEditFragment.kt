@@ -88,8 +88,11 @@ class ContainerEditFragment :
                             val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
                             tvTitle.text = "${'A' + index} ${getString(R.string.coordinate)}"
                             val point = viewModel.uiState.value.list.find { it.index == index }
-                            inputAxis.setText(point?.axis?.removeZero() ?: "0")
-                            inputWaste.setText(point?.waste?.removeZero() ?: "0")
+                            val textAxis = point?.axis ?: 0f
+                            val textWaste = point?.waste ?: 0f
+                            inputAxis.setText(String.format("%.2f", textAxis))
+                            inputWaste.setText(String.format("%.2f", textWaste))
+
                             val maxYTrip = viewModel.uiState.value.maxYTrip
 
                             btnMoveAxis.clickNoRepeat {

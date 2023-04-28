@@ -151,7 +151,7 @@
             android:layout_marginBottom="8dp"
             android:background="@color/light_onPrimary">
 
-            <com.zktony.www.ui.widget.DynamicPlate
+            <com.zktony.core.widget.DynamicPlate
                 android:id="@+id/dynamic_plate"
                 android:layout_width="360dp"
                 android:layout_height="240dp"

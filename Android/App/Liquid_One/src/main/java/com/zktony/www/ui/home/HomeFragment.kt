@@ -119,12 +119,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                     clickScale()
                                     clickNoRepeat {
                                         washDialog(
-                                            {
-                                                viewModel.wash(time = it, type = 0)
-                                            },
-                                            {
-                                                viewModel.wash(type = 1)
-                                            }
+                                            block = { viewModel.fill(type = 0) },
+                                            block1 = { viewModel.fill(type = 1) }
                                         )
                                     }
                                 }

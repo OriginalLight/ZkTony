@@ -2,15 +2,11 @@ package com.zktony.www.ui.program
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.*
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.spannerDialog
+import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentProgramEditBinding
 import kotlinx.coroutines.launch
@@ -46,8 +42,8 @@ class ProgramEditFragment :
                             if (list.isNotEmpty()) {
                                 data = list.map { point -> Triple(point.x, point.y, point.enable) }
                                 holeOne.text = list.filter { point -> point.enable }.size.toString()
-                                x = list.maxOf { point -> point.y } + 1
-                                y = list.maxOf { point -> point.x } + 1
+                                column = list.maxOf { point -> point.y } + 1
+                                row = list.maxOf { point -> point.x } + 1
                             } else {
                                 holeOne.text = ""
                             }
@@ -68,8 +64,8 @@ class ProgramEditFragment :
                             if (list.isNotEmpty()) {
                                 data = list.map { point -> Triple(point.x, point.y, point.enable) }
                                 holeTwo.text = list.filter { point -> point.enable }.size.toString()
-                                x = list.maxOf { point -> point.y } + 1
-                                y = list.maxOf { point -> point.x } + 1
+                                column = list.maxOf { point -> point.y } + 1
+                                row = list.maxOf { point -> point.x } + 1
                             } else {
                                 holeTwo.text = ""
                             }
@@ -92,8 +88,8 @@ class ProgramEditFragment :
                                 data = list.map { point -> Triple(point.x, point.y, point.enable) }
                                 holeThree.text =
                                     list.filter { point -> point.enable }.size.toString()
-                                x = list.maxOf { point -> point.y } + 1
-                                y = list.maxOf { point -> point.x } + 1
+                                column = list.maxOf { point -> point.y } + 1
+                                row = list.maxOf { point -> point.x } + 1
                             } else {
                                 holeThree.text = ""
                             }
@@ -116,8 +112,8 @@ class ProgramEditFragment :
                                 data = list.map { point -> Triple(point.x, point.y, point.enable) }
                                 holeFour.text =
                                     list.filter { point -> point.enable }.size.toString()
-                                x = list.maxOf { point -> point.y } + 1
-                                y = list.maxOf { point -> point.x } + 1
+                                column = list.maxOf { point -> point.y } + 1
+                                row = list.maxOf { point -> point.x } + 1
                             } else {
                                 holeFour.text = ""
                             }

@@ -4,6 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
+import com.zktony.core.R
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
 import com.zktony.datastore.ext.read
@@ -24,12 +25,12 @@ class ConfigViewModel(
     init {
         viewModelScope.launch {
             launch {
-                DS.read("MAX_X_TRIP", 160f).collect {
+                DS.read("MAX_X_TRIP", 240f).collect {
                     _uiState.value = _uiState.value.copy(maxXTrip = it)
                 }
             }
             launch {
-                DS.read("MAX_Y_TRIP", 200f).collect {
+                DS.read("MAX_Y_TRIP", 320f).collect {
                     _uiState.value = _uiState.value.copy(maxYTrip = it)
                 }
             }
@@ -49,7 +50,7 @@ class ConfigViewModel(
     fun move(xAxis: Float, yAxis: Float) {
         viewModelScope.launch {
             decideLock {
-                yes { PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.running)) }
+                yes { PopTip.show(Ext.ctx.getString(R.string.running)) }
                 no {
                     execute {
                         step {
@@ -70,8 +71,8 @@ class ConfigViewModel(
 }
 
 data class ConfigUiStatus(
-    val maxXTrip: Float = 160f,
-    val maxYTrip: Float = 200f,
+    val maxXTrip: Float = 240f,
+    val maxYTrip: Float = 320f,
     val washXAxis: Float = 0f,
     val washYAxis: Float = 0f,
 )

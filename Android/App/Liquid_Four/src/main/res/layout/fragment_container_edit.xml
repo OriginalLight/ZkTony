@@ -18,6 +18,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
+            android:background="@color/light_onPrimary"
             tools:ignore="TextSizeCheck">
 
             <ImageButton
@@ -38,55 +39,189 @@
                 android:text="@string/title_container"
                 android:textAlignment="center"
                 android:textColor="@color/black"
-                android:textSize="24sp" />
+                android:textSize="24sp"
+                tools:ignore="RelativeOverlap" />
 
         </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/edit_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/light_onPrimary"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/size_form"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@mipmap/size"
+                    tools:ignore="ContentDescription,ImageContrastCheck" />
+
+                <TextView
+                    android:layout_width="92dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="center"
+                    android:text="@string/size"
+                    android:textColor="@color/black"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/size"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="A0"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    tools:ignore="HardcodedText" />
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@mipmap/edit"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="2dp" />
+
+            <LinearLayout
+                android:id="@+id/c1_form"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@mipmap/axis"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:id="@+id/c1_title"
+                    android:layout_width="92dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="center"
+                    android:text="A1"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/c1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="A0"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    tools:ignore="HardcodedText" />
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@mipmap/edit"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="2dp" />
+
+            <LinearLayout
+                android:id="@+id/c2_form"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@mipmap/axis"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:id="@+id/c2_title"
+                    android:layout_width="92dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:gravity="center"
+                    android:text="F8"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/c2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="A0"
+                    android:textColor="@color/black"
+                    android:textSize="24sp"
+                    tools:ignore="HardcodedText" />
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@mipmap/edit"
+                    tools:ignore="ContentDescription" />
+
+            </LinearLayout>
+
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="2dp" />
+
+
+        </LinearLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
-
-            <TextView
-                android:id="@+id/size"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="8dp"
-                android:textColor="@color/black"
-                android:textSize="22sp"
-                app:layout_constraintBottom_toTopOf="@+id/dynamic_plate"
-                app:layout_constraintStart_toStartOf="@+id/dynamic_plate"
-                tools:ignore="VisualLintBounds" />
-
-            <TextView
-                android:id="@+id/xmyn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginBottom="8dp"
-                android:textColor="@color/black"
-                android:textSize="22sp"
-                app:layout_constraintBottom_toTopOf="@+id/dynamic_plate"
-                app:layout_constraintEnd_toEndOf="@+id/dynamic_plate"
-                tools:ignore="VisualLintBounds" />
-
-            <TextView
-                android:id="@+id/x0y0"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="8dp"
-                android:textColor="@color/black"
-                android:textSize="22sp"
-                app:layout_constraintStart_toStartOf="@+id/dynamic_plate"
-                app:layout_constraintTop_toBottomOf="@+id/dynamic_plate"
-                tools:ignore="VisualLintBounds" />
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_weight="1"
+            android:background="@color/light_onPrimary">
 
             <com.zktony.core.widget.DynamicPlate
                 android:id="@+id/dynamic_plate"
-                android:layout_width="600dp"
-                android:layout_height="400dp"
+                android:layout_width="480dp"
+                android:layout_height="320dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

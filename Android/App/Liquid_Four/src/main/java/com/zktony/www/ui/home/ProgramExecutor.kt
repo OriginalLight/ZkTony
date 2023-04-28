@@ -1,14 +1,9 @@
 package com.zktony.www.ui.home
 
-import com.zktony.core.ext.*
+import com.zktony.core.ext.logi
 import com.zktony.www.common.ext.*
-import com.zktony.www.manager.SerialManager
 import com.zktony.www.room.entity.Point
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import org.koin.java.KoinJavaComponent.inject
+import kotlinx.coroutines.*
 
 /**
  * @author: 刘贺贺
@@ -18,25 +13,23 @@ import org.koin.java.KoinJavaComponent.inject
  */
 class ProgramExecutor constructor(
     private val list: List<Point>,
-    private val settings: Settings,
+    private val space: Float,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var event: (ExecutorEvent) -> Unit = {}
-    private val serialManager: SerialManager by inject(SerialManager::class.java)
+    var pause: Boolean = false
     private var complete: Int = 0
     private val currentList: MutableList<Triple<Int, Int, Boolean>> = mutableListOf()
 
     suspend fun execute() {
         scope.launch {
             delay(100L)
-            event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${Ext.ctx.getString(com.zktony.core.R.string.start)}\n"))
             val total = list.total()
             if (total > 0) {
                 list.list().forEach { index ->
                     event(ExecutorEvent.CurrentContainer(index))
                     for (e in 0..3) {
                         event(ExecutorEvent.Liquid(e))
-                        event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${e + 1}号液体,${index + 1}号板开始加液\n"))
                         list.toString().logi()
                         val pointList = list.filter { it.index == index }
                         val xLength = pointList.maxOf { it.x } + 1
@@ -51,33 +44,32 @@ class ProgramExecutor constructor(
                                     else -> 0
                                 }
                                 if (it.enable && liquid > 0) {
-                                    currentList.add(Triple(i, j, true))
-                                    event(ExecutorEvent.PointList(currentList))
-                                    while (serialManager.lock.value || serialManager.pause.value) {
-                                        delay(100)
-                                    }
-                                    execute {
-                                        step {
-                                            x = it.xAxis + settings.needleSpace * e
-                                            y = it.yAxis
+                                    waitLock {
+                                        while (pause) {
+                                            delay(100L)
                                         }
-                                        step {
-                                            x = it.xAxis + settings.needleSpace * e
-                                            y = it.yAxis
-                                            v1 = if (e == 0) it.v1.toFloat() else 0f
-                                            v2 = if (e == 1) it.v2.toFloat() else 0f
-                                            v3 = if (e == 2) it.v3.toFloat() else 0f
-                                            v4 = if (e == 3) it.v4.toFloat() else 0f
+                                        execute {
+                                            step {
+                                                x = it.xAxis + space * e
+                                                y = it.yAxis
+                                                v1 = if (e == 0) it.v1.toFloat() else 0f
+                                                v2 = if (e == 1) it.v2.toFloat() else 0f
+                                                v3 = if (e == 2) it.v3.toFloat() else 0f
+                                                v4 = if (e == 3) it.v4.toFloat() else 0f
+                                            }
                                         }
+                                        delay(100L)
+                                        currentList.add(Triple(i, j, true))
+                                        event(ExecutorEvent.PointList(currentList))
+                                        complete += 1
+                                        event(ExecutorEvent.Progress(total, complete))
                                     }
-                                    delay(100L)
-                                    while (serialManager.lock.value) {
-                                        delay(100)
-                                    }
-                                    complete += 1
-                                    event(ExecutorEvent.Progress(total, complete))
                                 }
                             }
+                        }
+                        waitLock {
+                            // 复位
+                            asyncHex(0) {}
                         }
                         currentList.clear()
                         event(ExecutorEvent.PointList(currentList))
@@ -85,7 +77,6 @@ class ProgramExecutor constructor(
                 }
             }
             event(ExecutorEvent.Finish)
-            event(ExecutorEvent.Log("[ ${currentTime()} ]\t ${Ext.ctx.getString(com.zktony.core.R.string.complete)}"))
         }
     }
 
@@ -93,11 +84,11 @@ class ProgramExecutor constructor(
     private suspend fun forEachHole(x: Int, y: Int, block: suspend (Int, Int) -> Unit) {
         for (i in 0 until y) {
             if (i % 2 == 0) {
-                for (j in 0 until x) {
+                for (j in x - 1 downTo 0) {
                     block(j, i)
                 }
             } else {
-                for (j in x - 1 downTo 0) {
+                for (j in 0 until x) {
                     block(j, i)
                 }
             }
@@ -110,6 +101,5 @@ sealed class ExecutorEvent {
     data class Liquid(val liquid: Int) : ExecutorEvent()
     data class PointList(val hole: List<Triple<Int, Int, Boolean>>) : ExecutorEvent()
     data class Progress(val total: Int, val complete: Int) : ExecutorEvent()
-    data class Log(val log: String) : ExecutorEvent()
     object Finish : ExecutorEvent()
 }

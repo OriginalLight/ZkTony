@@ -1,11 +1,8 @@
 package com.zktony.www.ui.home
 
-import com.zktony.www.common.ext.execute
-import com.zktony.www.common.ext.total
-import com.zktony.www.manager.SerialManager
+import com.zktony.www.common.ext.*
 import com.zktony.www.room.entity.Point
 import kotlinx.coroutines.*
-import org.koin.java.KoinJavaComponent.inject
 
 /**
  * @author: 刘贺贺
@@ -18,7 +15,7 @@ class ProgramExecutor constructor(
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var event: (ExecutorEvent) -> Unit = {}
-    private val serialManager: SerialManager by inject(SerialManager::class.java)
+    var pause: Boolean = false
     private var complete: Int = 0
     private val currentList: MutableList<Triple<Int, Int, Boolean>> = mutableListOf()
 
@@ -32,37 +29,27 @@ class ProgramExecutor constructor(
                 forEachHole(xLength, yLength) { i, j ->
                     list.find { it.x == i && it.y == j }?.let {
                         if (it.enable && it.v1 > 0) {
+                            waitLock {
+                                while (pause) {
+                                    delay(100L)
+                                }
+                                execute {
+                                    step {
+                                        x = it.xAxis
+                                        y = it.yAxis
+                                        v1 = it.v1.toFloat()
+                                    }
+                                }
+                            }
+                            delay(100L)
                             currentList.add(Triple(i, j, true))
                             event(ExecutorEvent.PointList(currentList))
-                            while (serialManager.lock.value || serialManager.pause.value) {
-                                delay(100)
-                            }
-                            execute {
-                                step {
-                                    x = it.xAxis
-                                    y = it.yAxis
-                                }
-                            }
-                            delay(100L)
-                            while (serialManager.lock.value || serialManager.pause.value) {
-                                delay(100)
-                            }
-                            execute {
-                                step {
-                                    x = it.xAxis
-                                    y = it.yAxis
-                                    v1 = it.v1.toFloat()
-                                }
-                            }
-                            delay(100L)
-                            while (serialManager.lock.value) {
-                                delay(100)
-                            }
                             complete += 1
                             event(ExecutorEvent.Progress(total, complete))
                         }
                     }
                 }
+                waitLock { syncHex { } }
                 currentList.clear()
                 event(ExecutorEvent.PointList(currentList))
             }

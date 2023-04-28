@@ -1,9 +1,10 @@
 package com.zktony.www.common.ext
 
 import com.zktony.core.ext.toHex
+import com.zktony.serialport.protocol.V1
 import com.zktony.www.manager.MotorManager
 import com.zktony.www.manager.SerialManager
-import com.zktony.serialport.protocol.v1
+import kotlinx.coroutines.delay
 import org.koin.java.KoinJavaComponent.inject
 
 private val SM: SerialManager by inject(SerialManager::class.java)
@@ -18,6 +19,19 @@ data class Step(
     var v3: Float = 0f,
     var v4: Float = 0f,
 )
+
+class YesNo {
+    var yes: suspend () -> Unit = {}
+    var no: suspend () -> Unit = {}
+
+    fun yes(block: suspend () -> Unit) {
+        yes = block
+    }
+
+    fun no(block: suspend () -> Unit) {
+        no = block
+    }
+}
 
 class Execute {
 
@@ -46,44 +60,109 @@ fun execute(block: Execute.() -> Unit) {
         volumeStr.append("${l1[3]},${l1[4]},${l1[5]},")
     }
 
-    if (list.size > 1) {
-        SM.sendHex(
-            index = 0,
-            hex = v1 {
-                fn = "05"
-                pa = "04"
-                data = "0101" + axisStr.toString().toHex()
-            }
-        )
-        SM.sendHex(
-            index = 3,
-            hex = v1 {
-                fn = "05"
-                pa = "04"
-                data = "0101" + volumeStr.toString().toHex()
-            },
-            lock = true
-        )
-    } else {
-        SM.sendHex(
-            index = 0,
-            hex = v1 {
-                fn = "05"
-                pa = "01"
-                data = "0101" + axisStr.toString().toHex()
-            }
-        )
-        SM.sendHex(
-            index = 3,
-            hex = v1 {
-                fn = "05"
-                pa = "01"
-                data = "0101" + volumeStr.toString().toHex()
-            },
-            lock = true
-        )
+    asyncHex(0) {
+        fn = "05"
+        pa = "04"
+        data = "0101" + axisStr.toString().toHex()
     }
 
+    syncHex(3) {
+        fn = "05"
+        pa = "04"
+        data = "0101" + volumeStr.toString().toHex()
+    }
 }
+
+/**
+ * 收集hex回复
+ * @param block (String?) -> Unit
+ */
+suspend fun collectHex(block: (Pair<Int, String?>) -> Unit) {
+    SM.callback.collect {
+        block(it)
+    }
+}
+
+/**
+ * 串口发送 lock = true
+ *
+ * @param index 串口号
+ * @param block V1协议
+ */
+fun syncHex(index: Int, block: V1.() -> Unit) {
+    SM.sendHex(index, V1().apply(block).toHex(), lock = true)
+}
+
+/**
+ * 串口发送 lock = false
+ *
+ * @param index 串口号
+ * @param block V1协议
+ */
+fun asyncHex(index: Int, block: V1.() -> Unit) {
+    SM.sendHex(index, V1().apply(block).toHex())
+}
+
+/**
+ * 串口发送 lock = true
+ *
+ * @param index 串口号
+ * @param block V1协议
+ */
+suspend fun waitSyncHex(index: Int, block: V1.() -> Unit) {
+    while (SM.lock.value) {
+        delay(100L)
+    }
+    syncHex(index, block)
+}
+
+
+/**
+ * 串口发送 lock = false
+ *
+ * @param index 串口号
+ * @param block V1协议
+ */
+suspend fun waitAsyncHex(index: Int, block: V1.() -> Unit) {
+    while (SM.lock.value) {
+        delay(100L)
+    }
+    asyncHex(index, block)
+}
+
+/**
+ * 收集锁
+ * @param block Boolean
+ */
+suspend fun collectLock(block: (Boolean) -> Unit) {
+    SM.lock.collect {
+        block(it)
+    }
+}
+
+/**
+ * 判定是否有锁
+ * @param block YesNo
+ */
+suspend fun decideLock(block: YesNo.() -> Unit) {
+    val yesNo = YesNo().apply(block)
+    if (SM.lock.value) {
+        yesNo.yes()
+    } else {
+        yesNo.no()
+    }
+}
+
+/**
+ * 等待解锁
+ * @param block () -> Unit
+ */
+suspend fun waitLock(block: suspend () -> Unit) {
+    while (SM.lock.value) {
+        delay(100L)
+    }
+    block()
+}
+
 
 

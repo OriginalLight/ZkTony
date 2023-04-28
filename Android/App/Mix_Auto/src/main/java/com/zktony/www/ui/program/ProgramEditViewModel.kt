@@ -83,11 +83,7 @@ class ProgramEditViewModel constructor(
     fun selectContainer(index: Int) {
         viewModelScope.launch {
             val c1 = _uiState.value.containerList.getOrNull(index) ?: return@launch
-            val c2 = _uiState.value.container ?: return@launch
-            if (c1.id == c2.id) return@launch
-
             _uiState.value = _uiState.value.copy(container = c1)
-
             delay(200L)
             val pid = _uiState.value.id
             PD.deleteBySubId(pid)

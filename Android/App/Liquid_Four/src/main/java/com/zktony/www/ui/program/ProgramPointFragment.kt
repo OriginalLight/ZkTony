@@ -52,8 +52,8 @@ class ProgramPointFragment :
                                 else -> getString(R.string.plate_one)
                             }
                             with(dynamicPlate) {
-                                x = it.list.maxOf { point -> point.y } + 1
-                                y = it.list.maxOf { point -> point.x } + 1
+                                column = it.list.maxOf { point -> point.y } + 1
+                                row = it.list.maxOf { point -> point.x } + 1
                                 data =
                                     it.list.map { point -> Triple(point.x, point.y, point.enable) }
                             }

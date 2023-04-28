@@ -1,12 +1,14 @@
 package com.zktony.www.ui.container
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
 import com.zktony.core.utils.Snowflake
+import com.zktony.datastore.ext.read
 import com.zktony.www.common.ext.*
-import com.zktony.www.manager.SerialManager
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.dao.PointDao
 import com.zktony.www.room.entity.Container
@@ -18,7 +20,7 @@ import kotlinx.coroutines.launch
 class ContainerEditViewModel constructor(
     private val CD: ContainerDao,
     private val PD: PointDao,
-    private val SM: SerialManager,
+    private val DS: DataStore<Preferences>,
 ) : BaseViewModel() {
 
 
@@ -35,6 +37,16 @@ class ContainerEditViewModel constructor(
             launch {
                 PD.getBySubId(id).collect {
                     _uiState.value = _uiState.value.copy(list = it)
+                }
+            }
+            launch {
+                DS.read("MAX_X_TRIP", 240f).collect {
+                    _uiState.value = _uiState.value.copy(maxXTrip = it)
+                }
+            }
+            launch {
+                DS.read("MAX_Y_TRIP", 320f).collect {
+                    _uiState.value = _uiState.value.copy(maxYTrip = it)
                 }
             }
         }
@@ -59,14 +71,17 @@ class ContainerEditViewModel constructor(
 
 
     fun move(xAxis: Float, yAxis: Float) {
-        if (SM.lock.value || SM.pause.value) {
-            PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.running))
-            return
-        }
-        execute {
-            step {
-                x = xAxis
-                y = yAxis
+        viewModelScope.launch {
+            decideLock {
+                yes { PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.running)) }
+                no {
+                    execute {
+                        step {
+                            x = xAxis
+                            y = yAxis
+                        }
+                    }
+                }
             }
         }
     }
@@ -90,4 +105,6 @@ class ContainerEditViewModel constructor(
 data class ContainerEditUiState(
     val container: Container? = null,
     val list: List<Point> = emptyList(),
+    val maxXTrip: Float = 240f,
+    val maxYTrip: Float = 320f,
 )

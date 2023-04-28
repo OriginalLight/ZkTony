@@ -46,12 +46,13 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         }
                         if (it.pointList.isNotEmpty()) {
                             gradientPlate.size = it.pointList.size
+                            gradientPlate.checked = it.pointList.map { p -> p.index to p.enable }
                         }
                         gradientPlate.data = it.info.pairs
 
                         time.text = it.time.getTimeFormat()
-                        currentCoagulantVolume.text = it.info.point.v1.toString()
-                        currentColloidVolume.text = it.info.point.v2.toString()
+                        currentCoagulantVolume.text = it.info.volume.first.toString()
+                        currentColloidVolume.text = it.info.volume.second.toString()
                         currentSpeed.text = String.format("%.2f", it.info.speed)
                         currentLastTime.text = it.info.lastTime.getTimeFormat()
                         progress.progress = it.info.process

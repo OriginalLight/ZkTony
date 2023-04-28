@@ -1,21 +1,14 @@
 package com.zktony.www.manager
 
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.int8ToHex
-import com.zktony.core.ext.logi
+import com.zktony.core.ext.*
 import com.zktony.www.R
-import com.zktony.www.common.ext.toMotor
-import com.zktony.www.common.ext.toV1
-import com.zktony.serialport.protocol.V1
+import com.zktony.www.common.ext.*
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Calibration
 import com.zktony.www.room.entity.Motor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.launch
 
 /**
  * @author: 刘贺贺
@@ -24,7 +17,6 @@ import kotlinx.coroutines.launch
 class MotorManager(
     private val MD: MotorDao,
     private val CD: CalibrationDao,
-    private val SM: SerialManager,
 ) {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -105,44 +97,37 @@ class MotorManager(
             }
             launch {
                 delay(5000L)
-                if (!SM.lock.value) {
-                    for (i in 0..1) {
-                        for (j in 1..3) {
-                            val serial = when (i) {
-                                0 -> 0
-                                else -> 3
-                            }
-                            SM.sendHex(
-                                index = serial,
-                                hex = V1(fn = "03", pa = "04", data = j.int8ToHex()).toHex()
-                            )
-                            delay(100L)
-                        }
-                    }
-                }
-            }
-            launch {
-                SM.ttys0Flow.collect {
-                    it?.let {
-                        it.toV1().run {
-                            if (fn == "03" && pa == "04") {
-                                val motor = data.toMotor()
-                                sync(motor.copy(id = motor.address - 1))
+                decideLock {
+                    no {
+                        for (i in 0..1) {
+                            for (j in 1..3) {
+                                val serial = when (i) {
+                                    0 -> 0
+                                    else -> 3
+                                }
+                                asyncHex(serial) {
+                                    fn = "03"
+                                    pa = "04"
+                                    data = j.int8ToHex()
+                                }
+                                delay(100L)
                             }
                         }
                     }
                 }
             }
             launch {
-                SM.ttys3Flow.collect {
-                    it?.let {
-                        it.toV1().run {
-                            if (fn == "03" && pa == "04") {
-                                val motor = data.toMotor()
-                                sync(motor.copy(id = motor.address + 2))
-                            }
+                collectHex {
+                    val index = it.first
+                    val hex = it.second
+                    if (hex != null) {
+                        val v1 = hex.toV1()
+                        if (v1.fn == "03" && v1.pa == "04") {
+                            val motor = v1.data.toMotor()
+                            sync(motor.copy(id = if (index == 0) motor.address - 1 else motor.address + 2))
                         }
                     }
+
                 }
             }
         }

@@ -58,7 +58,6 @@ class ContainerViewHolder(
         binding.apply {
             container = item
             order.text = (layoutPosition + 1).toString()
-            size.text = "${item.x} x ${item.y}"
             with(edit) {
                 clickScale()
                 clickNoRepeat {

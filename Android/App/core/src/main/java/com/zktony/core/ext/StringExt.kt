@@ -25,6 +25,7 @@ fun String.removeZero(): String {
 }
 
 fun Float.removeZero(): String {
+    if (this == 0f) return ""
     // 去除小数点后面的0
     var str = this.toString()
     if (str.indexOf(".") > 0) {

@@ -4,13 +4,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
+import com.zktony.core.R
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
 import com.zktony.core.utils.Snowflake
 import com.zktony.datastore.ext.read
-import com.zktony.www.common.ext.calculateCoordinate
-import com.zktony.www.common.ext.execute
-import com.zktony.www.manager.SerialManager
+import com.zktony.www.common.ext.*
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.dao.PointDao
 import com.zktony.www.room.entity.Container
@@ -22,7 +21,6 @@ import kotlinx.coroutines.launch
 class ContainerEditViewModel constructor(
     private val CD: ContainerDao,
     private val PD: PointDao,
-    private val SM: SerialManager,
     private val DS: DataStore<Preferences>
 ) : BaseViewModel() {
 
@@ -74,14 +72,17 @@ class ContainerEditViewModel constructor(
 
 
     fun move(xAxis: Float, yAxis: Float) {
-        if (SM.lock.value || SM.pause.value) {
-            PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.running))
-            return
-        }
-        execute {
-            step {
-                x = xAxis
-                y = yAxis
+        viewModelScope.launch {
+            decideLock {
+                yes { PopTip.show(Ext.ctx.getString(R.string.running)) }
+                no {
+                    execute {
+                        step {
+                            x = xAxis
+                            y = yAxis
+                        }
+                    }
+                }
             }
         }
     }

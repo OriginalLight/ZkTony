@@ -9,6 +9,7 @@
     <string name="container_name">Name</string>
     <string name="custom_off">Custom OFF</string>
     <string name="custom_on">Custom ON</string>
+    <string name="in_operation">The institution is in operation</string>
     <string name="line_cleaning">Line cleaning</string>
     <string name="max_x_trip">Maximum travel on the x-axis</string>
     <string name="max_y_trip">Maximum travel on the y-axis</string>

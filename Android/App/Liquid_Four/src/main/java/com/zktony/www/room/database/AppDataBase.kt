@@ -11,7 +11,6 @@ import com.zktony.www.room.entity.*
 @Database(
     entities =
     [
-        Log::class,
         Motor::class,
         Calibration::class,
         CalibrationData::class,
@@ -24,7 +23,6 @@ import com.zktony.www.room.entity.*
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun logDao(): LogDao
     abstract fun motorDao(): MotorDao
     abstract fun calibrationDao(): CalibrationDao
     abstract fun calibrationDataDao(): CalibrationDataDao

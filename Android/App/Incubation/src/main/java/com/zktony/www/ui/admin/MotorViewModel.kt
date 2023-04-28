@@ -4,18 +4,14 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
-import com.zktony.www.manager.SerialManager
-import com.zktony.serialport.protocol.V1
+import com.zktony.www.common.ext.asyncHex
 import com.zktony.www.room.dao.MotorDao
 import com.zktony.www.room.entity.Motor
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 class MotorViewModel constructor(
     private val MD: MotorDao,
-    private val SM: SerialManager
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(MotorUiState())
@@ -111,7 +107,10 @@ class MotorViewModel constructor(
                             2
                         }
                     }
-                    SM.sendHex(serial, V1(pa = "04", data = it.toHex()).toHex())
+                    asyncHex(serial) {
+                        pa = "04"
+                        data = it.toHex()
+                    }
                     PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.update_success))
                 }
             }

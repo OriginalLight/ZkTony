@@ -9,6 +9,7 @@
     <string name="container_name">容器名</string>
     <string name="custom_off">自定义：关</string>
     <string name="custom_on">自定义：开</string>
+    <string name="in_operation">机构运行中</string>
     <string name="line_cleaning">管路清洗</string>
     <string name="max_x_trip">X轴最大行程</string>
     <string name="max_y_trip">Y轴最大行程</string>

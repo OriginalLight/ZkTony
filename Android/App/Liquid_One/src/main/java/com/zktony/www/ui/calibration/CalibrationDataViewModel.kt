@@ -2,8 +2,8 @@ package com.zktony.www.ui.calibration
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
+import com.zktony.www.common.ext.collectLock
 import com.zktony.www.common.ext.execute
-import com.zktony.www.manager.SerialManager
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.CalibrationDataDao
 import com.zktony.www.room.entity.Calibration
@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 class CalibrationDataViewModel constructor(
     private val CD: CalibrationDao,
     private val CDD: CalibrationDataDao,
-    private val SM: SerialManager,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(CalibrationDataUiState())
@@ -33,13 +32,8 @@ class CalibrationDataViewModel constructor(
                 }
             }
             launch {
-                SM.lock.collect {
+                collectLock {
                     _uiState.value = _uiState.value.copy(lock = it)
-                }
-            }
-            launch {
-                SM.pause.collect {
-                    _uiState.value = _uiState.value.copy(work = it)
                 }
             }
         }
@@ -103,5 +97,4 @@ data class CalibrationDataUiState(
     val expect: Float = 0f,
     val actual: Float = 0f,
     val lock: Boolean = false,
-    val work: Boolean = false,
 )

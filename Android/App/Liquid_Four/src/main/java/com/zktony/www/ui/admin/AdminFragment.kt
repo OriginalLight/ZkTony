@@ -1,15 +1,19 @@
 package com.zktony.www.ui.admin
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import androidx.core.view.isVisible
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.*
+import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
 import com.zktony.core.model.QrCode
@@ -110,7 +114,26 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             with(setting) {
                 clickScale()
                 clickNoRepeat {
-                    authDialog { findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor) }
+                    authDialog {
+                        CustomDialog.build()
+                            .setCustomView(object :
+                                OnBindView<CustomDialog>(R.layout.layout_select) {
+                                override fun onBind(dialog: CustomDialog, v: View) {
+                                    val motor = v.findViewById<MaterialButton>(R.id.motor)
+                                    val config = v.findViewById<MaterialButton>(R.id.config)
+                                    motor.clickNoRepeat(1000L) {
+                                        findNavController().navigate(R.id.action_navigation_admin_to_navigation_motor)
+                                        dialog.dismiss()
+                                    }
+                                    config.clickNoRepeat(1000L) {
+                                        findNavController().navigate(R.id.action_navigation_admin_to_navigation_config)
+                                        dialog.dismiss()
+                                    }
+                                }
+                            })
+                            .setMaskColor(Color.parseColor("#4D000000"))
+                            .show()
+                    }
                 }
             }
 

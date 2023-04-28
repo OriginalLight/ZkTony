@@ -3,12 +3,8 @@ package com.zktony.www.ui.home
 import com.zktony.core.ext.currentTime
 import com.zktony.core.ext.getTimeFormat
 import com.zktony.core.utils.Queue
-import com.zktony.www.room.entity.Action
-import com.zktony.www.room.entity.ActionEnum
-import com.zktony.www.room.entity.Container
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
+import com.zktony.www.room.entity.*
+import kotlinx.coroutines.*
 
 /**
  * @author: 刘贺贺
@@ -22,7 +18,7 @@ class ProgramExecutor constructor(
     val queue: Queue<Action>,
     val module: Int,
     val container: Container,
-    val settings: Settings,
+    val recycle: Boolean,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) {
     var event: (ExecutorEvent) -> Unit = {}
@@ -31,7 +27,7 @@ class ProgramExecutor constructor(
             module = module,
             con = container,
             event = { event(ExecutorEvent.Wait(module, it)) },
-            settings = settings
+            recycle = recycle
         )
     }
 

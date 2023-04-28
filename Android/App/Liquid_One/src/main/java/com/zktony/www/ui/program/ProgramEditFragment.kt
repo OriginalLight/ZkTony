@@ -11,9 +11,9 @@ import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
+import com.zktony.core.widget.DynamicPlate
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentProgramEditBinding
-import com.zktony.www.ui.widget.DynamicPlate
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

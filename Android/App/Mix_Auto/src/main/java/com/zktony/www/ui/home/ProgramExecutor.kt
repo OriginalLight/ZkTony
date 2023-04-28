@@ -24,10 +24,10 @@ class ProgramExecutor constructor(
             delay(100L)
             val total = list.total()
             if (total > 0) {
-                for (i in list.indices) {
+                for (i in list.indices.reversed()) {
                     val point = list.find { it.index == i && it.enable }
                     if (point != null && point.enable) {
-                        event(ExecutorEvent.CurrentPoint(point))
+                        event(ExecutorEvent.Volume(point.v3 to point.v4))
                         currentList.add(Pair(i, true))
                         event(ExecutorEvent.FinishList(currentList))
 
@@ -56,6 +56,8 @@ class ProgramExecutor constructor(
                                 delay(100L)
                             }
                         }
+
+                        event(ExecutorEvent.Volume(point.v1 to point.v2))
 
                         waitLock {
                             while (pause) {
@@ -94,7 +96,7 @@ class ProgramExecutor constructor(
 }
 
 sealed class ExecutorEvent {
-    data class CurrentPoint(val point: Point) : ExecutorEvent()
+    data class Volume(val volume: Pair<Int, Int>) : ExecutorEvent()
     data class FinishList(val list: List<Pair<Int, Boolean>>) : ExecutorEvent()
     data class Progress(val total: Int, val complete: Int) : ExecutorEvent()
     object Finish : ExecutorEvent()

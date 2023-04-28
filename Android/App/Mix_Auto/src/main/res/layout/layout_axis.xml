@@ -43,7 +43,7 @@
             android:layout_weight="2"
             android:gravity="center"
             android:imeOptions="actionNext"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:nextFocusForward="@id/input_v2"
             android:textColor="@color/black"
             android:textSize="18sp"

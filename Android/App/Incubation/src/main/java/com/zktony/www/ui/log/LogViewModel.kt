@@ -3,10 +3,7 @@ package com.zktony.www.ui.log
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.getDayEnd
-import com.zktony.core.ext.getDayStart
-import com.zktony.core.ext.logi
+import com.zktony.core.ext.*
 import com.zktony.www.room.dao.LogDao
 import com.zktony.www.room.entity.Log
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,7 +25,6 @@ class LogViewModel constructor(
         viewModelScope.launch {
             LD.getAll().collect {
                 _uiState.value = _uiState.value.copy(list = it)
-                it.toString().logi()
             }
         }
     }
