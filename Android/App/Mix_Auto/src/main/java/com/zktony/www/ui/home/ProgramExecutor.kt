@@ -82,11 +82,19 @@ class ProgramExecutor constructor(
                                         data = "0305"
                                     }
                                 }
+                                delay(100L)
                             }
                         }
 
                         complete += 1
                         event(ExecutorEvent.Progress(total, complete))
+                    }
+                }
+                waitLock {
+                    asyncHex(0) { }
+                    asyncHex(3) {
+                        pa = "0B"
+                        data = "0305"
                     }
                 }
             }

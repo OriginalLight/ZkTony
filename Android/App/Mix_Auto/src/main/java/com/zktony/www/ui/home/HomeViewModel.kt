@@ -74,16 +74,15 @@ class HomeViewModel constructor(
 
     fun reset() {
         viewModelScope.launch {
-            if (_uiState.value.job == null) {
-                waitLock {
+            decideLock {
+                yes { PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.running)) }
+                no {
                     asyncHex(0) { }
                     asyncHex(3) {
                         pa = "0B"
                         data = "0305"
                     }
                 }
-            } else {
-                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.stop_all))
             }
         }
     }
@@ -182,7 +181,6 @@ class HomeViewModel constructor(
                     pairs = emptyList(),
                 )
             )
-            reset()
         }
     }
 
