@@ -1,4 +1,4 @@
-package com.zktony.serialport
+package com.zktony.serialport.config
 
 data class SerialConfig(
     /**
@@ -44,8 +44,18 @@ data class SerialConfig(
      * 发送延时
      */
     var delay: Long = 30L,
+
+    /**
+     * CMD_SHELL
+     */
+    var cmdSuShell: CmdSuShell = CmdSuShell.CMD_X_BIN_SU_SHELL,
 )
 
 fun serialConfig(block: SerialConfig.() -> Unit): SerialConfig {
     return SerialConfig().apply(block)
+}
+
+enum class CmdSuShell {
+    CMD_BIN_SU_SHELL,
+    CMD_X_BIN_SU_SHELL,
 }

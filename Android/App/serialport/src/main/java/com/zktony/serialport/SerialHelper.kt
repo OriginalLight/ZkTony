@@ -2,6 +2,7 @@ package com.zktony.serialport
 
 import android.os.Message
 import android.util.Log
+import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.DataConversion.hexStringToBytes
 import java.io.IOException
 import java.io.UnsupportedEncodingException

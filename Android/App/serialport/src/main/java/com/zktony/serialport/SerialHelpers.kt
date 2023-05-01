@@ -1,6 +1,7 @@
 package com.zktony.serialport
 
 import android.util.Log
+import com.zktony.serialport.config.SerialConfig
 
 class SerialHelpers {
     private val serialMap: MutableMap<Int, SerialHelper> = HashMap()

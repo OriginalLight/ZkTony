@@ -2,7 +2,7 @@ package com.zktony.www.manager
 
 import com.zktony.core.ext.logi
 import com.zktony.serialport.SerialHelper
-import com.zktony.serialport.serialConfig
+import com.zktony.serialport.config.serialConfig
 import com.zktony.www.manager.protocol.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow

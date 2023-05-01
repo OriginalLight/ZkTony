@@ -1,9 +1,15 @@
 package com.zktony.serialport
 
-import android.os.*
+import android.os.Handler
+import android.os.HandlerThread
+import android.os.Message
+import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.core.SerialPort
 import com.zktony.serialport.ext.DataConversion.bytesToHexString
-import java.io.*
+import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.security.InvalidParameterException
 
 /**
@@ -40,7 +46,8 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
             dataBits = config.dataBits,
             parity = config.parity,
             flowCon = config.flowCon,
-            flags = config.flags
+            flags = config.flags,
+            cmdSuShell = config.cmdSuShell
         )
         serialPort?.let {
             outputStream = it.outputStream

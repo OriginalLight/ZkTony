@@ -4,7 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.removeZero
-import com.zktony.serialport.SerialConfig
+import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.SerialHelpers
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow

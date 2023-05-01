@@ -1,12 +1,18 @@
 package com.zktony.www.manager
 
-import com.zktony.core.ext.*
+import com.zktony.core.ext.hexToInt8
+import com.zktony.core.ext.logd
+import com.zktony.core.ext.logi
+import com.zktony.core.ext.verifyHex
 import com.zktony.serialport.SerialHelper
-import com.zktony.serialport.serialConfig
+import com.zktony.serialport.config.serialConfig
 import com.zktony.www.common.ext.toV1
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class SerialManager {
 
