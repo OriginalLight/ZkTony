@@ -1,4 +1,4 @@
-use ::entity::*;
+use ::entity::prelude::*;
 use sea_orm::*;
 
 pub struct ApplicationMutation;

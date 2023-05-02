@@ -1,6 +1,6 @@
 use chrono::NaiveDateTime;
 
-use entity::{ApplicationModel, LogDetailModel, LogModel, ProgramModel};
+use entity::prelude::{ApplicationModel, LogDetailModel, LogModel, ProgramModel};
 
 use application::*;
 use log::*;
