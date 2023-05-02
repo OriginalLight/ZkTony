@@ -9,6 +9,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // init tracing
     tracing_subscriber::fmt()
+        .with_ansi(true)
+        .with_thread_names(true)
+        .with_target(true)
+        .with_span_events(tracing_subscriber::fmt::format::FmtSpan::CLOSE)
         .with_max_level(tracing::Level::from_str(&CFG.log.log_level).unwrap())
         .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
         .init();
@@ -24,7 +28,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         tracing::info!("Starting {} at {}", &CFG.server.name, addr);
 
         let serve = Server::builder()
-            .enable_ssl()?
+            .enable_ssl()
             .add_grpc_service(db_conn.clone())
             .add_service(health_svc().await)
             .serve_with_shutdown(addr, shutdown_signal(addr));

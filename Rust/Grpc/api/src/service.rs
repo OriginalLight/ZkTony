@@ -2,7 +2,7 @@ use grpc_core::{sea_orm::DbConn, *};
 
 use tonic::{
     codec::CompressionEncoding,
-    transport::{server::Router, server::Server, Error, Identity, ServerTlsConfig},
+    transport::{server::Router, server::Server, Identity, ServerTlsConfig},
     Code, Request, Response, Status,
 };
 
@@ -459,7 +459,7 @@ impl TestService for MyTestServer {
 
 pub trait ServerExt {
     fn add_grpc_service(self, db_conn: DbConn) -> Router;
-    fn enable_ssl(self) -> Result<Self, Error>
+    fn enable_ssl(self) -> Self
     where
         Self: Sized;
 }
@@ -513,14 +513,15 @@ impl ServerExt for Server {
             .add_service(test_svc)
     }
 
-    fn enable_ssl(self) -> Result<Self, Error> {
+    fn enable_ssl(self) -> Self {
         let cert = std::fs::read_to_string(&CFG.cert.cert).unwrap();
         let key = std::fs::read_to_string(&CFG.cert.key).unwrap();
         let identity = Identity::from_pem(cert, key);
         if CFG.server.ssl {
             self.tls_config(ServerTlsConfig::new().identity(identity.clone()))
+                .unwrap()
         } else {
-            Ok(self)
+            self
         }
     }
 }
