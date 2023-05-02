@@ -6,14 +6,16 @@ use tonic::{
     Code, Request, Response, Status,
 };
 
-use super::CFG;
-
-use super::protobuf::{
-    application::{application_service_server::*, *},
-    log::{log_service_server::*, *},
-    log_detail::{log_detail_service_server::*, *},
-    program::{program_service_server::*, *},
-    test::{test_service_server::*, *},
+use super::{
+    health::health_svc,
+    protobuf::{
+        application::{application_service_server::*, *},
+        log::{log_service_server::*, *},
+        log_detail::{log_detail_service_server::*, *},
+        program::{program_service_server::*, *},
+        test::{test_service_server::*, *},
+    },
+    CFG,
 };
 
 #[derive(Debug, Default, Clone)]
@@ -42,24 +44,24 @@ pub struct MyTestServer {}
 #[tonic::async_trait]
 impl ApplicationService for MyApplicationServer {
     #[tracing::instrument]
-    async fn get_applications(
+    async fn query(
         &self,
-        request: Request<ApplicationRequestPage>,
-    ) -> Result<Response<ApplicationReplyPage>, Status> {
+        request: Request<ApplicationRequestQuery>,
+    ) -> Result<Response<ApplicationReplyQuery>, Status> {
         let conn = &self.db_conn;
-        let (page, page_size) = request.into_inner().into_page();
+        let form = request.into_inner().into_query();
 
-        if page == 0 || page_size == 0 {
+        if form.page == 0 || form.page_size == 0 {
             return Err(Status::invalid_argument(
                 "Page and page size cannot be zero",
             ));
         }
 
-        ApplicationQuery::get_applications_in_page(conn, page, page_size)
+        ApplicationQuery::query(conn, form)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|(models, total)| {
-                Response::new(ApplicationReplyPage {
+                Response::new(ApplicationReplyQuery {
                     list: models
                         .iter()
                         .map(|model| Application::from(model.clone()))
@@ -70,82 +72,84 @@ impl ApplicationService for MyApplicationServer {
     }
 
     #[tracing::instrument]
-    async fn get_by_application_id(
-        &self,
-        request: Request<ApplicationSearch>,
-    ) -> Result<Response<Application>, Status> {
-        let conn = &self.db_conn;
-        let application_id = request.into_inner().application_id;
-
-        if application_id.is_empty() {
-            return Err(Status::invalid_argument("Application id cannot be empty"));
-        }
-
-        ApplicationQuery::get_by_application_id(conn, application_id)
-            .await
-            .map_err(|e| Status::internal(e.to_string()))
-            .map(|model| {
-                model
-                    .map(|m| Ok(Response::new(Application::from(m))))
-                    .unwrap_or_else(|| Err(Status::not_found("Cannot find application")))
-            })?
-    }
-
-    #[tracing::instrument]
-    async fn get_by_id(
-        &self,
-        request: Request<ApplicationId>,
-    ) -> Result<Response<Application>, Status> {
-        let conn = &self.db_conn;
-        let id = request.into_inner().id;
-
-        ApplicationQuery::get_application_by_id(conn, id)
-            .await
-            .map_err(|e| Status::internal(e.to_string()))
-            .map(|model| {
-                model
-                    .map(|m| Ok(Response::new(Application::from(m))))
-                    .unwrap_or_else(|| Err(Status::not_found("Cannot find application")))
-            })?
-    }
-
-    #[tracing::instrument]
-    async fn add_application(
-        &self,
-        request: Request<Application>,
-    ) -> Result<Response<ApplicationId>, Status> {
-        let conn = &self.db_conn;
-        let input = request.into_inner().into_model();
-
-        ApplicationMutation::create_application(conn, input)
-            .await
-            .map_err(|e| Status::internal(e.to_string()))
-            .map(|model| Response::new(ApplicationId { id: model.id }))
-    }
-
-    #[tracing::instrument]
-    async fn update_application(
+    async fn insert(
         &self,
         request: Request<Application>,
     ) -> Result<Response<ApplicationReply>, Status> {
         let conn = &self.db_conn;
-        let input = request.into_inner().into_model();
+        let model = request.into_inner().into_model();
 
-        ApplicationMutation::update_application(conn, input)
+        ApplicationMutation::insert(conn, model)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|_| Response::new(ApplicationReply { success: true }))
     }
 
     #[tracing::instrument]
-    async fn delete_application(
+    async fn insert_batch(
         &self,
-        request: Request<ApplicationId>,
+        request: Request<ApplicationList>,
     ) -> Result<Response<ApplicationReply>, Status> {
         let conn = &self.db_conn;
-        let id = request.into_inner().id;
+        let models = request.into_inner().into_models();
 
-        ApplicationMutation::delete_application(conn, id)
+        ApplicationMutation::insert_batch(conn, models)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(ApplicationReply { success: true }))
+    }
+
+    #[tracing::instrument]
+    async fn update(
+        &self,
+        request: Request<Application>,
+    ) -> Result<Response<ApplicationReply>, Status> {
+        let conn = &self.db_conn;
+        let model = request.into_inner().into_model();
+
+        ApplicationMutation::update(conn, model)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(ApplicationReply { success: true }))
+    }
+
+    #[tracing::instrument]
+    async fn update_batch(
+        &self,
+        request: Request<ApplicationList>,
+    ) -> Result<Response<ApplicationReply>, Status> {
+        let conn = &self.db_conn;
+        let models = request.into_inner().into_models();
+
+        ApplicationMutation::update_batch(conn, models)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(ApplicationReply { success: true }))
+    }
+
+    #[tracing::instrument]
+    async fn delete(
+        &self,
+        request: Request<Application>,
+    ) -> Result<Response<ApplicationReply>, Status> {
+        let conn = &self.db_conn;
+        let model = request.into_inner().into_model();
+
+        ApplicationMutation::delete(conn, model)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(ApplicationReply { success: true }))
+    }
+
+    #[tracing::instrument]
+    async fn delete_batch(
+        &self,
+        request: Request<ApplicationList>,
+    ) -> Result<Response<ApplicationReply>, Status> {
+        let conn = &self.db_conn;
+        let models = request.into_inner().into_models();
+
+        ApplicationMutation::delete_batch(conn, models)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|_| Response::new(ApplicationReply { success: true }))
@@ -155,24 +159,24 @@ impl ApplicationService for MyApplicationServer {
 #[tonic::async_trait]
 impl LogService for MyLogServer {
     #[tracing::instrument]
-    async fn get_logs(
+    async fn query(
         &self,
-        request: Request<LogRequestPage>,
-    ) -> Result<Response<LogReplyPage>, Status> {
+        request: Request<LogRequestQuery>,
+    ) -> Result<Response<LogReplyQuery>, Status> {
         let conn = &self.db_conn;
-        let (page, page_size) = request.into_inner().into_page();
+        let form = request.into_inner().into_query();
 
-        if page == 0 || page_size == 0 {
+        if form.page == 0 || form.page_size == 0 {
             return Err(Status::invalid_argument(
                 "Page and page size cannot be zero",
             ));
         }
 
-        LogQuery::get_logs_in_page(conn, page, page_size)
+        LogQuery::query(conn, form)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|(models, total)| {
-                Response::new(LogReplyPage {
+                Response::new(LogReplyQuery {
                     list: models
                         .iter()
                         .map(|model| Log::from(model.clone()))
@@ -183,59 +187,66 @@ impl LogService for MyLogServer {
     }
 
     #[tracing::instrument]
-    async fn get_by_id(&self, request: Request<LogId>) -> Result<Response<Log>, Status> {
+    async fn insert(&self, request: Request<Log>) -> Result<Response<LogReply>, Status> {
         let conn = &self.db_conn;
-        let id = request.into_inner().id;
+        let model = request.into_inner().into_model();
 
-        LogQuery::get_log_by_id(conn, id)
-            .await
-            .map_err(|e| Status::internal(e.to_string()))
-            .map(|model| {
-                model
-                    .map(|m| Ok(Response::new(Log::from(m))))
-                    .unwrap_or_else(|| Err(Status::not_found("Cannot find log")))
-            })?
-    }
-
-    #[tracing::instrument]
-    async fn add_log(&self, request: Request<Log>) -> Result<Response<LogId>, Status> {
-        let conn = &self.db_conn;
-        let input = request.into_inner().into_model();
-
-        LogMutation::create_log(conn, input)
-            .await
-            .map_err(|e| Status::internal(e.to_string()))
-            .map(|model| Response::new(LogId { id: model.id }))
-    }
-
-    #[tracing::instrument]
-    async fn add_logs(&self, request: Request<LogList>) -> Result<Response<LogReply>, Status> {
-        let conn = &self.db_conn;
-        let input = request.into_inner().into_models();
-
-        LogMutation::create_logs(conn, input)
+        LogMutation::insert(conn, model)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|_| Response::new(LogReply { success: true }))
     }
 
     #[tracing::instrument]
-    async fn update_log(&self, request: Request<Log>) -> Result<Response<LogReply>, Status> {
+    async fn insert_batch(&self, request: Request<LogList>) -> Result<Response<LogReply>, Status> {
         let conn = &self.db_conn;
-        let input = request.into_inner().into_model();
+        let models = request.into_inner().into_models();
 
-        LogMutation::update_log(conn, input)
+        LogMutation::insert_batch(conn, models)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|_| Response::new(LogReply { success: true }))
     }
 
     #[tracing::instrument]
-    async fn delete_log(&self, request: Request<LogId>) -> Result<Response<LogReply>, Status> {
+    async fn update(&self, request: Request<Log>) -> Result<Response<LogReply>, Status> {
         let conn = &self.db_conn;
-        let id = request.into_inner().id;
+        let model = request.into_inner().into_model();
 
-        LogMutation::delete_log(conn, id)
+        LogMutation::update(conn, model)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(LogReply { success: true }))
+    }
+
+    #[tracing::instrument]
+    async fn update_batch(&self, request: Request<LogList>) -> Result<Response<LogReply>, Status> {
+        let conn = &self.db_conn;
+        let models = request.into_inner().into_models();
+
+        LogMutation::update_batch(conn, models)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(LogReply { success: true }))
+    }
+
+    #[tracing::instrument]
+    async fn delete(&self, request: Request<Log>) -> Result<Response<LogReply>, Status> {
+        let conn = &self.db_conn;
+        let model = request.into_inner().into_model();
+
+        LogMutation::delete(conn, model)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(LogReply { success: true }))
+    }
+
+    #[tracing::instrument]
+    async fn delete_batch(&self, request: Request<LogList>) -> Result<Response<LogReply>, Status> {
+        let conn = &self.db_conn;
+        let models = request.into_inner().into_models();
+
+        LogMutation::delete_batch(conn, models)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|_| Response::new(LogReply { success: true }))
@@ -245,24 +256,24 @@ impl LogService for MyLogServer {
 #[tonic::async_trait]
 impl LogDetailService for MyLogDetailServer {
     #[tracing::instrument]
-    async fn get_log_details(
+    async fn query(
         &self,
-        request: Request<LogDetailRequestPage>,
-    ) -> Result<Response<LogDetailReplyPage>, Status> {
+        request: Request<LogDetailRequestQuery>,
+    ) -> Result<Response<LogDetailReplyQuery>, Status> {
         let conn = &self.db_conn;
-        let (page, page_size) = request.into_inner().into_page();
+        let form = request.into_inner().into_query();
 
-        if page == 0 || page_size == 0 {
+        if form.page == 0 || form.page_size == 0 {
             return Err(Status::invalid_argument(
                 "Page and page size cannot be zero",
             ));
         }
 
-        LogDetailQuery::get_log_details_in_page(conn, page, page_size)
+        LogDetailQuery::query(conn, form)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|(models, total)| {
-                Response::new(LogDetailReplyPage {
+                Response::new(LogDetailReplyQuery {
                     list: models
                         .iter()
                         .map(|model| LogDetail::from(model.clone()))
@@ -273,74 +284,84 @@ impl LogDetailService for MyLogDetailServer {
     }
 
     #[tracing::instrument]
-    async fn get_by_id(
-        &self,
-        request: Request<LogDetailId>,
-    ) -> Result<Response<LogDetail>, Status> {
-        let conn = &self.db_conn;
-        let id = request.into_inner().id;
-
-        LogDetailQuery::get_log_detail_by_id(conn, id)
-            .await
-            .map_err(|e| Status::internal(e.to_string()))
-            .map(|model| {
-                model
-                    .map(|m| Ok(Response::new(LogDetail::from(m))))
-                    .unwrap_or_else(|| Err(Status::not_found("Cannot find log detail")))
-            })?
-    }
-
-    #[tracing::instrument]
-    async fn add_log_detail(
+    async fn insert(
         &self,
         request: Request<LogDetail>,
-    ) -> Result<Response<LogDetailId>, Status> {
+    ) -> Result<Response<LogDetailReply>, Status> {
         let conn = &self.db_conn;
-        let input = request.into_inner().into_model();
+        let model = request.into_inner().into_model();
 
-        LogDetailMutation::create_log_detail(conn, input)
+        LogDetailMutation::insert(conn, model)
             .await
             .map_err(|e| Status::internal(e.to_string()))
-            .map(|model| Response::new(LogDetailId { id: model.id }))
+            .map(|_| Response::new(LogDetailReply { success: true }))
     }
 
     #[tracing::instrument]
-    async fn add_log_details(
+    async fn insert_batch(
         &self,
         request: Request<LogDetailList>,
     ) -> Result<Response<LogDetailReply>, Status> {
         let conn = &self.db_conn;
-        let input = request.into_inner().into_models();
+        let models = request.into_inner().into_models();
 
-        LogDetailMutation::create_log_details(conn, input)
+        LogDetailMutation::insert_batch(conn, models)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|_| Response::new(LogDetailReply { success: true }))
     }
 
     #[tracing::instrument]
-    async fn update_log_detail(
+    async fn update(
         &self,
         request: Request<LogDetail>,
     ) -> Result<Response<LogDetailReply>, Status> {
         let conn = &self.db_conn;
-        let input = request.into_inner().into_model();
+        let model = request.into_inner().into_model();
 
-        LogDetailMutation::update_log_detail(conn, input)
+        LogDetailMutation::update(conn, model)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|_| Response::new(LogDetailReply { success: true }))
     }
 
     #[tracing::instrument]
-    async fn delete_log_detail(
+    async fn update_batch(
         &self,
-        request: Request<LogDetailId>,
+        request: Request<LogDetailList>,
     ) -> Result<Response<LogDetailReply>, Status> {
         let conn = &self.db_conn;
-        let id = request.into_inner().id;
+        let models = request.into_inner().into_models();
 
-        LogDetailMutation::delete_log_detail(conn, id)
+        LogDetailMutation::update_batch(conn, models)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(LogDetailReply { success: true }))
+    }
+
+    #[tracing::instrument]
+    async fn delete(
+        &self,
+        request: Request<LogDetail>,
+    ) -> Result<Response<LogDetailReply>, Status> {
+        let conn = &self.db_conn;
+        let model = request.into_inner().into_model();
+
+        LogDetailMutation::delete(conn, model)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(LogDetailReply { success: true }))
+    }
+
+    #[tracing::instrument]
+    async fn delete_batch(
+        &self,
+        request: Request<LogDetailList>,
+    ) -> Result<Response<LogDetailReply>, Status> {
+        let conn = &self.db_conn;
+        let models = request.into_inner().into_models();
+
+        LogDetailMutation::delete_batch(conn, models)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|_| Response::new(LogDetailReply { success: true }))
@@ -350,22 +371,22 @@ impl LogDetailService for MyLogDetailServer {
 #[tonic::async_trait]
 impl ProgramService for MyProgramServer {
     #[tracing::instrument]
-    async fn get_programs(
+    async fn query(
         &self,
-        request: Request<ProgramRequestPage>,
-    ) -> Result<Response<ProgramReplyPage>, Status> {
+        request: Request<ProgramRequestQuery>,
+    ) -> Result<Response<ProgramReplyQuery>, Status> {
         let conn = &self.db_conn;
-        let (page, page_size) = request.into_inner().into_page();
+        let form = request.into_inner().into_query();
 
-        if page == 0 || page_size == 0 {
+        if form.page == 0 || form.page_size == 0 {
             return Err(Status::new(
                 Code::InvalidArgument,
                 "Page and page size cannot be zero".to_string(),
             ));
         }
 
-        match ProgramQuery::get_programs_in_page(conn, page, page_size).await {
-            Ok((models, total)) => Ok(Response::new(ProgramReplyPage {
+        match ProgramQuery::query(conn, form).await {
+            Ok((models, total)) => Ok(Response::new(ProgramReplyQuery {
                 list: models
                     .iter()
                     .map(|model| Program::from(model.clone()))
@@ -377,68 +398,75 @@ impl ProgramService for MyProgramServer {
     }
 
     #[tracing::instrument]
-    async fn get_by_id(&self, request: Request<ProgramId>) -> Result<Response<Program>, Status> {
+    async fn insert(&self, request: Request<Program>) -> Result<Response<ProgramReply>, Status> {
         let conn = &self.db_conn;
-        let id = request.into_inner().id;
+        let model = request.into_inner().into_model();
 
-        ProgramQuery::get_program_by_id(conn, id)
+        ProgramMutation::insert(conn, model)
             .await
             .map_err(|e| Status::internal(e.to_string()))
-            .map(|model| {
-                model
-                    .map(|m| Ok(Response::new(Program::from(m))))
-                    .unwrap_or_else(|| Err(Status::not_found("Cannot find program")))
-            })?
+            .map(|_| Response::new(ProgramReply { success: true }))
     }
 
     #[tracing::instrument]
-    async fn add_program(&self, request: Request<Program>) -> Result<Response<ProgramId>, Status> {
-        let conn = &self.db_conn;
-        let input = request.into_inner().into_model();
-
-        ProgramMutation::create_program(conn, input)
-            .await
-            .map_err(|e| Status::internal(e.to_string()))
-            .map(|model| Response::new(ProgramId { id: model.id }))
-    }
-
-    #[tracing::instrument]
-    async fn add_programs(
+    async fn insert_batch(
         &self,
         request: Request<ProgramList>,
     ) -> Result<Response<ProgramReply>, Status> {
         let conn = &self.db_conn;
-        let input = request.into_inner().into_models();
+        let models = request.into_inner().into_models();
 
-        ProgramMutation::create_programs(conn, input)
+        ProgramMutation::insert_batch(conn, models)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|_| Response::new(ProgramReply { success: true }))
     }
 
     #[tracing::instrument]
-    async fn update_program(
-        &self,
-        request: Request<Program>,
-    ) -> Result<Response<ProgramReply>, Status> {
+    async fn update(&self, request: Request<Program>) -> Result<Response<ProgramReply>, Status> {
         let conn = &self.db_conn;
-        let input = request.into_inner().into_model();
+        let model = request.into_inner().into_model();
 
-        ProgramMutation::update_program(conn, input)
+        ProgramMutation::update(conn, model)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|_| Response::new(ProgramReply { success: true }))
     }
 
     #[tracing::instrument]
-    async fn delete_program(
+    async fn update_batch(
         &self,
-        request: Request<ProgramId>,
+        request: Request<ProgramList>,
     ) -> Result<Response<ProgramReply>, Status> {
         let conn = &self.db_conn;
-        let id = request.into_inner().id;
+        let models = request.into_inner().into_models();
 
-        ProgramMutation::delete_program(conn, id)
+        ProgramMutation::update_batch(conn, models)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(ProgramReply { success: true }))
+    }
+
+    #[tracing::instrument]
+    async fn delete(&self, request: Request<Program>) -> Result<Response<ProgramReply>, Status> {
+        let conn = &self.db_conn;
+        let model = request.into_inner().into_model();
+
+        ProgramMutation::delete(conn, model)
+            .await
+            .map_err(|e| Status::internal(e.to_string()))
+            .map(|_| Response::new(ProgramReply { success: true }))
+    }
+
+    #[tracing::instrument]
+    async fn delete_batch(
+        &self,
+        request: Request<ProgramList>,
+    ) -> Result<Response<ProgramReply>, Status> {
+        let conn = &self.db_conn;
+        let models = request.into_inner().into_models();
+
+        ProgramMutation::delete_batch(conn, models)
             .await
             .map_err(|e| Status::internal(e.to_string()))
             .map(|_| Response::new(ProgramReply { success: true }))
@@ -457,15 +485,17 @@ impl TestService for MyTestServer {
     }
 }
 
+#[tonic::async_trait]
 pub trait ServerExt {
-    fn add_grpc_service(self, db_conn: DbConn) -> Router;
+    async fn add_grpc_service(self, db_conn: DbConn) -> Router;
     fn enable_ssl(self) -> Self
     where
         Self: Sized;
 }
 
+#[tonic::async_trait]
 impl ServerExt for Server {
-    fn add_grpc_service(mut self, db_conn: DbConn) -> Router {
+    async fn add_grpc_service(mut self, db_conn: DbConn) -> Router {
         let mut application_svc = ApplicationServiceServer::new(MyApplicationServer {
             db_conn: db_conn.clone(),
         });
@@ -511,6 +541,7 @@ impl ServerExt for Server {
             .add_service(log_svc)
             .add_service(log_detail_svc)
             .add_service(test_svc)
+            .add_service(health_svc().await)
     }
 
     fn enable_ssl(self) -> Self {

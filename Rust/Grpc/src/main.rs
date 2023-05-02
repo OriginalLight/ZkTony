@@ -1,4 +1,4 @@
-use grpc_api::{health::health_svc, sea_orm::Database, service::ServerExt, CFG};
+use grpc_api::{sea_orm::Database, service::ServerExt, CFG};
 use std::{net::SocketAddr, str::FromStr};
 use tokio::{signal, sync::mpsc};
 use tonic::transport::Server;
@@ -30,7 +30,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let serve = Server::builder()
             .enable_ssl()
             .add_grpc_service(db_conn.clone())
-            .add_service(health_svc().await)
+            .await
             .serve_with_shutdown(addr, shutdown_signal(addr));
 
         tokio::spawn(async move {

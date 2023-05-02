@@ -1,6 +1,9 @@
 use chrono::NaiveDateTime;
 
-use entity::prelude::{ApplicationModel, LogDetailModel, LogModel, ProgramModel};
+use entity::{
+    form::{ApplicationQueryForm, LogDetailQueryForm, LogQueryForm, ProgramQueryForm},
+    prelude::{ApplicationModel, LogDetailModel, LogModel, ProgramModel},
+};
 
 use application::*;
 use log::*;
@@ -42,18 +45,24 @@ impl Application {
     }
 }
 
+impl ApplicationRequestQuery {
+    pub fn into_query(self) -> ApplicationQueryForm {
+        ApplicationQueryForm {
+            page_size: self.page_size,
+            page: self.page,
+            id: self.id,
+            application_id: self.application_id,
+            build_type: self.build_type,
+        }
+    }
+}
+
 impl ApplicationList {
     pub fn into_models(self) -> Vec<ApplicationModel> {
         self.list
             .into_iter()
             .map(|application| application.into_model())
             .collect()
-    }
-}
-
-impl ApplicationRequestPage {
-    pub fn into_page(self) -> (u64, u64) {
-        (self.page, self.page_size)
     }
 }
 
@@ -90,9 +99,15 @@ impl LogList {
     }
 }
 
-impl LogRequestPage {
-    pub fn into_page(self) -> (u64, u64) {
-        (self.page, self.page_size)
+impl LogRequestQuery {
+    pub fn into_query(self) -> LogQueryForm {
+        LogQueryForm {
+            page_size: self.page_size,
+            page: self.page,
+            id: self.id,
+            sub_id: self.sub_id,
+            log_type: self.log_type,
+        }
     }
 }
 
@@ -128,9 +143,13 @@ impl LogDetailList {
     }
 }
 
-impl LogDetailRequestPage {
-    pub fn into_page(self) -> (u64, u64) {
-        (self.page, self.page_size)
+impl LogDetailRequestQuery {
+    pub fn into_query(self) -> LogDetailQueryForm {
+        LogDetailQueryForm {
+            page_size: self.page_size,
+            page: self.page,
+            id: self.id,
+        }
     }
 }
 
@@ -165,9 +184,14 @@ impl ProgramList {
     }
 }
 
-impl ProgramRequestPage {
-    pub fn into_page(self) -> (u64, u64) {
-        (self.page, self.page_size)
+impl ProgramRequestQuery {
+    pub fn into_query(self) -> ProgramQueryForm {
+        ProgramQueryForm {
+            page_size: self.page_size,
+            page: self.page,
+            id: self.id,
+            name: self.name,
+        }
     }
 }
 

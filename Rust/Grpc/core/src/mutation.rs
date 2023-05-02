@@ -7,10 +7,7 @@ pub struct LogDetailMutation;
 pub struct ProgramMutation;
 
 impl ApplicationMutation {
-    pub async fn create_application(
-        db: &DbConn,
-        data: ApplicationModel,
-    ) -> Result<ApplicationModel, DbErr> {
+    pub async fn insert(db: &DbConn, data: ApplicationModel) -> Result<ApplicationModel, DbErr> {
         ApplicationActiveModel {
             id: Set(data.id),
             application_id: Set(data.application_id),
@@ -26,10 +23,29 @@ impl ApplicationMutation {
         .await
     }
 
-    pub async fn update_application(
-        db: &DbConn,
-        data: ApplicationModel,
-    ) -> Result<ApplicationModel, DbErr> {
+    pub async fn insert_batch(db: &DbConn, data: Vec<ApplicationModel>) -> Result<(), DbErr> {
+        let txn = db.begin().await?;
+
+        let mut models = Vec::new();
+        for model in data {
+            models.push(ApplicationActiveModel {
+                id: Set(model.id),
+                application_id: Set(model.application_id),
+                build_type: Set(model.build_type),
+                download_url: Set(model.download_url),
+                version_name: Set(model.version_name),
+                version_code: Set(model.version_code),
+                description: Set(model.description),
+                create_time: Set(model.create_time),
+                ..Default::default()
+            })
+        }
+        Application::insert_many(models).exec(&txn).await?;
+
+        txn.commit().await
+    }
+
+    pub async fn update(db: &DbConn, data: ApplicationModel) -> Result<ApplicationModel, DbErr> {
         let application: ApplicationActiveModel = Application::find_by_id(data.id)
             .one(db)
             .await?
@@ -50,8 +66,18 @@ impl ApplicationMutation {
         .await
     }
 
-    pub async fn delete_application(db: &DbConn, id: i32) -> Result<DeleteResult, DbErr> {
-        let application: ApplicationActiveModel = Application::find_by_id(id)
+    pub async fn update_batch(db: &DbConn, data: Vec<ApplicationModel>) -> Result<(), DbErr> {
+        let txn = db.begin().await?;
+
+        for model in data {
+            ApplicationMutation::update(db, model).await?;
+        }
+
+        txn.commit().await
+    }
+
+    pub async fn delete(db: &DbConn, data: ApplicationModel) -> Result<DeleteResult, DbErr> {
+        let application: ApplicationActiveModel = Application::find_by_id(data.id)
             .one(db)
             .await?
             .ok_or(DbErr::Custom("Cannot find application".to_owned()))
@@ -59,10 +85,20 @@ impl ApplicationMutation {
 
         application.delete(db).await
     }
+
+    pub async fn delete_batch(db: &DbConn, data: Vec<ApplicationModel>) -> Result<(), DbErr> {
+        let txn = db.begin().await?;
+
+        for model in data {
+            ApplicationMutation::delete(db, model).await?;
+        }
+
+        txn.commit().await
+    }
 }
 
 impl LogMutation {
-    pub async fn create_log(db: &DbConn, data: LogModel) -> Result<LogModel, DbErr> {
+    pub async fn insert(db: &DbConn, data: LogModel) -> Result<LogModel, DbErr> {
         LogActiveModel {
             id: Set(data.id),
             sub_id: Set(data.sub_id),
@@ -75,7 +111,7 @@ impl LogMutation {
         .await
     }
 
-    pub async fn create_logs(
+    pub async fn insert_batch(
         db: &DbConn,
         data: Vec<LogModel>,
     ) -> Result<InsertResult<LogActiveModel>, DbErr> {
@@ -94,7 +130,7 @@ impl LogMutation {
         Log::insert_many(add_data).exec(db).await
     }
 
-    pub async fn update_log(db: &DbConn, data: LogModel) -> Result<LogModel, DbErr> {
+    pub async fn update(db: &DbConn, data: LogModel) -> Result<LogModel, DbErr> {
         let log: LogActiveModel = Log::find_by_id(data.id)
             .one(db)
             .await?
@@ -112,8 +148,18 @@ impl LogMutation {
         .await
     }
 
-    pub async fn delete_log(db: &DbConn, id: String) -> Result<DeleteResult, DbErr> {
-        let log: LogActiveModel = Log::find_by_id(id)
+    pub async fn update_batch(db: &DbConn, data: Vec<LogModel>) -> Result<(), DbErr> {
+        let txn = db.begin().await?;
+
+        for model in data {
+            LogMutation::update(db, model).await?;
+        }
+
+        txn.commit().await
+    }
+
+    pub async fn delete(db: &DbConn, data: LogModel) -> Result<DeleteResult, DbErr> {
+        let log: LogActiveModel = Log::find_by_id(data.id)
             .one(db)
             .await?
             .ok_or(DbErr::Custom("Cannot find log".to_owned()))
@@ -121,13 +167,20 @@ impl LogMutation {
 
         log.delete(db).await
     }
+
+    pub async fn delete_batch(db: &DbConn, data: Vec<LogModel>) -> Result<(), DbErr> {
+        let txn = db.begin().await?;
+
+        for model in data {
+            LogMutation::delete(db, model).await?;
+        }
+
+        txn.commit().await
+    }
 }
 
 impl LogDetailMutation {
-    pub async fn create_log_detail(
-        db: &DbConn,
-        data: LogDetailModel,
-    ) -> Result<LogDetailModel, DbErr> {
+    pub async fn insert(db: &DbConn, data: LogDetailModel) -> Result<LogDetailModel, DbErr> {
         LogDetailActiveModel {
             id: Set(data.id),
             log_id: Set(data.log_id),
@@ -139,7 +192,7 @@ impl LogDetailMutation {
         .await
     }
 
-    pub async fn create_log_details(
+    pub async fn insert_batch(
         db: &DbConn,
         data: Vec<LogDetailModel>,
     ) -> Result<InsertResult<LogDetailActiveModel>, DbErr> {
@@ -157,10 +210,7 @@ impl LogDetailMutation {
         LogDetail::insert_many(add_data).exec(db).await
     }
 
-    pub async fn update_log_detail(
-        db: &DbConn,
-        data: LogDetailModel,
-    ) -> Result<LogDetailModel, DbErr> {
+    pub async fn update(db: &DbConn, data: LogDetailModel) -> Result<LogDetailModel, DbErr> {
         let log_detail: LogDetailActiveModel = LogDetail::find_by_id(data.id)
             .one(db)
             .await?
@@ -177,8 +227,18 @@ impl LogDetailMutation {
         .await
     }
 
-    pub async fn delete_log_detail(db: &DbConn, id: String) -> Result<DeleteResult, DbErr> {
-        let log_detail: LogDetailActiveModel = LogDetail::find_by_id(id)
+    pub async fn update_batch(db: &DbConn, data: Vec<LogDetailModel>) -> Result<(), DbErr> {
+        let txn = db.begin().await?;
+
+        for model in data {
+            LogDetailMutation::update(db, model).await?;
+        }
+
+        txn.commit().await
+    }
+
+    pub async fn delete(db: &DbConn, data: LogDetailModel) -> Result<DeleteResult, DbErr> {
+        let log_detail: LogDetailActiveModel = LogDetail::find_by_id(data.id)
             .one(db)
             .await?
             .ok_or(DbErr::Custom("Cannot find log detail".to_owned()))
@@ -186,10 +246,20 @@ impl LogDetailMutation {
 
         log_detail.delete(db).await
     }
+
+    pub async fn delete_batch(db: &DbConn, data: Vec<LogDetailModel>) -> Result<(), DbErr> {
+        let txn = db.begin().await?;
+
+        for model in data {
+            LogDetailMutation::delete(db, model).await?;
+        }
+
+        txn.commit().await
+    }
 }
 
 impl ProgramMutation {
-    pub async fn create_program(db: &DbConn, data: ProgramModel) -> Result<ProgramModel, DbErr> {
+    pub async fn insert(db: &DbConn, data: ProgramModel) -> Result<ProgramModel, DbErr> {
         ProgramActiveModel {
             id: Set(data.id),
             name: Set(data.name),
@@ -201,7 +271,7 @@ impl ProgramMutation {
         .await
     }
 
-    pub async fn create_programs(
+    pub async fn insert_batch(
         db: &DbConn,
         data: Vec<ProgramModel>,
     ) -> Result<InsertResult<ProgramActiveModel>, DbErr> {
@@ -219,7 +289,7 @@ impl ProgramMutation {
         Program::insert_many(add_data).exec(db).await
     }
 
-    pub async fn update_program(db: &DbConn, data: ProgramModel) -> Result<ProgramModel, DbErr> {
+    pub async fn update(db: &DbConn, data: ProgramModel) -> Result<ProgramModel, DbErr> {
         let program: ProgramActiveModel = Program::find_by_id(data.id)
             .one(db)
             .await?
@@ -236,13 +306,33 @@ impl ProgramMutation {
         .await
     }
 
-    pub async fn delete_program(db: &DbConn, id: String) -> Result<DeleteResult, DbErr> {
-        let program: ProgramActiveModel = Program::find_by_id(id)
+    pub async fn update_batch(db: &DbConn, data: Vec<ProgramModel>) -> Result<(), DbErr> {
+        let txn = db.begin().await?;
+
+        for model in data {
+            ProgramMutation::update(db, model).await?;
+        }
+
+        txn.commit().await
+    }
+
+    pub async fn delete(db: &DbConn, data: ProgramModel) -> Result<DeleteResult, DbErr> {
+        let program: ProgramActiveModel = Program::find_by_id(data.id)
             .one(db)
             .await?
             .ok_or(DbErr::Custom("Cannot find program".to_owned()))
             .map(Into::into)?;
 
         program.delete(db).await
+    }
+
+    pub async fn delete_batch(db: &DbConn, data: Vec<ProgramModel>) -> Result<(), DbErr> {
+        let txn = db.begin().await?;
+
+        for model in data {
+            ProgramMutation::delete(db, model).await?;
+        }
+
+        txn.commit().await
     }
 }

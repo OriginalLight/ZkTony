@@ -1,4 +1,4 @@
-use ::entity::prelude::*;
+use ::entity::{form::*, prelude::*};
 use sea_orm::*;
 
 pub struct ApplicationQuery;
@@ -7,93 +7,111 @@ pub struct LogDetailQuery;
 pub struct ProgramQuery;
 
 impl ApplicationQuery {
-    pub async fn get_application_by_id(
+    pub async fn query(
         db: &DbConn,
-        id: i32,
-    ) -> Result<Option<ApplicationModel>, DbErr> {
-        Application::find_by_id(id).one(db).await
-    }
-
-    pub async fn get_by_application_id(
-        db: &DbConn,
-        id: String,
-    ) -> Result<Option<ApplicationModel>, DbErr> {
-        Application::find()
-            .filter(ApplicationColumn::ApplicationId.eq(id))
-            .one(db)
-            .await
-    }
-
-    pub async fn get_applications_in_page(
-        db: &DbConn,
-        page: u64,
-        page_size: u64,
+        form: ApplicationQueryForm,
     ) -> Result<(Vec<ApplicationModel>, u64), DbErr> {
-        let paginator = Application::find()
+        let mut find = Application::find();
+
+        if form.id != 0 {
+            find = find.filter(ApplicationColumn::Id.eq(form.id));
+        }
+
+        if !form.application_id.is_empty() {
+            find = find.filter(ApplicationColumn::ApplicationId.eq(form.application_id));
+        }
+
+        if !form.build_type.is_empty() {
+            find = find.filter(ApplicationColumn::BuildType.eq(form.build_type));
+        }
+
+        let paginator = find
             .order_by_asc(ApplicationColumn::Id)
-            .paginate(db, page_size);
+            .paginate(db, form.page_size);
+
         let num_pages = paginator.num_pages().await?;
 
-        paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
+        paginator
+            .fetch_page(form.page - 1)
+            .await
+            .map(|p| (p, num_pages))
     }
 }
 
 impl LogQuery {
-    pub async fn get_log_by_id(db: &DbConn, id: String) -> Result<Option<LogModel>, DbErr> {
-        Log::find_by_id(id).one(db).await
-    }
+    pub async fn query(db: &DbConn, form: LogQueryForm) -> Result<(Vec<LogModel>, u64), DbErr> {
+        let mut find = Log::find();
 
-    pub async fn get_logs_in_page(
-        db: &DbConn,
-        page: u64,
-        page_size: u64,
-    ) -> Result<(Vec<LogModel>, u64), DbErr> {
-        let paginator = Log::find()
+        if !form.id.is_empty() {
+            find = find.filter(LogColumn::Id.eq(form.id));
+        }
+
+        if !form.sub_id.is_empty() {
+            find = find.filter(LogColumn::SubId.eq(form.sub_id));
+        }
+
+        if !form.log_type.is_empty() {
+            find = find.filter(LogColumn::LogType.eq(form.log_type));
+        }
+
+        let paginator = find
             .order_by_asc(LogColumn::Id)
-            .paginate(db, page_size);
+            .paginate(db, form.page_size);
         let num_pages = paginator.num_pages().await?;
 
-        paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
+        paginator
+            .fetch_page(form.page - 1)
+            .await
+            .map(|p| (p, num_pages))
     }
 }
 
 impl LogDetailQuery {
-    pub async fn get_log_detail_by_id(
+    pub async fn query(
         db: &DbConn,
-        id: String,
-    ) -> Result<Option<LogDetailModel>, DbErr> {
-        LogDetail::find_by_id(id).one(db).await
-    }
-
-    pub async fn get_log_details_in_page(
-        db: &DbConn,
-        page: u64,
-        page_szie: u64,
+        form: LogDetailQueryForm,
     ) -> Result<(Vec<LogDetailModel>, u64), DbErr> {
-        let paginator = LogDetail::find()
+        let mut find = LogDetail::find();
+
+        if !form.id.is_empty() {
+            find = find.filter(LogDetailColumn::Id.eq(form.id));
+        }
+
+        let paginator = find
             .order_by_asc(LogDetailColumn::Id)
-            .paginate(db, page_szie);
+            .paginate(db, form.page_size);
         let num_pages = paginator.num_pages().await?;
 
-        paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
+        paginator
+            .fetch_page(form.page - 1)
+            .await
+            .map(|p| (p, num_pages))
     }
 }
 
 impl ProgramQuery {
-    pub async fn get_program_by_id(db: &DbConn, id: String) -> Result<Option<ProgramModel>, DbErr> {
-        Program::find_by_id(id).one(db).await
-    }
-
-    pub async fn get_programs_in_page(
+    pub async fn query(
         db: &DbConn,
-        page: u64,
-        page_szie: u64,
+        form: ProgramQueryForm,
     ) -> Result<(Vec<ProgramModel>, u64), DbErr> {
-        let paginator = Program::find()
+        let mut find = Program::find();
+
+        if !form.id.is_empty() {
+            find = find.filter(ProgramColumn::Id.eq(form.id));
+        }
+
+        if !form.name.is_empty() {
+            find = find.filter(ProgramColumn::Name.eq(form.name));
+        }
+
+        let paginator = find
             .order_by_asc(ProgramColumn::Id)
-            .paginate(db, page_szie);
+            .paginate(db, form.page_size);
         let num_pages = paginator.num_pages().await?;
 
-        paginator.fetch_page(page - 1).await.map(|p| (p, num_pages))
+        paginator
+            .fetch_page(form.page - 1)
+            .await
+            .map(|p| (p, num_pages))
     }
 }
