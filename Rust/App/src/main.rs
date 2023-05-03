@@ -1,4 +1,5 @@
-use grpc_api::{sea_orm::Database, service::ServerExt, CFG};
+use api::{sea_orm::Database, service::ServerExt};
+use config::CFG;
 use std::{net::SocketAddr, str::FromStr};
 use tokio::{signal, sync::mpsc};
 use tonic::transport::Server;

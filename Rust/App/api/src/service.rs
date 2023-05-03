@@ -1,4 +1,6 @@
-use grpc_core::{sea_orm::DbConn, *};
+use db::{sea_orm::DbConn, *};
+
+use config::CFG;
 
 use tonic::{
     codec::CompressionEncoding,
@@ -6,16 +8,13 @@ use tonic::{
     Code, Request, Response, Status,
 };
 
-use super::{
-    health::health_svc,
-    protobuf::{
-        application::{application_service_server::*, *},
-        log::{log_service_server::*, *},
-        log_detail::{log_detail_service_server::*, *},
-        program::{program_service_server::*, *},
-        test::{test_service_server::*, *},
-    },
-    CFG,
+use super::health::health_svc;
+use protobuf::{
+    application::{application_service_server::*, *},
+    log::{log_service_server::*, *},
+    log_detail::{log_detail_service_server::*, *},
+    program::{program_service_server::*, *},
+    test::{test_service_server::*, *},
 };
 
 #[derive(Debug, Default, Clone)]

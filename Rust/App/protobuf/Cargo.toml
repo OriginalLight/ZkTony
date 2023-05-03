@@ -1,0 +1,17 @@
+[package]
+name = "protobuf"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+chrono = "0.4"
+tonic = { version = "0.9", features = ["gzip", "tls"] }
+entity = { path = "../entity" }
+prost = "0.11"
+
+[lib]
+path = "./src/lib.rs"
+
+[build-dependencies]
+tonic-build = "0.9"

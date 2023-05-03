@@ -43,7 +43,7 @@ pub struct Database {
     pub link: String,
 }
 
-const CFG_FILE: &str = "config/config.toml";
+const CFG_FILE: &str = "env/env.toml";
 //  只要是配置文件中的配置项，都可以通过这个结构体来获取，
 // 只要读取一次值后保存到内存，一直可供使用
 pub static CFG: Lazy<Configs> = Lazy::new(self::Configs::init);

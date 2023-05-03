@@ -1,6 +1,6 @@
 use tonic_health::pb::health_server::{Health, HealthServer};
 
-use crate::protobuf::{
+use protobuf::{
     application::application_service_server::ApplicationServiceServer,
     log::log_service_server::LogServiceServer,
     log_detail::log_detail_service_server::LogDetailServiceServer,

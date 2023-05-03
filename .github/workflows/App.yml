@@ -1,4 +1,4 @@
-name: Grpc
+name: App
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -12,15 +12,15 @@ on:
     tags:
       - 'v*'
     paths:
-      - 'Rust/Grpc/**'
+      - 'Rust/App/**'
 
 
 env:
-  SAMPLE_PATH: Rust/Grpc
+  SAMPLE_PATH: Rust/App
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
   # github.repository as <account>/<repo>
-  IMAGE_NAME: zktony/grpc
+  IMAGE_NAME: zktony/app
 
 
 jobs:
