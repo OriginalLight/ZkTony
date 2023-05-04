@@ -6,31 +6,18 @@ option java_outer_classname = "ProgramProto";
 
 package program;
 
-// The greeting service definition.
+// service for program
 service ProgramService {
-  // Sends a greeting
-  rpc GetPrograms (ProgramRequestPage) returns (ProgramReplyPage) {}
-  rpc GetById (ProgramId) returns (Program) {}
-  rpc AddProgram (Program) returns (ProgramId) {}
-  rpc AddPrograms (ProgramList) returns (ProgramReply) {}
-  rpc UpdateProgram (Program) returns (ProgramReply) {}
-  rpc DeleteProgram (ProgramId) returns (ProgramReply) {}
-
+  // rpcs for program
+  rpc Query (ProgramRequestQuery) returns (ProgramReplyQuery) {}
+  rpc Insert (Program) returns (ProgramReply) {}
+  rpc InsertBatch (ProgramList) returns (ProgramReply) {}
+  rpc Update (Program) returns (ProgramReply) {}
+  rpc UpdateBatch (ProgramList) returns (ProgramReply) {}
+  rpc Delete (Program) returns (ProgramReply) {}
+  rpc DeleteBatch (ProgramList) returns (ProgramReply) {}
 }
 
-message ProgramRequestPage {
-  uint64 page_size = 1;
-  uint64 page = 2;
-}
-
-message ProgramReply { bool success = 1; }
-
-// The request message containing the user's name.
-message ProgramId {
-  string id = 1;
-}
-
-// The response message containing the greetings
 message Program {
   string id = 1;
   string name = 2;
@@ -40,7 +27,16 @@ message Program {
 
 message ProgramList { repeated Program list = 1; }
 
-message ProgramReplyPage {
+message ProgramRequestQuery {
+  uint64 page_size = 1;
+  uint64 page = 2;
+  string id = 3;
+  string name = 4;
+}
+
+message ProgramReplyQuery {
   repeated Program list = 1;
   uint64 total = 2;
 }
+
+message ProgramReply { bool success = 1; }

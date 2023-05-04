@@ -1,12 +1,12 @@
 package com.zktony.www.manager
 
 import com.zktony.core.ext.*
+import com.zktony.serialport.protocol.toV1
 import com.zktony.www.R
 import com.zktony.www.common.ext.*
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.MotorDao
-import com.zktony.www.room.entity.Calibration
-import com.zktony.www.room.entity.Motor
+import com.zktony.www.room.entity.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
 
@@ -108,7 +108,7 @@ class MotorManager(
                                 asyncHex(serial) {
                                     fn = "03"
                                     pa = "04"
-                                    data = j.int8ToHex()
+                                    data = j.intToHex()
                                 }
                                 delay(100L)
                             }

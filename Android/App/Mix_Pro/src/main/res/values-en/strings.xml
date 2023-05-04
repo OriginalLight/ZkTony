@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fully automatic gradient mixer</string>
+    <string name="back_coagulant">Back Coagulant</string>
+    <string name="back_colloid">Back Colloid</string>
+    <string name="button">Button</string>
+    <string name="calibration_name">Name</string>
+    <string name="complete">Complete</string>
+    <string name="container_name">Name</string>
+    <string name="coordinate">Coordinate</string>
+    <string name="coordinate_edit">Coordinate Edit</string>
+    <string name="coordinate_liquid">Liquid coordinate</string>
+    <string name="coordinate_wash">Wash coordinate</string>
+    <string name="coordinate_waste">Waste coordinate</string>
+    <string name="fill_coagulant">Fill Coagulant</string>
+    <string name="fill_colloid">Fill Colloid</string>
+    <string name="glue_making">Glue making</string>
+    <string name="max_y_trip">Maximum travel on the y-axis</string>
+    <string name="motor_setting">Motor Setting</string>
+    <string name="notice_content">1. After the procedure, please clean the pipeline in time.\n2. Please read the instruction manual before use.</string>
+    <string name="over_the_volume">Maximum capacity exceeded</string>
+    <string name="pre_drainage">Pre-drainage</string>
+    <string name="program_name">Name</string>
+    <string name="pump_name">Pump name</string>
+    <string name="pump_one">Pump one</string>
+    <string name="pump_three">Pump three</string>
+    <string name="pump_two">Pump two</string>
+    <string name="select_all">Select all</string>
+    <string name="speed_liquid">Speed wells/min</string>
+    <string name="stop_back">Please stop sucking back first</string>
+    <string name="stop_fill">Please stop the population first</string>
+    <string name="time_remaining">Time remaining</string>
+    <string name="title_admin">Admin</string>
+    <string name="title_calibration">Calibration</string>
+    <string name="title_calibration_data">Calibration Data</string>
+    <string name="title_config">Config</string>
+    <string name="title_container">Container</string>
+    <string name="title_home">Home</string>
+    <string name="title_motor">Motor</string>
+    <string name="title_program">Program</string>
+    <string name="title_program_edit">Program Edit</string>
+    <string name="volume_coagulant">Coagulant μL</string>
+    <string name="volume_colloid">Colloid μL</string>
+    <string name="volume_edit">Volume Edit</string>
+    <string name="x_axis">XAxis</string>
+</resources>

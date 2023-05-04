@@ -1,10 +1,14 @@
 package com.zktony.www.ui.home
 
+import android.graphics.Color
 import android.view.View
+import android.widget.TextView
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
+import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.dialogs.PopTip
+import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.*
 import com.zktony.datastore.ext.read
@@ -188,10 +192,16 @@ class HomeViewModel constructor(
                         }
 
                         is ExecutorEvent.Finish -> {
-                            completeDialog(
-                                name = _uiState.value.program?.name ?: "None",
-                                time = _uiState.value.time.getTimeFormat(),
-                            )
+                            CustomDialog.build()
+                                .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_complete) {
+                                    override fun onBind(dialog: CustomDialog, v: View) {
+                                        val tvName = v.findViewById<TextView>(R.id.name)
+                                        val tvTime = v.findViewById<TextView>(R.id.time)
+                                        tvTime.text = _uiState.value.program?.name ?: "None"
+                                        tvName.text = _uiState.value.time.getTimeFormat()
+                                    }
+                                })
+                                .setMaskColor(Color.parseColor("#4D000000")).show()
                             launch {
                                 delay(500L)
                                 waitLock {

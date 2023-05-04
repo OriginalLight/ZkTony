@@ -41,7 +41,7 @@ class LogRecordWorker constructor(
                             .build()
                     )
                 }
-                grpc.addLogs(list)
+                grpc.insertBatch(list)
                     .catch {
                         "上传日志数据失败".logi("LogRecordWorker")
                     }

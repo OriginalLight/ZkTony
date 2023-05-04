@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
-import com.zktony.core.utils.Snowflake
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.dao.PointDao
 import com.zktony.www.room.entity.Container
@@ -43,19 +42,15 @@ class ContainerViewModel constructor(
                 return@launch
             }
             val container = _uiState.value.list.find { it.name == name }
-            val snowflake = Snowflake(1)
             if (container != null) {
                 PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_exists))
             } else {
-                val con = Container(
-                    id = snowflake.nextId(),
-                    name = name,
-                )
+                val con = Container(name = name)
                 CD.insert(con)
                 val pointList = mutableListOf<Point>()
                 for (i in 0 until con.x) {
                     for (j in 0 until con.y) {
-                        pointList.add(Point(id = snowflake.nextId(), subId = con.id, x = i, y = j))
+                        pointList.add(Point(subId = con.id, x = i, y = j))
                     }
                 }
                 PD.insertAll(pointList)

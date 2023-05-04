@@ -3,8 +3,8 @@ package com.zktony.www.manager
 import com.zktony.core.ext.*
 import com.zktony.serialport.SerialHelpers
 import com.zktony.serialport.config.serialConfig
+import com.zktony.serialport.protocol.toV1
 import com.zktony.www.common.ext.syncHex
-import com.zktony.www.common.ext.toV1
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -100,8 +100,8 @@ class SerialManager {
                         when (v1.fn) {
                             "85" -> {
                                 if (v1.pa == "01") {
-                                    val total = v1.data.substring(2, 4).hexToInt8()
-                                    val current = v1.data.substring(6, 8).hexToInt8()
+                                    val total = v1.data.substring(2, 4).hexToInt()
+                                    val current = v1.data.substring(6, 8).hexToInt()
                                     _lock.value = total != current
                                     lockTime = 0L
                                 }
@@ -109,7 +109,7 @@ class SerialManager {
 
                             "86" -> {
                                 if (v1.pa == "01") {
-                                    drawer.set(v1.data.hexToInt8() == 0)
+                                    drawer.set(v1.data.hexToInt() == 0)
                                 }
                                 if (v1.pa == "0A") {
                                     _lock.value = false

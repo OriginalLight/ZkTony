@@ -13,10 +13,10 @@ class LogGrpc constructor(
 ) {
     private val stub = LogServiceGrpcKt.LogServiceCoroutineStub(channel)
 
-    suspend fun addLogs(logs: List<Log>) = flow {
+    suspend fun insertBatch(logs: List<Log>) = flow {
         try {
             withTimeout(Constants.TIME_OUT) {
-                emit(stub.addLogs(logList { list.addAll(logs) }))
+                emit(stub.insertBatch(logList { list.addAll(logs) }))
             }
         } catch (e: Exception) {
             throw e

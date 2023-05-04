@@ -2,12 +2,12 @@ package com.zktony.www.manager
 
 import com.zktony.core.ext.*
 import com.zktony.serialport.protocol.V1
+import com.zktony.serialport.protocol.toV1
 import com.zktony.www.R
 import com.zktony.www.common.ext.*
 import com.zktony.www.room.dao.CalibrationDao
 import com.zktony.www.room.dao.MotorDao
-import com.zktony.www.room.entity.Calibration
-import com.zktony.www.room.entity.Motor
+import com.zktony.www.room.entity.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.firstOrNull
 
@@ -90,13 +90,13 @@ class MotorManager constructor(
                 if (!SM.lock.value) {
                     SM.sendHex(
                         index = 0,
-                        hex = V1(fn = "03", pa = "04", data = 2.int8ToHex()).toHex()
+                        hex = V1(fn = "03", pa = "04", data = 2.intToHex()).toHex()
                     )
                     delay(100L)
                     for (i in 1..3) {
                         SM.sendHex(
                             index = 3,
-                            hex = V1(fn = "03", pa = "04", data = i.int8ToHex()).toHex()
+                            hex = V1(fn = "03", pa = "04", data = i.intToHex()).toHex()
                         )
                         delay(100L)
                     }

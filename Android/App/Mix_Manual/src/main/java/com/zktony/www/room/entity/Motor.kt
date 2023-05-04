@@ -2,8 +2,7 @@ package com.zktony.www.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.zktony.core.ext.int16ToHex2
-import com.zktony.core.ext.int8ToHex
+import com.zktony.core.ext.*
 import java.util.Date
 
 /**
@@ -33,13 +32,13 @@ data class Motor(
     val createTime: Date = Date(System.currentTimeMillis()),
 ) {
     fun toHex(): String {
-        return address.int8ToHex() +
-                subdivision.int8ToHex() +
-                speed.int16ToHex2() +
-                acceleration.int8ToHex() +
-                deceleration.int8ToHex() +
-                mode.int8ToHex() +
-                waitTime.int16ToHex2()
+        return address.intToHex() +
+                subdivision.intToHex() +
+                speed.intToHex2() +
+                acceleration.intToHex() +
+                deceleration.intToHex() +
+                mode.intToHex() +
+                waitTime.intToHex2()
 
     }
 
@@ -58,4 +57,20 @@ data class Motor(
     fun pulseCount(distance: Float, unit: Float): Int {
         return (distance * pulseCount() / unit).toInt()
     }
+}
+
+/**
+ * 解析电机数据
+ * @return [Motor] 电机
+ */
+fun String.toMotor(): Motor {
+    return Motor(
+        address = this.substring(0, 2).hexToInt(),
+        subdivision = this.substring(2, 4).hexToInt(),
+        speed = this.substring(4, 8).hexToInt(),
+        acceleration = this.substring(8, 10).hexToInt(),
+        deceleration = this.substring(10, 12).hexToInt(),
+        mode = this.substring(12, 14).hexToInt(),
+        waitTime = this.substring(14, 18).hexToInt()
+    )
 }

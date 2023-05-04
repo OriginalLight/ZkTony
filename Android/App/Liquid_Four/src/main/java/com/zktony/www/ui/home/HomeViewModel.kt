@@ -2,10 +2,13 @@ package com.zktony.www.ui.home
 
 import android.graphics.Color
 import android.view.View
+import android.widget.TextView
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
+import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.dialogs.PopTip
+import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
@@ -116,38 +119,6 @@ class HomeViewModel constructor(
                 step {
                     x = _uiState.value.washTank.first
                     y = _uiState.value.washTank.second
-                }
-            }
-        }
-    }
-
-    fun wash(time: Int = 30, type: Int) {
-        viewModelScope.launch {
-            if (type == 0) {
-                val washJob = launch {
-                    asyncHex(0) {
-                        pa = "0B"
-                        data = "0301"
-                    }
-                    asyncHex(3) {
-                        pa = "0B"
-                        data = "0401"
-                    }
-                    delay(time * 1000L)
-                    wash(type = 1)
-                }
-                _uiState.value = _uiState.value.copy(washJob = washJob)
-                washJob.start()
-            } else {
-                _uiState.value.washJob?.cancel()
-                _uiState.value = _uiState.value.copy(washJob = null)
-                asyncHex(0) {
-                    pa = "0B"
-                    data = "0300"
-                }
-                asyncHex(3) {
-                    pa = "0B"
-                    data = "0400"
                 }
             }
         }
@@ -298,14 +269,22 @@ class HomeViewModel constructor(
                         }
 
                         is ExecutorEvent.Finish -> {
-                            completeDialog(
-                                name = _uiState.value.program?.name ?: "None",
-                                time = _uiState.value.time.getTimeFormat(),
-                                speed = String.format(
-                                    "%.2f",
-                                    _uiState.value.info.speed
-                                ),
-                            )
+                            CustomDialog.build()
+                                .setCustomView(object :
+                                    OnBindView<CustomDialog>(R.layout.layout_complete) {
+                                    override fun onBind(dialog: CustomDialog, v: View) {
+                                        val tvName = v.findViewById<TextView>(R.id.name)
+                                        val tvTime = v.findViewById<TextView>(R.id.time)
+                                        val tvSpeed = v.findViewById<TextView>(R.id.speed)
+                                        tvSpeed.text = _uiState.value.program?.name ?: "None"
+                                        tvTime.text = _uiState.value.time.getTimeFormat()
+                                        tvName.text = String.format(
+                                            "%.2f",
+                                            _uiState.value.info.speed
+                                        )
+                                    }
+                                })
+                                .setMaskColor(Color.parseColor("#4D000000")).show()
                             launch {
                                 delay(500L)
                                 waitLock {

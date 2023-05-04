@@ -3,9 +3,11 @@ package com.zktony.www.ui.home
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.*
+import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
@@ -14,9 +16,8 @@ import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.common.ext.total
-import com.zktony.www.common.ext.washDialog
 import com.zktony.www.databinding.FragmentHomeBinding
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
@@ -118,10 +119,50 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 with(wash) {
                                     clickScale()
                                     clickNoRepeat {
-                                        washDialog(
-                                            block = { viewModel.fill(type = 0) },
-                                            block1 = { viewModel.fill(type = 1) }
-                                        )
+                                        CustomDialog.build()
+                                            .setCustomView(object :
+                                                OnBindView<CustomDialog>(R.layout.layout_wash) {
+                                                override fun onBind(dialog: CustomDialog, v: View) {
+                                                    val input = v.findViewById<EditText>(R.id.input)
+                                                    val btnStart =
+                                                        v.findViewById<MaterialButton>(R.id.start)
+                                                    val btnStop =
+                                                        v.findViewById<MaterialButton>(R.id.stop)
+                                                    val btnCancel =
+                                                        v.findViewById<MaterialButton>(R.id.cancel)
+                                                    val time =
+                                                        input.text.toString().toIntOrNull() ?: 30
+                                                    val scope = CoroutineScope(Dispatchers.Main)
+                                                    var job: Job? = null
+                                                    btnStart.setOnClickListener {
+                                                        viewModel.fill(type = 0)
+                                                        job = scope.launch {
+                                                            btnStart.isEnabled = false
+                                                            var i = time
+                                                            while (i > 0) {
+                                                                input.setText(i.toString())
+                                                                delay(1000L)
+                                                                i--
+                                                            }
+                                                            viewModel.fill(type = 1)
+                                                            input.setText(time.toString())
+                                                            btnStart.isEnabled = true
+                                                        }
+                                                    }
+                                                    btnStop.setOnClickListener {
+                                                        viewModel.fill(type = 1)
+                                                        job?.cancel()
+                                                        input.setText(time.toString())
+                                                        btnStart.isEnabled = true
+                                                    }
+                                                    btnCancel.setOnClickListener {
+                                                        dialog.dismiss()
+                                                    }
+                                                }
+                                            })
+                                            .setCancelable(false)
+                                            .setMaskColor(Color.parseColor("#4D000000"))
+                                            .show()
                                     }
                                 }
 

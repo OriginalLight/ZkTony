@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">全自动梯度混合仪</string>
+    <string name="back_coagulant">回吸促凝剂</string>
+    <string name="back_colloid">回吸胶体</string>
+    <string name="button">Button</string>
+    <string name="calibration_name">校准程序名</string>
+    <string name="complete">执行完成</string>
+    <string name="container_name">容器名</string>
+    <string name="coordinate">坐标</string>
+    <string name="coordinate_edit">容器坐标编辑</string>
+    <string name="coordinate_liquid">请输入加液孔坐标</string>
+    <string name="coordinate_wash">请输入排液孔坐标</string>
+    <string name="coordinate_waste">请输入废液槽坐标</string>
+    <string name="fill_coagulant">填充促凝剂</string>
+    <string name="fill_colloid">填充胶体</string>
+    <string name="glue_making">制胶</string>
+    <string name="max_y_trip">Y轴最大行程</string>
+    <string name="motor_setting">电机设置</string>
+    <string name="notice_content">1. 执行程序前请确认有充足的溶液。\n2. 程序结束后请及时清理容器，避免滋生微生物等问题。\n3. 请阅读说明书后使用，避免误操作。</string>
+    <string name="over_the_volume">超出最大容量</string>
+    <string name="pre_drainage">预排液</string>
+    <string name="program_name">程序名</string>
+    <string name="pump_name">泵名</string>
+    <string name="pump_one">泵一</string>
+    <string name="pump_three">泵三</string>
+    <string name="pump_two">泵二</string>
+    <string name="select_all">全选</string>
+    <string name="speed_liquid">加液速度 孔/分钟</string>
+    <string name="stop_back">请先停止回吸</string>
+    <string name="stop_fill">请先停止填充</string>
+    <string name="time_remaining">剩余时间</string>
+    <string name="title_admin">管理员</string>
+    <string name="title_calibration">校准管理</string>
+    <string name="title_calibration_data">校准数据</string>
+    <string name="title_config">参数</string>
+    <string name="title_container">容器管理</string>
+    <string name="title_home">主界面</string>
+    <string name="title_motor">电机</string>
+    <string name="title_program">分液程序</string>
+    <string name="title_program_edit">程序编辑</string>
+    <string name="volume_coagulant">促凝剂量 μL</string>
+    <string name="volume_colloid">胶体量 μL</string>
+    <string name="volume_edit">加液量编辑</string>
+    <string name="x_axis">X轴</string>
+</resources>

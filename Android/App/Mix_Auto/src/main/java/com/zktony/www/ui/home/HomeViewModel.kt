@@ -1,8 +1,12 @@
 package com.zktony.www.ui.home
 
+import android.graphics.Color
 import android.view.View
+import android.widget.TextView
 import androidx.lifecycle.viewModelScope
+import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.dialogs.PopTip
+import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.*
 import com.zktony.www.R
@@ -149,14 +153,22 @@ class HomeViewModel constructor(
                         }
 
                         is ExecutorEvent.Finish -> {
-                            completeDialog(
-                                name = _uiState.value.program?.name ?: "None",
-                                time = _uiState.value.time.getTimeFormat(),
-                                speed = String.format(
-                                    "%.2f",
-                                    _uiState.value.info.speed
-                                ),
-                            )
+                            CustomDialog.build()
+                                .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_complete) {
+                                    override fun onBind(dialog: CustomDialog, v: View) {
+                                        val tvName = v.findViewById<TextView>(R.id.name)
+                                        val tvTime = v.findViewById<TextView>(R.id.time)
+                                        val tvSpeed = v.findViewById<TextView>(R.id.speed)
+                                        tvSpeed.text = _uiState.value.program?.name ?: "None"
+                                        tvTime.text = _uiState.value.time.getTimeFormat()
+                                        tvName.text = String.format(
+                                            "%.2f",
+                                            _uiState.value.info.speed
+                                        )
+                                    }
+                                })
+                                .setMaskColor(Color.parseColor("#4D000000"))
+                                .show()
                             stop()
                         }
                     }

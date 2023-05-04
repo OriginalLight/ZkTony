@@ -13,10 +13,10 @@ class ProgramGrpc constructor(
 ) {
     private val stub = ProgramServiceGrpcKt.ProgramServiceCoroutineStub(channel)
 
-    suspend fun addPrograms(programs: List<Program>) = flow {
+    suspend fun insertBatch(programs: List<Program>) = flow {
         try {
             withTimeout(Constants.TIME_OUT) {
-                emit(stub.addPrograms(programList { list.addAll(programs) }))
+                emit(stub.insertBatch(programList { list.addAll(programs) }))
             }
         } catch (e: Exception) {
             throw e

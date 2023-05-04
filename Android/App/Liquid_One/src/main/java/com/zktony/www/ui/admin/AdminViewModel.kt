@@ -17,7 +17,6 @@ import com.zktony.www.BuildConfig
 import com.zktony.www.MainActivity
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import java.io.File
 
 class AdminViewModel constructor(
@@ -31,7 +30,7 @@ class AdminViewModel constructor(
     init {
         viewModelScope.launch {
             if (Ext.ctx.isNetworkAvailable()) {
-                AG.getByApplicationId(BuildConfig.APPLICATION_ID)
+                AG.getApplication(BuildConfig.APPLICATION_ID)
                     .catch {
                         _uiState.value = _uiState.value.copy(
                             application = null
@@ -145,7 +144,7 @@ class AdminViewModel constructor(
                     _uiState.value = _uiState.value.copy(
                         loading = true
                     )
-                    AG.getByApplicationId(BuildConfig.APPLICATION_ID)
+                    AG.getApplication(BuildConfig.APPLICATION_ID)
                         .catch {
                             PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.failed_get_version_information))
                             _uiState.value = _uiState.value.copy(
@@ -202,10 +201,6 @@ class AdminViewModel constructor(
             putExtra("cmd", if (bar) "show" else "hide")
         }
         Ext.ctx.sendBroadcast(intent)
-    }
-
-    fun setNeedleSpace(fl: Float) {
-        DS.save(Constants.NEEDLE_SPACE, fl)
     }
 
     /**

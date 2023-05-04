@@ -6,34 +6,18 @@ option java_outer_classname = "ApplicationProto";
 
 package application;
 
-// The greeting service definition.
+// service for application
 service ApplicationService {
-  // Sends a greeting
-  rpc getApplications (ApplicationRequestPage) returns (ApplicationReplyPage) {}
-  rpc GetByApplicationId (ApplicationSearch) returns (Application) {}
-  rpc GetById (ApplicationId) returns (Application) {}
-  rpc AddApplication (Application) returns (ApplicationId) {}
-  rpc UpdateApplication (Application) returns (ApplicationReply) {}
-  rpc DeleteApplication (ApplicationId) returns (ApplicationReply) {}
+  // rpcs for application
+  rpc Query (ApplicationRequestQuery) returns (ApplicationReplyQuery) {}
+  rpc Insert (Application) returns (ApplicationReply) {}
+  rpc InsertBatch (ApplicationList) returns (ApplicationReply) {}
+  rpc Update (Application) returns (ApplicationReply) {}
+  rpc UpdateBatch (ApplicationList) returns (ApplicationReply) {}
+  rpc Delete (Application) returns (ApplicationReply) {}
+  rpc DeleteBatch (ApplicationList) returns (ApplicationReply) {}
 }
 
-message ApplicationRequestPage {
-  uint64 page_size = 1;
-  uint64 page = 2;
-}
-
-message ApplicationReply { bool success = 1; }
-
-// The request message containing the user's name.
-message ApplicationSearch {
-  string application_id = 1;
-}
-
-message ApplicationId {
-  int32 id = 1;
-}
-
-// The response message containing the greetings
 message Application {
   int32 id = 1;
   string application_id = 2;
@@ -45,9 +29,21 @@ message Application {
   string create_time = 8;
 }
 
-message ApplicationList { repeated Application list = 1; }
+message ApplicationList {
+  repeated Application list = 1;
+}
 
-message ApplicationReplyPage {
+message ApplicationRequestQuery {
+  uint64 page_size = 1;
+  uint64 page = 2;
+  int32 id = 3;
+  string application_id = 4;
+  string build_type = 5;
+}
+
+message ApplicationReplyQuery {
   repeated Application list = 1;
   uint64 total = 2;
 }
+
+message ApplicationReply { bool success = 1; }

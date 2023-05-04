@@ -2,7 +2,7 @@ package com.zktony.www.ui.program
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.utils.Snowflake
+import com.zktony.core.ext.nextId
 import com.zktony.www.room.dao.ContainerDao
 import com.zktony.www.room.dao.PointDao
 import com.zktony.www.room.entity.Container
@@ -40,12 +40,11 @@ class ProgramEditViewModel constructor(
             val c1 = _uiState.value.containerList[cIndex]
             val l1 = PD.getBySubId(c1.id).firstOrNull()
             l1?.let {
-                val snowflake = Snowflake(1)
                 val list = mutableListOf<Point>()
                 it.forEach { p ->
                     list.add(
                         p.copy(
-                            id = snowflake.nextId(),
+                            id = nextId(),
                             subId = _uiState.value.id,
                             thirdId = c1.id,
                             index = index,

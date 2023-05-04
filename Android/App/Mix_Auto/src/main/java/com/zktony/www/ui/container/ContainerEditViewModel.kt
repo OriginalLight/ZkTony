@@ -6,7 +6,6 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
-import com.zktony.core.utils.Snowflake
 import com.zktony.datastore.ext.read
 import com.zktony.www.common.ext.decideLock
 import com.zktony.www.common.ext.execute
@@ -57,15 +56,8 @@ class ContainerEditViewModel constructor(
                     CD.update(it.copy(size = size))
                     PD.deleteBySubId(it.id)
                     val list = mutableListOf<Point>()
-                    val snowflake = Snowflake(1)
                     for (i in 0 until size) {
-                        list.add(
-                            Point(
-                                id = snowflake.nextId(),
-                                subId = it.id,
-                                index = i,
-                            )
-                        )
+                        list.add(Point(subId = it.id, index = i))
                     }
                     PD.insertAll(list)
                 }

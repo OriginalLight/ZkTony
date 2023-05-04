@@ -7,12 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.ext.DownloadState
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.download
-import com.zktony.core.ext.installApk
-import com.zktony.core.ext.isNetworkAvailable
-import com.zktony.core.ext.updateDialog
+import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
@@ -22,10 +17,7 @@ import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.www.BuildConfig
 import com.zktony.www.MainActivity
 import com.zktony.www.manager.SerialManager
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -41,7 +33,7 @@ class AdminViewModel constructor(
     init {
         viewModelScope.launch {
             if (Ext.ctx.isNetworkAvailable()) {
-                AG.getByApplicationId(BuildConfig.APPLICATION_ID)
+                AG.getApplication(BuildConfig.APPLICATION_ID)
                     .catch {
                         _uiState.value = _uiState.value.copy(
                             application = null
@@ -253,7 +245,7 @@ class AdminViewModel constructor(
                     _uiState.value = _uiState.value.copy(
                         loading = true
                     )
-                    AG.getByApplicationId(BuildConfig.APPLICATION_ID)
+                    AG.getApplication(BuildConfig.APPLICATION_ID)
                         .catch {
                             PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.failed_get_version_information))
                             _uiState.value = _uiState.value.copy(

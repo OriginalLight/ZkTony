@@ -5,13 +5,12 @@
  */
 package com.zktony.www.manager.protocol
 
-import com.zktony.core.ext.float32ToHex4
-import com.zktony.core.ext.hex4ToFloat32
-import com.zktony.core.ext.hex4ToInt32
+import com.zktony.core.ext.floatToHex4
+import com.zktony.core.ext.hex4ToFloat
+import com.zktony.core.ext.hexToInt
 import com.zktony.core.ext.hexHighLow
-import com.zktony.core.ext.hexToInt8
-import com.zktony.core.ext.int32ToHex4
-import com.zktony.core.ext.int8ToHex
+import com.zktony.core.ext.intToHex4
+import com.zktony.core.ext.intToHex
 
 /**
  * @author 刘贺贺
@@ -298,35 +297,35 @@ fun protocol(block: Protocol.() -> Unit): Protocol {
 
 fun Protocol.toHex(): String {
     val hex = StringBuilder()
-    hex.append(head1.int8ToHex())
-    hex.append(head2.int8ToHex())
-    hex.append(id.int8ToHex())
-    hex.append(cmd.int8ToHex())
-    hex.append(motorX.int8ToHex())
-    hex.append((stepMotorX * pumpSpeedCoefficient).toInt().int32ToHex4().hexHighLow())
-    hex.append(powerENX.int8ToHex())
-    hex.append(autoX.int8ToHex())
-    hex.append(setVoltageX.float32ToHex4().hexHighLow())
-    hex.append((targetVoltageX / voltageCoefficient).float32ToHex4().hexHighLow())
-    hex.append(getVoltageX.float32ToHex4().hexHighLow())
-    hex.append(getCurrentX.float32ToHex4().hexHighLow())
-    hex.append(inputSensorX.int8ToHex())
-    hex.append(motorY.int8ToHex())
-    hex.append((stepMotorY * pumpSpeedCoefficient).toInt().int32ToHex4().hexHighLow())
-    hex.append(powerENY.int8ToHex())
-    hex.append(autoY.int8ToHex())
-    hex.append(setVoltageY.float32ToHex4().hexHighLow())
-    hex.append((targetVoltageY / voltageCoefficient).float32ToHex4().hexHighLow())
-    hex.append(getVoltageY.float32ToHex4().hexHighLow())
-    hex.append(getCurrentY.float32ToHex4().hexHighLow())
-    hex.append(inputSensorY.int8ToHex())
-    hex.append(inputSensorZ.int8ToHex())
-    hex.append(crc1.int8ToHex())
-    hex.append(crch.int8ToHex())
-    hex.append(end1.int8ToHex())
-    hex.append(end2.int8ToHex())
-    hex.append(end3.int8ToHex())
-    hex.append(end4.int8ToHex())
+    hex.append(head1.intToHex())
+    hex.append(head2.intToHex())
+    hex.append(id.intToHex())
+    hex.append(cmd.intToHex())
+    hex.append(motorX.intToHex())
+    hex.append((stepMotorX * pumpSpeedCoefficient).toInt().intToHex4().hexHighLow())
+    hex.append(powerENX.intToHex())
+    hex.append(autoX.intToHex())
+    hex.append(setVoltageX.floatToHex4().hexHighLow())
+    hex.append((targetVoltageX / voltageCoefficient).floatToHex4().hexHighLow())
+    hex.append(getVoltageX.floatToHex4().hexHighLow())
+    hex.append(getCurrentX.floatToHex4().hexHighLow())
+    hex.append(inputSensorX.intToHex())
+    hex.append(motorY.intToHex())
+    hex.append((stepMotorY * pumpSpeedCoefficient).toInt().intToHex4().hexHighLow())
+    hex.append(powerENY.intToHex())
+    hex.append(autoY.intToHex())
+    hex.append(setVoltageY.floatToHex4().hexHighLow())
+    hex.append((targetVoltageY / voltageCoefficient).floatToHex4().hexHighLow())
+    hex.append(getVoltageY.floatToHex4().hexHighLow())
+    hex.append(getCurrentY.floatToHex4().hexHighLow())
+    hex.append(inputSensorY.intToHex())
+    hex.append(inputSensorZ.intToHex())
+    hex.append(crc1.intToHex())
+    hex.append(crch.intToHex())
+    hex.append(end1.intToHex())
+    hex.append(end2.intToHex())
+    hex.append(end3.intToHex())
+    hex.append(end4.intToHex())
     return hex.toString()
 }
 
@@ -340,48 +339,48 @@ fun String.toProtocol(): Protocol {
     }
     val hex = this
     return protocol {
-        head1 = hex.substring(0, 2).hexToInt8()
-        head2 = hex.substring(2, 4).hexToInt8()
-        id = hex.substring(4, 6).hexToInt8()
-        cmd = hex.substring(6, 8).hexToInt8()
-        motorX = hex.substring(8, 10).hexToInt8()
+        head1 = hex.substring(0, 2).hexToInt()
+        head2 = hex.substring(2, 4).hexToInt()
+        id = hex.substring(4, 6).hexToInt()
+        cmd = hex.substring(6, 8).hexToInt()
+        motorX = hex.substring(8, 10).hexToInt()
         stepMotorX =
-            (hex.substring(10, 18).hexHighLow().hex4ToInt32() / pumpSpeedCoefficient).toInt()
-        powerENX = hex.substring(18, 20).hexToInt8()
-        autoX = hex.substring(20, 22).hexToInt8()
-        setVoltageX = hex.substring(22, 30).hexHighLow().hex4ToFloat32()
-        targetVoltageX = hex.substring(30, 38).hexHighLow().hex4ToFloat32() * voltageCoefficient
+            (hex.substring(10, 18).hexHighLow().hexToInt() / pumpSpeedCoefficient).toInt()
+        powerENX = hex.substring(18, 20).hexToInt()
+        autoX = hex.substring(20, 22).hexToInt()
+        setVoltageX = hex.substring(22, 30).hexHighLow().hex4ToFloat()
+        targetVoltageX = hex.substring(30, 38).hexHighLow().hex4ToFloat() * voltageCoefficient
         if (powerENX == 0) {
             getVoltageX = 0f
             getCurrentX = 0f
         } else {
-            getVoltageX = hex.substring(38, 46).hexHighLow().hex4ToFloat32() * voltageCoefficient
+            getVoltageX = hex.substring(38, 46).hexHighLow().hex4ToFloat() * voltageCoefficient
             getCurrentX = hex.substring(46, 54).hexHighLow()
-                .hex4ToFloat32() * currentCoefficient + currentOffset
+                .hex4ToFloat() * currentCoefficient + currentOffset
         }
-        inputSensorX = hex.substring(54, 56).hexToInt8()
-        motorY = hex.substring(56, 58).hexToInt8()
+        inputSensorX = hex.substring(54, 56).hexToInt()
+        motorY = hex.substring(56, 58).hexToInt()
         stepMotorY =
-            (hex.substring(58, 66).hexHighLow().hex4ToInt32() / pumpSpeedCoefficient).toInt()
-        powerENY = hex.substring(66, 68).hexToInt8()
-        autoY = hex.substring(68, 70).hexToInt8()
-        setVoltageY = hex.substring(70, 78).hexHighLow().hex4ToFloat32()
-        targetVoltageY = hex.substring(78, 86).hexHighLow().hex4ToFloat32() * voltageCoefficient
+            (hex.substring(58, 66).hexHighLow().hexToInt() / pumpSpeedCoefficient).toInt()
+        powerENY = hex.substring(66, 68).hexToInt()
+        autoY = hex.substring(68, 70).hexToInt()
+        setVoltageY = hex.substring(70, 78).hexHighLow().hex4ToFloat()
+        targetVoltageY = hex.substring(78, 86).hexHighLow().hex4ToFloat() * voltageCoefficient
         if (powerENY == 0) {
             getVoltageY = 0f
             getCurrentY = 0f
         } else {
-            getVoltageY = hex.substring(86, 94).hexHighLow().hex4ToFloat32() * voltageCoefficient
+            getVoltageY = hex.substring(86, 94).hexHighLow().hex4ToFloat() * voltageCoefficient
             getCurrentY = hex.substring(94, 102).hexHighLow()
-                .hex4ToFloat32() * currentCoefficient + currentOffset
+                .hex4ToFloat() * currentCoefficient + currentOffset
         }
-        inputSensorY = hex.substring(102, 104).hexToInt8()
-        inputSensorZ = hex.substring(104, 106).hexToInt8()
-        crc1 = hex.substring(106, 108).hexToInt8()
-        crch = hex.substring(108, 110).hexToInt8()
-        end1 = hex.substring(110, 112).hexToInt8()
-        end2 = hex.substring(112, 114).hexToInt8()
-        end3 = hex.substring(114, 116).hexToInt8()
-        end4 = hex.substring(116, 118).hexToInt8()
+        inputSensorY = hex.substring(102, 104).hexToInt()
+        inputSensorZ = hex.substring(104, 106).hexToInt()
+        crc1 = hex.substring(106, 108).hexToInt()
+        crch = hex.substring(108, 110).hexToInt()
+        end1 = hex.substring(110, 112).hexToInt()
+        end2 = hex.substring(112, 114).hexToInt()
+        end3 = hex.substring(114, 116).hexToInt()
+        end4 = hex.substring(116, 118).hexToInt()
     }
 }

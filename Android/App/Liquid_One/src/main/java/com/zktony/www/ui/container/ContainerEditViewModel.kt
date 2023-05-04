@@ -7,7 +7,6 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.R
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
-import com.zktony.core.utils.Snowflake
 import com.zktony.datastore.ext.read
 import com.zktony.www.common.ext.*
 import com.zktony.www.room.dao.ContainerDao
@@ -58,11 +57,10 @@ class ContainerEditViewModel constructor(
             _uiState.value.container?.let {
                 CD.update(it.copy(x = x, y = y))
                 PD.deleteBySubId(it.id)
-                val snowflake = Snowflake(2)
                 val list = mutableListOf<Point>()
                 for (i in 0 until x) {
                     for (j in 0 until y) {
-                        list.add(Point(id = snowflake.nextId(), subId = it.id, x = i, y = j))
+                        list.add(Point(subId = it.id, x = i, y = j))
                     }
                 }
                 PD.insertAll(list)

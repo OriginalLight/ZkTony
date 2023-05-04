@@ -45,7 +45,7 @@ class ProgramWorker constructor(
                             .build()
                     )
                 }
-                grpc.addPrograms(list)
+                grpc.insertBatch(list)
                     .catch {
                         "上传程序数据失败".logi("ProgramWorker")
                     }

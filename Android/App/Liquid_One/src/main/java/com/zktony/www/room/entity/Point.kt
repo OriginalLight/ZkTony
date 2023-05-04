@@ -2,7 +2,7 @@ package com.zktony.www.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.zktony.core.utils.Snowflake
+import com.zktony.core.ext.nextId
 import java.util.Date
 
 /**
@@ -12,7 +12,7 @@ import java.util.Date
 @Entity(tableName = "point")
 data class Point(
     @PrimaryKey(autoGenerate = true)
-    val id: Long = Snowflake(1).nextId(),
+    val id: Long = nextId(),
     val subId: Long = 0L,
     val thirdId: Long = 0L,
     val index: Int = 0,

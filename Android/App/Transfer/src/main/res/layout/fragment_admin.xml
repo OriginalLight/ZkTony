@@ -125,7 +125,7 @@
                             android:checked="true"
                             app:thumbTint="@color/light_primary"
                             app:trackTint="@color/dark_surfaceTint"
-                            tools:ignore="TouchTargetSizeCheck" />
+                            tools:ignore="TouchTargetSizeCheck,DuplicateSpeakableTextCheck" />
 
                     </RelativeLayout>
 
