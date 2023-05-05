@@ -89,55 +89,12 @@ fun String.toHex(): String {
     return sb.toString()
 }
 
-/**
- * hex命令分割
- * 将hex中所有以EE开头并且以FFFCFFFF结尾的命令放进数组中
- * @return List<String>
- */
-fun String.splitHex(): List<String> {
-    // 在FFFCFFFF后面加空格
-    val str = this.replace("FFFCFFFF", "FFFCFFFF，")
-    // 使用空格分割字符串
-    return str.split("，")
-}
-
-/**
- * hex命令查找某个字符的个数
- */
-fun String.hexCount(str: String): Int {
-    var count = 0
-    var index = 0
-    while (index != -1) {
-        index = this.indexOf(str, index)
-        if (index != -1) {
-            count++
-            index += str.length
-        }
-    }
-    return count
-}
-
-/**
- * 验证Hex
- * 不为空
- * 以EE开头并且以FFFCFFFF结尾
- * 如果FFFCFFFF的个数大于1，分割hex
- */
-fun String.verifyHex(): List<String> {
-    if (this.isEmpty()) {
-        return emptyList()
-    }
-    if (!this.startsWith("EE") || !this.endsWith("FFFCFFFF")) {
-        return emptyList()
-    }
-    if (this.hexCount("FFFCFFFF") > 1) {
-        return this.splitHex().filter { it.isNotEmpty() }
-    }
-    return listOf(this)
-}
 
 /**
  * hex命令格式化每两个字符加空格
+ *
+ * @receiver String
+ * @return String
  */
 fun String.hexFormat(): String {
     // 去掉空格
@@ -149,6 +106,12 @@ fun String.hexFormat(): String {
     return result.toString()
 }
 
+/**
+ * hexToAscii
+ *
+ * @receiver String
+ * @return String
+ */
 fun String.hexToAscii(): String {
     val hexStr = this.replace(" ", "")
     val output = StringBuilder("")

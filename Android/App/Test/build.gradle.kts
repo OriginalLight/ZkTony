@@ -88,6 +88,8 @@ dependencies {
     implementation(libs.dialogx)
     implementation(libs.koin.android)
     implementation(libs.material)
+    implementation("androidx.legacy:legacy-support-v4:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
     ksp(libs.androidx.room.compiler)
 

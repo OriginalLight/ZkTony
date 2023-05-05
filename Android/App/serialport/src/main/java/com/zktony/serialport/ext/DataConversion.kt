@@ -41,6 +41,18 @@ object DataConversion {
     }
 
     /**
+     * 16比特的int转2位Hex
+     * @return Hex x 1 like "AA55" "0102"
+     */
+    fun intToHex2(number: Int): String {
+        val result = Integer.toHexString(number).uppercase()
+        return when {
+            result.length < 4 -> "0".repeat(4 - result.length) + result
+            else -> result
+        }
+    }
+
+    /**
      * 字节转十进制
      *
      * @param b
@@ -184,11 +196,8 @@ object DataConversion {
      * @param length
      * @return
      */
-    fun bytesToHexString(src: ByteArray, offset: Int, length: Int): String? {
+    fun bytesToHexString(src: ByteArray, offset: Int, length: Int): String {
         val stringBuilder = StringBuilder("")
-        if (src.isEmpty()) {
-            return null
-        }
         for (i in offset until offset + length) {
             val v: Int = src[i].toInt() and 0xFF
             val hv = Integer.toHexString(v)
@@ -205,10 +214,7 @@ object DataConversion {
      * @param hexString
      * @return
      */
-    fun hexStringToBytes(hexString: String): ByteArray? {
-        if (hexString.isEmpty()) {
-            return null
-        }
+    fun hexStringToBytes(hexString: String): ByteArray {
         val hexStr = hexString.uppercase(Locale.getDefault())
         val length = hexStr.length / 2
         val hexChars = hexStr.toCharArray()
@@ -218,6 +224,26 @@ object DataConversion {
             d[i] = (charToByte(hexChars[pos]).toInt() shl 4 or charToByte(hexChars[pos + 1]).toInt()).toByte()
         }
         return d
+    }
+
+    fun splitString(str: String, head: String, end: String): List<String> {
+        val list = ArrayList<String>()
+        var index = 0
+        while (index < str.length) {
+            val start = str.indexOf(head, index)
+            if (start == -1) {
+                list.add(str)
+                break
+            }
+            val stop = str.indexOf(end, start + 1)
+            if (stop == -1) {
+                list.add(str)
+                break
+            }
+            list.add(str.substring(start, stop + end.length))
+            index = stop + end.length
+        }
+        return list
     }
 
     /**

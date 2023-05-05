@@ -30,7 +30,10 @@ fun v1(block: V1.() -> Unit): String {
  * 解析十六进制字符串为V1
  * @return [V1]
  */
-fun String.toV1(): V1 {
+fun String.toV1(): V1? {
+    if (isEmpty() || !startsWith("EE") || !endsWith("FFFCFFFF") || length % 2 != 0 ) {
+        return null
+    }
     return V1(
         head = this.substring(0, 2),
         addr = this.substring(2, 4),

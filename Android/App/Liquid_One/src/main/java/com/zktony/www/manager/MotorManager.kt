@@ -95,12 +95,11 @@ class MotorManager(
             launch {
 
                 collectHex {
-                    it?.let {
-                        it.toV1().run {
-                            if (fn == "03" && pa == "04") {
-                                val motor = data.toMotor()
-                                sync(motor.copy(id = motor.address - 1))
-                            }
+                    if (it != null) {
+                        val v1 = it.toV1()
+                        if (v1 != null && v1.fn == "03" && v1.pa == "04") {
+                            val motor = v1.data.toMotor()
+                            sync(motor.copy(id = motor.address - 1))
                         }
                     }
                 }

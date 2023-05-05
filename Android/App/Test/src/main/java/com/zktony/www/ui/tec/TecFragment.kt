@@ -24,11 +24,6 @@ class TecFragment : BaseFragment<TecViewModel, FragmentTecBinding>(R.layout.frag
         }
     }
 
-    override fun onDestroyView() {
-        viewModel.destroy()
-        super.onDestroyView()
-    }
-
     private fun initFlowCollector() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {

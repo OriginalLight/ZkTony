@@ -56,9 +56,9 @@ class SerialManager {
      * @param hex 命令
      */
     private fun hexHandler(hex: String) {
-        hex.verifyHex().forEach {
-            _callback.value = it
-            val v1 = it.toV1()
+        _callback.value = hex
+        val v1 = hex.toV1()
+        if (v1 != null) {
             when (v1.fn) {
                 "85" -> {
                     if (v1.pa == "01") {

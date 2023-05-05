@@ -1,15 +1,13 @@
 package com.zktony.serialport
 
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Message
+import android.os.*
+import com.zktony.serialport.config.SPLIT
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.core.SerialPort
+import com.zktony.serialport.ext.DataConversion
 import com.zktony.serialport.ext.DataConversion.bytesToHexString
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
+import com.zktony.serialport.ext.crc16
+import java.io.*
 import java.security.InvalidParameterException
 
 /**
@@ -94,7 +92,15 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
     private fun send(bOutArray: ByteArray) {
         if (isOpen) {
             try {
-                outputStream?.write(bOutArray)
+                if (config.crc16) {
+                    val buffer = bOutArray.slice(0 until bOutArray.size - 3).toByteArray()
+                    val end = bOutArray.slice(bOutArray.size - 1 until bOutArray.size).toByteArray()
+                    val crc = buffer.crc16()
+                    val crcArray = buffer + crc + end
+                    outputStream?.write(crcArray)
+                } else {
+                    outputStream?.write(bOutArray)
+                }
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -110,7 +116,32 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
     private fun dataProcess(temp: String) {
         if (temp == TAG_END) {
             if (cache.isNotEmpty()) {
-                callback.invoke(cache)
+                when (config.split) {
+                    SPLIT.V1 -> {
+                        DataConversion.splitString(cache, "EE", "FFFCFFFF").forEach {
+                            if (it.isNotEmpty()) {
+                                callback.invoke(it)
+                            }
+                        }
+                    }
+
+                    SPLIT.V2 -> {
+                        DataConversion.splitString(cache, "EE", "BB").forEach {
+                            if (it.isNotEmpty()) {
+                                val hex = it
+                                if (config.crc16) {
+                                    val crc = hex.substring(hex.length - 6, hex.length - 2)
+                                    val buffer = hex.substring(0, hex.length - 6)
+                                    if (buffer.crc16() == crc) {
+                                        callback.invoke(hex)
+                                    }
+                                } else {
+                                    callback.invoke(hex)
+                                }
+                            }
+                        }
+                    }
+                }
                 cache = ""
             }
             return
@@ -128,9 +159,7 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
                         if (it > 0) {
                             val buffer = ByteArray(it)
                             inputStream?.read(buffer)
-                            bytesToHexString(buffer, 0, buffer.size)?.let { hex ->
-                                dataProcess(hex)
-                            }
+                            dataProcess(bytesToHexString(buffer, 0, buffer.size))
                         } else {
                             dataProcess(TAG_END)
                         }

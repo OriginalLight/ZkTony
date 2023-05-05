@@ -152,15 +152,17 @@ class MotorManager(
                     val hex = it.second
                     if (hex != null) {
                         val v1 = hex.toV1()
-                        if (v1.fn == "03" && v1.pa == "04") {
-                            val motor = v1.data.toMotor()
-                            val id = when (index) {
-                                0 -> motor.address - 1
-                                1 -> motor.address + 2
-                                2 -> motor.address + 5
-                                else -> 0
+                        if (v1 != null) {
+                            if (v1.fn == "03" && v1.pa == "04") {
+                                val motor = v1.data.toMotor()
+                                val id = when (index) {
+                                    0 -> motor.address - 1
+                                    1 -> motor.address + 2
+                                    2 -> motor.address + 5
+                                    else -> 0
+                                }
+                                sync(motor.copy(id = id))
                             }
-                            sync(motor.copy(id = id))
                         }
                     }
                 }

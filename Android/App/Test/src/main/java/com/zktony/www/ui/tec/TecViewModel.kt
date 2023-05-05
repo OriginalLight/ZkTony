@@ -4,15 +4,22 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.removeZero
-import com.zktony.serialport.config.SerialConfig
-import com.zktony.serialport.SerialHelpers
+import com.zktony.serialport.SerialHelper
+import com.zktony.serialport.config.serialConfig
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class TecViewModel : BaseViewModel() {
 
-    private val helpers by lazy { SerialHelpers() }
+    private val helper by lazy {
+        SerialHelper(
+            serialConfig {
+                device = "/dev/ttyS3"
+                baudRate = 57600
+            }
+        )
+    }
 
 
     private val _serialFlow = MutableStateFlow<String?>(null)
@@ -32,17 +39,9 @@ class TecViewModel : BaseViewModel() {
     fun init() {
         viewModelScope.launch {
             launch {
-                helpers.init(
-                    SerialConfig(
-                        index = 3,
-                        device = "/dev/ttyS3",
-                        baudRate = 57600,
-                    )
-                )
-                helpers.callback = { index, data ->
-                    if (index == 3) {
-                        _serialFlow.value = data
-                    }
+                helper.openDevice()
+                helper.callback = { hex ->
+                    _serialFlow.value = hex
                 }
             }
             launch {
@@ -64,7 +63,7 @@ class TecViewModel : BaseViewModel() {
                 while (true) {
                     for (i in 0..4) {
                         delay(200L)
-                        helpers.sendText(3, "TC1:TCACTUALTEMP?@$i\r")
+                        helper.sendText("TC1:TCACTUALTEMP?@$i\r")
                     }
                     delay(2 * 1000L)
                 }
@@ -79,13 +78,6 @@ class TecViewModel : BaseViewModel() {
         3 -> _uiState3
         4 -> _uiState4
         else -> _uiState0
-    }
-
-
-    fun destroy() {
-        viewModelScope.launch {
-            helpers.close(3)
-        }
     }
 
     fun start(flag: Int) {
@@ -120,8 +112,7 @@ class TecViewModel : BaseViewModel() {
     ) {
         val flow = flow(flag)
         setTempDelay(flag)
-        helpers.sendText(
-            3,
+        helper.sendText(
             "TC1:TCADJUSTTEMP=${low.toString().removeZero()}@$flag\r"
         )
         flow.value = flow.value.copy(setTemp = low, count = count)
@@ -132,8 +123,7 @@ class TecViewModel : BaseViewModel() {
             return
         }
         setTempDelay(flag)
-        helpers.sendText(
-            3,
+        helper.sendText(
             "TC1:TCADJUSTTEMP=${high.toString().removeZero()}@$flag\r"
         )
         flow.value = flow.value.copy(setTemp = high)
@@ -152,13 +142,11 @@ class TecViewModel : BaseViewModel() {
      * 设置温度时先关闭输出十秒后打开输出
      */
     private suspend fun setTempDelay(flag: Int) {
-        helpers.sendText(
-            3,
+        helper.sendText(
             "TC1:TCSW=0@$flag\r"
         )
         delay(20 * 1000L)
-        helpers.sendText(
-            3,
+        helper.sendText(
             "TC1:TCSW=1@$flag\r"
         )
         delay(1000L)

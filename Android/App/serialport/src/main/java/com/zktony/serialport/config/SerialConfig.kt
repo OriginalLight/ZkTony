@@ -49,6 +49,16 @@ data class SerialConfig(
      * CMD_SHELL
      */
     var cmdSuShell: CmdSuShell = CmdSuShell.CMD_X_BIN_SU_SHELL,
+
+    /**
+     * CRC16
+     */
+    var crc16: Boolean = false,
+
+    /**
+     * split
+     */
+    var split: SPLIT = SPLIT.V1,
 )
 
 fun serialConfig(block: SerialConfig.() -> Unit): SerialConfig {
@@ -58,4 +68,9 @@ fun serialConfig(block: SerialConfig.() -> Unit): SerialConfig {
 enum class CmdSuShell {
     CMD_BIN_SU_SHELL,
     CMD_X_BIN_SU_SHELL,
+}
+
+enum class SPLIT {
+    V1,
+    V2,
 }

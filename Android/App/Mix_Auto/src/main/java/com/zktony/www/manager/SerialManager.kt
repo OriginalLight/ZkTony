@@ -66,12 +66,11 @@ class SerialManager {
      * @param hex 命令
      */
     private fun hexHandler(index: Int, hex: String) {
-        hex.verifyHex().forEach {
-            _callback.value = Pair(index, hex)
-            val v1 = it.toV1()
+        _callback.value = Pair(index, hex)
+        val v1 = hex.toV1()
+        if (v1 != null) {
             when (index) {
                 0 -> {
-                    it.hexFormat().logd("串口一 receivedHex: ")
                     when (v1.fn) {
                         "85" -> {
                             if (v1.pa == "01") {
@@ -92,7 +91,6 @@ class SerialManager {
                 }
 
                 3 -> {
-                    it.hexFormat().logd("串口三 receivedHex: ")
                     when (v1.fn) {
                         "86" -> {
                             if (v1.pa == "04" && v1.data == "01") {
@@ -104,6 +102,7 @@ class SerialManager {
                 }
             }
         }
+
     }
 
     /**

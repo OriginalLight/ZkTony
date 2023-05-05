@@ -91,31 +91,26 @@ class SerialManager {
      */
     private fun hexHandler(index: Int, hex: String) {
         if (index != 3) {
-            hex.verifyHex().forEach {
-                _callback.value = Pair(index, hex)
-                val v1 = it.toV1()
-                when (index) {
-                    0 -> {
-                        it.hexFormat().logd("串口一 receivedHex: ")
-                        when (v1.fn) {
-                            "85" -> {
-                                if (v1.pa == "01") {
-                                    val total = v1.data.substring(2, 4).hexToInt()
-                                    val current = v1.data.substring(6, 8).hexToInt()
-                                    _lock.value = total != current
-                                    lockTime = 0L
-                                }
-                            }
+            _callback.value = Pair(index, hex)
+            val v1 = hex.toV1()
+            if (v1 != null && index == 0) {
+                when (v1.fn) {
+                    "85" -> {
+                        if (v1.pa == "01") {
+                            val total = v1.data.substring(2, 4).hexToInt()
+                            val current = v1.data.substring(6, 8).hexToInt()
+                            _lock.value = total != current
+                            lockTime = 0L
+                        }
+                    }
 
-                            "86" -> {
-                                if (v1.pa == "01") {
-                                    drawer.set(v1.data.hexToInt() == 0)
-                                }
-                                if (v1.pa == "0A") {
-                                    _lock.value = false
-                                    lockTime = 0L
-                                }
-                            }
+                    "86" -> {
+                        if (v1.pa == "01") {
+                            drawer.set(v1.data.hexToInt() == 0)
+                        }
+                        if (v1.pa == "0A") {
+                            _lock.value = false
+                            lockTime = 0L
                         }
                     }
                 }

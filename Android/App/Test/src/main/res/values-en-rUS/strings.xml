@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">Test</string>
     <string name="title_tec">Tec Test</string>
+    <string name="title_protocol">V2 Test</string>
 </resources>

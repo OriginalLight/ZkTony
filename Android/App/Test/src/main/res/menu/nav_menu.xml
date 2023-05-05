@@ -8,4 +8,11 @@
             android:title="@string/title_tec" />
     </group>
 
+    <group android:id="@+id/g_protocol">
+        <item
+            android:id="@+id/navigation_protocol"
+            android:icon="@mipmap/bar"
+            android:title="@string/title_protocol" />
+    </group>
+
 </menu>
