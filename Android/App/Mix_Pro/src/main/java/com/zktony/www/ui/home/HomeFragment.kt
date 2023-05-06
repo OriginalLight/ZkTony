@@ -11,6 +11,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     override val viewModel: HomeViewModel by viewModel()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
+        viewModel.init()
     }
 
 }

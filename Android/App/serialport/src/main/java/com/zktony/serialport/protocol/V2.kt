@@ -1,7 +1,7 @@
 package com.zktony.serialport.protocol
 
-import com.zktony.serialport.ext.DataConversion.intToHex2
 import com.zktony.serialport.ext.crc16
+import com.zktony.serialport.ext.intToHex
 
 
 data class V2(
@@ -25,9 +25,9 @@ data class V2(
      * @return String
      */
     fun toHex(): String {
-        val crcArray = head + addr + fn + intToHex2(data.length / 2) + data
+        val crcArray = head + addr + fn + (data.length / 2).intToHex(2) + data
         val crc = crcArray.crc16()
-        return  crcArray + crc + end
+        return crcArray + crc + end
     }
 }
 

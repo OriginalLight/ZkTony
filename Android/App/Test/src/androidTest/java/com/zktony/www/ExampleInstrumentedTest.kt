@@ -2,7 +2,7 @@ package com.zktony.www
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.zktony.core.ext.hexToAscii
+import com.zktony.serialport.ext.hexToAscii
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,5 @@ class ExampleInstrumentedTest {
         val str = "43 4D 44 3A 52 45 50 4C 59 3D 32 40 30 0D"
         assertEquals("CMD:REPLY=2@0\r", str.hexToAscii())
     }
-
-
 
 }

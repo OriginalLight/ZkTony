@@ -70,8 +70,8 @@ class CalibrationDataViewHolder(
                 3 -> itemView.context.getString(R.string.pump_four)
                 else -> itemView.context.getString(R.string.pump_one)
             }
-            expect.text = item.expect.toString().removeZero()
-            actual.text = item.actual.toString().removeZero()
+            expect.text = item.expect.format()
+            actual.text = item.actual.format()
             with(delete) {
                 clickScale()
                 clickNoRepeat {

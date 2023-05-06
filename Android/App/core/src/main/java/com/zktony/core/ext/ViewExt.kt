@@ -212,7 +212,7 @@ fun EditText.addSuffix(suffix: String) {
     this.setOnFocusChangeListener { v, hasFocus ->
         v as EditText
         if (v.text.isNotEmpty() && v.text.toString().endsWith(suffix).not()) {
-            v.setText(v.text.toString().removeZero() + suffix)
+            v.setText(v.text.toString().format() + suffix)
         }
         if (hasFocus) {
             v.setText(v.text.toString().replace(suffix, ""))

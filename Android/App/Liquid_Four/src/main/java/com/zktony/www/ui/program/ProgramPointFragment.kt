@@ -36,13 +36,13 @@ class ProgramPointFragment :
                         } else {
                             selectAll.isEnabled = it.list.any { point -> !point.enable }
                             volume.text = if (!it.custom) "[ ${
-                                it.list[0].v1.toString().removeZero()
+                                it.list[0].v1
                             } μL, ${
-                                it.list[0].v2.toString().removeZero()
+                                it.list[0].v2
                             } μL, ${
-                                it.list[0].v3.toString().removeZero()
+                                it.list[0].v3
                             } μL, ${
-                                it.list[0].v4.toString().removeZero()
+                                it.list[0].v4
                             } μL ]" else "/"
                             title.text = when (it.list[0].index) {
                                 0 -> getString(R.string.plate_one)

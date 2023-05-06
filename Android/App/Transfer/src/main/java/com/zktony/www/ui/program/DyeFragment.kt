@@ -11,7 +11,7 @@ import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.afterTextChange
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.removeZero
+import com.zktony.core.ext.format
 import com.zktony.core.ext.setEqualText
 import com.zktony.core.utils.Constants.MAX_TIME
 import com.zktony.core.utils.Constants.MAX_VOLTAGE_RS
@@ -46,12 +46,12 @@ class DyeFragment : BaseFragment<DyeViewModel, FragmentDyeBinding>(R.layout.frag
             }
             voltage.afterTextChange {
                 viewModel.setVoltage(voltage = it.toFloatOrNull() ?: 0f, block = {
-                    binding.voltage.setText(MAX_VOLTAGE_RS.toString().removeZero())
+                    binding.voltage.setText(MAX_VOLTAGE_RS.format())
                 })
             }
             time.afterTextChange {
                 viewModel.setTime(time = it.toFloatOrNull() ?: 0f, block = {
-                    binding.time.setText(MAX_TIME.toString().removeZero())
+                    binding.time.setText(MAX_TIME.format())
                 })
             }
             cancel.clickNoRepeat { findNavController().navigateUp() }
@@ -85,10 +85,10 @@ class DyeFragment : BaseFragment<DyeViewModel, FragmentDyeBinding>(R.layout.frag
                     binding.apply {
                         name.setEqualText(it.name)
                         if (it.voltage > 0f) {
-                            voltage.setEqualText(it.voltage.toString().removeZero())
+                            voltage.setEqualText(it.voltage.format())
                         }
                         if (it.time > 0f) {
-                            time.setEqualText(it.time.toString().removeZero())
+                            time.setEqualText(it.time.format())
                         }
                     }
                 }

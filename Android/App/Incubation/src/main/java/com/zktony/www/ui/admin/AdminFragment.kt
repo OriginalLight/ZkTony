@@ -68,7 +68,7 @@ class AdminFragment :
                 launch {
                     launch {
                         dataStore.read(Constants.TEMP, 5.0f).collect {
-                            binding.etTemp.setEqualText(it.toString().removeZero())
+                            binding.etTemp.setEqualText(it.format())
                         }
                     }
                     launch {

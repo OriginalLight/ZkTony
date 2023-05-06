@@ -2,8 +2,8 @@ package com.zktony.www.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.zktony.core.ext.intToHex
 import com.zktony.core.ext.nextId
+import com.zktony.serialport.ext.intToHex
 import java.util.Date
 
 /**
@@ -31,6 +31,6 @@ data class Motor(
      * 生成Hex
      */
     fun hex(): String {
-        return speed.intToHex() + acc.intToHex() + dec.intToHex()
+        return speed.intToHex(2) + acc.intToHex(2) + dec.intToHex(2)
     }
 }

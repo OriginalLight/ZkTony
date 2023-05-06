@@ -70,7 +70,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     }
                     launch {
                         dataStore.read(Constants.NEEDLE_SPACE, 12f).collect {
-                            binding.needleSpace.setEqualText(it.toString().removeZero())
+                            binding.needleSpace.setEqualText(it.format())
                         }
                     }
                     launch {

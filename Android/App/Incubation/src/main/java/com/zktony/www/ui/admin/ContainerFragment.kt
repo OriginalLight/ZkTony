@@ -6,19 +6,16 @@ import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
 import com.zktony.www.R
+import com.zktony.www.common.ext.collectLock
 import com.zktony.www.databinding.FragmentContainerBinding
-import com.zktony.www.manager.SerialManager
 import com.zktony.www.room.entity.Container
 import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class ContainerFragment :
     BaseFragment<ContainerViewModel, FragmentContainerBinding>(R.layout.fragment_container) {
 
     override val viewModel: ContainerViewModel by viewModel()
-
-    private val serialManager: SerialManager by inject()
 
     override fun onViewCreated(savedInstanceState: Bundle?) {
         initFlowCollector()
@@ -34,22 +31,22 @@ class ContainerFragment :
                 launch {
                     viewModel.container.collect {
                         binding.apply {
-                            wastePosition.setEqualText(it.wasteY.toString().removeZero())
-                            wasteHeight.setEqualText(it.wasteZ.toString().removeZero())
-                            washPosition.setEqualText(it.washY.toString().removeZero())
-                            washHeight.setEqualText(it.washZ.toString().removeZero())
-                            blockingLiquidPosition.setEqualText(it.blockY.toString().removeZero())
-                            blockingLiquidHeight.setEqualText(it.blockZ.toString().removeZero())
-                            antibodyOnePosition.setEqualText(it.oneY.toString().removeZero())
-                            antibodyOneHeight.setEqualText(it.oneZ.toString().removeZero())
-                            antibodyOneRecycle.setEqualText(it.recycleOneZ.toString().removeZero())
-                            antibodyTwoPosition.setEqualText(it.twoY.toString().removeZero())
-                            antibodyTwoHeight.setEqualText(it.twoZ.toString().removeZero())
+                            wastePosition.setEqualText(it.wasteY.format())
+                            wasteHeight.setEqualText(it.wasteZ.format())
+                            washPosition.setEqualText(it.washY.format())
+                            washHeight.setEqualText(it.washZ.format())
+                            blockingLiquidPosition.setEqualText(it.blockY.format())
+                            blockingLiquidHeight.setEqualText(it.blockZ.format())
+                            antibodyOnePosition.setEqualText(it.oneY.format())
+                            antibodyOneHeight.setEqualText(it.oneZ.format())
+                            antibodyOneRecycle.setEqualText(it.recycleOneZ.format())
+                            antibodyTwoPosition.setEqualText(it.twoY.format())
+                            antibodyTwoHeight.setEqualText(it.twoZ.format())
                         }
                     }
                 }
                 launch {
-                    serialManager.lock.collect {
+                    collectLock {
                         binding.apply {
                             moveWastePosition.isEnabled = !it
                             moveWasteHeight.isEnabled = !it

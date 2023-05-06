@@ -3,7 +3,7 @@ package com.zktony.www.ui.tec
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.ext.removeZero
+import com.zktony.core.ext.format
 import com.zktony.serialport.SerialHelper
 import com.zktony.serialport.config.serialConfig
 import kotlinx.coroutines.*
@@ -51,7 +51,7 @@ class TecViewModel : BaseViewModel() {
                             // 读取温度
                             val address = it.substring(it.length - 2, it.length - 1).toInt()
                             val temp =
-                                it.replace("TC1:TCACTUALTEMP=", "").split("@")[0].removeZero()
+                                it.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
                             val flow = flow(address)
                             flow.value = flow.value.copy(temp = temp.toFloatOrNull() ?: 0f)
                         }
@@ -113,7 +113,7 @@ class TecViewModel : BaseViewModel() {
         val flow = flow(flag)
         setTempDelay(flag)
         helper.sendText(
-            "TC1:TCADJUSTTEMP=${low.toString().removeZero()}@$flag\r"
+            "TC1:TCADJUSTTEMP=${low.format()}@$flag\r"
         )
         flow.value = flow.value.copy(setTemp = low, count = count)
         delay(time * 60 * 1000L)
@@ -124,7 +124,7 @@ class TecViewModel : BaseViewModel() {
         }
         setTempDelay(flag)
         helper.sendText(
-            "TC1:TCADJUSTTEMP=${high.toString().removeZero()}@$flag\r"
+            "TC1:TCADJUSTTEMP=${high.format()}@$flag\r"
         )
         flow.value = flow.value.copy(setTemp = high)
         delay(time * 60 * 1000L)

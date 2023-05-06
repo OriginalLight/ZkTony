@@ -35,8 +35,8 @@ class ConfigFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     binding.apply {
-                        maxYTrip.setEqualText(it.maxYTrip.removeZero())
-                        wash.text = it.washTank.removeZero()
+                        maxYTrip.setEqualText(it.maxYTrip.format())
+                        wash.text = it.washTank.format()
                     }
                 }
             }

@@ -2,9 +2,10 @@ package com.zktony.serialport
 
 import android.util.Log
 import com.zktony.serialport.config.SerialConfig
+import java.util.concurrent.ConcurrentHashMap
 
 class SerialHelpers {
-    private val serialMap: MutableMap<Int, SerialHelper> = HashMap()
+    private val serialMap: MutableMap<Int, SerialHelper> = ConcurrentHashMap()
     var callback: (Int, String) -> Unit = { _, _ -> }
 
     @Synchronized

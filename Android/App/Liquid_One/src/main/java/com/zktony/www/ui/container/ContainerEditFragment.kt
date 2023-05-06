@@ -52,13 +52,13 @@ class ContainerEditFragment :
                                     it.list.find { c -> c.x == it.container.x - 1 && c.y == it.container.y - 1 }
                                 if (x1 != null) {
                                     c1.text =
-                                        "( ${x1.xAxis.removeZero()} , ${x1.yAxis.removeZero()} )"
+                                        "( ${x1.xAxis.format()} , ${x1.yAxis.format()} )"
                                 } else {
                                     c1.text = "( 0 , 0 )"
                                 }
                                 if (x2 != null) {
                                     c2.text =
-                                        "( ${x2.xAxis.removeZero()} , ${x2.yAxis.removeZero()} )"
+                                        "( ${x2.xAxis.format()} , ${x2.yAxis.format()} )"
                                 } else {
                                     c1.text = "( 0 , 0 )"
                                 }
@@ -160,15 +160,15 @@ class ContainerEditFragment :
                         val xy =
                             if (index == 1) list.find { p -> p.x == c1.x - 1 && p.y == c1.y - 1 }
                             else list.find { p -> p.x == 0 && p.y == 0 }
-                        inputX.setText(xy?.xAxis?.removeZero() ?: "0")
-                        inputY.setText(xy?.yAxis?.removeZero() ?: "0")
+                        inputX.setText(xy?.xAxis?.format() ?: "0")
+                        inputY.setText(xy?.yAxis?.format() ?: "0")
                     }
 
                     move.clickNoRepeat {
                         val x = inputX.text.toString().toFloatOrNull() ?: 0f
                         val y = inputY.text.toString().toFloatOrNull() ?: 0f
                         if (x > maxXTrip || y > maxYTrip) {
-                            PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} ${maxXTrip.removeZero()},${maxYTrip.removeZero()}")
+                            PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} ${maxXTrip.format()},${maxYTrip.format()}")
                         } else {
                             viewModel.move(x, y)
                         }
@@ -178,7 +178,7 @@ class ContainerEditFragment :
                         val x = inputX.text.toString().toFloatOrNull() ?: 0f
                         val y = inputY.text.toString().toFloatOrNull() ?: 0f
                         if (x > maxXTrip || y > maxYTrip) {
-                            PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} ${maxXTrip.removeZero()},${maxYTrip.removeZero()}")
+                            PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} ${maxXTrip.format()},${maxYTrip.format()}")
                         } else {
                             viewModel.save(x, y, index)
                             dialog.dismiss()

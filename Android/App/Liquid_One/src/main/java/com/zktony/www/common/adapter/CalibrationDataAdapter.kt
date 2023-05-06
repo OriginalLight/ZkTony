@@ -61,8 +61,8 @@ class CalibrationDataViewHolder(
     fun bind(item: CalibrationData) {
         binding.apply {
             order.text = (layoutPosition + 1).toString()
-            expect.text = item.expect.toString().removeZero()
-            actual.text = item.actual.toString().removeZero()
+            expect.text = item.expect.format()
+            actual.text = item.actual.format()
             with(delete) {
                 clickScale()
                 clickNoRepeat {

@@ -26,7 +26,7 @@ class App : Application(), KoinComponent {
             modules(
                 localModule,
                 remoteModule,
-                managerModule,
+                proxyModule,
                 viewModule
             )
         }

@@ -6,7 +6,7 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import com.zktony.core.ext.removeZero
+import com.zktony.core.ext.format
 
 class GradientPlate : View {
 
@@ -134,12 +134,12 @@ class GradientPlate : View {
                 paint.strokeWidth = 1f
                 paint.isAntiAlias = true
                 paint.textSize = space * 0.2f
-                val text = String.format("%.2f", axis.second).removeZero()
+                val text = String.format("%.2f", axis.second).format()
                 val x = left + (right - left - paint.measureText(text)) / 2
                 val y = top + (bottom - top - paint.textSize) / 2 - paint.textSize
                 canvas?.drawText(text, x, y, paint)
 
-                val text2 = String.format("%.2f", axis.third).removeZero()
+                val text2 = String.format("%.2f", axis.third).format()
                 val x2 = left + (right - left - paint.measureText(text2)) / 2
                 val y2 = top + (bottom - top - paint.textSize) / 2 + paint.textSize * 2
                 canvas?.drawText(text2, x2, y2, paint)

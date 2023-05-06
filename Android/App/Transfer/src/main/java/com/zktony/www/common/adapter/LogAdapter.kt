@@ -64,9 +64,9 @@ class LogViewHolder(
                 str.append(item.motor)
                 str.append("RPM - ")
             }
-            str.append(item.voltage.toString().removeZero())
+            str.append(item.voltage.format())
             str.append("V - ")
-            str.append(item.time.toString().removeZero())
+            str.append(item.time.format())
             str.append("MIN")
             parameter.text = str.toString()
             val zm = itemView.context.getString(R.string.transfer)

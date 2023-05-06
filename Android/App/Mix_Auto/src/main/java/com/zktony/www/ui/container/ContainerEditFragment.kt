@@ -90,8 +90,8 @@ class ContainerEditFragment :
                             val point = viewModel.uiState.value.list.find { it.index == index }
                             val textAxis = point?.axis ?: 0f
                             val textWaste = point?.waste ?: 0f
-                            inputAxis.setText(String.format("%.2f", textAxis))
-                            inputWaste.setText(String.format("%.2f", textWaste))
+                            inputAxis.setText(String.format("%.2f", textAxis).format())
+                            inputWaste.setText(String.format("%.2f", textWaste).format())
 
                             val maxYTrip = viewModel.uiState.value.maxYTrip
 

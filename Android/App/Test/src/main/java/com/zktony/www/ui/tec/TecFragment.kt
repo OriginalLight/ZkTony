@@ -5,7 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import androidx.lifecycle.*
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.removeZero
+import com.zktony.core.ext.format
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentTecBinding
 import kotlinx.coroutines.launch
@@ -56,8 +56,8 @@ class TecFragment : BaseFragment<TecViewModel, FragmentTecBinding>(R.layout.frag
     private fun uiChange(uiState: TecUiState, flag: Int) {
         val bind = bind(flag)
         bind.title.text = uiState.title
-        bind.setTemp.text = "${uiState.setTemp.toString().removeZero()} ℃"
-        bind.temp.text = "${uiState.temp.toString().removeZero()} ℃"
+        bind.setTemp.text = "${uiState.setTemp.format()} ℃"
+        bind.temp.text = "${uiState.temp.format()} ℃"
         bind.count.run {
             text = uiState.count.toString()
             if (uiState.error != null) {
@@ -81,6 +81,4 @@ class TecFragment : BaseFragment<TecViewModel, FragmentTecBinding>(R.layout.frag
         4 -> binding.e
         else -> binding.a
     }
-
-
 }

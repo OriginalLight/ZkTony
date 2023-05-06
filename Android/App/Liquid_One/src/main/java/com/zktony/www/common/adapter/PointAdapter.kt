@@ -54,8 +54,8 @@ class PointViewHolder(
     fun bind(item: Point) {
         binding.apply {
             content.text = "${'A' + item.x}${item.y + 1}: ( ${
-                String.format("%.2f", item.xAxis).removeZero()
-            }, ${String.format("%.2f", item.yAxis).removeZero()} )"
+                String.format("%.2f", item.xAxis).format()
+            }, ${String.format("%.2f", item.yAxis).format()} )"
             with(move) {
                 clickScale()
                 clickNoRepeat {

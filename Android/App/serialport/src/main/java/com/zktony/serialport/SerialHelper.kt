@@ -3,7 +3,7 @@ package com.zktony.serialport
 import android.os.Message
 import android.util.Log
 import com.zktony.serialport.config.SerialConfig
-import com.zktony.serialport.ext.DataConversion.hexStringToBytes
+import com.zktony.serialport.ext.hexStringToByteArray
 import java.io.IOException
 import java.io.UnsupportedEncodingException
 import java.security.InvalidParameterException
@@ -44,7 +44,7 @@ class SerialHelper(config: SerialConfig) : AbstractSerialHelper(config) {
      */
     fun sendHex(sHex: String) {
         val hex = sHex.trim { it <= ' ' }.replace(" ", "")
-        val bOutArray = hexStringToBytes(hex)
+        val bOutArray = hex.hexStringToByteArray()
         val msg = Message.obtain()
         msg.obj = bOutArray
         addWaitMessage(msg)

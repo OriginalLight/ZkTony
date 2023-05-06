@@ -48,12 +48,12 @@ class ActionFragment :
                         if (it.time == 0f) {
                             time.setEqualText("")
                         } else {
-                            time.setEqualText(it.time.toString().removeZero())
+                            time.setEqualText(it.time.format())
                         }
                         if (it.temp == 0f) {
                             temperature.setEqualText("")
                         } else {
-                            temperature.setEqualText(it.temp.toString().removeZero())
+                            temperature.setEqualText(it.temp.format())
                         }
                         if (it.volume == 0) {
                             liquidVolume.setEqualText("")

@@ -2,7 +2,8 @@ package com.zktony.www.room.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.zktony.core.ext.*
+import com.zktony.serialport.ext.hexToInt
+import com.zktony.serialport.ext.intToHex
 
 /**
  * @author: 刘贺贺
@@ -32,11 +33,11 @@ data class Motor(
     fun toHex(): String {
         return address.intToHex() +
                 subdivision.intToHex() +
-                speed.intToHex2() +
+                speed.intToHex(2) +
                 acceleration.intToHex() +
                 deceleration.intToHex() +
                 mode.intToHex() +
-                waitTime.intToHex2()
+                waitTime.intToHex(2)
 
     }
 

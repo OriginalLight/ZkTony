@@ -35,10 +35,10 @@ class ConfigFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     binding.apply {
-                        maxXTrip.setEqualText(it.maxXTrip.removeZero())
-                        maxYTrip.setEqualText(it.maxYTrip.removeZero())
+                        maxXTrip.setEqualText(it.maxXTrip.format())
+                        maxYTrip.setEqualText(it.maxYTrip.format())
                         wash.text =
-                            "( ${it.washXAxis.removeZero()} , ${it.washYAxis.removeZero()} )"
+                            "( ${it.washXAxis.format()} , ${it.washYAxis.format()} )"
                     }
                 }
             }
@@ -88,14 +88,14 @@ class ConfigFragment :
                     val washXAxis = viewModel.uiState.value.washXAxis
                     val washYAxis = viewModel.uiState.value.washYAxis
 
-                    inputX.setText(washXAxis.removeZero())
-                    inputY.setText(washYAxis.removeZero())
+                    inputX.setText(washXAxis.format())
+                    inputY.setText(washYAxis.format())
 
                     move.clickNoRepeat {
                         val x = inputX.text.toString().toFloatOrNull() ?: 0f
                         val y = inputY.text.toString().toFloatOrNull() ?: 0f
                         if (x > maxXTrip || y > maxYTrip) {
-                            PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} ${maxXTrip.removeZero()},${maxYTrip.removeZero()}")
+                            PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} ${maxXTrip.format()},${maxYTrip.format()}")
                         } else {
                             viewModel.move(x, y)
                         }
@@ -105,7 +105,7 @@ class ConfigFragment :
                         val x = inputX.text.toString().toFloatOrNull() ?: 0f
                         val y = inputY.text.toString().toFloatOrNull() ?: 0f
                         if (x > maxXTrip || y > maxYTrip) {
-                            PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} ${maxXTrip.removeZero()},${maxYTrip.removeZero()}")
+                            PopTip.show("${getString(com.zktony.core.R.string.over_the_trip)} ${maxXTrip.format()},${maxYTrip.format()}")
                         } else {
                             viewModel.save("WASH_X_AXIS", x)
                             viewModel.save("WASH_Y_AXIS", y)

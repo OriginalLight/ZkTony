@@ -2,11 +2,12 @@ package com.zktony.www.ui.protocol
 
 import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
-import com.zktony.core.ext.*
 import com.zktony.serialport.SerialHelper
-import com.zktony.serialport.config.SPLIT
+import com.zktony.serialport.config.Protocol
 import com.zktony.serialport.config.serialConfig
-import com.zktony.serialport.protocol.*
+import com.zktony.serialport.ext.intToHex
+import com.zktony.serialport.protocol.toV2
+import com.zktony.serialport.protocol.v2
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,8 +17,8 @@ class ProtocolViewModel : BaseViewModel() {
     private val helper by lazy {
         SerialHelper(serialConfig {
             device = "/dev/ttyS0"
-            crc16 = true
-            split = SPLIT.V2
+            crc = true
+            protocol = Protocol.V2
         })
     }
     private val _uiState = MutableStateFlow(ProtocolUiState())
@@ -49,13 +50,19 @@ class ProtocolViewModel : BaseViewModel() {
                     while (true) {
                         // 随机生成 0 - 15
                         val random = (0..15).random()
-                        val step = (3200.. 64000).random()
+                        val step = (3200..64000).random()
                         val speed = (100..1000).random()
                         val acc = (10..100).random()
                         val dec = (10..100).random()
-                        val dataStr = random.intToHex() + step.intToHex4() + speed.intToHex2() + acc.intToHex2() + dec.intToHex2()
+                        val dataStr =
+                            random.intToHex() + step.intToHex(4) + speed.intToHex(2) + acc.intToHex(
+                                2
+                            ) + dec.intToHex(2)
                         val hex = v2 { data = dataStr }
-                        _uiState.value = _uiState.value.copy(sendText = hex, sendNum = _uiState.value.sendNum + 1)
+                        _uiState.value = _uiState.value.copy(
+                            sendText = hex,
+                            sendNum = _uiState.value.sendNum + 1
+                        )
                         helper.sendHex(hex)
                         delay(5000L)
                         while (_uiState.value.map[random] != 0) {
@@ -73,11 +80,49 @@ class ProtocolViewModel : BaseViewModel() {
     }
 
     fun async() {
+        if (_uiState.value.asyncJob == null) {
+            _uiState.value = ProtocolUiState()
 
+            val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
+                launch {
+                    while (true) {
+                        delay(1000L)
+                        _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
+                    }
+                }
+                launch {
+                    while (true) {
+                        // 随机生成 0 - 15
+                        val random = (0..15).random()
+                        val step = (32000..64000).random()
+                        val speed = (100..1000).random()
+                        val acc = (10..100).random()
+                        val dec = (10..100).random()
+                        val dataStr =
+                            random.intToHex() + step.intToHex(4) + speed.intToHex(2) + acc.intToHex(
+                                2
+                            ) + dec.intToHex(2)
+                        val hex = v2 { data = dataStr }
+                        _uiState.value = _uiState.value.copy(
+                            sendText = hex,
+                            sendNum = _uiState.value.sendNum + 1
+                        )
+                        helper.sendHex(hex)
+                        delay(1000L)
+                    }
+                }
+            }
+            _uiState.value = _uiState.value.copy(asyncJob = job)
+            job.start()
+        } else {
+            _uiState.value.asyncJob?.cancel()
+            _uiState.value = _uiState.value.copy(asyncJob = null)
+        }
     }
 
     private fun hexHandler(hex: String) {
-        _uiState.value = _uiState.value.copy(receiveText = hex, receiveNum = _uiState.value.receiveNum + 1)
+        _uiState.value =
+            _uiState.value.copy(receiveText = hex, receiveNum = _uiState.value.receiveNum + 1)
         val v2 = hex.toV2()
         if (v2 != null && v2.addr == "02" && v2.fn == "01") {
             val key = v2.data.substring(0, 2).toInt(16)

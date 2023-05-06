@@ -38,10 +38,10 @@ class CalibrationDataFragment :
                             getString(R.string.pump_three)
                         )[it.pumpId]
                         if (it.expect > 0f) {
-                            expect.setEqualText(it.expect.toString().removeZero())
+                            expect.setEqualText(it.expect.format())
                         }
                         if (it.actual > 0f) {
-                            actual.setEqualText(it.actual.toString().removeZero())
+                            actual.setEqualText(it.actual.format())
                         }
                         addLiquid.isEnabled = it.expect > 0f && !it.lock
                         save.isEnabled = it.expect > 0f && it.actual > 0f

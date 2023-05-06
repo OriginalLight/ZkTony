@@ -1,7 +1,7 @@
 package com.zktony.serialport.core
 
 import android.util.Log
-import com.zktony.serialport.config.CmdSuShell
+import com.zktony.serialport.config.Shell
 import java.io.*
 
 /**
@@ -17,7 +17,7 @@ class SerialPort
     parity: Int,
     flowCon: Int,
     flags: Int,
-    cmdSuShell: CmdSuShell,
+    shell: Shell,
 ) {
 
     /**
@@ -43,7 +43,7 @@ class SerialPort
 
 
     init {
-        checkPermission(device, cmdSuShell)
+        checkPermission(device, shell)
         fd = open(device.absolutePath, baudRate, stopBits, dataBits, parity, flowCon, flags)
         if (fd == null) {
             Log.e(TAG, "native open returns null")
@@ -56,7 +56,7 @@ class SerialPort
     }
 
     @Throws(SecurityException::class, IllegalArgumentException::class)
-    private fun checkPermission(device: File, cmdSuShell: CmdSuShell) {
+    private fun checkPermission(device: File, shell: Shell) {
         Log.i(TAG, "检测读写权限: 是否可读:${device.canRead()}，是否可写：${device.canWrite()}")
         // 检测设备管理权限，即文件的权限属性
         if (!device.canRead() || !device.canWrite()) {
@@ -64,9 +64,9 @@ class SerialPort
                 // Missing read/write permission, trying to chmod the file
 
                 val su = Runtime.getRuntime().exec(
-                    when (cmdSuShell) {
-                        CmdSuShell.CMD_BIN_SU_SHELL -> "/system/xbin/su"
-                        CmdSuShell.CMD_X_BIN_SU_SHELL -> "/system/xbin/su"
+                    when (shell) {
+                        Shell.CMD_BIN_SU_SHELL -> "/system/xbin/su"
+                        Shell.CMD_X_BIN_SU_SHELL -> "/system/xbin/su"
                     }
                 )
                 val cmd = """chmod 777 ${device.absolutePath} exit""".trimIndent()

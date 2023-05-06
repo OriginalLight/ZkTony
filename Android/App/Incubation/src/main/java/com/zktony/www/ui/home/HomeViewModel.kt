@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.currentTime
-import com.zktony.core.ext.removeZero
+import com.zktony.core.ext.format
 import com.zktony.core.utils.Constants
 import com.zktony.core.utils.Queue
 import com.zktony.datastore.ext.read
@@ -60,7 +60,7 @@ class HomeViewModel constructor(
                             // 读取温度
                             val address = text.substring(text.length - 2, text.length - 1).toInt()
                             val temp =
-                                text.replace("TC1:TCACTUALTEMP=", "").split("@")[0].removeZero()
+                                text.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
                             when (address) {
                                 1 -> _aFlow.value = _aFlow.value.copy(temp = "$temp ℃")
                                 2 -> _bFlow.value = _bFlow.value.copy(temp = "$temp ℃")
@@ -80,8 +80,7 @@ class HomeViewModel constructor(
                     launch {
                         temp(
                             addr = i,
-                            temp = if (i == 0) _uiState.value.temp.toString()
-                                .removeZero() else "26"
+                            temp = if (i == 0) _uiState.value.temp.format() else "26"
                         )
                     }
 
@@ -233,7 +232,7 @@ class HomeViewModel constructor(
                                 delay(100L)
                                 stop(
                                     it.module,
-                                    _uiState.value.temp.toString().removeZero()
+                                    _uiState.value.temp.format()
                                 )
                             }
                         }
@@ -400,7 +399,7 @@ class HomeViewModel constructor(
             launch {
                 temp(
                     addr = 0, temp = if (_uiState.value.insulating) "26"
-                    else _uiState.value.temp.toString().removeZero()
+                    else _uiState.value.temp.format()
                 )
             }
             // 更改按钮状态

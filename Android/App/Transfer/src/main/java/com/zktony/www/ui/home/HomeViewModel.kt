@@ -22,7 +22,7 @@ import com.zktony.core.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.core.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.datastore.ext.read
 import com.zktony.www.R
-import com.zktony.www.manager.SerialManager
+import com.zktony.www.proxy.SerialProxy
 import com.zktony.www.room.dao.LogDataDao
 import com.zktony.www.room.dao.LogRecordDao
 import com.zktony.www.room.dao.ProgramDao
@@ -39,7 +39,7 @@ class HomeViewModel constructor(
     private val PD: ProgramDao,
     private val LRD: LogRecordDao,
     private val LDD: LogDataDao,
-    private val SM: SerialManager,
+    private val SM: SerialProxy,
     private val DS: DataStore<Preferences>
 ) : BaseViewModel() {
 

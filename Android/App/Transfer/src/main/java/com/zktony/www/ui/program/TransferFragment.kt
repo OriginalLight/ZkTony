@@ -11,7 +11,7 @@ import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.afterTextChange
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.removeZero
+import com.zktony.core.ext.format
 import com.zktony.core.ext.setEqualText
 import com.zktony.core.utils.Constants.MAX_MOTOR
 import com.zktony.core.utils.Constants.MAX_TIME
@@ -57,10 +57,10 @@ class TransferFragment :
                         name.setEqualText(it.name)
                         proteinName.setEqualText(it.proteinName)
                         if (it.proteinMin > 0f) {
-                            proteinMin.setEqualText(it.proteinMin.toString().removeZero())
+                            proteinMin.setEqualText(it.proteinMin.format())
                         }
                         if (it.proteinMax > 0f) {
-                            proteinMax.setEqualText(it.proteinMax.toString().removeZero())
+                            proteinMax.setEqualText(it.proteinMax.format())
                         }
                         if (it.glueType == 0) {
                             radioGlueNormal.isChecked = true
@@ -69,7 +69,7 @@ class TransferFragment :
                             glueMaxMin.visibility = View.GONE
                             if (it.glueNormalSize > 0f) {
                                 glueNormalSize.setEqualText(
-                                    it.glueNormalSize.toString().removeZero()
+                                    it.glueNormalSize.format()
                                 )
                             }
                         }
@@ -79,10 +79,10 @@ class TransferFragment :
                             glueNormal.visibility = View.GONE
                             glueMaxMin.visibility = View.VISIBLE
                             if (it.glueMax > 0f) {
-                                glueMax.setEqualText(it.glueMax.toString().removeZero())
+                                glueMax.setEqualText(it.glueMax.format())
                             }
                             if (it.glueMin > 0f) {
-                                glueMin.setEqualText(it.glueMin.toString().removeZero())
+                                glueMin.setEqualText(it.glueMin.format())
                             }
                         }
                         if (it.glueThickness == "0.75") {
@@ -105,13 +105,13 @@ class TransferFragment :
                             otherBufferInfo.setEqualText(it.bufferType)
                         }
                         if (it.voltage > 0f) {
-                            voltage.setEqualText(it.voltage.toString().removeZero())
+                            voltage.setEqualText(it.voltage.format())
                         }
                         if (it.motor > 0f) {
-                            motor.setEqualText(it.motor.toString().removeZero())
+                            motor.setEqualText(it.motor.toString())
                         }
                         if (it.time > 0f) {
-                            time.setEqualText(it.time.toString().removeZero())
+                            time.setEqualText(it.time.format())
                         }
                         if (it.name.isNotEmpty()
                             && it.proteinName.isNotEmpty()
@@ -171,17 +171,17 @@ class TransferFragment :
             otherBufferInfo.afterTextChange { viewModel.setBufferInfo(it) }
             voltage.afterTextChange {
                 viewModel.setVoltage(voltage = it.toFloatOrNull() ?: 0f, block = {
-                    binding.voltage.setText(MAX_VOLTAGE_ZM.toString().removeZero())
+                    binding.voltage.setText(MAX_VOLTAGE_ZM.format())
                 })
             }
             time.afterTextChange {
                 viewModel.setTime(time = it.toFloatOrNull() ?: 0f, block = {
-                    binding.time.setText(MAX_TIME.toString().removeZero())
+                    binding.time.setText(MAX_TIME.format())
                 })
             }
             motor.afterTextChange {
                 viewModel.setMotor(motor = it.toIntOrNull() ?: 0, block = {
-                    binding.motor.setText(MAX_MOTOR.toString().removeZero())
+                    binding.motor.setText(MAX_MOTOR.toString())
                 })
             }
 

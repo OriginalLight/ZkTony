@@ -108,7 +108,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         addSuffix(" RPM")
                         afterTextChange {
                             viewModel.setMotor(
-                                motor = it.replace(" RPM", "").removeZero().toIntOrNull() ?: 0,
+                                motor = it.replace(" RPM", "").format().toIntOrNull() ?: 0,
                                 xy = i,
                                 block = { bind.motor.setText(MAX_MOTOR.toString()) }
                             )
@@ -118,9 +118,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         addSuffix(" V")
                         afterTextChange {
                             viewModel.setVoltage(
-                                voltage = it.replace(" V", "").removeZero().toFloatOrNull() ?: 0f,
+                                voltage = it.replace(" V", "").format().toFloatOrNull() ?: 0f,
                                 xy = i,
-                                block = { max -> bind.voltage.setText(max.toString().removeZero()) }
+                                block = { max -> bind.voltage.setText(max.format()) }
                             )
                         }
                     }
@@ -128,9 +128,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         addSuffix(" MIN")
                         afterTextChange {
                             viewModel.setTime(
-                                time = it.replace(" MIN", "").removeZero().toFloatOrNull() ?: 0f,
+                                time = it.replace(" MIN", "").format().toFloatOrNull() ?: 0f,
                                 xy = i,
-                                block = { bind.time.setText(MAX_TIME.toString().removeZero()) }
+                                block = { bind.time.setText(MAX_TIME.format()) }
                             )
                         }
                     }
@@ -179,7 +179,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 voltage.isEnabled = true
                 if (voltage.isFocused.not()) {
                     if (uiState.voltage > 0f) {
-                        voltage.setText(uiState.voltage.toString().removeZero() + " V")
+                        voltage.setText(uiState.voltage.format() + " V")
                     } else {
                         voltage.setText("")
                     }
@@ -187,7 +187,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
             if (time.isFocused.not()) {
                 if (uiState.time > 0) {
-                    time.setText(uiState.time.toString().removeZero() + " MIN")
+                    time.setText(uiState.time.format() + " MIN")
                 } else {
                     time.setText("")
                 }
@@ -215,7 +215,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             val sub = if (uiState.voltage > 10f) 5 else 4
             bind.apply {
                 currentVoltage.text =
-                    uiState.currentVoltage.toString().removeZero()
+                    uiState.currentVoltage.format()
                         .substring(0, sub) + " V"
                 currentVoltage.setBackgroundColor(Color.parseColor("#287DF133"))
             }
@@ -240,7 +240,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 }
             } else {
                 bind.apply {
-                    currentCurrent.text = uiState.currentCurrent.toString().removeZero()
+                    currentCurrent.text = uiState.currentCurrent.format()
                         .substring(0, 4) + " A"
                     currentCurrent.setBackgroundColor(Color.parseColor("#287DF133"))
                 }

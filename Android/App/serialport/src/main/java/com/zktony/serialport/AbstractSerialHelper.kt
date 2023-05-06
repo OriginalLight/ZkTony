@@ -1,12 +1,10 @@
 package com.zktony.serialport
 
 import android.os.*
-import com.zktony.serialport.config.SPLIT
+import com.zktony.serialport.config.Protocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.core.SerialPort
-import com.zktony.serialport.ext.DataConversion
-import com.zktony.serialport.ext.DataConversion.bytesToHexString
-import com.zktony.serialport.ext.crc16
+import com.zktony.serialport.ext.*
 import java.io.*
 import java.security.InvalidParameterException
 
@@ -45,7 +43,7 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
             parity = config.parity,
             flowCon = config.flowCon,
             flags = config.flags,
-            cmdSuShell = config.cmdSuShell
+            shell = config.shell
         )
         serialPort?.let {
             outputStream = it.outputStream
@@ -92,7 +90,7 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
     private fun send(bOutArray: ByteArray) {
         if (isOpen) {
             try {
-                if (config.crc16) {
+                if (config.crc) {
                     val buffer = bOutArray.slice(0 until bOutArray.size - 3).toByteArray()
                     val end = bOutArray.slice(bOutArray.size - 1 until bOutArray.size).toByteArray()
                     val crc = buffer.crc16()
@@ -116,20 +114,25 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
     private fun dataProcess(temp: String) {
         if (temp == TAG_END) {
             if (cache.isNotEmpty()) {
-                when (config.split) {
-                    SPLIT.V1 -> {
-                        DataConversion.splitString(cache, "EE", "FFFCFFFF").forEach {
+                when (config.protocol) {
+                    // 转膜仪的不需要分割
+                    Protocol.V0 -> {
+                        callback.invoke(cache)
+                    }
+                    // 旧版的下位机需要分割
+                    Protocol.V1 -> {
+                        cache.splitString("EE", "FFFCFFFF").forEach {
                             if (it.isNotEmpty()) {
                                 callback.invoke(it)
                             }
                         }
                     }
-
-                    SPLIT.V2 -> {
-                        DataConversion.splitString(cache, "EE", "BB").forEach {
+                    // 新版的下位机需要分割和crc验证
+                    Protocol.V2 -> {
+                        cache.splitString("EE", "BB").forEach {
                             if (it.isNotEmpty()) {
                                 val hex = it
-                                if (config.crc16) {
+                                if (config.crc) {
                                     val crc = hex.substring(hex.length - 6, hex.length - 2)
                                     val buffer = hex.substring(0, hex.length - 6)
                                     if (buffer.crc16() == crc) {
@@ -149,6 +152,9 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
         cache += temp
     }
 
+    /**
+     * Thread for receiving data
+     */
     private inner class ReadThread : Thread() {
         override fun run() {
             super.run()
@@ -159,7 +165,7 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
                         if (it > 0) {
                             val buffer = ByteArray(it)
                             inputStream?.read(buffer)
-                            dataProcess(bytesToHexString(buffer, 0, buffer.size))
+                            dataProcess(buffer.byteArrayToHexString())
                         } else {
                             dataProcess(TAG_END)
                         }
