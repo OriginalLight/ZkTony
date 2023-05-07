@@ -10,5 +10,5 @@
   the License.
   -->
 <resources>
-    <style name="Theme.ZkTony" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.App" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>
