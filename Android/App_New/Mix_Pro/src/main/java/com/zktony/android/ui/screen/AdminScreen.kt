@@ -65,6 +65,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
@@ -79,6 +80,13 @@ enum class AdminPage {
     ADMIN, AUTHENTICATION,
 }
 
+/**
+ * Admin screen
+ *
+ * @param modifier Modifier
+ * @param navController NavHostController
+ * @param viewModel AdminViewModel
+ */
 @Composable
 fun AdminScreen(
     modifier: Modifier = Modifier,
@@ -110,7 +118,18 @@ fun AdminScreen(
     }
 }
 
-
+/**
+ * Admin page
+ *
+ * @param modifier Modifier
+ * @param navController NavHostController
+ * @param navigationTo Function1<AdminPage, Unit>
+ * @param uiState AdminUiState
+ * @param setNavigation Function1<Boolean, Unit>
+ * @param setLanguage Function1<String, Unit>
+ * @param openWifi Function0<Unit>
+ * @param checkUpdate Function0<Unit>
+ */
 @Composable
 fun AdminPage(
     modifier: Modifier = Modifier,
@@ -154,6 +173,13 @@ fun AdminPage(
     }
 }
 
+/**
+ * Authentication page
+ *
+ * @param modifier Modifier
+ * @param navController NavHostController
+ * @param navigationTo Function1<AdminPage, Unit>
+ */
 @Composable
 fun AuthenticationPage(
     modifier: Modifier = Modifier,
@@ -179,8 +205,7 @@ fun AuthenticationPage(
                 .padding(16.dp),
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            FloatingActionButton(
-                modifier = Modifier.size(64.dp),
+            FloatingActionButton(modifier = Modifier.size(64.dp),
                 onClick = { navigationTo(AdminPage.ADMIN) }) {
                 Icon(
                     imageVector = Icons.Default.Close,
@@ -250,6 +275,14 @@ fun AuthenticationPage(
     }
 }
 
+/**
+ * Settings form
+ *
+ * @param modifier Modifier
+ * @param uiState AdminUiState
+ * @param setNavigation Function1<Boolean, Unit>
+ * @param setLanguage Function1<String, Unit>
+ */
 @Composable
 fun SettingsForm(
     modifier: Modifier = Modifier,
@@ -265,10 +298,10 @@ fun SettingsForm(
         modifier = modifier
             .fillMaxSize()
             .padding(end = 4.dp, bottom = 4.dp)
+            .animateContentSize()
             .background(
                 color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
-            )
-            .animateContentSize(),
+            ),
         state = lazyColumnState,
     ) {
         item {
@@ -308,9 +341,9 @@ fun SettingsForm(
                 }
             }
         }
-        if (expanded) {
-            languageList.forEach { (name, code) ->
-                item {
+        languageList.forEach { (name, code) ->
+            item {
+                AnimatedVisibility(visible = expanded) {
                     Card(
                         modifier = Modifier
                             .wrapContentHeight()
@@ -376,6 +409,11 @@ fun SettingsForm(
     }
 }
 
+/**
+ * Info form
+ *
+ * @param modifier Modifier
+ */
 @SuppressLint("HardwareIds")
 @Composable
 fun InfoForm(
@@ -389,15 +427,15 @@ fun InfoForm(
         modifier = modifier
             .fillMaxSize()
             .padding(start = 4.dp, bottom = 4.dp)
+            .animateContentSize()
             .background(
                 color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
-            )
-            .animateContentSize(),
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
         state = lazyColumnState,
     ) {
-        if (!deviceInfo && !helpInfo) {
-            item {
+        item {
+            AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
                 Card(
                     modifier = Modifier
                         .wrapContentHeight()
@@ -430,7 +468,10 @@ fun InfoForm(
                     }
                 }
             }
-            item {
+
+        }
+        item {
+            AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
                 Card(
                     modifier = Modifier
                         .wrapContentHeight()
@@ -463,7 +504,10 @@ fun InfoForm(
                     }
                 }
             }
-            item {
+
+        }
+        item {
+            AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
                 Card(
                     modifier = Modifier
                         .wrapContentHeight()
@@ -497,8 +541,8 @@ fun InfoForm(
                 }
             }
         }
-        if (deviceInfo) {
-            item {
+        item {
+            AnimatedVisibility(visible = deviceInfo) {
                 Card(
                     modifier = Modifier
                         .wrapContentHeight()
@@ -524,7 +568,9 @@ fun InfoForm(
                     }
                 }
             }
-            item {
+        }
+        item {
+            AnimatedVisibility(visible = deviceInfo) {
                 Card(
                     modifier = Modifier
                         .wrapContentHeight()
@@ -565,8 +611,8 @@ fun InfoForm(
                 }
             }
         }
-        if (helpInfo) {
-            item {
+        item {
+            AnimatedVisibility(visible = helpInfo) {
                 Card(
                     modifier = Modifier
                         .wrapContentHeight()
@@ -592,7 +638,9 @@ fun InfoForm(
                     }
                 }
             }
-            item {
+        }
+        item {
+            AnimatedVisibility(visible = helpInfo) {
                 Card(
                     modifier = Modifier
                         .wrapContentHeight()
@@ -612,6 +660,15 @@ fun InfoForm(
     }
 }
 
+/**
+ * Operation form
+ *
+ * @param modifier Modifier
+ * @param uiState AdminUiState
+ * @param openWifi Function0<Unit>
+ * @param checkUpdate Function0<Unit>
+ * @param navigationTo Function1<AdminPage, Unit>
+ */
 @Composable
 fun OperationForm(
     modifier: Modifier = Modifier,
@@ -731,8 +788,10 @@ fun OperationForm(
 }
 
 /**
- * @param text 文本内容
- * @param focused 是否高亮当前输入框
+ * Code item
+ *
+ * @param text String
+ * @param focused Boolean
  */
 @Composable
 fun SimpleVerificationCodeItem(text: String, focused: Boolean) {
@@ -756,9 +815,12 @@ fun SimpleVerificationCodeItem(text: String, focused: Boolean) {
 }
 
 /**
- * @param digits 验证码位数（框数量）
- * @param horizontalMargin 水平间距
- * @param inputCallback 输入回调
+ * Verification code field
+ *
+ * @param digits Int
+ * @param horizontalMargin Dp
+ * @param inputCallback Function1<[@kotlin.ParameterName] String, Unit>
+ * @param itemScope [@androidx.compose.runtime.Composable] Function2<[@kotlin.ParameterName] String, [@kotlin.ParameterName] Boolean, Unit>
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -836,11 +898,27 @@ fun InfoFormPreview() {
 }
 
 @Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
+@Preview(showBackground = true, widthDp = 960)
 fun OperationFormPreview() {
     OperationForm(
         uiState = AdminUiState(),
         openWifi = {},
         checkUpdate = {},
     )
+}
+
+@Composable
+@Preview(showBackground = true, widthDp = 960, heightDp = 640)
+fun AdminPagePreview() {
+    AdminPage(
+        navController = rememberNavController(),
+        uiState = AdminUiState(),
+    )
+}
+
+
+@Composable
+@Preview(showBackground = true, widthDp = 960, heightDp = 640)
+fun AuthenticationPagePreview() {
+    AuthenticationPage(navController = rememberNavController())
 }

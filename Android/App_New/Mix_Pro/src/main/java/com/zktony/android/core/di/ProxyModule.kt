@@ -1,7 +1,7 @@
-package com.zktony.android.di
+package com.zktony.android.core.di
 
-import com.zktony.android.proxy.MCProxy
-import com.zktony.android.proxy.SerialProxy
+import com.zktony.android.core.proxy.MCProxy
+import com.zktony.android.core.proxy.SerialProxy
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 

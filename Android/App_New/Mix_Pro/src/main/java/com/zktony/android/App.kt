@@ -1,10 +1,10 @@
 package com.zktony.android
 
 import android.app.Application
-import com.zktony.android.di.localModule
-import com.zktony.android.di.proxyModule
-import com.zktony.android.di.remoteModule
-import com.zktony.android.di.viewModule
+import com.zktony.android.core.di.localModule
+import com.zktony.android.core.di.proxyModule
+import com.zktony.android.core.di.remoteModule
+import com.zktony.android.core.di.viewModule
 import com.zktony.core.ext.Ext
 import com.zktony.datastore.DataStoreFactory
 import org.koin.android.ext.koin.androidContext

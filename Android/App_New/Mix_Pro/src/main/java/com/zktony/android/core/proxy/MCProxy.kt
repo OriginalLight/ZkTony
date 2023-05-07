@@ -1,4 +1,4 @@
-package com.zktony.android.proxy
+package com.zktony.android.core.proxy
 
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.MotorDao

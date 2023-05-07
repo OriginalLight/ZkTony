@@ -1,4 +1,4 @@
-package com.zktony.android.proxy
+package com.zktony.android.core.proxy
 
 import com.zktony.core.ext.logi
 import com.zktony.serialport.SerialHelper

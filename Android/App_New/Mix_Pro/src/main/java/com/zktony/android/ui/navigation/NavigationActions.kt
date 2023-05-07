@@ -16,7 +16,7 @@ object Route {
 
 data class TopLevelDestination(
     val route: String,
-    val icon: Int,
+    val iconId: Int,
     val iconTextId: Int
 )
 
@@ -42,27 +42,27 @@ class NavigationActions(private val navController: NavHostController) {
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
         route = Route.HOME,
-        icon = R.drawable.ic_home,
+        iconId = R.drawable.ic_home,
         iconTextId = R.string.tab_home
     ),
     TopLevelDestination(
         route = Route.PROGRAM,
-        icon = R.drawable.ic_program,
+        iconId = R.drawable.ic_program,
         iconTextId = R.string.tab_program
     ),
     TopLevelDestination(
         route = Route.CONTAINER,
-        icon = R.drawable.ic_container,
+        iconId = R.drawable.ic_container,
         iconTextId = R.string.tab_container
     ),
     TopLevelDestination(
         route = Route.CALIBRATION,
-        icon = R.drawable.ic_calibration,
+        iconId = R.drawable.ic_calibration,
         iconTextId = R.string.tab_calibration
     ),
     TopLevelDestination(
         route = Route.ADMIN,
-        icon = R.drawable.ic_admin,
+        iconId = R.drawable.ic_admin,
         iconTextId = R.string.tab_admin
     )
 )

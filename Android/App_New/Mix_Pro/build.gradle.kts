@@ -53,11 +53,6 @@ android {
         compose = true
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
     }
@@ -120,7 +115,6 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.grpc.okhttp)
     implementation(libs.gson)
-    implementation(libs.koin.core)
     implementation(libs.koin.androidx.compose)
 
 

@@ -66,6 +66,11 @@ class AdminViewModel constructor(
         }
     }
 
+    /**
+     * 设置语言
+     *
+     * @param language String
+     */
     fun setLanguage(language: String) {
         datastore.save(Constants.LANGUAGE, language)
         viewModelScope.launch {
@@ -78,6 +83,11 @@ class AdminViewModel constructor(
         }
     }
 
+    /**
+     * 设置导航栏
+     *
+     * @param navigation Boolean
+     */
     fun setNavigation(navigation: Boolean) {
         datastore.save(Constants.NAVIGATION, navigation)
         val intent = Intent().apply {
@@ -87,6 +97,9 @@ class AdminViewModel constructor(
         Ext.ctx.sendBroadcast(intent)
     }
 
+    /**
+     * 跳转到wifi设置界面
+     */
     fun openWifi() {
         val intent = Intent(Settings.ACTION_WIFI_SETTINGS).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK

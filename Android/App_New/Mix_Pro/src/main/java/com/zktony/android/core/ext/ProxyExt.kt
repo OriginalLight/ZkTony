@@ -1,7 +1,7 @@
-package com.zktony.android.ext
+package com.zktony.android.core.ext
 
-import com.zktony.android.proxy.MCProxy
-import com.zktony.android.proxy.SerialProxy
+import com.zktony.android.core.proxy.MCProxy
+import com.zktony.android.core.proxy.SerialProxy
 import com.zktony.serialport.ext.intToHex
 import com.zktony.serialport.protocol.v2
 import kotlinx.coroutines.delay

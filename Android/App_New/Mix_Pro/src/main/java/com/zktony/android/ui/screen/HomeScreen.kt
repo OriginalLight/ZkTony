@@ -29,16 +29,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.viewmodel.HomeViewModel
 
+/**
+ * Home screen
+ *
+ * @param modifier Modifier
+ * @param viewModel HomeViewModel
+ */
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel,
-    navController: NavHostController
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -49,9 +52,6 @@ fun HomeScreen(
             modifier = Modifier
                 .padding(8.dp)
                 .clickable {
-                    navController.navigate(
-                        "${Route.CONTAINER}/ssss"
-                    )
                 },
             text = stringResource(id = R.string.tab_home),
             style = MaterialTheme.typography.titleLarge,

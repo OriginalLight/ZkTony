@@ -8,8 +8,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import com.zktony.android.ext.proxyInitializer
-import com.zktony.android.ui.theme.ManagerTheme
+import com.zktony.android.core.ext.proxyInitializer
+import com.zktony.android.ui.theme.AppTheme
 import com.zktony.core.ext.setLanguage
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
@@ -28,10 +28,10 @@ class MainActivity : ComponentActivity() {
         proxyInitializer()
 
         setContent {
-            ManagerTheme(
+            AppTheme(
                 dynamicColor = false,
             ) {
-                ManagerApp()
+                ZkTonyApp()
             }
         }
     }
@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 @Composable
 fun AppPreview() {
-    ManagerTheme {
-        ManagerApp()
+    AppTheme {
+        ZkTonyApp()
     }
 }
