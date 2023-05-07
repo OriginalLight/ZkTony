@@ -5,7 +5,7 @@ import com.zktony.www.proxy.SerialProxy
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
-val helperModule = module {
+val proxyModule = module {
     singleOf(::SerialProxy)
     singleOf(::MCProxy)
 }

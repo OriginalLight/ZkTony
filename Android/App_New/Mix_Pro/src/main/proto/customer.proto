@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.zktony.proto";
+option java_outer_classname = "CustomerProto";
+
+package customer;
+
+service CustomerService {
+  rpc GetCustomerPage (CustomerRequestPage) returns (CustomerReplyPage) {}
+  rpc SearchCustomer (CustomerSearch) returns (CustomerList) {}
+  rpc GetById (CustomerId) returns (Customer) {}
+  rpc AddCustomer (Customer) returns (CustomerId) {}
+  rpc UpdateCustomer(Customer) returns (CustomerReply) {}
+  rpc DeleteCustomer (CustomerId) returns (CustomerReply) {}
+}
+
+message CustomerRequestPage {
+  uint64 page_size = 1;
+  uint64 page = 2;
+}
+
+message CustomerReply {bool success = 1;}
+
+message CustomerSearch {
+  string id = 1;
+  string name = 2;
+  string phone = 3;
+  string address = 4;
+  string begin_time = 5;
+  string end_time = 6;
+}
+
+message CustomerId {
+  string id = 1;
+}
+
+message Customer {
+  string id = 1;
+  string name = 2;
+  string phone = 3;
+  string address = 4;
+  string source = 5;
+  string industry = 6;
+  string remarks = 7;
+  string create_time = 8;
+  string create_by = 9;
+}
+
+message CustomerList {repeated Customer list = 1;}
+
+message CustomerReplyPage {
+  repeated Customer list = 1;
+  uint64 total = 2;
+}
