@@ -113,8 +113,8 @@ private fun AppNavHost(
         composable(Route.CALIBRATION) {
             EmptyComingSoon()
         }
-        composable(Route.ADMIN) {
-            AdminScreen(
+        composable(Route.Setting) {
+            SettingScreen(
                 modifier = Modifier,
                 viewModel = koinViewModel(),
                 navController = navController,

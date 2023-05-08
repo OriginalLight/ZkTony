@@ -50,30 +50,31 @@ import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.navigation.Route
-import com.zktony.android.ui.viewmodel.AdminPage
-import com.zktony.android.ui.viewmodel.AdminUiState
-import com.zktony.android.ui.viewmodel.AdminViewModel
+import com.zktony.android.ui.viewmodel.SettingPage
+import com.zktony.android.ui.viewmodel.SettingUiState
+import com.zktony.android.ui.viewmodel.SettingViewModel
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.createQRCodeBitmap
 import com.zktony.core.model.QrCode
+import kotlinx.coroutines.delay
 
 /**
- * Admin screen
+ * Setting screen
  *
  * @param modifier Modifier
- * @param viewModel AdminViewModel
+ * @param viewModel SettingViewModel
  * @param navController NavHostController
  */
 @Composable
-fun AdminScreen(
+fun SettingScreen(
     modifier: Modifier = Modifier,
-    viewModel: AdminViewModel,
+    viewModel: SettingViewModel,
     navController: NavHostController,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    AnimatedVisibility(visible = uiState.page == AdminPage.ADMIN) {
-        AdminPage(
+    AnimatedVisibility(visible = uiState.page == SettingPage.SETTING) {
+        SettingPage(
             modifier = modifier,
             navController = navController,
             navigationTo = viewModel::navigateTo,
@@ -85,7 +86,7 @@ fun AdminScreen(
         )
     }
 
-    AnimatedVisibility(visible = uiState.page == AdminPage.AUTHENTICATION) {
+    AnimatedVisibility(visible = uiState.page == SettingPage.AUTHENTICATION) {
         AuthenticationPage(
             modifier = modifier,
             navController = navController,
@@ -95,23 +96,23 @@ fun AdminScreen(
 }
 
 /**
- * Admin page
+ * Setting page
  *
  * @param modifier Modifier
  * @param navController NavHostController
- * @param navigationTo Function1<AdminPage, Unit>
- * @param uiState AdminUiState
+ * @param navigationTo Function1<SettingPage, Unit>
+ * @param uiState SettingUiState
  * @param setNavigation Function1<Boolean, Unit>
  * @param setLanguage Function1<String, Unit>
  * @param openWifi Function0<Unit>
  * @param checkUpdate Function0<Unit>
  */
 @Composable
-fun AdminPage(
+fun SettingPage(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    navigationTo: (AdminPage) -> Unit = {},
-    uiState: AdminUiState,
+    navigationTo: (SettingPage) -> Unit = {},
+    uiState: SettingUiState,
     setNavigation: (Boolean) -> Unit = {},
     setLanguage: (String) -> Unit = {},
     openWifi: () -> Unit = {},
@@ -154,19 +155,20 @@ fun AdminPage(
  *
  * @param modifier Modifier
  * @param navController NavHostController
- * @param navigationTo Function1<AdminPage, Unit>
+ * @param navigationTo Function1<SettingPage, Unit>
  */
 @Composable
 fun AuthenticationPage(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    navigationTo: (AdminPage) -> Unit = {},
+    navigationTo: (SettingPage) -> Unit = {},
 ) {
     BackHandler {
-        navigationTo(AdminPage.ADMIN)
+        navigationTo(SettingPage.SETTING)
     }
 
     var show by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .padding(8.dp)
@@ -180,7 +182,7 @@ fun AuthenticationPage(
         ZkTonyTopAppBar(
             title = "",
             onBack = {
-                navigationTo(AdminPage.ADMIN)
+                navigationTo(SettingPage.SETTING)
             }
         )
         Spacer(modifier = Modifier.height(128.dp))
@@ -198,7 +200,7 @@ fun AuthenticationPage(
             ) {
                 Card(
                     modifier = Modifier.clickable {
-                        navigationTo(AdminPage.ADMIN)
+                        navigationTo(SettingPage.SETTING)
                         navController.navigate(Route.MOTOR)
                     },
                 ) {
@@ -222,7 +224,7 @@ fun AuthenticationPage(
 
                 Card(
                     modifier = Modifier.clickable {
-                        navigationTo(AdminPage.ADMIN)
+                        navigationTo(SettingPage.SETTING)
                         navController.navigate(Route.CONFIG)
                     },
                 ) {
@@ -252,14 +254,14 @@ fun AuthenticationPage(
  * Settings form
  *
  * @param modifier Modifier
- * @param uiState AdminUiState
+ * @param uiState SettingUiState
  * @param setNavigation Function1<Boolean, Unit>
  * @param setLanguage Function1<String, Unit>
  */
 @Composable
 fun SettingsForm(
     modifier: Modifier = Modifier,
-    uiState: AdminUiState,
+    uiState: SettingUiState,
     setNavigation: (Boolean) -> Unit = {},
     setLanguage: (String) -> Unit = {},
 ) {
@@ -633,18 +635,18 @@ fun InfoForm(
  * Operation form
  *
  * @param modifier Modifier
- * @param uiState AdminUiState
+ * @param uiState SettingUiState
  * @param openWifi Function0<Unit>
  * @param checkUpdate Function0<Unit>
- * @param navigationTo Function1<AdminPage, Unit>
+ * @param navigationTo Function1<SettingPage, Unit>
  */
 @Composable
 fun OperationForm(
     modifier: Modifier = Modifier,
-    uiState: AdminUiState,
+    uiState: SettingUiState,
     openWifi: () -> Unit = {},
     checkUpdate: () -> Unit = {},
-    navigationTo: (AdminPage) -> Unit = {},
+    navigationTo: (SettingPage) -> Unit = {},
 ) {
 
     Row(
@@ -661,7 +663,7 @@ fun OperationForm(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp)
-                .clickable { navigationTo(AdminPage.AUTHENTICATION) },
+                .clickable { navigationTo(SettingPage.AUTHENTICATION) },
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -805,8 +807,15 @@ fun VerificationCodeField(
     itemScope: @Composable (text: String, focused: Boolean) -> Unit
 ) {
     var content by remember { mutableStateOf("") }
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(Unit) {
+        delay(100) //延迟操作(关键点)
+        focusRequester.requestFocus()
+        keyboardController?.show()
+    }
+
     Box {
         Row(
             modifier = Modifier.padding(vertical = 16.dp),
@@ -862,7 +871,7 @@ fun VerificationCodeField(
 @Preview(showBackground = true)
 fun SettingsFormPreview() {
     SettingsForm(
-        uiState = AdminUiState(),
+        uiState = SettingUiState(),
     )
 }
 
@@ -876,7 +885,7 @@ fun InfoFormPreview() {
 @Preview(showBackground = true, widthDp = 960)
 fun OperationFormPreview() {
     OperationForm(
-        uiState = AdminUiState(),
+        uiState = SettingUiState(),
         openWifi = {},
         checkUpdate = {},
     )
@@ -884,10 +893,10 @@ fun OperationFormPreview() {
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun AdminPagePreview() {
-    AdminPage(
+fun SettingPagePreview() {
+    SettingPage(
         navController = rememberNavController(),
-        uiState = AdminUiState(),
+        uiState = SettingUiState(),
     )
 }
 

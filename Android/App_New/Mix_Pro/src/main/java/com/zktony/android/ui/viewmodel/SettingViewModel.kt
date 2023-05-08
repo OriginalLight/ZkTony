@@ -26,12 +26,12 @@ import java.io.File
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class AdminViewModel constructor(
+class SettingViewModel constructor(
     private val datastore: DataStore<Preferences>,
     private val grpc: ApplicationGrpc,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AdminUiState())
+    private val _uiState = MutableStateFlow(SettingUiState())
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -69,7 +69,7 @@ class AdminViewModel constructor(
      * @param page AdminPage
      * @return Unit
      */
-    fun navigateTo(page: AdminPage) {
+    fun navigateTo(page: SettingPage) {
         _uiState.value = _uiState.value.copy(page = page)
     }
 
@@ -220,17 +220,17 @@ class AdminViewModel constructor(
     }
 }
 
-data class AdminUiState(
+data class SettingUiState(
     val application: Application? = null,
     val navigation: Boolean = false,
     val language: String = "zh",
     val progress: Int = 0,
-    val page: AdminPage = AdminPage.ADMIN,
+    val page: SettingPage = SettingPage.SETTING,
 )
 
 /**
  * Admin page
  */
-enum class AdminPage {
-    ADMIN, AUTHENTICATION,
+enum class SettingPage {
+    SETTING, AUTHENTICATION,
 }

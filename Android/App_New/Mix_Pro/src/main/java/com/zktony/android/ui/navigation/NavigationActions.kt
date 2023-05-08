@@ -9,7 +9,7 @@ object Route {
     const val PROGRAM = "Program"
     const val CONTAINER = "Container"
     const val CALIBRATION = "Calibration"
-    const val ADMIN = "Admin"
+    const val Setting = "Setting"
     const val MOTOR = "Motor"
     const val CONFIG = "Config"
 }
@@ -61,8 +61,8 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         iconTextId = R.string.tab_calibration
     ),
     TopLevelDestination(
-        route = Route.ADMIN,
+        route = Route.Setting,
         iconId = R.drawable.ic_admin,
-        iconTextId = R.string.tab_admin
+        iconTextId = R.string.tab_setting
     )
 )

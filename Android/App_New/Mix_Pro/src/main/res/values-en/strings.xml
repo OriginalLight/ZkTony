@@ -14,7 +14,6 @@
     <string name="parameters">Parameters</string>
     <string name="qrcode">Scan this QR code</string>
     <string name="system_config">System config</string>
-    <string name="tab_admin">Admin</string>
     <string name="tab_calibration">Calibration</string>
     <string name="tab_container">Container</string>
     <string name="tab_home">Home</string>
@@ -32,4 +31,8 @@
     <string name="save">Save</string>
     <string name="edit">edit</string>
     <string name="delete">Delete</string>
+    <string name="tab_setting">Setting</string>
+    <string name="x_axis_travel">X-axis travel</string>
+    <string name="y_axis_travel">Y-axis travel</string>
+    <string name="z_axis_travel">Z-axis travel</string>
 </resources>

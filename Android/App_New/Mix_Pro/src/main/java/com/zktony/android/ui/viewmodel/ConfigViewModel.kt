@@ -15,7 +15,7 @@ class ConfigViewModel : ViewModel() {
 }
 
 data class ConfigUiState(
-    val xMaxTrip: Float = 0f,
-    val yMaxTrip: Float = 0f,
-    val zMaxTrip: Float = 0f,
+    val xAxisTravel: Float = 0f,
+    val yAxisTravel: Float = 0f,
+    val zAxisTravel: Float = 0f,
 )
