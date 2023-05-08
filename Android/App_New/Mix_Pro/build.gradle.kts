@@ -98,8 +98,6 @@ dependencies {
     implementation(project(mapOf("path" to ":protobuf")))
     implementation(project(mapOf("path" to ":room")))
     implementation(project(mapOf("path" to ":serialport")))
-    implementation(libs.accompanist.navigation.material)
-    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.iconsExtended)
@@ -120,6 +118,8 @@ dependencies {
 
     ksp(libs.androidx.room.compiler)
 
+    testImplementation(libs.junit)
+
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.test.core)
@@ -128,7 +128,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.kotlinx.coroutines.test)
-    androidTestImplementation(libs.junit)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

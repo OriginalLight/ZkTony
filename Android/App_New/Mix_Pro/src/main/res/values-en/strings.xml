@@ -23,4 +23,13 @@
     <string name="update_available">Update available</string>
     <string name="version">Version</string>
     <string name="wifi">WIFI</string>
+    <string name="download_failed">Download failed</string>
+    <string name="network_unavailable">Network Unavailable</string>
+    <string name="interface_exception">Interface Exception</string>
+    <string name="speed">Speed</string>
+    <string name="acceleration">Acceleration</string>
+    <string name="deceleration">Deceleration</string>
+    <string name="save">Save</string>
+    <string name="edit">edit</string>
+    <string name="delete">Delete</string>
 </resources>

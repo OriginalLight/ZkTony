@@ -9,12 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.ui.MainActivity
-import com.zktony.core.ext.DownloadState
-import com.zktony.core.ext.Ext
-import com.zktony.core.ext.download
-import com.zktony.core.ext.installApk
-import com.zktony.core.ext.isNetworkAvailable
-import com.zktony.core.ext.showShortToast
+import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
@@ -41,17 +36,19 @@ class AdminViewModel constructor(
 
     init {
         viewModelScope.launch {
-            if (Ext.ctx.isNetworkAvailable()) {
-                grpc.getApplication(BuildConfig.APPLICATION_ID)
-                    .catch {
-                        _uiState.value = _uiState.value.copy(
-                            application = null
-                        )
-                    }.collect {
-                        _uiState.value = _uiState.value.copy(
-                            application = it
-                        )
-                    }
+            launch {
+                if (Ext.ctx.isNetworkAvailable()) {
+                    grpc.getApplication(BuildConfig.APPLICATION_ID)
+                        .catch {
+                            _uiState.value = _uiState.value.copy(
+                                application = null
+                            )
+                        }.collect {
+                            _uiState.value = _uiState.value.copy(
+                                application = it
+                            )
+                        }
+                }
             }
             launch {
                 datastore.read(Constants.LANGUAGE, "zh").collect {
@@ -64,6 +61,16 @@ class AdminViewModel constructor(
                 }
             }
         }
+    }
+
+    /**
+     * 本screen切换
+     *
+     * @param page AdminPage
+     * @return Unit
+     */
+    fun navigateTo(page: AdminPage) {
+        _uiState.value = _uiState.value.copy(page = page)
     }
 
     /**
@@ -159,11 +166,14 @@ class AdminViewModel constructor(
                         && uiState.value.progress == 0
                     ) {
                         downloadApk(application)
+                        _uiState.value = _uiState.value.copy(
+                            progress = 1
+                        )
                     }
                 } else {
                     grpc.getApplication(BuildConfig.APPLICATION_ID)
                         .catch {
-                            "获取版本信息失败".showShortToast()
+                            Ext.ctx.getString(R.string.interface_exception).showShortToast()
                         }.collect {
                             _uiState.value = _uiState.value.copy(
                                 application = it
@@ -171,7 +181,7 @@ class AdminViewModel constructor(
                         }
                 }
             } else {
-                "网络不可用".showShortToast()
+                Ext.ctx.getString(R.string.network_unavailable).showShortToast()
             }
         }
     }
@@ -196,11 +206,12 @@ class AdminViewModel constructor(
                             _uiState.value = _uiState.value.copy(
                                 progress = 0
                             )
+                            Ext.ctx.getString(R.string.download_failed).showShortToast()
                         }
 
                         is DownloadState.Progress -> {
                             _uiState.value = _uiState.value.copy(
-                                progress = it.progress
+                                progress = maxOf(it.progress, 1)
                             )
                         }
                     }
@@ -214,4 +225,12 @@ data class AdminUiState(
     val navigation: Boolean = false,
     val language: String = "zh",
     val progress: Int = 0,
+    val page: AdminPage = AdminPage.ADMIN,
 )
+
+/**
+ * Admin page
+ */
+enum class AdminPage {
+    ADMIN, AUTHENTICATION,
+}

@@ -1,12 +1,8 @@
 package com.zktony.android.ui.navigation
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
@@ -15,14 +11,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.Measurable
-import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.layout.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
+import androidx.compose.ui.unit.sp
 import com.zktony.android.R
 
 /**
@@ -134,20 +128,19 @@ fun PermanentNavigationDrawerContent(
                                     Color.White, Color.LightGray.copy(alpha = 0.5f)
                                 )
                             )
-                        ),
+                        )
+                        .clickable { onDrawerClicked() },
                     contentAlignment = Alignment.Center,
                 ) {
                     Image(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
-                            .clickable { onDrawerClicked() },
+                            .padding(16.dp),
                         painter = painterResource(id = R.drawable.logo),
                         contentDescription = null,
                         contentScale = ContentScale.Fit,
                     )
                 }
-                Spacer(Modifier.height(16.dp))
             }
 
             Column(
@@ -162,7 +155,8 @@ fun PermanentNavigationDrawerContent(
                         label = {
                             Text(
                                 text = stringResource(id = destination.iconTextId),
-                                style = MaterialTheme.typography.titleLarge,
+                                fontSize = 22.sp,
+                                lineHeight = 28.sp,
                                 maxLines = 1,
                             )
                         },
@@ -175,12 +169,9 @@ fun PermanentNavigationDrawerContent(
                         },
                         colors = NavigationDrawerItemDefaults.colors(
                             unselectedContainerColor = Color.Transparent,
-                            selectedContainerColor = Color.Transparent,
-                            selectedTextColor = MaterialTheme.colorScheme.primary,
                         ),
-                        shape = RoundedCornerShape(0.dp),
+                        shape = RoundedCornerShape(topStart = 0.dp, topEnd = 32.dp, bottomStart = 0.dp, bottomEnd = 0.dp),
                         onClick = { navigateToTopLevelDestination(destination) })
-                    Divider()
                 }
             }
         }, measurePolicy = { measurables, constraints ->

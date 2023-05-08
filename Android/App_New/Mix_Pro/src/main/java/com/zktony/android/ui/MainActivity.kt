@@ -28,21 +28,15 @@ class MainActivity : ComponentActivity() {
         proxyInitializer()
 
         setContent {
-            AppTheme(
-                dynamicColor = false,
-            ) {
+            AppTheme {
                 ZkTonyApp()
             }
         }
     }
 
     override fun attachBaseContext(newBase: Context?) {
-        var language: String
-        runBlocking {
-            language = datastore.read(Constants.LANGUAGE, "zh").first()
-        }
         super.attachBaseContext(
-            newBase?.setLanguage(language)
+            newBase?.setLanguage(runBlocking { datastore.read(Constants.LANGUAGE, "zh").first() })
         )
     }
 }
