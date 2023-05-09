@@ -114,7 +114,7 @@ fun MotorPage(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
-        columns = GridCells.Adaptive(minSize = 250.dp)
+        columns = GridCells.Fixed(3)
     ) {
         list.forEach {
             item {
@@ -286,23 +286,27 @@ fun MotorEditPage(
         }
 
         AnimatedVisibility(visible = entity.speed != speed || entity.acc != acc || entity.dec != dec) {
-            FilledIconButton(
-                modifier = Modifier
-                    .size(128.dp)
-                    .padding(vertical = 16.dp),
-                onClick = {
-                    updateMotor(entity.copy(speed = speed, acc = acc, dec = dec))
-                },
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                )
+            Button(
+                modifier = Modifier.padding(vertical = 16.dp),
+                onClick = { updateMotor(entity.copy(speed = speed, acc = acc, dec = dec)) },
+                contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
-                Icon(
-                    modifier = Modifier.size(48.dp),
-                    imageVector = Icons.Default.Save,
-                    contentDescription = null,
-                )
+                Row (
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Icon(
+                        Icons.Filled.Save,
+                        contentDescription = stringResource(id = R.string.save),
+                        modifier = Modifier.size(36.dp),
+                    )
+                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                    Text(
+                        text = stringResource(id = R.string.save),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                }
             }
         }
     }

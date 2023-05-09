@@ -32,7 +32,7 @@
     <string name="edit">编辑</string>
     <string name="delete">删除</string>
     <string name="tab_setting">设置</string>
-    <string name="x_axis_travel">X轴行程</string>
-    <string name="y_axis_travel">Y轴行程</string>
-    <string name="z_axis_travel">Z轴行程</string>
+    <string name="maximum_stroke">最大行程</string>
+    <string name="waste_tank">废液槽坐标</string>
+    <string name="add">添加</string>
 </resources>
