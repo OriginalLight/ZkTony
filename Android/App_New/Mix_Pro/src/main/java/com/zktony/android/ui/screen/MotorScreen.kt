@@ -32,15 +32,15 @@ import com.zktony.android.ui.viewmodel.MotorViewModel
  * Motor screen
  *
  * @param modifier Modifier
- * @param viewModel MotorViewModel
  * @param navController NavHostController
+ * @param viewModel MotorViewModel
  * @return Unit
  */
 @Composable
 fun MotorScreen(
     modifier: Modifier = Modifier,
+    navController: NavHostController,
     viewModel: MotorViewModel,
-    navController: NavHostController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var motor by remember { mutableStateOf(Motor()) }
@@ -97,18 +97,18 @@ fun MotorScreen(
 }
 
 /**
- * Motor page
+ * Motor edit page
  *
  * @param modifier Modifier
- * @param list List<Motor>
  * @param editMotor Function1<Motor, Unit>
+ * @param list List<Motor>
  * @return Unit
  */
 @Composable
 fun MotorPage(
     modifier: Modifier = Modifier,
-    list: List<Motor>,
     editMotor: (Motor) -> Unit = {},
+    list: List<Motor>,
 ) {
     LazyVerticalGrid(
         modifier = modifier,
@@ -291,11 +291,11 @@ fun MotorEditPage(
                 onClick = { updateMotor(entity.copy(speed = speed, acc = acc, dec = dec)) },
                 contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
-                Row (
+                Row(
                     modifier = Modifier.padding(horizontal = 24.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
-                ){
+                ) {
                     Icon(
                         Icons.Filled.Save,
                         contentDescription = stringResource(id = R.string.save),

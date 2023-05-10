@@ -15,6 +15,7 @@ class HomeViewModel : ViewModel() {
     fun navigateTo(page: HomePageEnum) {
         _uiState.value = _uiState.value.copy(page = page)
     }
+
 }
 
 data class HomeUiState(

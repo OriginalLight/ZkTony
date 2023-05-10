@@ -24,10 +24,13 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,15 +49,15 @@ import kotlinx.coroutines.delay
  * 系统配置
  *
  * @param modifier Modifier
- * @param viewModel ConfigViewModel
  * @param navController NavHostController
+ * @param viewModel ConfigViewModel
  * @return Unit
  */
 @Composable
 fun ConfigScreen(
     modifier: Modifier = Modifier,
+    navController: NavHostController,
     viewModel: ConfigViewModel,
-    navController: NavHostController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -121,15 +124,15 @@ fun ConfigScreen(
  * ConfigPage
  *
  * @param modifier Modifier
- * @param uiState ConfigUiState
  * @param navigationTo Function1<ConfigPage, Unit>
+ * @param uiState ConfigUiState
  * @return Unit
  */
 @Composable
 fun ConfigPage(
     modifier: Modifier = Modifier,
+    navigationTo: (ConfigPage) -> Unit = {},
     uiState: ConfigUiState,
-    navigationTo: (ConfigPage) -> Unit = {}
 ) {
 
     LazyVerticalGrid(
@@ -207,16 +210,16 @@ fun ConfigPage(
  * TravelEditPage
  *
  * @param modifier Modifier
- * @param uiState ConfigUiState
  * @param setTravel Function3<Float, Float, Float, Unit>
+ * @param uiState ConfigUiState
  * @return Unit
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TravelEditPage(
     modifier: Modifier = Modifier,
+    setTravel: (Float, Float, Float) -> Unit = { _, _, _ -> },
     uiState: ConfigUiState,
-    setTravel: (Float, Float, Float) -> Unit = { _, _, _ -> }
 ) {
     var x by remember { mutableStateOf(uiState.xAxisTravel.format()) }
     var y by remember { mutableStateOf(uiState.yAxisTravel.format()) }
@@ -259,11 +262,12 @@ fun TravelEditPage(
                 modifier = Modifier
                     .width(128.dp)
                     .focusRequester(focusRequester),
-                value = x.format(),
-                onValueChange = { x = it },
+                value = TextFieldValue(x.format(), TextRange(x.format().length)),
+                onValueChange = { x = it.text },
                 textStyle = TextStyle(
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
                 ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal,
@@ -279,11 +283,12 @@ fun TravelEditPage(
             )
             CustomTextField(
                 modifier = Modifier.width(128.dp),
-                value = y.format(),
-                onValueChange = { y = it },
+                value = TextFieldValue(y.format(), TextRange(y.format().length)),
+                onValueChange = { y = it.text },
                 textStyle = TextStyle(
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
                 ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal,
@@ -299,11 +304,12 @@ fun TravelEditPage(
             )
             CustomTextField(
                 modifier = Modifier.width(128.dp),
-                value = z.format(),
-                onValueChange = { z = it },
+                value = TextFieldValue(z.format(), TextRange(z.format().length)),
+                onValueChange = { z = it.text },
                 textStyle = TextStyle(
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 keyboardActions = KeyboardActions(onDone = {
@@ -352,16 +358,16 @@ fun TravelEditPage(
  * WasteEditPage
  *
  * @param modifier Modifier
- * @param uiState ConfigUiState
  * @param setWaste Function3<Float, Float, Float, Unit>
+ * @param uiState ConfigUiState
  * @return Unit
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun WasteEditPage(
     modifier: Modifier = Modifier,
+    setWaste: (Float, Float, Float) -> Unit = { _, _, _ -> },
     uiState: ConfigUiState,
-    setWaste: (Float, Float, Float) -> Unit = { _, _, _ -> }
 ) {
     var x by remember { mutableStateOf(uiState.wasteX.format()) }
     var y by remember { mutableStateOf(uiState.wasteY.format()) }
@@ -404,11 +410,12 @@ fun WasteEditPage(
                 modifier = Modifier
                     .width(128.dp)
                     .focusRequester(focusRequester),
-                value = x.format(),
-                onValueChange = { x = it },
+                value = TextFieldValue(x.format(), TextRange(x.format().length)),
+                onValueChange = { x = it.text },
                 textStyle = TextStyle(
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
                 ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal,
@@ -424,11 +431,12 @@ fun WasteEditPage(
             )
             CustomTextField(
                 modifier = Modifier.width(128.dp),
-                value = y.format(),
-                onValueChange = { y = it },
+                value = TextFieldValue(y.format(), TextRange(y.format().length)),
+                onValueChange = { y = it.text },
                 textStyle = TextStyle(
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
                 ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal,
@@ -444,11 +452,12 @@ fun WasteEditPage(
             )
             CustomTextField(
                 modifier = Modifier.width(128.dp),
-                value = z.format(),
-                onValueChange = { z = it },
+                value = TextFieldValue(z.format(), TextRange(z.format().length)),
+                onValueChange = { z = it.text },
                 textStyle = TextStyle(
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
                 ),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 keyboardActions = KeyboardActions(onDone = {

@@ -32,7 +32,7 @@ data class Calibration(
     val v12: Float = 100f,
     val v13: Float = 100f,
     // 是否选用
-    val enable: Int = 0,
+    val active: Int = 0,
     // 创建时间
     val createTime: Date = Date(System.currentTimeMillis()),
 )

@@ -4,8 +4,6 @@ import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.entity.Calibration
 import com.zktony.android.data.entity.Motor
-import com.zktony.core.R
-import com.zktony.core.ext.Ext
 import com.zktony.core.ext.logi
 import kotlinx.coroutines.*
 import java.util.concurrent.ConcurrentHashMap
@@ -48,7 +46,7 @@ class MCProxy constructor(
             launch {
                 CD.getAll().collect {
                     if (it.isNotEmpty()) {
-                        it.find { c -> c.enable == 1 }?.let { c ->
+                        it.find { c -> c.active == 1 }?.let { c ->
                             hpc.clear()
                             hpc[0] = c.x
                             hpc[1] = c.y
@@ -71,7 +69,7 @@ class MCProxy constructor(
                         CD.insert(
                             Calibration(
                                 name = "Default",
-                                enable = 1
+                                active = 1
                             )
                         )
                     }

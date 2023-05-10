@@ -1,8 +1,8 @@
 package com.zktony.android.data.dao
 
 import androidx.room.*
-import com.zktony.room.dao.BaseDao
 import com.zktony.android.data.entity.CalibrationData
+import com.zktony.room.dao.BaseDao
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -11,6 +11,14 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface CalibrationDataDao : BaseDao<CalibrationData> {
+
+    @Query(
+        """
+        DELETE FROM calibration_data
+        WHERE id = :id
+        """
+    )
+    suspend fun deleteById(id: Long)
 
     @Query(
         """
@@ -24,7 +32,7 @@ interface CalibrationDataDao : BaseDao<CalibrationData> {
         """
         SELECT * FROM calibration_data
         WHERE subId = :id
-        ORDER BY pumpId ASC , createTime ASC
+        ORDER BY `index` ASC , createTime ASC
         """
     )
     fun getBySubId(id: Long): Flow<List<CalibrationData>>

@@ -16,7 +16,7 @@ data class CalibrationData(
     // 校准id
     val subId: Long = 0L,
     // 泵号
-    val pumpId: Int = 0,
+    val index: Int = 0,
     // 预计
     val expect: Float = 200f,
     // 实际

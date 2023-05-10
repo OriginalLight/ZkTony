@@ -62,27 +62,27 @@ import kotlinx.coroutines.delay
  * Setting screen
  *
  * @param modifier Modifier
- * @param viewModel SettingViewModel
  * @param navController NavHostController
+ * @param viewModel SettingViewModel
  */
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
-    viewModel: SettingViewModel,
     navController: NavHostController,
+    viewModel: SettingViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     AnimatedVisibility(visible = uiState.page == SettingPage.SETTING) {
         SettingPage(
             modifier = modifier,
+            checkUpdate = viewModel::checkUpdate,
             navController = navController,
             navigationTo = viewModel::navigateTo,
-            uiState = uiState,
-            setNavigation = viewModel::setNavigation,
-            setLanguage = viewModel::setLanguage,
             openWifi = viewModel::openWifi,
-            checkUpdate = viewModel::checkUpdate,
+            setLanguage = viewModel::setLanguage,
+            setNavigation = viewModel::setNavigation,
+            uiState = uiState,
         )
     }
 
@@ -99,24 +99,24 @@ fun SettingScreen(
  * Setting page
  *
  * @param modifier Modifier
+ * @param checkUpdate Function0<Unit>
  * @param navController NavHostController
  * @param navigationTo Function1<SettingPage, Unit>
- * @param uiState SettingUiState
- * @param setNavigation Function1<Boolean, Unit>
- * @param setLanguage Function1<String, Unit>
  * @param openWifi Function0<Unit>
- * @param checkUpdate Function0<Unit>
+ * @param setLanguage Function1<String, Unit>
+ * @param setNavigation Function1<Boolean, Unit>
+ * @param uiState SettingUiState
  */
 @Composable
 fun SettingPage(
     modifier: Modifier = Modifier,
+    checkUpdate: () -> Unit = {},
     navController: NavHostController,
     navigationTo: (SettingPage) -> Unit = {},
-    uiState: SettingUiState,
-    setNavigation: (Boolean) -> Unit = {},
-    setLanguage: (String) -> Unit = {},
     openWifi: () -> Unit = {},
-    checkUpdate: () -> Unit = {},
+    setLanguage: (String) -> Unit = {},
+    setNavigation: (Boolean) -> Unit = {},
+    uiState: SettingUiState,
 ) {
     BackHandler {
         navController.popBackStack()
@@ -132,9 +132,9 @@ fun SettingPage(
         ) {
             SettingsForm(
                 modifier = Modifier.weight(1f),
-                uiState = uiState,
-                setNavigation = setNavigation,
                 setLanguage = setLanguage,
+                setNavigation = setNavigation,
+                uiState = uiState,
             )
             InfoForm(
                 modifier = Modifier.weight(1f),
@@ -142,10 +142,10 @@ fun SettingPage(
         }
         OperationForm(
             modifier = Modifier.wrapContentHeight(),
-            uiState = uiState,
-            openWifi = openWifi,
             checkUpdate = checkUpdate,
             navigationTo = navigationTo,
+            openWifi = openWifi,
+            uiState = uiState,
         )
     }
 }
@@ -254,16 +254,16 @@ fun AuthenticationPage(
  * Settings form
  *
  * @param modifier Modifier
- * @param uiState SettingUiState
- * @param setNavigation Function1<Boolean, Unit>
  * @param setLanguage Function1<String, Unit>
+ * @param setNavigation Function1<Boolean, Unit>
+ * @param uiState SettingUiState
  */
 @Composable
 fun SettingsForm(
     modifier: Modifier = Modifier,
-    uiState: SettingUiState,
-    setNavigation: (Boolean) -> Unit = {},
     setLanguage: (String) -> Unit = {},
+    setNavigation: (Boolean) -> Unit = {},
+    uiState: SettingUiState,
 ) {
     val lazyColumnState = rememberLazyListState()
     var expanded by remember { mutableStateOf(false) }
@@ -635,18 +635,18 @@ fun InfoForm(
  * Operation form
  *
  * @param modifier Modifier
- * @param uiState SettingUiState
- * @param openWifi Function0<Unit>
  * @param checkUpdate Function0<Unit>
  * @param navigationTo Function1<SettingPage, Unit>
+ * @param openWifi Function0<Unit>
+ * @param uiState SettingUiState
  */
 @Composable
 fun OperationForm(
     modifier: Modifier = Modifier,
-    uiState: SettingUiState,
-    openWifi: () -> Unit = {},
     checkUpdate: () -> Unit = {},
     navigationTo: (SettingPage) -> Unit = {},
+    openWifi: () -> Unit = {},
+    uiState: SettingUiState,
 ) {
 
     Row(
@@ -804,7 +804,7 @@ fun VerificationCodeField(
     digits: Int,
     horizontalMargin: Dp = 16.dp,
     inputCallback: (content: String) -> Unit = {},
-    itemScope: @Composable (text: String, focused: Boolean) -> Unit
+    itemScope: @Composable (text: String, focused: Boolean) -> Unit,
 ) {
     var content by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
@@ -885,9 +885,9 @@ fun InfoFormPreview() {
 @Preview(showBackground = true, widthDp = 960)
 fun OperationFormPreview() {
     OperationForm(
-        uiState = SettingUiState(),
-        openWifi = {},
         checkUpdate = {},
+        openWifi = {},
+        uiState = SettingUiState(),
     )
 }
 

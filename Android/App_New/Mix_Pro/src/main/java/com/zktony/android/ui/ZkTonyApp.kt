@@ -25,6 +25,7 @@ import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.PermanentNavigationDrawerContent
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.screen.*
+import com.zktony.android.ui.viewmodel.*
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -78,8 +79,6 @@ fun ZkTonyApp() {
             }
         }
     }
-
-
 }
 
 /**
@@ -113,29 +112,29 @@ private fun AppNavHost(
         composable(Route.CALIBRATION) {
             CalibrationScreen(
                 modifier = Modifier,
-                viewModel = koinViewModel(),
                 navController = navController,
+                viewModel = koinViewModel(),
             )
         }
         composable(Route.Setting) {
             SettingScreen(
                 modifier = Modifier,
-                viewModel = koinViewModel(),
                 navController = navController,
+                viewModel = koinViewModel(),
             )
         }
         composable(Route.MOTOR) {
             MotorScreen(
                 modifier = Modifier,
+                navController = navController,
                 viewModel = koinViewModel(),
-                navController = navController
             )
         }
         composable(Route.CONFIG) {
             ConfigScreen(
                 modifier = Modifier,
+                navController = navController,
                 viewModel = koinViewModel(),
-                navController = navController
             )
         }
     }
