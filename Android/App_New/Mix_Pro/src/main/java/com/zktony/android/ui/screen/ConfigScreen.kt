@@ -11,7 +11,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -236,14 +236,11 @@ fun TravelEditPage(
 
     Column(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxSize()
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = stringResource(id = R.string.maximum_stroke),
-            style = MaterialTheme.typography.titleLarge
-        )
+        Spacer(modifier = Modifier.height(128.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -322,8 +319,10 @@ fun TravelEditPage(
             )
         }
         AnimatedVisibility(visible = uiState.xAxisTravel.format() != x || uiState.yAxisTravel.format() != y || uiState.zAxisTravel.format() != z) {
-            Button(
-                modifier = Modifier.padding(vertical = 16.dp),
+            FloatingActionButton(
+                modifier = Modifier
+                    .width(128.dp)
+                    .padding(16.dp),
                 onClick = {
                     setTravel(
                         x.toFloatOrNull() ?: 0f,
@@ -331,24 +330,12 @@ fun TravelEditPage(
                         z.toFloatOrNull() ?: 0f
                     )
                 },
-                contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Filled.Save,
-                        contentDescription = stringResource(id = R.string.save),
-                        modifier = Modifier.size(36.dp),
-                    )
-                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                    Text(
-                        text = stringResource(id = R.string.save),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                }
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    imageVector = Icons.Filled.ArrowForward,
+                    contentDescription = stringResource(id = R.string.save),
+                )
             }
         }
     }
@@ -388,10 +375,7 @@ fun WasteEditPage(
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = stringResource(id = R.string.waste_tank),
-            style = MaterialTheme.typography.titleLarge
-        )
+        Spacer(modifier = Modifier.height(128.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -469,9 +453,11 @@ fun WasteEditPage(
                 fontSize = 30.sp,
             )
         }
-        AnimatedVisibility(visible = uiState.wasteX.format() != x || uiState.wasteY.format() != y || uiState.wasteZ.format() != z) {
-            Button(
-                modifier = Modifier.padding(vertical = 16.dp),
+        AnimatedVisibility(visible = uiState.xAxisTravel.format() != x || uiState.yAxisTravel.format() != y || uiState.zAxisTravel.format() != z) {
+            FloatingActionButton(
+                modifier = Modifier
+                    .width(128.dp)
+                    .padding(16.dp),
                 onClick = {
                     setWaste(
                         x.toFloatOrNull() ?: 0f,
@@ -479,24 +465,12 @@ fun WasteEditPage(
                         z.toFloatOrNull() ?: 0f
                     )
                 },
-                contentPadding = ButtonDefaults.ButtonWithIconContentPadding
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Filled.Save,
-                        contentDescription = stringResource(id = R.string.save),
-                        modifier = Modifier.size(36.dp),
-                    )
-                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                    Text(
-                        text = stringResource(id = R.string.save),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                }
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    imageVector = Icons.Filled.ArrowForward,
+                    contentDescription = stringResource(id = R.string.save),
+                )
             }
         }
     }

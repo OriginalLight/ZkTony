@@ -174,7 +174,7 @@ class CalibrationViewModel constructor(
     private suspend fun calculateActual(id: Long) {
         val cali = dao.getById(id).firstOrNull()
         val dataList = dataDao.getBySubId(id).firstOrNull()
-        val vl = List(9) { 200f }.toMutableList()
+        val vl = List(9) { 100f }.toMutableList()
         if (!dataList.isNullOrEmpty()) {
             vl.forEachIndexed { index, item ->
                 dataList.filter { it.index == index }.let {

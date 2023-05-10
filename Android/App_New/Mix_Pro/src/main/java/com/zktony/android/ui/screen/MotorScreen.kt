@@ -5,13 +5,29 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -43,7 +59,7 @@ fun MotorScreen(
     viewModel: MotorViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var motor by remember { mutableStateOf(Motor()) }
+    var entity by remember { mutableStateOf(Motor()) }
 
     BackHandler {
         if (uiState.page == MotorPage.MOTOR_EDIT) {
@@ -77,8 +93,8 @@ fun MotorScreen(
             MotorPage(
                 modifier = Modifier,
                 list = uiState.list,
-                editMotor = {
-                    motor = it
+                edit = {
+                    entity = it
                     viewModel.navigateTo(MotorPage.MOTOR_EDIT)
                 }
             )
@@ -86,8 +102,8 @@ fun MotorScreen(
         AnimatedVisibility(visible = uiState.page == MotorPage.MOTOR_EDIT) {
             MotorEditPage(
                 modifier = Modifier,
-                entity = motor,
-                updateMotor = {
+                entity = entity,
+                update = {
                     viewModel.update(it)
                     viewModel.navigateTo(MotorPage.MOTOR)
                 }
@@ -100,14 +116,14 @@ fun MotorScreen(
  * Motor edit page
  *
  * @param modifier Modifier
- * @param editMotor Function1<Motor, Unit>
+ * @param edit Function1<Motor, Unit>
  * @param list List<Motor>
  * @return Unit
  */
 @Composable
 fun MotorPage(
     modifier: Modifier = Modifier,
-    editMotor: (Motor) -> Unit = {},
+    edit: (Motor) -> Unit = {},
     list: List<Motor>,
 ) {
     LazyVerticalGrid(
@@ -121,7 +137,7 @@ fun MotorPage(
                 Card(
                     modifier = Modifier
                         .padding(8.dp)
-                        .clickable { editMotor(it) },
+                        .clickable { edit(it) },
                 ) {
                     Row(
                         modifier = Modifier
@@ -166,14 +182,14 @@ fun MotorPage(
  *
  * @param modifier Modifier
  * @param entity Motor
- * @param updateMotor Function1<Motor, Unit>
+ * @param update Function1<Motor, Unit>
  * @return Unit
  */
 @Composable
 fun MotorEditPage(
     modifier: Modifier = Modifier,
     entity: Motor,
-    updateMotor: (Motor) -> Unit = {},
+    update: (Motor) -> Unit = {},
 ) {
     var speed by remember { mutableStateOf(entity.speed) }
     var acc by remember { mutableStateOf(entity.acc) }
@@ -286,27 +302,17 @@ fun MotorEditPage(
         }
 
         AnimatedVisibility(visible = entity.speed != speed || entity.acc != acc || entity.dec != dec) {
-            Button(
-                modifier = Modifier.padding(vertical = 16.dp),
-                onClick = { updateMotor(entity.copy(speed = speed, acc = acc, dec = dec)) },
-                contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+            FloatingActionButton(
+                modifier = Modifier
+                    .width(128.dp)
+                    .padding(16.dp),
+                onClick = { update(entity.copy(speed = speed, acc = acc, dec = dec)) },
             ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        Icons.Filled.Save,
-                        contentDescription = stringResource(id = R.string.save),
-                        modifier = Modifier.size(36.dp),
-                    )
-                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                    Text(
-                        text = stringResource(id = R.string.save),
-                        style = MaterialTheme.typography.titleLarge,
-                    )
-                }
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    imageVector = Icons.Filled.ArrowForward,
+                    contentDescription = stringResource(id = R.string.save),
+                )
             }
         }
     }

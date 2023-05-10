@@ -171,11 +171,11 @@ fun CalibrationPage(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Image(
+                                Icon(
                                     modifier = Modifier
                                         .size(48.dp)
                                         .padding(start = 16.dp),
-                                    painter = painterResource(id = if (it.active == 0) R.drawable.ic_inactive else R.drawable.ic_active),
+                                    imageVector = if (it.active == 1) Icons.Filled.Check else Icons.Filled.Circle,
                                     contentDescription = null,
                                 )
                                 Text(
@@ -593,24 +593,28 @@ fun CalibrationEditPage(
                         )
                     }
 
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = stringResource(id = R.string.expect),
-                        style = TextStyle(fontSize = 24.sp),
-                    )
                     Column(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.Center,
                     ) {
                         CustomTextField(
                             modifier = Modifier
                                 .height(48.dp)
+                                .fillMaxWidth()
                                 .focusRequester(focusRequester),
                             value = TextFieldValue(expect, TextRange(expect.length)),
+                            hint = stringResource(id = R.string.expect),
                             onValueChange = { expect = it.text },
                             textStyle = TextStyle(
                                 fontSize = 24.sp,
                                 textAlign = TextAlign.Center,
+                            ),
+                            hiltTextStyle = TextStyle(
+                                fontSize = 24.sp,
+                                textAlign = TextAlign.Center,
+                                color = Color.Gray,
                             ),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
@@ -624,24 +628,28 @@ fun CalibrationEditPage(
                         )
                         Divider(thickness = 2.dp)
                     }
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = stringResource(id = R.string.actual),
-                        style = TextStyle(fontSize = 24.sp),
-                    )
                     Column(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
                         verticalArrangement = Arrangement.Center,
                     ) {
                         CustomTextField(
                             modifier = Modifier
                                 .height(48.dp)
+                                .fillMaxWidth()
                                 .focusRequester(focusRequester),
                             value = TextFieldValue(actual, TextRange(actual.length)),
+                            hint = stringResource(id = R.string.actual),
                             onValueChange = { actual = it.text },
                             textStyle = TextStyle(
                                 fontSize = 24.sp,
                                 textAlign = TextAlign.Center,
+                            ),
+                            hiltTextStyle = TextStyle(
+                                fontSize = 24.sp,
+                                textAlign = TextAlign.Center,
+                                color = Color.Gray,
                             ),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
