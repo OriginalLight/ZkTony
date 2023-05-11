@@ -1,11 +1,14 @@
 package com.zktony.android.core.proxy
 
+import com.zktony.android.core.ext.avgRate
 import com.zktony.android.data.dao.CalibrationDao
+import com.zktony.android.data.dao.CalibrationDataDao
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.entity.Calibration
 import com.zktony.android.data.entity.Motor
 import com.zktony.core.ext.logi
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.firstOrNull
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -15,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap
 class MCProxy constructor(
     private val MD: MotorDao,
     private val CD: CalibrationDao,
+    private val CDD: CalibrationDataDao,
 ) {
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
@@ -46,24 +50,16 @@ class MCProxy constructor(
             launch {
                 CD.getAll().collect {
                     if (it.isNotEmpty()) {
-                        it.find { c -> c.active == 1 }?.let { c ->
+                        val c = it.find { c -> c.active == 1 }
+                        if (c != null) {
+                            val data = CDD.getBySubId(c.id).firstOrNull() ?: emptyList()
                             hpc.clear()
-                            hpc[0] = c.x
-                            hpc[1] = c.y
-                            hpc[2] = c.z
-                            hpc[3] = c.v1
-                            hpc[4] = c.v2
-                            hpc[5] = c.v3
-                            hpc[6] = c.v4
-                            hpc[7] = c.v5
-                            hpc[8] = c.v6
-                            hpc[9] = c.v7
-                            hpc[10] = c.v8
-                            hpc[11] = c.v9
-                            hpc[12] = c.v10
-                            hpc[13] = c.v11
-                            hpc[14] = c.v12
-                            hpc[15] = c.v13
+                            hpc[0] = 10f
+                            hpc[1] = 10f
+                            hpc[2] = 10f
+                            data.avgRate().forEachIndexed { index, fl ->
+                                hpc[index + 3] = fl * 100f
+                            }
                         }
                     } else {
                         CD.insert(

@@ -6,17 +6,52 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Abc
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DataSaverOff
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoveUp
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.outlined.Circle
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -44,6 +79,7 @@ import com.zktony.android.ui.components.CustomTextField
 import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.viewmodel.CalibrationPage
 import com.zktony.android.ui.viewmodel.CalibrationViewModel
+import com.zktony.core.ext.format
 import com.zktony.core.ext.simpleDateFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -104,7 +140,7 @@ fun CalibrationScreen(
         CalibrationEditPage(
             modifier = modifier,
             addLiquid = viewModel::addLiquid,
-            delete = viewModel::deleteData ,
+            delete = viewModel::deleteData,
             insert = viewModel::insertData,
             list = viewModel.dataList(selected),
             navigationTo = viewModel::navigateTo,
@@ -401,12 +437,12 @@ fun CalibrationAddPage(
  * @param selected Long
  * @return Unit
  */
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CalibrationEditPage(
     modifier: Modifier = Modifier,
     addLiquid: (Int, Float) -> Unit = { _, _ -> },
-    delete: (Long, Int) -> Unit = { _, _ -> },
+    delete: (Long) -> Unit = { },
     insert: (CalibrationData) -> Unit = {},
     list: Flow<List<CalibrationData>> = flowOf(),
     navigationTo: (CalibrationPage) -> Unit = {},
@@ -455,36 +491,63 @@ fun CalibrationEditPage(
                     .padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                data.compute().forEach { item ->
+                data.compute().forEach { (index, avg, list) ->
                     item {
                         Card(
                             modifier = Modifier.wrapContentHeight(),
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Icon(
-                                    modifier = Modifier.size(48.dp).padding(start = 16.dp),
-                                    imageVector = Icons.Default.DataSaverOff,
-                                    contentDescription = null
-                                )
-                                Text(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(horizontal = 16.dp),
-                                    text = item.second,
-                                    style = MaterialTheme.typography.titleLarge,
-                                )
-                                IconButton(
-                                    modifier = Modifier.size(48.dp).padding(end = 16.dp),
-                                    onClick = { delete(selected, item.first) }
+                            Column {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Icon(
-                                        modifier = Modifier.size(36.dp),
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = null,
-                                        tint = Color.Red,
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .padding(start = 8.dp),
+                                        imageVector = Icons.Default.DataSaverOff,
+                                        contentDescription = null
                                     )
+                                    Text(
+                                        modifier = Modifier.padding(horizontal = 16.dp),
+                                        text = "V${index + 1}",
+                                        style = MaterialTheme.typography.titleLarge,
+                                    )
+                                    Spacer(modifier = Modifier.weight(1f))
+                                    Text(
+                                        modifier = Modifier.padding(end = 8.dp),
+                                        text = "${(avg * 100).format(2)} %",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                    )
+                                }
+                                LazyRow(
+                                    modifier = modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 8.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                ) {
+                                    list.forEach { it1 ->
+                                        item {
+                                            AssistChip(
+                                                onClick = { delete(it1.id) },
+                                                label = {
+                                                    Text(
+                                                        text = "${it1.actual.format(2)} / ${
+                                                            it1.expect.format(
+                                                                2
+                                                            )
+                                                        }"
+                                                    )
+                                                },
+                                                trailingIcon = {
+                                                    Icon(
+                                                        imageVector = Icons.Default.Delete,
+                                                        contentDescription = null,
+                                                        tint = Color.Red,
+                                                    )
+                                                }
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -546,7 +609,7 @@ fun CalibrationEditPage(
                             ),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done                                                                                                                                                                                                                                                                                                                        ,
+                                imeAction = ImeAction.Done,
                             ),
                             keyboardActions = KeyboardActions(
                                 onDone = {

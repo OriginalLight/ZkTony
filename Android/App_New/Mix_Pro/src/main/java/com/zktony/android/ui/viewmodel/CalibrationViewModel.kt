@@ -9,7 +9,6 @@ import com.zktony.android.data.entity.CalibrationData
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 /**
@@ -62,8 +61,6 @@ class CalibrationViewModel constructor(
     fun insertData(data: CalibrationData) {
         viewModelScope.launch {
             dataDao.insert(data)
-            delete(500L)
-            calculateActual(data.subId)
         }
     }
 
@@ -89,14 +86,11 @@ class CalibrationViewModel constructor(
      * Delete Data
      *
      * @param id Long
-     * @param index Int
      * @return Unit
      */
-    fun deleteData(id: Long, index: Int) {
+    fun deleteData(id: Long) {
         viewModelScope.launch {
-            dataDao.deleteByIndex(id, index)
-            delete(500L)
-            calculateActual(id)
+            dataDao.deleteById(id)
         }
     }
 
@@ -141,35 +135,6 @@ class CalibrationViewModel constructor(
      */
     fun dataList(id: Long) = dataDao.getBySubId(id)
 
-    /**
-     * Calculate Actual
-     *
-     * @param id Long
-     * @return Unit
-     */
-    private suspend fun calculateActual(id: Long) {
-        val cali = dao.getById(id).firstOrNull()
-        val dataList = dataDao.getBySubId(id).firstOrNull()
-        val vl = List(13) { 100f }.toMutableList()
-        if (!dataList.isNullOrEmpty()) {
-            vl.forEachIndexed { index, item ->
-                dataList.filter { it.index == index }.let {
-                    if (it.isNotEmpty()) {
-                        vl[index] = item * it.map { data -> data.percent }.average().toFloat()
-                    }
-                }
-
-            }
-        }
-        dao.update(
-            cali!!.copy(
-                v1 = vl[0], v2 = vl[1], v3 = vl[2],
-                v4 = vl[3], v5 = vl[4], v6 = vl[5],
-                v7 = vl[6], v8 = vl[7], v9 = vl[8],
-                v10 = vl[9], v11 = vl[10], v12 = vl[11], v13 = vl[12]
-            )
-        )
-    }
 
     /**
      * 加液

@@ -8,35 +8,28 @@ import com.zktony.core.ext.format
  * @date 2023/5/11 16:26
  */
 
-fun List<CalibrationData>.compute() : List<Pair<Int, String>> {
-    val vl = List(13) { 100f }.toMutableList()
-    val sl = List(13) { Pair(0, "") }.toMutableList()
-    vl.forEachIndexed { index, item ->
-        val dataList = this.filter { it.index == index }
+fun List<CalibrationData>.compute() : List<Triple<Int, Float, List<CalibrationData>>> {
+    val vl = mutableListOf<Triple<Int, Float, List<CalibrationData>>>()
+    for (i in 0..12) {
+        val dataList = this.filter { it.index == i }
         if (dataList.isNotEmpty()) {
-            vl[index] = item * dataList.map { data -> data.percent }.average().toFloat()
-            val str = if (dataList.size > 1) {
-                "V${index + 1} = ${vl[index].format(2)} μL = 100  μL x ( ${
-                    dataList.joinToString(" + ") { data ->
-                        data.percent.format(
-                            2
-                        )
-                    }
-                } ) / ${dataList.size}"
-            } else {
-                "V${index + 1} = ${vl[index].format(2)} μL = 100  μL x ${
-                    dataList.joinToString(" + ") { data ->
-                        data.percent.format(
-                            2
-                        )
-                    }
-                }"
-            }
-            sl[index] = Pair(dataList.first().index, str)
-        } else {
-            vl[index] = 100f
-            sl[index] = Pair(-1, "V${index + 1} = 100 μL")
+            val avg = dataList.map { data -> data.percent }.average().toFloat()
+            vl.add(Triple(i, avg, dataList))
         }
     }
-    return sl
+    return vl
+}
+
+fun List<CalibrationData>.avgRate() : List<Float> {
+    val vl = mutableListOf<Float>()
+    for (i in 0..12) {
+        val dataList = this.filter { it.index == i }
+        if (dataList.isNotEmpty()) {
+            val avg = dataList.map { data -> data.percent }.average().toFloat()
+            vl.add(avg)
+        } else {
+            vl.add(1f)
+        }
+    }
+    return vl
 }
