@@ -1,4 +1,4 @@
-package com.zktony.android.core.di
+package com.zktony.android.di
 
 import com.zktony.android.R
 import com.zktony.core.utils.Constants

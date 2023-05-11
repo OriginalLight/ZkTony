@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui.screen.home
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable

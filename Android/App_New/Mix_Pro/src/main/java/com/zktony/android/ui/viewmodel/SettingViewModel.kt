@@ -9,7 +9,12 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.ui.MainActivity
-import com.zktony.core.ext.*
+import com.zktony.core.ext.DownloadState
+import com.zktony.core.ext.Ext
+import com.zktony.core.ext.download
+import com.zktony.core.ext.installApk
+import com.zktony.core.ext.isNetworkAvailable
+import com.zktony.core.ext.showShortToast
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save

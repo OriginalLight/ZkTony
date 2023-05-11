@@ -170,7 +170,12 @@ fun PermanentNavigationDrawerContent(
                         colors = NavigationDrawerItemDefaults.colors(
                             unselectedContainerColor = Color.Transparent,
                         ),
-                        shape = RoundedCornerShape(topStart = 0.dp, topEnd = 32.dp, bottomStart = 0.dp, bottomEnd = 0.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 0.dp,
+                            topEnd = 32.dp,
+                            bottomStart = 0.dp,
+                            bottomEnd = 0.dp
+                        ),
                         onClick = { navigateToTopLevelDestination(destination) })
                 }
             }

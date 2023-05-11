@@ -1,98 +1,67 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui.screen.calibration
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.Water
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.Circle
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.data.entity.Container
-import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.viewmodel.ContainerPage
-import com.zktony.android.ui.viewmodel.ContainerViewModel
+import com.zktony.android.data.entity.Calibration
+import com.zktony.android.ui.viewmodel.CalibrationPage
 import com.zktony.core.ext.simpleDateFormat
-import kotlinx.coroutines.delay
 
 /**
- * Container screen
+ * CalibrationPage
  *
  * @param modifier Modifier
- * @param navController NavHostController
- * @param viewModel ContainerViewModel
+ * @param delete Function1<Long, Unit>
+ * @param enable Function0<Unit>
+ * @param list List<Calibration>
+ * @param navigationTo Function1<CalibrationPage, Unit>
+ * @param selected Long
+ * @param toggleSelected Function1<Long, Unit>
  * @return Unit
  */
 @Composable
-fun ContainerScreen(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    viewModel: ContainerViewModel,
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var selected by remember { mutableStateOf(0L) }
-
-    BackHandler {
-        if (uiState.page == ContainerPage.CONTAINER) {
-            navController.navigateUp()
-        } else {
-            viewModel.navigationTo(ContainerPage.CONTAINER)
-        }
-    }
-
-    AnimatedVisibility(visible = uiState.page == ContainerPage.CONTAINER) {
-        ContainerPage(
-            modifier = modifier,
-            delete = viewModel::delete,
-            list = uiState.list,
-            navigationTo = viewModel::navigationTo,
-            selected = selected,
-            toggleSelected = { selected = if (selected == it) 0L else it },
-        )
-    }
-
-    AnimatedVisibility(visible = uiState.page == ContainerPage.CONTAINER_ADD) {
-        ContainerAddPage(
-            modifier = modifier,
-            insert = viewModel::insert,
-            list = uiState.list,
-            navigationTo = viewModel::navigationTo,
-            toggleSelected = { selected = it },
-        )
-    }
-}
-
-
-
-@Composable
-fun ContainerPage(
+fun CalibrationPage(
     modifier: Modifier = Modifier,
     delete: (Long) -> Unit = {},
-    list: List<Container>,
-    navigationTo: (ContainerPage) -> Unit = {},
+    enable: () -> Unit = {},
+    list: List<Calibration>,
+    navigationTo: (CalibrationPage) -> Unit = {},
     selected: Long = 0L,
     toggleSelected: (Long) -> Unit = {},
 ) {
@@ -140,7 +109,7 @@ fun ContainerPage(
                                     modifier = Modifier
                                         .size(48.dp)
                                         .padding(start = 16.dp),
-                                    imageVector = Icons.Outlined.Water,
+                                    imageVector = if (it.active == 1) Icons.Filled.Check else Icons.Outlined.Circle,
                                     contentDescription = null,
                                 )
                                 Text(
@@ -176,7 +145,7 @@ fun ContainerPage(
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
-                onClick = { navigationTo(ContainerPage.CONTAINER_ADD) }
+                onClick = { navigationTo(CalibrationPage.CALIBRATION_ADD) }
             ) {
                 Icon(
                     modifier = Modifier.size(36.dp),
@@ -214,7 +183,7 @@ fun ContainerPage(
                     modifier = Modifier
                         .padding(8.dp)
                         .fillMaxWidth(),
-                    onClick = { navigationTo(ContainerPage.CONTAINER_EDIT) }
+                    onClick = { navigationTo(CalibrationPage.CALIBRATION_EDIT) }
                 ) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -223,100 +192,17 @@ fun ContainerPage(
                     )
                 }
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
-@Composable
-fun ContainerAddPage(
-    modifier: Modifier = Modifier,
-    insert: (Container) -> Unit = {},
-    list: List<Container>,
-    navigationTo: (ContainerPage) -> Unit = {},
-    toggleSelected: (Long) -> Unit = {},
-) {
-    var name by remember { mutableStateOf("") }
-    val focusRequester = remember { FocusRequester() }
-    val softKeyboard = LocalSoftwareKeyboardController.current
-
-    LaunchedEffect(Unit) {
-        delay(100) //延迟操作(关键点)
-        focusRequester.requestFocus()
-        softKeyboard?.show()
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.background,
-                shape = MaterialTheme.shapes.medium
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ZkTonyTopAppBar(
-            title = stringResource(id = R.string.add),
-            onBack = {
-                navigationTo(ContainerPage.CONTAINER)
-            })
-        Spacer(modifier = Modifier.height(128.dp))
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 128.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            TextField(
-                modifier = Modifier
-                    .weight(1f)
-                    .focusRequester(focusRequester),
-                shape = MaterialTheme.shapes.large,
-                value = name,
-                onValueChange = { name = it },
-                textStyle = TextStyle(fontSize = 24.sp),
-                colors = TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                ),
-                leadingIcon = {
-                    Icon(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .padding(horizontal = 8.dp),
-                        imageVector = Icons.Default.Abc,
-                        contentDescription = null,
-                    )
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        softKeyboard?.hide()
-                    }
-                ),
-                singleLine = true,
-            )
-            AnimatedVisibility(visible = name.isNotEmpty() && !list.any { it.name == name }) {
-                FilledIconButton(
+            AnimatedVisibility(visible = selected != 0L) {
+                FloatingActionButton(
                     modifier = Modifier
-                        .padding(start = 16.dp)
-                        .size(48.dp),
-                    onClick = {
-                        val entity = Container(name = name)
-                        insert(entity)
-                        toggleSelected(entity.id)
-                        navigationTo(ContainerPage.CONTAINER)
-                        softKeyboard?.hide()
-                    }
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    onClick = { enable() }
                 ) {
                     Icon(
                         modifier = Modifier.size(36.dp),
-                        imageVector = Icons.Default.Done,
-                        contentDescription = null,
+                        imageVector = Icons.Default.Check,
+                        contentDescription = stringResource(id = R.string.edit),
                     )
                 }
             }
@@ -324,9 +210,10 @@ fun ContainerAddPage(
     }
 }
 
-
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ContainerPagePreview() {
-    ContainerPage(list = listOf(Container()))
+fun CalibrationPagePreview() {
+    CalibrationPage(
+        list = listOf(Calibration())
+    )
 }

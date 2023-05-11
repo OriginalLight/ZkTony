@@ -1,4 +1,4 @@
-package com.zktony.android.core.di
+package com.zktony.android.di
 
 import androidx.room.Room
 import com.zktony.android.data.database.AppDatabase
