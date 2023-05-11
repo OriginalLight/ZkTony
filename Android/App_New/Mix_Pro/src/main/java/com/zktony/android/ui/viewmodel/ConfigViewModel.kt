@@ -8,6 +8,7 @@ import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 /**
@@ -23,33 +24,29 @@ class ConfigViewModel constructor(
     init {
         viewModelScope.launch {
             launch {
-                dataStore.read("X_AXIS_TRAVEL", 0f).collect {
-                    _uiState.value = _uiState.value.copy(xAxisTravel = it)
+                dataStore.read("X_AXIS_TRAVEL", 0f).combine(
+                    dataStore.read("Y_AXIS_TRAVEL", 0f)
+                ) { x, y ->
+                    Pair(x, y)
+                }.combine(
+                    dataStore.read("Z_AXIS_TRAVEL", 0f)
+                ) { xy, z ->
+                    Triple(xy.first, xy.second, z)
+                }.collect {
+                    _uiState.value = _uiState.value.copy(travel = it)
                 }
             }
             launch {
-                dataStore.read("Y_AXIS_TRAVEL", 0f).collect {
-                    _uiState.value = _uiState.value.copy(yAxisTravel = it)
-                }
-            }
-            launch {
-                dataStore.read("Z_AXIS_TRAVEL", 0f).collect {
-                    _uiState.value = _uiState.value.copy(zAxisTravel = it)
-                }
-            }
-            launch {
-                dataStore.read("WASTE_X", 0f).collect {
-                    _uiState.value = _uiState.value.copy(wasteX = it)
-                }
-            }
-            launch {
-                dataStore.read("WASTE_Y", 0f).collect {
-                    _uiState.value = _uiState.value.copy(wasteY = it)
-                }
-            }
-            launch {
-                dataStore.read("WASTE_Z", 0f).collect {
-                    _uiState.value = _uiState.value.copy(wasteZ = it)
+                dataStore.read("WASTE_X", 0f).combine(
+                    dataStore.read("WASTE_Y", 0f)
+                ) { x, y ->
+                    Pair(x, y)
+                }.combine(
+                    dataStore.read("WASTE_Z", 0f)
+                ) { xy, z ->
+                    Triple(xy.first, xy.second, z)
+                }.collect {
+                    _uiState.value = _uiState.value.copy(waste = it)
                 }
             }
         }
@@ -96,12 +93,8 @@ class ConfigViewModel constructor(
 }
 
 data class ConfigUiState(
-    val xAxisTravel: Float = 0f,
-    val yAxisTravel: Float = 0f,
-    val zAxisTravel: Float = 0f,
-    val wasteX: Float = 0f,
-    val wasteY: Float = 0f,
-    val wasteZ: Float = 0f,
+    val travel: Triple<Float, Float, Float> = Triple(0f, 0f, 0f),
+    val waste: Triple<Float, Float, Float> = Triple(0f, 0f, 0f),
     val page: ConfigPage = ConfigPage.CONFIG,
 )
 

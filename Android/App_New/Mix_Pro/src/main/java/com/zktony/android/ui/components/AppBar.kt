@@ -49,7 +49,8 @@ fun ZkTonyTopAppBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = null,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.Black
                 )
             }
         },

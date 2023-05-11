@@ -10,4 +10,5 @@ val viewModule = module {
     viewModelOf(::MotorViewModel)
     viewModelOf(::ConfigViewModel)
     viewModelOf(::CalibrationViewModel)
+    viewModelOf(::ContainerViewModel)
 }

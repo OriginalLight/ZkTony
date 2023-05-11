@@ -37,4 +37,13 @@ interface CalibrationDataDao : BaseDao<CalibrationData> {
     )
     fun getBySubId(id: Long): Flow<List<CalibrationData>>
 
+    @Query(
+        """
+        DELETE FROM calibration_data
+        WHERE subId = :id
+        AND `index` = :index
+        """
+    )
+    suspend fun deleteByIndex(id: Long, index: Int)
+
 }

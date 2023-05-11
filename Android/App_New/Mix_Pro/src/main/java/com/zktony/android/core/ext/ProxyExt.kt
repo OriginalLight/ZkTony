@@ -2,6 +2,7 @@ package com.zktony.android.core.ext
 
 import com.zktony.android.core.proxy.MCProxy
 import com.zktony.android.core.proxy.SerialProxy
+import com.zktony.android.data.entity.Motor
 import com.zktony.serialport.ext.intToHex
 import com.zktony.serialport.protocol.v2
 import kotlinx.coroutines.delay
@@ -68,8 +69,8 @@ fun pulse(index: Int, dv: Float): Int {
  * @param dv Int
  * @return String
  */
-fun pwc(index: Int, dv: Float): String {
-    return index.intToHex() + pulse(index, dv).intToHex(4) + mcProxy.hpm[index]!!.hex()
+fun pwc(index: Int, dv: Float, config: Motor): String {
+    return index.intToHex() + pulse(index, dv).intToHex(4) + config.hex()
 }
 
 // endregion
@@ -95,70 +96,70 @@ fun sendHex(hex: String) {
  * @property list MutableList<Pair<Int, Float>>
  */
 class Compose {
-    val list = mutableListOf<Pair<Int, Float>>()
+    val list = mutableListOf<Triple<Int, Float, Motor>>()
 
-    fun x(dv: Float) {
-        list.add(Pair(0, dv))
+    fun x(dv: Float, config: Motor = mcProxy.hpm[0]!!) {
+        list.add(Triple(0, dv, config))
     }
 
-    fun y(dv: Float) {
-        list.add(Pair(1, dv))
+    fun y(dv: Float, config: Motor = mcProxy.hpm[1]!!) {
+        list.add(Triple(1, dv, config))
     }
 
-    fun z(dv: Float) {
-        list.add(Pair(2, dv))
+    fun z(dv: Float, config: Motor = mcProxy.hpm[2]!!) {
+        list.add(Triple(2, dv, config))
     }
 
-    fun v1(dv: Float) {
-        list.add(Pair(3, dv))
+    fun v1(dv: Float, config: Motor = mcProxy.hpm[3]!!) {
+        list.add(Triple(3, dv, config))
     }
 
-    fun v2(dv: Float) {
-        list.add(Pair(4, dv))
+    fun v2(dv: Float, config: Motor = mcProxy.hpm[4]!!) {
+        list.add(Triple(4, dv, config))
     }
 
-    fun v3(dv: Float) {
-        list.add(Pair(5, dv))
+    fun v3(dv: Float, config: Motor = mcProxy.hpm[5]!!) {
+        list.add(Triple(5, dv, config))
     }
 
-    fun v4(dv: Float) {
-        list.add(Pair(6, dv))
+    fun v4(dv: Float, config: Motor = mcProxy.hpm[6]!!) {
+        list.add(Triple(6, dv, config))
     }
 
-    fun v5(dv: Float) {
-        list.add(Pair(7, dv))
+    fun v5(dv: Float, config: Motor = mcProxy.hpm[7]!!) {
+        list.add(Triple(7, dv, config))
     }
 
-    fun v6(dv: Float) {
-        list.add(Pair(8, dv))
+    fun v6(dv: Float, config: Motor = mcProxy.hpm[8]!!) {
+        list.add(Triple(8, dv, config))
     }
 
-    fun v7(dv: Float) {
-        list.add(Pair(9, dv))
+    fun v7(dv: Float, config: Motor = mcProxy.hpm[9]!!) {
+        list.add(Triple(9, dv, config))
     }
 
-    fun v8(dv: Float) {
-        list.add(Pair(10, dv))
+    fun v8(dv: Float, config: Motor = mcProxy.hpm[10]!!) {
+        list.add(Triple(10, dv, config))
     }
 
-    fun v9(dv: Float) {
-        list.add(Pair(11, dv))
+    fun v9(dv: Float, config: Motor = mcProxy.hpm[11]!!) {
+        list.add(Triple(11, dv, config))
     }
 
-    fun v10(dv: Float) {
-        list.add(Pair(12, dv))
+    fun v10(dv: Float, config: Motor = mcProxy.hpm[12]!!) {
+        list.add(Triple(12, dv, config))
     }
 
-    fun v11(dv: Float) {
-        list.add(Pair(13, dv))
+    fun v11(dv: Float, config: Motor = mcProxy.hpm[13]!!) {
+        list.add(Triple(13, dv, config))
     }
 
-    fun v12(dv: Float) {
-        list.add(Pair(14, dv))
+    fun v12(dv: Float, config: Motor = mcProxy.hpm[14]!!) {
+        list.add(Triple(14, dv, config))
     }
 
-    fun v13(dv: Float) {
-        list.add(Pair(15, dv))
+    fun v13(dv: Float, config: Motor = mcProxy.hpm[15]!!) {
+        list.add(Triple(15, dv, config))
     }
 }
 
@@ -173,7 +174,7 @@ suspend fun syncHex(block: Compose.() -> Unit, timeOut: Long = 1000) {
     val compose = Compose().apply(block)
     val list = compose.list
     val hex = list.joinToString("") {
-        pwc(it.first, it.second)
+        pwc(it.first, it.second, it.third)
     }
     try {
         withTimeout(timeOut) {
@@ -199,7 +200,7 @@ fun asyncHex(block: Compose.() -> Unit) {
     val compose = Compose().apply(block)
     val list = compose.list
     val hex = list.joinToString("") {
-        pwc(it.first, it.second)
+        pwc(it.first, it.second, it.third)
     }
     sendHex(v2 { data = hex })
 }

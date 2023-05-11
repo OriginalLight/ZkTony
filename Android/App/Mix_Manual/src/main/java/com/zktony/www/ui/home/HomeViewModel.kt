@@ -105,6 +105,7 @@ class HomeViewModel constructor(
             val executor = ProgramExecutor(
                 colloid = _uiState.value.colloid,
                 coagulant = _uiState.value.coagulant,
+                slowFast = _uiState.value.slowFast,
                 scope = this,
             )
             executor.finish = {
@@ -135,6 +136,7 @@ class HomeViewModel constructor(
             val executor = ProgramExecutor(
                 colloid = _uiState.value.previousColloid,
                 coagulant = _uiState.value.previousCoagulant,
+                slowFast = _uiState.value.slowFast,
                 scope = this,
             )
             executor.finish = {
@@ -435,6 +437,12 @@ class HomeViewModel constructor(
                 _uiState.value.copy(previousCoagulant = minOf(str.toIntOrNull() ?: 0, 800))
         }
     }
+
+    fun slowFast() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(slowFast = !_uiState.value.slowFast)
+        }
+    }
 }
 
 data class HomeUiState(
@@ -453,4 +461,5 @@ data class HomeUiState(
     val coagulantHistory: Set<String> = emptySet(),
     val previousColloidHistory: Set<String> = emptySet(),
     val previousCoagulantHistory: Set<String> = emptySet(),
+    val slowFast: Boolean = false,
 )

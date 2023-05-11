@@ -167,7 +167,7 @@ fun ConfigPage(
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         modifier = Modifier.padding(end = 16.dp),
-                        text = "( ${uiState.xAxisTravel.format()} , ${uiState.yAxisTravel.format()} , ${uiState.zAxisTravel.format()} )",
+                        text = "( ${uiState.travel.first.format()} , ${uiState.travel.second.format()} , ${uiState.travel.third.format()} )",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
@@ -197,7 +197,7 @@ fun ConfigPage(
                     Spacer(modifier = Modifier.weight(1f))
                     Text(
                         modifier = Modifier.padding(end = 16.dp),
-                        text = "( ${uiState.wasteX.format()} , ${uiState.wasteY.format()} , ${uiState.wasteZ.format()} )",
+                        text = "( ${uiState.waste.first.format()} , ${uiState.waste.second.format()} , ${uiState.waste.third.format()} )",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
@@ -221,9 +221,9 @@ fun TravelEditPage(
     setTravel: (Float, Float, Float) -> Unit = { _, _, _ -> },
     uiState: ConfigUiState,
 ) {
-    var x by remember { mutableStateOf(uiState.xAxisTravel.format()) }
-    var y by remember { mutableStateOf(uiState.yAxisTravel.format()) }
-    var z by remember { mutableStateOf(uiState.zAxisTravel.format()) }
+    var x by remember { mutableStateOf(uiState.travel.first.format()) }
+    var y by remember { mutableStateOf(uiState.travel.second.format()) }
+    var z by remember { mutableStateOf(uiState.travel.third.format()) }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val softKeyboard = LocalSoftwareKeyboardController.current
@@ -236,7 +236,7 @@ fun TravelEditPage(
 
     Column(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -318,7 +318,7 @@ fun TravelEditPage(
                 fontSize = 30.sp,
             )
         }
-        AnimatedVisibility(visible = uiState.xAxisTravel.format() != x || uiState.yAxisTravel.format() != y || uiState.zAxisTravel.format() != z) {
+        AnimatedVisibility(visible = uiState.travel.first.format() != x || uiState.travel.second.format() != y || uiState.travel.third.format() != z) {
             FloatingActionButton(
                 modifier = Modifier
                     .width(128.dp)
@@ -356,9 +356,9 @@ fun WasteEditPage(
     setWaste: (Float, Float, Float) -> Unit = { _, _, _ -> },
     uiState: ConfigUiState,
 ) {
-    var x by remember { mutableStateOf(uiState.wasteX.format()) }
-    var y by remember { mutableStateOf(uiState.wasteY.format()) }
-    var z by remember { mutableStateOf(uiState.wasteZ.format()) }
+    var x by remember { mutableStateOf(uiState.waste.first.format()) }
+    var y by remember { mutableStateOf(uiState.waste.second.format()) }
+    var z by remember { mutableStateOf(uiState.waste.third.format()) }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val softKeyboard = LocalSoftwareKeyboardController.current
@@ -453,7 +453,7 @@ fun WasteEditPage(
                 fontSize = 30.sp,
             )
         }
-        AnimatedVisibility(visible = uiState.xAxisTravel.format() != x || uiState.yAxisTravel.format() != y || uiState.zAxisTravel.format() != z) {
+        AnimatedVisibility(visible = uiState.waste.first.format() != x || uiState.waste.second.format() != y || uiState.waste.third.format() != z) {
             FloatingActionButton(
                 modifier = Modifier
                     .width(128.dp)
@@ -481,11 +481,7 @@ fun WasteEditPage(
 @Preview(showBackground = true, widthDp = 960)
 fun ConfigPagePreview() {
     ConfigPage(
-        uiState = ConfigUiState(
-            xAxisTravel = 0f,
-            yAxisTravel = 0f,
-            zAxisTravel = 0f,
-        )
+        uiState = ConfigUiState()
     )
 }
 

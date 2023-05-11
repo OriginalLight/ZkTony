@@ -35,6 +35,6 @@
     <string name="maximum_stroke">Maximum stroke</string>
     <string name="waste_tank">Waste Tank</string>
     <string name="add">Add</string>
-    <string name="expect">Expect</string>
-    <string name="actual">Actual</string>
+    <string name="expect">Expect μL</string>
+    <string name="actual">Actual μL</string>
 </resources>

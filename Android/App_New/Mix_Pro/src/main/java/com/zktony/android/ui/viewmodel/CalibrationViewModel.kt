@@ -10,7 +10,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 /**
@@ -90,12 +89,12 @@ class CalibrationViewModel constructor(
      * Delete Data
      *
      * @param id Long
-     * @param dataId Long
+     * @param index Int
      * @return Unit
      */
-    fun deleteData(id: Long, dataId: Long) {
+    fun deleteData(id: Long, index: Int) {
         viewModelScope.launch {
-            dataDao.deleteById(dataId)
+            dataDao.deleteByIndex(id, index)
             delete(500L)
             calculateActual(id)
         }
@@ -143,29 +142,6 @@ class CalibrationViewModel constructor(
     fun dataList(id: Long) = dataDao.getBySubId(id)
 
     /**
-     * 返回校准后的参数
-     *
-     * @param id Long
-     * @return Flow<List<Pair<Int, Float>>>
-     */
-    fun calculatorList(id: Long) = flow {
-        dao.getById(id).collect {
-            val list = listOf(
-                Pair(0, it.v1),
-                Pair(1, it.v2),
-                Pair(2, it.v3),
-                Pair(3, it.v4),
-                Pair(4, it.v5),
-                Pair(5, it.v6),
-                Pair(6, it.v7),
-                Pair(7, it.v8),
-                Pair(8, it.v9),
-            )
-            emit(list)
-        }
-    }
-
-    /**
      * Calculate Actual
      *
      * @param id Long
@@ -174,7 +150,7 @@ class CalibrationViewModel constructor(
     private suspend fun calculateActual(id: Long) {
         val cali = dao.getById(id).firstOrNull()
         val dataList = dataDao.getBySubId(id).firstOrNull()
-        val vl = List(9) { 100f }.toMutableList()
+        val vl = List(13) { 100f }.toMutableList()
         if (!dataList.isNullOrEmpty()) {
             vl.forEachIndexed { index, item ->
                 dataList.filter { it.index == index }.let {
@@ -185,7 +161,14 @@ class CalibrationViewModel constructor(
 
             }
         }
-        dao.update(cali!!.copy(v1 = vl[0], v2 = vl[1], v3 = vl[2], v4 = vl[3], v5 = vl[4], v6 = vl[5], v7 = vl[6], v8 = vl[7], v9 = vl[8]))
+        dao.update(
+            cali!!.copy(
+                v1 = vl[0], v2 = vl[1], v3 = vl[2],
+                v4 = vl[3], v5 = vl[4], v6 = vl[5],
+                v7 = vl[6], v8 = vl[7], v9 = vl[8],
+                v10 = vl[9], v11 = vl[10], v12 = vl[11], v13 = vl[12]
+            )
+        )
     }
 
     /**

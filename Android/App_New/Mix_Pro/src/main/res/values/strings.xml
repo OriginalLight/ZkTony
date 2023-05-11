@@ -35,6 +35,6 @@
     <string name="maximum_stroke">最大行程</string>
     <string name="waste_tank">废液槽坐标</string>
     <string name="add">添加</string>
-    <string name="expect">预计</string>
-    <string name="actual">实际</string>
+    <string name="expect">预计 μL</string>
+    <string name="actual">实际 μL</string>
 </resources>

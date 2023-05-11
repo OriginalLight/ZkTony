@@ -1,8 +1,8 @@
 package com.zktony.android.data.dao
 
 import androidx.room.*
-import com.zktony.room.dao.BaseDao
 import com.zktony.android.data.entity.Container
+import com.zktony.room.dao.BaseDao
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -30,9 +30,9 @@ interface ContainerDao : BaseDao<Container> {
 
     @Query(
         """
-        SELECT * FROM container
-        WHERE type = :type
+        DELETE FROM container
+        WHERE id = :id
         """
     )
-    fun getByType(type: Int): Flow<List<Container>>
+    suspend fun deleteById(id: Long)
 }
