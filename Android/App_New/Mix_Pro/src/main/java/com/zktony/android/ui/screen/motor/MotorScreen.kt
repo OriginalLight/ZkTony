@@ -21,8 +21,6 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.entity.Motor
 import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.viewmodel.MotorPage
-import com.zktony.android.ui.viewmodel.MotorViewModel
 
 /**
  * Motor screen

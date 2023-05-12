@@ -6,7 +6,6 @@
     <string name="calibration_name">校准程序名</string>
     <string name="coagulant">促凝剂 μL:</string>
     <string name="colloid">胶体 μL:</string>
-    <string name="fast_slow"><![CDATA[快 <-> 慢]]></string>
     <string name="fill_coagulant">填充促凝剂</string>
     <string name="fill_colloid">填充胶体</string>
     <string name="motor_setting">电机设置</string>
@@ -16,7 +15,6 @@
     <string name="pump_one">泵一</string>
     <string name="pump_three">泵三</string>
     <string name="pump_two">泵二</string>
-    <string name="slow_fast"><![CDATA[慢 <-> 快]]></string>
     <string name="stop_all">请中止所有程序</string>
     <string name="stop_back">请先停止回吸</string>
     <string name="stop_fill">请先停止填充</string>
@@ -25,4 +23,6 @@
     <string name="title_calibration_data">校准数据</string>
     <string name="title_home">主界面</string>
     <string name="title_motor">电机</string>
+    <string name="standard_mode">标准模式</string>
+    <string name="mixer_mode">混合器模式</string>
 </resources>

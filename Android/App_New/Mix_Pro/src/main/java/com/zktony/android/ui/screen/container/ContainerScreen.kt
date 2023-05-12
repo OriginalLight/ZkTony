@@ -2,16 +2,12 @@ package com.zktony.android.ui.screen.container
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.zktony.android.ui.viewmodel.ContainerPage
-import com.zktony.android.ui.viewmodel.ContainerViewModel
 
 /**
  * Container screen
@@ -38,7 +34,11 @@ fun ContainerScreen(
         }
     }
 
-    AnimatedVisibility(visible = uiState.page == ContainerPage.CONTAINER) {
+    AnimatedVisibility(
+        visible = uiState.page == ContainerPage.CONTAINER,
+        enter = expandHorizontally(),
+        exit = shrinkHorizontally(),
+    ) {
         ContainerPage(
             modifier = modifier,
             delete = viewModel::delete,
@@ -49,13 +49,29 @@ fun ContainerScreen(
         )
     }
 
-    AnimatedVisibility(visible = uiState.page == ContainerPage.CONTAINER_ADD) {
+    AnimatedVisibility(
+        visible = uiState.page == ContainerPage.CONTAINER_ADD,
+        enter = expandHorizontally(),
+        exit = shrinkHorizontally(),
+    ) {
         ContainerAddPage(
             modifier = modifier,
             insert = viewModel::insert,
             list = uiState.list,
             navigationTo = viewModel::navigationTo,
-            toggleSelected = { selected = it },
+        )
+    }
+
+    AnimatedVisibility(
+        visible = uiState.page == ContainerPage.CONTAINER_EDIT,
+        enter = expandHorizontally(),
+        exit = shrinkHorizontally(),
+    ) {
+        ContainerEditPage(
+            modifier = modifier,
+            entityFlow = viewModel.entityFlow(selected),
+            navigationTo = viewModel::navigationTo,
+            update = viewModel::update,
         )
     }
 }

@@ -34,7 +34,6 @@ import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
 import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.navigation.Route
-import com.zktony.android.ui.viewmodel.SettingPage
 
 /**
  * Authentication page

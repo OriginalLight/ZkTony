@@ -17,8 +17,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.viewmodel.ConfigPage
-import com.zktony.android.ui.viewmodel.ConfigViewModel
 
 /**
  * 系统配置

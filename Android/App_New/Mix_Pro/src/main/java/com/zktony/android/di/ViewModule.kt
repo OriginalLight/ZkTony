@@ -1,11 +1,11 @@
 package com.zktony.android.di
 
-import com.zktony.android.ui.viewmodel.CalibrationViewModel
-import com.zktony.android.ui.viewmodel.ConfigViewModel
-import com.zktony.android.ui.viewmodel.ContainerViewModel
-import com.zktony.android.ui.viewmodel.HomeViewModel
-import com.zktony.android.ui.viewmodel.MotorViewModel
-import com.zktony.android.ui.viewmodel.SettingViewModel
+import com.zktony.android.ui.screen.calibration.CalibrationViewModel
+import com.zktony.android.ui.screen.config.ConfigViewModel
+import com.zktony.android.ui.screen.container.ContainerViewModel
+import com.zktony.android.ui.screen.home.HomeViewModel
+import com.zktony.android.ui.screen.motor.MotorViewModel
+import com.zktony.android.ui.screen.setting.SettingViewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
 

@@ -45,11 +45,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 it.coagulant > 0 && it.colloid > 0 && it.job == null && !it.start
                             previous.isEnabled =
                                 it.previousCoagulant > 0 && it.previousColloid > 0 && it.job == null
-                            slowFast.isEnabled = it.job == null
+                            mode.isEnabled = it.job == null
 
                             previous.isVisible = it.previous
                             start.isVisible = !it.previous
-                            slowFast.text = if (it.slowFast) getString(R.string.fast_slow) else getString(R.string.slow_fast)
+                            mode.text = if (it.mode) getString(R.string.mixer_mode) else getString(R.string.standard_mode)
                             normalContainer.isVisible = !it.previous
                             previousContainer.isVisible = it.previous
 
@@ -152,8 +152,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 viewModel.previousCoagulantEdit(it)
             }
 
-            slowFast.clickNoRepeat {
-                viewModel.slowFast()
+            mode.clickNoRepeat {
+                viewModel.mode()
             }
 
             with(coagulantHistory) {

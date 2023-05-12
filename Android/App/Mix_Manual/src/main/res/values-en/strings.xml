@@ -6,7 +6,6 @@
     <string name="calibration_name">Name</string>
     <string name="coagulant">Coagulant μL:</string>
     <string name="colloid">Colloid μL:</string>
-    <string name="fast_slow"><![CDATA[Fast <-> Slow]]></string>
     <string name="fill_coagulant">Fill Coagulant</string>
     <string name="fill_colloid">Fill Colloid</string>
     <string name="motor_setting">Motor Setting</string>
@@ -16,7 +15,6 @@
     <string name="pump_one">Pump one</string>
     <string name="pump_three">Pump three</string>
     <string name="pump_two">Pump two</string>
-    <string name="slow_fast">><![CDATA[Slow <-> Fast]]></string>
     <string name="stop_all">Please suspend all procedures</string>
     <string name="stop_back">Please stop sucking back first</string>
     <string name="stop_fill">Please stop the population first</string>
@@ -25,4 +23,6 @@
     <string name="title_calibration_data">Calibration Data</string>
     <string name="title_home">Home</string>
     <string name="title_motor">Motor</string>
+    <string name="standard_mode">Standard mode</string>
+    <string name="mixer_mode">Mixer mode</string>
 </resources>

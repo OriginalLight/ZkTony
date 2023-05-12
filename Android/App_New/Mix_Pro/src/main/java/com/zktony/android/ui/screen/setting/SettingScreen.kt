@@ -6,8 +6,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.zktony.android.ui.viewmodel.SettingPage
-import com.zktony.android.ui.viewmodel.SettingViewModel
 
 /**
  * Setting screen

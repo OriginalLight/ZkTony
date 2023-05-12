@@ -2,17 +2,7 @@ package com.zktony.android.ui.screen.calibration
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.text.KeyboardActions
@@ -22,19 +12,8 @@ import androidx.compose.material.icons.filled.DataSaverOff
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoveUp
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.Card
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -48,45 +27,36 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.R
 import com.zktony.android.core.ext.compute
+import com.zktony.android.data.entity.Calibration
 import com.zktony.android.data.entity.CalibrationData
-import com.zktony.android.ui.components.CustomTextField
 import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.viewmodel.CalibrationPage
 import com.zktony.core.ext.format
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 
 /**
  * CalibrationEditPage
  *
  * @param modifier Modifier
  * @param addLiquid Function2<Int, Float, Unit>
- * @param delete Function1<Long, Unit>
- * @param insert Function1<CalibrationData, Unit>
- * @param list Flow<List<CalibrationData>>
+ * @param entity Flow<Calibration>
  * @param navigationTo Function1<CalibrationPage, Unit>
- * @param selected Long
+ * @param update Function1<Calibration, Unit>
+ * @return Unit
  */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun CalibrationEditPage(
     modifier: Modifier = Modifier,
     addLiquid: (Int, Float) -> Unit = { _, _ -> },
-    delete: (Long) -> Unit = { },
-    insert: (CalibrationData) -> Unit = {},
-    list: Flow<List<CalibrationData>> = flowOf(),
-    navigationTo: (CalibrationPage) -> Unit = {},
-    selected: Long = 0L,
+    entity: Calibration? = null,
+    navigationTo: (CalibrationPageEnum) -> Unit = {},
+    update: (Calibration) -> Unit = { },
 ) {
 
-    val data by list.collectAsStateWithLifecycle(initialValue = emptyList())
     var expand by remember { mutableStateOf(false) }
     var index by remember { mutableStateOf(0) }
     var expect by remember { mutableStateOf("") }
@@ -107,8 +77,9 @@ fun CalibrationEditPage(
             ZkTonyTopAppBar(
                 title = stringResource(id = R.string.edit),
                 onBack = {
-                    navigationTo(CalibrationPage.CALIBRATION)
-                })
+                    navigationTo(CalibrationPageEnum.CALIBRATION)
+                }
+            )
         }
 
         Column(
@@ -128,7 +99,7 @@ fun CalibrationEditPage(
                     .padding(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                data.compute().forEach { (index, avg, list) ->
+                entity?.data?.compute()?.forEach { (index, avg, list) ->
                     item {
                         Card(
                             modifier = Modifier.wrapContentHeight(),
@@ -165,7 +136,15 @@ fun CalibrationEditPage(
                                     list.forEach { it1 ->
                                         item {
                                             AssistChip(
-                                                onClick = { delete(it1.id) },
+                                                onClick = {
+                                                    val l1 = entity.data.toMutableList()
+                                                    l1.remove(it1)
+                                                    update(
+                                                        entity.copy(
+                                                            data = l1
+                                                        )
+                                                    )
+                                                },
                                                 label = {
                                                     Text(
                                                         text = "${it1.actual.format(2)} / ${
@@ -221,76 +200,46 @@ fun CalibrationEditPage(
                         )
                     }
 
-                    Column(
+                    OutlinedTextField(
                         modifier = Modifier
                             .weight(1f)
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.Center,
-                    ) {
-                        CustomTextField(
-                            modifier = Modifier
-                                .height(48.dp)
-                                .fillMaxWidth()
-                                .focusRequester(focusRequester),
-                            value = TextFieldValue(expect, TextRange(expect.length)),
-                            hint = stringResource(id = R.string.expect),
-                            onValueChange = { expect = it.text },
-                            textStyle = TextStyle(
-                                fontSize = 24.sp,
-                                textAlign = TextAlign.Center,
-                            ),
-                            hiltTextStyle = TextStyle(
-                                fontSize = 20.sp,
-                                textAlign = TextAlign.Center,
-                                color = Color.LightGray,
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    softKeyboard?.hide()
-                                }
-                            ),
-                        )
-                        Divider(thickness = 2.dp)
-                    }
-                    Column(
+                            .padding(horizontal = 16.dp)
+                            .focusRequester(focusRequester),
+                        shape = MaterialTheme.shapes.large,
+                        value = TextFieldValue(expect, TextRange(expect.length)),
+                        onValueChange = { expect = it.text },
+                        label = { Text(text = stringResource(id = R.string.expect)) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                softKeyboard?.hide()
+                            }
+                        ),
+                        singleLine = true,
+                    )
+                    OutlinedTextField(
                         modifier = Modifier
                             .weight(1f)
-                            .padding(horizontal = 16.dp),
-                        verticalArrangement = Arrangement.Center,
-                    ) {
-                        CustomTextField(
-                            modifier = Modifier
-                                .height(48.dp)
-                                .fillMaxWidth()
-                                .focusRequester(focusRequester),
-                            value = TextFieldValue(actual, TextRange(actual.length)),
-                            hint = stringResource(id = R.string.actual),
-                            onValueChange = { actual = it.text },
-                            textStyle = TextStyle(
-                                fontSize = 24.sp,
-                                textAlign = TextAlign.Center,
-                            ),
-                            hiltTextStyle = TextStyle(
-                                fontSize = 20.sp,
-                                textAlign = TextAlign.Center,
-                                color = Color.LightGray,
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    softKeyboard?.hide()
-                                }
-                            ),
-                        )
-                        Divider(thickness = 2.dp)
-                    }
+                            .padding(horizontal = 16.dp)
+                            .focusRequester(focusRequester),
+                        shape = MaterialTheme.shapes.large,
+                        value = TextFieldValue(actual, TextRange(actual.length)),
+                        onValueChange = { actual = it.text },
+                        label = { Text(text = stringResource(id = R.string.actual)) },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                softKeyboard?.hide()
+                            }
+                        ),
+                        singleLine = true,
+                    )
 
                     FloatingActionButton(
                         modifier = Modifier
@@ -311,12 +260,16 @@ fun CalibrationEditPage(
                                 .width(128.dp)
                                 .padding(horizontal = 16.dp),
                             onClick = {
-                                insert(
-                                    CalibrationData(
-                                        subId = selected,
-                                        index = index,
-                                        expect = expect.toFloatOrNull() ?: 0f,
-                                        actual = actual.toFloatOrNull() ?: 0f,
+                                val l1 = entity!!.data.toMutableList()
+                                val data = CalibrationData(
+                                    index = index,
+                                    expect = expect.toFloatOrNull() ?: 0f,
+                                    actual = actual.toFloatOrNull() ?: 0f,
+                                )
+                                l1.add(data)
+                                update(
+                                    entity.copy(
+                                        data = l1
                                     )
                                 )
                             }

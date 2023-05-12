@@ -11,21 +11,28 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /**
  * @author 刘贺贺
  * @date 2023/5/11 13:19
  */
 
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun DynamicMixPlate(
     modifier: Modifier = Modifier,
     count: Int,
-    data: List<Pair<Int, Boolean>>,
-    onItemClick: (Int) -> Unit = {}
+    data: List<Pair<Int, Boolean>> = emptyList(),
+    onItemClick: (Int, Float) -> Unit = { _, _ -> }
 ) {
+    val textMeasure = rememberTextMeasurer()
 
     // 画一个长度和高度符合view大小的矩形
 
@@ -33,12 +40,9 @@ fun DynamicMixPlate(
         modifier = modifier
             .fillMaxSize()
             .pointerInput(Unit) {
-                detectTapGestures(
-                    onTap = {
-                        val space = size.width / count
-                        onItemClick((it.x / space).toInt())
-                    }
-                )
+                detectTapGestures {
+                    onItemClick(size.width, it.x)
+                }
             }
     ) {
         val space = size.width / count
@@ -70,6 +74,20 @@ fun DynamicMixPlate(
                     center = Offset((i + 0.5f) * space, size.height / 2f),
                 )
             }
+        }
+
+        for (i in 0 until count) {
+            val text = "${'A' + i}"
+            val textSize = textMeasure.measure(text, TextStyle(fontSize = 30.sp)).size
+            drawText(
+                textMeasurer = textMeasure,
+                text = text,
+                style = TextStyle(fontSize = 30.sp),
+                topLeft = Offset(
+                    (i + 0.5f) * space - textSize.width / 2,
+                    size.height / 2 - textSize.height / 2,
+                ),
+            )
         }
     }
 }

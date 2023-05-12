@@ -2,7 +2,6 @@ package com.zktony.android.data.dao
 
 import androidx.room.*
 import com.zktony.android.data.entity.Motor
-import com.zktony.room.dao.BaseDao
 import kotlinx.coroutines.flow.Flow
 
 /**

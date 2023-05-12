@@ -67,8 +67,6 @@ import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.ui.viewmodel.SettingPage
-import com.zktony.android.ui.viewmodel.SettingUiState
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.createQRCodeBitmap
 import com.zktony.core.model.QrCode

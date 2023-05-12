@@ -308,7 +308,7 @@
                         app:icon="@mipmap/water"
                         app:iconGravity="textStart"
                         app:iconSize="24dp"
-                        app:layout_constraintBottom_toTopOf="@+id/slow_fast"
+                        app:layout_constraintBottom_toTopOf="@+id/mode"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_weight="1"
                         app:layout_constraintStart_toStartOf="parent"
@@ -317,12 +317,12 @@
                         tools:ignore="VisualLintButtonSize" />
 
                     <com.google.android.material.button.MaterialButton
-                        android:id="@+id/slow_fast"
+                        android:id="@+id/mode"
                         android:layout_width="0dp"
                         android:layout_height="64dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        android:text="@string/fast_slow"
+                        android:text="@string/standard_mode"
                         android:textAllCaps="false"
                         android:textSize="22sp"
                         android:textStyle="bold"
@@ -332,7 +332,8 @@
                         app:layout_constraintHorizontal_weight="1"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/previous"
-                        app:rippleColor="@color/purple_700" />
+                        app:rippleColor="@color/purple_700"
+                        tools:ignore="VisualLintButtonSize" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

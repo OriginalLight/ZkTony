@@ -11,6 +11,7 @@ import com.zktony.datastore.ext.save
 import com.zktony.www.R
 import com.zktony.www.common.ext.asyncHex
 import com.zktony.www.common.ext.syncHex
+import com.zktony.www.common.ext.waitTime
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -102,10 +103,17 @@ class HomeViewModel constructor(
                     _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
                 }
             }
+            waitTime(
+                if (_uiState.value.mode) {
+                    20 * 60L
+                } else {
+                    4 * 60L
+                }
+            )
             val executor = ProgramExecutor(
                 colloid = _uiState.value.colloid,
                 coagulant = _uiState.value.coagulant,
-                slowFast = _uiState.value.slowFast,
+                mode = _uiState.value.mode,
                 scope = this,
             )
             executor.finish = {
@@ -133,10 +141,17 @@ class HomeViewModel constructor(
                     _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
                 }
             }
+            waitTime(
+                if (_uiState.value.mode) {
+                    20 * 60L
+                } else {
+                    4 * 60L
+                }
+            )
             val executor = ProgramExecutor(
                 colloid = _uiState.value.previousColloid,
                 coagulant = _uiState.value.previousCoagulant,
-                slowFast = _uiState.value.slowFast,
+                mode = _uiState.value.mode,
                 scope = this,
             )
             executor.finish = {
@@ -438,9 +453,9 @@ class HomeViewModel constructor(
         }
     }
 
-    fun slowFast() {
+    fun mode() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(slowFast = !_uiState.value.slowFast)
+            _uiState.value = _uiState.value.copy(mode = !_uiState.value.mode)
         }
     }
 }
@@ -461,5 +476,5 @@ data class HomeUiState(
     val coagulantHistory: Set<String> = emptySet(),
     val previousColloidHistory: Set<String> = emptySet(),
     val previousCoagulantHistory: Set<String> = emptySet(),
-    val slowFast: Boolean = false,
+    val mode: Boolean = false,
 )

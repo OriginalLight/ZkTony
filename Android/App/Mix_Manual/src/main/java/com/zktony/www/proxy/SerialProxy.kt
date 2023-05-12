@@ -24,7 +24,7 @@ class SerialProxy {
     private var lockTime = 0L
 
     // 机构运行小步骤等待时间
-    private val waitTime = 3 * 60L
+    private var waitTime = 4 * 60L
 
     init {
         scope.launch {
@@ -78,6 +78,16 @@ class SerialProxy {
                 }
             }
         }
+    }
+
+    /**
+     * setWaitTime
+     *
+     * @param time Long
+     * @return Unit
+     */
+    fun setWaitTime(time: Long) {
+        waitTime = time
     }
 
     /**

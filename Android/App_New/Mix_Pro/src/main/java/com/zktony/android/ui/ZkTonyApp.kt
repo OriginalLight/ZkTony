@@ -4,8 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -31,7 +29,6 @@ import com.zktony.android.ui.screen.container.ContainerScreen
 import com.zktony.android.ui.screen.home.HomeScreen
 import com.zktony.android.ui.screen.motor.MotorScreen
 import com.zktony.android.ui.screen.setting.SettingScreen
-import com.zktony.android.ui.viewmodel.*
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -52,7 +49,9 @@ fun ZkTonyApp() {
 
     PermanentNavigationDrawer(drawerContent = {
         AnimatedVisibility(
-            visible = !drawerState.value, enter = expandHorizontally(), exit = shrinkHorizontally()
+            visible = !drawerState.value,
+            enter = expandHorizontally(),
+            exit = shrinkHorizontally(),
         ) {
             PermanentNavigationDrawerContent(
                 selectedDestination = selectedDestination,
@@ -62,7 +61,9 @@ fun ZkTonyApp() {
             }
         }
         AnimatedVisibility(
-            visible = drawerState.value, enter = expandHorizontally(), exit = shrinkHorizontally()
+            visible = drawerState.value,
+            enter = expandHorizontally(),
+            exit = shrinkHorizontally(),
         ) {
             AppNavigationRail(
                 selectedDestination = selectedDestination,
@@ -72,18 +73,12 @@ fun ZkTonyApp() {
             }
         }
     }) {
-        Row(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.inverseOnSurface)
-            ) {
-                AppNavHost(
-                    navController = navController,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-        }
+        AppNavHost(
+            navController = navController,
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .fillMaxSize(),
+        )
     }
 }
 

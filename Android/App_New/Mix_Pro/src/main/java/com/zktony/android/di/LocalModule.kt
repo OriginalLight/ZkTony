@@ -1,7 +1,7 @@
 package com.zktony.android.di
 
 import androidx.room.Room
-import com.zktony.android.data.database.AppDatabase
+import com.zktony.android.data.AppDatabase
 import com.zktony.datastore.DataStoreFactory
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
@@ -17,8 +17,6 @@ val localModule = module {
     }
     single { get<AppDatabase>().motorDao() }
     single { get<AppDatabase>().calibrationDao() }
-    single { get<AppDatabase>().calibrationDataDao() }
     single { get<AppDatabase>().containerDao() }
     single { get<AppDatabase>().programDao() }
-    single { get<AppDatabase>().pointDao() }
 }

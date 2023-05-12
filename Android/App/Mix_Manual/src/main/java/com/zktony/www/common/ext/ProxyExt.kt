@@ -191,4 +191,14 @@ suspend fun waitLock(block: () -> Unit) {
     block()
 }
 
+/**
+ * waitTime
+ *
+ * @param time Long
+ * @return Unit
+ */
+fun waitTime(time: Long) {
+    serialProxy.setWaitTime(time)
+}
+
 // endregion
