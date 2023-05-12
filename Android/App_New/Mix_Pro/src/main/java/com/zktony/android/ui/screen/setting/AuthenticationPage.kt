@@ -33,6 +33,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
 import com.zktony.android.ui.components.ZkTonyTopAppBar
+import com.zktony.android.ui.navigation.PageEnum
 import com.zktony.android.ui.navigation.Route
 
 /**
@@ -40,16 +41,16 @@ import com.zktony.android.ui.navigation.Route
  *
  * @param modifier Modifier
  * @param navController NavHostController
- * @param navigationTo Function1<SettingPage, Unit>
+ * @param navigationTo Function1<PageEnum, Unit>
  */
 @Composable
 fun AuthenticationPage(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    navigationTo: (SettingPage) -> Unit = {},
+    navigationTo: (PageEnum) -> Unit = {},
 ) {
     BackHandler {
-        navigationTo(SettingPage.SETTING)
+        navigationTo(PageEnum.MAIN)
     }
 
     var show by remember { mutableStateOf(false) }
@@ -67,10 +68,12 @@ fun AuthenticationPage(
         ZkTonyTopAppBar(
             title = "",
             onBack = {
-                navigationTo(SettingPage.SETTING)
+                navigationTo(PageEnum.MAIN)
             }
         )
+
         Spacer(modifier = Modifier.height(128.dp))
+
         AnimatedVisibility(visible = !show) {
             VerificationCodeField(digits = 6, inputCallback = {
                 show = true
@@ -78,6 +81,7 @@ fun AuthenticationPage(
                 VerificationCodeItem(text, focused)
             }
         }
+
         AnimatedVisibility(visible = show) {
             Row(
                 modifier = Modifier.padding(16.dp),
@@ -85,7 +89,7 @@ fun AuthenticationPage(
             ) {
                 Card(
                     modifier = Modifier.clickable {
-                        navigationTo(SettingPage.SETTING)
+                        navigationTo(PageEnum.MAIN)
                         navController.navigate(Route.MOTOR)
                     },
                 ) {
@@ -98,6 +102,7 @@ fun AuthenticationPage(
                             painter = painterResource(id = R.drawable.ic_motor),
                             contentDescription = stringResource(id = R.string.motor_config)
                         )
+
                         Text(
                             modifier = Modifier.padding(bottom = 8.dp),
                             text = stringResource(id = R.string.motor_config),
@@ -109,7 +114,7 @@ fun AuthenticationPage(
 
                 Card(
                     modifier = Modifier.clickable {
-                        navigationTo(SettingPage.SETTING)
+                        navigationTo(PageEnum.MAIN)
                         navController.navigate(Route.CONFIG)
                     },
                 ) {
@@ -122,6 +127,7 @@ fun AuthenticationPage(
                             painter = painterResource(id = R.drawable.ic_settings),
                             contentDescription = stringResource(id = R.string.system_config)
                         )
+
                         Text(
                             modifier = Modifier.padding(bottom = 8.dp),
                             text = stringResource(id = R.string.system_config),

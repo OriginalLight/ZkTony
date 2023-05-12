@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -17,6 +20,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.ui.components.ZkTonyTopAppBar
+import com.zktony.android.ui.navigation.PageEnum
 
 /**
  * 系统配置
@@ -33,12 +37,13 @@ fun ConfigScreen(
     viewModel: ConfigViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var page by remember { mutableStateOf(PageEnum.MAIN) }
 
     BackHandler {
-        if (uiState.page == ConfigPage.CONFIG) {
+        if (page == PageEnum.MAIN) {
             navController.navigateUp()
         } else {
-            viewModel.navigateTo(ConfigPage.CONFIG)
+            page = PageEnum.MAIN
         }
     }
 
@@ -55,39 +60,37 @@ fun ConfigScreen(
         ZkTonyTopAppBar(
             title = stringResource(id = R.string.system_config),
             onBack = {
-                if (uiState.page == ConfigPage.CONFIG) {
+                if (page == PageEnum.MAIN) {
                     navController.navigateUp()
                 } else {
-                    viewModel.navigateTo(ConfigPage.CONFIG)
+                    page = PageEnum.MAIN
                 }
             }
         )
-        AnimatedVisibility(visible = uiState.page == ConfigPage.CONFIG) {
-            ConfigPage(
+
+        AnimatedVisibility(visible = page == PageEnum.MAIN) {
+            ConfigMainPage(
                 modifier = Modifier,
                 uiState = uiState,
-                navigationTo = viewModel::navigateTo
-            )
-        }
-        AnimatedVisibility(visible = uiState.page == ConfigPage.TRAVEL_EDIT) {
-            TravelEditPage(
-                modifier = Modifier,
-                uiState = uiState,
-                setTravel = { x, y, z ->
-                    viewModel.setTravel(x, y, z)
-                    viewModel.navigateTo(ConfigPage.CONFIG)
-                },
+                navigationTo = { page = it },
             )
         }
 
-        AnimatedVisibility(visible = uiState.page == ConfigPage.WASTE_EDIT) {
+        AnimatedVisibility(visible = page == PageEnum.TRAVEL_EDIT) {
+            TravelEditPage(
+                modifier = Modifier,
+                navigationTo = { page = it },
+                uiState = uiState,
+                setTravel = viewModel::setTravel,
+            )
+        }
+
+        AnimatedVisibility(visible = page == PageEnum.WASTE_EDIT) {
             WasteEditPage(
                 modifier = Modifier,
+                navigationTo = { page = it },
+                setWaste = viewModel::setWaste,
                 uiState = uiState,
-                setWaste = { x, y, z ->
-                    viewModel.setWaste(x, y, z)
-                    viewModel.navigateTo(ConfigPage.CONFIG)
-                },
             )
         }
     }

@@ -32,19 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.R
 import com.zktony.android.data.entity.Motor
+import com.zktony.android.ui.navigation.PageEnum
 
-/**
- * Motor edit page
- *
- * @param modifier Modifier
- * @param entity Motor
- * @param update Function1<Motor, Unit>
- * @return Unit
- */
 @Composable
 fun MotorEditPage(
     modifier: Modifier = Modifier,
-    entity: Motor,
+    entity: Motor = Motor(),
+    navigationTo: (PageEnum) -> Unit = {},
     update: (Motor) -> Unit = {},
 ) {
     var speed by remember { mutableStateOf(entity.speed) }
@@ -64,12 +58,14 @@ fun MotorEditPage(
             fontWeight = FontWeight.SemiBold,
             lineHeight = 30.sp,
         )
+
         Column {
             Text(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 text = stringResource(id = R.string.speed),
                 style = MaterialTheme.typography.labelLarge
             )
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -84,22 +80,26 @@ fun MotorEditPage(
                     painter = painterResource(id = R.drawable.ic_speed),
                     contentDescription = stringResource(id = R.string.speed)
                 )
+
                 Text(
                     modifier = Modifier.padding(8.dp),
                     text = speed.toString(),
                     style = MaterialTheme.typography.bodyLarge
                 )
+
                 Slider(
                     value = speed.toFloat(),
                     onValueChange = { speed = it.toInt() },
                     valueRange = 0f..600f,
                 )
             }
+
             Text(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 text = stringResource(id = R.string.acceleration),
                 style = MaterialTheme.typography.labelLarge
             )
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -114,22 +114,26 @@ fun MotorEditPage(
                     painter = painterResource(id = R.drawable.ic_acceleration),
                     contentDescription = stringResource(id = R.string.acceleration)
                 )
+
                 Text(
                     modifier = Modifier.padding(8.dp),
                     text = acc.toString(),
                     style = MaterialTheme.typography.bodyLarge
                 )
+
                 Slider(
                     value = acc.toFloat(),
                     onValueChange = { acc = it.toInt() },
                     valueRange = 10f..100f,
                 )
             }
+
             Text(
                 modifier = Modifier.padding(horizontal = 8.dp),
                 text = stringResource(id = R.string.deceleration),
                 style = MaterialTheme.typography.labelLarge
             )
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -144,11 +148,13 @@ fun MotorEditPage(
                     painter = painterResource(id = R.drawable.ic_deceleration),
                     contentDescription = stringResource(id = R.string.deceleration)
                 )
+
                 Text(
                     modifier = Modifier.padding(8.dp),
                     text = dec.toString(),
                     style = MaterialTheme.typography.bodyLarge
                 )
+
                 Slider(
                     value = dec.toFloat(),
                     onValueChange = { dec = it.toInt() },
@@ -160,9 +166,12 @@ fun MotorEditPage(
         AnimatedVisibility(visible = entity.speed != speed || entity.acc != acc || entity.dec != dec) {
             FloatingActionButton(
                 modifier = Modifier
-                    .width(128.dp)
-                    .padding(16.dp),
-                onClick = { update(entity.copy(speed = speed, acc = acc, dec = dec)) },
+                    .width(256.dp)
+                    .padding(vertical = 16.dp),
+                onClick = {
+                    update(entity.copy(speed = speed, acc = acc, dec = dec))
+                    navigationTo(PageEnum.MAIN)
+                },
             ) {
                 Icon(
                     modifier = Modifier.size(36.dp),

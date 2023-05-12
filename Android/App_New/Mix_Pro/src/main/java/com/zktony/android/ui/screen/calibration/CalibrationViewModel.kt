@@ -16,115 +16,34 @@ import kotlinx.coroutines.launch
 class CalibrationViewModel constructor(
     private val dao: CalibrationDao,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(CalibrationUiState())
-    val uiState = _uiState.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            dao.getAll().collect {
-                _uiState.value = _uiState.value.copy(list = it)
-            }
-        }
-    }
+    fun entities() = dao.getAll()
 
-    /**
-     * Navigate to
-     *
-     * @param page CalibrationPage
-     * @return Unit
-     */
-    fun navigateTo(page: CalibrationPageEnum) {
-        _uiState.value = _uiState.value.copy(page = page)
-    }
-
-    /**
-     * toggleEntity
-     *
-     * @param calibration Calibration
-     * @return Unit
-     */
-    fun toggleEntity(calibration: Calibration?) {
-        _uiState.value = _uiState.value.copy(entity = calibration)
-    }
-
-    /**
-     * Insert
-     *
-     * @param name String
-     * @return Unit
-     */
     fun insert(name: String) {
         viewModelScope.launch {
             dao.insert(Calibration(name = name))
         }
     }
 
-    /**
-     * Delete
-     *
-     * @param id Long
-     * @return Unit
-     */
-    fun delete(calibration: Calibration) {
+    fun delete(entity: Calibration) {
         viewModelScope.launch {
-            dao.delete(calibration)
-            delay(500L)
-            val list = uiState.value.list
-            if (list.isNotEmpty() && !list.any { it.active == 1 }) {
-                dao.update(list[0].copy(active = 1))
-            }
+            dao.delete(entity)
         }
     }
 
-
-    /**
-     * Update
-     *
-     * @param calibration Calibration
-     * @return Unit
-     */
-    fun update(calibration: Calibration) {
+    fun update(entity: Calibration) {
         viewModelScope.launch {
-            dao.update(calibration)
-            _uiState.value = _uiState.value.copy(entity = calibration)
+            dao.update(entity)
         }
     }
 
-    /**
-     * 加液
-     *
-     * @param i Int
-     * @param fl Float
-     * @return Unit
-     */
+    fun active(id: Long) {
+        viewModelScope.launch {
+            dao.active(id)
+        }
+    }
+
     fun addLiquid(i: Int, fl: Float) {
 
     }
-
-    fun activeEntity(calibration: Calibration) {
-        viewModelScope.launch {
-            val list = uiState.value.list
-                .map {
-                    if (it.id != calibration.id) {
-                        it.copy(active = 0)
-                    } else {
-                        it.copy(active = 1)
-                    }
-                }
-            dao.updateAll(list)
-        }
-    }
-
-}
-
-data class CalibrationUiState(
-    val list: List<Calibration> = emptyList(),
-    val entity: Calibration? = null,
-    val page: CalibrationPageEnum = CalibrationPageEnum.CALIBRATION,
-)
-
-enum class CalibrationPageEnum {
-    CALIBRATION,
-    CALIBRATION_ADD,
-    CALIBRATION_EDIT
 }

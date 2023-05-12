@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.R
 import com.zktony.android.ui.components.CustomTextField
+import com.zktony.android.ui.navigation.PageEnum
 import com.zktony.core.ext.format
 import kotlinx.coroutines.delay
 
@@ -40,14 +41,15 @@ import kotlinx.coroutines.delay
  * TravelEditPage
  *
  * @param modifier Modifier
+ * @param navigationTo Function1<PageEnum, Unit>
  * @param setTravel Function3<Float, Float, Float, Unit>
  * @param uiState ConfigUiState
- * @return Unit
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TravelEditPage(
     modifier: Modifier = Modifier,
+    navigationTo: (PageEnum) -> Unit = {},
     setTravel: (Float, Float, Float) -> Unit = { _, _, _ -> },
     uiState: ConfigUiState,
 ) {
@@ -71,6 +73,7 @@ fun TravelEditPage(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(128.dp))
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -81,10 +84,12 @@ fun TravelEditPage(
                 painter = painterResource(id = R.drawable.ic_distance),
                 contentDescription = null,
             )
+
             Text(
                 text = "(",
                 fontSize = 30.sp,
             )
+
             CustomTextField(
                 modifier = Modifier
                     .width(128.dp)
@@ -104,10 +109,12 @@ fun TravelEditPage(
                     focusManager.moveFocus(FocusDirection.Next)
                 })
             )
+
             Text(
                 text = ",",
                 fontSize = 30.sp,
             )
+
             CustomTextField(
                 modifier = Modifier.width(128.dp),
                 value = TextFieldValue(y.format(), TextRange(y.format().length)),
@@ -125,10 +132,12 @@ fun TravelEditPage(
                     focusManager.moveFocus(FocusDirection.Next)
                 })
             )
+
             Text(
                 text = ",",
                 fontSize = 30.sp,
             )
+
             CustomTextField(
                 modifier = Modifier.width(128.dp),
                 value = TextFieldValue(z.format(), TextRange(z.format().length)),
@@ -143,11 +152,13 @@ fun TravelEditPage(
                     softKeyboard?.hide()
                 })
             )
+
             Text(
                 text = ")",
                 fontSize = 30.sp,
             )
         }
+
         AnimatedVisibility(visible = uiState.travel.first.format() != x || uiState.travel.second.format() != y || uiState.travel.third.format() != z) {
             FloatingActionButton(
                 modifier = Modifier
@@ -159,6 +170,7 @@ fun TravelEditPage(
                         y.toFloatOrNull() ?: 0f,
                         z.toFloatOrNull() ?: 0f
                     )
+                    navigationTo(PageEnum.MAIN)
                 },
             ) {
                 Icon(

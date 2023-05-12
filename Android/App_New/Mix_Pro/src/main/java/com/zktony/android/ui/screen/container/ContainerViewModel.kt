@@ -16,33 +16,9 @@ import kotlinx.coroutines.launch
 class ContainerViewModel constructor(
     private val dao: ContainerDao,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(ContainerUiState())
-    val uiState = _uiState.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            dao.getAll().collect {
-                _uiState.value = _uiState.value.copy(list = it)
-            }
-        }
-    }
+    fun entities() = dao.getAll()
 
-    /**
-     * 页面切换
-     *
-     * @param page ContainerPage
-     * @return Unit
-     */
-    fun navigationTo(page: ContainerPage) {
-        _uiState.value = _uiState.value.copy(page = page)
-    }
-
-    /**
-     * 添加
-     *
-     * @param name String
-     * @return Unit
-     */
     fun insert(name: String) {
         viewModelScope.launch {
             val list: MutableList<Point> = mutableListOf()
@@ -53,46 +29,15 @@ class ContainerViewModel constructor(
         }
     }
 
-    /**
-     * 删除
-     *
-     * @param id Long
-     * @return Unit
-     */
-    fun delete(id: Long) {
+    fun delete(entity: Container) {
         viewModelScope.launch {
-            dao.deleteById(id)
+            dao.delete(entity)
         }
     }
 
-    /**
-     * 更新
-     *
-     * @param container Container
-     * @return Unit
-     */
     fun update(container: Container) {
         viewModelScope.launch {
             dao.update(container)
         }
     }
-
-    /**
-     * entityFlow
-     *
-     * @param id Long
-     * @return Flow<Container>
-     */
-    fun entityFlow(id: Long) = dao.getById(id)
-}
-
-data class ContainerUiState(
-    val list: List<Container> = emptyList(),
-    val page: ContainerPage = ContainerPage.CONTAINER
-)
-
-enum class ContainerPage {
-    CONTAINER,
-    CONTAINER_EDIT,
-    CONTAINER_ADD
 }

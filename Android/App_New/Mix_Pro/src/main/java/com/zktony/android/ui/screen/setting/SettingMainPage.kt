@@ -67,29 +67,30 @@ import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
+import com.zktony.android.ui.navigation.PageEnum
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.createQRCodeBitmap
 import com.zktony.core.model.QrCode
 import kotlinx.coroutines.delay
 
 /**
- * Setting page
+ * SettingMainPage
  *
  * @param modifier Modifier
  * @param checkUpdate Function0<Unit>
  * @param navController NavHostController
- * @param navigationTo Function1<SettingPage, Unit>
+ * @param navigationTo Function1<PageEnum, Unit>
  * @param openWifi Function0<Unit>
  * @param setLanguage Function1<String, Unit>
  * @param setNavigation Function1<Boolean, Unit>
  * @param uiState SettingUiState
  */
 @Composable
-fun SettingPage(
+fun SettingMainPage(
     modifier: Modifier = Modifier,
     checkUpdate: () -> Unit = {},
     navController: NavHostController,
-    navigationTo: (SettingPage) -> Unit = {},
+    navigationTo: (PageEnum) -> Unit = {},
     openWifi: () -> Unit = {},
     setLanguage: (String) -> Unit = {},
     setNavigation: (Boolean) -> Unit = {},
@@ -113,10 +114,12 @@ fun SettingPage(
                 setNavigation = setNavigation,
                 uiState = uiState,
             )
+
             InfoForm(
                 modifier = Modifier.weight(1f),
             )
         }
+
         OperationForm(
             modifier = Modifier.wrapContentHeight(),
             checkUpdate = checkUpdate,
@@ -174,12 +177,15 @@ fun SettingsForm(
                         painter = painterResource(id = R.drawable.ic_language),
                         contentDescription = null,
                     )
+
                     Text(
                         modifier = Modifier.padding(start = 8.dp),
                         text = stringResource(id = R.string.language),
                         style = MaterialTheme.typography.bodyLarge
                     )
+
                     Spacer(modifier = Modifier.weight(1f))
+
                     Text(
                         modifier = Modifier.padding(end = 16.dp),
                         text = when (uiState.language) {
@@ -214,7 +220,9 @@ fun SettingsForm(
                                 painter = painterResource(id = R.drawable.ic_language),
                                 contentDescription = null,
                             )
+
                             Spacer(modifier = Modifier.weight(1f))
+
                             Text(
                                 modifier = Modifier.padding(end = 16.dp),
                                 text = name,
@@ -241,11 +249,13 @@ fun SettingsForm(
                         painter = painterResource(id = R.drawable.ic_navigation),
                         contentDescription = null,
                     )
+
                     Text(
                         modifier = Modifier.padding(start = 8.dp),
                         text = stringResource(id = R.string.navigation),
                         style = MaterialTheme.typography.bodyLarge
                     )
+
                     Spacer(modifier = Modifier.weight(1f))
 
                     Switch(
@@ -302,12 +312,15 @@ fun InfoForm(
                             painter = painterResource(id = R.drawable.ic_version),
                             contentDescription = null,
                         )
+
                         Text(
                             modifier = Modifier.padding(start = 8.dp),
                             text = stringResource(id = R.string.version),
                             style = MaterialTheme.typography.bodyLarge
                         )
+
                         Spacer(modifier = Modifier.weight(1f))
+
                         Text(
                             modifier = Modifier.padding(end = 16.dp),
                             text = BuildConfig.VERSION_NAME,
@@ -338,12 +351,15 @@ fun InfoForm(
                             painter = painterResource(id = R.drawable.ic_device),
                             contentDescription = null,
                         )
+
                         Text(
                             modifier = Modifier.padding(start = 8.dp),
                             text = stringResource(id = R.string.device_info),
                             style = MaterialTheme.typography.bodyLarge
                         )
+
                         Spacer(modifier = Modifier.weight(1f))
+
                         Icon(
                             modifier = Modifier
                                 .size(36.dp)
@@ -374,12 +390,15 @@ fun InfoForm(
                             painter = painterResource(id = R.drawable.ic_help),
                             contentDescription = null,
                         )
+
                         Text(
                             modifier = Modifier.padding(start = 8.dp),
                             text = stringResource(id = R.string.help),
                             style = MaterialTheme.typography.bodyLarge
                         )
+
                         Spacer(modifier = Modifier.weight(1f))
+
                         Icon(
                             modifier = Modifier
                                 .size(36.dp)
@@ -407,7 +426,9 @@ fun InfoForm(
                             text = stringResource(id = R.string.device_info),
                             style = MaterialTheme.typography.bodyLarge,
                         )
+
                         Spacer(modifier = Modifier.weight(1f))
+
                         Icon(
                             modifier = Modifier
                                 .size(48.dp)
@@ -476,7 +497,9 @@ fun InfoForm(
                             text = stringResource(id = R.string.qrcode),
                             style = MaterialTheme.typography.bodyLarge,
                         )
+
                         Spacer(modifier = Modifier.weight(1f))
+
                         Icon(
                             modifier = Modifier
                                 .size(48.dp)
@@ -509,11 +532,11 @@ fun InfoForm(
 }
 
 /**
- * Operation form
+ * OperationForm
  *
  * @param modifier Modifier
  * @param checkUpdate Function0<Unit>
- * @param navigationTo Function1<SettingPage, Unit>
+ * @param navigationTo Function1<PageEnum, Unit>
  * @param openWifi Function0<Unit>
  * @param uiState SettingUiState
  */
@@ -521,7 +544,7 @@ fun InfoForm(
 fun OperationForm(
     modifier: Modifier = Modifier,
     checkUpdate: () -> Unit = {},
-    navigationTo: (SettingPage) -> Unit = {},
+    navigationTo: (PageEnum) -> Unit = {},
     openWifi: () -> Unit = {},
     uiState: SettingUiState,
 ) {
@@ -540,7 +563,7 @@ fun OperationForm(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp)
-                .clickable { navigationTo(SettingPage.AUTHENTICATION) },
+                .clickable { navigationTo(PageEnum.AUTHENTICATION) },
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -551,6 +574,7 @@ fun OperationForm(
                     painter = painterResource(id = R.drawable.ic_settings),
                     contentDescription = stringResource(id = R.string.parameters)
                 )
+
                 Text(
                     modifier = Modifier.padding(bottom = 8.dp),
                     text = stringResource(id = R.string.parameters),
@@ -574,6 +598,7 @@ fun OperationForm(
                     painter = painterResource(id = R.drawable.ic_wifi),
                     contentDescription = stringResource(id = R.string.wifi)
                 )
+
                 Text(
                     modifier = Modifier.padding(bottom = 8.dp),
                     text = stringResource(id = R.string.wifi),
@@ -614,6 +639,7 @@ fun OperationForm(
                         "${uiState.progress} %"
                     }
                 }
+
                 AnimatedVisibility(visible = uiState.progress > 0) {
                     CircularProgressIndicator(
                         modifier = Modifier
@@ -623,6 +649,7 @@ fun OperationForm(
                         strokeWidth = 16.dp,
                     )
                 }
+
                 AnimatedVisibility(visible = uiState.progress == 0) {
                     Image(
                         modifier = Modifier.size(96.dp),
@@ -630,6 +657,7 @@ fun OperationForm(
                         contentDescription = text,
                     )
                 }
+
                 Text(
                     modifier = Modifier.padding(bottom = 8.dp),
                     text = text,
@@ -714,6 +742,7 @@ fun VerificationCodeField(
             }
 
         }
+
         BasicTextField(
             modifier = Modifier
                 .focusRequester(focusRequester)
@@ -772,7 +801,7 @@ fun OperationFormPreview() {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun SettingPagePreview() {
-    SettingPage(
+    SettingMainPage(
         navController = rememberNavController(),
         uiState = SettingUiState(),
     )

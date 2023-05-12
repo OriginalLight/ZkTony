@@ -21,6 +21,7 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.entity.Motor
 import com.zktony.android.ui.components.ZkTonyTopAppBar
+import com.zktony.android.ui.navigation.PageEnum
 
 /**
  * Motor screen
@@ -36,14 +37,15 @@ fun MotorScreen(
     navController: NavHostController,
     viewModel: MotorViewModel,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var entity by remember { mutableStateOf(Motor()) }
+    val entities by viewModel.entities().collectAsStateWithLifecycle(emptyList())
+    var index by remember { mutableStateOf(-1) }
+    var page by remember { mutableStateOf(PageEnum.MAIN) }
 
     BackHandler {
-        if (uiState.page == MotorPage.MOTOR_EDIT) {
-            viewModel.navigateTo(MotorPage.MOTOR)
-        } else {
+        if (page == PageEnum.MAIN) {
             navController.navigateUp()
+        } else {
+            page = PageEnum.MAIN
         }
     }
 
@@ -60,31 +62,29 @@ fun MotorScreen(
         ZkTonyTopAppBar(
             title = stringResource(id = R.string.motor_config),
             onBack = {
-                if (uiState.page == MotorPage.MOTOR_EDIT) {
-                    viewModel.navigateTo(MotorPage.MOTOR)
-                } else {
+                if (page == PageEnum.MAIN) {
                     navController.navigateUp()
+                } else {
+                    page = PageEnum.MAIN
                 }
             }
         )
-        AnimatedVisibility(visible = uiState.page == MotorPage.MOTOR) {
-            MotorPage(
+
+        AnimatedVisibility(visible = page == PageEnum.MAIN) {
+            MotorMainPage(
                 modifier = Modifier,
-                list = uiState.list,
-                edit = {
-                    entity = it
-                    viewModel.navigateTo(MotorPage.MOTOR_EDIT)
-                }
+                entities = entities,
+                navigationTo = { page = it },
+                toggleIndex = { index = it },
             )
         }
-        AnimatedVisibility(visible = uiState.page == MotorPage.MOTOR_EDIT) {
+
+        AnimatedVisibility(visible = page == PageEnum.EDIT) {
             MotorEditPage(
                 modifier = Modifier,
-                entity = entity,
-                update = {
-                    viewModel.update(it)
-                    viewModel.navigateTo(MotorPage.MOTOR)
-                }
+                entity = entities[index],
+                navigationTo = { page = it },
+                update = viewModel::update,
             )
         }
     }

@@ -53,16 +53,6 @@ class ConfigViewModel constructor(
     }
 
     /**
-     * 本页面跳转
-     *
-     * @param page ConfigPage
-     * @return Unit
-     */
-    fun navigateTo(page: ConfigPage) {
-        _uiState.value = _uiState.value.copy(page = page)
-    }
-
-    /**
      * 设置行程
      *
      * @param x Float
@@ -95,11 +85,4 @@ class ConfigViewModel constructor(
 data class ConfigUiState(
     val travel: Triple<Float, Float, Float> = Triple(0f, 0f, 0f),
     val waste: Triple<Float, Float, Float> = Triple(0f, 0f, 0f),
-    val page: ConfigPage = ConfigPage.CONFIG,
 )
-
-enum class ConfigPage {
-    CONFIG,
-    TRAVEL_EDIT,
-    WASTE_EDIT,
-}

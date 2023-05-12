@@ -22,20 +22,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.zktony.android.R
+import com.zktony.android.ui.navigation.PageEnum
 import com.zktony.core.ext.format
 
 /**
- * ConfigPage
+ * ConfigMainPage
  *
  * @param modifier Modifier
- * @param navigationTo Function1<ConfigPage, Unit>
+ * @param navigationTo Function1<PageEnum, Unit>
  * @param uiState ConfigUiState
- * @return Unit
  */
 @Composable
-fun ConfigPage(
+fun ConfigMainPage(
     modifier: Modifier = Modifier,
-    navigationTo: (ConfigPage) -> Unit = {},
+    navigationTo: (PageEnum) -> Unit = {},
     uiState: ConfigUiState,
 ) {
 
@@ -51,7 +51,7 @@ fun ConfigPage(
             Card(
                 modifier = Modifier
                     .wrapContentHeight()
-                    .clickable { navigationTo(ConfigPage.TRAVEL_EDIT) },
+                    .clickable { navigationTo(PageEnum.TRAVEL_EDIT) },
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -63,12 +63,15 @@ fun ConfigPage(
                         painter = painterResource(id = R.drawable.ic_distance),
                         contentDescription = null,
                     )
+
                     Text(
                         modifier = Modifier.padding(start = 8.dp),
                         text = stringResource(id = R.string.maximum_stroke),
                         style = MaterialTheme.typography.bodyLarge
                     )
+
                     Spacer(modifier = Modifier.weight(1f))
+
                     Text(
                         modifier = Modifier.padding(end = 16.dp),
                         text = "( ${uiState.travel.first.format()} , ${uiState.travel.second.format()} , ${uiState.travel.third.format()} )",
@@ -81,7 +84,7 @@ fun ConfigPage(
             Card(
                 modifier = Modifier
                     .wrapContentHeight()
-                    .clickable { navigationTo(ConfigPage.WASTE_EDIT) },
+                    .clickable { navigationTo(PageEnum.WASTE_EDIT) },
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -93,12 +96,15 @@ fun ConfigPage(
                         painter = painterResource(id = R.drawable.ic_coordinate),
                         contentDescription = null,
                     )
+
                     Text(
                         modifier = Modifier.padding(start = 8.dp),
                         text = stringResource(id = R.string.waste_tank),
                         style = MaterialTheme.typography.bodyLarge
                     )
+
                     Spacer(modifier = Modifier.weight(1f))
+
                     Text(
                         modifier = Modifier.padding(end = 16.dp),
                         text = "( ${uiState.waste.first.format()} , ${uiState.waste.second.format()} , ${uiState.waste.third.format()} )",
@@ -114,7 +120,7 @@ fun ConfigPage(
 @Composable
 @Preview(showBackground = true, widthDp = 960)
 fun ConfigPagePreview() {
-    ConfigPage(
+    ConfigMainPage(
         uiState = ConfigUiState()
     )
 }

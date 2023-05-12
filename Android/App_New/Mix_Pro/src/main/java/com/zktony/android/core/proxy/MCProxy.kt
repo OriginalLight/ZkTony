@@ -49,14 +49,18 @@ class MCProxy constructor(
             launch {
                 CD.getAll().collect {
                     if (it.isNotEmpty()) {
-                        val active = it.find { c -> c.active == 1 } ?: it[0]
-                        hpc.clear()
-                        hpc[0] = 10f
-                        hpc[1] = 10f
-                        hpc[2] = 10f
-                        val avg = active.data.avgRate()
-                        avg.forEachIndexed { index, avgRate ->
-                            hpc[index + 3] = avgRate
+                        val active = it.find { c -> c.active == 1 }
+                        if (active == null) {
+                            CD.update(it[0].copy(active = 1))
+                        } else {
+                            hpc.clear()
+                            hpc[0] = 10f
+                            hpc[1] = 10f
+                            hpc[2] = 10f
+                            val avg = active.data.avgRate()
+                            avg.forEachIndexed { index, avgRate ->
+                                hpc[index + 3] = avgRate
+                            }
                         }
                     } else {
                         CD.insert(

@@ -4,6 +4,15 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 
+enum class PageEnum {
+    MAIN,
+    AUTHENTICATION,
+    ADD,
+    EDIT,
+    DETAIL,
+    TRAVEL_EDIT,
+    WASTE_EDIT,
+}
 object Route {
     const val HOME = "Home"
     const val PROGRAM = "Program"

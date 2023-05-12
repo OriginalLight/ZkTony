@@ -44,6 +44,7 @@ fun AppNavigationRail(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Spacer(Modifier.height(16.dp))
+
                 NavigationRailItem(selected = false, onClick = onDrawerClicked, icon = {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -51,6 +52,7 @@ fun AppNavigationRail(
                         contentDescription = null
                     )
                 })
+
                 Spacer(Modifier.height(16.dp))
             }
 
@@ -171,10 +173,7 @@ fun PermanentNavigationDrawerContent(
                             unselectedContainerColor = Color.Transparent,
                         ),
                         shape = RoundedCornerShape(
-                            topStart = 0.dp,
-                            topEnd = 32.dp,
-                            bottomStart = 0.dp,
-                            bottomEnd = 0.dp
+                            topStart = 0.dp, topEnd = 32.dp, bottomStart = 0.dp, bottomEnd = 0.dp
                         ),
                         onClick = { navigateToTopLevelDestination(destination) })
                 }

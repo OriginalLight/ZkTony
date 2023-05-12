@@ -26,11 +26,12 @@ interface CalibrationDao : BaseDao<Calibration> {
     )
     fun getById(id: Long): Flow<Calibration>
 
+    // 符合id的active更新为1，其他的更新为0
     @Query(
         """
-        DELETE FROM calibration
-        WHERE id = :id
+        UPDATE calibration
+        SET active = (CASE WHEN id = :id THEN 1 ELSE 0 END)
         """
     )
-    suspend fun deleteById(id: Long)
+    suspend fun active(id: Long)
 }

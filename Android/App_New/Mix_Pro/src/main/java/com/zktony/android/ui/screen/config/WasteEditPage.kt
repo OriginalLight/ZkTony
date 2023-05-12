@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.R
 import com.zktony.android.ui.components.CustomTextField
+import com.zktony.android.ui.navigation.PageEnum
 import com.zktony.core.ext.format
 import kotlinx.coroutines.delay
 
@@ -54,7 +55,7 @@ import kotlinx.coroutines.delay
  * @param modifier Modifier
  * @param setWaste Function3<Float, Float, Float, Unit>
  * @param uiState ConfigUiState
- * @return Unit
+ * @param navigationTo Function1<PageEnum, Unit>
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -62,6 +63,7 @@ fun WasteEditPage(
     modifier: Modifier = Modifier,
     setWaste: (Float, Float, Float) -> Unit = { _, _, _ -> },
     uiState: ConfigUiState,
+    navigationTo: (PageEnum) -> Unit = {},
 ) {
     var x by remember { mutableStateOf(uiState.waste.first.format()) }
     var y by remember { mutableStateOf(uiState.waste.second.format()) }
@@ -83,6 +85,7 @@ fun WasteEditPage(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(128.dp))
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -93,10 +96,12 @@ fun WasteEditPage(
                 painter = painterResource(id = R.drawable.ic_coordinate),
                 contentDescription = null,
             )
+
             Text(
                 text = "(",
                 fontSize = 30.sp,
             )
+
             CustomTextField(
                 modifier = Modifier
                     .width(128.dp)
@@ -116,10 +121,12 @@ fun WasteEditPage(
                     focusManager.moveFocus(FocusDirection.Next)
                 })
             )
+
             Text(
                 text = ",",
                 fontSize = 30.sp,
             )
+
             CustomTextField(
                 modifier = Modifier.width(128.dp),
                 value = TextFieldValue(y.format(), TextRange(y.format().length)),
@@ -137,10 +144,12 @@ fun WasteEditPage(
                     focusManager.moveFocus(FocusDirection.Next)
                 })
             )
+
             Text(
                 text = ",",
                 fontSize = 30.sp,
             )
+
             CustomTextField(
                 modifier = Modifier.width(128.dp),
                 value = TextFieldValue(z.format(), TextRange(z.format().length)),
@@ -155,11 +164,13 @@ fun WasteEditPage(
                     softKeyboard?.hide()
                 })
             )
+
             Text(
                 text = ")",
                 fontSize = 30.sp,
             )
         }
+
         AnimatedVisibility(visible = uiState.waste.first.format() != x || uiState.waste.second.format() != y || uiState.waste.third.format() != z) {
             FloatingActionButton(
                 modifier = Modifier
@@ -171,6 +182,7 @@ fun WasteEditPage(
                         y.toFloatOrNull() ?: 0f,
                         z.toFloatOrNull() ?: 0f
                     )
+                    navigationTo(PageEnum.MAIN)
                 },
             ) {
                 Icon(

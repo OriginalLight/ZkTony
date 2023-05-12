@@ -5,10 +5,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.zktony.android.ui.navigation.PageEnum
 
 /**
  * Calibration screen
@@ -24,55 +28,46 @@ fun CalibrationScreen(
     navController: NavHostController,
     viewModel: CalibrationViewModel,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val entities by viewModel.entities().collectAsState(emptyList())
+    var index by remember { mutableStateOf(-1) }
+    var page by remember { mutableStateOf(PageEnum.MAIN) }
+
 
     BackHandler {
-        if (uiState.page == CalibrationPageEnum.CALIBRATION) {
+        if (page == PageEnum.MAIN) {
             navController.navigateUp()
         } else {
-            viewModel.navigateTo(CalibrationPageEnum.CALIBRATION)
+            page = PageEnum.MAIN
         }
     }
 
     AnimatedVisibility(
-        visible = uiState.page == CalibrationPageEnum.CALIBRATION,
+        visible = page == PageEnum.MAIN,
         enter = expandHorizontally(),
         exit = shrinkHorizontally(),
     ) {
-        CalibrationPage(
+        CalibrationMainPage(
             modifier = modifier,
-            activeEntity = viewModel::activeEntity,
+            active = viewModel::active,
             delete = viewModel::delete,
-            entity = uiState.entity,
-            list = uiState.list,
-            navigationTo = viewModel::navigateTo,
-            toggleEntity = viewModel::toggleEntity,
-        )
-    }
-
-    AnimatedVisibility(
-        visible = uiState.page == CalibrationPageEnum.CALIBRATION_ADD,
-        enter = expandHorizontally(),
-        exit = shrinkHorizontally(),
-    ) {
-        CalibrationAddPage(
-            modifier = modifier,
+            entities = entities,
+            index = index,
             insert = viewModel::insert,
-            list = uiState.list,
-            navigationTo = viewModel::navigateTo,
+            navigationTo = { page = it },
+            toggleIndex = { index = it },
         )
     }
 
     AnimatedVisibility(
-        visible = uiState.page == CalibrationPageEnum.CALIBRATION_EDIT,
+        visible = page == PageEnum.EDIT,
         enter = expandHorizontally(),
         exit = shrinkHorizontally(),
     ) {
         CalibrationEditPage(
             modifier = modifier,
             addLiquid = viewModel::addLiquid,
-            entity = uiState.entity,
-            navigationTo = viewModel::navigateTo,
+            entity = entities[index],
+            navigationTo = { page = it },
             update = viewModel::update,
         )
     }

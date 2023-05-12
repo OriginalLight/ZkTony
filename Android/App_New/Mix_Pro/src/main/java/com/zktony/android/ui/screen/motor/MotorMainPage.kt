@@ -19,20 +19,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.data.entity.Motor
+import com.zktony.android.ui.navigation.PageEnum
 
-/**
- * Motor edit page
- *
- * @param modifier Modifier
- * @param edit Function1<Motor, Unit>
- * @param list List<Motor>
- * @return Unit
- */
 @Composable
-fun MotorPage(
+fun MotorMainPage(
     modifier: Modifier = Modifier,
-    edit: (Motor) -> Unit = {},
-    list: List<Motor>,
+    entities: List<Motor> = emptyList(),
+    navigationTo: (PageEnum) -> Unit = {},
+    toggleIndex: (Int) -> Unit = {},
 ) {
     LazyVerticalGrid(
         modifier = modifier,
@@ -40,12 +34,15 @@ fun MotorPage(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         columns = GridCells.Fixed(3)
     ) {
-        list.forEach {
+        entities.forEachIndexed { index, it ->
             item {
                 Card(
                     modifier = Modifier
                         .padding(8.dp)
-                        .clickable { edit(it) },
+                        .clickable {
+                            toggleIndex(index)
+                            navigationTo(PageEnum.EDIT)
+                        },
                 ) {
                     Row(
                         modifier = Modifier
@@ -61,17 +58,20 @@ fun MotorPage(
                             fontWeight = FontWeight.SemiBold,
                             lineHeight = 30.sp,
                         )
+
                         Column {
                             Text(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 text = "S - ${it.speed}",
                                 style = MaterialTheme.typography.bodyLarge
                             )
+
                             Text(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 text = "A - ${it.acc}",
                                 style = MaterialTheme.typography.bodyLarge
                             )
+
                             Text(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 text = "D - ${it.dec}",
@@ -89,8 +89,8 @@ fun MotorPage(
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun MotorPagePreview() {
-    MotorPage(
+    MotorMainPage(
         modifier = Modifier,
-        list = listOf(Motor(text = "M1"), Motor(text = "M2"))
+        entities = listOf(Motor(text = "M1"), Motor(text = "M2"))
     )
 }

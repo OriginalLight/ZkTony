@@ -69,16 +69,6 @@ class SettingViewModel constructor(
     }
 
     /**
-     * 本screen切换
-     *
-     * @param page AdminPage
-     * @return Unit
-     */
-    fun navigateTo(page: SettingPage) {
-        _uiState.value = _uiState.value.copy(page = page)
-    }
-
-    /**
      * 设置语言
      *
      * @param language String
@@ -230,12 +220,4 @@ data class SettingUiState(
     val navigation: Boolean = false,
     val language: String = "zh",
     val progress: Int = 0,
-    val page: SettingPage = SettingPage.SETTING,
 )
-
-/**
- * Admin page
- */
-enum class SettingPage {
-    SETTING, AUTHENTICATION,
-}
