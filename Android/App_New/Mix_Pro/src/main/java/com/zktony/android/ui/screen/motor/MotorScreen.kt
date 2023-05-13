@@ -2,26 +2,30 @@ package com.zktony.android.ui.screen.motor
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.data.entity.Motor
 import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.navigation.PageEnum
+import kotlinx.coroutines.launch
 
 /**
  * Motor screen
@@ -37,55 +41,81 @@ fun MotorScreen(
     navController: NavHostController,
     viewModel: MotorViewModel,
 ) {
-    val entities by viewModel.entities().collectAsStateWithLifecycle(emptyList())
-    var index by remember { mutableStateOf(-1) }
-    var page by remember { mutableStateOf(PageEnum.MAIN) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     BackHandler {
-        if (page == PageEnum.MAIN) {
+        if (uiState.page == PageEnum.MAIN) {
             navController.navigateUp()
         } else {
-            page = PageEnum.MAIN
+            viewModel.navigationTo(PageEnum.MAIN)
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.background,
-                shape = MaterialTheme.shapes.medium
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ZkTonyTopAppBar(
-            title = stringResource(id = R.string.motor_config),
-            onBack = {
-                if (page == PageEnum.MAIN) {
-                    navController.navigateUp()
-                } else {
-                    page = PageEnum.MAIN
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            ZkTonyTopAppBar(
+                title = stringResource(id = R.string.motor_config),
+                navigation = {
+                    if (uiState.page == PageEnum.MAIN) {
+                        navController.navigateUp()
+                    } else {
+                        viewModel.navigationTo(PageEnum.MAIN)
+                    }
+                }
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        content = { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.medium
+                        ),
+                ) {
+                    AnimatedVisibility(
+                        visible = uiState.page == PageEnum.MAIN,
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally(),
+                    ) {
+                        MotorMainPage(
+                            modifier = Modifier,
+                            uiState = uiState,
+                            navigationTo = viewModel::navigationTo,
+                            toggleSelected = viewModel::toggleSelected,
+                        )
+                    }
+
+                    AnimatedVisibility(
+                        visible = uiState.page == PageEnum.EDIT,
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally(),
+                    ) {
+                        MotorEditPage(
+                            modifier = Modifier,
+                            entity = uiState.entities.find { it.id == uiState.selected }!!,
+                            navigationTo = viewModel::navigationTo,
+                            update = viewModel::update,
+                            showSnackbar = { message ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(message = message)
+                                }
+                            }
+                        )
+                    }
                 }
             }
-        )
-
-        AnimatedVisibility(visible = page == PageEnum.MAIN) {
-            MotorMainPage(
-                modifier = Modifier,
-                entities = entities,
-                navigationTo = { page = it },
-                toggleIndex = { index = it },
-            )
         }
-
-        AnimatedVisibility(visible = page == PageEnum.EDIT) {
-            MotorEditPage(
-                modifier = Modifier,
-                entity = entities[index],
-                navigationTo = { page = it },
-                update = viewModel::update,
-            )
-        }
-    }
+    )
 }

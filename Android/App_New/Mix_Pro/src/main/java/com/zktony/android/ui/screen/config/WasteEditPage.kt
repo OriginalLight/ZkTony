@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -46,17 +47,10 @@ import androidx.compose.ui.unit.sp
 import com.zktony.android.R
 import com.zktony.android.ui.components.CustomTextField
 import com.zktony.android.ui.navigation.PageEnum
+import com.zktony.core.ext.Ext
 import com.zktony.core.ext.format
 import kotlinx.coroutines.delay
 
-/**
- * WasteEditPage
- *
- * @param modifier Modifier
- * @param setWaste Function3<Float, Float, Float, Unit>
- * @param uiState ConfigUiState
- * @param navigationTo Function1<PageEnum, Unit>
- */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun WasteEditPage(
@@ -64,6 +58,7 @@ fun WasteEditPage(
     setWaste: (Float, Float, Float) -> Unit = { _, _, _ -> },
     uiState: ConfigUiState,
     navigationTo: (PageEnum) -> Unit = {},
+    showSnackBar: (String) -> Unit = {},
 ) {
     var x by remember { mutableStateOf(uiState.waste.first.format()) }
     var y by remember { mutableStateOf(uiState.waste.second.format()) }
@@ -172,7 +167,7 @@ fun WasteEditPage(
         }
 
         AnimatedVisibility(visible = uiState.waste.first.format() != x || uiState.waste.second.format() != y || uiState.waste.third.format() != z) {
-            FloatingActionButton(
+            ElevatedButton(
                 modifier = Modifier
                     .width(128.dp)
                     .padding(16.dp),
@@ -183,6 +178,7 @@ fun WasteEditPage(
                         z.toFloatOrNull() ?: 0f
                     )
                     navigationTo(PageEnum.MAIN)
+                    showSnackBar(Ext.ctx.getString(R.string.save_success))
                 },
             ) {
                 Icon(

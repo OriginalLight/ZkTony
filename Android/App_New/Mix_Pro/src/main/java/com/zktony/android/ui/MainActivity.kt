@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import com.google.accompanist.insets.ProvideWindowInsets
 import com.zktony.android.core.ext.proxyInitializer
 import com.zktony.android.ui.theme.AppTheme
 import com.zktony.core.ext.setLanguage

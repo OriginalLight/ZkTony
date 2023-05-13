@@ -9,9 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.Card
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,13 +24,6 @@ import com.zktony.android.R
 import com.zktony.android.ui.navigation.PageEnum
 import com.zktony.core.ext.format
 
-/**
- * ConfigMainPage
- *
- * @param modifier Modifier
- * @param navigationTo Function1<PageEnum, Unit>
- * @param uiState ConfigUiState
- */
 @Composable
 fun ConfigMainPage(
     modifier: Modifier = Modifier,
@@ -39,16 +31,14 @@ fun ConfigMainPage(
     uiState: ConfigUiState,
 ) {
 
-    LazyVerticalGrid(
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        columns = GridCells.Fixed(2)
     ) {
         item {
-            Card(
+            ElevatedCard(
                 modifier = Modifier
                     .wrapContentHeight()
                     .clickable { navigationTo(PageEnum.TRAVEL_EDIT) },
@@ -81,7 +71,7 @@ fun ConfigMainPage(
             }
         }
         item {
-            Card(
+            ElevatedCard(
                 modifier = Modifier
                     .wrapContentHeight()
                     .clickable { navigationTo(PageEnum.WASTE_EDIT) },

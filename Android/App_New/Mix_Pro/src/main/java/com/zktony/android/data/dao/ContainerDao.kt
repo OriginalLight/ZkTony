@@ -6,32 +6,22 @@ import kotlinx.coroutines.flow.Flow
 
 /**
  * @author: 刘贺贺
- * @date: 2022-10-13 11:49
  */
 @Dao
-interface ContainerDao : BaseDao<Container> {
+abstract class ContainerDao : BaseDao<Container> {
     @Query(
         """
-        SELECT * FROM container
-        WHERE id = :id
-        LIMIT 1
+        SELECT * FROM containers
+        ORDER BY create_time ASC
         """
     )
-    fun getById(id: Long): Flow<Container>
+    abstract fun getAll(): Flow<List<Container>>
 
     @Query(
         """
-        SELECT * FROM container
-        ORDER BY createTime ASC
-        """
-    )
-    fun getAll(): Flow<List<Container>>
-
-    @Query(
-        """
-        DELETE FROM container
+        DELETE FROM containers
         WHERE id = :id
         """
     )
-    suspend fun deleteById(id: Long)
+    abstract suspend fun deleteById(id: Long)
 }

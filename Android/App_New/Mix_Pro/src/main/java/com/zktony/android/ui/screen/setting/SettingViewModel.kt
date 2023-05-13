@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.ui.MainActivity
+import com.zktony.android.ui.navigation.PageEnum
 import com.zktony.core.ext.DownloadState
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.download
@@ -23,6 +24,7 @@ import com.zktony.protobuf.grpc.ApplicationGrpc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.File
@@ -37,35 +39,51 @@ class SettingViewModel constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
+    private val _application = MutableStateFlow<Application?>(null)
+    private val _progress = MutableStateFlow(0)
+    private val _page = MutableStateFlow(PageEnum.MAIN)
     val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             launch {
+                combine(
+                    _application,
+                    datastore.read(Constants.LANGUAGE, "zh"),
+                    datastore.read(Constants.NAVIGATION, false),
+                    _progress,
+                    _page,
+                ) { application, language, navigation, progress, page ->
+                    SettingUiState(
+                        application = application,
+                        language = language,
+                        navigation = navigation,
+                        progress = progress,
+                        page = page,
+                    )
+                }.catch { ex ->
+                    _uiState.value = SettingUiState(errorMessage = ex.message ?: "Unknown error")
+                }.collect {
+                    _uiState.value = it
+                }
+            }
+            launch {
                 if (Ext.ctx.isNetworkAvailable()) {
                     grpc.getApplication(BuildConfig.APPLICATION_ID)
                         .catch {
-                            _uiState.value = _uiState.value.copy(
-                                application = null
-                            )
+                            _application.value = null
                         }.collect {
-                            _uiState.value = _uiState.value.copy(
-                                application = it
-                            )
+                            _application.value = it
                         }
-                }
-            }
-            launch {
-                datastore.read(Constants.LANGUAGE, "zh").collect {
-                    _uiState.value = _uiState.value.copy(language = it)
-                }
-            }
-            launch {
-                datastore.read(Constants.NAVIGATION, false).collect {
-                    _uiState.value = _uiState.value.copy(navigation = it)
+                } else {
+                    _application.value = null
                 }
             }
         }
+    }
+
+    fun navigationTo(page: PageEnum) {
+        _page.value = page
     }
 
     /**
@@ -154,25 +172,21 @@ class SettingViewModel constructor(
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (Ext.ctx.isNetworkAvailable()) {
-                val application = _uiState.value.application
+                val application = _application.value
                 if (application != null) {
                     if (application.versionCode > BuildConfig.VERSION_CODE
                         && application.downloadUrl.isNotEmpty()
-                        && uiState.value.progress == 0
+                        && _progress.value == 0
                     ) {
-                        downloadApk(application)
-                        _uiState.value = _uiState.value.copy(
-                            progress = 1
-                        )
+                        downloadApk(application.downloadUrl)
+                        _progress.value = 1
                     }
                 } else {
                     grpc.getApplication(BuildConfig.APPLICATION_ID)
                         .catch {
                             Ext.ctx.getString(R.string.interface_exception).showShortToast()
                         }.collect {
-                            _uiState.value = _uiState.value.copy(
-                                application = it
-                            )
+                           _application.value = it
                         }
                 }
             } else {
@@ -183,31 +197,26 @@ class SettingViewModel constructor(
 
     /**
      *  下载apk
-     *  @param application [Application]
+     *
+     * @param url String
      */
-    private fun downloadApk(application: Application) {
+    private fun downloadApk(url: String) {
         viewModelScope.launch {
-            application.downloadUrl.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
+            url.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
                 .collect {
                     when (it) {
                         is DownloadState.Success -> {
-                            _uiState.value = _uiState.value.copy(
-                                progress = 0
-                            )
+                            _progress.value = 0
                             Ext.ctx.installApk(it.file)
                         }
 
                         is DownloadState.Err -> {
-                            _uiState.value = _uiState.value.copy(
-                                progress = 0
-                            )
+                            _progress.value = 0
                             Ext.ctx.getString(R.string.download_failed).showShortToast()
                         }
 
                         is DownloadState.Progress -> {
-                            _uiState.value = _uiState.value.copy(
-                                progress = maxOf(it.progress, 1)
-                            )
+                            _progress.value = maxOf(it.progress, 1)
                         }
                     }
                 }
@@ -220,4 +229,6 @@ data class SettingUiState(
     val navigation: Boolean = false,
     val language: String = "zh",
     val progress: Int = 0,
+    val page: PageEnum = PageEnum.MAIN,
+    val errorMessage: String = "",
 )

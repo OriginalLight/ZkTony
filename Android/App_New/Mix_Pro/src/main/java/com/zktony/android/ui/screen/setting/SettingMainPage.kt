@@ -30,8 +30,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -96,10 +96,6 @@ fun SettingMainPage(
     setNavigation: (Boolean) -> Unit = {},
     uiState: SettingUiState,
 ) {
-    BackHandler {
-        navController.popBackStack()
-    }
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -161,7 +157,7 @@ fun SettingsForm(
         state = lazyColumnState,
     ) {
         item {
-            Card(
+            ElevatedCard(
                 modifier = Modifier
                     .wrapContentHeight()
                     .padding(start = 8.dp, top = 16.dp, end = 8.dp)
@@ -201,7 +197,7 @@ fun SettingsForm(
         languageList.forEach { (name, code) ->
             item {
                 AnimatedVisibility(visible = expanded) {
-                    Card(
+                    ElevatedCard(
                         modifier = Modifier
                             .wrapContentHeight()
                             .padding(start = 32.dp, top = 16.dp, end = 8.dp)
@@ -234,7 +230,7 @@ fun SettingsForm(
             }
         }
         item {
-            Card(
+            ElevatedCard(
                 modifier = Modifier
                     .wrapContentHeight()
                     .padding(start = 8.dp, top = 16.dp, end = 8.dp),
@@ -297,7 +293,7 @@ fun InfoForm(
     ) {
         item {
             AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
-                Card(
+                ElevatedCard(
                     modifier = Modifier
                         .wrapContentHeight()
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp),
@@ -335,7 +331,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
-                Card(
+                ElevatedCard(
                     modifier = Modifier
                         .wrapContentHeight()
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp)
@@ -374,7 +370,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
-                Card(
+                ElevatedCard(
                     modifier = Modifier
                         .wrapContentHeight()
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp)
@@ -412,7 +408,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = deviceInfo) {
-                Card(
+                ElevatedCard(
                     modifier = Modifier
                         .wrapContentHeight()
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp)
@@ -442,7 +438,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = deviceInfo) {
-                Card(
+                ElevatedCard(
                     modifier = Modifier.padding(16.dp),
                 ) {
                     Column(
@@ -483,7 +479,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = helpInfo) {
-                Card(
+                ElevatedCard(
                     modifier = Modifier
                         .wrapContentHeight()
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp)
@@ -513,7 +509,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = helpInfo) {
-                Card(
+                ElevatedCard(
                     modifier = Modifier.padding(16.dp),
                 ) {
                     Column(
@@ -559,7 +555,7 @@ fun OperationForm(
             )
             .animateContentSize(),
     ) {
-        Card(
+        ElevatedCard(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp)
@@ -583,7 +579,7 @@ fun OperationForm(
             }
         }
 
-        Card(
+        ElevatedCard(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp)
@@ -607,7 +603,7 @@ fun OperationForm(
             }
         }
 
-        Card(
+        ElevatedCard(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp)
@@ -723,7 +719,6 @@ fun VerificationCodeField(
 
     Box {
         Row(
-            modifier = Modifier.padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {

@@ -5,14 +5,16 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.zktony.android.R
 import com.zktony.android.data.entity.Motor
 import com.zktony.android.ui.navigation.PageEnum
+import com.zktony.core.ext.Ext
 
 @Composable
 fun MotorEditPage(
@@ -40,6 +43,7 @@ fun MotorEditPage(
     entity: Motor = Motor(),
     navigationTo: (PageEnum) -> Unit = {},
     update: (Motor) -> Unit = {},
+    showSnackbar: (String) -> Unit = {},
 ) {
     var speed by remember { mutableStateOf(entity.speed) }
     var acc by remember { mutableStateOf(entity.acc) }
@@ -48,11 +52,12 @@ fun MotorEditPage(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        Spacer(modifier = Modifier.height(128.dp))
+
         Text(
-            modifier = Modifier.padding(vertical = 8.dp),
             text = entity.text,
             fontSize = 50.sp,
             fontWeight = FontWeight.SemiBold,
@@ -61,28 +66,23 @@ fun MotorEditPage(
 
         Column {
             Text(
-                modifier = Modifier.padding(horizontal = 8.dp),
                 text = stringResource(id = R.string.speed),
                 style = MaterialTheme.typography.labelLarge
             )
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .padding(8.dp),
+                    modifier = Modifier.size(36.dp),
                     painter = painterResource(id = R.drawable.ic_speed),
                     contentDescription = stringResource(id = R.string.speed)
                 )
 
                 Text(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     text = speed.toString(),
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -95,28 +95,23 @@ fun MotorEditPage(
             }
 
             Text(
-                modifier = Modifier.padding(horizontal = 8.dp),
                 text = stringResource(id = R.string.acceleration),
                 style = MaterialTheme.typography.labelLarge
             )
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .padding(8.dp),
+                    modifier = Modifier.size(36.dp),
                     painter = painterResource(id = R.drawable.ic_acceleration),
                     contentDescription = stringResource(id = R.string.acceleration)
                 )
 
                 Text(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     text = acc.toString(),
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -129,28 +124,23 @@ fun MotorEditPage(
             }
 
             Text(
-                modifier = Modifier.padding(horizontal = 8.dp),
                 text = stringResource(id = R.string.deceleration),
                 style = MaterialTheme.typography.labelLarge
             )
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .padding(8.dp),
+                    modifier = Modifier.size(36.dp),
                     painter = painterResource(id = R.drawable.ic_deceleration),
                     contentDescription = stringResource(id = R.string.deceleration)
                 )
 
                 Text(
-                    modifier = Modifier.padding(8.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     text = dec.toString(),
                     style = MaterialTheme.typography.bodyLarge
                 )
@@ -164,19 +154,20 @@ fun MotorEditPage(
         }
 
         AnimatedVisibility(visible = entity.speed != speed || entity.acc != acc || entity.dec != dec) {
-            FloatingActionButton(
+            ElevatedButton(
                 modifier = Modifier
-                    .width(256.dp)
+                    .width(128.dp)
                     .padding(vertical = 16.dp),
                 onClick = {
                     update(entity.copy(speed = speed, acc = acc, dec = dec))
                     navigationTo(PageEnum.MAIN)
+                    showSnackbar(Ext.ctx.getString(R.string.save_success))
                 },
             ) {
                 Icon(
                     modifier = Modifier.size(36.dp),
-                    imageVector = Icons.Filled.ArrowForward,
-                    contentDescription = stringResource(id = R.string.save),
+                    imageVector = Icons.Filled.Save,
+                    contentDescription = null,
                 )
             }
         }

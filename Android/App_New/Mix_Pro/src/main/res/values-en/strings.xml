@@ -37,4 +37,6 @@
     <string name="add">Add</string>
     <string name="expect">Expect μL</string>
     <string name="actual">Actual μL</string>
+    <string name="save_success">保存成功</string>
+    <string name="authentication">Authentication</string>
 </resources>

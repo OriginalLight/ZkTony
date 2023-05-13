@@ -9,21 +9,20 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-13 11:49
  */
 @Dao
-interface ProgramDao : BaseDao<Program> {
+abstract class ProgramDao : BaseDao<Program> {
     @Query(
         """
-        SELECT * FROM program
+        SELECT * FROM programs
         """
     )
-    fun getAll(): Flow<List<Program>>
+    abstract fun getAll(): Flow<List<Program>>
 
     @Query(
         """
-        SELECT * FROM program
+        SELECT * FROM programs
         WHERE id = :id
         Limit 1
         """
     )
-    fun getById(id: Long): Flow<Program>
-
+    abstract fun getById(id: Long): Flow<Program>
 }

@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
-import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.navigation.PageEnum
 import com.zktony.android.ui.navigation.Route
 
@@ -57,21 +56,14 @@ fun AuthenticationPage(
 
     Column(
         modifier = modifier
+            .fillMaxSize()
             .padding(8.dp)
             .background(
-                MaterialTheme.colorScheme.background,
-                MaterialTheme.shapes.medium,
-            )
-            .fillMaxSize(),
+                color = MaterialTheme.colorScheme.background,
+                shape = MaterialTheme.shapes.medium,
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        ZkTonyTopAppBar(
-            title = "",
-            onBack = {
-                navigationTo(PageEnum.MAIN)
-            }
-        )
-
         Spacer(modifier = Modifier.height(128.dp))
 
         AnimatedVisibility(visible = !show) {
@@ -87,7 +79,7 @@ fun AuthenticationPage(
                 modifier = Modifier.padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                Card(
+                ElevatedCard(
                     modifier = Modifier.clickable {
                         navigationTo(PageEnum.MAIN)
                         navController.navigate(Route.MOTOR)
@@ -112,7 +104,7 @@ fun AuthenticationPage(
                     }
                 }
 
-                Card(
+                ElevatedCard(
                     modifier = Modifier.clickable {
                         navigationTo(PageEnum.MAIN)
                         navController.navigate(Route.CONFIG)

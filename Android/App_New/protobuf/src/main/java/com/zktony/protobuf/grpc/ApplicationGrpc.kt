@@ -1,6 +1,8 @@
 package com.zktony.protobuf.grpc
 
-import com.zktony.proto.*
+import com.zktony.proto.ApplicationRequestQuery
+import com.zktony.proto.ApplicationServiceGrpcKt
+import com.zktony.proto.applicationRequestQuery
 import com.zktony.protobuf.utils.Constants
 import io.grpc.ManagedChannel
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +39,7 @@ class ApplicationGrpc constructor(
 
                     }
                 )
-                if(query.listList.isNotEmpty()) {
+                if (query.listList.isNotEmpty()) {
                     emit(query.getList(0))
                 } else {
                     throw Exception("Application not found")

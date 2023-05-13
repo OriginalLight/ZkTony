@@ -29,6 +29,7 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 // Material 3 color schemes
 private val darkColorScheme = darkColorScheme(
@@ -111,8 +112,11 @@ fun AppTheme(
         else -> lightColorScheme
     }
     val view = LocalView.current
+    val uiController = rememberSystemUiController()
     if (!view.isInEditMode) {
         SideEffect {
+            uiController.isSystemBarsVisible = false
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 WindowCompat.setDecorFitsSystemWindows((view.context as Activity).window, false)
             }

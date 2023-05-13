@@ -4,14 +4,24 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.zktony.android.R
+import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
+import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.navigation.PageEnum
 
 /**
@@ -28,47 +38,84 @@ fun CalibrationScreen(
     navController: NavHostController,
     viewModel: CalibrationViewModel,
 ) {
-    val entities by viewModel.entities().collectAsState(emptyList())
-    var index by remember { mutableStateOf(-1) }
-    var page by remember { mutableStateOf(PageEnum.MAIN) }
-
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler {
-        if (page == PageEnum.MAIN) {
+        if (uiState.page == PageEnum.MAIN) {
             navController.navigateUp()
         } else {
-            page = PageEnum.MAIN
+            viewModel.navigationTo(PageEnum.MAIN)
         }
     }
 
-    AnimatedVisibility(
-        visible = page == PageEnum.MAIN,
-        enter = expandHorizontally(),
-        exit = shrinkHorizontally(),
-    ) {
-        CalibrationMainPage(
-            modifier = modifier,
-            active = viewModel::active,
-            delete = viewModel::delete,
-            entities = entities,
-            index = index,
-            insert = viewModel::insert,
-            navigationTo = { page = it },
-            toggleIndex = { index = it },
-        )
-    }
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
+                ZkTonyTopAppBar(
+                    title = stringResource(id = R.string.edit),
+                    navigation = {
+                        if (uiState.page == PageEnum.MAIN) {
+                            navController.navigateUp()
+                        } else {
+                            viewModel.navigationTo(PageEnum.MAIN)
+                        }
+                    }
+                )
+            }
+        },
+        bottomBar = {
+            AnimatedVisibility(visible = uiState.page == PageEnum.ADD) {
+                ZkTonyBottomAddAppBar(
+                    strings = uiState.entities.map { it.name },
+                    insert = {
+                        viewModel.insert(it)
+                        viewModel.navigationTo(PageEnum.MAIN)
+                    },
+                )
+            }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        content = { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    AnimatedVisibility(
+                        visible = uiState.page == PageEnum.MAIN || uiState.page == PageEnum.ADD,
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally(),
+                    ) {
+                        CalibrationMainPage(
+                            modifier = modifier,
+                            uiState = uiState,
+                            active = viewModel::active,
+                            delete = viewModel::delete,
+                            navigationTo = viewModel::navigationTo,
+                            toggleSelected = viewModel::toggleSelected,
+                        )
+                    }
 
-    AnimatedVisibility(
-        visible = page == PageEnum.EDIT,
-        enter = expandHorizontally(),
-        exit = shrinkHorizontally(),
-    ) {
-        CalibrationEditPage(
-            modifier = modifier,
-            addLiquid = viewModel::addLiquid,
-            entity = entities[index],
-            navigationTo = { page = it },
-            update = viewModel::update,
-        )
-    }
+                    AnimatedVisibility(
+                        visible = uiState.page == PageEnum.EDIT,
+                        enter = expandHorizontally(),
+                        exit = shrinkHorizontally(),
+                    ) {
+                        CalibrationEditPage(
+                            modifier = modifier,
+                            addLiquid = viewModel::addLiquid,
+                            entity = uiState.entities.find { it.id == uiState.selected }!!,
+                            update = viewModel::update,
+                        )
+                    }
+                }
+            }
+        }
+    )
 }

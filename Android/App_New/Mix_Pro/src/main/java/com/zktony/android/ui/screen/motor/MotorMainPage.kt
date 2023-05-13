@@ -24,56 +24,52 @@ import com.zktony.android.ui.navigation.PageEnum
 @Composable
 fun MotorMainPage(
     modifier: Modifier = Modifier,
-    entities: List<Motor> = emptyList(),
+    uiState: MotorUiState = MotorUiState(),
     navigationTo: (PageEnum) -> Unit = {},
-    toggleIndex: (Int) -> Unit = {},
+    toggleSelected: (Long) -> Unit = {},
 ) {
     LazyVerticalGrid(
-        modifier = modifier,
+        modifier = modifier.padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         columns = GridCells.Fixed(3)
     ) {
-        entities.forEachIndexed { index, it ->
+        uiState.entities.forEach {
             item {
                 Card(
                     modifier = Modifier
-                        .padding(8.dp)
                         .clickable {
-                            toggleIndex(index)
+                            toggleSelected(it.id)
                             navigationTo(PageEnum.EDIT)
                         },
                 ) {
                     Row(
                         modifier = Modifier
-                            .padding(8.dp)
+                            .padding(vertical = 16.dp)
                             .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            modifier = Modifier.padding(8.dp),
                             text = it.text,
                             fontSize = 50.sp,
                             fontWeight = FontWeight.SemiBold,
-                            lineHeight = 30.sp,
                         )
 
-                        Column {
+                        Column(
+                            modifier = Modifier.padding(start = 16.dp),
+                        ) {
                             Text(
-                                modifier = Modifier.padding(horizontal = 16.dp),
                                 text = "S - ${it.speed}",
                                 style = MaterialTheme.typography.bodyLarge
                             )
 
                             Text(
-                                modifier = Modifier.padding(horizontal = 16.dp),
                                 text = "A - ${it.acc}",
                                 style = MaterialTheme.typography.bodyLarge
                             )
 
                             Text(
-                                modifier = Modifier.padding(horizontal = 16.dp),
                                 text = "D - ${it.dec}",
                                 style = MaterialTheme.typography.bodyLarge
                             )
@@ -91,6 +87,6 @@ fun MotorMainPage(
 fun MotorPagePreview() {
     MotorMainPage(
         modifier = Modifier,
-        entities = listOf(Motor(text = "M1"), Motor(text = "M2"))
+        uiState = MotorUiState(entities = listOf(Motor(text = "M1"), Motor(text = "M2")))
     )
 }

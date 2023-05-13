@@ -7,6 +7,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -34,17 +35,10 @@ import androidx.compose.ui.unit.sp
 import com.zktony.android.R
 import com.zktony.android.ui.components.CustomTextField
 import com.zktony.android.ui.navigation.PageEnum
+import com.zktony.core.ext.Ext
 import com.zktony.core.ext.format
 import kotlinx.coroutines.delay
 
-/**
- * TravelEditPage
- *
- * @param modifier Modifier
- * @param navigationTo Function1<PageEnum, Unit>
- * @param setTravel Function3<Float, Float, Float, Unit>
- * @param uiState ConfigUiState
- */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TravelEditPage(
@@ -52,6 +46,7 @@ fun TravelEditPage(
     navigationTo: (PageEnum) -> Unit = {},
     setTravel: (Float, Float, Float) -> Unit = { _, _, _ -> },
     uiState: ConfigUiState,
+    showSnackBar: (String) -> Unit = {},
 ) {
     var x by remember { mutableStateOf(uiState.travel.first.format()) }
     var y by remember { mutableStateOf(uiState.travel.second.format()) }
@@ -160,7 +155,7 @@ fun TravelEditPage(
         }
 
         AnimatedVisibility(visible = uiState.travel.first.format() != x || uiState.travel.second.format() != y || uiState.travel.third.format() != z) {
-            FloatingActionButton(
+            ElevatedButton(
                 modifier = Modifier
                     .width(128.dp)
                     .padding(16.dp),
@@ -171,6 +166,7 @@ fun TravelEditPage(
                         z.toFloatOrNull() ?: 0f
                     )
                     navigationTo(PageEnum.MAIN)
+                    showSnackBar(Ext.ctx.getString(R.string.save_success))
                 },
             ) {
                 Icon(

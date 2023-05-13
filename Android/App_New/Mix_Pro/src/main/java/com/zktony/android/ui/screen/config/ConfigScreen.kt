@@ -3,16 +3,18 @@ package com.zktony.android.ui.screen.config
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -21,6 +23,7 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.navigation.PageEnum
+import kotlinx.coroutines.launch
 
 /**
  * 系统配置
@@ -37,61 +40,85 @@ fun ConfigScreen(
     viewModel: ConfigViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var page by remember { mutableStateOf(PageEnum.MAIN) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     BackHandler {
-        if (page == PageEnum.MAIN) {
+        if (uiState.page == PageEnum.MAIN) {
             navController.navigateUp()
         } else {
-            page = PageEnum.MAIN
+            viewModel.navigationTo(PageEnum.MAIN)
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.background,
-                shape = MaterialTheme.shapes.medium
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ZkTonyTopAppBar(
-            title = stringResource(id = R.string.system_config),
-            onBack = {
-                if (page == PageEnum.MAIN) {
-                    navController.navigateUp()
-                } else {
-                    page = PageEnum.MAIN
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            ZkTonyTopAppBar(
+                title = stringResource(id = R.string.system_config),
+                navigation = {
+                    if (uiState.page == PageEnum.MAIN) {
+                        navController.navigateUp()
+                    } else {
+                        viewModel.navigationTo(PageEnum.MAIN)
+                    }
+                }
+            )
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        content = { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.medium
+                        ),
+                ) {
+                    AnimatedVisibility(visible = uiState.page == PageEnum.MAIN) {
+                        ConfigMainPage(
+                            modifier = Modifier,
+                            uiState = uiState,
+                            navigationTo = viewModel::navigationTo,
+                        )
+                    }
+
+                    AnimatedVisibility(visible = uiState.page == PageEnum.TRAVEL_EDIT) {
+                        TravelEditPage(
+                            modifier = Modifier,
+                            uiState = uiState,
+                            navigationTo = viewModel::navigationTo,
+                            setTravel = viewModel::setTravel,
+                            showSnackBar = { message ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(message)
+                                }
+                            }
+                        )
+                    }
+
+                    AnimatedVisibility(visible = uiState.page == PageEnum.WASTE_EDIT) {
+                        WasteEditPage(
+                            modifier = Modifier,
+                            uiState = uiState,
+                            navigationTo = viewModel::navigationTo,
+                            setWaste = viewModel::setWaste,
+                            showSnackBar = { message ->
+                                scope.launch {
+                                    snackbarHostState.showSnackbar(message)
+                                }
+                            }
+                        )
+                    }
                 }
             }
-        )
-
-        AnimatedVisibility(visible = page == PageEnum.MAIN) {
-            ConfigMainPage(
-                modifier = Modifier,
-                uiState = uiState,
-                navigationTo = { page = it },
-            )
         }
-
-        AnimatedVisibility(visible = page == PageEnum.TRAVEL_EDIT) {
-            TravelEditPage(
-                modifier = Modifier,
-                navigationTo = { page = it },
-                uiState = uiState,
-                setTravel = viewModel::setTravel,
-            )
-        }
-
-        AnimatedVisibility(visible = page == PageEnum.WASTE_EDIT) {
-            WasteEditPage(
-                modifier = Modifier,
-                navigationTo = { page = it },
-                setWaste = viewModel::setWaste,
-                uiState = uiState,
-            )
-        }
-    }
+    )
 }

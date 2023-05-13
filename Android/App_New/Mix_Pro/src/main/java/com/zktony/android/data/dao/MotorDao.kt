@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-13 11:49
  */
 @Dao
-interface MotorDao : BaseDao<Motor> {
+abstract class MotorDao : BaseDao<Motor> {
     @Query(
         """
-        SELECT * FROM motor
+        SELECT * FROM motors
         """
     )
-    fun getAll(): Flow<List<Motor>>
+    abstract fun getAll(): Flow<List<Motor>>
 }

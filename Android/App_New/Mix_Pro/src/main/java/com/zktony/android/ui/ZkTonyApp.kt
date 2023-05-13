@@ -73,12 +73,7 @@ fun ZkTonyApp() {
             }
         }
     }) {
-        AppNavHost(
-            navController = navController,
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .fillMaxSize(),
-        )
+        AppNavHost(navController = navController)
     }
 }
 

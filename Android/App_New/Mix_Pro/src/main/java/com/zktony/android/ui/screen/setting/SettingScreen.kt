@@ -2,14 +2,24 @@ package com.zktony.android.ui.screen.setting
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.zktony.android.R
+import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.navigation.PageEnum
 
 /**
@@ -26,34 +36,66 @@ fun SettingScreen(
     viewModel: SettingViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var page by remember { mutableStateOf(PageEnum.MAIN) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     BackHandler {
-        if (page == PageEnum.MAIN) {
+        if (uiState.page == PageEnum.MAIN) {
             navController.navigateUp()
         } else {
-            page = PageEnum.MAIN
+            viewModel.navigationTo(PageEnum.MAIN)
         }
     }
 
-    AnimatedVisibility(visible = page == PageEnum.MAIN) {
-        SettingMainPage(
-            modifier = modifier,
-            checkUpdate = viewModel::checkUpdate,
-            navController = navController,
-            navigationTo = { page = it },
-            openWifi = viewModel::openWifi,
-            setLanguage = viewModel::setLanguage,
-            setNavigation = viewModel::setNavigation,
-            uiState = uiState,
-        )
-    }
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            AnimatedVisibility(visible = uiState.page == PageEnum.AUTHENTICATION) {
+                ZkTonyTopAppBar(
+                    title = stringResource(id = R.string.authentication),
+                    navigation = {
+                        if (uiState.page == PageEnum.MAIN) {
+                            navController.navigateUp()
+                        } else {
+                            viewModel.navigationTo(PageEnum.MAIN)
+                        }
+                    }
+                )
+            }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        content = { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    AnimatedVisibility(visible = uiState.page == PageEnum.MAIN) {
+                        SettingMainPage(
+                            modifier = modifier,
+                            uiState = uiState,
+                            checkUpdate = viewModel::checkUpdate,
+                            navController = navController,
+                            navigationTo = viewModel::navigationTo,
+                            openWifi = viewModel::openWifi,
+                            setLanguage = viewModel::setLanguage,
+                            setNavigation = viewModel::setNavigation,
+                        )
+                    }
 
-    AnimatedVisibility(visible = page == PageEnum.AUTHENTICATION) {
-        AuthenticationPage(
-            modifier = modifier,
-            navController = navController,
-            navigationTo = { page = it },
-        )
-    }
+                    AnimatedVisibility(visible = uiState.page == PageEnum.AUTHENTICATION) {
+                        AuthenticationPage(
+                            modifier = modifier,
+                            navController = navController,
+                            navigationTo = viewModel::navigationTo,
+                        )
+                    }
+                }
+            }
+        }
+    )
 }

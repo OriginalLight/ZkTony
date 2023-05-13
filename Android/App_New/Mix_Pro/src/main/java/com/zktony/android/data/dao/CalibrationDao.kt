@@ -9,29 +9,28 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-25 11:09
  */
 @Dao
-interface CalibrationDao : BaseDao<Calibration> {
+abstract class CalibrationDao : BaseDao<Calibration> {
     @Query(
         """
-        SELECT * FROM calibration
-        ORDER BY createTime ASC
+        SELECT * FROM calibrations
+        ORDER BY create_time ASC
         """
     )
-    fun getAll(): Flow<List<Calibration>>
+    abstract fun getAll(): Flow<List<Calibration>>
 
     @Query(
         """
-        SELECT * FROM calibration
-        WHERE id = :id
-        """
-    )
-    fun getById(id: Long): Flow<Calibration>
-
-    // 符合id的active更新为1，其他的更新为0
-    @Query(
-        """
-        UPDATE calibration
+        UPDATE calibrations
         SET active = (CASE WHEN id = :id THEN 1 ELSE 0 END)
         """
     )
-    suspend fun active(id: Long)
+    abstract suspend fun active(id: Long)
+
+    @Query(
+        """
+        DELETE FROM calibrations
+        WHERE id = :id
+        """
+    )
+    abstract suspend fun deleteById(id: Long)
 }

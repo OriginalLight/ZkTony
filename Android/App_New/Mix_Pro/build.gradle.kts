@@ -29,7 +29,10 @@ android {
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".mix.pro.release"
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -97,6 +100,8 @@ dependencies {
     implementation(project(mapOf("path" to ":datastore")))
     implementation(project(mapOf("path" to ":protobuf")))
     implementation(project(mapOf("path" to ":serialport")))
+    implementation(libs.accompanist.insets)
+    implementation(libs.accompanist.systemuicontroller)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.iconsExtended)
