@@ -7,12 +7,9 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 
 val localModule = module {
-    single { DataStoreFactory.getDefaultPreferencesDataStore() }
     single {
         Room.databaseBuilder(
-            androidContext(),
-            AppDatabase::class.java,
-            "data.db"
+            androidContext(), AppDatabase::class.java, "data.db"
         ).build()
     }
     single { get<AppDatabase>().motorDao() }

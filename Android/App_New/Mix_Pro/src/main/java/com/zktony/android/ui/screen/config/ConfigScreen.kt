@@ -93,9 +93,9 @@ fun ConfigScreen(
                     AnimatedVisibility(visible = uiState.page == PageEnum.TRAVEL_EDIT) {
                         TravelEditPage(
                             modifier = Modifier,
-                            uiState = uiState,
                             navigationTo = viewModel::navigationTo,
                             setTravel = viewModel::setTravel,
+                            travel = uiState.settings.travelList.ifEmpty { listOf(0f, 0f, 0f) },
                             showSnackBar = { message ->
                                 scope.launch {
                                     snackbarHostState.showSnackbar(message)
@@ -107,9 +107,9 @@ fun ConfigScreen(
                     AnimatedVisibility(visible = uiState.page == PageEnum.WASTE_EDIT) {
                         WasteEditPage(
                             modifier = Modifier,
-                            uiState = uiState,
                             navigationTo = viewModel::navigationTo,
                             setWaste = viewModel::setWaste,
+                            waste = uiState.settings.wasteList.ifEmpty { listOf(0f, 0f, 0f) },
                             showSnackBar = { message ->
                                 scope.launch {
                                     snackbarHostState.showSnackbar(message)

@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.zktony.datastore";
+
+
+message SettingsPreferences {
+  bool navigation = 1;
+  string language = 2;
+  repeated float travel = 3;
+  repeated float waste = 4;
+}

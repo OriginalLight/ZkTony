@@ -25,13 +25,11 @@ android {
         }
 
         release {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            isMinifyEnabled = false
             signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".mix.pro.release"
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
         }
     }
@@ -74,10 +72,7 @@ android {
         }
 
         jniLibs.keepDebugSymbols += listOf(
-            "*/x86/*.so",
-            "*/x86_64/*.so",
-            "*/armeabi-v7a/*.so",
-            "*/arm64-v8a/*.so"
+            "*/x86/*.so", "*/x86_64/*.so", "*/armeabi-v7a/*.so", "*/arm64-v8a/*.so"
         )
 
     }
@@ -107,7 +102,6 @@ dependencies {
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui.tooling.preview)
-    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
@@ -130,7 +124,6 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.androidx.test.runner)
-    androidTestImplementation(libs.kotlinx.coroutines.test)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

@@ -2,8 +2,6 @@ package com.zktony.android.ui.screen.setting
 
 import android.content.Intent
 import android.provider.Settings
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
@@ -16,16 +14,16 @@ import com.zktony.core.ext.download
 import com.zktony.core.ext.installApk
 import com.zktony.core.ext.isNetworkAvailable
 import com.zktony.core.ext.showShortToast
-import com.zktony.core.utils.Constants
-import com.zktony.datastore.ext.read
-import com.zktony.datastore.ext.save
+import com.zktony.datastore.SettingsPreferences
+import com.zktony.datastore.copy
+import com.zktony.datastore.ext.saveSettings
+import com.zktony.datastore.ext.settingsFlow
 import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -34,7 +32,6 @@ import java.io.File
  * @date: 2023-02-14 15:37
  */
 class SettingViewModel constructor(
-    private val datastore: DataStore<Preferences>,
     private val grpc: ApplicationGrpc,
 ) : ViewModel() {
 
@@ -49,15 +46,13 @@ class SettingViewModel constructor(
             launch {
                 combine(
                     _application,
-                    datastore.read(Constants.LANGUAGE, "zh"),
-                    datastore.read(Constants.NAVIGATION, false),
+                    settingsFlow,
                     _progress,
                     _page,
-                ) { application, language, navigation, progress, page ->
+                ) { application, settings, progress, page ->
                     SettingUiState(
                         application = application,
-                        language = language,
-                        navigation = navigation,
+                        settings = settings,
                         progress = progress,
                         page = page,
                     )
@@ -89,13 +84,13 @@ class SettingViewModel constructor(
     /**
      * 设置语言
      *
-     * @param language String
+     * @param new String
      */
-    fun setLanguage(language: String) {
-        datastore.save(Constants.LANGUAGE, language)
+    fun setLanguage(new: String) {
         viewModelScope.launch {
-            val old = datastore.read(Constants.LANGUAGE, "zh").first()
-            if (old != language) {
+            val old = _uiState.value.settings.language
+            saveSettings { it.copy { language = new } }
+            if (old != new) {
                 Ext.ctx.startActivity(Intent(Ext.ctx, MainActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 })
@@ -106,15 +101,17 @@ class SettingViewModel constructor(
     /**
      * 设置导航栏
      *
-     * @param navigation Boolean
+     * @param nav Boolean
      */
-    fun setNavigation(navigation: Boolean) {
-        datastore.save(Constants.NAVIGATION, navigation)
-        val intent = Intent().apply {
-            action = "ACTION_SHOW_NAVBAR"
-            putExtra("cmd", if (navigation) "show" else "hide")
+    fun setNavigation(nav: Boolean) {
+        viewModelScope.launch {
+            saveSettings { it.copy { navigation = nav } }
+            val intent = Intent().apply {
+                action = "ACTION_SHOW_NAVBAR"
+                putExtra("cmd", if (nav) "show" else "hide")
+            }
+            Ext.ctx.sendBroadcast(intent)
         }
-        Ext.ctx.sendBroadcast(intent)
     }
 
     /**
@@ -186,7 +183,7 @@ class SettingViewModel constructor(
                         .catch {
                             Ext.ctx.getString(R.string.interface_exception).showShortToast()
                         }.collect {
-                           _application.value = it
+                            _application.value = it
                         }
                 }
             } else {
@@ -225,9 +222,8 @@ class SettingViewModel constructor(
 }
 
 data class SettingUiState(
+    val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
     val application: Application? = null,
-    val navigation: Boolean = false,
-    val language: String = "zh",
     val progress: Int = 0,
     val page: PageEnum = PageEnum.MAIN,
     val errorMessage: String = "",

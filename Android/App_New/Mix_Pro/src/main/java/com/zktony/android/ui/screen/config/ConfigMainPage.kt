@@ -62,9 +62,10 @@ fun ConfigMainPage(
 
                     Spacer(modifier = Modifier.weight(1f))
 
+                    val list = uiState.settings.travelList.ifEmpty { listOf(0f, 0f, 0f) }
                     Text(
                         modifier = Modifier.padding(end = 16.dp),
-                        text = "( ${uiState.travel.first.format()} , ${uiState.travel.second.format()} , ${uiState.travel.third.format()} )",
+                        text = "( ${list[0].format()} , ${list[1].format()} , ${list[2].format()} )",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
@@ -95,9 +96,10 @@ fun ConfigMainPage(
 
                     Spacer(modifier = Modifier.weight(1f))
 
+                    val list = uiState.settings.wasteList.ifEmpty { listOf(0f, 0f, 0f) }
                     Text(
                         modifier = Modifier.padding(end = 16.dp),
-                        text = "( ${uiState.waste.first.format()} , ${uiState.waste.second.format()} , ${uiState.waste.third.format()} )",
+                        text = "( ${list[0].format()} , ${list[1].format()} , ${list[2].format()} )",
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }

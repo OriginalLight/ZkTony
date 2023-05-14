@@ -3,10 +3,6 @@ package com.zktony.android.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,7 +18,7 @@ import com.zktony.android.ui.navigation.AppNavigationRail
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.PermanentNavigationDrawerContent
 import com.zktony.android.ui.navigation.Route
-import com.zktony.android.ui.screen.*
+import com.zktony.android.ui.screen.EmptyComingSoon
 import com.zktony.android.ui.screen.calibration.CalibrationScreen
 import com.zktony.android.ui.screen.config.ConfigScreen
 import com.zktony.android.ui.screen.container.ContainerScreen
@@ -34,7 +30,6 @@ import org.koin.androidx.compose.koinViewModel
 /**
  * Main entry point for the app.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ZkTonyApp() {
 

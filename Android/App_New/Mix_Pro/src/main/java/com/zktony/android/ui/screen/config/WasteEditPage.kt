@@ -15,7 +15,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -56,13 +55,13 @@ import kotlinx.coroutines.delay
 fun WasteEditPage(
     modifier: Modifier = Modifier,
     setWaste: (Float, Float, Float) -> Unit = { _, _, _ -> },
-    uiState: ConfigUiState,
+    waste: List<Float> = listOf(0f, 0f, 0f),
     navigationTo: (PageEnum) -> Unit = {},
     showSnackBar: (String) -> Unit = {},
 ) {
-    var x by remember { mutableStateOf(uiState.waste.first.format()) }
-    var y by remember { mutableStateOf(uiState.waste.second.format()) }
-    var z by remember { mutableStateOf(uiState.waste.third.format()) }
+    var x by remember { mutableStateOf(waste[0].format()) }
+    var y by remember { mutableStateOf(waste[1].format()) }
+    var z by remember { mutableStateOf(waste[2].format()) }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val softKeyboard = LocalSoftwareKeyboardController.current
@@ -166,7 +165,7 @@ fun WasteEditPage(
             )
         }
 
-        AnimatedVisibility(visible = uiState.waste.first.format() != x || uiState.waste.second.format() != y || uiState.waste.third.format() != z) {
+        AnimatedVisibility(visible = waste[0].format() != x || waste[1].format() != y || waste[2].format() != z) {
             ElevatedButton(
                 modifier = Modifier
                     .width(128.dp)
@@ -195,7 +194,5 @@ fun WasteEditPage(
 @Composable
 @Preview(showBackground = true, widthDp = 960)
 fun WasteEditPagePreview() {
-    WasteEditPage(
-        uiState = ConfigUiState()
-    )
+    WasteEditPage()
 }

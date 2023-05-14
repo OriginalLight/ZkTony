@@ -60,6 +60,9 @@ fun Context.isNetworkAvailable(): Boolean {
 
 @Suppress("DEPRECATION")
 fun Context.setLanguage(language: String): Context {
+    if (language.isEmpty()) {
+        return this
+    }
     val resources = this.resources
     val config = resources.configuration
     config.setLocale(Locale(language))

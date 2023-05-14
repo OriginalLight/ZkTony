@@ -3,7 +3,6 @@ package com.zktony.android.ui.screen.setting
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.provider.Settings
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -62,8 +61,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
@@ -73,23 +70,10 @@ import com.zktony.core.ext.createQRCodeBitmap
 import com.zktony.core.model.QrCode
 import kotlinx.coroutines.delay
 
-/**
- * SettingMainPage
- *
- * @param modifier Modifier
- * @param checkUpdate Function0<Unit>
- * @param navController NavHostController
- * @param navigationTo Function1<PageEnum, Unit>
- * @param openWifi Function0<Unit>
- * @param setLanguage Function1<String, Unit>
- * @param setNavigation Function1<Boolean, Unit>
- * @param uiState SettingUiState
- */
 @Composable
 fun SettingMainPage(
     modifier: Modifier = Modifier,
     checkUpdate: () -> Unit = {},
-    navController: NavHostController,
     navigationTo: (PageEnum) -> Unit = {},
     openWifi: () -> Unit = {},
     setLanguage: (String) -> Unit = {},
@@ -184,10 +168,10 @@ fun SettingsForm(
 
                     Text(
                         modifier = Modifier.padding(end = 16.dp),
-                        text = when (uiState.language) {
+                        text = when (uiState.settings.language) {
                             "en" -> "English"
                             "zh" -> "简体中文"
-                            else -> "English"
+                            else -> "简体中文"
                         },
                         style = MaterialTheme.typography.bodyLarge,
                     )
@@ -256,7 +240,7 @@ fun SettingsForm(
 
                     Switch(
                         modifier = Modifier.padding(end = 16.dp),
-                        checked = uiState.navigation,
+                        checked = uiState.settings.navigation,
                         onCheckedChange = { setNavigation(it) },
                     )
                 }
@@ -796,8 +780,5 @@ fun OperationFormPreview() {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun SettingPagePreview() {
-    SettingMainPage(
-        navController = rememberNavController(),
-        uiState = SettingUiState(),
-    )
+    SettingMainPage(uiState = SettingUiState())
 }

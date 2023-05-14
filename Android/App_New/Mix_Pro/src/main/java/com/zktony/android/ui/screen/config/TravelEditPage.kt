@@ -8,7 +8,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.ElevatedButton
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -45,12 +44,12 @@ fun TravelEditPage(
     modifier: Modifier = Modifier,
     navigationTo: (PageEnum) -> Unit = {},
     setTravel: (Float, Float, Float) -> Unit = { _, _, _ -> },
-    uiState: ConfigUiState,
+    travel: List<Float> = listOf(0f, 0f, 0f),
     showSnackBar: (String) -> Unit = {},
 ) {
-    var x by remember { mutableStateOf(uiState.travel.first.format()) }
-    var y by remember { mutableStateOf(uiState.travel.second.format()) }
-    var z by remember { mutableStateOf(uiState.travel.third.format()) }
+    var x by remember { mutableStateOf(travel[0].format()) }
+    var y by remember { mutableStateOf(travel[1].format()) }
+    var z by remember { mutableStateOf(travel[2].format()) }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val softKeyboard = LocalSoftwareKeyboardController.current
@@ -97,8 +96,7 @@ fun TravelEditPage(
                     textAlign = TextAlign.Center,
                 ),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Next
+                    keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(onNext = {
                     focusManager.moveFocus(FocusDirection.Next)
@@ -120,8 +118,7 @@ fun TravelEditPage(
                     textAlign = TextAlign.Center,
                 ),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Next
+                    keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(onNext = {
                     focusManager.moveFocus(FocusDirection.Next)
@@ -154,16 +151,14 @@ fun TravelEditPage(
             )
         }
 
-        AnimatedVisibility(visible = uiState.travel.first.format() != x || uiState.travel.second.format() != y || uiState.travel.third.format() != z) {
+        AnimatedVisibility(visible = travel[0].format() != x || travel[1].format() != y || travel[2].format() != z) {
             ElevatedButton(
                 modifier = Modifier
                     .width(128.dp)
                     .padding(16.dp),
                 onClick = {
                     setTravel(
-                        x.toFloatOrNull() ?: 0f,
-                        y.toFloatOrNull() ?: 0f,
-                        z.toFloatOrNull() ?: 0f
+                        x.toFloatOrNull() ?: 0f, y.toFloatOrNull() ?: 0f, z.toFloatOrNull() ?: 0f
                     )
                     navigationTo(PageEnum.MAIN)
                     showSnackBar(Ext.ctx.getString(R.string.save_success))
@@ -183,7 +178,5 @@ fun TravelEditPage(
 @Composable
 @Preview(showBackground = true, widthDp = 960)
 fun TravelEditPagePreview() {
-    TravelEditPage(
-        uiState = ConfigUiState()
-    )
+    TravelEditPage()
 }

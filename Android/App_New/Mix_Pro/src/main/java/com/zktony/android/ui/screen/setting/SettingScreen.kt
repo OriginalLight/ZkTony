@@ -13,7 +13,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,7 +36,6 @@ fun SettingScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     BackHandler {
         if (uiState.page == PageEnum.MAIN) {
@@ -79,7 +77,6 @@ fun SettingScreen(
                             modifier = modifier,
                             uiState = uiState,
                             checkUpdate = viewModel::checkUpdate,
-                            navController = navController,
                             navigationTo = viewModel::navigationTo,
                             openWifi = viewModel::openWifi,
                             setLanguage = viewModel::setLanguage,

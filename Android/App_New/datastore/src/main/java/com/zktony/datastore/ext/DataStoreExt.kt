@@ -2,9 +2,14 @@ package com.zktony.datastore.ext
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
+import com.zktony.datastore.DataStoreFactory
+import com.zktony.datastore.SettingsPreferences
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import java.io.IOException
+
+private val defaultDataStore: DataStore<Preferences> = DataStoreFactory.default()
+private val settingsDataStore: DataStore<SettingsPreferences> = DataStoreFactory.settings()
 
 @Suppress("UNCHECKED_CAST")
 @OptIn(DelicateCoroutinesApi::class)
@@ -78,4 +83,27 @@ inline fun <reified T> DataStore<Preferences>.read(key: String, defaultValue: T)
             else -> throw IllegalArgumentException("This type can be saved into DataStore")
         }
     } as Flow<T>
+}
+
+
+val settingsFlow: Flow<SettingsPreferences> = settingsDataStore.data.catch { exception ->
+    if (exception is IOException) {
+        emit(SettingsPreferences.getDefaultInstance())
+    } else {
+        throw exception
+    }
+}
+
+val settings: SettingsPreferences = runBlocking { settingsDataStore.data.first() }
+
+suspend fun saveSettings(block: suspend (SettingsPreferences) -> SettingsPreferences) {
+    settingsDataStore.updateData(block)
+}
+
+fun read(key: String, defaultValue: Any): Flow<Any> {
+    return defaultDataStore.read(key, defaultValue)
+}
+
+fun save(key: String, value: Any) {
+    defaultDataStore.save(key, value)
 }
