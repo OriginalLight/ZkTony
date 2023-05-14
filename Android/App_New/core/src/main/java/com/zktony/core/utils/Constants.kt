@@ -9,6 +9,4 @@ object Constants {
     const val GRPC_AUTHORITY = "example.com"
     const val GRPC_HOST = "182.160.14.59"
     const val GRPC_PORT = 50051
-    const val NAVIGATION = "Navigation"
-    const val LANGUAGE = "language"
 }

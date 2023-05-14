@@ -1,4 +1,4 @@
-package com.zktony.core.model
+package com.zktony.core.utils
 
 import com.zktony.core.ext.currentTime
 
