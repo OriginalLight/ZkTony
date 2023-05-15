@@ -1,11 +1,26 @@
 package com.zktony.datastore.ext
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.doublePreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.zktony.datastore.DataStoreFactory
 import com.zktony.datastore.SettingsPreferences
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.io.IOException
 
 private val defaultDataStore: DataStore<Preferences> = DataStoreFactory.default()
@@ -100,8 +115,12 @@ suspend fun saveSettings(block: suspend (SettingsPreferences) -> SettingsPrefere
     settingsDataStore.updateData(block)
 }
 
-fun read(key: String, defaultValue: Any): Flow<Any> {
+fun readFlow(key: String, defaultValue: Any): Flow<Any> {
     return defaultDataStore.read(key, defaultValue)
+}
+
+fun read(key: String, defaultValue: Any): Any {
+    return runBlocking { defaultDataStore.read(key, defaultValue).first() }
 }
 
 fun save(key: String, value: Any) {

@@ -2,7 +2,7 @@ package com.zktony.android.core.ext
 
 import com.zktony.android.core.proxy.MCProxy
 import com.zktony.android.core.proxy.SerialProxy
-import com.zktony.android.data.entity.Motor
+import com.zktony.android.data.entity.MotorEntity
 import com.zktony.serialport.ext.intToHex
 import com.zktony.serialport.protocol.v2
 import kotlinx.coroutines.delay
@@ -69,7 +69,7 @@ fun pulse(index: Int, dv: Float): Int {
  * @param dv Int
  * @return String
  */
-fun pwc(index: Int, dv: Float, config: Motor): String {
+fun pwc(index: Int, dv: Float, config: MotorEntity): String {
     return index.intToHex() + pulse(index, dv).intToHex(4) + config.hex()
 }
 
@@ -96,69 +96,69 @@ fun sendHex(hex: String) {
  * @property list MutableList<Pair<Int, Float>>
  */
 class Compose {
-    val list = mutableListOf<Triple<Int, Float, Motor>>()
+    val list = mutableListOf<Triple<Int, Float, MotorEntity>>()
 
-    fun x(dv: Float, config: Motor = mcProxy.hpm[0]!!) {
+    fun x(dv: Float, config: MotorEntity = mcProxy.hpm[0]!!) {
         list.add(Triple(0, dv, config))
     }
 
-    fun y(dv: Float, config: Motor = mcProxy.hpm[1]!!) {
+    fun y(dv: Float, config: MotorEntity = mcProxy.hpm[1]!!) {
         list.add(Triple(1, dv, config))
     }
 
-    fun z(dv: Float, config: Motor = mcProxy.hpm[2]!!) {
+    fun z(dv: Float, config: MotorEntity = mcProxy.hpm[2]!!) {
         list.add(Triple(2, dv, config))
     }
 
-    fun v1(dv: Float, config: Motor = mcProxy.hpm[3]!!) {
+    fun v1(dv: Float, config: MotorEntity = mcProxy.hpm[3]!!) {
         list.add(Triple(3, dv, config))
     }
 
-    fun v2(dv: Float, config: Motor = mcProxy.hpm[4]!!) {
+    fun v2(dv: Float, config: MotorEntity = mcProxy.hpm[4]!!) {
         list.add(Triple(4, dv, config))
     }
 
-    fun v3(dv: Float, config: Motor = mcProxy.hpm[5]!!) {
+    fun v3(dv: Float, config: MotorEntity = mcProxy.hpm[5]!!) {
         list.add(Triple(5, dv, config))
     }
 
-    fun v4(dv: Float, config: Motor = mcProxy.hpm[6]!!) {
+    fun v4(dv: Float, config: MotorEntity = mcProxy.hpm[6]!!) {
         list.add(Triple(6, dv, config))
     }
 
-    fun v5(dv: Float, config: Motor = mcProxy.hpm[7]!!) {
+    fun v5(dv: Float, config: MotorEntity = mcProxy.hpm[7]!!) {
         list.add(Triple(7, dv, config))
     }
 
-    fun v6(dv: Float, config: Motor = mcProxy.hpm[8]!!) {
+    fun v6(dv: Float, config: MotorEntity = mcProxy.hpm[8]!!) {
         list.add(Triple(8, dv, config))
     }
 
-    fun v7(dv: Float, config: Motor = mcProxy.hpm[9]!!) {
+    fun v7(dv: Float, config: MotorEntity = mcProxy.hpm[9]!!) {
         list.add(Triple(9, dv, config))
     }
 
-    fun v8(dv: Float, config: Motor = mcProxy.hpm[10]!!) {
+    fun v8(dv: Float, config: MotorEntity = mcProxy.hpm[10]!!) {
         list.add(Triple(10, dv, config))
     }
 
-    fun v9(dv: Float, config: Motor = mcProxy.hpm[11]!!) {
+    fun v9(dv: Float, config: MotorEntity = mcProxy.hpm[11]!!) {
         list.add(Triple(11, dv, config))
     }
 
-    fun v10(dv: Float, config: Motor = mcProxy.hpm[12]!!) {
+    fun v10(dv: Float, config: MotorEntity = mcProxy.hpm[12]!!) {
         list.add(Triple(12, dv, config))
     }
 
-    fun v11(dv: Float, config: Motor = mcProxy.hpm[13]!!) {
+    fun v11(dv: Float, config: MotorEntity = mcProxy.hpm[13]!!) {
         list.add(Triple(13, dv, config))
     }
 
-    fun v12(dv: Float, config: Motor = mcProxy.hpm[14]!!) {
+    fun v12(dv: Float, config: MotorEntity = mcProxy.hpm[14]!!) {
         list.add(Triple(14, dv, config))
     }
 
-    fun v13(dv: Float, config: Motor = mcProxy.hpm[15]!!) {
+    fun v13(dv: Float, config: MotorEntity = mcProxy.hpm[15]!!) {
         list.add(Triple(15, dv, config))
     }
 }

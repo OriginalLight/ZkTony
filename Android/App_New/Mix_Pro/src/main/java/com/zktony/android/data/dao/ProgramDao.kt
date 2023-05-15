@@ -1,7 +1,7 @@
 package com.zktony.android.data.dao
 
 import androidx.room.*
-import com.zktony.android.data.entity.Program
+import com.zktony.android.data.entity.ProgramEntity
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-13 11:49
  */
 @Dao
-abstract class ProgramDao : BaseDao<Program> {
+abstract class ProgramDao : BaseDao<ProgramEntity> {
     @Query(
         """
         SELECT * FROM programs
         """
     )
-    abstract fun getAll(): Flow<List<Program>>
+    abstract fun getAll(): Flow<List<ProgramEntity>>
 
     @Query(
         """
@@ -24,5 +24,13 @@ abstract class ProgramDao : BaseDao<Program> {
         Limit 1
         """
     )
-    abstract fun getById(id: Long): Flow<Program>
+    abstract fun getById(id: Long): Flow<ProgramEntity>
+
+    @Query(
+        """
+        DELETE FROM programs
+        WHERE id = :id
+        """
+    )
+    abstract suspend fun deleteById(id: Long)
 }

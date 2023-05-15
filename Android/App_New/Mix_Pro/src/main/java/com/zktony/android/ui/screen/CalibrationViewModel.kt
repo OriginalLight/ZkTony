@@ -1,10 +1,9 @@
-package com.zktony.android.ui.screen.container
+package com.zktony.android.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.data.dao.ContainerDao
-import com.zktony.android.data.entity.Container
-import com.zktony.android.data.entity.Point
+import com.zktony.android.data.dao.CalibrationDao
+import com.zktony.android.data.entity.CalibrationEntity
 import com.zktony.android.ui.navigation.PageEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,13 +13,12 @@ import kotlinx.coroutines.launch
 
 /**
  * @author 刘贺贺
- * @date 2023/5/11 14:48
+ * @date 2023/5/9 13:19
  */
-class ContainerViewModel constructor(
-    private val dao: ContainerDao,
+class CalibrationViewModel constructor(
+    private val dao: CalibrationDao,
 ) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(ContainerUiState())
+    private val _uiState = MutableStateFlow(CalibrationUiState())
     private val _page = MutableStateFlow(PageEnum.MAIN)
     private val _selected = MutableStateFlow(0L)
     val uiState = _uiState.asStateFlow()
@@ -29,12 +27,12 @@ class ContainerViewModel constructor(
         viewModelScope.launch {
             combine(
                 dao.getAll(),
-                _page,
                 _selected,
-            ) { entities, page, selectedId ->
-                ContainerUiState(entities = entities, page = page, selected = selectedId)
+                _page,
+            ) { entities, selected, page ->
+                CalibrationUiState(entities = entities, selected = selected, page = page)
             }.catch { ex ->
-                _uiState.value = ContainerUiState(errorMessage = ex.message ?: "Unknown error")
+                _uiState.value = CalibrationUiState(errorMessage = ex.message ?: "Unknown error")
             }.collect {
                 _uiState.value = it
             }
@@ -51,11 +49,7 @@ class ContainerViewModel constructor(
 
     fun insert(name: String) {
         viewModelScope.launch {
-            val list: MutableList<Point> = mutableListOf()
-            for (i in 0 until 6) {
-                list.add(Point(index = i))
-            }
-            dao.insert(Container(name = name, data = list))
+            dao.insert(CalibrationEntity(name = name))
         }
     }
 
@@ -65,16 +59,26 @@ class ContainerViewModel constructor(
         }
     }
 
-    fun update(container: Container) {
+    fun update(entity: CalibrationEntity) {
         viewModelScope.launch {
-            dao.update(container)
+            dao.update(entity)
         }
+    }
+
+    fun active(id: Long) {
+        viewModelScope.launch {
+            dao.active(id)
+        }
+    }
+
+    fun addLiquid(i: Int, fl: Float) {
+
     }
 }
 
-data class ContainerUiState(
-    val entities: List<Container> = emptyList(),
-    val page: PageEnum = PageEnum.MAIN,
+data class CalibrationUiState(
+    val entities: List<CalibrationEntity> = emptyList(),
     val selected: Long = 0L,
+    val page: PageEnum = PageEnum.MAIN,
     val errorMessage: String = "",
 )

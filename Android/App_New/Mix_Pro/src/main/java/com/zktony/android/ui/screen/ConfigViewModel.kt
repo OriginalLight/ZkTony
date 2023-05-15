@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen.config
+package com.zktony.android.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

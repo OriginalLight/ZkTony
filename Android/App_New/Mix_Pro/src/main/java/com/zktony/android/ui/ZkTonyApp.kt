@@ -19,12 +19,12 @@ import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.PermanentNavigationDrawerContent
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.screen.EmptyComingSoon
-import com.zktony.android.ui.screen.calibration.CalibrationScreen
-import com.zktony.android.ui.screen.config.ConfigScreen
-import com.zktony.android.ui.screen.container.ContainerScreen
-import com.zktony.android.ui.screen.home.HomeScreen
-import com.zktony.android.ui.screen.motor.MotorScreen
-import com.zktony.android.ui.screen.setting.SettingScreen
+import com.zktony.android.ui.screen.CalibrationScreen
+import com.zktony.android.ui.screen.ConfigScreen
+import com.zktony.android.ui.screen.ContainerScreen
+import com.zktony.android.ui.screen.HomeScreen
+import com.zktony.android.ui.screen.MotorScreen
+import com.zktony.android.ui.screen.SettingScreen
 import org.koin.androidx.compose.koinViewModel
 
 /**

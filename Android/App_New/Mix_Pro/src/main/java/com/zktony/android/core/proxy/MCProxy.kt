@@ -3,8 +3,8 @@ package com.zktony.android.core.proxy
 import com.zktony.android.core.ext.avgRate
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.MotorDao
-import com.zktony.android.data.entity.Calibration
-import com.zktony.android.data.entity.Motor
+import com.zktony.android.data.entity.CalibrationEntity
+import com.zktony.android.data.entity.MotorEntity
 import com.zktony.core.ext.logi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -25,7 +25,7 @@ class MCProxy constructor(
     /**
      *  0: Y轴 1: 泵1 2: 泵2 1: 泵3
      */
-    val hpm: MutableMap<Int, Motor> = ConcurrentHashMap()
+    val hpm: MutableMap<Int, MotorEntity> = ConcurrentHashMap()
     val hpc: MutableMap<Int, Float> = ConcurrentHashMap()
 
     init {
@@ -38,9 +38,9 @@ class MCProxy constructor(
                             hpm[it1.index] = it1
                         }
                     } else {
-                        val list = mutableListOf<Motor>()
+                        val list = mutableListOf<MotorEntity>()
                         for (i in 0..15) {
-                            list.add(Motor(text = "M$i", index = i))
+                            list.add(MotorEntity(text = "M$i", index = i))
                         }
                         MD.insertAll(list)
                     }
@@ -64,7 +64,7 @@ class MCProxy constructor(
                         }
                     } else {
                         CD.insert(
-                            Calibration(
+                            CalibrationEntity(
                                 name = "Default",
                                 active = 1,
                             )

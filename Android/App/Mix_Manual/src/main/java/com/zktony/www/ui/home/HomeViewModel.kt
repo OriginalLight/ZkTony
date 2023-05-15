@@ -105,7 +105,7 @@ class HomeViewModel constructor(
             }
             waitTime(
                 if (_uiState.value.mode) {
-                    20 * 60L
+                    30 * 60L
                 } else {
                     4 * 60L
                 }
@@ -143,7 +143,7 @@ class HomeViewModel constructor(
             }
             waitTime(
                 if (_uiState.value.mode) {
-                    20 * 60L
+                    30 * 60L
                 } else {
                     4 * 60L
                 }

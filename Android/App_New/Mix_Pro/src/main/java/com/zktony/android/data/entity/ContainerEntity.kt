@@ -12,21 +12,20 @@ import java.util.Date
 
 /**
  * @author: 刘贺贺
- * @date: 2023-02-02 10:56
+ * @date: 2023-01-28 16:00
  */
 @Entity(
-    tableName = "programs",
+    tableName = "containers",
     indices = [
-       Index(value = ["name"], unique = true)
+        Index(value = ["name"], unique = true)
     ]
 )
 @Immutable
 @TypeConverters(PointConverters::class)
-data class Program(
+data class ContainerEntity(
     @PrimaryKey @ColumnInfo(name = "id") val id: Long = nextId(),
-    @ColumnInfo(name = "name") val name: String = "None",
+    @ColumnInfo(name = "name") val name: String = "默认",
     @ColumnInfo(name = "data") val data: List<Point> = emptyList(),
-    @ColumnInfo(name = "count") val count: Int = 0,
     @ColumnInfo(name = "active") val active: Int = 0,
     @ColumnInfo(name = "create_time") val createTime: Date = Date(System.currentTimeMillis()),
 )

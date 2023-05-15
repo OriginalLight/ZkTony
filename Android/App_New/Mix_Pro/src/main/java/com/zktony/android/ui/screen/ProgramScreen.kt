@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen.home
+package com.zktony.android.ui.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun HomeScreen(
+fun ProgramScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel,
 ) {
@@ -38,7 +38,7 @@ fun HomeScreen(
             ZkTonyTopAppBar(title = "Home")
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
         content = { innerPadding ->
             Box(
                 modifier = Modifier

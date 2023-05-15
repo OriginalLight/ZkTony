@@ -20,7 +20,7 @@ import java.util.Date
     ]
 )
 @Immutable
-data class Motor(
+data class MotorEntity(
     @PrimaryKey @ColumnInfo(name = "id") val id: Long = nextId(),
     @ColumnInfo(name = "index") val index: Int = 0,
     @ColumnInfo(name = "text") val text: String = "",

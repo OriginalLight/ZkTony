@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen.home
+package com.zktony.android.ui.screen
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

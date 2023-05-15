@@ -1,23 +1,23 @@
-package com.zktony.android.ui.screen.motor
+package com.zktony.android.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.data.dao.MotorDao
-import com.zktony.android.data.entity.Motor
+import com.zktony.android.data.dao.ProgramDao
+import com.zktony.android.data.entity.ProgramEntity
 import com.zktony.android.ui.navigation.PageEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 /**
- * @author: 刘贺贺
+ * @author 刘贺贺
+ * @date 2023/5/15 14:51
  */
-class MotorViewModel constructor(
-    private val dao: MotorDao
+class ProgramViewModel constructor(
+    private val dao: ProgramDao
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(MotorUiState())
+    private val _uiState = MutableStateFlow(ProgramUiState())
     private val _page = MutableStateFlow(PageEnum.MAIN)
     private val _selected = MutableStateFlow(0L)
     val uiState = _uiState.asStateFlow()
@@ -26,12 +26,10 @@ class MotorViewModel constructor(
         viewModelScope.launch {
             combine(
                 dao.getAll(),
-                _selected,
                 _page,
-            ) { entities, selected, page ->
-                MotorUiState(entities = entities, selected = selected, page = page)
-            }.catch { ex ->
-                _uiState.value = MotorUiState(errorMessage = ex.message ?: "Unknown error")
+                _selected,
+            ) { entities, page, selectedId ->
+                ProgramUiState(entities = entities, page = page, selected = selectedId)
             }.collect {
                 _uiState.value = it
             }
@@ -46,16 +44,28 @@ class MotorViewModel constructor(
         _selected.value = id
     }
 
-    fun update(motor: Motor) {
+    fun insert(name: String) {
         viewModelScope.launch {
-            dao.update(motor)
+            dao.insert(ProgramEntity(name = name))
         }
     }
+
+    fun update(entity: ProgramEntity) {
+        viewModelScope.launch {
+            dao.update(entity)
+        }
+    }
+
+    fun delete(id: Long) {
+        viewModelScope.launch {
+            dao.deleteById(id)
+        }
+    }
+
 }
 
-data class MotorUiState(
-    val entities: List<Motor> = emptyList(),
+data class ProgramUiState(
+    val entities: List<ProgramEntity> = emptyList(),
     val selected: Long = 0L,
     val page: PageEnum = PageEnum.MAIN,
-    val errorMessage: String = "",
 )

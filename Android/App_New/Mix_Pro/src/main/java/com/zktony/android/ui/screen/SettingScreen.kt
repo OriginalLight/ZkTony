@@ -1,8 +1,9 @@
-package com.zktony.android.ui.screen.setting
+package com.zktony.android.ui.screen
 
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.provider.Settings
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,10 +31,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -61,14 +67,96 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
+import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.navigation.PageEnum
+import com.zktony.android.ui.navigation.Route
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.createQRCodeBitmap
 import com.zktony.core.utils.QrCode
 import kotlinx.coroutines.delay
+
+/**
+ * Setting screen
+ *
+ * @param modifier Modifier
+ * @param navController NavHostController
+ * @param viewModel SettingViewModel
+ */
+@Composable
+fun SettingScreen(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    viewModel: SettingViewModel,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+
+    BackHandler {
+        if (uiState.page == PageEnum.MAIN) {
+            navController.navigateUp()
+        } else {
+            viewModel.navigationTo(PageEnum.MAIN)
+        }
+    }
+
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            AnimatedVisibility(visible = uiState.page == PageEnum.AUTHENTICATION) {
+                ZkTonyTopAppBar(
+                    title = stringResource(id = R.string.authentication),
+                    navigation = {
+                        if (uiState.page == PageEnum.MAIN) {
+                            navController.navigateUp()
+                        } else {
+                            viewModel.navigationTo(PageEnum.MAIN)
+                        }
+                    }
+                )
+            }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        content = { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    AnimatedVisibility(visible = uiState.page == PageEnum.MAIN) {
+                        SettingMainPage(
+                            modifier = modifier,
+                            uiState = uiState,
+                            checkUpdate = viewModel::checkUpdate,
+                            navigationTo = viewModel::navigationTo,
+                            openWifi = viewModel::openWifi,
+                            setLanguage = viewModel::setLanguage,
+                            setNavigation = viewModel::setNavigation,
+                        )
+                    }
+
+                    AnimatedVisibility(visible = uiState.page == PageEnum.AUTHENTICATION) {
+                        AuthenticationPage(
+                            modifier = modifier,
+                            navController = navController,
+                            navigationTo = viewModel::navigationTo,
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
 
 @Composable
 fun SettingMainPage(
@@ -141,7 +229,7 @@ fun SettingsForm(
         state = lazyColumnState,
     ) {
         item {
-            ElevatedCard(
+            Card(
                 modifier = Modifier
                     .wrapContentHeight()
                     .padding(start = 8.dp, top = 16.dp, end = 8.dp)
@@ -181,7 +269,7 @@ fun SettingsForm(
         languageList.forEach { (name, code) ->
             item {
                 AnimatedVisibility(visible = expanded) {
-                    ElevatedCard(
+                    Card(
                         modifier = Modifier
                             .wrapContentHeight()
                             .padding(start = 32.dp, top = 16.dp, end = 8.dp)
@@ -214,7 +302,7 @@ fun SettingsForm(
             }
         }
         item {
-            ElevatedCard(
+            Card(
                 modifier = Modifier
                     .wrapContentHeight()
                     .padding(start = 8.dp, top = 16.dp, end = 8.dp),
@@ -277,7 +365,7 @@ fun InfoForm(
     ) {
         item {
             AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
-                ElevatedCard(
+                Card(
                     modifier = Modifier
                         .wrapContentHeight()
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp),
@@ -315,7 +403,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
-                ElevatedCard(
+                Card(
                     modifier = Modifier
                         .wrapContentHeight()
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp)
@@ -354,7 +442,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
-                ElevatedCard(
+                Card(
                     modifier = Modifier
                         .wrapContentHeight()
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp)
@@ -392,7 +480,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = deviceInfo) {
-                ElevatedCard(
+                Card(
                     modifier = Modifier
                         .wrapContentHeight()
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp)
@@ -422,7 +510,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = deviceInfo) {
-                ElevatedCard(
+                Card(
                     modifier = Modifier.padding(16.dp),
                 ) {
                     Column(
@@ -463,7 +551,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = helpInfo) {
-                ElevatedCard(
+                Card(
                     modifier = Modifier
                         .wrapContentHeight()
                         .padding(start = 8.dp, top = 16.dp, end = 8.dp)
@@ -493,7 +581,7 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = helpInfo) {
-                ElevatedCard(
+                Card(
                     modifier = Modifier.padding(16.dp),
                 ) {
                     Column(
@@ -753,32 +841,112 @@ fun VerificationCodeField(
 
 
 @Composable
-@Preview(showBackground = true)
-fun SettingsFormPreview() {
-    SettingsForm(
-        uiState = SettingUiState(),
-    )
+@Preview(showBackground = true, widthDp = 960, heightDp = 640)
+fun SettingPagePreview() {
+    SettingMainPage(uiState = SettingUiState())
 }
 
+/**
+ * Authentication page
+ *
+ * @param modifier Modifier
+ * @param navController NavHostController
+ * @param navigationTo Function1<PageEnum, Unit>
+ */
 @Composable
-@Preview(showBackground = true)
-fun InfoFormPreview() {
-    InfoForm()
-}
+fun AuthenticationPage(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    navigationTo: (PageEnum) -> Unit = {},
+) {
+    BackHandler {
+        navigationTo(PageEnum.MAIN)
+    }
 
-@Composable
-@Preview(showBackground = true, widthDp = 960)
-fun OperationFormPreview() {
-    OperationForm(
-        checkUpdate = {},
-        openWifi = {},
-        uiState = SettingUiState(),
-    )
+    var show by remember { mutableStateOf(false) }
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp)
+            .background(
+                color = MaterialTheme.colorScheme.background,
+                shape = MaterialTheme.shapes.medium,
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Spacer(modifier = Modifier.height(128.dp))
+
+        AnimatedVisibility(visible = !show) {
+            VerificationCodeField(digits = 6, inputCallback = {
+                show = true
+            }) { text, focused ->
+                VerificationCodeItem(text, focused)
+            }
+        }
+
+        AnimatedVisibility(visible = show) {
+            Row(
+                modifier = Modifier.padding(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                ElevatedCard(
+                    modifier = Modifier.clickable {
+                        navigationTo(PageEnum.MAIN)
+                        navController.navigate(Route.MOTOR)
+                    },
+                ) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Image(
+                            modifier = Modifier.size(96.dp),
+                            painter = painterResource(id = R.drawable.ic_motor),
+                            contentDescription = stringResource(id = R.string.motor_config)
+                        )
+
+                        Text(
+                            modifier = Modifier.padding(bottom = 8.dp),
+                            text = stringResource(id = R.string.motor_config),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+
+                ElevatedCard(
+                    modifier = Modifier.clickable {
+                        navigationTo(PageEnum.MAIN)
+                        navController.navigate(Route.CONFIG)
+                    },
+                ) {
+                    Column(
+                        modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Image(
+                            modifier = Modifier.size(96.dp),
+                            painter = painterResource(id = R.drawable.ic_settings),
+                            contentDescription = stringResource(id = R.string.system_config)
+                        )
+
+                        Text(
+                            modifier = Modifier.padding(bottom = 8.dp),
+                            text = stringResource(id = R.string.system_config),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+            }
+        }
+    }
 }
 
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun SettingPagePreview() {
-    SettingMainPage(uiState = SettingUiState())
+fun AuthenticationPagePreview() {
+    AuthenticationPage(navController = rememberNavController())
 }

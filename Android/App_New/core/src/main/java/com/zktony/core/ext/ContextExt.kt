@@ -1,10 +1,11 @@
 package com.zktony.core.ext
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.app.LocaleManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Typeface
 import android.net.*
 import android.os.Build
 import android.os.LocaleList
@@ -12,7 +13,7 @@ import androidx.core.content.FileProvider
 import androidx.core.content.getSystemService
 import java.io.File
 import java.util.Locale
-import java.util.prefs.Preferences
+import kotlin.system.exitProcess
 
 /**
  * 安装apk
@@ -80,4 +81,15 @@ fun Context.setLanguage(language: String): Context {
     }
     resources.updateConfiguration(config, resources.displayMetrics)
     return this.createConfigurationContext(config)
+}
+
+fun Context.restartApp() {
+    val intent = this.packageManager.getLaunchIntentForPackage(this.packageName)
+    val pendingIntent = PendingIntent.getActivity(
+        this, 0,
+        intent, PendingIntent.FLAG_ONE_SHOT
+    )
+    val mgr = this.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
+    mgr?.set(AlarmManager.RTC, System.currentTimeMillis(), pendingIntent)
+    exitProcess(0)
 }

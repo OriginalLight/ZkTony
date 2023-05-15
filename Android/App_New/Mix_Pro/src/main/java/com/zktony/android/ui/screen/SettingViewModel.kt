@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen.setting
+package com.zktony.android.ui.screen
 
 import android.content.Intent
 import android.provider.Settings
@@ -6,13 +6,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.ui.MainActivity
 import com.zktony.android.ui.navigation.PageEnum
 import com.zktony.core.ext.DownloadState
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.download
 import com.zktony.core.ext.installApk
 import com.zktony.core.ext.isNetworkAvailable
+import com.zktony.core.ext.restartApp
 import com.zktony.core.ext.showShortToast
 import com.zktony.datastore.SettingsPreferences
 import com.zktony.datastore.copy
@@ -39,6 +39,7 @@ class SettingViewModel constructor(
     private val _application = MutableStateFlow<Application?>(null)
     private val _progress = MutableStateFlow(0)
     private val _page = MutableStateFlow(PageEnum.MAIN)
+
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -91,9 +92,7 @@ class SettingViewModel constructor(
             val old = _uiState.value.settings.language
             saveSettings { it.copy { language = new } }
             if (old != new) {
-                Ext.ctx.startActivity(Intent(Ext.ctx, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                })
+                Ext.ctx.restartApp()
             }
         }
     }

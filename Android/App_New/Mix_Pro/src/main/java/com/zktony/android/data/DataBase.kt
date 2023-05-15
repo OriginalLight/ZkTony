@@ -10,10 +10,10 @@ import com.zktony.android.data.entity.*
 @Database(
     entities =
     [
-        Motor::class,
-        Calibration::class,
-        Program::class,
-        Container::class,
+        MotorEntity::class,
+        CalibrationEntity::class,
+        ProgramEntity::class,
+        ContainerEntity::class,
     ],
     version = 1,
     exportSchema = false
