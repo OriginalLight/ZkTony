@@ -1,6 +1,7 @@
 package com.zktony.android.ui.screen
 
 import androidx.lifecycle.ViewModel
+import com.zktony.android.ui.navigation.PageEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
@@ -12,16 +13,13 @@ class HomeViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun navigateTo(page: HomePageEnum) {
+
+    fun navigateTo(page: PageEnum) {
         _uiState.value = _uiState.value.copy(page = page)
     }
 
 }
 
 data class HomeUiState(
-    val page: HomePageEnum = HomePageEnum.HOME,
+    val page: PageEnum = PageEnum.MAIN,
 )
-
-enum class HomePageEnum {
-    HOME,
-}

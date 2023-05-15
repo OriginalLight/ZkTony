@@ -58,7 +58,7 @@ class SettingViewModel constructor(
                         page = page,
                     )
                 }.catch { ex ->
-                    _uiState.value = SettingUiState(errorMessage = ex.message ?: "Unknown error")
+                    ex.printStackTrace()
                 }.collect {
                     _uiState.value = it
                 }
@@ -66,8 +66,8 @@ class SettingViewModel constructor(
             launch {
                 if (Ext.ctx.isNetworkAvailable()) {
                     grpc.getApplication(BuildConfig.APPLICATION_ID)
-                        .catch {
-                            _application.value = null
+                        .catch { ex ->
+                            ex.printStackTrace()
                         }.collect {
                             _application.value = it
                         }
@@ -179,7 +179,8 @@ class SettingViewModel constructor(
                     }
                 } else {
                     grpc.getApplication(BuildConfig.APPLICATION_ID)
-                        .catch {
+                        .catch { ex ->
+                            ex.printStackTrace()
                             Ext.ctx.getString(R.string.interface_exception).showShortToast()
                         }.collect {
                             _application.value = it
@@ -225,5 +226,4 @@ data class SettingUiState(
     val application: Application? = null,
     val progress: Int = 0,
     val page: PageEnum = PageEnum.MAIN,
-    val errorMessage: String = "",
 )

@@ -18,12 +18,12 @@ import com.zktony.android.ui.navigation.AppNavigationRail
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.PermanentNavigationDrawerContent
 import com.zktony.android.ui.navigation.Route
-import com.zktony.android.ui.screen.EmptyComingSoon
 import com.zktony.android.ui.screen.CalibrationScreen
 import com.zktony.android.ui.screen.ConfigScreen
 import com.zktony.android.ui.screen.ContainerScreen
 import com.zktony.android.ui.screen.HomeScreen
 import com.zktony.android.ui.screen.MotorScreen
+import com.zktony.android.ui.screen.ProgramScreen
 import com.zktony.android.ui.screen.SettingScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -91,11 +91,16 @@ private fun AppNavHost(
         composable(Route.HOME) {
             HomeScreen(
                 modifier = Modifier,
+                navController = navController,
                 viewModel = koinViewModel(),
             )
         }
         composable(Route.PROGRAM) {
-            EmptyComingSoon()
+            ProgramScreen(
+                modifier = Modifier,
+                navController = navController,
+                viewModel = koinViewModel(),
+            )
         }
         composable(Route.CONTAINER) {
             ContainerScreen(
@@ -111,7 +116,7 @@ private fun AppNavHost(
                 viewModel = koinViewModel(),
             )
         }
-        composable(Route.Setting) {
+        composable(Route.SETTING) {
             SettingScreen(
                 modifier = Modifier,
                 navController = navController,

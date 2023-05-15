@@ -32,7 +32,7 @@ class CalibrationViewModel constructor(
             ) { entities, selected, page ->
                 CalibrationUiState(entities = entities, selected = selected, page = page)
             }.catch { ex ->
-                _uiState.value = CalibrationUiState(errorMessage = ex.message ?: "Unknown error")
+                ex.printStackTrace()
             }.collect {
                 _uiState.value = it
             }
@@ -80,5 +80,4 @@ data class CalibrationUiState(
     val entities: List<CalibrationEntity> = emptyList(),
     val selected: Long = 0L,
     val page: PageEnum = PageEnum.MAIN,
-    val errorMessage: String = "",
 )

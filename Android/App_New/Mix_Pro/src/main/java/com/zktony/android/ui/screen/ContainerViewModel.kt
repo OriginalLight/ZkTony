@@ -34,7 +34,7 @@ class ContainerViewModel constructor(
             ) { entities, page, selectedId ->
                 ContainerUiState(entities = entities, page = page, selected = selectedId)
             }.catch { ex ->
-                _uiState.value = ContainerUiState(errorMessage = ex.message ?: "Unknown error")
+                ex.printStackTrace()
             }.collect {
                 _uiState.value = it
             }
@@ -55,7 +55,7 @@ class ContainerViewModel constructor(
             for (i in 0 until 6) {
                 list.add(Point(index = i))
             }
-            dao.insert(ContainerEntity(name = name, data = list))
+            dao.insert(ContainerEntity(name = name, data = list, active = 1))
         }
     }
 
@@ -76,5 +76,4 @@ data class ContainerUiState(
     val entities: List<ContainerEntity> = emptyList(),
     val page: PageEnum = PageEnum.MAIN,
     val selected: Long = 0L,
-    val errorMessage: String = "",
 )

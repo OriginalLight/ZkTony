@@ -30,7 +30,7 @@ class ConfigViewModel : ViewModel() {
             ) { settings, page ->
                 ConfigUiState(settings = settings, page = page)
             }.catch { ex ->
-                _uiState.value = ConfigUiState(errorMessage = ex.message ?: "Unknown error")
+                ex.printStackTrace()
             }.collect {
                 _uiState.value = it
             }
@@ -68,5 +68,4 @@ class ConfigViewModel : ViewModel() {
 data class ConfigUiState(
     val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
     val page: PageEnum = PageEnum.MAIN,
-    val errorMessage: String = "",
 )

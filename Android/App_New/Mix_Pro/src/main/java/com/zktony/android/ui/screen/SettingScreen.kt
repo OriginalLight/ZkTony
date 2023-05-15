@@ -839,13 +839,6 @@ fun VerificationCodeField(
 
 }
 
-
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun SettingPagePreview() {
-    SettingMainPage(uiState = SettingUiState())
-}
-
 /**
  * Authentication page
  *
@@ -944,6 +937,11 @@ fun AuthenticationPage(
     }
 }
 
+@Composable
+@Preview(showBackground = true, widthDp = 960, heightDp = 640)
+fun SettingMainPagePreview() {
+    SettingMainPage(uiState = SettingUiState())
+}
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)

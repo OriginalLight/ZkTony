@@ -249,15 +249,6 @@ fun ConfigMainPage(
     }
 }
 
-
-@Composable
-@Preview(showBackground = true, widthDp = 960)
-fun ConfigPagePreview() {
-    ConfigMainPage(
-        uiState = ConfigUiState()
-    )
-}
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TravelEditPage(
@@ -392,13 +383,6 @@ fun TravelEditPage(
             }
         }
     }
-}
-
-
-@Composable
-@Preview(showBackground = true, widthDp = 960)
-fun TravelEditPagePreview() {
-    TravelEditPage()
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -541,6 +525,19 @@ fun WasteEditPage(
     }
 }
 
+@Composable
+@Preview(showBackground = true, widthDp = 960)
+fun ConfigMainPagePreview() {
+    ConfigMainPage(
+        uiState = ConfigUiState()
+    )
+}
+
+@Composable
+@Preview(showBackground = true, widthDp = 960)
+fun TravelEditPagePreview() {
+    TravelEditPage()
+}
 
 @Composable
 @Preview(showBackground = true, widthDp = 960)

@@ -31,7 +31,7 @@ class MotorViewModel constructor(
             ) { entities, selected, page ->
                 MotorUiState(entities = entities, selected = selected, page = page)
             }.catch { ex ->
-                _uiState.value = MotorUiState(errorMessage = ex.message ?: "Unknown error")
+                ex.printStackTrace()
             }.collect {
                 _uiState.value = it
             }
@@ -57,5 +57,4 @@ data class MotorUiState(
     val entities: List<MotorEntity> = emptyList(),
     val selected: Long = 0L,
     val page: PageEnum = PageEnum.MAIN,
-    val errorMessage: String = "",
 )

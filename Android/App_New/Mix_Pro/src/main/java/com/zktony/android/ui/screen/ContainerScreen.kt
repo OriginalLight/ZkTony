@@ -72,6 +72,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.entity.ContainerEntity
+import com.zktony.android.data.entity.Point
 import com.zktony.android.ui.components.DynamicMixPlate
 import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
 import com.zktony.android.ui.components.ZkTonyTopAppBar
@@ -189,7 +190,6 @@ fun ContainerMainPage(
     navigationTo: (PageEnum) -> Unit = {},
     toggleSelected: (Long) -> Unit = {},
 ) {
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -197,7 +197,7 @@ fun ContainerMainPage(
     ) {
         val columnState = rememberLazyListState()
 
-        // Container list
+        // list
         LazyColumn(
             modifier = Modifier
                 .weight(6f)
@@ -262,7 +262,7 @@ fun ContainerMainPage(
             }
         }
 
-        // Container operation
+        // operation
         Column(
             modifier = modifier
                 .weight(1f)
@@ -328,15 +328,6 @@ fun ContainerMainPage(
             }
         }
     }
-}
-
-
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ContainerPagePreview() {
-    ContainerMainPage(
-        uiState = ContainerUiState(entities = listOf(ContainerEntity())),
-    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
@@ -565,9 +556,16 @@ fun ContainerEditPage(
     }
 }
 
+@Composable
+@Preview(showBackground = true, widthDp = 960, heightDp = 640)
+fun ContainerMainPagePreview() {
+    ContainerMainPage(
+        uiState = ContainerUiState(entities = listOf(ContainerEntity())),
+    )
+}
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun ContainerEditPagePreview() {
-    ContainerEditPage(entity = ContainerEntity())
+    ContainerEditPage(entity = ContainerEntity(data = listOf(Point())))
 }

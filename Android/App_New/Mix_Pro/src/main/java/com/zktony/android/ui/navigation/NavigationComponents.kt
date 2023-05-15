@@ -71,13 +71,14 @@ fun AppNavigationRail(
                 ) {
                     Spacer(Modifier.height(16.dp))
 
-                    NavigationRailItem(selected = false, onClick = onDrawerClicked, icon = {
-                        Icon(
-                            modifier = Modifier.size(36.dp),
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = null
-                        )
-                    })
+                    NavigationRailItem(
+                        selected = false, onClick = onDrawerClicked, icon = {
+                            Icon(
+                                modifier = Modifier.size(36.dp),
+                                imageVector = Icons.Filled.Menu,
+                                contentDescription = null
+                            )
+                        })
 
                     Spacer(Modifier.height(16.dp))
                 }
@@ -88,7 +89,8 @@ fun AppNavigationRail(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     TOP_LEVEL_DESTINATIONS.forEach { destination ->
-                        NavigationRailItem(selected = selectedDestination == destination.route,
+                        NavigationRailItem(
+                            selected = selectedDestination == destination.route,
                             onClick = { navigateToTopLevelDestination(destination) },
                             icon = {
                                 Image(
@@ -134,7 +136,8 @@ fun PermanentNavigationDrawerContent(
                             .background(
                                 brush = Brush.horizontalGradient(
                                     listOf(
-                                        Color.White, Color.LightGray.copy(alpha = 0.5f)
+                                        Color.White,
+                                        Color.LightGray.copy(alpha = 0.5f)
                                     )
                                 )
                             )
@@ -160,7 +163,8 @@ fun PermanentNavigationDrawerContent(
                     verticalArrangement = Arrangement.Center,
                 ) {
                     TOP_LEVEL_DESTINATIONS.forEach { destination ->
-                        NavigationDrawerItem(selected = selectedDestination == destination.route,
+                        NavigationDrawerItem(
+                            selected = selectedDestination == destination.route,
                             label = {
                                 Text(
                                     text = stringResource(id = destination.iconTextId),

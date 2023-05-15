@@ -54,34 +54,41 @@ fun ZkTonyTopAppBar(
     navigation: () -> Unit = {},
     actions: @Composable (() -> Unit)? = null,
 ) {
-    CenterAlignedTopAppBar(modifier = modifier
-        .padding(top = 8.dp, start = 8.dp, end = 8.dp)
-        .background(
-            color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
-        ), title = {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-        )
-    }, colors = TopAppBarDefaults.topAppBarColors(
-        containerColor = Color.Transparent,
-    ), navigationIcon = {
-        FilledIconButton(
-            onClick = navigation,
-            colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.onSurface,
+    CenterAlignedTopAppBar(
+        modifier = modifier
+            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.medium
+            ),
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
             )
-        ) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-            )
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Color.Transparent,
+        ),
+        navigationIcon = {
+            FilledIconButton(
+                onClick = navigation,
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+        },
+        actions = {
+            actions?.invoke()
         }
-    }, actions = {
-        actions?.invoke()
-    })
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
@@ -98,7 +105,8 @@ fun ZkTonyBottomAddAppBar(
         modifier = modifier
             .padding(bottom = 8.dp, start = 8.dp, end = 8.dp)
             .background(
-                color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
+                color = MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.medium
             ),
         windowInsets = WindowInsets.imeAnimationSource,
         containerColor = Color.Transparent,
@@ -141,6 +149,7 @@ fun ZkTonyBottomAddAppBar(
                     softKeyboard?.hide()
                 }),
             )
+
             AnimatedVisibility(visible = name.isNotBlank() && !strings.contains(name)) {
                 FloatingActionButton(
                     modifier = Modifier
@@ -149,7 +158,8 @@ fun ZkTonyBottomAddAppBar(
                     onClick = {
                         insert(name)
                         softKeyboard?.hide()
-                    }) {
+                    }
+                ) {
                     Icon(
                         modifier = Modifier.size(36.dp),
                         imageVector = Icons.Default.Add,

@@ -7,6 +7,7 @@ import com.zktony.android.data.entity.ProgramEntity
 import com.zktony.android.ui.navigation.PageEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
@@ -30,6 +31,8 @@ class ProgramViewModel constructor(
                 _selected,
             ) { entities, page, selectedId ->
                 ProgramUiState(entities = entities, page = page, selected = selectedId)
+            }.catch { ex ->
+                ex.printStackTrace()
             }.collect {
                 _uiState.value = it
             }

@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.zktony.android.ui.components.ZkTonyTopAppBar
 import kotlinx.coroutines.launch
 
@@ -25,6 +26,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
+    navController: NavHostController,
     viewModel: HomeViewModel,
 ) {
 

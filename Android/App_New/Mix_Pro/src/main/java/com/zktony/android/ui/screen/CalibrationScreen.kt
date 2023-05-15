@@ -349,12 +349,6 @@ fun CalibrationMainPage(
     }
 }
 
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun CalibrationPagePreview() {
-    CalibrationMainPage(uiState = CalibrationUiState(entities = listOf(CalibrationEntity())))
-}
-
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun CalibrationEditPage(
@@ -611,6 +605,12 @@ fun CalibrationEditPage(
             }
         }
     }
+}
+
+@Composable
+@Preview(showBackground = true, widthDp = 960, heightDp = 640)
+fun CalibrationMainPagePreview() {
+    CalibrationMainPage(uiState = CalibrationUiState(entities = listOf(CalibrationEntity())))
 }
 
 @Composable

@@ -4,21 +4,12 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 
-enum class PageEnum {
-    MAIN,
-    AUTHENTICATION,
-    ADD,
-    EDIT,
-    DETAIL,
-    TRAVEL_EDIT,
-    WASTE_EDIT,
-}
 object Route {
     const val HOME = "Home"
     const val PROGRAM = "Program"
     const val CONTAINER = "Container"
     const val CALIBRATION = "Calibration"
-    const val Setting = "Setting"
+    const val SETTING = "Setting"
     const val MOTOR = "Motor"
     const val CONFIG = "Config"
 }
@@ -70,8 +61,12 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         iconTextId = R.string.tab_calibration
     ),
     TopLevelDestination(
-        route = Route.Setting,
+        route = Route.SETTING,
         iconId = R.drawable.ic_admin,
         iconTextId = R.string.tab_setting
     )
 )
+
+enum class PageEnum {
+    ADD, AUTHENTICATION, DETAIL, EDIT, MAIN, TRAVEL_EDIT, WASTE_EDIT,
+}

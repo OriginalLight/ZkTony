@@ -209,16 +209,6 @@ fun MotorMainPage(
     }
 }
 
-
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun MotorPagePreview() {
-    MotorMainPage(
-        modifier = Modifier,
-        uiState = MotorUiState(entities = listOf(MotorEntity(text = "M1"), MotorEntity(text = "M2")))
-    )
-}
-
 @Composable
 fun MotorEditPage(
     modifier: Modifier = Modifier,
@@ -347,6 +337,14 @@ fun MotorEditPage(
     }
 }
 
+@Composable
+@Preview(showBackground = true, widthDp = 960, heightDp = 640)
+fun MotorMainPagePreview() {
+    MotorMainPage(
+        modifier = Modifier,
+        uiState = MotorUiState(entities = listOf(MotorEntity(text = "M1"), MotorEntity(text = "M2")))
+    )
+}
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
