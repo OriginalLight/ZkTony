@@ -163,10 +163,9 @@ class MCProxy(
                                     else -> 0
                                 }
                                 scope.launch {
-                                    MD.getById(motor.id).firstOrNull()?.let { m1 ->
+                                    MD.getById(id).firstOrNull()?.let { m1 ->
                                         MD.update(
                                             m1.copy(
-                                                id = id,
                                                 subdivision = motor.subdivision,
                                                 speed = motor.speed,
                                                 acceleration = motor.acceleration,

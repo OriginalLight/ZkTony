@@ -25,4 +25,5 @@
     <string name="title_motor">Motor</string>
     <string name="standard_mode">Standard mode</string>
     <string name="mixer_mode">Mixer mode</string>
+    <string name="switch_mode">Switch mode</string>
 </resources>

@@ -25,4 +25,5 @@
     <string name="title_motor">电机</string>
     <string name="standard_mode">标准模式</string>
     <string name="mixer_mode">混合器模式</string>
+    <string name="switch_mode">模式切换</string>
 </resources>

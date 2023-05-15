@@ -30,10 +30,20 @@
                 tools:ignore="NestedWeights">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/normal_container"
                     android:layout_width="480dp"
                     android:layout_height="match_parent"
                     tools:ignore="VisualLintBounds">
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:text="@string/standard_mode"
+                        android:textColor="@color/black"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        app:layout_constraintTop_toTopOf="parent" />
 
                     <LinearLayout
                         android:id="@+id/colloid"
@@ -46,7 +56,7 @@
                         app:layout_constraintBottom_toTopOf="@+id/coagulant"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
+                        app:layout_constraintTop_toBottomOf="@+id/title">
 
 
                         <com.google.android.material.button.MaterialButton
@@ -144,127 +154,10 @@
                     </LinearLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/previous_container"
-                    android:layout_width="480dp"
-                    android:layout_height="match_parent"
-                    android:visibility="gone"
-                    tools:ignore="VisualLintBounds">
-
-                    <LinearLayout
-                        android:id="@+id/previous_colloid"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginEnd="32dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        app:layout_constraintBottom_toTopOf="@+id/previous_coagulant"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent">
-
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/previous_colloid_history"
-                            android:layout_width="196dp"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:gravity="center"
-                            android:insetTop="0dp"
-                            android:insetBottom="0dp"
-                            android:singleLine="true"
-                            android:text="@string/colloid"
-                            android:textAllCaps="false"
-                            android:textColor="@color/light_onPrimary"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            app:cornerRadius="0dp"
-                            app:icon="@mipmap/expand_arrow"
-                            app:iconSize="24dp"
-                            app:iconTint="@null"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:rippleColor="@color/purple_700"
-                            tools:ignore="SpeakableTextPresentCheck" />
-
-                        <EditText
-                            android:id="@+id/previous_colloid_edit"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:imeOptions="actionNext"
-                            android:inputType="number"
-                            android:paddingStart="8dp"
-                            android:paddingEnd="8dp"
-                            android:textColor="@color/black"
-                            android:textSize="30sp"
-                            tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck" />
-
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:id="@+id/previous_coagulant"
-                        android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="32dp"
-                        android:layout_marginEnd="32dp"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/previous_colloid">
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/previous_coagulant_history"
-                            android:layout_width="196dp"
-                            android:layout_height="wrap_content"
-                            android:ellipsize="end"
-                            android:gravity="center"
-                            android:insetTop="0dp"
-                            android:insetBottom="0dp"
-                            android:singleLine="true"
-                            android:text="@string/coagulant"
-                            android:textAllCaps="false"
-                            android:textColor="@color/light_onPrimary"
-                            android:textSize="18sp"
-                            android:textStyle="bold"
-                            app:cornerRadius="0dp"
-                            app:icon="@mipmap/expand_arrow"
-                            app:iconSize="24dp"
-                            app:iconTint="@null"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:rippleColor="@color/purple_700"
-                            tools:ignore="SpeakableTextPresentCheck" />
-
-                        <EditText
-                            android:id="@+id/previous_coagulant_edit"
-                            android:layout_width="0dp"
-                            android:layout_height="match_parent"
-                            android:layout_weight="1"
-                            android:gravity="center"
-                            android:imeOptions="actionDone"
-                            android:inputType="number"
-                            android:paddingStart="8dp"
-                            android:paddingEnd="8dp"
-                            android:textColor="@color/black"
-                            android:textSize="30sp"
-                            tools:ignore="Autofill,LabelFor,SpeakableTextPresentCheck" />
-
-                    </LinearLayout>
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="2dp"
                     android:layout_height="match_parent"
                     tools:ignore="VisualLintBounds" />
-
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="0dp"
@@ -286,33 +179,11 @@
                         app:icon="@mipmap/play"
                         app:iconGravity="textStart"
                         app:iconSize="24dp"
-                        app:layout_constraintBottom_toTopOf="@+id/previous"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_weight="1"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:rippleColor="@color/purple_700"
-                        tools:ignore="VisualLintButtonSize" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/previous"
-                        android:layout_width="0dp"
-                        android:layout_height="64dp"
-                        android:layout_marginStart="16dp"
-                        android:layout_marginEnd="16dp"
-                        android:text="@string/pre_drainage"
-                        android:textAllCaps="false"
-                        android:textSize="22sp"
-                        android:textStyle="bold"
-                        app:cornerRadius="32dp"
-                        app:icon="@mipmap/water"
-                        app:iconGravity="textStart"
-                        app:iconSize="24dp"
                         app:layout_constraintBottom_toTopOf="@+id/mode"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_weight="1"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/start"
+                        app:layout_constraintTop_toTopOf="parent"
                         app:rippleColor="@color/purple_700"
                         tools:ignore="VisualLintButtonSize" />
 
@@ -322,7 +193,7 @@
                         android:layout_height="64dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="16dp"
-                        android:text="@string/standard_mode"
+                        android:text="@string/switch_mode"
                         android:textAllCaps="false"
                         android:textSize="22sp"
                         android:textStyle="bold"
@@ -331,7 +202,7 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_weight="1"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/previous"
+                        app:layout_constraintTop_toBottomOf="@+id/start"
                         app:rippleColor="@color/purple_700"
                         tools:ignore="VisualLintButtonSize" />
 

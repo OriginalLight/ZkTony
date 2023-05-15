@@ -13,7 +13,8 @@ import com.zktony.www.room.entity.*
     [
         Motor::class,
         Calibration::class,
-        CalibrationData::class
+        CalibrationData::class,
+        Cache::class
     ],
     version = 1,
     exportSchema = false
@@ -23,4 +24,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun motorDao(): MotorDao
     abstract fun calibrationDao(): CalibrationDao
     abstract fun calibrationDataDao(): CalibrationDataDao
+
+    abstract fun cacheDao(): CacheDao
 }

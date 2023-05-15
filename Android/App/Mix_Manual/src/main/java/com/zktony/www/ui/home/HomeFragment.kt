@@ -2,7 +2,9 @@ package com.zktony.www.ui.home
 
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.R.mipmap
 import com.zktony.core.base.BaseFragment
@@ -30,38 +32,29 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         binding.apply {
                             if (it.coagulant > 0) {
                                 coagulantEdit.setEqualText(it.coagulant.toString())
+                            } else {
+                                coagulantEdit.setEqualText("")
                             }
                             if (it.colloid > 0) {
                                 colloidEdit.setEqualText(it.colloid.toString())
-                            }
-                            if (it.previousCoagulant > 0) {
-                                previousCoagulantEdit.setEqualText(it.previousCoagulant.toString())
-                            }
-                            if (it.previousColloid > 0) {
-                                previousColloidEdit.setEqualText(it.previousColloid.toString())
+                            } else {
+                                colloidEdit.setEqualText("")
                             }
 
                             start.isEnabled =
                                 it.coagulant > 0 && it.colloid > 0 && it.job == null && !it.start
-                            previous.isEnabled =
-                                it.previousCoagulant > 0 && it.previousColloid > 0 && it.job == null
+                            start.text =
+                                if (it.previous) getString(R.string.pre_drainage) else getString(com.zktony.core.R.string.start)
                             mode.isEnabled = it.job == null
 
-                            previous.isVisible = it.previous
-                            start.isVisible = !it.previous
-                            mode.text = if (it.mode) getString(R.string.mixer_mode) else getString(R.string.standard_mode)
-                            normalContainer.isVisible = !it.previous
-                            previousContainer.isVisible = it.previous
+                            title.text =
+                                if (it.mode) getString(R.string.mixer_mode) else getString(R.string.standard_mode)
 
                             operate.isVisible = it.job == null
                             coagulantEdit.isEnabled = it.job == null
                             colloidEdit.isEnabled = it.job == null
                             coagulantHistory.isEnabled = it.job == null
                             colloidHistory.isEnabled = it.job == null
-                            previousColloidEdit.isEnabled = it.job == null
-                            previousCoagulantEdit.isEnabled = it.job == null
-                            previousCoagulantHistory.isEnabled = it.job == null
-                            previousColloidHistory.isEnabled = it.job == null
 
                             timeText.text = it.time.getTimeFormat()
                             fillCoagulantImage.setBackgroundResource(if (it.fillCoagulant) mipmap.close else mipmap.right)
@@ -85,9 +78,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         binding.apply {
             start.clickNoRepeat {
                 viewModel.start()
-            }
-            previous.clickNoRepeat {
-                viewModel.previous()
             }
             with(reset) {
                 clickScale()
@@ -144,14 +134,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 viewModel.colloidEdit(it)
             }
 
-            previousColloidEdit.afterTextChange {
-                viewModel.previousColloidEdit(it)
-            }
-
-            previousCoagulantEdit.afterTextChange {
-                viewModel.previousCoagulantEdit(it)
-            }
-
             mode.clickNoRepeat {
                 viewModel.mode()
             }
@@ -159,31 +141,16 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             with(coagulantHistory) {
                 clickScale()
                 clickNoRepeat {
-                    val menu = viewModel.uiState.value.coagulantHistory.toList().reversed()
-                    if (menu.isEmpty()) {
+                    val uiState = viewModel.uiState.value
+                    val list = uiState.cacheList.filter { it.type == viewModel.getType() }
+                    if (list.isEmpty()) {
                         return@clickNoRepeat
                     }
                     spannerDialog(
                         view = binding.coagulantEdit,
                         font = 30,
-                        menu = menu,
+                        menu = list.first().coagulant.map { it.toString() }.reversed(),
                         block = { str, _ -> viewModel.selectCoagulant(str) }
-                    )
-                }
-            }
-
-            with(previousCoagulantHistory) {
-                clickScale()
-                clickNoRepeat {
-                    val menu = viewModel.uiState.value.previousCoagulantHistory.toList().reversed()
-                    if (menu.isEmpty()) {
-                        return@clickNoRepeat
-                    }
-                    spannerDialog(
-                        view = binding.previousCoagulantEdit,
-                        font = 30,
-                        menu = menu,
-                        block = { str, _ -> viewModel.selectPreviousCoagulant(str) }
                     )
                 }
             }
@@ -191,31 +158,16 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             with(colloidHistory) {
                 clickScale()
                 clickNoRepeat {
-                    val menu = viewModel.uiState.value.colloidHistory.toList().reversed()
-                    if (menu.isEmpty()) {
+                    val list =
+                        viewModel.uiState.value.cacheList.filter { it.type == viewModel.getType() }
+                    if (list.isEmpty()) {
                         return@clickNoRepeat
                     }
                     spannerDialog(
                         view = binding.colloidEdit,
                         font = 30,
-                        menu = menu,
+                        menu = list.first().colloid.map { it.toString() }.reversed(),
                         block = { str, _ -> viewModel.selectColloid(str) }
-                    )
-                }
-            }
-
-            with(previousColloidHistory) {
-                clickScale()
-                clickNoRepeat {
-                    val menu = viewModel.uiState.value.previousColloidHistory.toList().reversed()
-                    if (menu.isEmpty()) {
-                        return@clickNoRepeat
-                    }
-                    spannerDialog(
-                        view = binding.previousColloidEdit,
-                        font = 30,
-                        menu = menu,
-                        block = { str, _ -> viewModel.selectPreviousColloid(str) }
                     )
                 }
             }

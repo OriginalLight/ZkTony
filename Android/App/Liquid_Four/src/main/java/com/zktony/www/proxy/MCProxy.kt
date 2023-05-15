@@ -126,10 +126,10 @@ class MCProxy(
                         if (v1 != null && v1.fn == "03" && v1.pa == "04") {
                             val motor = v1.data.toMotor()
                             scope.launch {
-                                MD.getById(motor.id).firstOrNull()?.let { m1 ->
+                                val id = if (index == 0) motor.address - 1 else motor.address + 2
+                                MD.getById(id).firstOrNull()?.let { m1 ->
                                     MD.update(
                                         m1.copy(
-                                            id = if (index == 0) motor.address - 1 else motor.address + 2,
                                             subdivision = motor.subdivision,
                                             speed = motor.speed,
                                             acceleration = motor.acceleration,
