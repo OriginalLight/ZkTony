@@ -17,16 +17,17 @@ import java.util.Date
 @Entity(
     tableName = "programs",
     indices = [
-       Index(value = ["name"], unique = true)
+        Index(value = ["name"], unique = true)
     ]
 )
 @Immutable
 @TypeConverters(PointConverters::class)
 data class ProgramEntity(
     @PrimaryKey @ColumnInfo(name = "id") val id: Long = nextId(),
+    @ColumnInfo(name = "sub_id") val subId: Long = 0L,
     @ColumnInfo(name = "name") val name: String = "None",
     @ColumnInfo(name = "data") val data: List<Point> = emptyList(),
     @ColumnInfo(name = "count") val count: Int = 0,
-    @ColumnInfo(name = "active") val active: Int = 0,
+    @ColumnInfo(name = "active") val active: Boolean = false,
     @ColumnInfo(name = "create_time") val createTime: Date = Date(System.currentTimeMillis()),
 )

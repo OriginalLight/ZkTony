@@ -46,6 +46,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -80,6 +81,7 @@ import com.zktony.core.ext.Ext
 import com.zktony.core.ext.createQRCodeBitmap
 import com.zktony.core.utils.QrCode
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Setting screen
@@ -176,19 +178,19 @@ fun SettingMainPage(
         Row(
             modifier = Modifier.weight(1f),
         ) {
-            SettingsForm(
+            SettingsContent(
                 modifier = Modifier.weight(1f),
                 setLanguage = setLanguage,
                 setNavigation = setNavigation,
                 uiState = uiState,
             )
 
-            InfoForm(
+            InfoContent(
                 modifier = Modifier.weight(1f),
             )
         }
 
-        OperationForm(
+        OperationContent(
             modifier = Modifier.wrapContentHeight(),
             checkUpdate = checkUpdate,
             navigationTo = navigationTo,
@@ -198,22 +200,15 @@ fun SettingMainPage(
     }
 }
 
-/**
- * Settings form
- *
- * @param modifier Modifier
- * @param setLanguage Function1<String, Unit>
- * @param setNavigation Function1<Boolean, Unit>
- * @param uiState SettingUiState
- */
 @Composable
-fun SettingsForm(
+fun SettingsContent(
     modifier: Modifier = Modifier,
     setLanguage: (String) -> Unit = {},
     setNavigation: (Boolean) -> Unit = {},
     uiState: SettingUiState,
 ) {
     val lazyColumnState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
     val languageList = listOf(Pair("English", "en"), Pair("简体中文", "zh"))
 
@@ -229,122 +224,63 @@ fun SettingsForm(
         state = lazyColumnState,
     ) {
         item {
-            Card(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .padding(start = 8.dp, top = 16.dp, end = 8.dp)
-                    .clickable { expanded = !expanded },
+            SettingsCard(
+                image = R.drawable.ic_language,
+                text = stringResource(id = R.string.language),
+                onClick = { expanded = !expanded }
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .padding(start = 16.dp),
-                        painter = painterResource(id = R.drawable.ic_language),
-                        contentDescription = null,
-                    )
-
-                    Text(
-                        modifier = Modifier.padding(start = 8.dp),
-                        text = stringResource(id = R.string.language),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Text(
-                        modifier = Modifier.padding(end = 16.dp),
-                        text = when (uiState.settings.language) {
-                            "en" -> "English"
-                            "zh" -> "简体中文"
-                            else -> "简体中文"
-                        },
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
-                }
+                Text(
+                    text = when (uiState.settings.language) {
+                        "en" -> "English"
+                        "zh" -> "简体中文"
+                        else -> "简体中文"
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                )
             }
         }
         languageList.forEach { (name, code) ->
             item {
                 AnimatedVisibility(visible = expanded) {
-                    Card(
-                        modifier = Modifier
-                            .wrapContentHeight()
-                            .padding(start = 32.dp, top = 16.dp, end = 8.dp)
-                            .clickable {
+                    SettingsCard(
+                        image = R.drawable.ic_language,
+                        paddingStart = 32.dp,
+                        onClick = {
+                            scope.launch {
                                 setLanguage(code)
                                 expanded = false
-                            },
-                    ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .padding(start = 16.dp),
-                                painter = painterResource(id = R.drawable.ic_language),
-                                contentDescription = null,
-                            )
-
-                            Spacer(modifier = Modifier.weight(1f))
-
-                            Text(
-                                modifier = Modifier.padding(end = 16.dp),
-                                text = name,
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
+                            }
                         }
+                    ) {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
                     }
                 }
             }
         }
         item {
-            Card(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .padding(start = 8.dp, top = 16.dp, end = 8.dp),
+            SettingsCard(
+                image = R.drawable.ic_navigation,
+                text = stringResource(id = R.string.navigation),
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Image(
-                        modifier = Modifier
-                            .size(48.dp)
-                            .padding(start = 16.dp),
-                        painter = painterResource(id = R.drawable.ic_navigation),
-                        contentDescription = null,
-                    )
-
-                    Text(
-                        modifier = Modifier.padding(start = 8.dp),
-                        text = stringResource(id = R.string.navigation),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    Switch(
-                        modifier = Modifier.padding(end = 16.dp),
-                        checked = uiState.settings.navigation,
-                        onCheckedChange = { setNavigation(it) },
-                    )
-                }
+                Switch(
+                    checked = uiState.settings.navigation,
+                    onCheckedChange = {
+                        scope.launch {
+                            setNavigation(it)
+                        }
+                    },
+                )
             }
         }
     }
 }
 
-/**
- * Info form
- *
- * @param modifier Modifier
- */
 @SuppressLint("HardwareIds")
 @Composable
-fun InfoForm(
+fun InfoContent(
     modifier: Modifier = Modifier,
 ) {
     val lazyColumnState = rememberLazyListState()
@@ -365,146 +301,62 @@ fun InfoForm(
     ) {
         item {
             AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
-                Card(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .padding(start = 8.dp, top = 16.dp, end = 8.dp),
+                SettingsCard(
+                    image = R.drawable.ic_version,
+                    text = stringResource(id = R.string.version),
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .padding(start = 16.dp),
-                            painter = painterResource(id = R.drawable.ic_version),
-                            contentDescription = null,
-                        )
-
-                        Text(
-                            modifier = Modifier.padding(start = 8.dp),
-                            text = stringResource(id = R.string.version),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Text(
-                            modifier = Modifier.padding(end = 16.dp),
-                            text = BuildConfig.VERSION_NAME,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontStyle = FontStyle.Italic,
-                        )
-                    }
+                    Text(
+                        text = BuildConfig.VERSION_NAME,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontStyle = FontStyle.Italic,
+                    )
+                }
+            }
+        }
+        item {
+            AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
+                SettingsCard(
+                    image = R.drawable.ic_device,
+                    text = stringResource(id = R.string.device_info),
+                    onClick = { deviceInfo = !deviceInfo },
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.Default.ArrowForward,
+                        contentDescription = null,
+                    )
                 }
             }
 
         }
         item {
             AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
-                Card(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .padding(start = 8.dp, top = 16.dp, end = 8.dp)
-                        .clickable { deviceInfo = !deviceInfo },
+                SettingsCard(
+                    image = R.drawable.ic_help,
+                    text = stringResource(id = R.string.help),
+                    onClick = { helpInfo = !helpInfo },
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .padding(start = 16.dp),
-                            painter = painterResource(id = R.drawable.ic_device),
-                            contentDescription = null,
-                        )
-
-                        Text(
-                            modifier = Modifier.padding(start = 8.dp),
-                            text = stringResource(id = R.string.device_info),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Icon(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .padding(end = 16.dp),
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = stringResource(id = R.string.device_info)
-                        )
-                    }
-                }
-            }
-
-        }
-        item {
-            AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
-                Card(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .padding(start = 8.dp, top = 16.dp, end = 8.dp)
-                        .clickable { helpInfo = !helpInfo },
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .padding(start = 16.dp),
-                            painter = painterResource(id = R.drawable.ic_help),
-                            contentDescription = null,
-                        )
-
-                        Text(
-                            modifier = Modifier.padding(start = 8.dp),
-                            text = stringResource(id = R.string.help),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Icon(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .padding(end = 16.dp),
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = stringResource(id = R.string.help)
-                        )
-                    }
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.Default.ArrowForward,
+                        contentDescription = null,
+                    )
                 }
             }
         }
         item {
             AnimatedVisibility(visible = deviceInfo) {
-                Card(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .padding(start = 8.dp, top = 16.dp, end = 8.dp)
-                        .clickable { deviceInfo = !deviceInfo },
+                SettingsCard(
+                    image = R.drawable.ic_device,
+                    text = stringResource(id = R.string.device_info),
+                    onClick = { deviceInfo = !deviceInfo },
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(start = 16.dp),
-                            text = stringResource(id = R.string.device_info),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Icon(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .padding(end = 16.dp),
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(id = R.string.device_info),
-                        )
-                    }
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.Default.Close,
+                        contentDescription = null,
+                    )
                 }
             }
         }
@@ -551,31 +403,16 @@ fun InfoForm(
         }
         item {
             AnimatedVisibility(visible = helpInfo) {
-                Card(
-                    modifier = Modifier
-                        .wrapContentHeight()
-                        .padding(start = 8.dp, top = 16.dp, end = 8.dp)
-                        .clickable { helpInfo = !helpInfo },
+                SettingsCard(
+                    image = R.drawable.ic_help,
+                    text = stringResource(id = R.string.qrcode),
+                    onClick = { helpInfo = !helpInfo },
                 ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(start = 16.dp),
-                            text = stringResource(id = R.string.qrcode),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        Icon(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .padding(end = 16.dp),
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(id = R.string.qrcode),
-                        )
-                    }
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.Default.Close,
+                        contentDescription = null,
+                    )
                 }
             }
         }
@@ -599,24 +436,14 @@ fun InfoForm(
     }
 }
 
-/**
- * OperationForm
- *
- * @param modifier Modifier
- * @param checkUpdate Function0<Unit>
- * @param navigationTo Function1<PageEnum, Unit>
- * @param openWifi Function0<Unit>
- * @param uiState SettingUiState
- */
 @Composable
-fun OperationForm(
+fun OperationContent(
     modifier: Modifier = Modifier,
     checkUpdate: () -> Unit = {},
     navigationTo: (PageEnum) -> Unit = {},
     openWifi: () -> Unit = {},
     uiState: SettingUiState,
 ) {
-
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -642,7 +469,6 @@ fun OperationForm(
                     painter = painterResource(id = R.drawable.ic_settings),
                     contentDescription = stringResource(id = R.string.parameters)
                 )
-
                 Text(
                     modifier = Modifier.padding(bottom = 8.dp),
                     text = stringResource(id = R.string.parameters),
@@ -650,7 +476,6 @@ fun OperationForm(
                 )
             }
         }
-
         ElevatedCard(
             modifier = Modifier
                 .weight(1f)
@@ -666,7 +491,6 @@ fun OperationForm(
                     painter = painterResource(id = R.drawable.ic_wifi),
                     contentDescription = stringResource(id = R.string.wifi)
                 )
-
                 Text(
                     modifier = Modifier.padding(bottom = 8.dp),
                     text = stringResource(id = R.string.wifi),
@@ -674,7 +498,6 @@ fun OperationForm(
                 )
             }
         }
-
         ElevatedCard(
             modifier = Modifier
                 .weight(1f)
@@ -707,7 +530,6 @@ fun OperationForm(
                         "${uiState.progress} %"
                     }
                 }
-
                 AnimatedVisibility(visible = uiState.progress > 0) {
                     CircularProgressIndicator(
                         modifier = Modifier
@@ -717,7 +539,6 @@ fun OperationForm(
                         strokeWidth = 16.dp,
                     )
                 }
-
                 AnimatedVisibility(visible = uiState.progress == 0) {
                     Image(
                         modifier = Modifier.size(96.dp),
@@ -725,7 +546,6 @@ fun OperationForm(
                         contentDescription = text,
                     )
                 }
-
                 Text(
                     modifier = Modifier.padding(bottom = 8.dp),
                     text = text,
@@ -736,12 +556,6 @@ fun OperationForm(
     }
 }
 
-/**
- * Code item
- *
- * @param text String
- * @param focused Boolean
- */
 @Composable
 fun VerificationCodeItem(text: String, focused: Boolean) {
     val borderColor = if (focused) {
@@ -763,14 +577,6 @@ fun VerificationCodeItem(text: String, focused: Boolean) {
 
 }
 
-/**
- * Verification code field
- *
- * @param digits Int
- * @param horizontalMargin Dp
- * @param inputCallback Function1<[@kotlin.ParameterName] String, Unit>
- * @param itemScope [@androidx.compose.runtime.Composable] Function2<[@kotlin.ParameterName] String, [@kotlin.ParameterName] Boolean, Unit>
- */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun VerificationCodeField(
@@ -809,7 +615,6 @@ fun VerificationCodeField(
             }
 
         }
-
         BasicTextField(
             modifier = Modifier
                 .focusRequester(focusRequester)
@@ -839,24 +644,17 @@ fun VerificationCodeField(
 
 }
 
-/**
- * Authentication page
- *
- * @param modifier Modifier
- * @param navController NavHostController
- * @param navigationTo Function1<PageEnum, Unit>
- */
 @Composable
 fun AuthenticationPage(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     navigationTo: (PageEnum) -> Unit = {},
 ) {
+    var show by remember { mutableStateOf(false) }
+
     BackHandler {
         navigationTo(PageEnum.MAIN)
     }
-
-    var show by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -869,7 +667,6 @@ fun AuthenticationPage(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(128.dp))
-
         AnimatedVisibility(visible = !show) {
             VerificationCodeField(digits = 6, inputCallback = {
                 show = true
@@ -877,7 +674,6 @@ fun AuthenticationPage(
                 VerificationCodeItem(text, focused)
             }
         }
-
         AnimatedVisibility(visible = show) {
             Row(
                 modifier = Modifier.padding(16.dp),
@@ -898,7 +694,6 @@ fun AuthenticationPage(
                             painter = painterResource(id = R.drawable.ic_motor),
                             contentDescription = stringResource(id = R.string.motor_config)
                         )
-
                         Text(
                             modifier = Modifier.padding(bottom = 8.dp),
                             text = stringResource(id = R.string.motor_config),
@@ -907,7 +702,6 @@ fun AuthenticationPage(
                         )
                     }
                 }
-
                 ElevatedCard(
                     modifier = Modifier.clickable {
                         navigationTo(PageEnum.MAIN)
@@ -923,7 +717,6 @@ fun AuthenticationPage(
                             painter = painterResource(id = R.drawable.ic_settings),
                             contentDescription = stringResource(id = R.string.system_config)
                         )
-
                         Text(
                             modifier = Modifier.padding(bottom = 8.dp),
                             text = stringResource(id = R.string.system_config),
@@ -933,6 +726,44 @@ fun AuthenticationPage(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun SettingsCard(
+    paddingStart: Dp = 8.dp,
+    onClick: () -> Unit = { },
+    image: Int,
+    text: String? = null,
+    content: @Composable () -> Unit,
+) {
+    Card(
+        modifier = Modifier
+            .wrapContentHeight()
+            .padding(start = paddingStart, top = 16.dp, end = 8.dp)
+            .clickable { onClick() },
+    ) {
+        Row(
+            modifier = Modifier
+                .height(48.dp)
+                .padding(horizontal = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Image(
+                modifier = Modifier.size(32.dp),
+                painter = painterResource(id = image),
+                contentDescription = null,
+            )
+            text?.let {
+                Text(
+                    modifier = Modifier.padding(start = 8.dp),
+                    text = text,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            content.invoke()
         }
     }
 }

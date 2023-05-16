@@ -53,9 +53,9 @@ class ContainerViewModel constructor(
         viewModelScope.launch {
             val list: MutableList<Point> = mutableListOf()
             for (i in 0 until 6) {
-                list.add(Point(index = i))
+                list.add(Point(index = i, active = true))
             }
-            dao.insert(ContainerEntity(name = name, data = list, active = 1))
+            dao.insert(ContainerEntity(name = name, data = list))
         }
     }
 

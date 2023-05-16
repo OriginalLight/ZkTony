@@ -49,15 +49,15 @@ class MCProxy constructor(
             launch {
                 CD.getAll().collect {
                     if (it.isNotEmpty()) {
-                        val active = it.find { c -> c.active == 1 }
+                        val active = it.find { c -> c.active }
                         if (active == null) {
-                            CD.update(it[0].copy(active = 1))
+                            CD.update(it[0].copy(active = true))
                         } else {
                             hpc.clear()
                             hpc[0] = 10f
                             hpc[1] = 10f
                             hpc[2] = 10f
-                            val avg = active.data.avgRate()
+                            val avg = active.avgRate()
                             avg.forEachIndexed { index, avgRate ->
                                 hpc[index + 3] = avgRate
                             }
@@ -66,7 +66,7 @@ class MCProxy constructor(
                         CD.insert(
                             CalibrationEntity(
                                 name = "Default",
-                                active = 1,
+                                active = true,
                             )
                         )
                     }

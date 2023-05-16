@@ -10,13 +10,8 @@ import com.zktony.core.ext.nextId
 data class Point(
     val id: Long = nextId(),
     val index: Int = 0,
-    val x: Float = 0f,
-    val y: Float = 0f,
-    val z: Float = 0f,
-    val v1: Int = 0,
-    val v2: Int = 0,
-    val v3: Int = 0,
-    val v4: Int = 0,
+    val axis: List<Float> = listOf(0f, 0f, 0f),
+    val volume: List<Int> = listOf(0, 0, 0, 0),
     val active: Boolean = false,
 )
 

@@ -26,6 +26,6 @@ data class CalibrationEntity(
     @PrimaryKey @ColumnInfo(name = "id") val id: Long = nextId(),
     @ColumnInfo(name = "name") val name: String = "默认",
     @ColumnInfo(name = "data") val data: List<CalibrationData> = emptyList(),
-    @ColumnInfo(name = "active") val active: Int = 0,
+    @ColumnInfo(name = "active") val active: Boolean = false,
     @ColumnInfo(name = "create_time") val createTime: Date = Date(System.currentTimeMillis()),
 )

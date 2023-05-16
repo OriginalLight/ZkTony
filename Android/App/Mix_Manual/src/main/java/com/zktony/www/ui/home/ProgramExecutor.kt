@@ -23,8 +23,8 @@ class ProgramExecutor constructor(
             waitLock {
                 execute {
                     step {
-                        v1 = if (mode) (colloid / 2f + 1f) else (colloid / 2f - 1f)
-                        v2 = if (mode) (colloid / 2f - 1f) else (colloid / 2f + 1f)
+                        v1 = if (mode) (colloid / 2f - 1f) else (colloid / 2f + 1f)
+                        v2 = if (mode) (colloid / 2f + 1f) else (colloid / 2f - 1f)
                         v3 = coagulant.toFloat()
                     }
                 }
@@ -44,8 +44,8 @@ class ProgramExecutor constructor(
                 execute {
                     type(0)
                     step {
-                        v1 = if (mode) colloid.toFloat() else 0f
-                        v2 = if (mode) 0f else colloid.toFloat()
+                        v1 = if (mode) 0f else colloid.toFloat()
+                        v2 = if (mode) colloid.toFloat() else 0f
                         v3 = coagulant.toFloat()
                     }
                 }

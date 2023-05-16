@@ -246,24 +246,20 @@ fun CalibrationMainPage(
                                     painter = painterResource(id = R.drawable.ic_calibration),
                                     contentDescription = null,
                                 )
-
                                 Text(
                                     modifier = Modifier.padding(horizontal = 16.dp),
                                     text = it.name,
                                     style = MaterialTheme.typography.bodyLarge,
                                     maxLines = 1,
                                 )
-
-                                AnimatedVisibility(visible = it.active == 1) {
+                                AnimatedVisibility(visible = it.active) {
                                     Icon(
                                         modifier = Modifier.size(36.dp),
                                         imageVector = Icons.Default.Check,
                                         contentDescription = null,
                                     )
                                 }
-
                                 Spacer(modifier = Modifier.weight(1f))
-
                                 Text(
                                     modifier = Modifier.padding(horizontal = 16.dp),
                                     text = it.createTime.simpleDateFormat("yyyy - MM - dd"),
@@ -274,7 +270,6 @@ fun CalibrationMainPage(
                     }
                 }
             }
-
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -294,7 +289,6 @@ fun CalibrationMainPage(
                         contentDescription = null,
                     )
                 }
-
                 AnimatedVisibility(visible = uiState.selected != 0L) {
                     var count by remember { mutableStateOf(0) }
 
@@ -318,7 +312,6 @@ fun CalibrationMainPage(
                         )
                     }
                 }
-
                 AnimatedVisibility(visible = uiState.selected != 0L) {
                     FloatingActionButton(modifier = Modifier
                         .padding(8.dp)
@@ -331,7 +324,6 @@ fun CalibrationMainPage(
                         )
                     }
                 }
-
                 AnimatedVisibility(visible = uiState.selected != 0L) {
                     FloatingActionButton(modifier = Modifier
                         .padding(8.dp)
@@ -379,7 +371,7 @@ fun CalibrationEditPage(
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            entity.data.compute().forEach { (index, avg, list) ->
+            entity.compute().forEach { (index, avg, list) ->
                 item {
                     Card {
                         Column {
@@ -391,9 +383,7 @@ fun CalibrationEditPage(
                                     text = "V${index + 1}",
                                     style = MaterialTheme.typography.titleLarge,
                                 )
-
                                 Spacer(modifier = Modifier.weight(1f))
-
                                 Text(
                                     modifier = Modifier.padding(end = 16.dp),
                                     text = "${(100f * avg).format(2)} μL",
@@ -403,7 +393,6 @@ fun CalibrationEditPage(
                                     ),
                                 )
                             }
-
                             FlowRow(
                                 modifier = modifier
                                     .fillMaxWidth()
@@ -495,7 +484,6 @@ fun CalibrationEditPage(
                     style = TextStyle(fontSize = 24.sp),
                 )
             }
-
             TextField(
                 modifier = Modifier
                     .weight(1f)
@@ -528,7 +516,6 @@ fun CalibrationEditPage(
                 }),
                 singleLine = true,
             )
-
             TextField(
                 modifier = Modifier
                     .weight(1f)
@@ -562,7 +549,6 @@ fun CalibrationEditPage(
                 }),
                 singleLine = true,
             )
-
             FloatingActionButton(
                 modifier = Modifier
                     .width(128.dp)
@@ -577,7 +563,6 @@ fun CalibrationEditPage(
                     contentDescription = null,
                 )
             }
-
             AnimatedVisibility(visible = expect.isNotEmpty() && actual.isNotEmpty()) {
                 FloatingActionButton(
                     modifier = Modifier

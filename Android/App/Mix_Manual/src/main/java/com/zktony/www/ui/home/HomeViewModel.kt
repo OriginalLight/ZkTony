@@ -197,14 +197,16 @@ class HomeViewModel constructor(
      */
     fun fillColloid() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                start = true,
-                previous = true,
-            )
-            updateValue()
-            asyncHex {
-                pa = "0B"
-                data = "0401"
+            if (!uiState.value.fillCoagulant && !uiState.value.recaptureCoagulant) {
+                _uiState.value = _uiState.value.copy(
+                    start = true,
+                    previous = true,
+                )
+                updateValue()
+                asyncHex {
+                    pa = "0B"
+                    data = "0401"
+                }
             }
         }
     }
@@ -214,14 +216,16 @@ class HomeViewModel constructor(
      */
     fun recaptureColloid() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(
-                start = true,
-                previous = true,
-            )
-            updateValue()
-            asyncHex {
-                pa = "0B"
-                data = "0402"
+            if (!uiState.value.fillCoagulant && !uiState.value.recaptureCoagulant) {
+                _uiState.value = _uiState.value.copy(
+                    start = true,
+                    previous = true,
+                )
+                updateValue()
+                asyncHex {
+                    pa = "0B"
+                    data = "0402"
+                }
             }
         }
     }
@@ -231,10 +235,12 @@ class HomeViewModel constructor(
      */
     fun stopFillAndRecapture() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(start = false)
-            asyncHex {
-                pa = "0B"
-                data = "0400"
+            if (!uiState.value.fillCoagulant && !uiState.value.recaptureCoagulant) {
+                _uiState.value = _uiState.value.copy(start = false)
+                asyncHex {
+                    pa = "0B"
+                    data = "0400"
+                }
             }
         }
     }

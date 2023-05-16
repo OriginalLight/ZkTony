@@ -47,13 +47,6 @@ fun DynamicMixPlate(
     ) {
         val space = size.width / count
 
-        drawRect(
-            color = Color.Black,
-            topLeft = Offset(0f, 0f),
-            size = size,
-            style = Stroke(4f)
-        )
-
         // 画count个圆形
         for (i in 0 until count) {
             drawCircle(

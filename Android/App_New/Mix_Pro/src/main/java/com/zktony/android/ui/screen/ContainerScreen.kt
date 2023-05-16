@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Height
 import androidx.compose.material.icons.outlined.WidthNormal
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
@@ -340,8 +341,8 @@ fun ContainerEditPage(
 ) {
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
-    var y by remember { mutableStateOf(entity.data[0].y.format()) }
-    var z by remember { mutableStateOf(entity.data[0].z.format()) }
+    var y by remember { mutableStateOf(entity.data[0].axis[1].format()) }
+    var z by remember { mutableStateOf(entity.data[0].axis[2].format()) }
 
     LazyColumn(
         modifier = modifier
@@ -355,13 +356,17 @@ fun ContainerEditPage(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         item {
-            DynamicMixPlate(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(128.dp)
-                    .padding(horizontal = 128.dp, vertical = 16.dp),
-                count = entity.data.size,
-            )
+            Card(
+                modifier = Modifier.padding(horizontal = 128.dp, vertical = 16.dp),
+            ) {
+                DynamicMixPlate(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(128.dp)
+                        .padding(horizontal = 16.dp),
+                    count = entity.data.size,
+                )
+            }
         }
 
         item {
@@ -438,8 +443,11 @@ fun ContainerEditPage(
                                 entity.copy(
                                     data = list.map { point ->
                                         point.copy(
-                                            y = y.toFloatOrNull() ?: 0f,
-                                            z = z.toFloatOrNull() ?: 0f,
+                                            axis = listOf(
+                                                0f,
+                                                y.toFloatOrNull() ?: 0f,
+                                                z.toFloatOrNull() ?: 0f
+                                            )
                                         )
                                     }
                                 )
@@ -520,7 +528,6 @@ fun ContainerEditPage(
                         contentDescription = null,
                     )
                 }
-
                 FloatingActionButton(
                     modifier = Modifier
                         .weight(1f)
@@ -533,8 +540,11 @@ fun ContainerEditPage(
                                 entity.copy(
                                     data = list.map { point ->
                                         point.copy(
-                                            y = y.toFloatOrNull() ?: 0f,
-                                            z = z.toFloatOrNull() ?: 0f,
+                                            axis = listOf(
+                                                0f,
+                                                y.toFloatOrNull() ?: 0f,
+                                                z.toFloatOrNull() ?: 0f
+                                            )
                                         )
                                     }
                                 )
@@ -567,5 +577,9 @@ fun ContainerMainPagePreview() {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun ContainerEditPagePreview() {
-    ContainerEditPage(entity = ContainerEntity(data = listOf(Point())))
+    val pointList = mutableListOf<Point>()
+    repeat(6) {
+        pointList.add(Point())
+    }
+    ContainerEditPage(entity = ContainerEntity(data = pointList))
 }
