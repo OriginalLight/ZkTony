@@ -125,7 +125,6 @@ fun MotorScreen(
                             toggleSelected = viewModel::toggleSelected,
                         )
                     }
-
                     AnimatedVisibility(
                         visible = uiState.page == PageEnum.EDIT,
                         enter = expandHorizontally(),
@@ -183,7 +182,6 @@ fun MotorMainPage(
                             fontSize = 50.sp,
                             fontWeight = FontWeight.SemiBold,
                         )
-
                         Column(
                             modifier = Modifier.padding(start = 16.dp),
                         ) {
@@ -233,7 +231,6 @@ fun MotorEditPage(
             text = stringResource(id = R.string.speed),
             style = MaterialTheme.typography.labelLarge
         )
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -244,25 +241,21 @@ fun MotorEditPage(
                 painter = painterResource(id = R.drawable.ic_speed),
                 contentDescription = stringResource(id = R.string.speed)
             )
-
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 text = speed.toString(),
                 style = MaterialTheme.typography.bodyLarge
             )
-
             Slider(
                 value = speed.toFloat(),
                 onValueChange = { speed = it.toInt() },
                 valueRange = 0f..600f,
             )
         }
-
         Text(
             text = stringResource(id = R.string.acceleration),
             style = MaterialTheme.typography.labelLarge
         )
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -273,25 +266,21 @@ fun MotorEditPage(
                 painter = painterResource(id = R.drawable.ic_acceleration),
                 contentDescription = stringResource(id = R.string.acceleration)
             )
-
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 text = acc.toString(),
                 style = MaterialTheme.typography.bodyLarge
             )
-
             Slider(
                 value = acc.toFloat(),
                 onValueChange = { acc = it.toInt() },
                 valueRange = 10f..100f,
             )
         }
-
         Text(
             text = stringResource(id = R.string.deceleration),
             style = MaterialTheme.typography.labelLarge
         )
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
@@ -302,20 +291,17 @@ fun MotorEditPage(
                 painter = painterResource(id = R.drawable.ic_deceleration),
                 contentDescription = stringResource(id = R.string.deceleration)
             )
-
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 text = dec.toString(),
                 style = MaterialTheme.typography.bodyLarge
             )
-
             Slider(
                 value = dec.toFloat(),
                 onValueChange = { dec = it.toInt() },
                 valueRange = 10f..100f,
             )
         }
-
         AnimatedVisibility(visible = entity.speed != speed || entity.acc != acc || entity.dec != dec) {
             Button(
                 modifier = Modifier
@@ -342,7 +328,12 @@ fun MotorEditPage(
 fun MotorMainPagePreview() {
     MotorMainPage(
         modifier = Modifier,
-        uiState = MotorUiState(entities = listOf(MotorEntity(text = "M1"), MotorEntity(text = "M2")))
+        uiState = MotorUiState(
+            entities = listOf(
+                MotorEntity(text = "M1"),
+                MotorEntity(text = "M2")
+            )
+        )
     )
 }
 

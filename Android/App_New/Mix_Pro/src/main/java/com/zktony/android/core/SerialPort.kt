@@ -1,4 +1,4 @@
-package com.zktony.android.core.proxy
+package com.zktony.android.core
 
 import com.zktony.core.ext.logi
 import com.zktony.serialport.SerialHelper
@@ -12,11 +12,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.ConcurrentHashMap
+import java.util.Vector
 
-class SerialProxy {
-
+class SerialPort {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+
     private val helper by lazy {
         SerialHelper(serialConfig {
             crc = true
@@ -27,14 +27,15 @@ class SerialProxy {
     private val _callback = MutableStateFlow<String?>(null)
 
     val callback = _callback.asStateFlow()
-    val map: MutableMap<Int, Int> = ConcurrentHashMap()
+    val vector = Vector<Int>(16).apply {
+        for (i in 0..15) {
+            add(0)
+        }
+    }
 
     init {
         scope.launch {
             helper.openDevice()
-            for (i in 0..15) {
-                map[i] = 0
-            }
             helper.callback = { hexHandler(it) }
         }
     }
@@ -57,7 +58,7 @@ class SerialProxy {
                 "01" -> {
                     val index = v2.data.substring(0, 2).hexToInt()
                     val value = v2.data.substring(2, 4).hexToInt()
-                    map[index] = value
+                    vector[index] = value
                 }
             }
         }
@@ -67,7 +68,7 @@ class SerialProxy {
      * 初始化
      */
     fun initializer() {
-        "SerialProxy initializer".logi()
+        "SerialPortHelper initializer".logi()
     }
 
 }

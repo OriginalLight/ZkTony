@@ -584,7 +584,7 @@ fun CalibrationEditPage(
                     Icon(
                         modifier = Modifier.size(36.dp),
                         imageVector = Icons.Default.Save,
-                        contentDescription = stringResource(id = R.string.save),
+                        contentDescription = null,
                     )
                 }
             }

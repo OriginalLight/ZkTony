@@ -149,7 +149,6 @@ fun ZkTonyBottomAddAppBar(
                     softKeyboard?.hide()
                 }),
             )
-
             AnimatedVisibility(visible = name.isNotBlank() && !strings.contains(name)) {
                 FloatingActionButton(
                     modifier = Modifier

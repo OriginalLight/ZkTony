@@ -160,7 +160,6 @@ fun ContainerScreen(
                             toggleSelected = viewModel::toggleSelected,
                         )
                     }
-
                     AnimatedVisibility(
                         visible = uiState.page == PageEnum.EDIT,
                         enter = expandHorizontally(),
@@ -219,7 +218,6 @@ fun ContainerMainPage(
                     } else {
                         MaterialTheme.colorScheme.surfaceVariant
                     }
-
                     OutlinedCard(
                         modifier = Modifier
                             .wrapContentHeight()
@@ -242,16 +240,13 @@ fun ContainerMainPage(
                                 painter = painterResource(id = R.drawable.ic_container),
                                 contentDescription = null,
                             )
-
                             Text(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 text = it.name,
                                 style = MaterialTheme.typography.bodyLarge,
                                 maxLines = 1,
                             )
-
                             Spacer(modifier = Modifier.weight(1f))
-
                             Text(
                                 modifier = Modifier.padding(horizontal = 16.dp),
                                 text = it.createTime.simpleDateFormat("yyyy - MM - dd"),
@@ -417,7 +412,6 @@ fun ContainerEditPage(
                     ),
                     singleLine = true,
                 )
-
                 FloatingActionButton(
                     modifier = Modifier
                         .weight(1f)
@@ -430,7 +424,6 @@ fun ContainerEditPage(
                         contentDescription = null,
                     )
                 }
-
                 FloatingActionButton(
                     modifier = Modifier
                         .weight(1f)
@@ -463,7 +456,6 @@ fun ContainerEditPage(
                     )
                 }
             }
-
             Divider(modifier = Modifier.padding(horizontal = 16.dp))
         }
 
@@ -515,7 +507,6 @@ fun ContainerEditPage(
                     ),
                     singleLine = true,
                 )
-
                 FloatingActionButton(
                     modifier = Modifier
                         .weight(1f)
@@ -560,7 +551,6 @@ fun ContainerEditPage(
                     )
                 }
             }
-
             Divider(modifier = Modifier.padding(horizontal = 16.dp))
         }
     }

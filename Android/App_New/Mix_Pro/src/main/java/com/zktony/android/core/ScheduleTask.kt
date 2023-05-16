@@ -1,4 +1,4 @@
-package com.zktony.android.core.proxy
+package com.zktony.android.core
 
 import com.zktony.android.core.ext.avgRate
 import com.zktony.android.data.dao.CalibrationDao
@@ -15,11 +15,10 @@ import java.util.concurrent.ConcurrentHashMap
  * @author: 刘贺贺
  * @date: 2023-01-30 14:27
  */
-class MCProxy constructor(
+class ScheduleTask constructor(
     private val MD: MotorDao,
     private val CD: CalibrationDao,
 ) {
-
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     /**
@@ -57,8 +56,7 @@ class MCProxy constructor(
                             hpc[0] = 10f
                             hpc[1] = 10f
                             hpc[2] = 10f
-                            val avg = active.avgRate()
-                            avg.forEachIndexed { index, avgRate ->
+                            active.avgRate().forEachIndexed { index, avgRate ->
                                 hpc[index + 3] = avgRate
                             }
                         }
@@ -76,6 +74,6 @@ class MCProxy constructor(
     }
 
     fun initializer() {
-        "MCProxy initializer".logi()
+        "ScheduleHelper initializer".logi()
     }
 }

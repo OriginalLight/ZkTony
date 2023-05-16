@@ -146,7 +146,6 @@ fun SettingScreen(
                             setNavigation = viewModel::setNavigation,
                         )
                     }
-
                     AnimatedVisibility(visible = uiState.page == PageEnum.AUTHENTICATION) {
                         AuthenticationPage(
                             modifier = modifier,
@@ -184,12 +183,10 @@ fun SettingMainPage(
                 setNavigation = setNavigation,
                 uiState = uiState,
             )
-
             InfoContent(
                 modifier = Modifier.weight(1f),
             )
         }
-
         OperationContent(
             modifier = Modifier.wrapContentHeight(),
             checkUpdate = checkUpdate,

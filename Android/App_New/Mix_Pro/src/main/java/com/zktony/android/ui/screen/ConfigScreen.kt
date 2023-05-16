@@ -132,7 +132,6 @@ fun ConfigScreen(
                             navigationTo = viewModel::navigationTo,
                         )
                     }
-
                     AnimatedVisibility(visible = uiState.page == PageEnum.TRAVEL_EDIT) {
                         TravelEditPage(
                             modifier = Modifier,
@@ -146,7 +145,6 @@ fun ConfigScreen(
                             }
                         )
                     }
-
                     AnimatedVisibility(visible = uiState.page == PageEnum.WASTE_EDIT) {
                         WasteEditPage(
                             modifier = Modifier,
@@ -278,7 +276,6 @@ fun TravelEditPage(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(128.dp))
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -289,12 +286,10 @@ fun TravelEditPage(
                 painter = painterResource(id = R.drawable.ic_distance),
                 contentDescription = null,
             )
-
             Text(
                 text = "(",
                 fontSize = 30.sp,
             )
-
             CustomTextField(
                 modifier = Modifier
                     .width(128.dp)
@@ -313,12 +308,10 @@ fun TravelEditPage(
                     focusManager.moveFocus(FocusDirection.Next)
                 })
             )
-
             Text(
                 text = ",",
                 fontSize = 30.sp,
             )
-
             CustomTextField(
                 modifier = Modifier.width(128.dp),
                 value = TextFieldValue(y.format(), TextRange(y.format().length)),
@@ -335,12 +328,10 @@ fun TravelEditPage(
                     focusManager.moveFocus(FocusDirection.Next)
                 })
             )
-
             Text(
                 text = ",",
                 fontSize = 30.sp,
             )
-
             CustomTextField(
                 modifier = Modifier.width(128.dp),
                 value = TextFieldValue(z.format(), TextRange(z.format().length)),
@@ -355,7 +346,6 @@ fun TravelEditPage(
                     softKeyboard?.hide()
                 })
             )
-
             Text(
                 text = ")",
                 fontSize = 30.sp,
@@ -414,7 +404,6 @@ fun WasteEditPage(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(128.dp))
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -425,12 +414,10 @@ fun WasteEditPage(
                 painter = painterResource(id = R.drawable.ic_coordinate),
                 contentDescription = null,
             )
-
             Text(
                 text = "(",
                 fontSize = 30.sp,
             )
-
             CustomTextField(
                 modifier = Modifier
                     .width(128.dp)
@@ -450,12 +437,10 @@ fun WasteEditPage(
                     focusManager.moveFocus(FocusDirection.Next)
                 })
             )
-
             Text(
                 text = ",",
                 fontSize = 30.sp,
             )
-
             CustomTextField(
                 modifier = Modifier.width(128.dp),
                 value = TextFieldValue(y.format(), TextRange(y.format().length)),
@@ -473,12 +458,10 @@ fun WasteEditPage(
                     focusManager.moveFocus(FocusDirection.Next)
                 })
             )
-
             Text(
                 text = ",",
                 fontSize = 30.sp,
             )
-
             CustomTextField(
                 modifier = Modifier.width(128.dp),
                 value = TextFieldValue(z.format(), TextRange(z.format().length)),
@@ -493,13 +476,11 @@ fun WasteEditPage(
                     softKeyboard?.hide()
                 })
             )
-
             Text(
                 text = ")",
                 fontSize = 30.sp,
             )
         }
-
         AnimatedVisibility(visible = waste[0].format() != x || waste[1].format() != y || waste[2].format() != z) {
             ElevatedButton(
                 modifier = Modifier

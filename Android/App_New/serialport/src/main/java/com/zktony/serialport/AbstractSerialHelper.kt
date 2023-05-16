@@ -83,7 +83,7 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
         }
         serialPort?.close()
         readThread?.interrupt()
-        handlerThread?.quit()
+        handlerThread?.interrupt()
         isOpen = false
     }
 

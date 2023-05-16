@@ -43,7 +43,7 @@ data class SerialConfig(
     /**
      * 发送延时
      */
-    var delay: Long = 30L,
+    var delay: Long = 10L,
 
     /**
      * CMD_SHELL
