@@ -18,9 +18,9 @@ fun ContainerEntity.axis(): List<Float> {
     }
 }
 
-fun ProgramEntity.volume(): List<Int> {
+fun ProgramEntity.volume(): List<Float> {
     return if (this.data.isEmpty()) {
-        listOf(0, 0, 0, 0)
+        listOf(0f, 0f, 0f, 0f)
     } else {
         this.data[0].volume
     }

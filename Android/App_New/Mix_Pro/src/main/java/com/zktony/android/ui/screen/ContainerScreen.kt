@@ -35,8 +35,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoveUp
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.outlined.Height
-import androidx.compose.material.icons.outlined.WidthNormal
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -44,11 +42,12 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,7 +64,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -336,8 +334,8 @@ fun ContainerEditPage(
 ) {
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
-    var y by remember { mutableStateOf(entity.data[0].axis[1].format()) }
-    var z by remember { mutableStateOf(entity.data[0].axis[2].format()) }
+    var y by remember { mutableStateOf(entity.data[0].axis[1].format(2)) }
+    var z by remember { mutableStateOf(entity.data[0].axis[2].format(2)) }
 
     LazyColumn(
         modifier = modifier
@@ -372,7 +370,7 @@ fun ContainerEditPage(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
-                OutlinedTextField(
+                TextField(
                     modifier = Modifier
                         .weight(2f)
                         .padding(horizontal = 16.dp),
@@ -382,17 +380,12 @@ fun ContainerEditPage(
                     label = { Text(text = "容器位置") },
                     textStyle = TextStyle(
                         fontSize = 24.sp,
-                        textAlign = TextAlign.Center
                     ),
-                    leadingIcon = {
-                        Icon(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .padding(horizontal = 8.dp),
-                            imageVector = Icons.Outlined.WidthNormal,
-                            contentDescription = null,
-                        )
-                    },
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                    ),
                     trailingIcon = {
                         Icon(
                             modifier = Modifier
@@ -467,7 +460,7 @@ fun ContainerEditPage(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
             ) {
-                OutlinedTextField(
+                TextField(
                     modifier = Modifier
                         .weight(2f)
                         .padding(horizontal = 16.dp),
@@ -477,17 +470,12 @@ fun ContainerEditPage(
                     label = { Text(text = "下降高度") },
                     textStyle = TextStyle(
                         fontSize = 24.sp,
-                        textAlign = TextAlign.Center
                     ),
-                    leadingIcon = {
-                        Icon(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .padding(horizontal = 8.dp),
-                            imageVector = Icons.Outlined.Height,
-                            contentDescription = null,
-                        )
-                    },
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                    ),
                     trailingIcon = {
                         Icon(
                             modifier = Modifier

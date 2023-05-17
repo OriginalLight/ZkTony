@@ -13,26 +13,26 @@ import com.zktony.core.ext.nextId
  * @date 2023/5/15 16:10
  */
 @Entity(tableName = "cache")
-@TypeConverters(IntConverters::class)
+@TypeConverters(FloatConverters::class)
 data class Cache(
     @PrimaryKey
     val id: Long = nextId(),
-    val colloid: List<Int> = emptyList(),
-    val coagulant: List<Int> = emptyList(),
+    val colloid: List<Float> = emptyList(),
+    val coagulant: List<Float> = emptyList(),
     val type: Int = 0,
 )
 
-object IntConverters {
+object FloatConverters {
     @TypeConverter
     @JvmStatic
-    fun stringToObject(value: String): List<Int> {
-        val listType = object : TypeToken<List<Int>>() {}.type
+    fun stringToObject(value: String): List<Float> {
+        val listType = object : TypeToken<List<Float>>() {}.type
         return Gson().fromJson(value, listType)
     }
 
     @TypeConverter
     @JvmStatic
-    fun objectToString(list: List<Int>): String {
+    fun objectToString(list: List<Float>): String {
         val gson = Gson()
         return gson.toJson(list)
     }

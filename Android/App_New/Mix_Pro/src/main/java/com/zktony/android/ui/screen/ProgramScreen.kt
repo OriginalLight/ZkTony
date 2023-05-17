@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,11 +43,12 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,10 +62,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
@@ -75,6 +79,7 @@ import com.zktony.android.ui.components.DynamicMixPlate
 import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
 import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.navigation.PageEnum
+import com.zktony.core.ext.format
 import com.zktony.core.ext.simpleDateFormat
 import kotlinx.coroutines.launch
 
@@ -329,10 +334,10 @@ fun ProgramEditPage(
 ) {
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
-    var v1 by remember { mutableStateOf(entity.volume()[0].toString()) }
-    var v2 by remember { mutableStateOf(entity.volume()[1].toString()) }
-    var v3 by remember { mutableStateOf(entity.volume()[2].toString()) }
-    var v4 by remember { mutableStateOf(entity.volume()[3].toString()) }
+    var v1 by remember { mutableStateOf(entity.volume()[0].format(1)) }
+    var v2 by remember { mutableStateOf(entity.volume()[1].format(1)) }
+    var v3 by remember { mutableStateOf(entity.volume()[2].format(1)) }
+    var v4 by remember { mutableStateOf(entity.volume()[3].format(1)) }
 
     LazyColumn(
         modifier = modifier
@@ -427,13 +432,28 @@ fun ProgramEditPage(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    OutlinedTextField(
+                    TextField(
                         modifier = Modifier.weight(1f),
                         value = v1,
                         onValueChange = { v1 = it },
                         shape = MaterialTheme.shapes.medium,
                         label = { Text("制胶-胶体") },
-                        suffix = { Text("μL") },
+                        textStyle = TextStyle(
+                            fontSize = 24.sp,
+                        ),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                        ),
+                        trailingIcon = {
+                            Icon(
+                                modifier = Modifier
+                                    .clickable { v1 = "" },
+                                imageVector = Icons.Outlined.Clear,
+                                contentDescription = null,
+                            )
+                        },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -445,13 +465,28 @@ fun ProgramEditPage(
                             }
                         ),
                     )
-                    OutlinedTextField(
+                    TextField(
                         modifier = Modifier.weight(1f),
                         value = v2,
                         onValueChange = { v2 = it },
                         shape = MaterialTheme.shapes.medium,
                         label = { Text("制胶-促凝剂") },
-                        suffix = { Text("μL") },
+                        textStyle = TextStyle(
+                            fontSize = 24.sp,
+                        ),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                        ),
+                        trailingIcon = {
+                            Icon(
+                                modifier = Modifier
+                                    .clickable { v2 = "" },
+                                imageVector = Icons.Outlined.Clear,
+                                contentDescription = null,
+                            )
+                        },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -467,13 +502,28 @@ fun ProgramEditPage(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    OutlinedTextField(
+                    TextField(
                         modifier = Modifier.weight(1f),
                         value = v3,
                         onValueChange = { v3 = it },
                         shape = MaterialTheme.shapes.medium,
                         label = { Text("预排-胶体") },
-                        suffix = { Text("μL") },
+                        textStyle = TextStyle(
+                            fontSize = 24.sp,
+                        ),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                        ),
+                        trailingIcon = {
+                            Icon(
+                                modifier = Modifier
+                                    .clickable { v3 = "" },
+                                imageVector = Icons.Outlined.Clear,
+                                contentDescription = null,
+                            )
+                        },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -485,13 +535,28 @@ fun ProgramEditPage(
                             }
                         ),
                     )
-                    OutlinedTextField(
+                    TextField(
                         modifier = Modifier.weight(1f),
                         value = v4,
                         onValueChange = { v4 = it },
                         shape = MaterialTheme.shapes.medium,
                         label = { Text("预排-促凝剂") },
-                        suffix = { Text("μL") },
+                        textStyle = TextStyle(
+                            fontSize = 24.sp,
+                        ),
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent,
+                        ),
+                        trailingIcon = {
+                            Icon(
+                                modifier = Modifier
+                                    .clickable { v4 = "" },
+                                imageVector = Icons.Outlined.Clear,
+                                contentDescription = null,
+                            )
+                        },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -519,10 +584,10 @@ fun ProgramEditPage(
                                         data = entity.data.map { p ->
                                             p.copy(
                                                 volume = listOf(
-                                                    v1.toIntOrNull() ?: 0,
-                                                    v2.toIntOrNull() ?: 0,
-                                                    v3.toIntOrNull() ?: 0,
-                                                    v4.toIntOrNull() ?: 0,
+                                                    v1.toFloatOrNull() ?: 0f,
+                                                    v2.toFloatOrNull() ?: 0f,
+                                                    v3.toFloatOrNull() ?: 0f,
+                                                    v4.toFloatOrNull() ?: 0f,
                                                 )
                                             )
                                         },

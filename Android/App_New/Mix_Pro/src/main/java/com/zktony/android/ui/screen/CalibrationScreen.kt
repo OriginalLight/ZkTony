@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -34,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoveUp
 import androidx.compose.material.icons.filled.Save
@@ -41,10 +43,11 @@ import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -341,7 +344,10 @@ fun CalibrationMainPage(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
+@OptIn(
+    ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
 fun CalibrationEditPage(
     modifier: Modifier = Modifier,
@@ -349,7 +355,6 @@ fun CalibrationEditPage(
     entity: CalibrationEntity = CalibrationEntity(),
     update: (CalibrationEntity) -> Unit = { },
 ) {
-    var expand by remember { mutableStateOf(false) }
     var index by remember { mutableStateOf(0) }
     var expect by remember { mutableStateOf("") }
     var actual by remember { mutableStateOf("") }
@@ -436,29 +441,40 @@ fun CalibrationEditPage(
             }
         }
 
-        AnimatedVisibility(visible = expand) {
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp, end = 8.dp, bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                repeat(13) {
-                    OutlinedButton(
-                        modifier = Modifier
-                            .width(96.dp)
-                            .padding(vertical = 8.dp),
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = MaterialTheme.shapes.medium
+                ),
+            contentPadding = PaddingValues(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            repeat(9) {
+                item {
+                    FilterChip(
+                        selected = index == it,
                         shape = MaterialTheme.shapes.small,
-                        onClick = {
-                            index = it
-                            expand = false
-                        }) {
-                        Text(
-                            text = "V${it + 1}",
-                            style = TextStyle(fontSize = 24.sp),
-                        )
-                    }
+                        onClick = { index = it },
+                        trailingIcon = {
+                            if (index == it) {
+                                Icon(
+                                    imageVector = Icons.Default.Done,
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        label = {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 8.dp),
+                                text = "V${it + 1}",
+                                style = TextStyle(fontSize = 24.sp),
+                            )
+                        }
+                    )
                 }
             }
         }
@@ -474,16 +490,6 @@ fun CalibrationEditPage(
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            FloatingActionButton(
-                modifier = Modifier
-                    .width(128.dp)
-                    .padding(start = 16.dp),
-                onClick = { expand = true }) {
-                Text(
-                    text = "V${index + 1}",
-                    style = TextStyle(fontSize = 24.sp),
-                )
-            }
             TextField(
                 modifier = Modifier
                     .weight(1f)

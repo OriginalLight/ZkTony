@@ -65,13 +65,13 @@ class HomeViewModel constructor(
                 scope = this,
             )
             executor.finish = {
-                _uiState.value.job?.cancel()
                 _uiState.value = _uiState.value.copy(
-                    job = null,
                     time = 0L,
                     previous = !_uiState.value.previous
                 )
                 updateValue()
+                _uiState.value.job?.cancel()
+                _uiState.value = _uiState.value.copy(job = null)
             }
             if (_uiState.value.previous) {
                 executor.executePrevious()
@@ -248,7 +248,7 @@ class HomeViewModel constructor(
     fun selectCoagulant(str: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
-                coagulant = str.toIntOrNull() ?: 0,
+                coagulant = str.toFloatOrNull() ?: 0f,
             )
         }
     }
@@ -256,20 +256,20 @@ class HomeViewModel constructor(
     fun selectColloid(str: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
-                colloid = str.toIntOrNull() ?: 0,
+                colloid = str.toFloatOrNull() ?: 0f,
             )
         }
     }
 
     fun colloidEdit(str: String) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(colloid = str.toIntOrNull() ?: 0)
+            _uiState.value = _uiState.value.copy(colloid = str.toFloatOrNull() ?: 0f)
         }
     }
 
     fun coagulantEdit(str: String) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(coagulant = minOf(str.toIntOrNull() ?: 0, 800))
+            _uiState.value = _uiState.value.copy(coagulant = str.toFloatOrNull() ?: 0f)
         }
     }
 
@@ -358,22 +358,22 @@ class HomeViewModel constructor(
         if (cacheList.isNotEmpty()) {
             val list = cacheList.filter { c -> c.type == getType() }
             if (list.isNotEmpty()) {
-                val colloid = list.first().colloid.lastOrNull() ?: 0
-                val coagulant = list.first().coagulant.lastOrNull() ?: 0
+                val colloid = list.first().colloid.lastOrNull() ?: 0f
+                val coagulant = list.first().coagulant.lastOrNull() ?: 0f
                 _uiState.value = _uiState.value.copy(
                     colloid = colloid,
                     coagulant = coagulant,
                 )
             } else {
                 _uiState.value = _uiState.value.copy(
-                    colloid = 0,
-                    coagulant = 0,
+                    colloid = 0f,
+                    coagulant = 0f,
                 )
             }
         } else {
             _uiState.value = _uiState.value.copy(
-                colloid = 0,
-                coagulant = 0,
+                colloid = 0f,
+                coagulant = 0f,
             )
         }
     }
@@ -386,8 +386,8 @@ data class HomeUiState(
     val fillCoagulant: Boolean = false,
     val recaptureCoagulant: Boolean = false,
     val upOrDown: Boolean = true,
-    val colloid: Int = 0,
-    val coagulant: Int = 0,
+    val colloid: Float = 0f,
+    val coagulant: Float = 0f,
     val cacheList: List<Cache> = emptyList(),
     val mode: Boolean = false,
     val previous: Boolean = true,

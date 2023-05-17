@@ -30,19 +30,19 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 launch {
                     viewModel.uiState.collect {
                         binding.apply {
-                            if (it.coagulant > 0) {
-                                coagulantEdit.setEqualText(it.coagulant.toString())
+                            if (it.coagulant > 0f) {
+                                coagulantEdit.setEqualText(it.coagulant.format())
                             } else {
                                 coagulantEdit.setEqualText("")
                             }
-                            if (it.colloid > 0) {
-                                colloidEdit.setEqualText(it.colloid.toString())
+                            if (it.colloid > 0f) {
+                                colloidEdit.setEqualText(it.colloid.format())
                             } else {
                                 colloidEdit.setEqualText("")
                             }
 
                             start.isEnabled =
-                                it.coagulant > 0 && it.colloid > 0 && it.job == null && !it.start
+                                it.coagulant > 0f && it.colloid > 0f && it.job == null && !it.start
                             start.text =
                                 if (it.previous) getString(R.string.pre_drainage) else getString(com.zktony.core.R.string.start)
                             mode.isEnabled = it.job == null
@@ -149,7 +149,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     spannerDialog(
                         view = binding.coagulantEdit,
                         font = 30,
-                        menu = list.first().coagulant.map { it.toString() }.reversed(),
+                        menu = list.first().coagulant.map { it.format() }.reversed(),
                         block = { str, _ -> viewModel.selectCoagulant(str) }
                     )
                 }
@@ -166,7 +166,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     spannerDialog(
                         view = binding.colloidEdit,
                         font = 30,
-                        menu = list.first().colloid.map { it.toString() }.reversed(),
+                        menu = list.first().colloid.map { it.format() }.reversed(),
                         block = { str, _ -> viewModel.selectColloid(str) }
                     )
                 }

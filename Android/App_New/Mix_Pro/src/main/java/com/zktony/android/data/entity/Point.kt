@@ -11,7 +11,7 @@ data class Point(
     val id: Long = nextId(),
     val index: Int = 0,
     val axis: List<Float> = listOf(0f, 0f, 0f),
-    val volume: List<Int> = listOf(0, 0, 0, 0),
+    val volume: List<Float> = listOf(0f, 0f, 0f, 0f),
     val active: Boolean = false,
 )
 
