@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.ui.navigation.PageEnum
+import com.zktony.android.ui.utils.PageEnum
 import com.zktony.core.ext.DownloadState
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.download

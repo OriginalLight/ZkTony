@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -25,6 +26,9 @@ import com.zktony.android.ui.screen.HomeScreen
 import com.zktony.android.ui.screen.MotorScreen
 import com.zktony.android.ui.screen.ProgramScreen
 import com.zktony.android.ui.screen.SettingScreen
+import com.zktony.android.ui.screen.SplashScreen
+import com.zktony.android.ui.utils.NavigationType
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -39,36 +43,48 @@ fun ZkTonyApp() {
     }
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val selectedDestination = navBackStackEntry?.destination?.route ?: Route.HOME
+    val navigationType = remember { mutableStateOf(NavigationType.NONE) }
+    val scope = rememberCoroutineScope()
 
-    val drawerState = remember { mutableStateOf(false) }
-
-    PermanentNavigationDrawer(drawerContent = {
-        AnimatedVisibility(
-            visible = !drawerState.value,
-            enter = expandHorizontally(),
-            exit = shrinkHorizontally(),
-        ) {
-            PermanentNavigationDrawerContent(
-                selectedDestination = selectedDestination,
-                navigateToTopLevelDestination = navigationActions::navigateTo,
+    PermanentNavigationDrawer(
+        drawerContent = {
+            AnimatedVisibility(
+                visible = navigationType.value == NavigationType.PERMANENT_NAVIGATION_DRAWER,
+                enter = expandHorizontally(),
+                exit = shrinkHorizontally(),
             ) {
-                drawerState.value = true
+                PermanentNavigationDrawerContent(
+                    selectedDestination = selectedDestination,
+                    navigateToTopLevelDestination = navigationActions::navigateTo,
+                ) {
+                    scope.launch {
+                        navigationType.value = NavigationType.NAVIGATION_RAIL
+                    }
+                }
+            }
+            AnimatedVisibility(
+                visible = navigationType.value == NavigationType.NAVIGATION_RAIL,
+                enter = expandHorizontally(),
+                exit = shrinkHorizontally(),
+            ) {
+                AppNavigationRail(
+                    selectedDestination = selectedDestination,
+                    navigateToTopLevelDestination = navigationActions::navigateTo
+                ) {
+                    scope.launch {
+                        navigationType.value = NavigationType.PERMANENT_NAVIGATION_DRAWER
+                    }
+                }
+            }
+        }) {
+        AppNavHost(
+            modifier = Modifier,
+            navController = navController,
+        ) {
+            scope.launch {
+                navigationType.value = NavigationType.PERMANENT_NAVIGATION_DRAWER
             }
         }
-        AnimatedVisibility(
-            visible = drawerState.value,
-            enter = expandHorizontally(),
-            exit = shrinkHorizontally(),
-        ) {
-            AppNavigationRail(
-                selectedDestination = selectedDestination,
-                navigateToTopLevelDestination = navigationActions::navigateTo
-            ) {
-                drawerState.value = false
-            }
-        }
-    }) {
-        AppNavHost(navController = navController)
     }
 }
 
@@ -80,14 +96,22 @@ fun ZkTonyApp() {
  */
 @Composable
 private fun AppNavHost(
-    navController: NavHostController,
     modifier: Modifier = Modifier,
+    navController: NavHostController,
+    openDrawer: () -> Unit = {},
 ) {
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = Route.HOME,
+        startDestination = Route.SPLASH,
     ) {
+        composable(Route.SPLASH) {
+            SplashScreen(
+                modifier = Modifier,
+                navController = navController,
+                openDrawer = openDrawer,
+            )
+        }
         composable(Route.HOME) {
             HomeScreen(
                 modifier = Modifier,

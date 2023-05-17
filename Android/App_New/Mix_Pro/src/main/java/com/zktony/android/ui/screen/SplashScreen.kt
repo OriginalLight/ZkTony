@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +31,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.zktony.android.R
+import com.zktony.android.ui.navigation.Route
 
 /**
  * @author 刘贺贺
@@ -42,12 +43,12 @@ import com.zktony.android.R
 @Composable
 fun SplashScreen(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    navController: NavHostController,
+    openDrawer: () -> Unit = {},
 ) {
 
     val scale = remember { Animatable(0f) }
     var splash by remember { mutableStateOf(true) }
-    var notice by remember { mutableStateOf(false) }
 
     // AnimationEffect
     LaunchedEffect(key1 = true) {
@@ -59,60 +60,57 @@ fun SplashScreen(
                     OvershootInterpolator(2f).getInterpolation(it)
                 })
         )
-        notice = true
+        splash = false
     }
 
-    // Image
-    AnimatedVisibility(visible = splash) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center,
-        ) {
-            AnimatedVisibility(visible = !notice) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "Logo",
-                    modifier = Modifier.scale(scale.value)
+    Box(
+        modifier = modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        AnimatedVisibility(visible = splash) {
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "Logo",
+                modifier = Modifier.scale(scale.value)
+            )
+        }
+        AnimatedVisibility(visible = !splash) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp),
+                    text = stringResource(id = R.string.notice),
+                    style = TextStyle(
+                        fontSize = 36.sp,
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = 50.sp,
+                    ),
                 )
-            }
-            AnimatedVisibility(visible = notice) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Text(
+                    modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 32.dp),
+                    text = stringResource(id = R.string.notice_content),
+                    style = TextStyle(
+                        fontSize = 24.sp,
+                        lineHeight = 36.sp,
+                    ),
+                )
+                Button(
+                    modifier = Modifier.width(192.dp),
+                    onClick = {
+                        openDrawer()
+                        navController.popBackStack()
+                        navController.navigate(Route.HOME)
+                    },
                 ) {
-                    Text(
-                        modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp),
-                        text = stringResource(id = R.string.notice),
-                        style = TextStyle(
-                            fontSize = 36.sp,
-                            fontWeight = FontWeight.Bold,
-                            lineHeight = 50.sp,
-                        ),
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.Default.Done,
+                        contentDescription = null
                     )
-                    Text(
-                        modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 32.dp),
-                        text = stringResource(id = R.string.notice_content),
-                        style = TextStyle(
-                            fontSize = 24.sp,
-                            lineHeight = 36.sp,
-                        ),
-                    )
-                    Button(
-                        modifier = Modifier.width(196.dp),
-                        onClick = { splash = false },
-                        elevation = ButtonDefaults.buttonElevation(4.dp),
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(36.dp),
-                            imageVector = Icons.Default.Done,
-                            contentDescription = null
-                        )
-                    }
                 }
             }
         }
     }
 
-    AnimatedVisibility(visible = !splash) {
-        content()
-    }
 }

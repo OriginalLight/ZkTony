@@ -12,6 +12,7 @@ object Route {
     const val SETTING = "Setting"
     const val MOTOR = "Motor"
     const val CONFIG = "Config"
+    const val SPLASH = "Splash"
 }
 
 data class TopLevelDestination(
@@ -66,7 +67,3 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         iconTextId = R.string.tab_setting
     )
 )
-
-enum class PageEnum {
-    ADD, AUTHENTICATION, DETAIL, EDIT, MAIN, TRAVEL_EDIT, WASTE_EDIT,
-}

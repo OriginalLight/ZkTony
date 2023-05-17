@@ -6,12 +6,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -26,7 +25,6 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -61,8 +59,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.ui.components.CustomTextField
+import com.zktony.android.ui.components.ZkTonyScaffold
 import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.navigation.PageEnum
+import com.zktony.android.ui.utils.PageEnum
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.format
 import kotlinx.coroutines.delay
@@ -94,74 +93,49 @@ fun ConfigScreen(
         }
     }
 
-    Scaffold(
+    ZkTonyScaffold(
         modifier = modifier,
         topBar = {
-            ZkTonyTopAppBar(
-                title = stringResource(id = R.string.system_config),
-                navigation = {
-                    if (uiState.page == PageEnum.MAIN) {
-                        navController.navigateUp()
-                    } else {
-                        viewModel.navigationTo(PageEnum.MAIN)
-                    }
+            ZkTonyTopAppBar(title = stringResource(id = R.string.system_config), navigation = {
+                if (uiState.page == PageEnum.MAIN) {
+                    navController.navigateUp()
+                } else {
+                    viewModel.navigationTo(PageEnum.MAIN)
                 }
-            )
+            })
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        content = { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = MaterialTheme.shapes.medium
-                        ),
-                ) {
-                    AnimatedVisibility(visible = uiState.page == PageEnum.MAIN) {
-                        ConfigMainPage(
-                            modifier = Modifier,
-                            uiState = uiState,
-                            navigationTo = viewModel::navigationTo,
-                        )
-                    }
-                    AnimatedVisibility(visible = uiState.page == PageEnum.TRAVEL_EDIT) {
-                        TravelEditPage(
-                            modifier = Modifier,
-                            navigationTo = viewModel::navigationTo,
-                            setTravel = viewModel::setTravel,
-                            travel = uiState.settings.travelList.ifEmpty { listOf(0f, 0f, 0f) },
-                            showSnackBar = { message ->
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(message)
-                                }
-                            }
-                        )
-                    }
-                    AnimatedVisibility(visible = uiState.page == PageEnum.WASTE_EDIT) {
-                        WasteEditPage(
-                            modifier = Modifier,
-                            navigationTo = viewModel::navigationTo,
-                            setWaste = viewModel::setWaste,
-                            waste = uiState.settings.wasteList.ifEmpty { listOf(0f, 0f, 0f) },
-                            showSnackBar = { message ->
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(message)
-                                }
-                            }
-                        )
-                    }
-                }
-            }
+    ) {
+        AnimatedVisibility(visible = uiState.page == PageEnum.MAIN) {
+            ConfigMainPage(
+                modifier = Modifier,
+                uiState = uiState,
+                navigationTo = viewModel::navigationTo,
+            )
         }
-    )
+        AnimatedVisibility(visible = uiState.page == PageEnum.TRAVEL_EDIT) {
+            TravelEditPage(modifier = Modifier,
+                navigationTo = viewModel::navigationTo,
+                setTravel = viewModel::setTravel,
+                travel = uiState.settings.travelList.ifEmpty { listOf(0f, 0f, 0f) },
+                showSnackBar = { message ->
+                    scope.launch {
+                        snackbarHostState.showSnackbar(message)
+                    }
+                })
+        }
+        AnimatedVisibility(visible = uiState.page == PageEnum.WASTE_EDIT) {
+            WasteEditPage(modifier = Modifier,
+                navigationTo = viewModel::navigationTo,
+                setWaste = viewModel::setWaste,
+                waste = uiState.settings.wasteList.ifEmpty { listOf(0f, 0f, 0f) },
+                showSnackBar = { message ->
+                    scope.launch {
+                        snackbarHostState.showSnackbar(message)
+                    }
+                })
+        }
+    }
 }
 
 @Composable
@@ -173,7 +147,11 @@ fun ConfigMainPage(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(8.dp),
+            .padding(8.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
+            ),
+        contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         item {
@@ -271,8 +249,11 @@ fun TravelEditPage(
 
     Column(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+            .fillMaxSize()
+            .padding(8.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(128.dp))
@@ -399,8 +380,11 @@ fun WasteEditPage(
 
     Column(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(8.dp),
+            .fillMaxSize()
+            .padding(8.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(128.dp))
@@ -430,8 +414,7 @@ fun WasteEditPage(
                     textAlign = TextAlign.Center,
                 ),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Next
+                    keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(onNext = {
                     focusManager.moveFocus(FocusDirection.Next)
@@ -451,8 +434,7 @@ fun WasteEditPage(
                     textAlign = TextAlign.Center,
                 ),
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Next
+                    keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(onNext = {
                     focusManager.moveFocus(FocusDirection.Next)
@@ -488,9 +470,7 @@ fun WasteEditPage(
                     .padding(16.dp),
                 onClick = {
                     setWaste(
-                        x.toFloatOrNull() ?: 0f,
-                        y.toFloatOrNull() ?: 0f,
-                        z.toFloatOrNull() ?: 0f
+                        x.toFloatOrNull() ?: 0f, y.toFloatOrNull() ?: 0f, z.toFloatOrNull() ?: 0f
                     )
                     navigationTo(PageEnum.MAIN)
                     showSnackBar(Ext.ctx.getString(R.string.save_success))

@@ -1,7 +1,7 @@
 package com.zktony.android.ui.screen
 
 import androidx.lifecycle.ViewModel
-import com.zktony.android.ui.navigation.PageEnum
+import com.zktony.android.ui.utils.PageEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

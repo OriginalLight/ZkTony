@@ -2,13 +2,10 @@ package com.zktony.android.ui.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
@@ -42,7 +39,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -74,8 +70,9 @@ import com.zktony.android.data.entity.ContainerEntity
 import com.zktony.android.data.entity.Point
 import com.zktony.android.ui.components.DynamicMixPlate
 import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
+import com.zktony.android.ui.components.ZkTonyScaffold
 import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.navigation.PageEnum
+import com.zktony.android.ui.utils.PageEnum
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.format
 import com.zktony.core.ext.simpleDateFormat
@@ -107,7 +104,7 @@ fun ContainerScreen(
         }
     }
 
-    Scaffold(
+    ZkTonyScaffold(
         modifier = modifier,
         topBar = {
             AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
@@ -127,57 +124,35 @@ fun ContainerScreen(
             AnimatedVisibility(visible = uiState.page == PageEnum.ADD) {
                 ZkTonyBottomAddAppBar(
                     strings = uiState.entities.map { it.name },
-                    insert = {
-                        viewModel.insert(it)
-                        viewModel.navigationTo(PageEnum.MAIN)
-                    },
+                    insert = viewModel::insert,
+                    navigationTo = viewModel::navigationTo,
                 )
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        content = { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    AnimatedVisibility(
-                        visible = uiState.page == PageEnum.MAIN || uiState.page == PageEnum.ADD,
-                        enter = expandHorizontally(),
-                        exit = shrinkHorizontally(),
-                    ) {
-                        ContainerMainPage(
-                            modifier = modifier,
-                            uiState = uiState,
-                            delete = viewModel::delete,
-                            navigationTo = viewModel::navigationTo,
-                            toggleSelected = viewModel::toggleSelected,
-                        )
-                    }
-                    AnimatedVisibility(
-                        visible = uiState.page == PageEnum.EDIT,
-                        enter = expandHorizontally(),
-                        exit = shrinkHorizontally(),
-                    ) {
-                        ContainerEditPage(
-                            modifier = modifier,
-                            entity = uiState.entities.find { it.id == uiState.selected }!!,
-                            update = viewModel::update,
-                            showSnackbar = { message ->
-                                scope.launch {
-                                    snackbarHostState.showSnackbar(message)
-                                }
-                            },
-                        )
-                    }
-                }
-            }
+    ) {
+        AnimatedVisibility(visible = uiState.page in listOf(PageEnum.MAIN, PageEnum.ADD)) {
+            ContainerMainPage(
+                modifier = modifier,
+                uiState = uiState,
+                delete = viewModel::delete,
+                navigationTo = viewModel::navigationTo,
+                toggleSelected = viewModel::toggleSelected,
+            )
         }
-    )
+        AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
+            ContainerEditPage(
+                modifier = modifier,
+                entity = uiState.entities.find { it.id == uiState.selected }!!,
+                update = viewModel::update,
+                showSnackbar = { message ->
+                    scope.launch {
+                        snackbarHostState.showSnackbar(message)
+                    }
+                },
+            )
+        }
+    }
 }
 
 @Composable

@@ -2,7 +2,7 @@ package com.zktony.android.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.ui.navigation.PageEnum
+import com.zktony.android.ui.utils.PageEnum
 import com.zktony.datastore.SettingsPreferences
 import com.zktony.datastore.copy
 import com.zktony.datastore.ext.saveSettings

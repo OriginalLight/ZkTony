@@ -5,7 +5,7 @@ import com.zktony.android.core.SerialPort
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
-val proxyModule = module {
+val coreModule = module {
     singleOf(::SerialPort)
     singleOf(::ScheduleTask)
 }

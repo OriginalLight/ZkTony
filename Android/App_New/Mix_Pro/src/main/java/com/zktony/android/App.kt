@@ -2,7 +2,7 @@ package com.zktony.android
 
 import android.app.Application
 import com.zktony.android.di.localModule
-import com.zktony.android.di.proxyModule
+import com.zktony.android.di.coreModule
 import com.zktony.android.di.remoteModule
 import com.zktony.android.di.viewModule
 import com.zktony.core.ext.Ext
@@ -30,7 +30,7 @@ class App : Application() {
                 localModule,
                 remoteModule,
                 viewModule,
-                proxyModule,
+                coreModule,
             )
         }
     }

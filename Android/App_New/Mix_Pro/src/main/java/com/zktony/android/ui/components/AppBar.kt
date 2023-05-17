@@ -1,5 +1,6 @@
 package com.zktony.android.ui.components
 
+import android.provider.SyncStateContract.Helpers.insert
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.zktony.android.ui.utils.PageEnum
 
 /**
  * Top app bar
@@ -97,6 +99,7 @@ fun ZkTonyBottomAddAppBar(
     modifier: Modifier = Modifier,
     strings: List<String> = listOf(),
     insert: (String) -> Unit = {},
+    navigationTo: (PageEnum) -> Unit = {},
 ) {
     var name by remember { mutableStateOf("") }
     val softKeyboard = LocalSoftwareKeyboardController.current
@@ -156,6 +159,7 @@ fun ZkTonyBottomAddAppBar(
                         .padding(start = 16.dp),
                     onClick = {
                         insert(name)
+                        navigationTo(PageEnum.MAIN)
                         softKeyboard?.hide()
                     }
                 ) {

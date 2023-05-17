@@ -2,13 +2,10 @@ package com.zktony.android.ui.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -17,7 +14,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imeAnimationSource
@@ -49,7 +45,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -84,8 +79,9 @@ import com.zktony.android.core.ext.compute
 import com.zktony.android.data.entity.CalibrationData
 import com.zktony.android.data.entity.CalibrationEntity
 import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
+import com.zktony.android.ui.components.ZkTonyScaffold
 import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.navigation.PageEnum
+import com.zktony.android.ui.utils.PageEnum
 import com.zktony.core.ext.format
 import com.zktony.core.ext.simpleDateFormat
 import kotlinx.coroutines.launch
@@ -115,75 +111,50 @@ fun CalibrationScreen(
         }
     }
 
-    Scaffold(
+    ZkTonyScaffold(
         modifier = modifier,
         topBar = {
             AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
-                ZkTonyTopAppBar(
-                    title = stringResource(id = R.string.edit),
-                    navigation = {
-                        if (uiState.page == PageEnum.MAIN) {
-                            navController.navigateUp()
-                        } else {
-                            viewModel.navigationTo(PageEnum.MAIN)
-                        }
+                ZkTonyTopAppBar(title = stringResource(id = R.string.edit), navigation = {
+                    if (uiState.page == PageEnum.MAIN) {
+                        navController.navigateUp()
+                    } else {
+                        viewModel.navigationTo(PageEnum.MAIN)
                     }
-                )
+                })
             }
         },
         bottomBar = {
             AnimatedVisibility(visible = uiState.page == PageEnum.ADD) {
                 ZkTonyBottomAddAppBar(
                     strings = uiState.entities.map { it.name },
-                    insert = {
-                        viewModel.insert(it)
-                        viewModel.navigationTo(PageEnum.MAIN)
-                    },
+                    insert = viewModel::insert,
+                    navigationTo = viewModel::navigationTo,
                 )
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        content = { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    AnimatedVisibility(
-                        visible = uiState.page == PageEnum.MAIN || uiState.page == PageEnum.ADD,
-                        enter = expandHorizontally(),
-                        exit = shrinkHorizontally(),
-                    ) {
-                        CalibrationMainPage(
-                            modifier = modifier,
-                            uiState = uiState,
-                            active = viewModel::active,
-                            delete = viewModel::delete,
-                            navigationTo = viewModel::navigationTo,
-                            toggleSelected = viewModel::toggleSelected,
-                        )
-                    }
-
-                    AnimatedVisibility(
-                        visible = uiState.page == PageEnum.EDIT,
-                        enter = expandHorizontally(),
-                        exit = shrinkHorizontally(),
-                    ) {
-                        CalibrationEditPage(
-                            modifier = modifier,
-                            addLiquid = viewModel::addLiquid,
-                            entity = uiState.entities.find { it.id == uiState.selected }!!,
-                            update = viewModel::update,
-                        )
-                    }
-                }
-            }
+    ) {
+        AnimatedVisibility(visible = uiState.page in listOf(PageEnum.MAIN, PageEnum.ADD)) {
+            CalibrationMainPage(
+                modifier = modifier,
+                uiState = uiState,
+                active = viewModel::active,
+                delete = viewModel::delete,
+                navigationTo = viewModel::navigationTo,
+                toggleSelected = viewModel::toggleSelected,
+            )
         }
-    )
+
+        AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
+            CalibrationEditPage(
+                modifier = modifier,
+                addLiquid = viewModel::addLiquid,
+                entity = uiState.entities.find { it.id == uiState.selected }!!,
+                update = viewModel::update,
+            )
+        }
+    }
 }
 
 @Composable
@@ -234,8 +205,7 @@ fun CalibrationMainPage(
                                     } else {
                                         toggleSelected(it.id)
                                     }
-                                },
-                            colors = CardDefaults.cardColors(
+                                }, colors = CardDefaults.cardColors(
                                 containerColor = background,
                             )
                         ) {
@@ -345,8 +315,7 @@ fun CalibrationMainPage(
 }
 
 @OptIn(
-    ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class
 )
 @Composable
 fun CalibrationEditPage(
@@ -405,34 +374,31 @@ fun CalibrationEditPage(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                             ) {
                                 list.forEach { it1 ->
-                                    AssistChip(
-                                        onClick = {
-                                            scope.launch {
-                                                val l1 = entity.data.toMutableList()
-                                                l1.remove(it1)
-                                                update(
-                                                    entity.copy(
-                                                        data = l1
-                                                    )
+                                    AssistChip(onClick = {
+                                        scope.launch {
+                                            val l1 = entity.data.toMutableList()
+                                            l1.remove(it1)
+                                            update(
+                                                entity.copy(
+                                                    data = l1
                                                 )
-                                            }
-                                        },
-                                        label = {
-                                            Text(
-                                                text = "${it1.actual.format(2)} / ${
-                                                    it1.expect.format(
-                                                        2
-                                                    )
-                                                }"
                                             )
-                                        },
-                                        trailingIcon = {
-                                            Icon(
-                                                imageVector = Icons.Default.Delete,
-                                                contentDescription = null,
-                                                tint = Color.Red,
-                                            )
-                                        })
+                                        }
+                                    }, label = {
+                                        Text(
+                                            text = "${it1.actual.format(2)} / ${
+                                                it1.expect.format(
+                                                    2
+                                                )
+                                            }"
+                                        )
+                                    }, trailingIcon = {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = null,
+                                            tint = Color.Red,
+                                        )
+                                    })
                                 }
                             }
                         }
@@ -455,8 +421,7 @@ fun CalibrationEditPage(
         ) {
             repeat(9) {
                 item {
-                    FilterChip(
-                        selected = index == it,
+                    FilterChip(selected = index == it,
                         shape = MaterialTheme.shapes.small,
                         onClick = { index = it },
                         trailingIcon = {
@@ -473,8 +438,7 @@ fun CalibrationEditPage(
                                 text = "V${it + 1}",
                                 style = TextStyle(fontSize = 24.sp),
                             )
-                        }
-                    )
+                        })
                 }
             }
         }

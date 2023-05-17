@@ -36,7 +36,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
@@ -74,9 +73,10 @@ import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
+import com.zktony.android.ui.components.ZkTonyScaffold
 import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.navigation.PageEnum
 import com.zktony.android.ui.navigation.Route
+import com.zktony.android.ui.utils.PageEnum
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.createQRCodeBitmap
 import com.zktony.core.utils.QrCode
@@ -108,55 +108,40 @@ fun SettingScreen(
         }
     }
 
-    Scaffold(
+    ZkTonyScaffold(
         modifier = modifier,
         topBar = {
             AnimatedVisibility(visible = uiState.page == PageEnum.AUTHENTICATION) {
-                ZkTonyTopAppBar(
-                    title = stringResource(id = R.string.authentication),
-                    navigation = {
-                        if (uiState.page == PageEnum.MAIN) {
-                            navController.navigateUp()
-                        } else {
-                            viewModel.navigationTo(PageEnum.MAIN)
-                        }
+                ZkTonyTopAppBar(title = stringResource(id = R.string.authentication), navigation = {
+                    if (uiState.page == PageEnum.MAIN) {
+                        navController.navigateUp()
+                    } else {
+                        viewModel.navigationTo(PageEnum.MAIN)
                     }
-                )
+                })
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        content = { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    AnimatedVisibility(visible = uiState.page == PageEnum.MAIN) {
-                        SettingMainPage(
-                            modifier = modifier,
-                            uiState = uiState,
-                            checkUpdate = viewModel::checkUpdate,
-                            navigationTo = viewModel::navigationTo,
-                            openWifi = viewModel::openWifi,
-                            setLanguage = viewModel::setLanguage,
-                            setNavigation = viewModel::setNavigation,
-                        )
-                    }
-                    AnimatedVisibility(visible = uiState.page == PageEnum.AUTHENTICATION) {
-                        AuthenticationPage(
-                            modifier = modifier,
-                            navController = navController,
-                            navigationTo = viewModel::navigationTo,
-                        )
-                    }
-                }
-            }
+    ) {
+        AnimatedVisibility(visible = uiState.page == PageEnum.MAIN) {
+            SettingMainPage(
+                modifier = modifier,
+                uiState = uiState,
+                checkUpdate = viewModel::checkUpdate,
+                navigationTo = viewModel::navigationTo,
+                openWifi = viewModel::openWifi,
+                setLanguage = viewModel::setLanguage,
+                setNavigation = viewModel::setNavigation,
+            )
         }
-    )
+        AnimatedVisibility(visible = uiState.page == PageEnum.AUTHENTICATION) {
+            AuthenticationPage(
+                modifier = modifier,
+                navController = navController,
+                navigationTo = viewModel::navigationTo,
+            )
+        }
+    }
 }
 
 @Composable
@@ -221,11 +206,9 @@ fun SettingsContent(
         state = lazyColumnState,
     ) {
         item {
-            SettingsCard(
-                image = R.drawable.ic_language,
+            SettingsCard(image = R.drawable.ic_language,
                 text = stringResource(id = R.string.language),
-                onClick = { expanded = !expanded }
-            ) {
+                onClick = { expanded = !expanded }) {
                 Text(
                     text = when (uiState.settings.language) {
                         "en" -> "English"
@@ -239,16 +222,12 @@ fun SettingsContent(
         languageList.forEach { (name, code) ->
             item {
                 AnimatedVisibility(visible = expanded) {
-                    SettingsCard(
-                        image = R.drawable.ic_language,
-                        paddingStart = 32.dp,
-                        onClick = {
-                            scope.launch {
-                                setLanguage(code)
-                                expanded = false
-                            }
+                    SettingsCard(image = R.drawable.ic_language, paddingStart = 32.dp, onClick = {
+                        scope.launch {
+                            setLanguage(code)
+                            expanded = false
                         }
-                    ) {
+                    }) {
                         Text(
                             text = name,
                             style = MaterialTheme.typography.bodyLarge,

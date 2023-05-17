@@ -8,7 +8,9 @@ import com.zktony.android.data.entity.MotorEntity
 import com.zktony.core.ext.logi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import java.util.Vector
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -19,7 +21,7 @@ class ScheduleTask constructor(
     private val MD: MotorDao,
     private val CD: CalibrationDao,
 ) {
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     /**
      *  0: Y轴 1: 泵1 2: 泵2 1: 泵3
@@ -32,7 +34,6 @@ class ScheduleTask constructor(
             launch {
                 MD.getAll().collect {
                     if (it.isNotEmpty()) {
-                        hpm.clear()
                         it.forEach { it1 ->
                             hpm[it1.index] = it1
                         }
@@ -73,7 +74,8 @@ class ScheduleTask constructor(
         }
     }
 
+
     fun initializer() {
-        "ScheduleHelper initializer".logi()
+        "ScheduleTask initializer".logi()
     }
 }

@@ -8,7 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import com.zktony.android.core.ext.scheduleTask
 import com.zktony.android.core.ext.serialPort
-import com.zktony.android.ui.screen.SplashScreen
 import com.zktony.android.ui.theme.AppTheme
 import com.zktony.core.ext.setLanguage
 import com.zktony.datastore.ext.settings
@@ -21,10 +20,10 @@ class MainActivity : ComponentActivity() {
         serialPort.initializer()
 
         setContent {
-            AppTheme {
-                SplashScreen {
-                    ZkTonyApp()
-                }
+            AppTheme(
+                dynamicColor = false
+            ) {
+                ZkTonyApp()
             }
         }
     }
