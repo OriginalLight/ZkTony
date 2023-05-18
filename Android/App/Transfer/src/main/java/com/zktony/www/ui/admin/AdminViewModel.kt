@@ -16,7 +16,7 @@ import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.www.BuildConfig
 import com.zktony.www.MainActivity
-import com.zktony.www.proxy.SerialProxy
+import com.zktony.www.core.SerialPort
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
@@ -24,7 +24,7 @@ import java.io.File
 class AdminViewModel constructor(
     private val DS: DataStore<Preferences>,
     private val AG: ApplicationGrpc,
-    private val SM: SerialProxy
+    private val SM: SerialPort
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(AdminUiState())

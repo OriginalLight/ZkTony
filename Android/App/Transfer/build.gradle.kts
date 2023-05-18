@@ -75,7 +75,6 @@ dependencies {
     implementation(project(mapOf("path" to ":datastore")))
     implementation(project(mapOf("path" to ":gpio")))
     implementation(project(mapOf("path" to ":protobuf")))
-    implementation(project(mapOf("path" to ":room")))
     implementation(project(mapOf("path" to ":serialport")))
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)

@@ -4,9 +4,9 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
-import com.zktony.www.common.ext.asyncHex
-import com.zktony.www.room.dao.MotorDao
-import com.zktony.www.room.entity.Motor
+import com.zktony.www.core.ext.asyncHex
+import com.zktony.www.data.dao.MotorDao
+import com.zktony.www.data.entities.Motor
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 

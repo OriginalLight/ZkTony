@@ -2,14 +2,20 @@ package com.zktony.www.ui.calibration
 
 import android.os.Bundle
 import android.view.Gravity
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.findNavController
 import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.*
+import com.zktony.core.ext.afterTextChange
+import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.clickScale
+import com.zktony.core.ext.format
+import com.zktony.core.ext.setEqualText
 import com.zktony.www.R
-import com.zktony.www.common.adapter.CalibrationDataAdapter
+import com.zktony.www.adapter.CalibrationDataAdapter
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

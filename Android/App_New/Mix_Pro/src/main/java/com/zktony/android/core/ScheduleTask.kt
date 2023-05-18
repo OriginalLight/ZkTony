@@ -10,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.util.Vector
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -18,8 +17,8 @@ import java.util.concurrent.ConcurrentHashMap
  * @date: 2023-01-30 14:27
  */
 class ScheduleTask constructor(
-    private val MD: MotorDao,
-    private val CD: CalibrationDao,
+    private val motorDao: MotorDao,
+    private val calibrationDao: CalibrationDao,
 ) {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
@@ -32,7 +31,7 @@ class ScheduleTask constructor(
     init {
         scope.launch {
             launch {
-                MD.getAll().collect {
+                motorDao.getAll().collect {
                     if (it.isNotEmpty()) {
                         it.forEach { it1 ->
                             hpm[it1.index] = it1
@@ -42,16 +41,16 @@ class ScheduleTask constructor(
                         for (i in 0..15) {
                             list.add(MotorEntity(text = "M$i", index = i))
                         }
-                        MD.insertAll(list)
+                        motorDao.insertAll(list)
                     }
                 }
             }
             launch {
-                CD.getAll().collect {
+                calibrationDao.getAll().collect {
                     if (it.isNotEmpty()) {
                         val active = it.find { c -> c.active }
                         if (active == null) {
-                            CD.update(it[0].copy(active = true))
+                            calibrationDao.update(it[0].copy(active = true))
                         } else {
                             hpc.clear()
                             hpc[0] = 10f
@@ -62,7 +61,7 @@ class ScheduleTask constructor(
                             }
                         }
                     } else {
-                        CD.insert(
+                        calibrationDao.insert(
                             CalibrationEntity(
                                 name = "Default",
                                 active = true,

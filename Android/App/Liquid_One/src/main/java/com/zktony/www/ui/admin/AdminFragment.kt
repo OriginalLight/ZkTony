@@ -21,7 +21,7 @@ import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
-import com.zktony.www.common.ext.*
+import com.zktony.www.core.ext.*
 import com.zktony.www.databinding.FragmentAdminBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject

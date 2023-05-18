@@ -9,7 +9,7 @@ import androidx.lifecycle.*
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
 import com.zktony.www.R
-import com.zktony.www.common.adapter.LogAdapter
+import com.zktony.www.adapter.LogAdapter
 import com.zktony.www.databinding.FragmentLogBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

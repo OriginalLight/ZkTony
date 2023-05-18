@@ -22,13 +22,13 @@ import com.zktony.core.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.core.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.datastore.ext.read
 import com.zktony.www.R
-import com.zktony.www.proxy.SerialProxy
-import com.zktony.www.room.dao.LogDataDao
-import com.zktony.www.room.dao.LogRecordDao
-import com.zktony.www.room.dao.ProgramDao
-import com.zktony.www.room.entity.LogData
-import com.zktony.www.room.entity.LogRecord
-import com.zktony.www.room.entity.Program
+import com.zktony.www.core.SerialPort
+import com.zktony.www.data.dao.LogDataDao
+import com.zktony.www.data.dao.LogRecordDao
+import com.zktony.www.data.dao.ProgramDao
+import com.zktony.www.data.entities.LogData
+import com.zktony.www.data.entities.LogRecord
+import com.zktony.www.data.entities.Program
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +39,7 @@ class HomeViewModel constructor(
     private val PD: ProgramDao,
     private val LRD: LogRecordDao,
     private val LDD: LogDataDao,
-    private val SM: SerialProxy,
+    private val SM: SerialPort,
     private val DS: DataStore<Preferences>
 ) : BaseViewModel() {
 

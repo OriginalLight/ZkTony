@@ -11,7 +11,8 @@ import com.zktony.core.ext.noticeDialog
 import com.zktony.core.ext.setLanguage
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
-import com.zktony.www.common.ext.proxyInitializer
+import com.zktony.www.core.ext.scheduleTask
+import com.zktony.www.core.ext.serialPort
 import com.zktony.www.databinding.ActivityMainBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -23,7 +24,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        proxyInitializer()
+        scheduleTask.initializer()
+        serialPort.initializer()
 
         val navigationView = binding.navView
         navigationView.itemIconTintList = null

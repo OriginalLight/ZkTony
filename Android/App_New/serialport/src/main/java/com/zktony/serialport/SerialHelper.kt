@@ -2,7 +2,10 @@ package com.zktony.serialport
 
 import android.os.Message
 import android.util.Log
+import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.config.SerialConfig
+import com.zktony.serialport.ext.ascii2ByteArray
+import com.zktony.serialport.ext.hex2ByteArray
 import java.io.IOException
 import java.security.InvalidParameterException
 
@@ -43,6 +46,40 @@ class SerialHelper(config: SerialConfig) : AbstractSerialHelper(config) {
     fun sendByteArray(bytes: ByteArray) {
         val msg = Message.obtain()
         msg.obj = bytes
+        addWaitMessage(msg)
+    }
+
+    /**
+     * Send hex string
+     *
+     * @param hex String
+     */
+    fun sendHexString(hex: String) {
+        val msg = Message.obtain()
+        msg.obj = hex.hex2ByteArray()
+        addWaitMessage(msg)
+    }
+
+
+    /**
+     * Send ascii string
+     *
+     * @param ascii String
+     */
+    fun sendAsciiString(ascii: String) {
+        val msg = Message.obtain()
+        msg.obj = ascii.ascii2ByteArray(true)
+        addWaitMessage(msg)
+    }
+
+    /**
+     * Send protocol
+     *
+     * @param protocol Protocol
+     */
+    fun sendProtocol(protocol: Protocol) {
+        val msg = Message.obtain()
+        msg.obj = protocol.toByteArray()
         addWaitMessage(msg)
     }
 

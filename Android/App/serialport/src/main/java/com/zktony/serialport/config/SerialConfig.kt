@@ -45,36 +45,8 @@ data class SerialConfig(
      */
     var delay: Long = 30L,
 
-    /**
-     * CMD_SHELL
-     */
-    var shell: Shell = Shell.CMD_X_BIN_SU_SHELL,
-
-    /**
-     * CRC16
-     */
-    var crc: Boolean = false,
-
-    /**
-     * split
-     */
-    var protocol: Protocol = Protocol.V1,
 )
 
 fun serialConfig(block: SerialConfig.() -> Unit): SerialConfig {
     return SerialConfig().apply(block)
-}
-
-enum class Shell {
-    CMD_BIN_SU_SHELL,
-    CMD_X_BIN_SU_SHELL,
-}
-
-enum class Protocol {
-    // V0 转膜仪下位机通信协议
-    V0,
-    // V1 旧版下位机格式
-    V1,
-    // V2 新版下位机的格式
-    V2,
 }

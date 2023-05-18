@@ -8,8 +8,8 @@ import com.zktony.core.utils.Constants.MAX_MOTOR
 import com.zktony.core.utils.Constants.MAX_TIME
 import com.zktony.core.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.www.R
-import com.zktony.www.room.dao.ProgramDao
-import com.zktony.www.room.entity.Program
+import com.zktony.www.data.dao.ProgramDao
+import com.zktony.www.data.entities.Program
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

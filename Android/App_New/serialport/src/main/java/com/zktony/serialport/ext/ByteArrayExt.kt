@@ -29,10 +29,7 @@ fun ByteArray.readInt16BE(offset: Int = 0): Int {
 
 fun ByteArray.readUInt16BE(offset: Int = 0): Int {
     throwOffsetError(this, offset, 2)
-    // 方式一
     return ((this[offset].toInt() and 0xFF) shl 8) or (this[offset + 1].toInt() and 0xFF)
-    // 方式二
-//    return readUnsigned(this, 2, offset, false).toInt()
 }
 
 
@@ -44,7 +41,6 @@ fun ByteArray.readInt16LE(offset: Int = 0): Int {
 fun ByteArray.readUInt16LE(offset: Int = 0): Int {
     throwOffsetError(this, offset, 2)
     return ((this[offset + 1].toInt() and 0xFF) shl 8) or (this[offset].toInt() and 0xFF)
-//    return readUnsigned(this, 2, offset, true).toInt()
 }
 
 fun ByteArray.readInt32BE(offset: Int = 0): Int {
@@ -53,7 +49,6 @@ fun ByteArray.readInt32BE(offset: Int = 0): Int {
             ((this[offset + 1].toInt() and 0xFF) shl 16) or
             ((this[offset + 2].toInt() and 0xFF) shl 8) or
             (this[offset + 3].toInt() and 0xFF)
-//    return (this[offset].toInt() shl 24) + (this[offset + 1].toUByte().toInt() shl 16) + (this[offset + 2].toUByte().toInt() shl 8) + this[offset + 3].toUByte().toInt()
 }
 
 fun ByteArray.readUInt32BE(offset: Int = 0): Long {
@@ -62,7 +57,6 @@ fun ByteArray.readUInt32BE(offset: Int = 0): Long {
             ((this[offset + 1].toInt() and 0xFF).toLong() shl 16) or
             ((this[offset + 2].toInt() and 0xFF).toLong() shl 8) or
             (this[offset + 3].toInt() and 0xFF).toLong())
-//    return readUnsigned(this, 4, offset, false)
 }
 
 fun ByteArray.readInt32LE(offset: Int = 0): Int {
@@ -71,7 +65,6 @@ fun ByteArray.readInt32LE(offset: Int = 0): Int {
             ((this[offset + 2].toInt() and 0xFF) shl 16) or
             ((this[offset + 1].toInt() and 0xFF) shl 8) or
             (this[offset].toInt() and 0xFF)
-//    return (this[offset + 3].toInt() shl 24) + (this[offset + 2].toUByte().toInt() shl 16) + (this[offset + 1].toUByte().toInt() shl 8) + this[offset].toUByte().toInt()
 }
 
 fun ByteArray.readUInt32LE(offset: Int = 0): Long {
@@ -80,7 +73,6 @@ fun ByteArray.readUInt32LE(offset: Int = 0): Long {
             ((this[offset + 2].toInt() and 0xFF).toLong() shl 16) or
             ((this[offset + 1].toInt() and 0xFF).toLong() shl 8) or
             (this[offset].toInt() and 0xFF).toLong())
-//    return readUnsigned(this, 4, offset, true)
 }
 
 // 四字节 float
@@ -246,37 +238,6 @@ fun ByteArray.writeByteArrayLE(
 }
 
 // ********************************************** 其他 **********************************************
-
-// 根据命令格式分割成多个ByteArray
-
-fun ByteArray.splitByteArray(head: ByteArray, end: ByteArray): List<ByteArray> {
-    var byteArray = this.copyOfRange(0, this.size)
-    val list = mutableListOf<ByteArray>()
-    var headIndex: Int
-    var endIndex: Int
-    while (byteArray.isNotEmpty()) {
-        headIndex = this.indexOf(head)
-        endIndex = this.indexOf(end)
-        if (headIndex > 0 && endIndex > 0) {
-            val bytes = this.copyOfRange(headIndex, endIndex + end.size)
-            list.add(bytes)
-            if (bytes.size == byteArray.size) {
-                break
-            } else {
-                byteArray = byteArray.copyOfRange(bytes.size, byteArray.size)
-            }
-        } else {
-            break
-        }
-    }
-    return list
-}
-
-fun ByteArray.indexOf(bytes: ByteArray): Int {
-    val index = this.indexOf(bytes.first())
-    val array = this.copyOfRange(index, index + bytes.size)
-    return if (array.contentEquals(bytes)) index else -1
-}
 
 // 指定位置插入ByteArray
 fun ByteArray.insertByteArrayBE(
@@ -446,4 +407,35 @@ private fun throwOffsetError(
     byteLength: Int = 0
 ) {
     if (offset > byteArray.size - length - byteLength) throw IllegalArgumentException("The value of \"offset\" is out of range. It must be >= 0 and <= ${byteArray.size - length - byteLength}. Received $offset")
+}
+
+
+// 根据命令格式分割成多个ByteArray
+
+fun ByteArray.splitByteArray(head: ByteArray, end: ByteArray): List<ByteArray> {
+    var byteArray = this.copyOfRange(0, this.size)
+    val list = mutableListOf<ByteArray>()
+    while (byteArray.isNotEmpty()) {
+        val headIndex = byteArray.indexOf(head)
+        val endIndex = byteArray.indexOf(end)
+        if (headIndex != -1 && endIndex != -1) {
+            val bytes = byteArray.copyOfRange(headIndex, endIndex + end.size)
+            list.add(bytes)
+            if (bytes.size == byteArray.size) {
+                break
+            } else {
+                byteArray = byteArray.copyOfRange(bytes.size, byteArray.size)
+            }
+        } else {
+            break
+        }
+    }
+    return list
+}
+
+fun ByteArray.indexOf(bytes: ByteArray): Int {
+    if (bytes.isEmpty() || this.isEmpty()) return -1
+    val index = this.indexOf(bytes.first())
+    val array = this.copyOfRange(index, index + bytes.size)
+    return if (array.contentEquals(bytes)) index else -1
 }

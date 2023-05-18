@@ -2,6 +2,7 @@ package com.zktony.serialport
 
 import com.zktony.serialport.ext.ascii2ByteArray
 import com.zktony.serialport.ext.hex2ByteArray
+import com.zktony.serialport.ext.indexOf
 import com.zktony.serialport.ext.insertByteArrayBE
 import com.zktony.serialport.ext.insertByteArrayLE
 import com.zktony.serialport.ext.readByteArrayBE
@@ -22,6 +23,8 @@ import com.zktony.serialport.ext.readUInt16LE
 import com.zktony.serialport.ext.readUInt32BE
 import com.zktony.serialport.ext.readUInt32LE
 import com.zktony.serialport.ext.readUInt8
+import com.zktony.serialport.ext.replaceByteArrayBE
+import com.zktony.serialport.ext.replaceByteArrayLE
 import com.zktony.serialport.ext.splitByteArray
 import com.zktony.serialport.ext.toAsciiString
 import com.zktony.serialport.ext.toHexString
@@ -303,7 +306,15 @@ class ByteArrayTest {
     }
 
     @Test
-    fun splitByteArray() {
+    fun replaceByteArray() {
+        val ba = byteArrayOf(0x01, 0x02, 0x03, 0x04, 0x05, 0x06)
+        val replaceArray = byteArrayOf(0x07, 0x08, 0x09)
+        assertEquals("01 07 08 09 05 06", ba.replaceByteArrayBE(replaceArray, 1, 0).toHexString())
+        assertEquals("01 09 08 07 05 06", ba.replaceByteArrayLE(replaceArray, 1, 0).toHexString())
+    }
+
+    @Test
+    fun indexOf() {
         val ba = byteArrayOf(
             0xEE.toByte(),
             0x01.toByte(),
@@ -315,12 +326,47 @@ class ByteArrayTest {
             0xFF.toByte(),
             0xFF.toByte()
         )
-        val ba1 = byteArrayOf(
+        assertEquals(0, ba.indexOf(byteArrayOf(0xEE.toByte())))
+        assertEquals(
+            5,
+            ba.indexOf(byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte()))
+        )
+        assertEquals(
+            -1,
+            ba.indexOf(byteArrayOf(0xFF.toByte(), 0xFB.toByte(), 0xFF.toByte(), 0xFF.toByte()))
+        )
+        assertEquals(
+            -1,
+            byteArrayOf().indexOf(
+                byteArrayOf(
+                    0xFF.toByte(),
+                    0xFB.toByte(),
+                    0xFF.toByte(),
+                    0xFF.toByte()
+                )
+            )
+        )
+    }
+
+    @Test
+    fun splitByteArray() {
+        val ba = byteArrayOf(
             0xEE.toByte(),
             0x01.toByte(),
-            0x01.toByte(),
-            0x00.toByte(),
-            0x01.toByte(),
+            0x02.toByte(),
+            0x03.toByte(),
+            0x04.toByte(),
+            0xFF.toByte(),
+            0xFC.toByte(),
+            0xFF.toByte(),
+            0xFF.toByte()
+        )
+        val ba1 = byteArrayOf(
+            0xEE.toByte(),
+            0x02.toByte(),
+            0x03.toByte(),
+            0x04.toByte(),
+            0x05.toByte(),
             0xFF.toByte(),
             0xFC.toByte(),
             0xFF.toByte(),
@@ -328,10 +374,10 @@ class ByteArrayTest {
         )
         val ba2 = byteArrayOf(
             0xEE.toByte(),
-            0x01.toByte(),
-            0x01.toByte(),
-            0x00.toByte(),
-            0x01.toByte(),
+            0x03.toByte(),
+            0x04.toByte(),
+            0x05.toByte(),
+            0x06.toByte(),
             0xFF.toByte(),
             0xFC.toByte(),
             0xFF.toByte(),
@@ -348,5 +394,8 @@ class ByteArrayTest {
             )
         )
         assertEquals(3, result.size)
+        assertEquals("EE 01 02 03 04 FF FC FF FF", result[0].toHexString())
+        assertEquals("EE 02 03 04 05 FF FC FF FF", result[1].toHexString())
+        assertEquals("EE 03 04 05 06 FF FC FF FF", result[2].toHexString())
     }
 }

@@ -1,12 +1,17 @@
 package com.zktony.www.ui.calibration
 
 import android.os.Bundle
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.*
+import com.zktony.core.ext.clickNoRepeat
+import com.zktony.core.ext.clickScale
+import com.zktony.core.ext.inputDialog
+import com.zktony.core.ext.messageDialog
 import com.zktony.www.R
-import com.zktony.www.common.adapter.CalibrationAdapter
+import com.zktony.www.adapter.CalibrationAdapter
 import com.zktony.www.databinding.FragmentCalibrationBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

@@ -24,7 +24,7 @@ class App : Application() {
             modules(
                 localModule,
                 remoteModule,
-                proxyModule,
+                coreModule,
                 viewModule
             )
         }

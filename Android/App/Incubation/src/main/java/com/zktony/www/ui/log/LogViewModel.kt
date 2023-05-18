@@ -4,8 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.*
-import com.zktony.www.room.dao.LogDao
-import com.zktony.www.room.entity.Log
+import com.zktony.www.data.dao.LogDao
+import com.zktony.www.data.entities.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

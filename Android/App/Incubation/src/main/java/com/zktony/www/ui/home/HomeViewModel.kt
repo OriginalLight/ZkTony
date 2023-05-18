@@ -10,11 +10,27 @@ import com.zktony.core.ext.format
 import com.zktony.core.utils.Constants
 import com.zktony.core.utils.Queue
 import com.zktony.datastore.ext.read
-import com.zktony.www.common.ext.*
-import com.zktony.www.room.dao.*
-import com.zktony.www.room.entity.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import com.zktony.www.core.ext.asyncHex
+import com.zktony.www.core.ext.asyncText
+import com.zktony.www.core.ext.collectHex
+import com.zktony.www.core.ext.decideLock
+import com.zktony.www.core.ext.syncHex
+import com.zktony.www.core.ext.temp
+import com.zktony.www.data.dao.ActionDao
+import com.zktony.www.data.dao.ContainerDao
+import com.zktony.www.data.dao.LogDao
+import com.zktony.www.data.dao.ProgramDao
+import com.zktony.www.data.entities.Action
+import com.zktony.www.data.entities.Container
+import com.zktony.www.data.entities.Log
+import com.zktony.www.data.entities.Program
+import com.zktony.www.data.entities.getActionEnum
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 
 class HomeViewModel constructor(
     private val PD: ProgramDao,
@@ -59,15 +75,13 @@ class HomeViewModel constructor(
                         if (text.startsWith("TC1:TCACTUALTEMP=")) {
                             // 读取温度
                             val address = text.substring(text.length - 2, text.length - 1).toInt()
-                            val temp =
-                                text.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
+                            val temp = text.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
                             when (address) {
                                 1 -> _aFlow.value = _aFlow.value.copy(temp = "$temp ℃")
                                 2 -> _bFlow.value = _bFlow.value.copy(temp = "$temp ℃")
                                 3 -> _cFlow.value = _cFlow.value.copy(temp = "$temp ℃")
                                 4 -> _dFlow.value = _dFlow.value.copy(temp = "$temp ℃")
-                                0 -> _uiState.value =
-                                    _uiState.value.copy(insulatingTemp = "$temp ℃")
+                                0 -> _uiState.value = _uiState.value.copy(insulatingTemp = "$temp ℃")
                             }
                         }
                     }
@@ -83,15 +97,15 @@ class HomeViewModel constructor(
                             temp = if (i == 0) _uiState.value.temp.format() else "26"
                         )
                     }
-
                 }
+                delay(500L)
                 // 每十秒钟查询一次温度
                 while (true) {
                     for (i in 0..4) {
-                        delay(300L)
+                        delay(500L)
                         asyncText("TC1:TCACTUALTEMP?@$$i\r")
                     }
-                    delay(4 * 1000L)
+                    delay(5 * 1000L)
                 }
             }
             launch {

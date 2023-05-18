@@ -21,6 +21,7 @@ fun ZkTonyScaffold(
     Scaffold(
         modifier = modifier,
         topBar = topBar,
+        bottomBar = bottomBar,
         snackbarHost = snackbarHost,
         containerColor = MaterialTheme.colorScheme.secondaryContainer,
         content = { innerPadding ->

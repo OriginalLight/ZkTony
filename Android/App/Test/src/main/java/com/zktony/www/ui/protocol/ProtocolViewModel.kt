@@ -3,22 +3,22 @@ package com.zktony.www.ui.protocol
 import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
 import com.zktony.serialport.SerialHelper
-import com.zktony.serialport.config.Protocol
 import com.zktony.serialport.config.serialConfig
 import com.zktony.serialport.ext.intToHex
 import com.zktony.serialport.protocol.toV2
 import com.zktony.serialport.protocol.v2
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 class ProtocolViewModel : BaseViewModel() {
 
     private val helper by lazy {
         SerialHelper(serialConfig {
             device = "/dev/ttyS0"
-            crc = true
-            protocol = Protocol.V2
         })
     }
     private val _uiState = MutableStateFlow(ProtocolUiState())

@@ -2,7 +2,7 @@ package com.zktony.www.di
 
 import androidx.room.Room
 import com.zktony.datastore.DataStoreFactory
-import com.zktony.www.room.database.AppDatabase
+import com.zktony.www.data.AppDatabase
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 

@@ -1,7 +1,7 @@
 package com.zktony.serialport
 
 import com.zktony.serialport.ext.crc16
-import com.zktony.serialport.ext.byteToHex
+import com.zktony.serialport.ext.toHexString
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -13,24 +13,22 @@ class CRCTest {
         for (i in 0..255) {
             bytes[i] = i.toByte()
         }
-        val crc16 = bytes.crc16()
-        assertEquals("DE", crc16[0].byteToHex())
-        assertEquals("6C", crc16[1].byteToHex())
+        assertEquals("DE 6C", bytes.crc16().toHexString())
     }
 
     @Test
     fun crc2() {
-        val bytes = byteArrayOf(0x01.toByte(), 0x06.toByte(), 0x0A.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
+        val bytes = byteArrayOf(
+            0x01.toByte(),
+            0x06.toByte(),
+            0x0A.toByte(),
+            0x00.toByte(),
+            0x00.toByte(),
+            0x00.toByte()
+        )
         val crc16 = bytes.crc16()
-        assertEquals("12", crc16[0].byteToHex())
-        assertEquals("8A", crc16[1].byteToHex())
+        assertEquals(0x12.toByte(), crc16[0])
+        assertEquals(0x8A.toByte(), crc16[1])
     }
 
-
-    @Test
-    fun crc3() {
-        val text = "01060A000000"
-        val crc16 = text.crc16()
-        assertEquals("128A", crc16)
-    }
 }

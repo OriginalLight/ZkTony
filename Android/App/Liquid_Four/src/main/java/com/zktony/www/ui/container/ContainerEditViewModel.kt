@@ -4,14 +4,17 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
+import com.zktony.core.R
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
 import com.zktony.datastore.ext.read
-import com.zktony.www.common.ext.*
-import com.zktony.www.room.dao.ContainerDao
-import com.zktony.www.room.dao.PointDao
-import com.zktony.www.room.entity.Container
-import com.zktony.www.room.entity.Point
+import com.zktony.www.core.ext.calculateCoordinate
+import com.zktony.www.core.ext.decideLock
+import com.zktony.www.core.ext.execute
+import com.zktony.www.data.dao.ContainerDao
+import com.zktony.www.data.dao.PointDao
+import com.zktony.www.data.entities.Container
+import com.zktony.www.data.entities.Point
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -71,7 +74,7 @@ class ContainerEditViewModel constructor(
     fun move(xAxis: Float, yAxis: Float) {
         viewModelScope.launch {
             decideLock {
-                yes { PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.running)) }
+                yes { PopTip.show(Ext.ctx.getString(R.string.running)) }
                 no {
                     execute {
                         step {

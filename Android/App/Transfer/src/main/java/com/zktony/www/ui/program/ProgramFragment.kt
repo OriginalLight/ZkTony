@@ -16,7 +16,7 @@ import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.core.ext.messageDialog
 import com.zktony.www.R
-import com.zktony.www.common.adapter.ProgramAdapter
+import com.zktony.www.adapter.ProgramAdapter
 import com.zktony.www.databinding.FragmentProgramBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

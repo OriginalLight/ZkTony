@@ -12,8 +12,20 @@ val serialPort: SerialPort by inject(SerialPort::class.java)
 /**
  * 发送命令
  */
-fun sendByteArray(block: Protocol.() -> Unit) {
-    serialPort.sendByteArray(Protocol().apply(block).toByteArray())
+fun sendByteArray(byteArray: ByteArray) {
+    serialPort.sendByteArray(byteArray)
+}
+
+fun sendProtocol(block: Protocol.() -> Unit) {
+    serialPort.sendProtocol(Protocol().apply(block))
+}
+
+fun sendHexString(hex: String) {
+    serialPort.sendHexString(hex)
+}
+
+fun sendAsciiString(ascii: String) {
+    serialPort.sendAsciiString(ascii)
 }
 
 /**
@@ -21,7 +33,7 @@ fun sendByteArray(block: Protocol.() -> Unit) {
  *
  * @property list MutableList<Triple<Int, Float, MotorEntity>>
  */
-class Compose {
+class DV {
     val list = mutableListOf<Triple<Int, Float, MotorEntity>>()
 
     fun x(dv: Float, config: MotorEntity = scheduleTask.hpm[0]!!) {
@@ -96,16 +108,18 @@ class Compose {
  *
  * @param block Compose.() -> Unit
  */
-suspend fun syncHex(block: Compose.() -> Unit, timeOut: Long = 5000) {
-    val compose = Compose().apply(block)
-    val list = compose.list
+suspend fun syncHex(block: DV.() -> Unit, timeOut: Long = 5000) {
+    val dv = DV().apply(block)
+    val list = dv.list
     val bytes = byteArrayOf()
     list.forEach {
         bytes.plus(pwc(it.first, it.second, it.third))
     }
     try {
         withTimeout(timeOut) {
-            sendByteArray { data = bytes }
+            sendProtocol {
+                data = bytes
+            }
             delay(100L)
             while (getLock(list.map { it.first })) {
                 delay(100L)
@@ -123,14 +137,16 @@ suspend fun syncHex(block: Compose.() -> Unit, timeOut: Long = 5000) {
  *
  * @param block Compose.() -> Unit
  */
-fun asyncHex(block: Compose.() -> Unit) {
-    val compose = Compose().apply(block)
-    val list = compose.list
+fun asyncHex(block: DV.() -> Unit) {
+    val dv = DV().apply(block)
+    val list = dv.list
     val bytes = byteArrayOf()
     list.forEach {
         bytes.plus(pwc(it.first, it.second, it.third))
     }
-    sendByteArray { data = bytes }
+    sendProtocol {
+        data = bytes
+    }
 }
 
 /**

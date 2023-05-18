@@ -45,7 +45,3 @@ data class SerialConfig(
      */
     var delay: Long = 10L,
 )
-
-fun serialConfig(block: SerialConfig.() -> Unit): SerialConfig {
-    return SerialConfig().apply(block)
-}

@@ -9,8 +9,8 @@ import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
 import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
-import com.zktony.www.common.ext.decideLock
-import com.zktony.www.common.ext.execute
+import com.zktony.www.core.ext.decideLock
+import com.zktony.www.core.ext.execute
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

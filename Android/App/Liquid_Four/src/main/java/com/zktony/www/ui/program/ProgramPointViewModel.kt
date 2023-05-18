@@ -9,8 +9,8 @@ import com.kongzue.dialogx.dialogs.CustomDialog
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseViewModel
 import com.zktony.www.R
-import com.zktony.www.room.dao.PointDao
-import com.zktony.www.room.entity.Point
+import com.zktony.www.data.dao.PointDao
+import com.zktony.www.data.entities.Point
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch

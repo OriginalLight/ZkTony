@@ -15,7 +15,7 @@ import com.zktony.core.R.mipmap
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
 import com.zktony.www.R
-import com.zktony.www.common.ext.total
+import com.zktony.www.core.ext.total
 import com.zktony.www.databinding.FragmentHomeBinding
 import kotlinx.coroutines.*
 import org.koin.androidx.viewmodel.ext.android.viewModel

@@ -15,7 +15,7 @@ import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
 import com.zktony.www.R
-import com.zktony.www.common.adapter.PointAdapter
+import com.zktony.www.adapter.PointAdapter
 import com.zktony.www.databinding.FragmentContainerEditBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

@@ -6,7 +6,7 @@ import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
 import com.zktony.www.R
-import com.zktony.www.common.adapter.CalibrationAdapter
+import com.zktony.www.adapter.CalibrationAdapter
 import com.zktony.www.databinding.FragmentCalibrationBinding
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

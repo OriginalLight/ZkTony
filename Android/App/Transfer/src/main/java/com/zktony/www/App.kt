@@ -5,8 +5,8 @@ import com.zktony.core.ext.Ext
 import com.zktony.core.ext.initDialogX
 import com.zktony.core.ext.initTypeface
 import com.zktony.datastore.DataStoreFactory
+import com.zktony.www.di.coreModule
 import com.zktony.www.di.localModule
-import com.zktony.www.di.proxyModule
 import com.zktony.www.di.remoteModule
 import com.zktony.www.di.viewModule
 import org.koin.android.ext.koin.androidContext
@@ -36,7 +36,7 @@ class App : Application(), KoinComponent {
             modules(
                 localModule,
                 remoteModule,
-                proxyModule,
+                coreModule,
                 viewModule
             )
         }

@@ -5,8 +5,6 @@ import android.os.HandlerThread
 import android.os.Message
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.core.SerialPort
-import com.zktony.serialport.ext.crc16
-import com.zktony.serialport.ext.splitByteArray
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
@@ -34,8 +32,7 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
     private var handlerThread: HandlerThread? = null
 
     private var cache: ByteArray = byteArrayOf()
-
-    var callback: (ByteArray) -> Unit = { _ -> }
+    var callback: (ByteArray) -> Unit = { }
 
 
     @Throws(SecurityException::class, IOException::class, InvalidParameterException::class)
@@ -108,26 +105,12 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
     private fun dataProcess(byteArray: ByteArray) {
         if (byteArray.isEmpty()) {
             if (cache.isNotEmpty()) {
-                cache.splitByteArray(
-                    head = byteArrayOf(0xEE.toByte()),
-                    end = byteArrayOf(
-                        0xFF.toByte(),
-                        0xFC.toByte(),
-                        0xFF.toByte(),
-                        0xFF.toByte()
-                    )
-                ).forEach {
-                    val crc = it.copyOfRange(it.size - 3, it.size - 1)
-                    val buffer = it.copyOfRange(0, it.size - 3)
-                    if (buffer.crc16().contentEquals(crc)) {
-                        callback.invoke(it)
-                    }
-                }
+                callback.invoke(cache)
                 cache = byteArrayOf()
             }
             return
         }
-        cache += byteArray
+        cache.plus(byteArray)
     }
 
     /**

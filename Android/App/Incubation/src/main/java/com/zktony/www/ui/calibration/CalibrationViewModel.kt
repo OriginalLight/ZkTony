@@ -4,10 +4,12 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
-import com.zktony.www.room.dao.CalibrationDao
-import com.zktony.www.room.dao.CalibrationDataDao
-import com.zktony.www.room.entity.Calibration
-import kotlinx.coroutines.flow.*
+import com.zktony.www.data.dao.CalibrationDao
+import com.zktony.www.data.dao.CalibrationDataDao
+import com.zktony.www.data.entities.Calibration
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class CalibrationViewModel constructor(
