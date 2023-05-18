@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.errorprone.annotations.Immutable
 import com.zktony.core.ext.nextId
-import com.zktony.serialport.ext.intToHex
+import com.zktony.serialport.ext.writeInt16BE
 import java.util.Date
 
 /**
@@ -29,10 +29,8 @@ data class MotorEntity(
     @ColumnInfo(name = "dec") val dec: Int = 100,
     @ColumnInfo(name = "create_time") val createTime: Date = Date(System.currentTimeMillis()),
 ) {
-    /**
-     * 生成Hex
-     */
-    fun hex(): String {
-        return speed.intToHex(2) + acc.intToHex(2) + dec.intToHex(2)
+    fun toByteArray(): ByteArray {
+        val ba = ByteArray(6)
+        return ba.writeInt16BE(speed, 0).writeInt16BE(acc, 2).writeInt16BE(dec, 4)
     }
 }

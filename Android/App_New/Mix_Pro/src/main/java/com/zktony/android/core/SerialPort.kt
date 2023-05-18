@@ -2,11 +2,8 @@ package com.zktony.android.core
 
 import com.zktony.core.ext.logi
 import com.zktony.serialport.SerialHelper
-import com.zktony.serialport.config.Protocol
+import com.zktony.serialport.command.protocol
 import com.zktony.serialport.config.serialConfig
-import com.zktony.serialport.ext.hexFormat
-import com.zktony.serialport.ext.hexToInt
-import com.zktony.serialport.protocol.toV2
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,13 +15,10 @@ class SerialPort {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     private val helper by lazy {
-        SerialHelper(serialConfig {
-            crc = true
-            protocol = Protocol.V2
-        })
+        SerialHelper(serialConfig {})
     }
 
-    private val _callback = MutableStateFlow<String?>(null)
+    private val _callback = MutableStateFlow(byteArrayOf())
 
     val callback = _callback.asStateFlow()
     val vector = Vector<Int>(16).apply {
@@ -41,23 +35,23 @@ class SerialPort {
     }
 
     /**
-     * 发送Hex
+     * 发送命令
      *
-     * @param hex String
+     * @param bytes ByteArray
+     * @return Unit
      */
-    fun sendHex(hex: String) {
-        helper.sendHex(hex)
-        hex.hexFormat().logi()
+    fun sendByteArray(bytes: ByteArray) {
+        helper.sendByteArray(bytes = bytes)
     }
 
-    private fun hexHandler(hex: String) {
-        _callback.value = hex
-        val v2 = hex.toV2()
-        if (v2 != null && v2.addr == "02") {
-            when (v2.fn) {
-                "01" -> {
-                    val index = v2.data.substring(0, 2).hexToInt()
-                    val value = v2.data.substring(2, 4).hexToInt()
+    private fun hexHandler(bytes: ByteArray) {
+        _callback.value = bytes
+        val rec = protocol(bytes)
+        if (rec.addr == 0x02.toByte()) {
+            when (rec.fn) {
+                0x01.toByte() -> {
+                    val index = rec.data[0].toInt()
+                    val value = rec.data[1].toInt()
                     vector[index] = value
                 }
             }

@@ -11,7 +11,7 @@ class Protocol {
     var len: ByteArray = byteArrayOf(0x00, 0x00)
     var data: ByteArray = byteArrayOf()
     var crc: ByteArray = byteArrayOf(0x00, 0x00)
-    var end: Byte = 0xBB.toByte()
+    var end: ByteArray = byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
 
     fun toByteArray(): ByteArray {
         val array = byteArrayOf(head, addr, fn) + len.writeInt16BE(data.size, 0) + data + crc + end
@@ -24,6 +24,7 @@ fun protocol(block: Protocol.() -> Unit): Protocol {
     return Protocol().apply(block)
 }
 
+
 fun protocol(data: ByteArray): Protocol {
     return protocol {
         head = data[0]
@@ -31,7 +32,7 @@ fun protocol(data: ByteArray): Protocol {
         fn = data[2]
         len = data.copyOfRange(3, 5)
         this.data = data.copyOfRange(5, data.size - 3)
-        crc = data.copyOfRange(data.size - 3, data.size - 1)
-        end = data[data.size - 1]
+        crc = data.copyOfRange(data.size - 6, data.size - 4)
+        end = data.copyOfRange(data.size - 4, data.size)
     }
 }

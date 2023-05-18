@@ -108,7 +108,15 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
     private fun dataProcess(byteArray: ByteArray) {
         if (byteArray.isEmpty()) {
             if (cache.isNotEmpty()) {
-                cache.splitByteArray(head = 0xEE.toByte(), end = 0xBB.toByte()).forEach {
+                cache.splitByteArray(
+                    head = byteArrayOf(0xEE.toByte()),
+                    end = byteArrayOf(
+                        0xFF.toByte(),
+                        0xFC.toByte(),
+                        0xFF.toByte(),
+                        0xFF.toByte()
+                    )
+                ).forEach {
                     val crc = it.copyOfRange(it.size - 3, it.size - 1)
                     val buffer = it.copyOfRange(0, it.size - 3)
                     if (buffer.crc16().contentEquals(crc)) {

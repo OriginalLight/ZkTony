@@ -7,6 +7,7 @@ import com.zktony.www.proxy.SerialProxy
 import com.zktony.www.room.entity.Motor
 import kotlinx.coroutines.delay
 import org.koin.java.KoinJavaComponent.inject
+import kotlin.math.abs
 
 private val serialProxy: SerialProxy by inject(SerialProxy::class.java)
 private val mcProxy: MCProxy by inject(MCProxy::class.java)
@@ -62,6 +63,7 @@ class YesNo {
 class Execute {
 
     private val list = mutableListOf<Step>()
+    private var mode = false
     private var type = 1
 
     fun type(type: Int) {
@@ -72,6 +74,10 @@ class Execute {
         list.add(Step().apply(block))
     }
 
+    fun mode(mode: Boolean) {
+        this.mode = mode
+    }
+
     fun list(): List<Step> {
         return list
     }
@@ -79,14 +85,32 @@ class Execute {
     fun type(): Int {
         return type
     }
+
+    fun mode(): Boolean {
+        return mode
+    }
 }
 
 fun execute(block: Execute.() -> Unit) {
     val list = Execute().apply(block).list()
     val type = Execute().apply(block).type()
+    val mode = Execute().apply(block).mode()
     val s1 = StringBuilder()
     list.forEach {
-        s1.append("${pulse(it.v1, 0)},${pulse(it.v2, 1)},${pulse(it.v3, 2)},")
+        val p1 = pulse(it.v1, 0)
+        val p2 = pulse(it.v2, 1)
+        val p3 = pulse(it.v3, 2)
+
+        if (type == 0) {
+            s1.append("$p1,$p2,$p3,")
+        } else {
+            val avg = (p1 + p2) / 2
+            if (mode) {
+                s1.append("${avg - 1},${avg + 1},$p3,")
+            } else {
+                s1.append("${avg + 1},${avg - 1},$p3,")
+            }
+        }
     }
 
     if (type == 1) {

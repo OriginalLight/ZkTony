@@ -43,17 +43,17 @@ class MCProxy constructor(
                             listOf(
                                 Motor(
                                     id = 0,
-                                    name = Ext.ctx.getString(R.string.pump_one),
+                                    name = "排液泵",
                                     address = 1
                                 ),
                                 Motor(
                                     id = 1,
-                                    name = Ext.ctx.getString(R.string.pump_two),
+                                    name = "混合器泵",
                                     address = 2
                                 ),
                                 Motor(
                                     id = 2,
-                                    name = Ext.ctx.getString(R.string.pump_three),
+                                    name = "标准泵",
                                     address = 3
                                 ),
                             )

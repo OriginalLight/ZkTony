@@ -2,17 +2,18 @@ package com.zktony.android.core.ext
 
 import com.zktony.android.core.ScheduleTask
 import com.zktony.android.data.entity.MotorEntity
-import com.zktony.serialport.ext.intToHex
+import com.zktony.serialport.ext.writeInt32BE
+import com.zktony.serialport.ext.writeInt8
 import org.koin.java.KoinJavaComponent.inject
-import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicLong
 
 val scheduleTask: ScheduleTask by inject(ScheduleTask::class.java)
 
 
 // x轴坐标
-private var x: AtomicInteger = AtomicInteger(0)
-private var y: AtomicInteger = AtomicInteger(0)
-private var z: AtomicInteger = AtomicInteger(0)
+private var x: AtomicLong = AtomicLong(0L)
+private var y: AtomicLong = AtomicLong(0L)
+private var z: AtomicLong = AtomicLong(0L)
 
 /**
  * 脉冲
@@ -21,12 +22,12 @@ private var z: AtomicInteger = AtomicInteger(0)
  * @param dv Int
  * @return Int
  */
-fun pulse(index: Int, dv: Float): Int {
-    val p = (dv / scheduleTask.hpc[index]!! * 3200).toInt()
+fun pulse(index: Int, dv: Float): Long {
+    val p = (dv / scheduleTask.hpc[index]!! * 3200).toLong()
     return when (index) {
         0 -> {
             val d = p - x.get()
-            x.set(maxOf(p, 0))
+            x.set(maxOf(p, 0L))
             d
         }
 
@@ -53,6 +54,7 @@ fun pulse(index: Int, dv: Float): Int {
  * @param dv Int
  * @return String
  */
-fun pwc(index: Int, dv: Float, config: MotorEntity): String {
-    return index.intToHex() + pulse(index, dv).intToHex(4) + config.hex()
+fun pwc(index: Int, dv: Float, config: MotorEntity): ByteArray {
+    val ba = ByteArray(5)
+    return ba.writeInt8(index, 0).writeInt32BE(pulse(index, dv), 1) + config.toByteArray()
 }

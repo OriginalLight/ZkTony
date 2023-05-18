@@ -6,10 +6,8 @@ import java.util.Locale
 
 // https://www.jianshu.com/p/8ee33de703e2
 
-fun ByteArray.toHexString(hasSpace: Boolean = true) = this.joinToString("") {
-    (it.toInt() and 0xFF).toString(16).padStart(2, '0')
-        .uppercase(Locale.ROOT) + if (hasSpace) " " else ""
-}
+fun ByteArray.toHexString(hasSpace: Boolean = true) =
+    this.joinToString(if (hasSpace) " " else "") { String.format("%02X", it) }
 
 fun ByteArray.toAsciiString(hasSpace: Boolean = false) =
     this.map { it.toInt().toChar() }.joinToString(if (hasSpace) " " else "")
@@ -250,20 +248,34 @@ fun ByteArray.writeByteArrayLE(
 // ********************************************** 其他 **********************************************
 
 // 根据命令格式分割成多个ByteArray
-fun ByteArray.splitByteArray(head: Byte, end: Byte): List<ByteArray> {
+
+fun ByteArray.splitByteArray(head: ByteArray, end: ByteArray): List<ByteArray> {
+    var byteArray = this.copyOfRange(0, this.size)
     val list = mutableListOf<ByteArray>()
-    var headIndex = 0
+    var headIndex: Int
     var endIndex: Int
-    for (i in this.indices) {
-        if (this[i] == head) {
-            headIndex = i
-        }
-        if (this[i] == end && (i == this.size - 1 || this[i + 1] == head)) {
-            endIndex = i
-            list.add(this.copyOfRange(headIndex, endIndex + 1))
+    while (byteArray.isNotEmpty()) {
+        headIndex = this.indexOf(head)
+        endIndex = this.indexOf(end)
+        if (headIndex > 0 && endIndex > 0) {
+            val bytes = this.copyOfRange(headIndex, endIndex + end.size)
+            list.add(bytes)
+            if (bytes.size == byteArray.size) {
+                break
+            } else {
+                byteArray = byteArray.copyOfRange(bytes.size, byteArray.size)
+            }
+        } else {
+            break
         }
     }
     return list
+}
+
+fun ByteArray.indexOf(bytes: ByteArray): Int {
+    val index = this.indexOf(bytes.first())
+    val array = this.copyOfRange(index, index + bytes.size)
+    return if (array.contentEquals(bytes)) index else -1
 }
 
 // 指定位置插入ByteArray

@@ -22,9 +22,10 @@ class ProgramExecutor constructor(
         scope.launch {
             waitLock {
                 execute {
+                    mode(mode)
                     step {
-                        v1 = if (mode) (colloid / 2f - 1f) else (colloid / 2f + 1f)
-                        v2 = if (mode) (colloid / 2f + 1f) else (colloid / 2f - 1f)
+                        v1 = colloid / 2f
+                        v2 = colloid / 2f
                         v3 = coagulant
                     }
                 }
@@ -43,6 +44,7 @@ class ProgramExecutor constructor(
             waitLock {
                 execute {
                     type(0)
+                    mode(mode)
                     step {
                         v1 = if (mode) 0f else colloid
                         v2 = if (mode) colloid else 0f

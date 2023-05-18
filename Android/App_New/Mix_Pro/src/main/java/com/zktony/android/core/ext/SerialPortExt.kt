@@ -2,7 +2,7 @@ package com.zktony.android.core.ext
 
 import com.zktony.android.core.SerialPort
 import com.zktony.android.data.entity.MotorEntity
-import com.zktony.serialport.protocol.v2
+import com.zktony.serialport.command.Protocol
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import org.koin.java.KoinJavaComponent.inject
@@ -10,14 +10,10 @@ import org.koin.java.KoinJavaComponent.inject
 val serialPort: SerialPort by inject(SerialPort::class.java)
 
 /**
- * 同步发送Hex
- *
- * 一发一收算作完成
- *
- * @param hex String
+ * 发送命令
  */
-fun sendHex(hex: String) {
-    serialPort.sendHex(hex)
+fun sendByteArray(block: Protocol.() -> Unit) {
+    serialPort.sendByteArray(Protocol().apply(block).toByteArray())
 }
 
 /**
@@ -103,12 +99,13 @@ class Compose {
 suspend fun syncHex(block: Compose.() -> Unit, timeOut: Long = 5000) {
     val compose = Compose().apply(block)
     val list = compose.list
-    val hex = list.joinToString("") {
-        pwc(it.first, it.second, it.third)
+    val bytes = byteArrayOf()
+    list.forEach {
+        bytes.plus(pwc(it.first, it.second, it.third))
     }
     try {
         withTimeout(timeOut) {
-            sendHex(v2 { data = hex })
+            sendByteArray { data = bytes }
             delay(100L)
             while (getLock(list.map { it.first })) {
                 delay(100L)
@@ -129,10 +126,11 @@ suspend fun syncHex(block: Compose.() -> Unit, timeOut: Long = 5000) {
 fun asyncHex(block: Compose.() -> Unit) {
     val compose = Compose().apply(block)
     val list = compose.list
-    val hex = list.joinToString("") {
-        pwc(it.first, it.second, it.third)
+    val bytes = byteArrayOf()
+    list.forEach {
+        bytes.plus(pwc(it.first, it.second, it.third))
     }
-    sendHex(v2 { data = hex })
+    sendByteArray { data = bytes }
 }
 
 /**
@@ -164,8 +162,8 @@ fun freeLock(list: List<Int>) {
  * 收集hex回复
  * @param block (String) -> Unit
  */
-suspend fun collectHex(block: (String) -> Unit) {
+suspend fun collectHex(block: (ByteArray) -> Unit) {
     serialPort.callback.collect {
-        it?.let { block(it) }
+        block(it)
     }
 }
