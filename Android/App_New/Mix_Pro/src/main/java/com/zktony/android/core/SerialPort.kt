@@ -68,7 +68,7 @@ class SerialPort {
      * 初始化
      */
     fun initializer() {
-        "SerialPortHelper initializer".logi()
+        "SerialPort initializer".logi()
     }
 
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
+import com.zktony.serialport.protocol.v1
 import com.zktony.www.R
 import com.zktony.www.common.ext.asyncHex
 import com.zktony.www.common.ext.syncHex
@@ -82,6 +83,20 @@ class HomeViewModel constructor(
         _uiState.value = _uiState.value.copy(job = job)
     }
 
+    fun stop() {
+        viewModelScope.launch {
+            asyncHex {
+                pa = "10"
+            }
+            _uiState.value = _uiState.value.copy(
+                time = 0L,
+                previous = !_uiState.value.previous
+            )
+            updateValue()
+            _uiState.value.job?.cancel()
+            _uiState.value = _uiState.value.copy(job = null)
+        }
+    }
 
     /**
      * 填充促凝剂
@@ -124,14 +139,14 @@ class HomeViewModel constructor(
                             pa = "0B"
                             data = "0301"
                         }
-                        delay(8500L)
+                        delay(10000L)
                     } else {
                         _uiState.value = _uiState.value.copy(upOrDown = true)
                         asyncHex {
                             pa = "0B"
                             data = "0305"
                         }
-                        delay(9000L)
+                        delay(10000L)
                     }
                 }
             }
@@ -178,14 +193,14 @@ class HomeViewModel constructor(
                             pa = "0B"
                             data = "0303"
                         }
-                        delay(8500L)
+                        delay(10000L)
                     } else {
                         _uiState.value = _uiState.value.copy(upOrDown = true)
                         asyncHex {
                             pa = "0B"
                             data = "0304"
                         }
-                        delay(9000L)
+                        delay(10000L)
                     }
                 }
             }

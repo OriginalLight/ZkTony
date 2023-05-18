@@ -3,9 +3,7 @@ package com.zktony.serialport
 import android.os.Message
 import android.util.Log
 import com.zktony.serialport.config.SerialConfig
-import com.zktony.serialport.ext.hexStringToByteArray
 import java.io.IOException
-import java.io.UnsupportedEncodingException
 import java.security.InvalidParameterException
 
 /**
@@ -34,36 +32,6 @@ class SerialHelper(config: SerialConfig) : AbstractSerialHelper(config) {
         } catch (e: Exception) {
             Log.e(TAG, "Failed to open the serial port: other error!")
             -4
-        }
-    }
-
-    /**
-     * Send HEX data
-     *
-     * @param sHex hex data
-     */
-    fun sendHex(sHex: String) {
-        val hex = sHex.trim { it <= ' ' }.replace(" ", "")
-        val bOutArray = hex.hexStringToByteArray()
-        val msg = Message.obtain()
-        msg.obj = bOutArray
-        addWaitMessage(msg)
-    }
-
-    /**
-     * Send string data
-     *
-     * @param sText string data
-     */
-    fun sendText(sText: String) {
-        val bOutArray: ByteArray
-        try {
-            bOutArray = sText.toByteArray()
-            val msg = Message.obtain()
-            msg.obj = bOutArray
-            addWaitMessage(msg)
-        } catch (e: UnsupportedEncodingException) {
-            e.printStackTrace()
         }
     }
 

@@ -247,6 +247,25 @@ fun ByteArray.writeByteArrayLE(
     return this
 }
 
+// ********************************************** 其他 **********************************************
+
+// 根据命令格式分割成多个ByteArray
+fun ByteArray.splitByteArray(head: Byte, end: Byte): List<ByteArray> {
+    val list = mutableListOf<ByteArray>()
+    var headIndex = 0
+    var endIndex: Int
+    for (i in this.indices) {
+        if (this[i] == head) {
+            headIndex = i
+        }
+        if (this[i] == end && (i == this.size - 1 || this[i + 1] == head)) {
+            endIndex = i
+            list.add(this.copyOfRange(headIndex, endIndex + 1))
+        }
+    }
+    return list
+}
+
 // 指定位置插入ByteArray
 fun ByteArray.insertByteArrayBE(
     insertArray: ByteArray,
@@ -273,6 +292,34 @@ fun ByteArray.insertByteArrayLE(
     val insertFinalArray =
         insertArray.copyOfRange(insertArrayOffset, insertArrayOffset + insertArrayLength)
     return byteArrayPre.plus(insertFinalArray).plus(byteArrayLast)
+}
+
+// 指定位置开始替换ByteArray
+fun ByteArray.replaceByteArrayBE(
+    replaceArray: ByteArray,
+    originalIndex: Int = 0,
+    replaceArrayOffset: Int = 0,
+    replaceArrayLength: Int = replaceArray.size - replaceArrayOffset
+): ByteArray {
+    val byteArrayPre = this.copyOfRange(0, originalIndex)
+    val byteArrayLast = this.copyOfRange(originalIndex + replaceArrayLength, this.size)
+    val replaceFinalArray =
+        replaceArray.copyOfRange(replaceArrayOffset, replaceArrayOffset + replaceArrayLength)
+    return byteArrayPre.plus(replaceFinalArray).plus(byteArrayLast)
+}
+
+fun ByteArray.replaceByteArrayLE(
+    replaceArray: ByteArray,
+    originalIndex: Int = 0,
+    replaceArrayOffset: Int = 0,
+    replaceArrayLength: Int = replaceArray.size - replaceArrayOffset
+): ByteArray {
+    replaceArray.reverse()
+    val byteArrayPre = this.copyOfRange(0, originalIndex)
+    val byteArrayLast = this.copyOfRange(originalIndex + replaceArrayLength, this.size)
+    val replaceFinalArray =
+        replaceArray.copyOfRange(replaceArrayOffset, replaceArrayOffset + replaceArrayLength)
+    return byteArrayPre.plus(replaceFinalArray).plus(byteArrayLast)
 }
 
 // 指定位置写入String
