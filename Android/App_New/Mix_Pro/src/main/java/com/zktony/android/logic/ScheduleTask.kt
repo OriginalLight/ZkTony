@@ -1,10 +1,10 @@
-package com.zktony.android.core
+package com.zktony.android.logic
 
-import com.zktony.android.core.ext.avgRate
-import com.zktony.android.data.dao.CalibrationDao
-import com.zktony.android.data.dao.MotorDao
-import com.zktony.android.data.entity.CalibrationEntity
-import com.zktony.android.data.entity.MotorEntity
+import com.zktony.android.logic.data.dao.CalibrationDao
+import com.zktony.android.logic.data.dao.MotorDao
+import com.zktony.android.logic.data.entities.CalibrationEntity
+import com.zktony.android.logic.data.entities.MotorEntity
+import com.zktony.android.logic.ext.avgRate
 import com.zktony.core.ext.logi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

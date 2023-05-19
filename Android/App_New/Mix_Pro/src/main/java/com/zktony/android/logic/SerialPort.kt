@@ -1,4 +1,4 @@
-package com.zktony.android.core
+package com.zktony.android.logic
 
 import com.zktony.core.ext.logi
 import com.zktony.serialport.SerialHelper
@@ -75,6 +75,7 @@ class SerialPort {
 
     /**
      * Callback process
+     * 包括分包、crc校验等
      *
      * @param byteArray ByteArray
      * @param block Function1<ByteArray, Unit>
@@ -119,7 +120,6 @@ class SerialPort {
             }
         }
     }
-
 
     /**
      * 初始化

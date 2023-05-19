@@ -1,4 +1,4 @@
-package com.zktony.android.data.entity
+package com.zktony.android.logic.data.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.google.errorprone.annotations.Immutable
-import com.zktony.android.data.PointConverters
+import com.zktony.android.logic.data.PointConverters
 import com.zktony.core.ext.nextId
 import java.util.Date
 

@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.data.entity.MotorEntity
+import com.zktony.android.logic.data.entities.MotorEntity
 import com.zktony.android.ui.components.ZkTonyScaffold
 import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.utils.PageEnum

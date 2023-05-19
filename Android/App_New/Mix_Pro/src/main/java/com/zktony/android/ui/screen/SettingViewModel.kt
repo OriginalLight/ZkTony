@@ -14,11 +14,11 @@ import com.zktony.core.ext.installApk
 import com.zktony.core.ext.isNetworkAvailable
 import com.zktony.core.ext.restartApp
 import com.zktony.core.ext.showShortToast
-import com.zktony.datastore.SettingsPreferences
-import com.zktony.datastore.copy
+import com.zktony.proto.SettingsPreferences
 import com.zktony.datastore.ext.saveSettings
 import com.zktony.datastore.ext.settingsFlow
 import com.zktony.proto.Application
+import com.zktony.proto.copy
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

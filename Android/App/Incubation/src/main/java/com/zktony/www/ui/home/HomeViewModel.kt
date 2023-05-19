@@ -103,7 +103,7 @@ class HomeViewModel constructor(
                 while (true) {
                     for (i in 0..4) {
                         delay(500L)
-                        asyncText("TC1:TCACTUALTEMP?@$$i\r")
+                        asyncText("TC1:TCACTUALTEMP?@$i\r")
                     }
                     delay(5 * 1000L)
                 }

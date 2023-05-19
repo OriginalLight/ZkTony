@@ -1,7 +1,7 @@
-package com.zktony.android.core.ext
+package com.zktony.android.logic.ext
 
-import com.zktony.android.core.SerialPort
-import com.zktony.android.data.entity.MotorEntity
+import com.zktony.android.logic.SerialPort
+import com.zktony.android.logic.data.entities.MotorEntity
 import com.zktony.serialport.command.Protocol
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout

@@ -66,8 +66,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.data.entity.ContainerEntity
-import com.zktony.android.data.entity.Point
+import com.zktony.android.logic.data.entities.ContainerEntity
+import com.zktony.android.logic.data.entities.Point
 import com.zktony.android.ui.components.DynamicMixPlate
 import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
 import com.zktony.android.ui.components.ZkTonyScaffold

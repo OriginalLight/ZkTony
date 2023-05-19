@@ -2,8 +2,8 @@ package com.zktony.android.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.data.dao.CalibrationDao
-import com.zktony.android.data.entity.CalibrationEntity
+import com.zktony.android.logic.data.dao.CalibrationDao
+import com.zktony.android.logic.data.entities.CalibrationEntity
 import com.zktony.android.ui.utils.PageEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

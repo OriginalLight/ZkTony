@@ -1,8 +1,14 @@
-package com.zktony.android.data
+package com.zktony.android.logic.data
 
 import androidx.room.*
-import com.zktony.android.data.dao.*
-import com.zktony.android.data.entity.*
+import com.zktony.android.logic.data.dao.CalibrationDao
+import com.zktony.android.logic.data.dao.ContainerDao
+import com.zktony.android.logic.data.dao.MotorDao
+import com.zktony.android.logic.data.dao.ProgramDao
+import com.zktony.android.logic.data.entities.CalibrationEntity
+import com.zktony.android.logic.data.entities.ContainerEntity
+import com.zktony.android.logic.data.entities.MotorEntity
+import com.zktony.android.logic.data.entities.ProgramEntity
 
 /**
  * @author 刘贺贺

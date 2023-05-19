@@ -1,10 +1,7 @@
 package com.zktony.android
 
 import android.app.Application
-import com.zktony.android.di.localModule
-import com.zktony.android.di.coreModule
-import com.zktony.android.di.remoteModule
-import com.zktony.android.di.viewModule
+import com.zktony.android.logic.appModule
 import com.zktony.core.ext.Ext
 import com.zktony.datastore.DataStoreFactory
 import org.koin.android.ext.koin.androidContext
@@ -26,12 +23,7 @@ class App : Application() {
         startKoin {
             androidContext(this@App)
             androidLogger(level = Level.INFO)
-            modules(
-                localModule,
-                remoteModule,
-                viewModule,
-                coreModule,
-            )
+            modules(appModule)
         }
     }
 }

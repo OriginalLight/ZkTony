@@ -7,6 +7,7 @@ import com.zktony.core.ext.Ext
 import com.zktony.www.R
 import com.zktony.www.core.ext.asyncHex
 import com.zktony.www.core.ext.syncHex
+import com.zktony.www.core.ext.waitLock
 import com.zktony.www.core.ext.waitTime
 import com.zktony.www.data.dao.CacheDao
 import com.zktony.www.data.entities.Cache
@@ -25,9 +26,20 @@ class HomeViewModel constructor(
 
     init {
         viewModelScope.launch {
-            dao.getAll().collect {
-                _uiState.value = _uiState.value.copy(cacheList = it)
-                updateValue()
+            launch {
+                dao.getAll().collect {
+                    _uiState.value = _uiState.value.copy(cacheList = it)
+                    updateValue()
+                }
+            }
+            launch {
+                _uiState.value = _uiState.value.copy(
+                    lock = true
+                )
+                delay(5000L)
+                _uiState.value = _uiState.value.copy(
+                    lock = false
+                )
             }
         }
     }
@@ -103,19 +115,30 @@ class HomeViewModel constructor(
     fun fillCoagulant() {
         viewModelScope.launch {
             if (_uiState.value.fillCoagulant) {
+                if (_uiState.value.lock) {
+                    PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.resetting))
+                    return@launch
+                }
                 _uiState.value = _uiState.value.copy(
                     upOrDown = true,
                     fillCoagulant = false,
-                    start = false,
+                    lock = true
                 )
-                asyncHex {
-                    pa = "0B"
-                    data = "0300"
+                syncHex {
+                    pa = "10"
                 }
-                delay(100L)
+                delay(200L)
                 syncHex {
                     pa = "0B"
                     data = "0305"
+                }
+                delay(100L)
+                waitLock {
+                    delay(2000L)
+                    _uiState.value = _uiState.value.copy(
+                        lock = false,
+                    )
+                    PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.reset_success))
                 }
 
             } else {
@@ -123,10 +146,13 @@ class HomeViewModel constructor(
                     PopTip.show(Ext.ctx.getString(R.string.stop_back))
                     return@launch
                 }
+                if (_uiState.value.lock) {
+                    PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.resetting))
+                    return@launch
+                }
                 _uiState.value = _uiState.value.copy(
                     upOrDown = true,
                     fillCoagulant = true,
-                    start = true,
                     previous = true
                 )
                 updateValue()
@@ -143,7 +169,7 @@ class HomeViewModel constructor(
                         _uiState.value = _uiState.value.copy(upOrDown = true)
                         asyncHex {
                             pa = "0B"
-                            data = "0305"
+                            data = "0302"
                         }
                         delay(10000L)
                     }
@@ -158,29 +184,43 @@ class HomeViewModel constructor(
     fun recaptureCoagulant() {
         viewModelScope.launch {
             if (_uiState.value.recaptureCoagulant) {
+                if (_uiState.value.lock) {
+                    PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.resetting))
+                    return@launch
+                }
                 _uiState.value = _uiState.value.copy(
                     upOrDown = true,
                     recaptureCoagulant = false,
-                    start = false
+                    lock = true
                 )
-                asyncHex {
-                    pa = "0B"
-                    data = "0300"
+                syncHex {
+                    pa = "10"
                 }
-                delay(100L)
+                delay(200L)
                 syncHex {
                     pa = "0B"
                     data = "0305"
+                }
+                delay(100L)
+                waitLock {
+                    delay(2000L)
+                    _uiState.value = _uiState.value.copy(
+                        lock = false,
+                    )
+                    PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.reset_success))
                 }
             } else {
                 if (_uiState.value.fillCoagulant) {
                     PopTip.show(Ext.ctx.getString(R.string.stop_fill))
                     return@launch
                 }
+                if (_uiState.value.lock) {
+                    PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.resetting))
+                    return@launch
+                }
                 _uiState.value = _uiState.value.copy(
                     upOrDown = true,
                     recaptureCoagulant = true,
-                    start = true,
                     previous = true
                 )
                 updateValue()
@@ -212,10 +252,7 @@ class HomeViewModel constructor(
     fun fillColloid() {
         viewModelScope.launch {
             if (!uiState.value.fillCoagulant && !uiState.value.recaptureCoagulant) {
-                _uiState.value = _uiState.value.copy(
-                    start = true,
-                    previous = true,
-                )
+                _uiState.value = _uiState.value.copy(previous = true)
                 updateValue()
                 asyncHex {
                     pa = "0B"
@@ -231,10 +268,7 @@ class HomeViewModel constructor(
     fun recaptureColloid() {
         viewModelScope.launch {
             if (!uiState.value.fillCoagulant && !uiState.value.recaptureCoagulant) {
-                _uiState.value = _uiState.value.copy(
-                    start = true,
-                    previous = true,
-                )
+                _uiState.value = _uiState.value.copy(previous = true)
                 updateValue()
                 asyncHex {
                     pa = "0B"
@@ -250,7 +284,6 @@ class HomeViewModel constructor(
     fun stopFillAndRecapture() {
         viewModelScope.launch {
             if (!uiState.value.fillCoagulant && !uiState.value.recaptureCoagulant) {
-                _uiState.value = _uiState.value.copy(start = false)
                 asyncHex {
                     pa = "0B"
                     data = "0400"
@@ -396,9 +429,9 @@ class HomeViewModel constructor(
 data class HomeUiState(
     val job: Job? = null,
     val time: Long = 0L,
-    val start: Boolean = false,
     val fillCoagulant: Boolean = false,
     val recaptureCoagulant: Boolean = false,
+    val lock: Boolean = false,
     val upOrDown: Boolean = true,
     val colloid: Float = 0f,
     val coagulant: Float = 0f,

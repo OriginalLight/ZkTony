@@ -1,7 +1,7 @@
-package com.zktony.android.core.ext
+package com.zktony.android.logic.ext
 
-import com.zktony.android.core.ScheduleTask
-import com.zktony.android.data.entity.MotorEntity
+import com.zktony.android.logic.ScheduleTask
+import com.zktony.android.logic.data.entities.MotorEntity
 import com.zktony.serialport.ext.writeInt32BE
 import com.zktony.serialport.ext.writeInt8
 import org.koin.java.KoinJavaComponent.inject

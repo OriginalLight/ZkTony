@@ -3,6 +3,7 @@ package com.zktony.datastore
 import androidx.datastore.core.CorruptionException
 import androidx.datastore.core.Serializer
 import androidx.datastore.preferences.protobuf.InvalidProtocolBufferException
+import com.zktony.proto.SettingsPreferences
 import java.io.InputStream
 import java.io.OutputStream
 

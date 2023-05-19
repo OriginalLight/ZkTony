@@ -172,11 +172,15 @@ suspend fun decideLock(block: YesNo.() -> Unit) {
     }
 }
 
+fun getLock(): Boolean {
+    return serialPort.lock.value
+}
+
 /**
  * 等待解锁
  * @param block () -> Unit
  */
-suspend fun waitLock(block: () -> Unit) {
+suspend fun waitLock(block: suspend () -> Unit) {
     while (serialPort.lock.value) {
         delay(100L)
     }

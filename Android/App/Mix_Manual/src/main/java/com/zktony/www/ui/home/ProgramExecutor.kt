@@ -31,9 +31,17 @@ class ProgramExecutor constructor(
                 }
             }
             delay(100L)
-            waitSyncHex {
+            waitAsyncHex {
+                pa = "10"
+            }
+            delay(200L)
+            syncHex {
                 pa = "0B"
                 data = "0305"
+            }
+            delay(100L)
+            waitLock {
+                delay(3000L)
             }
             finish()
         }
@@ -53,9 +61,17 @@ class ProgramExecutor constructor(
                 }
             }
             delay(100L)
-            waitSyncHex {
+            waitAsyncHex {
+                pa = "10"
+            }
+            delay(200L)
+            syncHex {
                 pa = "0B"
                 data = "0305"
+            }
+            delay(100L)
+            waitLock {
+                delay(3000L)
             }
             finish()
         }

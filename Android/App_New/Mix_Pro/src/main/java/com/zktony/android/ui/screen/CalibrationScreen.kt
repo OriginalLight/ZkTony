@@ -75,9 +75,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.core.ext.compute
-import com.zktony.android.data.entity.CalibrationData
-import com.zktony.android.data.entity.CalibrationEntity
+import com.zktony.android.logic.ext.compute
+import com.zktony.android.logic.data.entities.CalibrationData
+import com.zktony.android.logic.data.entities.CalibrationEntity
 import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
 import com.zktony.android.ui.components.ZkTonyScaffold
 import com.zktony.android.ui.components.ZkTonyTopAppBar

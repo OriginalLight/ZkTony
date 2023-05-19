@@ -42,7 +42,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             }
 
                             start.isEnabled =
-                                it.coagulant > 0f && it.colloid > 0f && it.job == null && !it.start
+                                it.coagulant > 0f && it.colloid > 0f && it.job == null && !it.lock
                             start.text =
                                 if (it.previous) getString(R.string.pre_drainage) else getString(com.zktony.core.R.string.start)
                             mode.isVisible = it.job == null

@@ -87,7 +87,7 @@ class ScheduleTask constructor(
                 }
             }
             launch {
-                delay(5000L)
+                delay(100L)
                 decideLock {
                     no {
                         for (i in 1..3) {

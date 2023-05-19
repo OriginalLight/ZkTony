@@ -1,9 +1,9 @@
-package com.zktony.android.core.ext
+package com.zktony.android.logic.ext
 
-import com.zktony.android.data.entity.CalibrationData
-import com.zktony.android.data.entity.CalibrationEntity
-import com.zktony.android.data.entity.ContainerEntity
-import com.zktony.android.data.entity.ProgramEntity
+import com.zktony.android.logic.data.entities.CalibrationData
+import com.zktony.android.logic.data.entities.CalibrationEntity
+import com.zktony.android.logic.data.entities.ContainerEntity
+import com.zktony.android.logic.data.entities.ProgramEntity
 
 /**
  * @author 刘贺贺

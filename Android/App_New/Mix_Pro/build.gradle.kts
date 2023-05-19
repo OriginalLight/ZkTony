@@ -25,7 +25,7 @@ android {
         }
 
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".mix.pro.release"
             proguardFiles(

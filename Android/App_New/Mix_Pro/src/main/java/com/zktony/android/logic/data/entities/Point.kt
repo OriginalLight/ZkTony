@@ -1,4 +1,4 @@
-package com.zktony.android.data.entity
+package com.zktony.android.logic.data.entities
 
 import com.zktony.core.ext.nextId
 

@@ -1,7 +1,7 @@
-package com.zktony.android.data.dao
+package com.zktony.android.logic.data.dao
 
 import androidx.room.*
-import com.zktony.android.data.entity.CalibrationEntity
+import com.zktony.android.logic.data.entities.CalibrationEntity
 import kotlinx.coroutines.flow.Flow
 
 /**
