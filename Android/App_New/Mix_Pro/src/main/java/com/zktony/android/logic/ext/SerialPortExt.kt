@@ -158,7 +158,7 @@ fun asyncHex(block: DV.() -> Unit) {
 fun getLock(list: List<Int>): Boolean {
     var lock = false
     list.forEach {
-        lock = lock || serialPort.vector[it] != 0
+        lock = lock || serialPort.arrayList[it] != 0
     }
     return lock
 }
@@ -170,7 +170,7 @@ fun getLock(list: List<Int>): Boolean {
  */
 fun freeLock(list: List<Int>) {
     list.forEach {
-        serialPort.vector[it] = 0
+        serialPort.arrayList[it] = 0
     }
 }
 
@@ -178,8 +178,8 @@ fun freeLock(list: List<Int>) {
  * 收集hex回复
  * @param block (String) -> Unit
  */
-suspend fun collectHex(block: (ByteArray) -> Unit) {
-    serialPort.callback.collect {
+suspend fun collectCallback(block: (ByteArray) -> Unit) {
+    serialPort.byteArrayFlow.collect {
         block(it)
     }
 }

@@ -13,14 +13,22 @@ import java.security.InvalidParameterException
  * @author: 刘贺贺
  * @date: 2022-12-08 14:39
  */
-class SerialHelper(config: SerialConfig) : AbstractSerialHelper(config) {
+abstract class AbstractSerial : AbstractSerialHelper() {
+
+    init {
+        callback = {
+            callbackProcess(it) { bytes ->
+                byteArrayProcess(bytes)
+            }
+        }
+    }
 
     /**
      * Open the serial port
      */
-    fun openDevice(): Int {
+    fun openDevice(config: SerialConfig): Int {
         return try {
-            open()
+            open(config)
             Log.i(TAG, "Open the serial port successfully")
             0
         } catch (e: SecurityException) {
@@ -82,6 +90,21 @@ class SerialHelper(config: SerialConfig) : AbstractSerialHelper(config) {
         msg.obj = protocol.toByteArray()
         addWaitMessage(msg)
     }
+
+    /**
+     * Callback process
+     * 包括分包、crc校验等
+     *
+     * @param byteArray ByteArray
+     */
+    abstract fun callbackProcess(byteArray: ByteArray, block: (ByteArray) -> Unit = {})
+
+    /**
+     * ByteArray process
+     *
+     * @param byteArray ByteArray
+     */
+    abstract fun byteArrayProcess(byteArray: ByteArray)
 
     companion object {
         private const val TAG = "SerialHelper"

@@ -14,11 +14,8 @@ import java.security.InvalidParameterException
 /**
  * Serial port auxiliary tool class
  */
-abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
-    /**
-     * Serial port
-     */
-    private val config = serialConfig
+abstract class AbstractSerialHelper {
+
     private var serialPort: SerialPort? = null
     private var outputStream: OutputStream? = null
     private var inputStream: InputStream? = null
@@ -36,7 +33,7 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
 
 
     @Throws(SecurityException::class, IOException::class, InvalidParameterException::class)
-    fun open() {
+    fun open(config: SerialConfig) {
         serialPort = SerialPort(
             device = File(config.device),
             baudRate = config.baudRate,
