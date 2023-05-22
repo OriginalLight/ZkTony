@@ -265,6 +265,7 @@ class AdminViewModel constructor(
                             } else {
                                 PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_latest_version))
                                 _uiState.value = _uiState.value.copy(
+                                    application = it,
                                     loading = false
                                 )
                             }
