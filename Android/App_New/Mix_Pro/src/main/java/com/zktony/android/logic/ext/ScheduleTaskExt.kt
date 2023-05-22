@@ -2,7 +2,7 @@ package com.zktony.android.logic.ext
 
 import com.zktony.android.logic.ScheduleTask
 import com.zktony.android.logic.data.entities.MotorEntity
-import com.zktony.serialport.ext.writeInt32BE
+import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
 import org.koin.java.KoinJavaComponent.inject
 import java.util.concurrent.atomic.AtomicLong
@@ -56,5 +56,5 @@ fun pulse(index: Int, dv: Float): Long {
  */
 fun pwc(index: Int, dv: Float, config: MotorEntity): ByteArray {
     val ba = ByteArray(5)
-    return ba.writeInt8(index, 0).writeInt32BE(pulse(index, dv), 1) + config.toByteArray()
+    return ba.writeInt8(index, 0).writeInt32LE(pulse(index, dv), 1) + config.toByteArray()
 }

@@ -1,5 +1,6 @@
 package com.zktony.android.ui.screen
 
+import android.graphics.Point
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -29,6 +30,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Code
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
@@ -58,7 +61,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -69,9 +71,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.logic.ext.volume
 import com.zktony.android.logic.data.entities.ContainerEntity
-import com.zktony.android.logic.data.entities.Point
 import com.zktony.android.logic.data.entities.ProgramEntity
 import com.zktony.android.ui.components.DynamicMixPlate
 import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
@@ -212,7 +212,7 @@ fun ProgramMainPage(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .padding(start = 16.dp),
-                                painter = painterResource(id = R.drawable.ic_program),
+                                imageVector = Icons.Default.Code,
                                 contentDescription = null,
                             )
                             Text(
@@ -312,15 +312,15 @@ fun ProgramEditPage(
     containers: List<ContainerEntity> = emptyList(),
     update: (ProgramEntity) -> Unit = {},
     toggleActive: (Int) -> Unit = {},
-    toggleContainer: (ContainerEntity) -> Unit = {},
+    toggleContainer: (Long) -> Unit = {},
     showSnackbar: (String) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
-    var v1 by remember { mutableStateOf(entity.volume()[0].format(1)) }
-    var v2 by remember { mutableStateOf(entity.volume()[1].format(1)) }
-    var v3 by remember { mutableStateOf(entity.volume()[2].format(1)) }
-    var v4 by remember { mutableStateOf(entity.volume()[3].format(1)) }
+    var v1 by remember { mutableStateOf(entity.volume[0].format(1)) }
+    var v2 by remember { mutableStateOf(entity.volume[1].format(1)) }
+    var v3 by remember { mutableStateOf(entity.volume[2].format(1)) }
+    var v4 by remember { mutableStateOf(entity.volume[3].format(1)) }
 
     LazyColumn(
         modifier = modifier
@@ -342,11 +342,11 @@ fun ProgramEditPage(
                         .fillMaxWidth()
                         .height(128.dp)
                         .padding(horizontal = 16.dp),
-                    count = entity.data.size,
-                    data = entity.data.map { p -> Pair(p.index, p.active) },
+                    count = 6,
+                    active = entity.active,
                     onItemClick = { width, x ->
                         scope.launch {
-                            val space = width / entity.data.size
+                            val space = width / 6
                             val index = (x / space).toInt()
                             toggleActive(index)
                         }
@@ -367,11 +367,7 @@ fun ProgramEditPage(
                         selected = it.id == entity.subId,
                         onClick = {
                             scope.launch {
-                                toggleContainer(it)
-                                v1 = "0"
-                                v2 = "0"
-                                v3 = "0"
-                                v4 = "0"
+                                toggleContainer(it.id)
                                 showSnackbar("已切换容器- ${it.name}")
                             }
                         },
@@ -383,8 +379,8 @@ fun ProgramEditPage(
                             )
                         },
                         leadingIcon = {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_container),
+                            Icon(
+                                imageVector = Icons.Default.Dashboard,
                                 contentDescription = null,
                                 modifier = Modifier.size(FilterChipDefaults.IconSize),
                             )
@@ -553,10 +549,10 @@ fun ProgramEditPage(
                     )
                 }
                 AnimatedVisibility(
-                    visible = v1 != entity.volume()[0].toString()
-                            || v2 != entity.volume()[1].toString()
-                            || v3 != entity.volume()[2].toString()
-                            || v4 != entity.volume()[3].toString(),
+                    visible = v1 != entity.volume[0].format(1)
+                            || v2 != entity.volume[1].toString()
+                            || v3 != entity.volume[2].toString()
+                            || v4 != entity.volume[3].toString(),
                 ) {
                     FloatingActionButton(
                         modifier = Modifier.width(128.dp),
@@ -564,16 +560,12 @@ fun ProgramEditPage(
                             scope.launch {
                                 update(
                                     entity.copy(
-                                        data = entity.data.map { p ->
-                                            p.copy(
-                                                volume = listOf(
-                                                    v1.toFloatOrNull() ?: 0f,
-                                                    v2.toFloatOrNull() ?: 0f,
-                                                    v3.toFloatOrNull() ?: 0f,
-                                                    v4.toFloatOrNull() ?: 0f,
-                                                )
-                                            )
-                                        },
+                                        volume = listOf(
+                                            v1.toFloatOrNull() ?: 0f,
+                                            v2.toFloatOrNull() ?: 0f,
+                                            v3.toFloatOrNull() ?: 0f,
+                                            v4.toFloatOrNull() ?: 0f,
+                                        )
                                     )
                                 )
                                 showSnackbar("已更新数据")
@@ -616,7 +608,7 @@ fun ProgramEditPagePreview() {
         containers.add(ContainerEntity())
     }
     ProgramEditPage(
-        entity = ProgramEntity(data = pointList),
+        entity = ProgramEntity(),
         containers = containers,
     )
 }

@@ -2,29 +2,11 @@ package com.zktony.android.logic.ext
 
 import com.zktony.android.logic.data.entities.CalibrationData
 import com.zktony.android.logic.data.entities.CalibrationEntity
-import com.zktony.android.logic.data.entities.ContainerEntity
-import com.zktony.android.logic.data.entities.ProgramEntity
 
 /**
  * @author 刘贺贺
  * @date 2023/5/16 13:29
  */
-
-fun ContainerEntity.axis(): List<Float> {
-    return if (this.data.isEmpty()) {
-        listOf(0f, 0f, 0f)
-    } else {
-        this.data[0].axis
-    }
-}
-
-fun ProgramEntity.volume(): List<Float> {
-    return if (this.data.isEmpty()) {
-        listOf(0f, 0f, 0f, 0f)
-    } else {
-        this.data[0].volume
-    }
-}
 
 fun CalibrationEntity.compute(): List<Triple<Int, Float, List<CalibrationData>>> {
     val vl = mutableListOf<Triple<Int, Float, List<CalibrationData>>>()

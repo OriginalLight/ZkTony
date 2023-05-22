@@ -149,27 +149,12 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 viewModel.toggleNavigationBar(isChecked)
             }
 
-            with(navigation) {
-                clickScale()
-                clickNoRepeat { viewModel.toggleNavigationBar(!swBar.isChecked) }
-            }
-
             swAudio.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.toggleAudio(isChecked)
             }
 
-            with(audio) {
-                clickScale()
-                clickNoRepeat { viewModel.toggleAudio(!swAudio.isChecked) }
-            }
-
             swDetect.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.toggleDetect(isChecked)
-            }
-
-            with(detect) {
-                clickScale()
-                clickNoRepeat { viewModel.toggleDetect(!swDetect.isChecked) }
             }
 
             with(reset) {

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="already_latest">Already latest</string>
+    <string name="app_name">ZkTony</string>
+    <string name="cancel">Cancel</string>
+    <string name="device_info">Device info</string>
+    <string name="empty_screen_subtitle">This screen is still under construction. This sample will help you learn about adaptive layouts in Jetpack Compose</string>
+    <string name="empty_screen_title">Screen under construction</string>
+    <string name="finish">Finish</string>
+    <string name="help">Help</string>
+    <string name="language">Language</string>
+    <string name="motor_config">Motor config</string>
+    <string name="navigation">Navigation</string>
+    <string name="parameters">Parameters</string>
+    <string name="qrcode">Scan this QR code</string>
+    <string name="system_config">System config</string>
+    <string name="tab_calibration">Calibration</string>
+    <string name="tab_container">Container</string>
+    <string name="tab_home">Home</string>
+    <string name="tab_program">Program</string>
+    <string name="update">Update</string>
+    <string name="update_available">Update available</string>
+    <string name="version">Version</string>
+    <string name="wifi">WIFI</string>
+    <string name="download_failed">Download failed</string>
+    <string name="network_unavailable">Network Unavailable</string>
+    <string name="interface_exception">Interface Exception</string>
+    <string name="speed">Speed</string>
+    <string name="acceleration">Acceleration</string>
+    <string name="deceleration">Deceleration</string>
+    <string name="save">Save</string>
+    <string name="edit">edit</string>
+    <string name="delete">Delete</string>
+    <string name="tab_setting">Setting</string>
+    <string name="maximum_stroke">Maximum stroke</string>
+    <string name="waste_tank">Waste Tank</string>
+    <string name="add">Add</string>
+    <string name="expect">Expect μL</string>
+    <string name="actual">Actual μL</string>
+    <string name="save_success">保存成功</string>
+    <string name="authentication">Authentication</string>
+    <string name="time_out">Time out</string>
+    <string name="notice_content">1. Please follow the instruction manual\n2. Please fill the coagulant first and then fill the glue\n3. Please stick the needle to the opening of the rubber board during glue filling\n4. During use, please keep the liquid in the pipeline in a flowing state as much as possible\n5. The time interval between filling two gels should not be too long\n6. After the glue filling is completed, rinse the pipeline with clean water to avoid the gel blocking the pipeline</string>
+    <string name="notice">Notice</string>
+    <string name="tab_lc">下位机</string>
+</resources>

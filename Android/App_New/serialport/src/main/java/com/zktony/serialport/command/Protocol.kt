@@ -1,8 +1,8 @@
 package com.zktony.serialport.command
 
 import com.zktony.serialport.ext.crc16
-import com.zktony.serialport.ext.replaceByteArrayBE
-import com.zktony.serialport.ext.writeInt16BE
+import com.zktony.serialport.ext.replaceByteArrayLE
+import com.zktony.serialport.ext.writeInt16LE
 
 class Protocol {
     var head: Byte = 0xEE.toByte()
@@ -16,13 +16,13 @@ class Protocol {
     fun toByteArray(): ByteArray {
         val byteArray =
             byteArrayOf(head, addr, fn)
-                .plus(len.writeInt16BE(data.size, 0))
+                .plus(len.writeInt16LE(data.size, 0))
                 .plus(data)
                 .plus(crc)
                 .plus(end)
 
         // replace crc
-        return byteArray.replaceByteArrayBE(
+        return byteArray.replaceByteArrayLE(
             byteArray.copyOfRange(0, byteArray.size - 6).crc16(),
             byteArray.size - 6,
             0

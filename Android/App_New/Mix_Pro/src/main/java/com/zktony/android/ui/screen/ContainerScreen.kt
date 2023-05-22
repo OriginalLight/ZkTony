@@ -1,8 +1,8 @@
 package com.zktony.android.ui.screen
 
+import android.graphics.Point
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +27,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoveUp
@@ -55,7 +56,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -67,7 +67,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.logic.data.entities.ContainerEntity
-import com.zktony.android.logic.data.entities.Point
 import com.zktony.android.ui.components.DynamicMixPlate
 import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
 import com.zktony.android.ui.components.ZkTonyScaffold
@@ -206,11 +205,11 @@ fun ContainerMainPage(
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Image(
+                            Icon(
                                 modifier = Modifier
                                     .size(48.dp)
                                     .padding(start = 16.dp),
-                                painter = painterResource(id = R.drawable.ic_container),
+                                imageVector = Icons.Default.Dashboard,
                                 contentDescription = null,
                             )
                             Text(
@@ -309,8 +308,8 @@ fun ContainerEditPage(
 ) {
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
-    var y by remember { mutableStateOf(entity.data[0].axis[1].format(2)) }
-    var z by remember { mutableStateOf(entity.data[0].axis[2].format(2)) }
+    var y by remember { mutableStateOf(entity.axis[0].format(2)) }
+    var z by remember { mutableStateOf(entity.axis[1].format(2)) }
 
     LazyColumn(
         modifier = modifier
@@ -332,7 +331,7 @@ fun ContainerEditPage(
                         .fillMaxWidth()
                         .height(128.dp)
                         .padding(horizontal = 16.dp),
-                    count = entity.data.size,
+                    count = 6,
                 )
             }
         }
@@ -399,18 +398,12 @@ fun ContainerEditPage(
                     onClick = {
                         softKeyboard?.hide()
                         scope.launch {
-                            val list = entity.data.toMutableList()
                             update(
                                 entity.copy(
-                                    data = list.map { point ->
-                                        point.copy(
-                                            axis = listOf(
-                                                0f,
-                                                y.toFloatOrNull() ?: 0f,
-                                                z.toFloatOrNull() ?: 0f
-                                            )
-                                        )
-                                    }
+                                    axis = listOf(
+                                        y.toFloatOrNull() ?: 0f,
+                                        z.toFloatOrNull() ?: 0f
+                                    )
                                 )
                             )
                             showSnackbar(Ext.ctx.getString(R.string.save_success))
@@ -489,18 +482,12 @@ fun ContainerEditPage(
                     onClick = {
                         softKeyboard?.hide()
                         scope.launch {
-                            val list = entity.data.toMutableList()
                             update(
                                 entity.copy(
-                                    data = list.map { point ->
-                                        point.copy(
-                                            axis = listOf(
-                                                0f,
-                                                y.toFloatOrNull() ?: 0f,
-                                                z.toFloatOrNull() ?: 0f
-                                            )
-                                        )
-                                    }
+                                    axis = listOf(
+                                        y.toFloatOrNull() ?: 0f,
+                                        z.toFloatOrNull() ?: 0f
+                                    )
                                 )
                             )
                             showSnackbar(Ext.ctx.getString(R.string.save_success))
@@ -534,5 +521,5 @@ fun ContainerEditPagePreview() {
     repeat(6) {
         pointList.add(Point())
     }
-    ContainerEditPage(entity = ContainerEntity(data = pointList))
+    ContainerEditPage(entity = ContainerEntity())
 }

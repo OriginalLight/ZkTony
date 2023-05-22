@@ -21,6 +21,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -43,7 +44,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -163,11 +163,11 @@ fun ConfigMainPage(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Image(
+                    Icon(
                         modifier = Modifier
                             .size(48.dp)
                             .padding(start = 16.dp),
-                        painter = painterResource(id = R.drawable.ic_distance),
+                        imageVector = Icons.Default.Settings,
                         contentDescription = null,
                     )
 
@@ -201,7 +201,7 @@ fun ConfigMainPage(
                         modifier = Modifier
                             .size(48.dp)
                             .padding(start = 16.dp),
-                        painter = painterResource(id = R.drawable.ic_coordinate),
+                        imageVector = Icons.Default.Settings,
                         contentDescription = null,
                     )
 
@@ -260,11 +260,11 @@ fun TravelEditPage(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Image(
+            Icon(
                 modifier = Modifier
                     .size(84.dp)
                     .padding(end = 16.dp),
-                painter = painterResource(id = R.drawable.ic_distance),
+                imageVector = Icons.Default.Settings,
                 contentDescription = null,
             )
             Text(
@@ -391,11 +391,11 @@ fun WasteEditPage(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Image(
+            Icon(
                 modifier = Modifier
                     .size(84.dp)
                     .padding(end = 16.dp),
-                painter = painterResource(id = R.drawable.ic_coordinate),
+                imageVector = Icons.Default.Settings,
                 contentDescription = null,
             )
             Text(

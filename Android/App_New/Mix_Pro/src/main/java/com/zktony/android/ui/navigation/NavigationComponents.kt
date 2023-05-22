@@ -93,10 +93,15 @@ fun AppNavigationRail(
                             selected = selectedDestination == destination.route,
                             onClick = { navigateToTopLevelDestination(destination) },
                             icon = {
-                                Image(
+                                Icon(
                                     modifier = Modifier.size(36.dp),
-                                    painter = painterResource(id = destination.iconId),
+                                    imageVector = destination.icon,
                                     contentDescription = stringResource(id = destination.iconTextId),
+                                    tint = if (selectedDestination == destination.route) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
+                                    }
                                 )
                             })
                     }
@@ -174,10 +179,15 @@ fun PermanentNavigationDrawerContent(
                                 )
                             },
                             icon = {
-                                Image(
-                                    modifier = Modifier.size(48.dp),
-                                    painter = painterResource(id = destination.iconId),
+                                Icon(
+                                    modifier = Modifier.size(36.dp),
+                                    imageVector = destination.icon,
                                     contentDescription = stringResource(id = destination.iconTextId),
+                                    tint = if (selectedDestination == destination.route) {
+                                        MaterialTheme.colorScheme.primary
+                                    } else {
+                                        MaterialTheme.colorScheme.onSurface
+                                    }
                                 )
                             },
                             colors = NavigationDrawerItemDefaults.colors(

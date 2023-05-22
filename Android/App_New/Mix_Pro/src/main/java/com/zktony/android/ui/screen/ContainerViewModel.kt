@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.logic.data.dao.ContainerDao
 import com.zktony.android.logic.data.entities.ContainerEntity
-import com.zktony.android.logic.data.entities.Point
 import com.zktony.android.ui.utils.PageEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -51,11 +50,7 @@ class ContainerViewModel constructor(
 
     fun insert(name: String) {
         viewModelScope.launch {
-            val list: MutableList<Point> = mutableListOf()
-            for (i in 0 until 6) {
-                list.add(Point(index = i, active = true))
-            }
-            dao.insert(ContainerEntity(name = name, data = list))
+            dao.insert(ContainerEntity(name = name))
         }
     }
 

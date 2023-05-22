@@ -1,6 +1,7 @@
 package com.zktony.android.logic.data.dao
 
 import androidx.room.*
+import com.zktony.android.logic.data.entities.PWC
 import com.zktony.android.logic.data.entities.ProgramEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -15,7 +16,7 @@ abstract class ProgramDao : BaseDao<ProgramEntity> {
         SELECT * FROM programs
         """
     )
-    abstract fun getAll(): Flow<List<ProgramEntity>>
+    abstract fun getAll(): Flow<List<PWC>>
 
     @Query(
         """

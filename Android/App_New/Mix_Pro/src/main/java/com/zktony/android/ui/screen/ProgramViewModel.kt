@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.logic.data.dao.ContainerDao
 import com.zktony.android.logic.data.dao.ProgramDao
 import com.zktony.android.logic.data.entities.ContainerEntity
-import com.zktony.android.logic.data.entities.Point
 import com.zktony.android.logic.data.entities.ProgramEntity
 import com.zktony.android.ui.utils.PageEnum
 import com.zktony.core.ext.showShortToast
@@ -37,7 +36,7 @@ class ProgramViewModel constructor(
                 _selected,
             ) { entities, containers, page, selectedId ->
                 ProgramUiState(
-                    entities = entities,
+                    entities = entities.map { it.program },
                     containers = containers,
                     page = page,
                     selected = selectedId
@@ -63,14 +62,7 @@ class ProgramViewModel constructor(
             if (uiState.value.containers.isEmpty()) {
                 "请先添加容器".showShortToast()
             } else {
-                val container = uiState.value.containers[0]
-                dao.insert(
-                    ProgramEntity(
-                        subId = container.id,
-                        name = name,
-                        data = container.data,
-                    )
-                )
+                dao.insert(ProgramEntity(name = name, subId = uiState.value.containers[0].id))
             }
         }
     }
@@ -91,25 +83,22 @@ class ProgramViewModel constructor(
         viewModelScope.launch {
             val entity = uiState.value.entities.find { it.id == uiState.value.selected }
             entity?.let {
-                val data = it.data
-                val list = mutableListOf<Point>()
-                data.forEach { p ->
-                    if (p.index == index) {
-                        list.add(p.copy(active = !p.active))
-                    } else {
-                        list.add(p)
-                    }
+                val al = it.active.toMutableList()
+                if (al.contains(index)) {
+                    al.remove(index)
+                } else {
+                    al.add(index)
                 }
-                dao.update(it.copy(data = list))
+                dao.update(it.copy(active = al))
             }
         }
     }
 
-    fun toggleContainer(containerEntity: ContainerEntity) {
+    fun toggleContainer(id: Long) {
         viewModelScope.launch {
             val entity = uiState.value.entities.find { it.id == uiState.value.selected }
             entity?.let {
-                dao.update(it.copy(subId = containerEntity.id, data = containerEntity.data))
+                dao.update(it.copy(subId = id))
             }
         }
     }

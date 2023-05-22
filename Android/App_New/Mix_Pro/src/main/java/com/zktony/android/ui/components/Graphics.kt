@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 fun DynamicMixPlate(
     modifier: Modifier = Modifier,
     count: Int,
-    data: List<Pair<Int, Boolean>> = emptyList(),
+    active: List<Int> = emptyList(),
     onItemClick: (Int, Float) -> Unit = { _, _ -> }
 ) {
     val textMeasure = rememberTextMeasurer()
@@ -59,8 +59,7 @@ fun DynamicMixPlate(
 
         // 画count个圆形
         for (i in 0 until count) {
-            val fill = data.getOrNull(i)?.second ?: false
-            if (fill) {
+            if (active.contains(i)) {
                 drawCircle(
                     color = Color.Green,
                     radius = space / 2.5f,
@@ -90,6 +89,6 @@ fun DynamicMixPlate(
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun DynamicMixPlatePreview() {
     Column(modifier = Modifier.padding(16.dp)) {
-        DynamicMixPlate(count = 6, modifier = Modifier, data = listOf(Pair(0, true)))
+        DynamicMixPlate(count = 6, modifier = Modifier, active = listOf(1, 2))
     }
 }

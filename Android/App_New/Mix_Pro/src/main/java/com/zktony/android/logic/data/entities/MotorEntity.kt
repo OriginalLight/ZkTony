@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.google.errorprone.annotations.Immutable
 import com.zktony.core.ext.nextId
-import com.zktony.serialport.ext.writeInt16BE
+import com.zktony.serialport.ext.writeInt16LE
 import java.util.Date
 
 /**
@@ -31,6 +31,6 @@ data class MotorEntity(
 ) {
     fun toByteArray(): ByteArray {
         val ba = ByteArray(6)
-        return ba.writeInt16BE(speed, 0).writeInt16BE(acc, 2).writeInt16BE(dec, 4)
+        return ba.writeInt16LE(speed, 0).writeInt16LE(acc, 2).writeInt16LE(dec, 4)
     }
 }

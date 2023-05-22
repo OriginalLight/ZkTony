@@ -31,6 +31,18 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.Devices
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Navigation
+import androidx.compose.material.icons.filled.NewReleases
+import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.SyncLock
+import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -55,6 +67,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -206,7 +219,8 @@ fun SettingsContent(
         state = lazyColumnState,
     ) {
         item {
-            SettingsCard(image = R.drawable.ic_language,
+            SettingsCard(
+                icon = Icons.Default.Language,
                 text = stringResource(id = R.string.language),
                 onClick = { expanded = !expanded }) {
                 Text(
@@ -222,12 +236,15 @@ fun SettingsContent(
         languageList.forEach { (name, code) ->
             item {
                 AnimatedVisibility(visible = expanded) {
-                    SettingsCard(image = R.drawable.ic_language, paddingStart = 32.dp, onClick = {
-                        scope.launch {
-                            setLanguage(code)
-                            expanded = false
-                        }
-                    }) {
+                    SettingsCard(
+                        icon = Icons.Default.Language,
+                        paddingStart = 32.dp,
+                        onClick = {
+                            scope.launch {
+                                setLanguage(code)
+                                expanded = false
+                            }
+                        }) {
                         Text(
                             text = name,
                             style = MaterialTheme.typography.bodyLarge,
@@ -238,7 +255,7 @@ fun SettingsContent(
         }
         item {
             SettingsCard(
-                image = R.drawable.ic_navigation,
+                icon = Icons.Default.Navigation,
                 text = stringResource(id = R.string.navigation),
             ) {
                 Switch(
@@ -278,7 +295,7 @@ fun InfoContent(
         item {
             AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
                 SettingsCard(
-                    image = R.drawable.ic_version,
+                    icon = Icons.Default.Info,
                     text = stringResource(id = R.string.version),
                 ) {
                     Text(
@@ -293,7 +310,7 @@ fun InfoContent(
         item {
             AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
                 SettingsCard(
-                    image = R.drawable.ic_device,
+                    icon = Icons.Default.Devices,
                     text = stringResource(id = R.string.device_info),
                     onClick = { deviceInfo = !deviceInfo },
                 ) {
@@ -309,7 +326,7 @@ fun InfoContent(
         item {
             AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
                 SettingsCard(
-                    image = R.drawable.ic_help,
+                    icon = Icons.Default.Help,
                     text = stringResource(id = R.string.help),
                     onClick = { helpInfo = !helpInfo },
                 ) {
@@ -324,7 +341,7 @@ fun InfoContent(
         item {
             AnimatedVisibility(visible = deviceInfo) {
                 SettingsCard(
-                    image = R.drawable.ic_device,
+                    icon = Icons.Default.Devices,
                     text = stringResource(id = R.string.device_info),
                     onClick = { deviceInfo = !deviceInfo },
                 ) {
@@ -380,7 +397,7 @@ fun InfoContent(
         item {
             AnimatedVisibility(visible = helpInfo) {
                 SettingsCard(
-                    image = R.drawable.ic_help,
+                    icon = Icons.Default.Help,
                     text = stringResource(id = R.string.qrcode),
                     onClick = { helpInfo = !helpInfo },
                 ) {
@@ -440,10 +457,11 @@ fun OperationContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Image(
+                Icon(
                     modifier = Modifier.size(96.dp),
-                    painter = painterResource(id = R.drawable.ic_settings),
-                    contentDescription = stringResource(id = R.string.parameters)
+                    imageVector = Icons.Default.Security,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
                 )
                 Text(
                     modifier = Modifier.padding(bottom = 8.dp),
@@ -462,10 +480,11 @@ fun OperationContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Image(
+                Icon(
                     modifier = Modifier.size(96.dp),
-                    painter = painterResource(id = R.drawable.ic_wifi),
-                    contentDescription = stringResource(id = R.string.wifi)
+                    imageVector = Icons.Default.Wifi,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
                 )
                 Text(
                     modifier = Modifier.padding(bottom = 8.dp),
@@ -485,12 +504,12 @@ fun OperationContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 val icon = if (uiState.application == null) {
-                    R.drawable.ic_update
+                    Icons.Default.Sync
                 } else {
                     if (uiState.application.versionCode > BuildConfig.VERSION_CODE) {
-                        R.drawable.ic_update_avialable
+                        Icons.Default.NewReleases
                     } else {
-                        R.drawable.ic_good
+                        Icons.Default.SyncLock
                     }
                 }
                 val text = if (uiState.application == null) {
@@ -516,10 +535,11 @@ fun OperationContent(
                     )
                 }
                 AnimatedVisibility(visible = uiState.progress == 0) {
-                    Image(
+                    Icon(
                         modifier = Modifier.size(96.dp),
-                        painter = painterResource(id = icon),
+                        imageVector = icon,
                         contentDescription = text,
+                        tint = MaterialTheme.colorScheme.primary,
                     )
                 }
                 Text(
@@ -665,10 +685,11 @@ fun AuthenticationPage(
                         modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Image(
+                        Icon(
                             modifier = Modifier.size(96.dp),
-                            painter = painterResource(id = R.drawable.ic_motor),
-                            contentDescription = stringResource(id = R.string.motor_config)
+                            imageVector = Icons.Outlined.Settings,
+                            contentDescription = stringResource(id = R.string.motor_config),
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                         Text(
                             modifier = Modifier.padding(bottom = 8.dp),
@@ -688,10 +709,11 @@ fun AuthenticationPage(
                         modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Image(
+                        Icon(
                             modifier = Modifier.size(96.dp),
-                            painter = painterResource(id = R.drawable.ic_settings),
-                            contentDescription = stringResource(id = R.string.system_config)
+                            imageVector = Icons.Default.Description,
+                            contentDescription = stringResource(id = R.string.system_config),
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                         Text(
                             modifier = Modifier.padding(bottom = 8.dp),
@@ -710,7 +732,7 @@ fun AuthenticationPage(
 fun SettingsCard(
     paddingStart: Dp = 8.dp,
     onClick: () -> Unit = { },
-    image: Int,
+    icon: ImageVector,
     text: String? = null,
     content: @Composable () -> Unit,
 ) {
@@ -726,10 +748,11 @@ fun SettingsCard(
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Image(
+            Icon(
                 modifier = Modifier.size(32.dp),
-                painter = painterResource(id = image),
+                imageVector = icon,
                 contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
             )
             text?.let {
                 Text(

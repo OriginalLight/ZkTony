@@ -4,7 +4,6 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.zktony.android.logic.data.entities.CalibrationData
-import com.zktony.android.logic.data.entities.Point
 import java.util.Date
 
 /**
@@ -37,23 +36,36 @@ object CalibrationDataConverters {
     @TypeConverter
     @JvmStatic
     fun objectToString(list: List<CalibrationData>): String {
-        val gson = Gson()
-        return gson.toJson(list)
+        return Gson().toJson(list)
     }
 }
 
-object PointConverters {
+object IntConverters {
     @TypeConverter
     @JvmStatic
-    fun stringToObject(value: String): List<Point> {
-        val listType = object : TypeToken<List<Point>>() {}.type
+    fun stringToObject(value: String): List<Int> {
+        val listType = object : TypeToken<List<Int>>() {}.type
         return Gson().fromJson(value, listType)
     }
 
     @TypeConverter
     @JvmStatic
-    fun objectToString(list: List<Point>): String {
-        val gson = Gson()
-        return gson.toJson(list)
+    fun objectToString(list: List<Int>): String {
+        return Gson().toJson(list)
+    }
+}
+
+object FloatConverters {
+    @TypeConverter
+    @JvmStatic
+    fun stringToObject(value: String): List<Float> {
+        val listType = object : TypeToken<List<Float>>() {}.type
+        return Gson().fromJson(value, listType)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun objectToString(list: List<Float>): String {
+        return Gson().toJson(list)
     }
 }

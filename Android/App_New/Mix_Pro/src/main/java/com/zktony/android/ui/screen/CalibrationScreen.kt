@@ -2,7 +2,6 @@ package com.zktony.android.ui.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,6 +28,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Balance
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -61,7 +61,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -75,9 +74,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.logic.ext.compute
 import com.zktony.android.logic.data.entities.CalibrationData
 import com.zktony.android.logic.data.entities.CalibrationEntity
+import com.zktony.android.logic.ext.compute
 import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
 import com.zktony.android.ui.components.ZkTonyScaffold
 import com.zktony.android.ui.components.ZkTonyTopAppBar
@@ -212,11 +211,11 @@ fun CalibrationMainPage(
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
-                                Image(
+                                Icon(
                                     modifier = Modifier
                                         .size(48.dp)
                                         .padding(start = 16.dp),
-                                    painter = painterResource(id = R.drawable.ic_calibration),
+                                    imageVector = Icons.Default.Balance,
                                     contentDescription = null,
                                 )
                                 Text(
