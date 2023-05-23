@@ -28,4 +28,30 @@ data class CalibrationEntity(
     @ColumnInfo(name = "data") val data: List<CalibrationData> = emptyList(),
     @ColumnInfo(name = "active") val active: Boolean = false,
     @ColumnInfo(name = "create_time") val createTime: Date = Date(System.currentTimeMillis()),
-)
+) {
+    fun compute(): List<Triple<Int, Float, List<CalibrationData>>> {
+        val vl = mutableListOf<Triple<Int, Float, List<CalibrationData>>>()
+        for (i in 0..12) {
+            val dataList = this.data.filter { it.index == i }
+            if (dataList.isNotEmpty()) {
+                val avg = dataList.map { data -> data.percent }.average().toFloat()
+                vl.add(Triple(i, avg, dataList))
+            }
+        }
+        return vl
+    }
+
+    fun avgRate(): List<Float> {
+        val vl = mutableListOf<Float>()
+        for (i in 0..12) {
+            val dataList = this.data.filter { it.index == i }
+            if (dataList.isNotEmpty()) {
+                val avg = dataList.map { data -> data.percent }.average().toFloat()
+                vl.add(avg)
+            } else {
+                vl.add(1f)
+            }
+        }
+        return vl
+    }
+}

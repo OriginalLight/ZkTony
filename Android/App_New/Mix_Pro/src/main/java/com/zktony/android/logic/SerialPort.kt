@@ -4,7 +4,7 @@ import com.zktony.core.ext.logi
 import com.zktony.serialport.AbstractSerial
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.config.SerialConfig
-import com.zktony.serialport.ext.crc16
+import com.zktony.serialport.ext.crc16LE
 import com.zktony.serialport.ext.splitByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,8 +43,8 @@ class SerialPort : AbstractSerial() {
         ).forEach {
             val crc = it.copyOfRange(it.size - 6, it.size - 4)
             val bytes = it.copyOfRange(0, it.size - 6)
-            if (bytes.crc16().contentEquals(crc)) {
-                block(bytes)
+            if (bytes.crc16LE().contentEquals(crc)) {
+                block(it)
             }
         }
     }
@@ -58,8 +58,8 @@ class SerialPort : AbstractSerial() {
         _byteArrayFlow.value = byteArray
 
         val rec = byteArray.protocol()
-        if (rec.addr == 0x02.toByte()) {
-            when (rec.fn) {
+        if (rec.id == 0x02.toByte()) {
+            when (rec.cmd) {
                 0x01.toByte() -> {
                     val index = rec.data[0].toInt()
                     val value = rec.data[1].toInt()

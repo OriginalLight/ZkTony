@@ -126,6 +126,7 @@ suspend fun syncHex(block: DV.() -> Unit, timeOut: Long = 5000) {
             }
         }
     } catch (e: Exception) {
+
         freeLock(list.map { it.first })
     }
 }
@@ -146,6 +147,16 @@ fun asyncHex(block: DV.() -> Unit) {
     }
     sendProtocol {
         data = bytes
+    }
+}
+
+/**
+ * 设置锁
+ * @param list List<Int>
+ */
+fun setLock(list: List<Int>) {
+    list.forEach {
+        serialPort.arrayList[it] = 1
     }
 }
 

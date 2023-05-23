@@ -4,7 +4,6 @@ import com.zktony.android.logic.data.dao.CalibrationDao
 import com.zktony.android.logic.data.dao.MotorDao
 import com.zktony.android.logic.data.entities.CalibrationEntity
 import com.zktony.android.logic.data.entities.MotorEntity
-import com.zktony.android.logic.ext.avgRate
 import com.zktony.core.ext.logi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +56,7 @@ class ScheduleTask constructor(
                             hpc[1] = 10f
                             hpc[2] = 10f
                             active.avgRate().forEachIndexed { index, avgRate ->
-                                hpc[index + 3] = avgRate
+                                hpc[index + 3] = 100f * avgRate
                             }
                         }
                     } else {

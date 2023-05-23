@@ -3,10 +3,11 @@ package com.zktony.android.ui.screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.logic.ext.collectCallback
-import com.zktony.android.logic.ext.freeLock
 import com.zktony.android.logic.ext.getLock
 import com.zktony.android.logic.ext.sendByteArray
 import com.zktony.android.logic.ext.serialPort
+import com.zktony.android.logic.ext.setLock
+import com.zktony.core.ext.logi
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.ext.writeInt16LE
@@ -71,28 +72,40 @@ class LcViewModel : ViewModel() {
         } else {
             val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
                 while (true) {
-                    val id = (0..15).random()
-                    val step = (3200L..64000L).random()
-                    val speed = (100..600).random()
-                    val acc = (10..100).random()
-                    val dec = (10..100).random()
+                    val id = 3
+                    val step = 6400L
+                    val speed = 3200
+                    val acc = 6400
+                    val dec = 6400
                     val bytes = ByteArray(11)
                     bytes.writeInt8(id, 0).writeInt32LE(step, 1).writeInt16LE(speed, 5)
                         .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
+                    val bytes1 = ByteArray(11)
+                    bytes1.writeInt8(id + 1, 0).writeInt32LE(step, 1).writeInt16LE(speed, 5)
+                        .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
+                    val bytes2 = ByteArray(11)
+                    bytes2.writeInt8(id + 2, 0).writeInt32LE(step, 1).writeInt16LE(speed, 5)
+                        .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
+                    val bytes3 = ByteArray(11)
+                    bytes3.writeInt8(id + 3, 0).writeInt32LE(step, 1).writeInt16LE(speed, 5)
+                        .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
                     try {
-                        withTimeout(20000L) {
+                        setLock(listOf(id, id + 1, id + 2))
+                        withTimeout(10000L) {
                             val p = protocol {
-                                data = bytes
+                                data = bytes + bytes1 + bytes2
                             }
+                            p.toByteArray().toHexString().logi()
                             sendByteArray(p.toByteArray())
                             history(p.toByteArray())
                             delay(200L)
-                            while (getLock(listOf(id))) {
+                            while (getLock(listOf(id, id + 1, id + 2))) {
                                 delay(200L)
                             }
                         }
                     } catch (e: Exception) {
-                        freeLock(listOf(id))
+                        _uiState.value = _uiState.value.copy(job = null)
+                        break
                     }
                 }
             }

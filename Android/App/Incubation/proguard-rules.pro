@@ -84,6 +84,9 @@
 -dontwarn android.databinding.**
 -keep class android.databinding.** { *; }
 
+-keep class com.google.gson.reflect.TypeToken { *; }
+-keep class * extends com.google.gson.reflect.TypeToken
+
 # Gson
 -keep class com.google.gson.** {*;}
 -keep class com.google.gson.stream.** {*;}

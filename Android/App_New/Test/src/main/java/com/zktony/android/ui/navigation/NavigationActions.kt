@@ -3,6 +3,8 @@ package com.zktony.android.ui.navigation
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -15,7 +17,8 @@ object Route {
 
 data class TopLevelDestination(
     val route: String,
-    val icon: ImageVector,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
     val iconTextId: Int
 )
 
@@ -41,12 +44,14 @@ class NavigationActions(private val navController: NavHostController) {
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
         route = Route.HOME,
-        icon = Icons.Default.Home,
+        selectedIcon = Icons.Outlined.Home,
+        unselectedIcon = Icons.Filled.Home,
         iconTextId = R.string.tab_home
     ),
     TopLevelDestination(
         route = Route.LC,
-        icon = Icons.Default.Code,
+        selectedIcon = Icons.Outlined.Code,
+        unselectedIcon = Icons.Filled.Code,
         iconTextId = R.string.tab_lc
     )
 )

@@ -41,7 +41,7 @@
     <string name="title_program">孵育程序</string>
     <string name="volume">加液量 μL</string>
     <string name="wash_tank">洗涤液槽</string>
-    <string name="x_axis">X轴</string>
+    <string name="x_axis">摇床</string>
     <string name="y_axis">Y轴</string>
     <string name="z_axis">Z轴</string>
     <string name="zero">原点</string>

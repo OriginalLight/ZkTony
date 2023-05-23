@@ -42,7 +42,7 @@
     <string name="pump_four">泵四</string>
     <string name="pump_five">泵五</string>
     <string name="pump_six">泵六</string>
-    <string name="x_axis">X轴</string>
+    <string name="x_axis">摇床</string>
     <string name="y_axis">Y轴</string>
     <string name="z_axis">Z轴</string>
 </resources>

@@ -95,7 +95,7 @@ fun AppNavigationRail(
                             icon = {
                                 Icon(
                                     modifier = Modifier.size(48.dp),
-                                    imageVector = destination.icon,
+                                    imageVector = if (selectedDestination == destination.route) destination.selectedIcon else destination.unselectedIcon,
                                     contentDescription = stringResource(id = destination.iconTextId)
                                 )
                             })
@@ -176,7 +176,7 @@ fun PermanentNavigationDrawerContent(
                             icon = {
                                 Icon(
                                     modifier = Modifier.size(48.dp),
-                                    imageVector = destination.icon,
+                                    imageVector = if (selectedDestination == destination.route) destination.selectedIcon else destination.unselectedIcon,
                                     contentDescription = stringResource(id = destination.iconTextId)
                                 )
                             },

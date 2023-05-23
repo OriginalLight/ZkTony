@@ -128,7 +128,8 @@ fun MotorMainPage(
             .fillMaxSize()
             .padding(8.dp)
             .background(
-                color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
+                color = MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.medium,
             ),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),

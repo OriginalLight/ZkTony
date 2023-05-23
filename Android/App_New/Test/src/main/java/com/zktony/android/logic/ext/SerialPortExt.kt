@@ -25,6 +25,12 @@ fun sendAsciiString(ascii: String) {
     serialPort.sendAsciiString(ascii)
 }
 
+fun setLock(list: List<Int>) {
+    list.forEach {
+        serialPort.array[it] = 1
+    }
+}
+
 /**
  * 获取锁
  *

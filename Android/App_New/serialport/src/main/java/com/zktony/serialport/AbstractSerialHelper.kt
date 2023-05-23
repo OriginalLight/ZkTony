@@ -99,15 +99,15 @@ abstract class AbstractSerialHelper {
     /**
      * data processing
      */
-    private fun dataProcess(byteArray: ByteArray) {
-        if (byteArray.isEmpty()) {
+    private fun dataProcess(byteArray: ByteArray?) {
+        if (byteArray == null) {
             if (cache.isNotEmpty()) {
                 callback.invoke(cache)
                 cache = byteArrayOf()
             }
             return
         }
-        cache.plus(byteArray)
+        cache += byteArray
     }
 
     /**
@@ -119,14 +119,12 @@ abstract class AbstractSerialHelper {
             while (!isInterrupted) {
                 try {
                     val input = inputStream?.available()
-                    input?.let {
-                        if (it > 0) {
-                            val buffer = ByteArray(it)
-                            inputStream?.read(buffer)
-                            dataProcess(buffer)
-                        } else {
-                            dataProcess(byteArrayOf())
-                        }
+                    if (input != null && input > 0) {
+                        val buffer = ByteArray(input)
+                        inputStream?.read(buffer)
+                        dataProcess(buffer)
+                    } else {
+                        dataProcess(null)
                     }
                     try {
                         sleep(1L)

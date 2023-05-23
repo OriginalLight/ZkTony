@@ -123,12 +123,6 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     viewModel.checkUpdate()
                 }
             }
-            with(navigation) {
-                clickScale()
-                clickNoRepeat {
-                    viewModel.toggleNavigationBar(!swBar.isChecked)
-                }
-            }
             with(version) {
                 clickScale()
                 clickNoRepeat {

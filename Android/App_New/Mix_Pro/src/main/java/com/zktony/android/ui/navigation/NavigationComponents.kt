@@ -25,6 +25,7 @@ import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
+import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -95,15 +96,19 @@ fun AppNavigationRail(
                             icon = {
                                 Icon(
                                     modifier = Modifier.size(36.dp),
-                                    imageVector = destination.icon,
-                                    contentDescription = stringResource(id = destination.iconTextId),
-                                    tint = if (selectedDestination == destination.route) {
-                                        MaterialTheme.colorScheme.primary
+                                    imageVector = if (selectedDestination == destination.route) {
+                                        destination.selectedIcon
                                     } else {
-                                        MaterialTheme.colorScheme.onSurface
-                                    }
+                                        destination.unselectedIcon
+                                    },
+                                    contentDescription = stringResource(id = destination.iconTextId),
                                 )
-                            })
+                            },
+                            colors = NavigationRailItemDefaults.colors(
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
+                            )
+                        )
                     }
                 }
             },
@@ -181,17 +186,18 @@ fun PermanentNavigationDrawerContent(
                             icon = {
                                 Icon(
                                     modifier = Modifier.size(36.dp),
-                                    imageVector = destination.icon,
-                                    contentDescription = stringResource(id = destination.iconTextId),
-                                    tint = if (selectedDestination == destination.route) {
-                                        MaterialTheme.colorScheme.primary
+                                    imageVector = if (selectedDestination == destination.route) {
+                                        destination.selectedIcon
                                     } else {
-                                        MaterialTheme.colorScheme.onSurface
-                                    }
+                                        destination.unselectedIcon
+                                    },
+                                    contentDescription = stringResource(id = destination.iconTextId),
                                 )
                             },
                             colors = NavigationDrawerItemDefaults.colors(
                                 unselectedContainerColor = Color.Transparent,
+                                selectedIconColor = MaterialTheme.colorScheme.primary,
+                                selectedTextColor = MaterialTheme.colorScheme.primary,
                             ),
                             shape = CutCornerShape(topEnd = 36.dp, bottomStart = 16.dp),
                             onClick = { navigateToTopLevelDestination(destination) })

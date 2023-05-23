@@ -7,7 +7,7 @@ package com.zktony.serialport.ext
  * @receiver ByteArray
  * @return ByteArray
  */
-fun ByteArray.crc16ccitt(): ByteArray {
+fun ByteArray.crc16ccitt(): Int {
     var crc = 0x0000
     for (j in this) {
         crc = crc xor (j.toInt() and 0xff)
@@ -15,7 +15,7 @@ fun ByteArray.crc16ccitt(): ByteArray {
             crc = if (crc and 1 != 0) crc shr 1 xor 0x8408 else crc shr 1 // 0x8408 = reverse 0x1021
         }
     }
-    return byteArrayOf((crc shr 8 and 0xff).toByte(), (crc and 0xff).toByte())
+    return crc
 }
 
 /**
@@ -24,7 +24,7 @@ fun ByteArray.crc16ccitt(): ByteArray {
  * @receiver ByteArray
  * @return ByteArray
  */
-fun ByteArray.crc16ccittFalse(): ByteArray {
+fun ByteArray.crc16ccittFalse(): Int {
     var crc = 0xffff
     for (j in this) {
         crc = crc xor (j.toInt() shl 8)
@@ -33,7 +33,7 @@ fun ByteArray.crc16ccittFalse(): ByteArray {
                 if (crc and 0x8000 != 0) crc shl 1 xor 0x1021 else crc shl 1 // 0x1021 = reverse 0x8408
         }
     }
-    return byteArrayOf((crc shr 8 and 0xff).toByte(), (crc and 0xff).toByte())
+    return crc
 }
 
 /**
@@ -42,7 +42,7 @@ fun ByteArray.crc16ccittFalse(): ByteArray {
  * @receiver ByteArray
  * @return ByteArray
  */
-fun ByteArray.crc16xmodem(): ByteArray {
+fun ByteArray.crc16xmodem(): Int {
     var crc = 0x0000
     for (j in this) {
         crc = crc xor (j.toInt() shl 8)
@@ -51,7 +51,7 @@ fun ByteArray.crc16xmodem(): ByteArray {
                 if (crc and 0x8000 != 0) crc shl 1 xor 0x1021 else crc shl 1 // 0x1021 = reverse 0x8408
         }
     }
-    return byteArrayOf((crc shr 8 and 0xff).toByte(), (crc and 0xff).toByte())
+    return crc
 }
 
 /**
@@ -60,7 +60,7 @@ fun ByteArray.crc16xmodem(): ByteArray {
  * @receiver ByteArray
  * @return ByteArray
  */
-fun ByteArray.crc16x25(): ByteArray {
+fun ByteArray.crc16x25(): Int {
     var crc = 0xffff
     for (j in this) {
         crc = crc xor j.toInt()
@@ -68,8 +68,7 @@ fun ByteArray.crc16x25(): ByteArray {
             crc = if (crc and 1 != 0) crc shr 1 xor 0x8408 else crc shr 1 // 0x8408 = reverse 0x1021
         }
     }
-    crc = crc.inv() // crc^0xffff
-    return byteArrayOf((crc shr 8 and 0xff).toByte(), (crc and 0xff).toByte())
+    return crc.inv() // crc^0xffff
 }
 
 /**
@@ -78,7 +77,7 @@ fun ByteArray.crc16x25(): ByteArray {
  * @receiver ByteArray
  * @return ByteArray
  */
-fun ByteArray.crc16modbus(): ByteArray {
+fun ByteArray.crc16modbus(): Int {
     var crc = 0xffff
     for (j in this) {
         crc = crc xor (j.toInt() and 0xff) and 0xffff
@@ -87,7 +86,7 @@ fun ByteArray.crc16modbus(): ByteArray {
                 if (crc and 1 == 0) crc shr 1 else crc shr 1 xor 0xA001 and 0xffff // 0xA001 = reverse 0x8005
         }
     }
-    return byteArrayOf((crc shr 8 and 0xff).toByte(), (crc and 0xff).toByte())
+    return crc
 }
 
 /**
@@ -96,7 +95,7 @@ fun ByteArray.crc16modbus(): ByteArray {
  * @receiver ByteArray
  * @return ByteArray
  */
-fun ByteArray.crc16ibm(): ByteArray {
+fun ByteArray.crc16ibm(): Int {
     var crc = 0x0000
     for (j in this) {
         crc = crc xor j.toInt()
@@ -105,7 +104,7 @@ fun ByteArray.crc16ibm(): ByteArray {
                 if (crc and 1 == 0) crc shr 1 else crc shr 1 xor 0xA001  // 0xA001 = reverse 0x8005
         }
     }
-    return byteArrayOf((crc shr 8 and 0xff).toByte(), (crc and 0xff).toByte())
+    return crc
 }
 
 /**
@@ -114,7 +113,7 @@ fun ByteArray.crc16ibm(): ByteArray {
  * @receiver ByteArray
  * @return ByteArray
  */
-fun ByteArray.crc16maxim(): ByteArray {
+fun ByteArray.crc16maxim(): Int {
     var crc = 0x0000
     for (j in this) {
         crc = crc xor j.toInt()
@@ -123,8 +122,7 @@ fun ByteArray.crc16maxim(): ByteArray {
                 if (crc and 1 == 0) crc shr 1 else crc shr 1 xor 0xA001  // 0xA001 = reverse 0x8005
         }
     }
-    crc = crc.inv() // crc^0xffff
-    return byteArrayOf((crc shr 8 and 0xff).toByte(), (crc and 0xff).toByte())
+    return crc.inv() // crc^0xffff
 }
 
 /**
@@ -133,7 +131,7 @@ fun ByteArray.crc16maxim(): ByteArray {
  * @receiver ByteArray
  * @return ByteArray
  */
-fun ByteArray.crc16usb(): ByteArray {
+fun ByteArray.crc16usb(): Int {
     var crc = 0xffff
     for (j in this) {
         crc = crc xor j.toInt()
@@ -142,8 +140,7 @@ fun ByteArray.crc16usb(): ByteArray {
                 if (crc and 1 == 0) crc shr 1 else crc shr 1 xor 0xA001  // 0xA001 = reverse 0x8005
         }
     }
-    crc = crc.inv() // crc^0xffff
-    return byteArrayOf((crc shr 8 and 0xff).toByte(), (crc and 0xff).toByte())
+    return crc.inv() // crc^0xffff
 }
 
 /**
@@ -152,7 +149,7 @@ fun ByteArray.crc16usb(): ByteArray {
  * @receiver ByteArray
  * @return ByteArray
  */
-fun ByteArray.crc16dnp(): ByteArray {
+fun ByteArray.crc16dnp(): Int {
     var crc = 0x0000
     for (j in this) {
         crc = crc xor j.toInt()
@@ -161,19 +158,18 @@ fun ByteArray.crc16dnp(): ByteArray {
                 if (crc and 1 != 0) crc shr 1 xor 0xA6BC else crc shr 1 // 0xA6BC = reverse 0x3D65
         }
     }
-    crc = crc.inv()
-    return byteArrayOf((crc shr 8 and 0xff).toByte(), (crc and 0xff).toByte())
+    return crc.inv()
 }
 
 /**
- * crc16
+ * crc16LE
  *
  * @receiver ByteArray
  * @param method String
  * @return ByteArray
  */
-fun ByteArray.crc16(method: String = "MODBUS"): ByteArray {
-    return when (method) {
+fun ByteArray.crc16LE(method: String = "MODBUS"): ByteArray {
+    val crc = when (method) {
         "CCITT" -> crc16ccitt()
         "CCITT_FALSE" -> crc16ccittFalse()
         "XMODEM" -> crc16xmodem()
@@ -185,4 +181,28 @@ fun ByteArray.crc16(method: String = "MODBUS"): ByteArray {
         "DNP" -> crc16dnp()
         else -> crc16modbus()
     }
+    return byteArrayOf((crc and 0xff).toByte(), (crc shr 8 and 0xff).toByte())
+}
+
+/**
+ * crc16BE
+ *
+ * @receiver ByteArray
+ * @param method String
+ * @return ByteArray
+ */
+fun ByteArray.crc16BE(method: String = "MODBUS"): ByteArray {
+    val crc = when (method) {
+        "CCITT" -> crc16ccitt()
+        "CCITT_FALSE" -> crc16ccittFalse()
+        "XMODEM" -> crc16xmodem()
+        "X25" -> crc16x25()
+        "MODBUS" -> crc16modbus()
+        "IBM" -> crc16ibm()
+        "MAXIM" -> crc16maxim()
+        "USB" -> crc16usb()
+        "DNP" -> crc16dnp()
+        else -> crc16modbus()
+    }
+    return byteArrayOf((crc shr 8 and 0xff).toByte(), (crc and 0xff).toByte())
 }

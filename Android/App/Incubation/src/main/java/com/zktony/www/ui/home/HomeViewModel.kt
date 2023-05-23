@@ -199,12 +199,12 @@ class HomeViewModel constructor(
                     && _bFlow.value.job == null
                     && _cFlow.value.job == null
                     && _dFlow.value.job == null
-            if (!run) {
+            if (run) {
                 asyncHex(0) {
                     pa = "0B"
-                    data = "0100"
+                    data = "0101"
                 }
-                _uiState.value = _uiState.value.copy(shakeBed = false)
+                _uiState.value = _uiState.value.copy(shakeBed = true)
                 delay(100L)
             }
             // 创建job
@@ -322,7 +322,7 @@ class HomeViewModel constructor(
                     && _bFlow.value.job == null
                     && _cFlow.value.job == null
                     && _dFlow.value.job == null
-            if (!run) {
+            if (run) {
                 asyncHex(0) {
                     pa = "0B"
                     data = "0100"

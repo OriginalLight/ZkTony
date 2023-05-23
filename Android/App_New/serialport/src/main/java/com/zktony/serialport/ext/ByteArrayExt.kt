@@ -413,6 +413,7 @@ private fun throwOffsetError(
 // 根据命令格式分割成多个ByteArray
 
 fun ByteArray.splitByteArray(head: ByteArray, end: ByteArray): List<ByteArray> {
+    if (this.size <= head.size + end.size) return listOf()
     var byteArray = this.copyOfRange(0, this.size)
     val list = mutableListOf<ByteArray>()
     while (byteArray.isNotEmpty()) {

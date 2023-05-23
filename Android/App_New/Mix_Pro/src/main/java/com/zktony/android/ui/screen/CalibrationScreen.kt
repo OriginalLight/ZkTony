@@ -76,7 +76,6 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.logic.data.entities.CalibrationData
 import com.zktony.android.logic.data.entities.CalibrationEntity
-import com.zktony.android.logic.ext.compute
 import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
 import com.zktony.android.ui.components.ZkTonyScaffold
 import com.zktony.android.ui.components.ZkTonyTopAppBar

@@ -6,6 +6,11 @@ import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Balance
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.Dashboard
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -24,7 +29,8 @@ object Route {
 
 data class TopLevelDestination(
     val route: String,
-    val icon: ImageVector,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector,
     val iconTextId: Int
 )
 
@@ -50,27 +56,32 @@ class NavigationActions(private val navController: NavHostController) {
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
         route = Route.HOME,
-        icon = Icons.Default.Home,
+        selectedIcon = Icons.Filled.Home,
+        unselectedIcon = Icons.Outlined.Home,
         iconTextId = R.string.tab_home
     ),
     TopLevelDestination(
         route = Route.PROGRAM,
-        icon = Icons.Default.Code,
+        selectedIcon = Icons.Filled.Code,
+        unselectedIcon = Icons.Outlined.Code,
         iconTextId = R.string.tab_program
     ),
     TopLevelDestination(
         route = Route.CONTAINER,
-        icon = Icons.Default.Dashboard,
+        selectedIcon = Icons.Filled.Dashboard,
+        unselectedIcon = Icons.Outlined.Dashboard,
         iconTextId = R.string.tab_container
     ),
     TopLevelDestination(
         route = Route.CALIBRATION,
-        icon = Icons.Default.Balance,
+        selectedIcon = Icons.Filled.Balance,
+        unselectedIcon = Icons.Outlined.Balance,
         iconTextId = R.string.tab_calibration
     ),
     TopLevelDestination(
         route = Route.SETTING,
-        icon = Icons.Default.Settings,
+        selectedIcon = Icons.Filled.Settings,
+        unselectedIcon = Icons.Outlined.Settings,
         iconTextId = R.string.tab_setting
     )
 )
