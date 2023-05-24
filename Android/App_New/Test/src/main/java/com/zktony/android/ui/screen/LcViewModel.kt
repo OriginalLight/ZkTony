@@ -115,6 +115,118 @@ class LcViewModel : ViewModel() {
         }
     }
 
+    fun test2() {
+        if (_uiState.value.job != null) {
+            _uiState.value.job?.cancel()
+            _uiState.value = _uiState.value.copy(
+                job = null,
+                replyIndex = 0,
+                replyHistory = emptyList(),
+                queryIndex = 0,
+                queryHistory = emptyList()
+            )
+        } else {
+            val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
+                while (true) {
+                    val id = 5
+                    val step = 6400L
+                    val speed = 3200
+                    val acc = 6400
+                    val dec = 6400
+                    val bytes = ByteArray(11)
+                    bytes.writeInt8(id, 0).writeInt32LE(step, 1).writeInt16LE(speed, 5)
+                        .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
+                    val bytes1 = ByteArray(11)
+                    bytes1.writeInt8(id + 1, 0).writeInt32LE(step, 1).writeInt16LE(speed, 5)
+                        .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
+                    val bytes2 = ByteArray(11)
+                    bytes2.writeInt8(id + 2, 0).writeInt32LE(step, 1).writeInt16LE(speed, 5)
+                        .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
+                    val bytes3 = ByteArray(11)
+                    bytes3.writeInt8(id + 3, 0).writeInt32LE(step, 1).writeInt16LE(speed, 5)
+                        .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
+                    try {
+                        setLock(listOf(id, id + 1, id + 2, id + 3))
+                        withTimeout(10000L) {
+                            val p = protocol {
+                                data = bytes + bytes1 + bytes2 + bytes3
+                            }
+                            p.toByteArray().toHexString().logi()
+                            sendByteArray(p.toByteArray())
+                            history(p.toByteArray())
+                            delay(200L)
+                            while (getLock(listOf(id, id + 1, id + 2, id + 3))) {
+                                delay(200L)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        _uiState.value = _uiState.value.copy(job = null)
+                        break
+                    }
+                }
+            }
+
+            job.start()
+            _uiState.value = _uiState.value.copy(job = job)
+        }
+    }
+
+    fun test3() {
+        if (_uiState.value.job != null) {
+            _uiState.value.job?.cancel()
+            _uiState.value = _uiState.value.copy(
+                job = null,
+                replyIndex = 0,
+                replyHistory = emptyList(),
+                queryIndex = 0,
+                queryHistory = emptyList()
+            )
+        } else {
+            val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
+                while (true) {
+                    val step = 6400L
+                    val speed = 3200
+                    val acc = 6400
+                    val dec = 6400
+                    val bytes = ByteArray(11)
+                    bytes.writeInt8(4, 0).writeInt32LE(6400L, 1).writeInt16LE(speed, 5)
+                        .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
+                    val bytes1 = ByteArray(11)
+                    bytes1.writeInt8(8, 0).writeInt32LE(9600L, 1).writeInt16LE(speed, 5)
+                        .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
+                    val bytes2 = ByteArray(11)
+                    bytes2.writeInt8(12, 0).writeInt32LE(12800L, 1).writeInt16LE(speed, 5)
+                        .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
+                    val bytes3 = ByteArray(11)
+                    bytes3.writeInt8(15, 0).writeInt32LE(15600L, 1).writeInt16LE(speed, 5)
+                        .writeInt16LE(acc, 7).writeInt16LE(dec, 9)
+                    try {
+                        setLock(listOf(4, 12, 15))
+                        withTimeout(10000L) {
+                            val p = protocol {
+                                data = bytes + bytes2 + bytes3
+                            }
+                            p.toByteArray().toHexString().logi()
+                            sendByteArray(p.toByteArray())
+                            history(p.toByteArray())
+                            delay(200L)
+                            while (getLock(listOf(4, 12, 15))) {
+                                delay(200L)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        _uiState.value = _uiState.value.copy(job = null)
+                        break
+                    }
+                }
+            }
+
+            job.start()
+            _uiState.value = _uiState.value.copy(job = job)
+        }
+    }
+
+
     private fun history(bytes: ByteArray) {
         val index = _uiState.value.queryIndex
         val history = _uiState.value.queryHistory.toMutableList()

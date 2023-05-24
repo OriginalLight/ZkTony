@@ -12,7 +12,6 @@ import com.zktony.www.data.entities.*
     [
         Motor::class,
         Calibration::class,
-        CalibrationData::class,
         Cache::class
     ],
     version = 1,
@@ -22,7 +21,5 @@ import com.zktony.www.data.entities.*
 abstract class AppDatabase : RoomDatabase() {
     abstract fun motorDao(): MotorDao
     abstract fun calibrationDao(): CalibrationDao
-    abstract fun calibrationDataDao(): CalibrationDataDao
-
     abstract fun cacheDao(): CacheDao
 }

@@ -30,10 +30,14 @@ class Protocol {
     }
 }
 
+interface IProtocol {
+    fun exception(byteArray: ByteArray)
+    fun function0x01(byteArray: ByteArray)
+}
+
 fun protocol(block: Protocol.() -> Unit): Protocol {
     return Protocol().apply(block)
 }
-
 
 fun ByteArray.protocol(): Protocol {
     val bytes = this

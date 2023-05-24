@@ -1,6 +1,5 @@
 package com.zktony.www.core
 
-import com.zktony.core.ext.Ext
 import com.zktony.core.ext.logi
 import com.zktony.serialport.ext.intToHex
 import com.zktony.serialport.protocol.toV1
@@ -9,7 +8,6 @@ import com.zktony.www.core.ext.collectHex
 import com.zktony.www.core.ext.decideLock
 import com.zktony.www.data.dao.CalibrationDao
 import com.zktony.www.data.dao.MotorDao
-import com.zktony.www.data.entities.Calibration
 import com.zktony.www.data.entities.Motor
 import com.zktony.www.data.entities.toMotor
 import kotlinx.coroutines.CoroutineScope
@@ -32,19 +30,13 @@ class ScheduleTask constructor(
     /**
      *  0: 泵1 1: 泵2 2: 泵3
      */
-    val hpm: MutableMap<Int, Motor> = ConcurrentHashMap()
     val hpc: MutableMap<Int, Float> = ConcurrentHashMap()
 
     init {
         scope.launch {
             launch {
                 MD.getAll().collect {
-                    if (it.isNotEmpty()) {
-                        hpm.clear()
-                        it.forEach { it1 ->
-                            hpm[it1.id] = it1
-                        }
-                    } else {
+                    if (it.isEmpty()) {
                         MD.insertAll(
                             listOf(
                                 Motor(
@@ -70,19 +62,20 @@ class ScheduleTask constructor(
             launch {
                 CD.getAll().collect {
                     if (it.isNotEmpty()) {
-                        it.find { c -> c.enable == 1 }?.let { c ->
+                        val c = it.find { c -> c.active == 1 }
+                        if (c != null) {
+                            val list = c.avgRate()
                             hpc.clear()
-                            hpc[0] = c.v1
-                            hpc[1] = c.v2
-                            hpc[2] = c.v3
+                            for (i in 0..2) {
+                                hpc[i] = list[i]
+                            }
+                        } else {
+                            hpc.clear()
+                            for (i in 0..2) {
+                                hpc[i] = 0.01f
+                            }
                         }
-                    } else {
-                        CD.insert(
-                            Calibration(
-                                name = Ext.ctx.getString(com.zktony.core.R.string.def),
-                                enable = 1
-                            )
-                        )
+
                     }
                 }
             }

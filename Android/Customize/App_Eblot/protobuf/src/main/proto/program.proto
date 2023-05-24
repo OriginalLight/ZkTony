@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.zktony.proto";
+option java_outer_classname = "ProgramProto";
+
+package program;
+
+// service for program
+service ProgramService {
+  // rpcs for program
+  rpc Query (ProgramRequestQuery) returns (ProgramReplyQuery) {}
+  rpc Insert (Program) returns (ProgramReply) {}
+  rpc InsertBatch (ProgramList) returns (ProgramReply) {}
+  rpc Update (Program) returns (ProgramReply) {}
+  rpc UpdateBatch (ProgramList) returns (ProgramReply) {}
+  rpc Delete (Program) returns (ProgramReply) {}
+  rpc DeleteBatch (ProgramList) returns (ProgramReply) {}
+}
+
+message Program {
+  string id = 1;
+  string name = 2;
+  string content = 4;
+  string create_time = 5;
+}
+
+message ProgramList { repeated Program list = 1; }
+
+message ProgramRequestQuery {
+  uint64 page_size = 1;
+  uint64 page = 2;
+  string id = 3;
+  string name = 4;
+}
+
+message ProgramReplyQuery {
+  repeated Program list = 1;
+  uint64 total = 2;
+}
+
+message ProgramReply { bool success = 1; }

@@ -77,6 +77,14 @@
 
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@mipmap/empty"
+            tools:ignore="ContentDescription,ImageContrastCheck" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
@@ -86,6 +94,7 @@
             android:layout_marginEnd="2dp"
             android:layout_marginBottom="2dp"
             android:layout_weight="1"
+            android:visibility="gone"
             android:background="@color/dark_onBackground"
             app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
             tools:listitem="@layout/item_calibration" />

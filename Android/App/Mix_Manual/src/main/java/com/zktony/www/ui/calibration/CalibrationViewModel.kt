@@ -5,7 +5,6 @@ import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
 import com.zktony.www.data.dao.CalibrationDao
-import com.zktony.www.data.dao.CalibrationDataDao
 import com.zktony.www.data.entities.Calibration
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +12,6 @@ import kotlinx.coroutines.launch
 
 class CalibrationViewModel constructor(
     private val CD: CalibrationDao,
-    private val CDD: CalibrationDataDao,
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow<List<Calibration>?>(null)
@@ -47,26 +45,20 @@ class CalibrationViewModel constructor(
     fun delete(calibration: Calibration) {
         viewModelScope.launch {
             CD.delete(calibration)
-            CDD.deleteBySubId(calibration.id)
-            if (calibration.enable == 1) {
-                val cali =
-                    _uiState.value?.find { it.name == Ext.ctx.getString(com.zktony.core.R.string.def) }
-                cali?.let { CD.update(it.copy(enable = 1)) }
-            }
         }
     }
 
     fun enable(calibration: Calibration) {
         viewModelScope.launch {
-            val cali = _uiState.value?.find { it.enable == 1 }
+            val cali = _uiState.value?.find { it.active == 1 }
             if (cali == null) {
-                CD.update(calibration.copy(enable = 1))
+                CD.update(calibration.copy(active = 1))
             } else {
                 if (cali.id != calibration.id) {
                     CD.updateAll(
                         listOf(
-                            cali.copy(enable = 0),
-                            calibration.copy(enable = 1)
+                            cali.copy(active = 0),
+                            calibration.copy(active = 1)
                         )
                     )
                 }

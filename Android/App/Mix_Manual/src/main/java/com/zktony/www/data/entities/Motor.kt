@@ -42,22 +42,6 @@ data class Motor(
                 waitTime.intToHex(2)
 
     }
-
-    /**
-     * 一圈脉冲数
-     */
-    private fun pulseCount(): Int {
-        return 200 * subdivision
-    }
-
-    /**
-     * 距离/加液需要的脉冲数
-     * @param distance 距离/加液梁
-     * @param unit 单位
-     */
-    fun pulseCount(distance: Float, unit: Float): Int {
-        return (distance * pulseCount() / unit).toInt()
-    }
 }
 
 /**

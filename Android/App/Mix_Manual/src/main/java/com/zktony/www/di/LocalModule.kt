@@ -17,6 +17,5 @@ val localModule = module {
     }
     single { get<AppDatabase>().motorDao() }
     single { get<AppDatabase>().calibrationDao() }
-    single { get<AppDatabase>().calibrationDataDao() }
     single { get<AppDatabase>().cacheDao() }
 }

@@ -10,11 +10,10 @@ val scheduleTask: ScheduleTask by inject(ScheduleTask::class.java)
  * 脉冲
  *
  * @param dv Float
- * @param type Int
+ * @param index Int
  * @return Int
  */
-fun pulse(dv: Float, type: Int): Int {
-    val me = scheduleTask.hpm[type] ?: Motor()
-    val ce = scheduleTask.hpc[type] ?: 200f
-    return me.pulseCount(dv, ce)
+fun pulse(dv: Float, index: Int): Int {
+    val ce = scheduleTask.hpc[index] ?: 0.01f
+    return (dv / ce).toInt()
 }

@@ -30,21 +30,18 @@ class CalibrationDataFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
-                    adapter.submitList(it.caliData)
+                    adapter.submitList(it.cali.data)
                     binding.apply {
                         select.text = listOf(
                             getString(R.string.pump_one),
                             getString(R.string.pump_two),
                             getString(R.string.pump_three)
-                        )[it.pumpId]
-                        if (it.expect > 0f) {
-                            expect.setEqualText(it.expect.format())
-                        }
+                        )[it.index]
                         if (it.actual > 0f) {
                             actual.setEqualText(it.actual.format())
                         }
-                        addLiquid.isEnabled = it.expect > 0f && !it.lock
-                        save.isEnabled = it.expect > 0f && it.actual > 0f
+                        addLiquid.isEnabled = !it.lock
+                        save.isEnabled = it.actual > 0f
                     }
                 }
             }
@@ -69,10 +66,6 @@ class CalibrationDataFragment :
 
             save.clickNoRepeat {
                 viewModel.save()
-            }
-
-            expect.afterTextChange {
-                viewModel.expect(it.toFloatOrNull() ?: 0f)
             }
 
             actual.afterTextChange {

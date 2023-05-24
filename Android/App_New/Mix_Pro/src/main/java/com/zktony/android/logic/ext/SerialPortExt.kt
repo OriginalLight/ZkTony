@@ -184,13 +184,3 @@ fun freeLock(list: List<Int>) {
         serialPort.arrayList[it] = 0
     }
 }
-
-/**
- * 收集hex回复
- * @param block (String) -> Unit
- */
-suspend fun collectCallback(block: (ByteArray) -> Unit) {
-    serialPort.byteArrayFlow.collect {
-        block(it)
-    }
-}

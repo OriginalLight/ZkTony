@@ -12,9 +12,9 @@
     <string name="notice_content">1. Please follow the instruction manual\n2. Please fill the coagulant first and then fill the glue\n3. Please stick the needle to the opening of the rubber board during glue filling\n4. During use, please keep the liquid in the pipeline in a flowing state as much as possible\n5. The time interval between filling two gels should not be too long\n6. After the glue filling is completed, rinse the pipeline with clean water to avoid the gel blocking the pipeline</string>
     <string name="pre_drainage">Pre</string>
     <string name="pump_name">Pump name</string>
-    <string name="pump_one">Pump one</string>
-    <string name="pump_three">Pump three</string>
-    <string name="pump_two">Pump two</string>
+    <string name="pump_one">Heavy fluid pump</string>
+    <string name="pump_two">Light liquid pump</string>
+    <string name="pump_three">Syringe pump</string>
     <string name="stop_all">Please suspend all procedures</string>
     <string name="stop_back">Please stop sucking back first</string>
     <string name="stop_fill">Please stop the population first</string>
@@ -26,4 +26,5 @@
     <string name="standard_mode">Standard mode</string>
     <string name="mixer_mode">Mixer mode</string>
     <string name="switch_mode">Switch mode</string>
+    <string name="volume">Volume μL</string>
 </resources>

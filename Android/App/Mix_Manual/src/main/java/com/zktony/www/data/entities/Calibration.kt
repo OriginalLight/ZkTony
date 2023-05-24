@@ -2,7 +2,9 @@ package com.zktony.www.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import com.zktony.core.ext.nextId
+import com.zktony.www.data.CalibrationDataConverters
 import java.util.Date
 
 /**
@@ -10,21 +12,26 @@ import java.util.Date
  * @date: 2022-10-25 10:42
  */
 @Entity(tableName = "calibration")
+@TypeConverters(CalibrationDataConverters::class)
 data class Calibration(
     @PrimaryKey
     val id: Long = nextId(),
-    // 校准名称
     val name: String = "默认",
-    // y轴电机一圈走的距离
-    val y: Float = 4f,
-    // 蠕动泵一一圈走的进液量
-    val v1: Float = 200f,
-    // 蠕动泵二一圈走的进液量
-    val v2: Float = 200f,
-    // 蠕动泵三一圈走的进液量
-    val v3: Float = 100f,
-    // 是否选用
-    val enable: Int = 0,
-    // 创建时间
+    val data: List<CalibrationData> = emptyList(),
+    val active: Int = 0,
     val createTime: Date = Date(System.currentTimeMillis()),
-)
+) {
+    fun avgRate(): List<Float> {
+        val vl = mutableListOf<Float>()
+        for (i in 0..2) {
+            val dataList = this.data.filter { it.index == i }
+            if (dataList.isNotEmpty()) {
+                val avg = dataList.map { data -> data.vps }.average().toFloat()
+                vl.add(avg)
+            } else {
+                vl.add(1f)
+            }
+        }
+        return vl
+    }
+}
