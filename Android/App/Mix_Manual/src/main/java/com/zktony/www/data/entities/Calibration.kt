@@ -29,7 +29,7 @@ data class Calibration(
                 val avg = dataList.map { data -> data.vps }.average().toFloat()
                 vl.add(avg)
             } else {
-                vl.add(1f)
+                vl.add(0.01f)
             }
         }
         return vl

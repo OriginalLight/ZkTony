@@ -11,7 +11,7 @@ ndk = "25.2.9519653"
 targetSdk = "33"
 ## dependencies
 accompanist = "0.30.1"
-androidGradlePlugin = "8.0.1"
+androidGradlePlugin = "8.0.2"
 androidx-activity-compose = "1.7.1"
 androidx-appcompat = "1.6.1"
 androidx-compose-bom = "2023.05.01"

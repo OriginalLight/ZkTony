@@ -53,7 +53,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginBottom="8dp"
                 android:gravity="center"
-                android:text="@{String.valueOf(action.order)}"
+                android:text="@{String.valueOf(action.index)}"
                 android:textAlignment="center"
                 android:textColor="@color/light_primary"
                 android:textSize="36sp"

@@ -29,7 +29,7 @@ class ProgramViewModel constructor(
      * 添加程序
      * @param name [String] 程序名
      */
-    fun insert(name: String, block: (String) -> Unit) {
+    fun insert(name: String, block: (Long) -> Unit) {
         viewModelScope.launch {
             if (name.isEmpty()) {
                 PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.not_empty))
@@ -52,7 +52,7 @@ class ProgramViewModel constructor(
     fun delete(entity: Program) {
         viewModelScope.launch {
             PD.delete(entity)
-            AD.deleteByProgramId(entity.id)
+            AD.deleteBySubId(entity.id)
         }
     }
 }

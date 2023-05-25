@@ -37,7 +37,7 @@ class CommandExecutor constructor(
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
         waitForFree {
             // 设置温度
-            scope.launch { temp(addr = module + 1, temp = action.temperature.toString()) }
+            scope.launch { temp(addr = module + 1, temp = action.temp.toString()) }
             addLiquid(yAxis = con.blockY, zAxis = con.blockZ)
             event("加液中")
             delay(100L)
@@ -54,7 +54,7 @@ class CommandExecutor constructor(
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
         waitForFree {
             // 设置温度
-            scope.launch { temp(addr = module + 1, temp = action.temperature.toString()) }
+            scope.launch { temp(addr = module + 1, temp = action.temp.toString()) }
             addLiquid(yAxis = con.oneY, zAxis = con.oneZ)
             event("加液中")
             delay(100L)
@@ -99,7 +99,7 @@ class CommandExecutor constructor(
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
         waitForFree {
             // 设置温度
-            scope.launch { temp(addr = module + 1, temp = action.temperature.toString()) }
+            scope.launch { temp(addr = module + 1, temp = action.temp.toString()) }
             addLiquid(yAxis = con.twoY, zAxis = con.twoZ)
             event("加液中")
             delay(100L)
@@ -116,7 +116,7 @@ class CommandExecutor constructor(
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
         waitForFree {
             // 设置温度
-            scope.launch { temp(addr = module + 1, temp = action.temperature.toString()) }
+            scope.launch { temp(addr = module + 1, temp = action.temp.toString()) }
             // 主板运动
             addLiquid(yAxis = con.washY, zAxis = con.washZ)
             event("加液中")
@@ -158,19 +158,19 @@ class CommandExecutor constructor(
      */
     private fun addLiquid(yAxis: Float, zAxis: Float) {
         execute {
-            step {
+            dv {
                 y = yAxis
             }
-            step {
+            dv {
                 y = yAxis
                 z = zAxis
-                v1 = if (module == 0) action.liquidVolume else 0f
-                v2 = if (module == 1) action.liquidVolume else 0f
-                v3 = if (module == 2) action.liquidVolume else 0f
-                v4 = if (module == 3) action.liquidVolume else 0f
-                v5 = if (action.mode == 3) action.liquidVolume else 0f
+                v1 = if (module == 0) action.volume else 0f
+                v2 = if (module == 1) action.volume else 0f
+                v3 = if (module == 2) action.volume else 0f
+                v4 = if (module == 3) action.volume else 0f
+                v5 = if (action.mode == 3) action.volume else 0f
             }
-            step {
+            dv {
                 y = yAxis
                 v1 = if (module == 0) 15000f else 0f
                 v2 = if (module == 1) 15000f else 0f
@@ -186,21 +186,21 @@ class CommandExecutor constructor(
      * @return [List]<[String]>
      */
     private fun recycleLiquid(yAxis: Float, zAxis: Float) {
-        val volume = -(action.liquidVolume + 20000f)
+        val volume = -(action.volume + 20000f)
         execute {
-            step {
+            dv {
                 y = yAxis
             }
-            step {
+            dv {
                 y = yAxis
                 z = zAxis
                 v1 = if (module == 0) volume else 0f
                 v2 = if (module == 1) volume else 0f
                 v3 = if (module == 2) volume else 0f
                 v4 = if (module == 3) volume else 0f
-                v6 = action.liquidVolume + 20000f
+                v6 = action.volume + 20000f
             }
-            step {
+            dv {
                 y = yAxis
             }
         }

@@ -7,11 +7,10 @@ import com.zktony.serialport.protocol.toV1
 import com.zktony.www.R
 import com.zktony.www.core.ext.asyncHex
 import com.zktony.www.core.ext.collectHex
-import com.zktony.www.core.ext.decideLock
+import com.zktony.www.core.ext.serialPort
 import com.zktony.www.data.dao.CalibrationDao
 import com.zktony.www.data.dao.ContainerDao
 import com.zktony.www.data.dao.MotorDao
-import com.zktony.www.data.entities.Calibration
 import com.zktony.www.data.entities.Container
 import com.zktony.www.data.entities.Motor
 import com.zktony.www.data.entities.toMotor
@@ -119,41 +118,53 @@ class ScheduleTask(
             launch {
                 calibrationDao.getAll().collect {
                     if (it.isNotEmpty()) {
-                        it.find { c -> c.enable == 1 }?.let { c ->
+                        val c = it.find { c -> c.active == 1 }
+                        if (c != null) {
                             hpc.clear()
-                            hpc[0] = c.x
-                            hpc[1] = c.y
-                            hpc[2] = c.z
-                            hpc[3] = c.v1
-                            hpc[4] = c.v2
-                            hpc[5] = c.v3
-                            hpc[6] = c.v4
-                            hpc[7] = c.v5
-                            hpc[8] = c.v6
+                            hpc[0] = 0f
+                            hpc[1] = 58f / 3200f
+                            hpc[2] = 3.8f / 3200f
+                            val list = c.vps()
+                            list.forEachIndexed { index, fl ->
+                                hpc[index + 3] = fl
+                            }
+                        } else {
+                            hpc.clear()
+                            hpc[0] = 0f
+                            hpc[1] = 58f / 3200f
+                            hpc[2] = 3.8f / 3200f
+                            hpc[3] = 150f / 3200f
+                            hpc[4] = 150f / 3200f
+                            hpc[5] = 150f / 3200f
+                            hpc[6] = 150f / 3200f
+                            hpc[7] = 150f / 3200f
+                            hpc[8] = 150f / 3200f
                         }
                     } else {
-                        calibrationDao.insert(
-                            Calibration(
-                                name = Ext.ctx.getString(com.zktony.core.R.string.def),
-                                enable = 1
-                            )
-                        )
+                        hpc.clear()
+                        hpc[0] = 0f
+                        hpc[1] = 58f / 3200f
+                        hpc[2] = 3.8f / 3200f
+                        hpc[3] = 150f / 3200f
+                        hpc[4] = 150f / 3200f
+                        hpc[5] = 150f / 3200f
+                        hpc[6] = 150f / 3200f
+                        hpc[7] = 150f / 3200f
+                        hpc[8] = 150f / 3200f
                     }
                 }
             }
             launch {
                 delay(5000L)
-                decideLock {
-                    no {
-                        for (i in 0..2) {
-                            for (j in 1..3) {
-                                asyncHex(i) {
-                                    fn = "03"
-                                    pa = "04"
-                                    data = j.intToHex()
-                                }
-                                delay(200L)
+                if (serialPort.lock.value.not()) {
+                    for (i in 0..2) {
+                        for (j in 1..3) {
+                            asyncHex(i) {
+                                fn = "03"
+                                pa = "04"
+                                data = j.intToHex()
                             }
+                            delay(200L)
                         }
                     }
                 }

@@ -2,6 +2,7 @@ package com.zktony.www.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.zktony.core.ext.nextId
 
 /**
  * @author: 刘贺贺
@@ -11,7 +12,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "container")
 data class Container(
     @PrimaryKey
-    val id: Int = 1,
+    val id: Long = nextId(),
     // 废液槽位置
     val wasteY: Float = 0f,
     val wasteZ: Float = 80f,

@@ -343,7 +343,7 @@ fun CalibrationEditPage(
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            entity.compute().forEach { (index, avg, list) ->
+            entity.format().forEach { (index, avg, list) ->
                 item {
                     Card {
                         Column {

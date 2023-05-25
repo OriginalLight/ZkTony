@@ -10,12 +10,7 @@ import com.zktony.core.ext.format
 import com.zktony.core.utils.Constants
 import com.zktony.core.utils.Queue
 import com.zktony.datastore.ext.read
-import com.zktony.www.core.ext.asyncHex
-import com.zktony.www.core.ext.asyncText
-import com.zktony.www.core.ext.collectHex
-import com.zktony.www.core.ext.decideLock
-import com.zktony.www.core.ext.syncHex
-import com.zktony.www.core.ext.temp
+import com.zktony.www.core.ext.*
 import com.zktony.www.data.dao.ActionDao
 import com.zktony.www.data.dao.ContainerDao
 import com.zktony.www.data.dao.LogDao
@@ -211,7 +206,7 @@ class HomeViewModel constructor(
             val job = launch {
                 // 将程序中的所有步骤排序放入队列
                 val actionQueue = Queue<Action>()
-                AD.getByProgramId(state.value.program!!.id).first().forEach {
+                AD.getBySubId(state.value.program!!.id).first().forEach {
                     actionQueue.enqueue(it)
                 }
                 // 创建程序执行者
@@ -283,7 +278,7 @@ class HomeViewModel constructor(
                 state.value.job?.cancel()
                 // 创建日志
                 val log = Log(
-                    programName = state.value.program?.name ?: "None",
+                    name = state.value.program?.name ?: "None",
                     module = module,
                 )
                 LD.insert(log)
@@ -349,11 +344,10 @@ class HomeViewModel constructor(
                     && _cFlow.value.job == null
                     && _dFlow.value.job == null
             if (run) {
-                decideLock {
-                    yes { PopTip.show("运动中禁止复位") }
-                    no {
-                        syncHex(0) {}
-                    }
+                if (serialPort.lock.value) {
+                    PopTip.show("运动中禁止复位")
+                } else {
+                    syncHex(0) {}
                 }
             } else {
                 PopTip.show("请中止所有运行中程序")

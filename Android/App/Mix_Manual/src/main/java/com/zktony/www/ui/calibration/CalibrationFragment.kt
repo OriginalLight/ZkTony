@@ -1,6 +1,7 @@
 package com.zktony.www.ui.calibration
 
 import android.os.Bundle
+import androidx.core.view.isVisible
 import androidx.lifecycle.*
 import androidx.navigation.fragment.findNavController
 import com.zktony.core.base.BaseFragment
@@ -31,6 +32,10 @@ class CalibrationFragment :
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
                     adapter.submitList(it)
+                    binding.apply {
+                        empty.isVisible = it.isEmpty()
+                        recyclerView.isVisible = it.isNotEmpty()
+                    }
                 }
             }
         }

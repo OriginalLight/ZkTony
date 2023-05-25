@@ -5,7 +5,7 @@ import com.zktony.serialport.ext.intToHex
 import com.zktony.serialport.protocol.toV1
 import com.zktony.www.core.ext.asyncHex
 import com.zktony.www.core.ext.collectHex
-import com.zktony.www.core.ext.decideLock
+import com.zktony.www.core.ext.serialPort
 import com.zktony.www.data.dao.CalibrationDao
 import com.zktony.www.data.dao.MotorDao
 import com.zktony.www.data.entities.Motor
@@ -75,22 +75,24 @@ class ScheduleTask constructor(
                                 hpc[i] = 0.01f
                             }
                         }
-
+                    } else {
+                        hpc.clear()
+                        for (i in 0..2) {
+                            hpc[i] = 0.01f
+                        }
                     }
                 }
             }
             launch {
                 delay(100L)
-                decideLock {
-                    no {
-                        for (i in 1..3) {
-                            asyncHex {
-                                fn = "03"
-                                pa = "04"
-                                data = i.intToHex()
-                            }
-                            delay(100L)
+                if (serialPort.lock.value.not()) {
+                    for (i in 1..3) {
+                        asyncHex {
+                            fn = "03"
+                            pa = "04"
+                            data = i.intToHex()
                         }
+                        delay(100L)
                     }
                 }
             }

@@ -45,7 +45,7 @@ class ProgramFragment :
         adapter.onEditButtonClick = {
             findNavController().navigate(
                 R.id.action_navigation_program_to_navigation_action,
-                Bundle().apply { putString("id", it.id) }
+                Bundle().apply { putLong("id", it.id) }
             )
         }
 
@@ -70,7 +70,7 @@ class ProgramFragment :
                             viewModel.insert(it) { id ->
                                 findNavController().navigate(
                                     R.id.action_navigation_program_to_navigation_action,
-                                    Bundle().apply { putString("id", id) }
+                                    Bundle().apply { putLong("id", id) }
                                 )
                             }
                         }

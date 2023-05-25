@@ -2,8 +2,8 @@ package com.zktony.www.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.zktony.core.ext.nextId
 import java.util.Date
-import java.util.UUID
 
 /**
  * @author: 刘贺贺
@@ -13,15 +13,14 @@ import java.util.UUID
 @Entity
 data class Action(
     @PrimaryKey
-    val id: String = UUID.randomUUID().toString(),
-    val programId: String = "",
+    val id: Long = nextId(),
+    val subId: Long = 0L,
     val mode: Int = 0,
-    val order: Int = 0,
-    val temperature: Float = 0f,
-    val liquidVolume: Float = 0f,
+    val index: Int = 0,
+    val temp: Float = 0f,
+    val volume: Float = 0f,
     val count: Int = 0,
     val time: Float = 0f,
-    val upload: Int = 0,
     val createTime: Date = Date(System.currentTimeMillis())
 )
 

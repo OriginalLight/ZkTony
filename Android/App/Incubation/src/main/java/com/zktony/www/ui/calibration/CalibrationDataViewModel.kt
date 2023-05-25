@@ -4,18 +4,19 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
 import com.zktony.www.core.ext.collectLock
 import com.zktony.www.core.ext.execute
+import com.zktony.www.core.ext.pulse
 import com.zktony.www.data.dao.CalibrationDao
-import com.zktony.www.data.dao.CalibrationDataDao
 import com.zktony.www.data.dao.ContainerDao
 import com.zktony.www.data.entities.Calibration
 import com.zktony.www.data.entities.CalibrationData
 import com.zktony.www.data.entities.Container
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 
 class CalibrationDataViewModel constructor(
     private val CD: CalibrationDao,
-    private val CDD: CalibrationDataDao,
     private val COND: ContainerDao,
 ) : BaseViewModel() {
 
@@ -39,86 +40,75 @@ class CalibrationDataViewModel constructor(
         }
     }
 
-    fun load(id: String) {
+    fun load(id: Long) {
         viewModelScope.launch {
             launch {
-                CD.getById(id).distinctUntilChanged().collect {
+                CD.getById(id).collect {
                     _uiState.value = _uiState.value.copy(cali = it)
-                }
-            }
-            launch {
-                CDD.getBySubId(id).distinctUntilChanged().collect {
-                    _uiState.value = _uiState.value.copy(caliData = it)
                 }
             }
         }
     }
 
     fun selectPump(pumpId: Int) {
-        _uiState.value = _uiState.value.copy(pumpId = pumpId)
+        _uiState.value = _uiState.value.copy(index = pumpId)
     }
 
     fun delete(data: CalibrationData) {
         viewModelScope.launch {
-            CDD.delete(data)
-            calculateActual(data.calibrationId)
+            val list = _uiState.value.cali.data.toMutableList()
+            list.remove(data)
+            CD.update(_uiState.value.cali.copy(data = list))
         }
     }
 
     fun addLiquid() {
         val con = _uiState.value.container
-        val liquid = _uiState.value.expect
-        val motorId = _uiState.value.pumpId
-        if (motorId < 4) {
+        val index = _uiState.value.index
+        if (index < 4) {
             execute {
-                step {
-                    y = con.washY
+                pulse {
+                    y = pulse(con.washY, 1)
                 }
-                step {
-                    y = con.washY
-                    z = con.washZ
-                    v1 = if (motorId == 0) liquid else 0f
-                    v2 = if (motorId == 1) liquid else 0f
-                    v3 = if (motorId == 2) liquid else 0f
-                    v4 = if (motorId == 3) liquid else 0f
+                pulse {
+                    y = pulse(con.washY, 1)
+                    z = pulse(con.washZ, 2)
+                    v1 = if (index == 0) 30 * 3200 else 0
+                    v2 = if (index == 1) 30 * 3200 else 0
+                    v3 = if (index == 2) 30 * 3200 else 0
+                    v4 = if (index == 3) 30 * 3200 else 0
                 }
-                step {
-                    y = con.washY
-                    v1 = if (motorId == 0) 15000f else 0f
-                    v2 = if (motorId == 1) 15000f else 0f
-                    v3 = if (motorId == 2) 15000f else 0f
-                    v4 = if (motorId == 3) 15000f else 0f
+                pulse {
+                    y = pulse(con.washY, 1)
+                    v1 = if (index == 0) 15000 else 0
+                    v2 = if (index == 1) 15000 else 0
+                    v3 = if (index == 2) 15000 else 0
+                    v4 = if (index == 3) 15000 else 0
                 }
-                step {}
+                pulse {}
             }
         } else {
             execute {
-                step {}
-                step {
-                    v5 = if (motorId == 4) liquid else 0f
-                    v6 = if (motorId == 5) liquid else 0f
+                pulse {}
+                pulse {
+                    v5 = if (index == 4) 30 * 3200 else 0
+                    v6 = if (index == 5) 30 * 3200 else 0
                 }
-                step {}
+                pulse {}
             }
         }
     }
 
     fun save() {
         viewModelScope.launch {
+            val list = _uiState.value.cali.data.toMutableList()
             val data = CalibrationData(
-                pumpId = _uiState.value.pumpId,
-                calibrationId = _uiState.value.cali?.id ?: "",
-                expect = _uiState.value.expect,
+                index = _uiState.value.index,
+                step = 3200 * 30,
                 actual = _uiState.value.actual,
             )
-            CDD.insert(data)
-            calculateActual(data.calibrationId)
-        }
-    }
-
-    fun expect(fl: Float) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(expect = fl)
+            list.add(data)
+            CD.update(_uiState.value.cali.copy(data = list))
         }
     }
 
@@ -128,58 +118,12 @@ class CalibrationDataViewModel constructor(
         }
     }
 
-    private suspend fun calculateActual(id: String) {
-        val cali = CD.getById(id).firstOrNull()
-        val dataList = CDD.getBySubId(id).firstOrNull()
-        var v1 = 180f
-        var v2 = 180f
-        var v3 = 180f
-        var v4 = 180f
-        var v5 = 180f
-        var v6 = 180f
-        if (!dataList.isNullOrEmpty()) {
-            dataList.filter { it.pumpId == 0 }.let {
-                if (it.isNotEmpty()) {
-                    v1 *= it.map { data -> data.percent }.average().toFloat()
-                }
-            }
-            dataList.filter { it.pumpId == 1 }.let {
-                if (it.isNotEmpty()) {
-                    v2 *= it.map { data -> data.percent }.average().toFloat()
-                }
-            }
-            dataList.filter { it.pumpId == 2 }.let {
-                if (it.isNotEmpty()) {
-                    v3 *= it.map { data -> data.percent }.average().toFloat()
-                }
-            }
-            dataList.filter { it.pumpId == 3 }.let {
-                if (it.isNotEmpty()) {
-                    v4 *= it.map { data -> data.percent }.average().toFloat()
-                }
-            }
-            dataList.filter { it.pumpId == 4 }.let {
-                if (it.isNotEmpty()) {
-                    v5 *= it.map { data -> data.percent }.average().toFloat()
-                }
-            }
-            dataList.filter { it.pumpId == 5 }.let {
-                if (it.isNotEmpty()) {
-                    v6 *= it.map { data -> data.percent }.average().toFloat()
-                }
-            }
-        }
-        CD.update(cali!!.copy(v1 = v1, v2 = v2, v3 = v3, v4 = v4, v5 = v5, v6 = v6))
-    }
-
 }
 
 data class CalibrationDataUiState(
-    val pumpId: Int = 0,
-    val cali: Calibration? = null,
+    val index: Int = 0,
+    val cali: Calibration = Calibration(),
     val container: Container = Container(),
-    val caliData: List<CalibrationData> = emptyList(),
-    val expect: Float = 0f,
     val actual: Float = 0f,
     val lock: Boolean = false,
 )

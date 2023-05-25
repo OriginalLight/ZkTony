@@ -60,7 +60,7 @@ class CalibrationFragment :
             onEditButtonClick = {
                 findNavController().navigate(
                     R.id.action_navigation_calibration_to_navigation_calibration_data,
-                    Bundle().apply { putString("id", it.id) }
+                    Bundle().apply { putLong("id", it.id) }
                 )
             }
         }
@@ -77,7 +77,7 @@ class CalibrationFragment :
                             viewModel.insert(it) { id ->
                                 findNavController().navigate(
                                     R.id.action_navigation_calibration_to_navigation_calibration_data,
-                                    Bundle().apply { putString("id", id) })
+                                    Bundle().apply { putLong("id", id) })
                             }
                         }
                     )

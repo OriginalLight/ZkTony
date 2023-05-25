@@ -16,9 +16,8 @@ val scheduleTask: ScheduleTask by KoinJavaComponent.inject(ScheduleTask::class.j
  * @return Int
  */
 fun pulse(dv: Float, type: Int): Int {
-    val me = scheduleTask.hpm[type] ?: Motor()
-    val ce = scheduleTask.hpc[type] ?: 200f
-    return me.pulseCount(dv, ce)
+    val vps = scheduleTask.hpc[type] ?: (150f / 3200f)
+    return (dv / vps).toInt()
 }
 
 /**

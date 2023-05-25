@@ -7,9 +7,10 @@ import com.zktony.www.data.dao.ProgramDao
 import com.zktony.www.data.entities.Action
 import com.zktony.www.data.entities.getActionEnum
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 class ActionViewModel constructor(
     private val PD: ProgramDao,
@@ -23,15 +24,13 @@ class ActionViewModel constructor(
      * 加载程序列表
      * @param id [String] 程序ID
      */
-    fun init(id: String) {
+    fun init(id: Long) {
         viewModelScope.launch {
-            if (id.isNotEmpty()) {
-                AD.getByProgramId(id).collect { actionList ->
-                    _uiState.value = _uiState.value.copy(
-                        actionList = actionList,
-                        programId = id
-                    )
-                }
+            AD.getBySubId(id).collect { actionList ->
+                _uiState.value = _uiState.value.copy(
+                    actionList = actionList,
+                    programId = id
+                )
             }
         }
     }
@@ -44,13 +43,12 @@ class ActionViewModel constructor(
             val uiState = _uiState.value
             AD.insert(
                 Action(
-                    id = UUID.randomUUID().toString(),
-                    programId = uiState.programId,
-                    order = uiState.order,
+                    subId = uiState.programId,
+                    index = uiState.order,
                     mode = uiState.action,
                     time = uiState.time,
-                    temperature = uiState.temp,
-                    liquidVolume = uiState.volume.toFloat(),
+                    temp = uiState.temp,
+                    volume = uiState.volume.toFloat(),
                     count = uiState.count,
                 )
             )
@@ -79,7 +77,7 @@ class ActionViewModel constructor(
      */
     private fun updateActions() {
         viewModelScope.launch {
-            AD.getByProgramId(_uiState.value.programId).firstOrNull()?.let {
+            AD.getBySubId(_uiState.value.programId).firstOrNull()?.let {
                 val str = StringBuilder()
                 if (it.isNotEmpty()) {
                     it.forEachIndexed { index, action ->
@@ -188,7 +186,7 @@ class ActionViewModel constructor(
 
 data class ActionUiState(
     val actionList: List<Action> = emptyList(),
-    val programId: String = "",
+    val programId: Long = 0L,
     val box: Int = 0,
     val action: Int = 0,
     val order: Int = 1,

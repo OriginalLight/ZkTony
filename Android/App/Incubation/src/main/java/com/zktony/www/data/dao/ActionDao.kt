@@ -13,17 +13,17 @@ interface ActionDao : BaseDao<Action> {
     @Query(
         """
         DELETE FROM `action`
-        WHERE programId = :programId
+        WHERE subId = :id
         """
     )
-    suspend fun deleteByProgramId(programId: String)
+    suspend fun deleteBySubId(id: Long)
 
     @Query(
         """
         SELECT * FROM `action`
-        WHERE programId = :programId
-        ORDER BY `order` ASC
+        WHERE subId = :id
+        ORDER BY `index` ASC
         """
     )
-    fun getByProgramId(programId: String): Flow<List<Action>>
+    fun getBySubId(id: Long): Flow<List<Action>>
 }

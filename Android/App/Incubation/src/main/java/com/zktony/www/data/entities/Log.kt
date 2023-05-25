@@ -18,8 +18,8 @@ package com.zktony.www.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.zktony.core.ext.nextId
 import java.util.Date
-import java.util.UUID
 
 /**
  * Data class that represent the a table in the database.
@@ -27,11 +27,10 @@ import java.util.UUID
 @Entity(tableName = "log")
 data class Log(
     @PrimaryKey
-    val id: String = UUID.randomUUID().toString(),
-    val programName: String = "",
+    val id: Long = nextId(),
+    val name: String = "",
     val module: Int = 0,
     val content: String = "",
     val status: Int = 0,
-    val upload: Int = 0,
     val createTime: Date = Date(System.currentTimeMillis())
 )

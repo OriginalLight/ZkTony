@@ -42,7 +42,7 @@ class ContainerViewModel constructor(
     fun toWasteY() {
         viewModelScope.launch {
             execute {
-                step {
+                dv {
                     y = container.value.wasteY
                 }
             }
@@ -55,10 +55,10 @@ class ContainerViewModel constructor(
     fun toWasteZ() {
         viewModelScope.launch {
             execute {
-                step {
+                dv {
                     y = container.value.wasteY
                 }
-                step {
+                dv {
                     y = container.value.wasteY
                     z = container.value.wasteZ
                 }
@@ -73,7 +73,7 @@ class ContainerViewModel constructor(
     fun toWashY() {
         viewModelScope.launch {
             execute {
-                step {
+                dv {
                     y = container.value.washY
                 }
             }
@@ -86,10 +86,10 @@ class ContainerViewModel constructor(
     fun toWashZ() {
         viewModelScope.launch {
             execute {
-                step {
+                dv {
                     y = container.value.washY
                 }
-                step {
+                dv {
                     y = container.value.washY
                     z = container.value.washZ
                 }
@@ -103,7 +103,7 @@ class ContainerViewModel constructor(
     fun toBlockY() {
         viewModelScope.launch {
             execute {
-                step {
+                dv {
                     y = container.value.blockY
                 }
             }
@@ -116,10 +116,10 @@ class ContainerViewModel constructor(
     fun toBlockZ() {
         viewModelScope.launch {
             execute {
-                step {
+                dv {
                     y = container.value.blockY
                 }
-                step {
+                dv {
                     y = container.value.blockY
                     z = container.value.blockZ
                 }
@@ -133,7 +133,7 @@ class ContainerViewModel constructor(
     fun toOneY() {
         viewModelScope.launch {
             execute {
-                step {
+                dv {
                     y = container.value.oneY
                 }
             }
@@ -146,10 +146,10 @@ class ContainerViewModel constructor(
     fun toOneZ() {
         viewModelScope.launch {
             execute {
-                step {
+                dv {
                     y = container.value.oneY
                 }
-                step {
+                dv {
                     y = container.value.oneY
                     z = container.value.oneZ
                 }
@@ -163,10 +163,10 @@ class ContainerViewModel constructor(
     fun toRecycleOneZ() {
         viewModelScope.launch {
             execute {
-                step {
+                dv {
                     y = container.value.oneY
                 }
-                step {
+                dv {
                     y = container.value.oneY
                     z = container.value.recycleOneZ
                 }
@@ -180,7 +180,7 @@ class ContainerViewModel constructor(
     fun toTwoY() {
         viewModelScope.launch {
             execute {
-                step {
+                dv {
                     y = container.value.twoY
                 }
             }
@@ -193,10 +193,10 @@ class ContainerViewModel constructor(
     fun toTwoZ() {
         viewModelScope.launch {
             execute {
-                step {
+                dv {
                     y = container.value.twoY
                 }
-                step {
+                dv {
                     y = container.value.twoY
                     z = container.value.twoZ
                 }
@@ -210,7 +210,7 @@ class ContainerViewModel constructor(
     fun toZero() {
         viewModelScope.launch {
             execute {
-                step {}
+                dv {}
             }
         }
     }

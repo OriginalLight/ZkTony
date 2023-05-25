@@ -9,7 +9,7 @@ import org.koin.java.KoinJavaComponent.inject
 val serialPort: SerialPort by inject(SerialPort::class.java)
 
 
-data class Step(
+data class DV(
     var x: Float = 0f,
     var y: Float = 0f,
     var z: Float = 0f,
@@ -21,64 +21,60 @@ data class Step(
     var v6: Float = 0f,
 )
 
-class YesNo {
-    var yes: suspend () -> Unit = {}
-    var no: suspend () -> Unit = {}
-
-    fun yes(block: suspend () -> Unit) {
-        yes = block
-    }
-
-    fun no(block: suspend () -> Unit) {
-        no = block
-    }
-}
+data class Pulse(
+    var x: Int = 0,
+    var y: Int = 0,
+    var z: Int = 0,
+    var v1: Int = 0,
+    var v2: Int = 0,
+    var v3: Int = 0,
+    var v4: Int = 0,
+    var v5: Int = 0,
+    var v6: Int = 0,
+)
 
 class Execute {
 
-    private val list = mutableListOf<Step>()
+    var pulse: Triple<String, String, String> = Triple("", "", "")
 
-    fun step(block: Step.() -> Unit) {
-        list.add(Step().apply(block))
+    fun dv(block: DV.() -> Unit) {
+        val dv = DV().apply(block)
+        pulse = Triple(
+            first = pulse.first + "${pulse(dv.x, 0)},${pulse(dv.y, 1)},${pulse(dv.z, 2)},",
+            second = pulse.second + "${pulse(dv.v1, 3)},${pulse(dv.v2, 4)},${pulse(dv.v3, 5)},",
+            third = pulse.third + "${pulse(dv.v4, 6)},${pulse(dv.v5, 7)},${pulse(dv.v6, 8)},"
+        )
     }
 
-    fun list(): List<Step> {
-        return list
+    fun pulse(block: Pulse.() -> Unit) {
+        val p = Pulse().apply(block)
+        pulse = Triple(
+            first = pulse.first + "${p.x},${p.y},${p.z},",
+            second = pulse.second + "${p.v1},${p.v2},${p.v3},",
+            third = pulse.third + "${p.v4},${p.v5},${p.v6},"
+        )
     }
 }
 
 fun execute(block: Execute.() -> Unit) {
-    val list = Execute().apply(block).list()
-
-    val s1 = StringBuilder()
-    val s2 = StringBuilder()
-    val s3 = StringBuilder()
-    list.forEach {
-        val l1 = pulse(
-            listOf(it.x, it.y, it.z, it.v1, it.v2, it.v3, it.v4, it.v5, it.v6),
-            listOf(0, 1, 2, 3, 4, 5, 6, 7, 8)
-        )
-        s1.append("${l1[0]},${l1[1]},${l1[2]},")
-        s2.append("${l1[3]},${l1[4]},${l1[5]},")
-        s3.append("${l1[6]},${l1[7]},${l1[8]},")
-    }
+    val pulse = Execute().apply(block).pulse
 
     asyncHex(0) {
         fn = "05"
         pa = "04"
-        data = "0101" + s1.toString().asciiToHex()
+        data = "0101" + pulse.first.asciiToHex()
     }
 
     asyncHex(1) {
         fn = "05"
         pa = "04"
-        data = "0101" + s2.toString().asciiToHex()
+        data = "0101" + pulse.second.asciiToHex()
     }
 
     syncHex(2) {
         fn = "05"
         pa = "04"
-        data = "0101" + s3.toString().asciiToHex()
+        data = "0101" + pulse.third.asciiToHex()
     }
 }
 
@@ -151,19 +147,6 @@ suspend fun waitAsyncHex(index: Int, block: V1.() -> Unit) {
 suspend fun collectLock(block: (Boolean) -> Unit) {
     serialPort.lock.collect {
         block(it)
-    }
-}
-
-/**
- * 判定是否有锁
- * @param block YesNo
- */
-suspend fun decideLock(block: YesNo.() -> Unit) {
-    val yesNo = YesNo().apply(block)
-    if (serialPort.lock.value) {
-        yesNo.yes()
-    } else {
-        yesNo.no()
     }
 }
 

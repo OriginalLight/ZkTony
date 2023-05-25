@@ -68,8 +68,8 @@ class ActionViewHolder(
             }
             model.text = getActionEnum(item.mode).value
             time.text = item.time.format() + if (item.mode == 3) " Min" else " Hour"
-            temperature.text = item.temperature.format() + " ℃"
-            water.text = item.liquidVolume.format() + " μL"
+            temperature.text = item.temp.format() + " ℃"
+            water.text = item.volume.format() + " μL"
             counter.text = item.count.toString() + " Freq"
             cardView.clickNoRepeat {
             }

@@ -29,7 +29,7 @@ data class CalibrationEntity(
     @ColumnInfo(name = "active") val active: Boolean = false,
     @ColumnInfo(name = "create_time") val createTime: Date = Date(System.currentTimeMillis()),
 ) {
-    fun compute(): List<Triple<Int, Float, List<CalibrationData>>> {
+    fun format(): List<Triple<Int, Float, List<CalibrationData>>> {
         val vl = mutableListOf<Triple<Int, Float, List<CalibrationData>>>()
         for (i in 0..12) {
             val dataList = this.data.filter { it.index == i }
@@ -41,7 +41,7 @@ data class CalibrationEntity(
         return vl
     }
 
-    fun avgRate(): List<Float> {
+    fun vps(): List<Float> {
         val vl = mutableListOf<Float>()
         for (i in 0..12) {
             val dataList = this.data.filter { it.index == i }

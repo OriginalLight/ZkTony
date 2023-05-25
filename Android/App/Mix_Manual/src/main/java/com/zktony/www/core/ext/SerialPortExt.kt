@@ -9,28 +9,15 @@ import org.koin.java.KoinJavaComponent.inject
 val serialPort: SerialPort by inject(SerialPort::class.java)
 
 
-data class Step(
+data class DV(
     var v1: Float = 0f,
     var v2: Float = 0f,
     var v3: Float = 0f,
 )
 
-class YesNo {
-    var yes: suspend () -> Unit = {}
-    var no: suspend () -> Unit = {}
-
-    fun yes(block: suspend () -> Unit) {
-        yes = block
-    }
-
-    fun no(block: suspend () -> Unit) {
-        no = block
-    }
-}
-
 class Execute {
 
-    private val list = mutableListOf<Step>()
+    private val list = mutableListOf<DV>()
     private var mode = false
     private var type = 1
 
@@ -38,15 +25,15 @@ class Execute {
         this.type = type
     }
 
-    fun step(block: Step.() -> Unit) {
-        list.add(Step().apply(block))
+    fun dv(block: DV.() -> Unit) {
+        list.add(DV().apply(block))
     }
 
     fun mode(mode: Boolean) {
         this.mode = mode
     }
 
-    fun list(): List<Step> {
+    fun list(): List<DV> {
         return list
     }
 
@@ -157,23 +144,6 @@ suspend fun collectLock(block: (Boolean) -> Unit) {
     serialPort.lock.collect {
         block(it)
     }
-}
-
-/**
- * 判定是否有锁
- * @param block YesNo
- */
-suspend fun decideLock(block: YesNo.() -> Unit) {
-    val yesNo = YesNo().apply(block)
-    if (serialPort.lock.value) {
-        yesNo.yes()
-    } else {
-        yesNo.no()
-    }
-}
-
-fun getLock(): Boolean {
-    return serialPort.lock.value
 }
 
 /**

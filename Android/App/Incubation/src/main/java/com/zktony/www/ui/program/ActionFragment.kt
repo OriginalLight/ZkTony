@@ -85,10 +85,8 @@ class ActionFragment :
 
     private fun initView() {
         arguments?.let {
-            val id = it.getString("id") ?: ""
-            if (id.isNotEmpty()) {
-                viewModel.init(id)
-            }
+            val id = it.getLong("id")
+            viewModel.init(id)
         }
         adapter.onDeleteButtonClick = {
             viewModel.delete(it)

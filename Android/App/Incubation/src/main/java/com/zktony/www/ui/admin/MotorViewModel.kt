@@ -38,22 +38,6 @@ class MotorViewModel constructor(
         }
     }
 
-    fun model(model: Int) {
-        viewModelScope.launch {
-            _uiState.value.motor?.let {
-                _uiState.value = _uiState.value.copy(motor = it.copy(mode = model))
-            }
-        }
-    }
-
-    fun subdivision(value: Int) {
-        viewModelScope.launch {
-            _uiState.value.motor?.let {
-                _uiState.value = _uiState.value.copy(motor = it.copy(subdivision = value))
-            }
-        }
-    }
-
     fun speed(i: Int) {
         viewModelScope.launch {
             _uiState.value.motor?.let {

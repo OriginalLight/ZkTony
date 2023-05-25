@@ -9,11 +9,7 @@ import androidx.navigation.findNavController
 import com.kongzue.dialogx.dialogs.PopMenu
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.core.base.BaseFragment
-import com.zktony.core.ext.afterTextChange
-import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.format
-import com.zktony.core.ext.setEqualText
+import com.zktony.core.ext.*
 import com.zktony.www.R
 import com.zktony.www.adapter.CalibrationDataAdapter
 import com.zktony.www.databinding.FragmentCalibrationDataBinding
@@ -35,7 +31,7 @@ class CalibrationDataFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect {
-                    adapter.submitList(it.caliData)
+                    adapter.submitList(it.cali.data)
                     binding.apply {
                         select.text = listOf(
                             getString(R.string.pump_one),
@@ -44,15 +40,12 @@ class CalibrationDataFragment :
                             getString(R.string.pump_four),
                             getString(R.string.pump_five),
                             getString(R.string.pump_six)
-                        )[it.pumpId]
-                        if (it.expect > 0f) {
-                            expect.setEqualText(it.expect.format())
-                        }
+                        )[it.index]
                         if (it.actual > 0f) {
                             actual.setEqualText(it.actual.format())
                         }
-                        addLiquid.isEnabled = it.expect > 0f && !it.lock
-                        save.isEnabled = it.expect > 0f && it.actual > 0f
+                        addLiquid.isEnabled = !it.lock
+                        save.isEnabled = it.actual > 0f
                     }
                 }
             }
@@ -61,10 +54,8 @@ class CalibrationDataFragment :
 
     private fun initView() {
         arguments?.let {
-            val id = it.getString("id") ?: ""
-            if (id.isNotEmpty()) {
-                viewModel.load(id)
-            }
+            val id = it.getLong("id")
+            viewModel.load(id)
         }
         adapter.onDeleteButtonClick = { viewModel.delete(it) }
 
@@ -77,10 +68,6 @@ class CalibrationDataFragment :
 
             save.clickNoRepeat {
                 viewModel.save()
-            }
-
-            expect.afterTextChange {
-                viewModel.expect(it.toFloatOrNull() ?: 0f)
             }
 
             actual.afterTextChange {

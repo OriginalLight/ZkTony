@@ -51,7 +51,7 @@ class CalibrationDataViewModel constructor(
             val state = _uiState.value
             val v1 = if (state.index == 0) 32000 else 0
             val v2 = if (state.index == 1) 32000 else 0
-            val v3 = if (state.index == 2) 32000 else 0
+            val v3 = if (state.index == 2) 9600 else 0
             syncHex {
                 fn = "05"
                 pa = "04"
@@ -73,7 +73,7 @@ class CalibrationDataViewModel constructor(
             list.add(
                 CalibrationData(
                     index = _uiState.value.index,
-                    step = 32000,
+                    step = if (_uiState.value.index == 2) 9600 else 32000,
                     actual = _uiState.value.actual,
                 )
             )

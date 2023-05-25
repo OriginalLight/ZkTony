@@ -29,21 +29,13 @@ interface ProgramDao : BaseDao<Program> {
         WHERE id = :id
         """
     )
-    fun getById(id: String): Flow<Program>
-
-    @Query(
-        """
-        SELECT * FROM program
-        WHERE upload = 0
-        """
-    )
-    fun withoutUpload(): Flow<List<Program>>
+    fun getById(id: Long): Flow<Program>
 
     @Query(
         """
         DELETE FROM program
-        WHERE id = :programId
+        WHERE id = :id
         """
     )
-    suspend fun deleteById(programId: String)
+    suspend fun deleteById(id: Long)
 }

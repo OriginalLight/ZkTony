@@ -23,7 +23,7 @@
     <string name="position">位置</string>
     <string name="program_name">程序名</string>
     <string name="pump_name">泵名</string>
-    <string name="pump_one">泵一</string>
+    <string name="pump_one">A模块</string>
     <string name="recycle">回收</string>
     <string name="start_time">开始时间</string>
     <string name="title_motor">电机</string>
@@ -37,11 +37,11 @@
     <string name="zero">原点</string>
     <string name="wash_tank">洗涤液槽</string>
     <string name="recycle_antibody">抗体回收</string>
-    <string name="pump_two">泵二</string>
-    <string name="pump_three">泵三</string>
-    <string name="pump_four">泵四</string>
-    <string name="pump_five">泵五</string>
-    <string name="pump_six">泵六</string>
+    <string name="pump_two">B模块</string>
+    <string name="pump_three">C模块</string>
+    <string name="pump_four">D模块</string>
+    <string name="pump_five">洗涤液泵</string>
+    <string name="pump_six">废液泵</string>
     <string name="x_axis">摇床</string>
     <string name="y_axis">Y轴</string>
     <string name="z_axis">Z轴</string>

@@ -55,7 +55,7 @@ class ScheduleTask constructor(
                             hpc[0] = 10f
                             hpc[1] = 10f
                             hpc[2] = 10f
-                            active.avgRate().forEachIndexed { index, avgRate ->
+                            active.vps().forEachIndexed { index, avgRate ->
                                 hpc[index + 3] = 100f * avgRate
                             }
                         }

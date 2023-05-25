@@ -34,11 +34,6 @@ class MotorFragment : BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layou
                         if (it.motor != null) {
                             binding.apply {
                                 tvTitle.text = it.motor.name
-                                mode.text =
-                                    if (it.motor.mode == 0) getString(com.zktony.core.R.string.incremental_mode) else getString(
-                                        com.zktony.core.R.string.coordinate_mode
-                                    )
-                                subdivision.text = it.motor.subdivision.toString()
                                 speed.setEqualText(it.motor.speed.toString())
                                 acceleration.setEqualText(it.motor.acceleration.toString())
                                 deceleration.setEqualText(it.motor.deceleration.toString())
@@ -59,26 +54,6 @@ class MotorFragment : BaseFragment<MotorViewModel, FragmentMotorBinding>(R.layou
 
         binding.apply {
             recycleView.adapter = adapter
-
-            mode.clickNoRepeat {
-                spannerDialog(
-                    view = it,
-                    menu = listOf(
-                        getString(com.zktony.core.R.string.incremental_mode),
-                        getString(com.zktony.core.R.string.coordinate_mode)
-                    ),
-                    block = { _, index -> viewModel.model(index) }
-
-                )
-            }
-
-            subdivision.clickNoRepeat {
-                spannerDialog(
-                    view = it,
-                    menu = listOf("2", "4", "8", "16", "32"),
-                    block = { str, _ -> viewModel.subdivision(str.toInt()) }
-                )
-            }
 
             update.clickNoRepeat {
                 viewModel.update()

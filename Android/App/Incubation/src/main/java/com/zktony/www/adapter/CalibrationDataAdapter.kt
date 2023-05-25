@@ -63,7 +63,7 @@ class CalibrationDataViewHolder(
         binding.apply {
             cali = item
             order.text = (layoutPosition + 1).toString()
-            name.text = when (item.pumpId) {
+            name.text = when (item.index) {
                 0 -> itemView.context.getString(R.string.pump_one)
                 1 -> itemView.context.getString(R.string.pump_two)
                 2 -> itemView.context.getString(R.string.pump_three)
@@ -72,7 +72,6 @@ class CalibrationDataViewHolder(
                 5 -> itemView.context.getString(R.string.pump_six)
                 else -> itemView.context.getString(R.string.pump_one)
             }
-            expect.text = item.expect.format()
             actual.text = item.actual.format()
             with(delete) {
                 clickScale()
