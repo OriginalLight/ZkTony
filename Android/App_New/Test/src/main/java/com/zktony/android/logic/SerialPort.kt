@@ -74,6 +74,8 @@ class SerialPort : AbstractSerial(), IProtocol {
         if (rec.id == 0x02.toByte()) {
             when (rec.cmd) {
                 0x01.toByte() -> function0x01(rec.data)
+                0x02.toByte() -> function0x02(rec.data)
+                0x03.toByte() -> function0x03(rec.data)
                 0xFF.toByte() -> exception(rec.data)
             }
         }
@@ -81,18 +83,35 @@ class SerialPort : AbstractSerial(), IProtocol {
 
     override fun exception(byteArray: ByteArray) {
         when (byteArray.readInt16LE()) {
-            1 -> "head or end exception".loge()
-            2 -> "crc exception".loge()
-            3 -> "cmd exception".loge()
-            4 -> "len exception".loge()
-            5 -> "data exception".loge()
+            1 -> "CMD_Error_Header".loge()
+            2 -> "CMD_Error_Addr".loge()
+            3 -> "CMD_Error_Crc".loge()
+            4 -> "CMD_NO_COM".loge()
         }
     }
 
     override fun function0x01(byteArray: ByteArray) {
-        val index = byteArray.readInt8(1)
-        val value = byteArray.readInt8(0)
-        array[index] = value
+        for (i in 0 until byteArray.size / 2) {
+            val index = byteArray.readInt8(i * 2)
+            val status = byteArray.readInt8(i * 2 + 1)
+            array[index] = status
+        }
+    }
+
+    override fun function0x02(byteArray: ByteArray) {
+        for (i in 0 until byteArray.size / 2) {
+            val index = byteArray.readInt8(i * 2)
+            val status = byteArray.readInt8(i * 2 + 1)
+            array[index] = status
+        }
+    }
+
+    override fun function0x03(byteArray: ByteArray) {
+        for (i in 0 until byteArray.size / 2) {
+            val index = byteArray.readInt8(i * 2)
+            val status = byteArray.readInt8(i * 2 + 1)
+            array[index] = status
+        }
     }
 
     /**

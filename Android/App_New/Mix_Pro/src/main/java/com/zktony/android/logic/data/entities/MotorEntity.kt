@@ -31,6 +31,6 @@ data class MotorEntity(
 ) {
     fun toByteArray(): ByteArray {
         val ba = ByteArray(6)
-        return ba.writeInt16LE(speed, 0).writeInt16LE(acc, 2).writeInt16LE(dec, 4)
+        return ba.writeInt16LE(acc, 0).writeInt16LE(dec, 2).writeInt16LE(speed, 4)
     }
 }

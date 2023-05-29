@@ -128,43 +128,59 @@ fun LcScreen(
                             MaterialTheme.colorScheme.primary
                         }
                     ),
-                    onClick = { viewModel.test1() }
-                ) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = "Test1"
-                    )
-                }
-                Spacer(modifier = Modifier.width(32.dp))
-                Button(
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (uiState.job != null) {
-                            MaterialTheme.colorScheme.error
-                        } else {
-                            MaterialTheme.colorScheme.primary
-                        }
-                    ),
-                    onClick = { viewModel.test2() }
-                ) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        text = "Test2"
-                    )
-                }
-                Spacer(modifier = Modifier.width(32.dp))
-                Button(
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (uiState.job != null) {
-                            MaterialTheme.colorScheme.error
-                        } else {
-                            MaterialTheme.colorScheme.primary
-                        }
-                    ),
                     onClick = { viewModel.test3() }
                 ) {
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         text = "Test3"
+                    )
+                }
+                Spacer(modifier = Modifier.width(32.dp))
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (uiState.job != null) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.primary
+                        }
+                    ),
+                    onClick = { viewModel.test4() }
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        text = "Test4"
+                    )
+                }
+                Spacer(modifier = Modifier.width(32.dp))
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (uiState.job != null) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.primary
+                        }
+                    ),
+                    onClick = { viewModel.test8() }
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        text = "Test8"
+                    )
+                }
+                Spacer(modifier = Modifier.width(32.dp))
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (uiState.job != null) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.primary
+                        }
+                    ),
+                    onClick = { viewModel.test16() }
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        text = "Test16"
                     )
                 }
             }

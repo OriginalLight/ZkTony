@@ -33,6 +33,8 @@ class Protocol {
 interface IProtocol {
     fun exception(byteArray: ByteArray)
     fun function0x01(byteArray: ByteArray)
+    fun function0x02(byteArray: ByteArray)
+    fun function0x03(byteArray: ByteArray)
 }
 
 fun protocol(block: Protocol.() -> Unit): Protocol {
