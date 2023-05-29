@@ -37,7 +37,7 @@ int main(void)
 
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); // ����ϵͳ�ж����ȼ�����2
 
-	delay_init(168);   // ��ʼ����ʱ����
+	delay_init(168);
 	uart_init(115200); // ��ʼ�����ڲ�����Ϊ115200
 
 	// ��ʱ
