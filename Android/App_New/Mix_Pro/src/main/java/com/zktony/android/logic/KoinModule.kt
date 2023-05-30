@@ -31,9 +31,9 @@ val koinModule = module {
             androidContext(), AppDatabase::class.java, "data.db"
         ).build()
     }
-    single { get<AppDatabase>().motorDao() }
     single { get<AppDatabase>().calibrationDao() }
     single { get<AppDatabase>().containerDao() }
+    single { get<AppDatabase>().motorDao() }
     single { get<AppDatabase>().programDao() }
 
     // remote
@@ -52,15 +52,15 @@ val koinModule = module {
     singleOf(::ApplicationGrpc)
 
     // task
-    singleOf(::SerialPort)
     singleOf(::ScheduleTask)
+    singleOf(::SerialPort)
 
     // viewModel
-    viewModelOf(::HomeViewModel)
-    viewModelOf(::SettingViewModel)
-    viewModelOf(::MotorViewModel)
-    viewModelOf(::ConfigViewModel)
     viewModelOf(::CalibrationViewModel)
+    viewModelOf(::ConfigViewModel)
     viewModelOf(::ContainerViewModel)
+    viewModelOf(::HomeViewModel)
+    viewModelOf(::MotorViewModel)
     viewModelOf(::ProgramViewModel)
+    viewModelOf(::SettingViewModel)
 }

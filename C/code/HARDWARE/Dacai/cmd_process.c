@@ -40,10 +40,10 @@ void ComAckPack(uint8 ack, uint8 dictate, uint8 data[], uint16 length)
 	*p++ = crc & 0xff;
 	*p++ = (crc >> 8) & 0xff;
 	// end to buffer
-	*p++ = (PACK_END >> 24) & 0xff;
-	*p++ = (PACK_END >> 16) & 0xff;
-	*p++ = (PACK_END >> 8) & 0xff;
 	*p++ = PACK_END & 0xff;
+	*p++ = (PACK_END >> 8) & 0xff;
+	*p++ = (PACK_END >> 16) & 0xff;
+	*p++ = (PACK_END >> 24) & 0xff;
 	// send data
 	SendData(TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
 }
@@ -75,11 +75,11 @@ NetLH_Res CmdCheckPack(uint8 *RXbuffer)
 
 	p++; // dictate
 
-	data_len = *p| *(p + 1) << 8;
+	data_len = *p | (*(p + 1) << 8);
 	p += 2;
 
 	_crc16 = do_crc_table(RXbuffer, (_PACK_HEAD_LEN + data_len));
-	crc16 = *(p + data_len) << 8 | *(p + data_len + 1);
+	crc16 = *(p + data_len) | (*(p + data_len + 1) << 8);
 
 	if (_crc16 != crc16)
 	{
@@ -97,7 +97,7 @@ NetLH_Res CmdCheckPack(uint8 *RXbuffer)
 void CmdRun(uint8 *RXbuffer)
 {
 	uint8 *p = &RXbuffer[_LENGTH_INDEX];
-	uint16 data_len = *p | *(p + 1) << 8;
+	uint16 data_len = *p | (*(p + 1) << 8);
 	p += 2;
 	uint8 count = data_len / 11;
 
@@ -106,7 +106,7 @@ void CmdRun(uint8 *RXbuffer)
 		uint8 id = *p;
 
 		Moto[id].MID = id;
-		Moto[id].Mstep = (*(p + 1) | (*(p + 2) << 8) | (*(p + 3) << 16) | (*(p + 4) << 24));
+		Moto[id].Mstep = *(p + 1) | (*(p + 2) << 8) | (*(p + 3) << 16) | (*(p + 4) << 24);
 		Moto[id].Maccel = *(p + 5) | (*(p + 6) << 8);
 		Moto[id].Mdecel = *(p + 7) | (*(p + 8) << 8);
 		Moto[id].MotoSpeed = *(p + 9) | (*(p + 10) << 8);
@@ -118,7 +118,7 @@ void CmdRun(uint8 *RXbuffer)
 void CmdStop(uint8 *RXbuffer)
 {
 	uint8 *p = &RXbuffer[_LENGTH_INDEX];
-	uint16 data_len = *p << 8 | *(p + 1);
+	uint16 data_len = *p | (*(p + 1) << 8);
 	p += 2;
 
 	for (int i = 0; i < data_len; i++, p++)
@@ -133,7 +133,7 @@ void CmdStop(uint8 *RXbuffer)
 void CmdQuery(uint8 *RXbuffer)
 {
 	uint8 *p = &RXbuffer[_LENGTH_INDEX];
-	uint16 data_len = *p | *(p + 1) << 8;
+	uint16 data_len = *p | (*(p + 1) << 8);
 	p += 2;
 	uint8 tx_data[data_len * 2];
 	uint8 *tx_p = tx_data;
@@ -159,20 +159,10 @@ void CmdAnalysis()
 		{
 			Cmd_Cnt = 0;
 		}
-		p++;
+		p++; // dictate
 		// get data len
-		uint16 data_len = *p | *(p + 1) << 8;
+		uint16 data_len = *p | (*(p + 1) << 8);
 		// len check
-/////////////////////////////////////////
-			for(uint8 i=0 ;i<Cmd_Cnt;i++)
-		{
-			//printf("\n");
-			printf("0x%x\t",cmd_buffer[i]);
-			if(i!=0&&i%10==0)
-			{printf("\n");}
-		}
-		printf("\n");
-////////////////////////////////////////////////
 		if (Cmd_Cnt == _PACK_HEAD_LEN + data_len + _PACK_END_LEN)
 		{
 			memcpy(cmd_RXbuffer, cmd_buffer, Cmd_Cnt);
@@ -193,7 +183,6 @@ void CmdAnalysis()
 void CmdProcess()
 {
 	uint8 tx_data[2];
-printf(" cmd_dictate %x\n",cmd_RXbuffer[_DICTATE_INDEX]);
 	switch (cmd_RXbuffer[_DICTATE_INDEX])
 	{
 	case CMD_RX_RUN:

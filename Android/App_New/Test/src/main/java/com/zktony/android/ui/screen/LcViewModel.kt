@@ -7,7 +7,7 @@ import com.zktony.android.logic.ext.getLock
 import com.zktony.android.logic.ext.sendByteArray
 import com.zktony.android.logic.ext.serialPort
 import com.zktony.android.logic.ext.setLock
-import com.zktony.core.ext.logi
+import com.zktony.core.ext.loge
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.ext.writeInt16LE
@@ -59,9 +59,14 @@ class LcViewModel : ViewModel() {
         }
     }
 
-    fun test3() {
+    fun test() {
         if (_uiState.value.job != null) {
-            _uiState.value.job?.cancel()
+            if (_uiState.value.job!!.isActive) {
+                _uiState.value.job!!.cancel()
+                _uiState.value = _uiState.value.copy(job = null)
+            } else {
+                _uiState.value = _uiState.value.copy(job = null)
+            }
             _uiState.value = _uiState.value.copy(
                 job = null,
                 replyIndex = 0,
@@ -71,155 +76,39 @@ class LcViewModel : ViewModel() {
             )
         } else {
             val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
-                while (true) {
-                    try {
-                        setLock(listOf(3, 4, 5))
-                        withTimeout(10000L) {
-                            val p = protocol {
-                                data = getRandom(3) + getRandom(4) + getRandom(5)
-                            }
-                            p.toByteArray().toHexString().logi()
-                            sendByteArray(p.toByteArray())
-                            history(p.toByteArray())
-                            delay(200L)
-                            while (getLock(listOf(3, 4, 5))) {
-                                delay(200L)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        _uiState.value = _uiState.value.copy(job = null)
-                        break
+                launch {
+                    while (true) {
+                        _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
+                        delay(1000L)
                     }
                 }
-            }
-
-            job.start()
-            _uiState.value = _uiState.value.copy(job = job)
-        }
-    }
-
-    fun test4() {
-        if (_uiState.value.job != null) {
-            _uiState.value.job?.cancel()
-            _uiState.value = _uiState.value.copy(
-                job = null,
-                replyIndex = 0,
-                replyHistory = emptyList(),
-                queryIndex = 0,
-                queryHistory = emptyList()
-            )
-        } else {
-            val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
-                while (true) {
-                    try {
-                        setLock(listOf(6, 7, 8, 9))
-                        withTimeout(10000L) {
-                            val p = protocol {
-                                data = getRandom(6) + getRandom(7) + getRandom(8) + getRandom(9)
-                            }
-                            p.toByteArray().toHexString().logi()
-                            sendByteArray(p.toByteArray())
-                            history(p.toByteArray())
-                            delay(200L)
-                            while (getLock(listOf(6, 7, 8, 9))) {
-                                delay(200L)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        _uiState.value = _uiState.value.copy(job = null)
-                        break
-                    }
-                }
-            }
-
-            job.start()
-            _uiState.value = _uiState.value.copy(job = job)
-        }
-    }
-
-    fun test8() {
-        if (_uiState.value.job != null) {
-            _uiState.value.job?.cancel()
-            _uiState.value = _uiState.value.copy(
-                job = null,
-                replyIndex = 0,
-                replyHistory = emptyList(),
-                queryIndex = 0,
-                queryHistory = emptyList()
-            )
-        } else {
-            val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
-                while (true) {
-                    var bytes = byteArrayOf()
+                launch {
+                    val maxIndex = 6
                     val indexList = mutableListOf<Int>()
-                    for (i in 0..7) {
-                        bytes += getRandom(i)
-                        indexList.add(i)
-                    }
-
-                    try {
-                        setLock(indexList)
-                        withTimeout(10000L) {
-                            val p = protocol {
-                                data = bytes
-                            }
-                            p.toByteArray().toHexString().logi()
-                            sendByteArray(p.toByteArray())
-                            history(p.toByteArray())
-                            delay(200L)
-                            while (getLock(indexList)) {
-                                delay(200L)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        _uiState.value = _uiState.value.copy(job = null)
-                        break
-                    }
-                }
-            }
-
-            job.start()
-            _uiState.value = _uiState.value.copy(job = job)
-        }
-    }
-
-    fun test16() {
-        if (_uiState.value.job != null) {
-            _uiState.value.job?.cancel()
-            _uiState.value = _uiState.value.copy(
-                job = null,
-                replyIndex = 0,
-                replyHistory = emptyList(),
-                queryIndex = 0,
-                queryHistory = emptyList()
-            )
-        } else {
-            val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
-                while (true) {
                     var bytes = byteArrayOf()
-                    val indexList = mutableListOf<Int>()
-                    for (i in 0..15) {
-                        bytes += getRandom(i)
-                        indexList.add(i)
+                    repeat(maxIndex) {
+                        indexList.add(it)
+                        bytes += combine(it, 6400L)
                     }
-
-                    try {
-                        setLock(indexList)
-                        withTimeout(10000L) {
-                            val p = protocol {
-                                data = bytes
+                    while (true) {
+                        try {
+                            setLock(indexList)
+                            withTimeout(10000L) {
+                                val p = protocol {
+                                    data = bytes
+                                }
+                                p.toByteArray().toHexString().loge()
+                                sendByteArray(p.toByteArray())
+                                history(p.toByteArray())
+                                delay(100L)
+                                while (getLock(indexList)) {
+                                    delay(200L)
+                                }
                             }
-                            p.toByteArray().toHexString().logi()
-                            sendByteArray(p.toByteArray())
-                            history(p.toByteArray())
-                            delay(200L)
-                            while (getLock(indexList)) {
-                                delay(200L)
-                            }
+                        } catch (e: Exception) {
+                            _uiState.value.job?.cancel()
+                            _uiState.value = _uiState.value.copy(job = null)
                         }
-                    } catch (e: Exception) {
-                        _uiState.value = _uiState.value.copy(job = null)
-                        break
                     }
                 }
             }
@@ -230,11 +119,13 @@ class LcViewModel : ViewModel() {
     }
 
 
-    private fun getRandom(id: Int): ByteArray {
+    private fun combine(id: Int, step: Long): ByteArray {
         val bytes = ByteArray(11)
-        return bytes.writeInt8(id, 0).writeInt32LE(6400L, 1)
-            .writeInt16LE(6400, 5)
-            .writeInt16LE(6400, 7).writeInt16LE(3200, 9)
+        return bytes.writeInt8(id, 0)
+            .writeInt32LE(step, 1)
+            .writeInt16LE(3200, 5)
+            .writeInt16LE(3200, 7)
+            .writeInt16LE(3200, 9)
     }
 
 
@@ -262,4 +153,6 @@ data class LcUiState(
     val queryHistory: List<String> = listOf(),
     val replyHistory: List<String> = listOf(),
     val vec: CopyOnWriteArrayList<Int> = CopyOnWriteArrayList(),
+    val time: Long = 0L,
+    val log: String = "",
 )

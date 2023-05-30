@@ -3,7 +3,6 @@ package com.zktony.android.logic
 import com.zktony.core.ext.loge
 import com.zktony.core.ext.logi
 import com.zktony.serialport.AbstractSerial
-import com.zktony.serialport.command.IProtocol
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.crc16LE
@@ -15,7 +14,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SerialPort : AbstractSerial(), IProtocol {
+class SerialPort : AbstractSerial() {
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
@@ -65,30 +64,26 @@ class SerialPort : AbstractSerial(), IProtocol {
      */
     override fun byteArrayProcess(byteArray: ByteArray) {
         val rec = byteArray.protocol()
-        if (rec.id != 0x02.toByte()) {
-            "Reply cmd error".loge()
-        } else {
+        if (rec.id == 0x02.toByte()) {
             when (rec.cmd) {
-                0x01.toByte() -> function0x01(rec.data)
-                0xFF.toByte() -> exception(rec.data)
+                0x01.toByte() -> {
+                    for (i in 0 until rec.data.size / 2) {
+                        val index = rec.data.readInt8(offset = i * 2)
+                        val status = rec.data.readInt8(offset = i * 2 + 1)
+                        arrayList[index] = status
+                    }
+                }
+
+                0xFF.toByte() -> {
+                    when (rec.data.readInt16LE()) {
+                        1 -> throw Exception("TX Header Error")
+                        2 -> throw Exception("TX Addr Error")
+                        3 -> throw Exception("TX Crc Error")
+                        4 -> throw Exception("TX No Com")
+                    }
+                }
             }
         }
-    }
-
-    override fun exception(byteArray: ByteArray) {
-        when (byteArray.readInt16LE()) {
-            1 -> "Query head or end exception".loge()
-            2 -> "Query crc exception".loge()
-            3 -> "Query cmd exception".loge()
-            4 -> "Query len exception".loge()
-            5 -> "Query data exception".loge()
-        }
-    }
-
-    override fun function0x01(byteArray: ByteArray) {
-        val index = byteArray.readInt8(1)
-        val value = byteArray.readInt8(0)
-        arrayList[index] = value
     }
 
     /**

@@ -31,6 +31,12 @@ fun setLock(list: List<Int>) {
     }
 }
 
+fun setLock(vararg list: Int) {
+    list.forEach {
+        serialPort.array[it] = 1
+    }
+}
+
 /**
  * 获取锁
  *
@@ -38,11 +44,18 @@ fun setLock(list: List<Int>) {
  * @return Boolean
  */
 fun getLock(list: List<Int>): Boolean {
-    var lock = false
-    list.forEach {
-        lock = lock || serialPort.array[it] != 0
-    }
-    return lock
+    return list.any { serialPort.array[it] == 1 }
+}
+
+
+/**
+ * 获取锁
+ *
+ * @param list List<Int>
+ * @return Boolean
+ */
+fun getLock(vararg list: Int): Boolean {
+    return list.any { serialPort.array[it] == 1 }
 }
 
 /**

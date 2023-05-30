@@ -1,7 +1,7 @@
 package com.zktony.serialport.command
 
 import com.zktony.serialport.ext.crc16LE
-import com.zktony.serialport.ext.replaceByteArrayLE
+import com.zktony.serialport.ext.replaceByteArrayBE
 import com.zktony.serialport.ext.writeInt16LE
 
 class Protocol {
@@ -20,21 +20,15 @@ class Protocol {
                 .plus(data)
                 .plus(crc)
                 .plus(end)
+        
 
         // replace crc
-        return byteArray.replaceByteArrayLE(
+        return byteArray.replaceByteArrayBE(
             byteArray.copyOfRange(0, byteArray.size - 6).crc16LE(),
             byteArray.size - 6,
             0
         )
     }
-}
-
-interface IProtocol {
-    fun exception(byteArray: ByteArray)
-    fun function0x01(byteArray: ByteArray)
-    fun function0x02(byteArray: ByteArray)
-    fun function0x03(byteArray: ByteArray)
 }
 
 fun protocol(block: Protocol.() -> Unit): Protocol {

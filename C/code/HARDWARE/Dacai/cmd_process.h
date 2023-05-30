@@ -25,7 +25,7 @@
 #define PACK_HEAD 0xEE
 #define PACK_CMD 0x01
 #define PACK_ACK 0x02
-#define PACK_END 0XFFFCFFFF
+#define PACK_END 0XFFFFFCFF
 
 /** RX DICTATE */
 #define CMD_RX_RUN 0x01
