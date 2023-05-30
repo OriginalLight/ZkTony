@@ -1,6 +1,5 @@
 package com.zktony.android.logic
 
-import com.zktony.core.ext.loge
 import com.zktony.core.ext.logi
 import com.zktony.serialport.AbstractSerial
 import com.zktony.serialport.command.protocol
@@ -8,6 +7,8 @@ import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.crc16LE
 import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.readInt8
+import com.zktony.serialport.ext.splitByteArray
+import com.zktony.serialport.ext.toHexString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -35,23 +36,30 @@ class SerialPort : AbstractSerial() {
      * @param block Function1<ByteArray, Unit>
      */
     override fun callbackProcess(byteArray: ByteArray, block: (ByteArray) -> Unit) {
-        // 验证包长 >=10
+        byteArray.toHexString().logi()
+        // 验证包长 >= 12
         if (byteArray.size < 12) {
-            "Reply byteArray size < 12".loge()
+            throw Exception("RX Length Error")
         } else {
-            //验证包头和包尾
-            val head = byteArray.copyOfRange(0, 1)
-            val end = byteArray.copyOfRange(byteArray.size - 4, byteArray.size)
+            // 分包处理
             val expectHead = byteArrayOf(0xEE.toByte())
             val expectEnd = byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
-            if (!head.contentEquals(expectHead) || !end.contentEquals(expectEnd)) {
-                "Reply head or end error".loge()
-            } else {
-                // crc 校验
-                val crc = byteArray.copyOfRange(byteArray.size - 6, byteArray.size - 4)
-                val bytes = byteArray.copyOfRange(0, byteArray.size - 6)
-                if (bytes.crc16LE().contentEquals(crc)) {
-                    block(byteArray)
+            byteArray.splitByteArray(expectHead, expectEnd).forEach {
+                //验证包头和包尾
+                val head = it.copyOfRange(0, 1)
+                val end = it.copyOfRange(it.size - 4, it.size)
+
+                if (!head.contentEquals(expectHead) || !end.contentEquals(expectEnd)) {
+                    throw Exception("RX Header or End Error")
+                } else {
+                    // crc 校验
+                    val crc = it.copyOfRange(it.size - 6, it.size - 4)
+                    val bytes = it.copyOfRange(0, it.size - 6)
+                    if (bytes.crc16LE().contentEquals(crc)) {
+                        block(it)
+                    } else {
+                        throw Exception("RX Crc Error")
+                    }
                 }
             }
         }

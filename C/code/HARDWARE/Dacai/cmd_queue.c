@@ -1,19 +1,19 @@
 #include "cmd_queue.h"
-#include "usart.h"	
+#include "usart.h"
 
-#define CMD_HEAD 0XEE  //Ö¡Í·
-#define CMD_TAIL 0XFFFCFFFF //Ö¡Î²
-//#define CMD_TAIL 0XBB //Ö¡Î²
+#define CMD_HEAD 0XEE		// Ö¡Í·
+#define CMD_TAIL 0XFFFCFFFF // Ö¡Î²
+// #define CMD_TAIL 0XBB //Ö¡Î²
 typedef struct _QUEUE
 {
-	qsize _head; //¶ÓÁĞÍ·
-	qsize _tail;  //¶ÓÁĞÎ²
-	qdata _data[QUEUE_MAX_SIZE];	//¶ÓÁĞÊı¾İ»º´æÇø
-}QUEUE;
+	qsize _head;				 // ï¿½ï¿½ï¿½ï¿½Í·
+	qsize _tail;				 // ï¿½ï¿½ï¿½ï¿½Î²
+	qdata _data[QUEUE_MAX_SIZE]; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ»ï¿½ï¿½ï¿½ï¿½ï¿½
+} QUEUE;
 
-static QUEUE que = {0,0,0};  //Ö¸Áî¶ÓÁĞ
-static uint32 cmd_state = 0;  //¶ÓÁĞÖ¡Î²¼ì²â×´Ì¬
-static qsize cmd_pos = 0;  //µ±Ç°Ö¸ÁîÖ¸ÕëÎ»ÖÃ
+static QUEUE que = {0, 0, 0}; // Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½
+static uint32 cmd_state = 0;  // ï¿½ï¿½ï¿½ï¿½Ö¡Î²ï¿½ï¿½ï¿½×´Ì¬
+static qsize cmd_pos = 0;	  // ï¿½ï¿½Ç°Ö¸ï¿½ï¿½Ö¸ï¿½ï¿½Î»ï¿½ï¿½
 
 void queue_reset()
 {
@@ -23,71 +23,66 @@ void queue_reset()
 
 void queue_push(qdata _data)
 {
-	qsize pos = (que._head+1)%QUEUE_MAX_SIZE;
-	if(pos!=que._tail)//·ÇÂú×´Ì¬
+	qsize pos = (que._head + 1) % QUEUE_MAX_SIZE;
+	if (pos != que._tail) // ï¿½ï¿½ï¿½ï¿½×´Ì¬
 	{
 		que._data[que._head] = _data;
 		que._head = pos;
 	}
 }
 
-//´Ó¶ÓÁĞÖĞÈ¡Ò»¸öÊı¾İ
-static void queue_pop(qdata* _data)
+// ï¿½Ó¶ï¿½ï¿½ï¿½ï¿½ï¿½È¡Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+static void queue_pop(qdata *_data)
 {
-	if(que._tail!=que._head)//·Ç¿Õ×´Ì¬
+	if (que._tail != que._head) // ï¿½Ç¿ï¿½×´Ì¬
 	{
 		*_data = que._data[que._tail];
-		que._tail = (que._tail+1)%QUEUE_MAX_SIZE;
+		que._tail = (que._tail + 1) % QUEUE_MAX_SIZE;
 	}
 }
 
-//»ñÈ¡¶ÓÁĞÖĞÓĞĞ§Êı¾İ¸öÊı
+// ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ§ï¿½ï¿½ï¿½İ¸ï¿½ï¿½ï¿½
 static qsize queue_size()
 {
-	return ((que._head+QUEUE_MAX_SIZE-que._tail)%QUEUE_MAX_SIZE);
+	return ((que._head + QUEUE_MAX_SIZE - que._tail) % QUEUE_MAX_SIZE);
 }
 
-qsize queue_find_cmd(qdata *buffer,qsize buf_len)
+qsize queue_find_cmd(qdata *buffer, qsize buf_len)
 {
 	qsize cmd_size = 0;
 	qdata _data = 0;
-	while(queue_size()>0)
+	while (queue_size() > 0)
 	{
-		//È¡Ò»¸öÊı¾İ
+		// È¡Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		queue_pop(&_data);
-    
-		
-		if(cmd_pos==0&&_data!=CMD_HEAD)//Ö¸ÁîµÚÒ»¸ö×Ö½Ú±ØĞëÊÇÖ¡Í·£¬·ñÔòÌø¹ı
-		    continue;
 
-		if(cmd_pos<buf_len)//·ÀÖ¹»º³åÇøÒç³ö
+		if (cmd_pos == 0 && _data != CMD_HEAD) // Ö¸ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ö½Ú±ï¿½ï¿½ï¿½ï¿½ï¿½Ö¡Í·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			continue;
+
+		if (cmd_pos < buf_len) // ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			buffer[cmd_pos++] = _data;
 
-		cmd_state = ((cmd_state<<8)|_data);//Æ´½Ó×îºó4¸ö×Ö½Ú£¬×é³ÉÒ»¸ö32Î»ÕûÊı
-//			cmd_state = (_data);//
+		cmd_state = ((cmd_state << 8) | _data); // Æ´ï¿½ï¿½ï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½Ö½Ú£ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½32Î»ï¿½ï¿½ï¿½ï¿½
+		//			cmd_state = (_data);//
 
-		//×îºó4¸ö×Ö½ÚÓëÖ¡Î²Æ¥Åä£¬µÃµ½ÍêÕûÖ¡
-		if(cmd_state==CMD_TAIL)
+		// ï¿½ï¿½ï¿½4ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½Ö¡Î²Æ¥ï¿½ä£¬ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½Ö¡
+		if (cmd_state == CMD_TAIL)
 		{
-			cmd_size = cmd_pos; //Ö¸Áî×Ö½Ú³¤¶È
-			cmd_state = 0;  //ÖØĞÂ¼ì²âÖ¡Î²°Í
-			cmd_pos = 0; //¸´Î»Ö¸ÁîÖ¸Õë
+			cmd_size = cmd_pos; // Ö¸ï¿½ï¿½ï¿½Ö½Ú³ï¿½ï¿½ï¿½
+			cmd_state = 0;		// ï¿½ï¿½ï¿½Â¼ï¿½ï¿½Ö¡Î²ï¿½ï¿½
+			cmd_pos = 0;		// ï¿½ï¿½Î»Ö¸ï¿½ï¿½Ö¸ï¿½ï¿½
 
-#if(CRC16_ENABLE)
-			//È¥µôÖ¸ÁîÍ·Î²EE£¬Î²FFFCFFFF¹²¼Æ5¸ö×Ö½Ú£¬Ö»¼ÆËãÊı¾İ²¿·ÖCRC
-			if(!CheckCRC16(buffer+1,cmd_size-5))//CRCĞ£Ñé
+#if (CRC16_ENABLE)
+			// È¥ï¿½ï¿½Ö¸ï¿½ï¿½Í·Î²EEï¿½ï¿½Î²FFFCFFFFï¿½ï¿½ï¿½ï¿½5ï¿½ï¿½ï¿½Ö½Ú£ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½İ²ï¿½ï¿½ï¿½CRC
+			if (!CheckCRC16(buffer + 1, cmd_size - 5)) // CRCĞ£ï¿½ï¿½
 				return 0;
 
-			cmd_size -= 2;//È¥µôCRC16£¨2×Ö½Ú£©
+			cmd_size -= 2; // È¥ï¿½ï¿½CRC16ï¿½ï¿½2ï¿½Ö½Ú£ï¿½
 #endif
 
 			return cmd_size;
 		}
 	}
 
-	return 0;//Ã»ÓĞĞÎ³ÉÍêÕûµÄÒ»Ö¡
-
-
+	return 0; // Ã»ï¿½ï¿½ï¿½Î³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ö¡
 }
-
-

@@ -41,7 +41,7 @@ class SerialPort : AbstractSerial() {
      */
     override fun callbackProcess(byteArray: ByteArray, block: (ByteArray) -> Unit) {
         byteArray.toHexString().logi()
-        // 验证包长 >=10
+        // 验证包长 >=12
         if (byteArray.size < 12) {
             throw Exception("RX Length Error")
         } else {

@@ -11,12 +11,12 @@
 #include "crc16.h"
 #include "SEGGER_RTT.h"
 
-uint8 cmd_buffer[CMD_MAX_SIZE]; // ָ���
-uint8 cmd_RXbuffer[_PACK_LEN];	// Rxָ���
+uint8 cmd_buffer[CMD_MAX_SIZE]; // ָCommand buffer
+uint8 cmd_RXbuffer[_PACK_LEN];	// Rx buffer
 COMM_EVENT DoComEvent = NO_COMEVENT;
 uint16 Cmd_Cnt = 0;
 extern Moto_Struct Moto[MOTONUM];
-extern speedRampData srd[MOTONUM];
+extern SpeedRampData srd[MOTONUM];
 
 void ComAckPack(uint8 ack, uint8 dictate, uint8 data[], uint16 length)
 {
@@ -179,7 +179,6 @@ void CmdAnalysis()
 	}
 }
 
-/*Pbuffer ://Ϊreceive buff */
 void CmdProcess()
 {
 	uint8 tx_data[2];

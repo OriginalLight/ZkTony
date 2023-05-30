@@ -12,7 +12,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 extern uint8 cmd_RXbuffer[];
 
-extern speedRampData srd[MOTONUM];
+extern SpeedRampData srd[MOTONUM];
 extern Moto_Struct Moto[MOTONUM];
 
 void Tim2Config(void)

@@ -1,9 +1,9 @@
-/*! 
+/*!
  *  \file cmd_queue.h
- *  \brief ´®¿ÚÖ¸Áî¶ÓÁĞ
+ *  \brief ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½
  *  \version 1.0
  *  \date 2012-2015
- *  \copyright ¹ãÖİ´ó²Ê¹âµç¿Æ¼¼ÓĞÏŞ¹«Ë¾
+ *  \copyright ï¿½ï¿½ï¿½İ´ï¿½Ê¹ï¿½ï¿½Æ¼ï¿½ï¿½ï¿½ï¿½Ş¹ï¿½Ë¾
  */
 
 #ifndef _CMD_QUEUE
@@ -13,24 +13,24 @@
 typedef unsigned char qdata;
 typedef unsigned short qsize;
 
-/*! 
- *  \brief  Çå¿ÕÖ¸ÁîÊı¾İ
+/*!
+ *  \brief  ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 extern void queue_reset(void);
 
-/*! 
- * \brief  Ìí¼ÓÖ¸ÁîÊı¾İ
- * \detial ´®¿Ú½ÓÊÕµÄÊı¾İ£¬Í¨¹ı´Ëº¯Êı·ÅÈëÖ¸Áî¶ÓÁĞ 
- *  \param  _data Ö¸ÁîÊı¾İ
+/*!
+ * \brief  ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ * \detial ï¿½ï¿½ï¿½Ú½ï¿½ï¿½Õµï¿½ï¿½ï¿½ï¿½İ£ï¿½Í¨ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  _data Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 extern void queue_push(qdata _data);
 
-/*! 
- *  \brief  ´ÓÖ¸Áî¶ÓÁĞÖĞÈ¡³öÒ»ÌõÍêÕûµÄÖ¸Áî
- *  \param  cmd Ö¸Áî½ÓÊÕ»º´æÇø
- *  \param  buf_len Ö¸Áî½ÓÊÕ»º´æÇø´óĞ¡
- *  \return  Ö¸Áî³¤¶È£¬0±íÊ¾¶ÓÁĞÖĞÎŞÍêÕûÖ¸Áî
+/*!
+ *  \brief  ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
+ *  \param  cmd Ö¸ï¿½ï¿½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  buf_len Ö¸ï¿½ï¿½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ğ¡
+ *  \return  Ö¸ï¿½î³¤ï¿½È£ï¿½0ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
  */
-extern qsize queue_find_cmd(qdata *cmd,qsize buf_len);
+extern qsize queue_find_cmd(qdata *cmd, qsize buf_len);
 
 #endif

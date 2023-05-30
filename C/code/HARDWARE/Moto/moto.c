@@ -30,7 +30,7 @@ u32 RSACC[ACCNUM] = {0xffff};
 
 u8 Para_Save[32] = {0x01, 0x01, 0xC2, 0x00, 0x01, 0x01, 0x01, 0x01, 0x10, 0x02, 0x58, 0x64, 0x64, 0x01, 0x00, 0x00, 0x10, 0x02, 0x58, 0x64, 0x64, 0x01, 0x00, 0x00, 0x10, 0x02, 0x58, 0x64, 0x64, 0x00, 0x00, 0x00};
 
-speedRampData srd[MOTONUM] = {0};
+SpeedRampData srd[MOTONUM] = {0};
 
 Moto_Struct Moto[MOTONUM] = {0};
 Device_Struct DeviceA;
@@ -441,172 +441,6 @@ void AxisMove(u32 num, s32 step, u32 accel, u32 decel, u32 speed)
 		srd[num].accel_count = 0;
 	}
 	CompareValue(num, step);
-	//			switch(num)
-	//				{
-	//					case 1:
-	//						 if(step == 1)
-	//						 {TIM1->CCR3=1000;
-	//							TIM1->ARR=2000;}
-	//						 else
-	//						 {TIM1->CCR3=srd[num].step_delay/2;
-	//							TIM1->ARR=srd[num].step_delay;
-	//							}
-	//						 TIMxCH3OutControl(TIM1,1);
-	//							break;
-	//					case 2:
-	//						 if(step == 1)
-	//						 {TIM1->CCR4=1000;
-	//							TIM1->ARR=2000;}
-	//						 else
-	//						 {TIM1->CCR4=srd[num].step_delay/2;
-	//							TIM1->ARR=srd[num].step_delay;
-	//							}
-	//						  TIMxCH4OutControl(TIM1,1);
-	//							break;
-	//					case 3:
-	//						 if(step == 1)
-	//						 {TIM1->CCR2=1000;
-	//							TIM1->ARR=2000;}
-	//						 else
-	//						 {TIM1->CCR2=srd[num].step_delay/2;
-	//							TIM1->ARR=srd[num].step_delay;
-	//							}
-	//						 TIMxCH2OutControl(TIM1,1);
-	//							break;
-	//				case 4:
-	//						 if(step == 1)
-	//						 {TIM1->CCR1=1000;
-	//							TIM1->ARR=2000;}
-	//						 else
-	//						 {TIM1->CCR1=srd[num].step_delay/2;
-	//							TIM1->ARR=srd[num].step_delay;
-	//							}
-	//						 TIMxCH1OutControl(TIM1,1);
-	//							break;
-	//				case 5:
-	//						 if(step == 1)
-	//						 {TIM3->CCR4=1000;
-	//							TIM3->ARR=2000;}
-	//						 else
-	//						 {TIM3->CCR4=srd[num].step_delay/2;
-	//							TIM3->ARR=srd[num].step_delay;
-	//							}
-	//						  TIMxCH4OutControl(TIM3,1);
-	//							break;
-	//				case 6:
-	//					 if(step == 1)
-	//					 {TIM3->CCR3=1000;
-	//						TIM3->ARR=2000;}
-	//					 else
-	//					 {TIM3->CCR3=srd[num].step_delay/2;
-	//						TIM3->ARR=srd[num].step_delay;
-	//						}
-	//					  TIMxCH3OutControl(TIM3,1);
-	//						break;
-	//				case 7:
-	//					 if(step == 1)
-	//					 {TIM2->CCR4=1000;
-	//						TIM2->ARR=2000;}
-	//					 else
-	//					 {TIM2->CCR4=srd[num].step_delay/2;
-	//						TIM2->ARR=srd[num].step_delay;
-	//						}
-	//					  TIMxCH4OutControl(TIM2,1);
-	//						break;
-	//				case 8:
-	//					 if(step == 1)
-	//					 {TIM2->CCR3=1000;
-	//						TIM2->ARR=2000;}
-	//					 else
-	//					 {TIM2->CCR3=srd[num].step_delay/2;
-	//						TIM2->ARR=srd[num].step_delay;
-	//						}
-	//					  TIMxCH3OutControl(TIM2,1);
-	//						break;
-
-	//				case 9:
-	//					 if(step == 1)
-	//					 {TIM2->CCR1=1000;
-	//						TIM2->ARR=2000;}
-	//					 else
-	//					 {TIM2->CCR1=srd[num].step_delay/2;
-	//						TIM2->ARR=srd[num].step_delay;
-	//						}
-	//					 TIMxCH1OutControl(TIM2,1);
-	//						break;
-	//
-	//				case 10:
-	//					 if(step == 1)
-	//					 {TIM2->CCR2=1000;
-	//						TIM2->ARR=2000;}
-	//					 else
-	//					 {TIM2->CCR2=srd[num].step_delay/2;
-	//						TIM2->ARR=srd[num].step_delay;
-	//						}
-	//					 TIMxCH2OutControl(TIM2,1);
-	//						break;
-	//				case 11:
-	//					 if(step == 1)
-	//					 {TIM3->CCR2=1000;
-	//						TIM3->ARR=2000;}
-	//					 else
-	//					 {TIM3->CCR2=srd[num].step_delay/2;
-	//						TIM3->ARR=srd[num].step_delay;
-	//						}
-	//					 TIMxCH2OutControl(TIM3,1);
-	//						break;
-	//				case 12:
-	//					 if(step == 1)
-	//					 {TIM3->CCR1=1000;
-	//						TIM3->ARR=2000;}
-	//					 else
-	//					 {TIM3->CCR1=srd[num].step_delay/2;
-	//						TIM3->ARR=srd[num].step_delay;
-	//						}
-	//					 TIMxCH1OutControl(TIM3,1);
-	//						break;
-	//				case 13:
-	//					 if(step == 1)
-	//					 {TIM8->CCR1=1000;
-	//						TIM8->ARR=2000;}
-	//					 else
-	//					 {TIM8->CCR1=srd[num].step_delay/2;
-	//						TIM8->ARR=srd[num].step_delay;
-	//						}
-	//					 TIMxCH1OutControl(TIM8,1);
-	//						break;
-	//				case 14:
-	//					 if(step == 1)
-	//					 {TIM8->CCR2=1000;
-	//						TIM8->ARR=2000;}
-	//					 else
-	//					 {TIM8->CCR2=srd[num].step_delay/2;
-	//						TIM8->ARR=srd[num].step_delay;
-	//						}
-	//					 TIMxCH2OutControl(TIM8,1);
-	//						break;
-	//				case 15:
-	//					 if(step == 1)
-	//					 {TIM8->CCR3=1000;
-	//						TIM8->ARR=2000;}
-	//					 else
-	//					 {TIM8->CCR3=srd[num].step_delay/2;
-	//						TIM8->ARR=srd[num].step_delay;
-	//						}
-	//					 TIMxCH3OutControl(TIM8,1);
-	//						break;
-	//				case 16:
-	//					 if(step == 1)
-	//					 {TIM8->CCR4=1000;
-	//						TIM8->ARR=2000;}
-	//					 else
-	//					 {TIM8->CCR4=srd[num].step_delay/2;
-	//						TIM8->ARR=srd[num].step_delay;
-	//						}
-	//					 TIMxCH4OutControl(TIM8,1);
-	//						break;
-	//				}
-	//				//while((srd[num].run_state != STOP));
 }
 
 /**
@@ -1064,7 +898,7 @@ void MotoInitConfig()
 	M3_DIR = 1;
 	M4_DIR = 1;
 	M5_DIR = 1;
-	M6_DIR = 1;
+	M6_DIR = 1;s
 	M7_DIR = 1;
 	M8_DIR = 1;
 	M9_DIR = 1;

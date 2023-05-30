@@ -48,13 +48,25 @@ fun pulse(index: Int, dv: Float): Long {
 }
 
 /**
- * pulse with config
+ * distance or volume pulse with config
  *
  * @param index Int
  * @param dv Int
- * @return String
+ * @return ByteArray
  */
 fun pwc(index: Int, dv: Float, config: MotorEntity): ByteArray {
     val ba = ByteArray(5)
     return ba.writeInt8(index, 0).writeInt32LE(pulse(index, dv), 1) + config.toByteArray()
+}
+
+/**
+ * pulse with config
+ *
+ * @param index Int
+ * @param pulse Long
+ * @return ByteArray
+ */
+fun pwc(index: Int, pulse: Long, config: MotorEntity): ByteArray {
+    val ba = ByteArray(5)
+    return ba.writeInt8(index, 0).writeInt32LE(pulse, 1) + config.toByteArray()
 }

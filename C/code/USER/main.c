@@ -21,7 +21,7 @@
 #include "SEGGER_RTT.h"
 
 extern Moto_Struct Moto[MOTONUM];
-extern speedRampData srd[MOTONUM];
+extern SpeedRampData srd[MOTONUM];
 extern COMM_EVENT DoComEvent;
 extern uint16 Cmd_Cnt;
 

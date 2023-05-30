@@ -60,24 +60,25 @@ class LcViewModel : ViewModel() {
     }
 
     fun test() {
-        if (_uiState.value.job != null) {
+        if (_uiState.value.start) {
             if (_uiState.value.job!!.isActive) {
                 _uiState.value.job!!.cancel()
-                _uiState.value = _uiState.value.copy(job = null)
+                _uiState.value = _uiState.value.copy(job = null, start = false)
             } else {
-                _uiState.value = _uiState.value.copy(job = null)
+                _uiState.value = _uiState.value.copy(job = null, start = false)
             }
             _uiState.value = _uiState.value.copy(
                 job = null,
                 replyIndex = 0,
                 replyHistory = emptyList(),
                 queryIndex = 0,
-                queryHistory = emptyList()
+                queryHistory = emptyList(),
+                time = 0L,
             )
         } else {
             val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
                 launch {
-                    while (true) {
+                    while (_uiState.value.start) {
                         _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
                         delay(1000L)
                     }
@@ -88,9 +89,9 @@ class LcViewModel : ViewModel() {
                     var bytes = byteArrayOf()
                     repeat(maxIndex) {
                         indexList.add(it)
-                        bytes += combine(it, 6400L)
+                        bytes += combine(it, 1600L)
                     }
-                    while (true) {
+                    while (_uiState.value.start) {
                         try {
                             setLock(indexList)
                             withTimeout(10000L) {
@@ -100,21 +101,18 @@ class LcViewModel : ViewModel() {
                                 p.toByteArray().toHexString().loge()
                                 sendByteArray(p.toByteArray())
                                 history(p.toByteArray())
-                                delay(100L)
                                 while (getLock(indexList)) {
-                                    delay(200L)
+                                    delay(10L)
                                 }
                             }
                         } catch (e: Exception) {
-                            _uiState.value.job?.cancel()
-                            _uiState.value = _uiState.value.copy(job = null)
+                            _uiState.value = _uiState.value.copy(start = false)
                         }
                     }
                 }
             }
-
+            _uiState.value = _uiState.value.copy(job = job, start = true)
             job.start()
-            _uiState.value = _uiState.value.copy(job = job)
         }
     }
 
@@ -125,7 +123,7 @@ class LcViewModel : ViewModel() {
             .writeInt32LE(step, 1)
             .writeInt16LE(3200, 5)
             .writeInt16LE(3200, 7)
-            .writeInt16LE(3200, 9)
+            .writeInt16LE(12800, 9)
     }
 
 
@@ -148,6 +146,7 @@ class LcViewModel : ViewModel() {
 
 data class LcUiState(
     val job: Job? = null,
+    val start: Boolean = false,
     val queryIndex: Int = 0,
     val replyIndex: Int = 0,
     val queryHistory: List<String> = listOf(),
