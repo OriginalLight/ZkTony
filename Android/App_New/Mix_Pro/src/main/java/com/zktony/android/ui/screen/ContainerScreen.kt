@@ -3,6 +3,7 @@ package com.zktony.android.ui.screen
 import android.graphics.Point
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,32 +20,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imeAnimationSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.MoveUp
 import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,10 +54,14 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -190,9 +192,9 @@ fun ContainerMainPage(
                     } else {
                         MaterialTheme.colorScheme.surfaceVariant
                     }
-                    OutlinedCard(
+                    Card(
                         modifier = Modifier
-                            .wrapContentHeight()
+                            .height(48.dp)
                             .clickable {
                                 if (it.id == uiState.selected) {
                                     toggleSelected(0L)
@@ -203,24 +205,24 @@ fun ContainerMainPage(
                         colors = CardDefaults.cardColors(containerColor = background),
                     ) {
                         Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Icon(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .padding(start = 16.dp),
-                                imageVector = Icons.Default.Dashboard,
+                            Image(
+                                modifier = Modifier.size(32.dp),
+                                painter = painterResource(id = R.drawable.ic_module),
                                 contentDescription = null,
                             )
                             Text(
-                                modifier = Modifier.padding(horizontal = 16.dp),
                                 text = it.name,
                                 style = MaterialTheme.typography.bodyLarge,
                                 maxLines = 1,
                             )
                             Spacer(modifier = Modifier.weight(1f))
                             Text(
-                                modifier = Modifier.padding(horizontal = 16.dp),
                                 text = it.createTime.simpleDateFormat("yyyy - MM - dd"),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
@@ -250,7 +252,8 @@ fun ContainerMainPage(
                 Icon(
                     modifier = Modifier.size(36.dp),
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(id = R.string.add),
+                    contentDescription = null,
+                    tint = Color.Black,
                 )
             }
 
@@ -274,7 +277,7 @@ fun ContainerMainPage(
                     Icon(
                         modifier = Modifier.size(36.dp),
                         imageVector = Icons.Default.Delete,
-                        contentDescription = stringResource(id = R.string.delete),
+                        contentDescription = null,
                         tint = if (count == 1) Color.Red else Color.Black,
                     )
                 }
@@ -291,6 +294,7 @@ fun ContainerMainPage(
                         modifier = Modifier.size(36.dp),
                         imageVector = Icons.Default.Edit,
                         contentDescription = null,
+                        tint = Color.Black,
                     )
                 }
             }
@@ -308,8 +312,8 @@ fun ContainerEditPage(
 ) {
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
-    var y by remember { mutableStateOf(entity.axis[0].format(2)) }
-    var z by remember { mutableStateOf(entity.axis[1].format(2)) }
+    var y by remember { mutableStateOf(entity.axis[0].format(1)) }
+    var z by remember { mutableStateOf(entity.axis[1].format(1)) }
 
     LazyColumn(
         modifier = modifier
@@ -318,7 +322,7 @@ fun ContainerEditPage(
             .padding(8.dp)
             .background(
                 color = MaterialTheme.colorScheme.background,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.medium,
             ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -342,32 +346,23 @@ fun ContainerEditPage(
                     .fillMaxWidth()
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                TextField(
-                    modifier = Modifier
-                        .weight(2f)
-                        .padding(horizontal = 16.dp),
-                    shape = MaterialTheme.shapes.large,
-                    value = y,
-                    onValueChange = { y = it },
-                    label = { Text(text = "容器位置") },
-                    textStyle = TextStyle(
-                        fontSize = 24.sp,
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                    ),
-                    trailingIcon = {
-                        Icon(
-                            modifier = Modifier
-                                .clickable { y = "" },
-                            imageVector = Icons.Outlined.Clear,
-                            contentDescription = null,
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    shape = MaterialTheme.shapes.medium,
+                    value = TextFieldValue(text = y, selection = TextRange(y.length)),
+                    onValueChange = { y = it.text },
+                    leadingIcon = {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = "容器位置"
                         )
                     },
+                    textStyle = TextStyle(
+                        fontSize = 24.sp,
+                        textAlign = TextAlign.Center,
+                    ),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,
                         imeAction = ImeAction.Done,
@@ -379,22 +374,20 @@ fun ContainerEditPage(
                     ),
                     singleLine = true,
                 )
-                FloatingActionButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp),
+
+                Button(
+                    modifier = Modifier.width(156.dp),
                     onClick = { softKeyboard?.hide() },
                 ) {
                     Icon(
-                        modifier = Modifier.size(36.dp),
-                        imageVector = Icons.Filled.MoveUp,
+                        modifier = Modifier.size(32.dp),
+                        imageVector = Icons.Filled.ArrowForward,
                         contentDescription = null,
                     )
                 }
-                FloatingActionButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp),
+                Button(
+                    modifier = Modifier.width(156.dp),
+                    enabled = (y.toFloatOrNull() ?: 0f) != entity.axis[0],
                     onClick = {
                         softKeyboard?.hide()
                         scope.launch {
@@ -411,7 +404,7 @@ fun ContainerEditPage(
                     },
                 ) {
                     Icon(
-                        modifier = Modifier.size(36.dp),
+                        modifier = Modifier.size(32.dp),
                         imageVector = Icons.Filled.Save,
                         contentDescription = null,
                     )
@@ -426,32 +419,23 @@ fun ContainerEditPage(
                     .fillMaxWidth()
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                TextField(
-                    modifier = Modifier
-                        .weight(2f)
-                        .padding(horizontal = 16.dp),
-                    shape = MaterialTheme.shapes.large,
-                    value = z,
-                    onValueChange = { z = it },
-                    label = { Text(text = "下降高度") },
-                    textStyle = TextStyle(
-                        fontSize = 24.sp,
-                    ),
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent,
-                        disabledContainerColor = Color.Transparent,
-                    ),
-                    trailingIcon = {
-                        Icon(
-                            modifier = Modifier
-                                .clickable { z = "" },
-                            imageVector = Icons.Outlined.Clear,
-                            contentDescription = null,
+                OutlinedTextField(
+                    modifier = Modifier.weight(1f),
+                    shape = MaterialTheme.shapes.medium,
+                    value = TextFieldValue(text = z, selection = TextRange(z.length)),
+                    onValueChange = { z = it.text },
+                    leadingIcon = {
+                        Text(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            text = "下降高度"
                         )
                     },
+                    textStyle = TextStyle(
+                        fontSize = 24.sp,
+                        textAlign = TextAlign.Center,
+                    ),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,
                         imeAction = ImeAction.Done,
@@ -463,22 +447,19 @@ fun ContainerEditPage(
                     ),
                     singleLine = true,
                 )
-                FloatingActionButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp),
+                Button(
+                    modifier = Modifier.width(156.dp),
                     onClick = { softKeyboard?.hide() },
                 ) {
                     Icon(
-                        modifier = Modifier.size(36.dp),
-                        imageVector = Icons.Filled.MoveUp,
+                        modifier = Modifier.size(32.dp),
+                        imageVector = Icons.Filled.ArrowForward,
                         contentDescription = null,
                     )
                 }
-                FloatingActionButton(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(horizontal = 16.dp),
+                Button(
+                    modifier = Modifier.width(156.dp),
+                    enabled = (z.toFloatOrNull() ?: 0f) != entity.axis[1],
                     onClick = {
                         softKeyboard?.hide()
                         scope.launch {
@@ -495,7 +476,7 @@ fun ContainerEditPage(
                     },
                 ) {
                     Icon(
-                        modifier = Modifier.size(36.dp),
+                        modifier = Modifier.size(32.dp),
                         imageVector = Icons.Filled.Save,
                         contentDescription = null,
                     )

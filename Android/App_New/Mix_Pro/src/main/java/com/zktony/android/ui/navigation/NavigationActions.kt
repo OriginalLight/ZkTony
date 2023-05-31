@@ -1,17 +1,5 @@
 package com.zktony.android.ui.navigation
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Balance
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Dashboard
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Balance
-import androidx.compose.material.icons.outlined.Code
-import androidx.compose.material.icons.outlined.Dashboard
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.zktony.android.R
@@ -29,8 +17,7 @@ object Route {
 
 data class TopLevelDestination(
     val route: String,
-    val selectedIcon: ImageVector,
-    val unselectedIcon: ImageVector,
+    val imageId: Int,
     val iconTextId: Int
 )
 
@@ -56,32 +43,27 @@ class NavigationActions(private val navController: NavHostController) {
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
         route = Route.HOME,
-        selectedIcon = Icons.Filled.Home,
-        unselectedIcon = Icons.Outlined.Home,
+        imageId = R.drawable.ic_home,
         iconTextId = R.string.tab_home
     ),
     TopLevelDestination(
         route = Route.PROGRAM,
-        selectedIcon = Icons.Filled.Code,
-        unselectedIcon = Icons.Outlined.Code,
+        imageId = R.drawable.ic_flow,
         iconTextId = R.string.tab_program
     ),
     TopLevelDestination(
         route = Route.CONTAINER,
-        selectedIcon = Icons.Filled.Dashboard,
-        unselectedIcon = Icons.Outlined.Dashboard,
+        imageId = R.drawable.ic_module,
         iconTextId = R.string.tab_container
     ),
     TopLevelDestination(
         route = Route.CALIBRATION,
-        selectedIcon = Icons.Filled.Balance,
-        unselectedIcon = Icons.Outlined.Balance,
+        imageId = R.drawable.ic_scale,
         iconTextId = R.string.tab_calibration
     ),
     TopLevelDestination(
         route = Route.SETTING,
-        selectedIcon = Icons.Filled.Settings,
-        unselectedIcon = Icons.Outlined.Settings,
+        imageId = R.drawable.ic_settings,
         iconTextId = R.string.tab_setting
     )
 )

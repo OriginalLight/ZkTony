@@ -94,13 +94,9 @@ fun AppNavigationRail(
                             selected = selectedDestination == destination.route,
                             onClick = { navigateToTopLevelDestination(destination) },
                             icon = {
-                                Icon(
+                                Image(
                                     modifier = Modifier.size(36.dp),
-                                    imageVector = if (selectedDestination == destination.route) {
-                                        destination.selectedIcon
-                                    } else {
-                                        destination.unselectedIcon
-                                    },
+                                    painter = painterResource(id = destination.imageId),
                                     contentDescription = stringResource(id = destination.iconTextId),
                                 )
                             },
@@ -184,13 +180,9 @@ fun PermanentNavigationDrawerContent(
                                 )
                             },
                             icon = {
-                                Icon(
+                                Image(
                                     modifier = Modifier.size(36.dp),
-                                    imageVector = if (selectedDestination == destination.route) {
-                                        destination.selectedIcon
-                                    } else {
-                                        destination.unselectedIcon
-                                    },
+                                    painter = painterResource(id = destination.imageId),
                                     contentDescription = stringResource(id = destination.iconTextId),
                                 )
                             },

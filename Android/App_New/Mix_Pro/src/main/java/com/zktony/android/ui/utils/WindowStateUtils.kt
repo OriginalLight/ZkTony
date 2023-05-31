@@ -8,5 +8,5 @@ enum class NavigationType {
 }
 
 enum class PageEnum {
-    ADD, AUTHENTICATION, DETAIL, EDIT, MAIN, TRAVEL_EDIT, WASTE_EDIT,
+    ADD, AUTHENTICATION, EDIT, MAIN,
 }

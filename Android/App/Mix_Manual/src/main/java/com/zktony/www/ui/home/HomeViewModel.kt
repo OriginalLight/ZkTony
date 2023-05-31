@@ -94,21 +94,6 @@ class HomeViewModel constructor(
         _uiState.value = _uiState.value.copy(job = job)
     }
 
-    fun stop() {
-        viewModelScope.launch {
-            asyncHex {
-                pa = "10"
-            }
-            _uiState.value = _uiState.value.copy(
-                time = 0L,
-                previous = !_uiState.value.previous
-            )
-            updateValue()
-            _uiState.value.job?.cancel()
-            _uiState.value = _uiState.value.copy(job = null)
-        }
-    }
-
     /**
      * 填充促凝剂
      */
@@ -356,6 +341,7 @@ class HomeViewModel constructor(
 
     private fun updateCache() {
         viewModelScope.launch {
+            delay(100L)
             val cacheList = _uiState.value.cacheList.filter { it.type == getType() }
             if (cacheList.isEmpty()) {
                 val cache = Cache(

@@ -3,7 +3,9 @@ package com.zktony.android.ui.screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.logic.data.dao.CalibrationDao
+import com.zktony.android.logic.data.entities.CalibrationData
 import com.zktony.android.logic.data.entities.CalibrationEntity
+import com.zktony.android.logic.ext.syncTransmit
 import com.zktony.android.ui.utils.PageEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,8 +73,41 @@ class CalibrationViewModel constructor(
         }
     }
 
-    fun addLiquid(i: Int, fl: Float) {
+    fun addLiquid(index: Int) {
+        viewModelScope.launch {
+            syncTransmit {
+                when (index) {
+                    0 -> m3(3200L * 10)
+                    1 -> m4(3200L * 10)
+                }
+            }
+        }
+    }
 
+    fun deleteData(data: CalibrationData) {
+        viewModelScope.launch {
+            val entity = _uiState.value.entities.find { it.id == _uiState.value.selected }
+            if (entity != null) {
+                dao.update(entity.copy(data = entity.data - data))
+            }
+        }
+    }
+
+    fun insertData(index: Int, volume: Double) {
+        viewModelScope.launch {
+            val entity = _uiState.value.entities.find { it.id == _uiState.value.selected }
+            if (entity != null) {
+                dao.update(
+                    entity.copy(
+                        data = entity.data + CalibrationData(
+                            index = index,
+                            pulse = 3200 * 10,
+                            volume = volume,
+                        )
+                    )
+                )
+            }
+        }
     }
 }
 

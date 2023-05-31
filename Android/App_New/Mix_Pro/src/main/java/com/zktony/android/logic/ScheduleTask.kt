@@ -2,7 +2,6 @@ package com.zktony.android.logic
 
 import com.zktony.android.logic.data.dao.CalibrationDao
 import com.zktony.android.logic.data.dao.MotorDao
-import com.zktony.android.logic.data.entities.CalibrationEntity
 import com.zktony.android.logic.data.entities.MotorEntity
 import com.zktony.core.ext.logi
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +24,7 @@ class ScheduleTask constructor(
      *  0: Y轴 1: 泵1 2: 泵2 1: 泵3
      */
     val hpm: MutableMap<Int, MotorEntity> = ConcurrentHashMap()
-    val hpc: MutableMap<Int, Float> = ConcurrentHashMap()
+    val hpc: MutableMap<Int, Double> = ConcurrentHashMap()
 
     init {
         scope.launch {
@@ -52,20 +51,21 @@ class ScheduleTask constructor(
                             calibrationDao.update(it[0].copy(active = true))
                         } else {
                             hpc.clear()
-                            hpc[0] = 10f
-                            hpc[1] = 10f
-                            hpc[2] = 10f
-                            active.vps().forEachIndexed { index, avgRate ->
-                                hpc[index + 3] = 100f * avgRate
+                            hpc[0] = 10.0 / 3200
+                            hpc[1] = 10.0 / 3200
+                            hpc[2] = 10.0 / 3200
+                            active.vps().forEachIndexed { index, vps ->
+                                hpc[index + 3] = vps
                             }
                         }
                     } else {
-                        calibrationDao.insert(
-                            CalibrationEntity(
-                                name = "Default",
-                                active = true,
-                            )
-                        )
+                        hpc.clear()
+                        hpc[0] = 10.0 / 3200
+                        hpc[1] = 10.0 / 3200
+                        hpc[2] = 10.0 / 3200
+                        repeat(13) { index ->
+                            hpc[index + 3] = 0.01
+                        }
                     }
                 }
             }

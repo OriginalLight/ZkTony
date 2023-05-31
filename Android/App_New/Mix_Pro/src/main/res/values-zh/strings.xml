@@ -35,11 +35,17 @@
     <string name="maximum_stroke">最大行程</string>
     <string name="waste_tank">废液槽坐标</string>
     <string name="add">添加</string>
-    <string name="expect">预计 μL</string>
-    <string name="actual">实际 μL</string>
     <string name="save_success">保存成功</string>
     <string name="authentication">权限认证</string>
     <string name="time_out">超时</string>
     <string name="notice_content">1、请按照说明书进行操作\n2、请先填充促凝剂再填充胶液\n3、灌胶中请将针头贴紧胶板开口\n4、使用中请尽可能保持管路中液体处于流动状态\n5、灌装两块凝胶之间的时间间隔不宜过长\n6、灌胶完成后用清水冲洗管路避免凝胶堵塞管路</string>
     <string name="notice">通知</string>
+    <string name="x_axis">X 轴</string>
+    <string name="y_axis">Y 轴</string>
+    <string name="z_axis">Z 轴</string>
+    <string name="volume">出液量 μL</string>
+    <string name="colloid">胶体</string>
+    <string name="coagulant">促凝剂</string>
+    <string name="glue_making">制胶</string>
+    <string name="pre_drain">预排液</string>
 </resources>

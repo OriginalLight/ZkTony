@@ -9,7 +9,7 @@ import com.zktony.core.ext.nextId
 data class CalibrationData(
     val id: Long = nextId(),
     val index: Int = 0,
-    val expect: Float = 100f,
-    val actual: Float = 100f,
-    val percent: Float = actual / expect,
+    val pulse: Int = 3200,
+    val volume: Double = 100.0,
+    val vps: Double = volume / pulse,
 )

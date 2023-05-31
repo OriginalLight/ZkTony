@@ -46,7 +46,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                             start.text =
                                 if (it.previous) getString(R.string.pre_drainage) else getString(com.zktony.core.R.string.start)
                             mode.isVisible = it.job == null
-//                            stop.isVisible = it.job != null
 
                             title.text =
                                 if (it.mode) getString(R.string.mixer_mode) else getString(R.string.standard_mode)

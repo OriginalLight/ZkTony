@@ -2,6 +2,7 @@ package com.zktony.android.ui.screen
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,9 +18,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Rocket
-import androidx.compose.material.icons.filled.Speed
-import androidx.compose.material.icons.filled.Toys
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -36,6 +34,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -212,9 +211,9 @@ fun MotorEditPage(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
+            Image(
                 modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.Speed,
+                painter = painterResource(id = R.drawable.ic_speed),
                 contentDescription = stringResource(id = R.string.speed)
             )
             Text(
@@ -240,9 +239,9 @@ fun MotorEditPage(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
+            Image(
                 modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.Rocket,
+                painter = painterResource(id = R.drawable.ic_rocket),
                 contentDescription = stringResource(id = R.string.acceleration)
             )
             Text(
@@ -268,9 +267,9 @@ fun MotorEditPage(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
+            Image(
                 modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.Toys,
+                painter = painterResource(id = R.drawable.ic_turtle),
                 contentDescription = stringResource(id = R.string.deceleration)
             )
             Text(

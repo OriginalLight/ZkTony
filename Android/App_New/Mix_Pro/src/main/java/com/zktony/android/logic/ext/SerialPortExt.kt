@@ -203,9 +203,10 @@ class DV {
  *
  * @param block Compose.() -> Unit
  */
-suspend fun syncHex(block: DV.() -> Unit, timeOut: Long = 5000L) {
+suspend fun syncTransmit(timeOut: Long = 5000L, block: DV.() -> Unit) {
     val dv = DV().apply(block)
     try {
+        setLock(dv.indexList)
         withTimeout(timeOut) {
             sendProtocol {
                 data = dv.byteList.toByteArray()
@@ -217,6 +218,7 @@ suspend fun syncHex(block: DV.() -> Unit, timeOut: Long = 5000L) {
         }
     } catch (e: Exception) {
         freeLock(dv.indexList)
+
     }
 }
 
@@ -227,7 +229,7 @@ suspend fun syncHex(block: DV.() -> Unit, timeOut: Long = 5000L) {
  *
  * @param block Compose.() -> Unit
  */
-fun asyncHex(block: DV.() -> Unit) {
+fun asyncTransmit(block: DV.() -> Unit) {
     val dv = DV().apply(block)
     sendProtocol {
         data = dv.byteList.toByteArray()

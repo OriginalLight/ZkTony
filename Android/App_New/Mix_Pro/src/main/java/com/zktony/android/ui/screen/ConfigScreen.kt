@@ -4,25 +4,28 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imeAnimationSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.ElevatedButton
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +33,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,11 +41,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -64,7 +63,6 @@ import com.zktony.android.ui.components.ZkTonyTopAppBar
 import com.zktony.android.ui.utils.PageEnum
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.format
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -110,377 +108,245 @@ fun ConfigScreen(
             ConfigMainPage(
                 modifier = Modifier,
                 uiState = uiState,
-                navigationTo = viewModel::navigationTo,
-            )
-        }
-        AnimatedVisibility(visible = uiState.page == PageEnum.TRAVEL_EDIT) {
-            TravelEditPage(modifier = Modifier,
-                navigationTo = viewModel::navigationTo,
                 setTravel = viewModel::setTravel,
-                travel = uiState.settings.travelList.ifEmpty { listOf(0f, 0f, 0f) },
-                showSnackBar = { message ->
-                    scope.launch {
-                        snackbarHostState.showSnackbar(message)
-                    }
-                })
-        }
-        AnimatedVisibility(visible = uiState.page == PageEnum.WASTE_EDIT) {
-            WasteEditPage(modifier = Modifier,
-                navigationTo = viewModel::navigationTo,
                 setWaste = viewModel::setWaste,
-                waste = uiState.settings.wasteList.ifEmpty { listOf(0f, 0f, 0f) },
+                moveTo = viewModel::moveTo,
                 showSnackBar = { message ->
                     scope.launch {
                         snackbarHostState.showSnackbar(message)
                     }
-                })
+                }
+            )
         }
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun ConfigMainPage(
     modifier: Modifier = Modifier,
-    navigationTo: (PageEnum) -> Unit = {},
     uiState: ConfigUiState,
+    setTravel: (Int, Float) -> Unit = { _, _ -> },
+    setWaste: (Int, Float) -> Unit = { _, _ -> },
+    moveTo: (Int, Float) -> Unit = { _, _ -> },
+    showSnackBar: (String) -> Unit = {},
 ) {
+    val softKeyboard = LocalSoftwareKeyboardController.current
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.imeAnimationSource)
             .padding(8.dp)
             .background(
-                color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
+                color = MaterialTheme.colorScheme.surface,
+                shape = MaterialTheme.shapes.medium,
             ),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        item {
-            ElevatedCard(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .clickable { navigationTo(PageEnum.TRAVEL_EDIT) },
-            ) {
+
+        val travel = uiState.settings.travelList.ifEmpty { listOf(0f, 0f, 0f) }
+        travel.forEachIndexed { index, item ->
+            item {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Icon(
+                    var text by remember { mutableStateOf(item.format(1)) }
+
+                    ElevatedCard(
                         modifier = Modifier
-                            .size(48.dp)
-                            .padding(start = 16.dp),
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = null,
-                    )
+                            .height(48.dp)
+                            .weight(1f),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .padding(start = 16.dp),
+                                painter = painterResource(id = R.drawable.ic_distance),
+                                contentDescription = null,
+                            )
 
-                    Text(
-                        modifier = Modifier.padding(start = 8.dp),
-                        text = stringResource(id = R.string.maximum_stroke),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                            Text(
+                                modifier = Modifier.padding(start = 8.dp),
+                                text = stringResource(id = R.string.maximum_stroke) + " " +
+                                        when (index) {
+                                            0 -> stringResource(id = R.string.x_axis)
+                                            1 -> stringResource(id = R.string.y_axis)
+                                            2 -> stringResource(id = R.string.z_axis)
+                                            else -> ""
+                                        },
+                                style = MaterialTheme.typography.bodyLarge
+                            )
 
-                    Spacer(modifier = Modifier.weight(1f))
+                            Spacer(modifier = Modifier.weight(1f))
 
-                    val list = uiState.settings.travelList.ifEmpty { listOf(0f, 0f, 0f) }
-                    Text(
-                        modifier = Modifier.padding(end = 16.dp),
-                        text = "( ${list[0].format()} , ${list[1].format()} , ${list[2].format()} )",
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
+                            Column(
+                                modifier = Modifier
+                                    .width(196.dp)
+                                    .padding(end = 16.dp),
+                            ) {
+                                CustomTextField(
+                                    modifier = Modifier.weight(1f),
+                                    value = TextFieldValue(text, TextRange(text.length)),
+                                    onValueChange = { text = it.text },
+                                    textStyle = TextStyle(
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center,
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Decimal,
+                                        imeAction = ImeAction.Done,
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            softKeyboard?.hide()
+                                        }
+                                    )
+                                )
+                                Divider()
+                            }
+                        }
+                    }
+
+
+                    Button(
+                        modifier = Modifier.width(128.dp),
+                        enabled = !uiState.lock,
+                        onClick = { moveTo(index, text.toFloatOrNull() ?: 0f) },
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = null,
+                        )
+                    }
+
+                    AnimatedVisibility(visible = (text.toFloatOrNull() ?: 0f) != item) {
+                        Button(
+                            modifier = Modifier.width(128.dp),
+                            onClick = {
+                                val value = text.toFloatOrNull() ?: 0f
+                                text = value.format(1)
+                                setTravel(index, value)
+                                showSnackBar(Ext.ctx.getString(R.string.save_success))
+                            },
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = Icons.Filled.Save,
+                                contentDescription = null,
+                            )
+                        }
+                    }
                 }
             }
         }
-        item {
-            ElevatedCard(
-                modifier = Modifier
-                    .wrapContentHeight()
-                    .clickable { navigationTo(PageEnum.WASTE_EDIT) },
-            ) {
+
+        val waste = uiState.settings.wasteList.ifEmpty { listOf(0f, 0f, 0f) }
+        waste.forEachIndexed { index, item ->
+            item {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Image(
+                    var text by remember { mutableStateOf(item.format(1)) }
+
+                    ElevatedCard(
                         modifier = Modifier
-                            .size(48.dp)
-                            .padding(start = 16.dp),
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = null,
-                    )
+                            .height(48.dp)
+                            .weight(1f),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .padding(start = 16.dp),
+                                painter = painterResource(id = R.drawable.ic_abscissa),
+                                contentDescription = null,
+                            )
 
-                    Text(
-                        modifier = Modifier.padding(start = 8.dp),
-                        text = stringResource(id = R.string.waste_tank),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                            Text(
+                                modifier = Modifier.padding(start = 8.dp),
+                                text = stringResource(id = R.string.waste_tank) + " " +
+                                        when (index) {
+                                            0 -> stringResource(id = R.string.x_axis)
+                                            1 -> stringResource(id = R.string.y_axis)
+                                            2 -> stringResource(id = R.string.z_axis)
+                                            else -> ""
+                                        },
+                                style = MaterialTheme.typography.bodyLarge
+                            )
 
-                    Spacer(modifier = Modifier.weight(1f))
+                            Spacer(modifier = Modifier.weight(1f))
 
-                    val list = uiState.settings.wasteList.ifEmpty { listOf(0f, 0f, 0f) }
-                    Text(
-                        modifier = Modifier.padding(end = 16.dp),
-                        text = "( ${list[0].format()} , ${list[1].format()} , ${list[2].format()} )",
-                        style = MaterialTheme.typography.bodyLarge,
-                    )
+                            Column(
+                                modifier = Modifier
+                                    .width(196.dp)
+                                    .padding(end = 16.dp),
+                            ) {
+                                CustomTextField(
+                                    modifier = Modifier.weight(1f),
+                                    value = TextFieldValue(text, TextRange(text.length)),
+                                    onValueChange = { text = it.text },
+                                    textStyle = TextStyle(
+                                        fontSize = 24.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        textAlign = TextAlign.Center,
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Decimal,
+                                        imeAction = ImeAction.Done,
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            softKeyboard?.hide()
+                                        }
+                                    )
+                                )
+                                Divider()
+                            }
+                        }
+                    }
+
+
+                    Button(
+                        modifier = Modifier.width(128.dp),
+                        enabled = !uiState.lock,
+                        onClick = { moveTo(index, text.toFloatOrNull() ?: 0f) },
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.Filled.ArrowForward,
+                            contentDescription = null,
+                        )
+                    }
+
+                    AnimatedVisibility(visible = (text.toFloatOrNull() ?: 0f) != item) {
+                        Button(
+                            modifier = Modifier.width(128.dp),
+                            onClick = {
+                                val value = text.toFloatOrNull() ?: 0f
+                                text = value.format(1)
+                                setWaste(index, value)
+                                showSnackBar(Ext.ctx.getString(R.string.save_success))
+                            },
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = Icons.Filled.Save,
+                                contentDescription = null,
+                            )
+                        }
+                    }
                 }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun TravelEditPage(
-    modifier: Modifier = Modifier,
-    navigationTo: (PageEnum) -> Unit = {},
-    setTravel: (Float, Float, Float) -> Unit = { _, _, _ -> },
-    travel: List<Float> = listOf(0f, 0f, 0f),
-    showSnackBar: (String) -> Unit = {},
-) {
-    var x by remember { mutableStateOf(travel[0].format()) }
-    var y by remember { mutableStateOf(travel[1].format()) }
-    var z by remember { mutableStateOf(travel[2].format()) }
-    val focusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
-    val softKeyboard = LocalSoftwareKeyboardController.current
-
-    LaunchedEffect(Unit) {
-        delay(100) //延迟操作(关键点)
-        focusRequester.requestFocus()
-        softKeyboard?.show()
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Spacer(modifier = Modifier.height(128.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                modifier = Modifier
-                    .size(84.dp)
-                    .padding(end = 16.dp),
-                imageVector = Icons.Default.Settings,
-                contentDescription = null,
-            )
-            Text(
-                text = "(",
-                fontSize = 30.sp,
-            )
-            CustomTextField(
-                modifier = Modifier
-                    .width(128.dp)
-                    .focusRequester(focusRequester),
-                value = TextFieldValue(x.format(), TextRange(x.format().length)),
-                onValueChange = { x = it.text },
-                textStyle = TextStyle(
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                ),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(FocusDirection.Next)
-                })
-            )
-            Text(
-                text = ",",
-                fontSize = 30.sp,
-            )
-            CustomTextField(
-                modifier = Modifier.width(128.dp),
-                value = TextFieldValue(y.format(), TextRange(y.format().length)),
-                onValueChange = { y = it.text },
-                textStyle = TextStyle(
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                ),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(FocusDirection.Next)
-                })
-            )
-            Text(
-                text = ",",
-                fontSize = 30.sp,
-            )
-            CustomTextField(
-                modifier = Modifier.width(128.dp),
-                value = TextFieldValue(z.format(), TextRange(z.format().length)),
-                onValueChange = { z = it.text },
-                textStyle = TextStyle(
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                keyboardActions = KeyboardActions(onDone = {
-                    softKeyboard?.hide()
-                })
-            )
-            Text(
-                text = ")",
-                fontSize = 30.sp,
-            )
-        }
-
-        AnimatedVisibility(visible = travel[0].format() != x || travel[1].format() != y || travel[2].format() != z) {
-            ElevatedButton(
-                modifier = Modifier
-                    .width(128.dp)
-                    .padding(16.dp),
-                onClick = {
-                    setTravel(
-                        x.toFloatOrNull() ?: 0f, y.toFloatOrNull() ?: 0f, z.toFloatOrNull() ?: 0f
-                    )
-                    navigationTo(PageEnum.MAIN)
-                    showSnackBar(Ext.ctx.getString(R.string.save_success))
-                },
-            ) {
-                Icon(
-                    modifier = Modifier.size(36.dp),
-                    imageVector = Icons.Filled.ArrowForward,
-                    contentDescription = stringResource(id = R.string.save),
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun WasteEditPage(
-    modifier: Modifier = Modifier,
-    setWaste: (Float, Float, Float) -> Unit = { _, _, _ -> },
-    waste: List<Float> = listOf(0f, 0f, 0f),
-    navigationTo: (PageEnum) -> Unit = {},
-    showSnackBar: (String) -> Unit = {},
-) {
-    var x by remember { mutableStateOf(waste[0].format()) }
-    var y by remember { mutableStateOf(waste[1].format()) }
-    var z by remember { mutableStateOf(waste[2].format()) }
-    val focusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
-    val softKeyboard = LocalSoftwareKeyboardController.current
-
-    LaunchedEffect(Unit) {
-        delay(100) //延迟操作(关键点)
-        focusRequester.requestFocus()
-        softKeyboard?.show()
-    }
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
-            ),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Spacer(modifier = Modifier.height(128.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                modifier = Modifier
-                    .size(84.dp)
-                    .padding(end = 16.dp),
-                imageVector = Icons.Default.Settings,
-                contentDescription = null,
-            )
-            Text(
-                text = "(",
-                fontSize = 30.sp,
-            )
-            CustomTextField(
-                modifier = Modifier
-                    .width(128.dp)
-                    .focusRequester(focusRequester),
-                value = TextFieldValue(x.format(), TextRange(x.format().length)),
-                onValueChange = { x = it.text },
-                textStyle = TextStyle(
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                ),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(FocusDirection.Next)
-                })
-            )
-            Text(
-                text = ",",
-                fontSize = 30.sp,
-            )
-            CustomTextField(
-                modifier = Modifier.width(128.dp),
-                value = TextFieldValue(y.format(), TextRange(y.format().length)),
-                onValueChange = { y = it.text },
-                textStyle = TextStyle(
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                ),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal, imeAction = ImeAction.Next
-                ),
-                keyboardActions = KeyboardActions(onNext = {
-                    focusManager.moveFocus(FocusDirection.Next)
-                })
-            )
-            Text(
-                text = ",",
-                fontSize = 30.sp,
-            )
-            CustomTextField(
-                modifier = Modifier.width(128.dp),
-                value = TextFieldValue(z.format(), TextRange(z.format().length)),
-                onValueChange = { z = it.text },
-                textStyle = TextStyle(
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                ),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                keyboardActions = KeyboardActions(onDone = {
-                    softKeyboard?.hide()
-                })
-            )
-            Text(
-                text = ")",
-                fontSize = 30.sp,
-            )
-        }
-        AnimatedVisibility(visible = waste[0].format() != x || waste[1].format() != y || waste[2].format() != z) {
-            ElevatedButton(
-                modifier = Modifier
-                    .width(128.dp)
-                    .padding(16.dp),
-                onClick = {
-                    setWaste(
-                        x.toFloatOrNull() ?: 0f, y.toFloatOrNull() ?: 0f, z.toFloatOrNull() ?: 0f
-                    )
-                    navigationTo(PageEnum.MAIN)
-                    showSnackBar(Ext.ctx.getString(R.string.save_success))
-                },
-            ) {
-                Icon(
-                    modifier = Modifier.size(36.dp),
-                    imageVector = Icons.Filled.ArrowForward,
-                    contentDescription = stringResource(id = R.string.save),
-                )
             }
         }
     }
@@ -492,16 +358,4 @@ fun ConfigMainPagePreview() {
     ConfigMainPage(
         uiState = ConfigUiState()
     )
-}
-
-@Composable
-@Preview(showBackground = true, widthDp = 960)
-fun TravelEditPagePreview() {
-    TravelEditPage()
-}
-
-@Composable
-@Preview(showBackground = true, widthDp = 960)
-fun WasteEditPagePreview() {
-    WasteEditPage()
 }

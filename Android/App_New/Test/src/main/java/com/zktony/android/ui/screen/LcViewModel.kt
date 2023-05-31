@@ -84,7 +84,7 @@ class LcViewModel : ViewModel() {
                     }
                 }
                 launch {
-                    val maxIndex = 6
+                    val maxIndex = 8
                     val indexList = mutableListOf<Int>()
                     var bytes = byteArrayOf()
                     repeat(maxIndex) {

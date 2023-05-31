@@ -23,7 +23,7 @@ private var z: AtomicLong = AtomicLong(0L)
  * @return Int
  */
 fun pulse(index: Int, dv: Float): Long {
-    val p = (dv / scheduleTask.hpc[index]!! * 3200).toLong()
+    val p = (dv / scheduleTask.hpc[index]!!).toLong()
     return when (index) {
         0 -> {
             val d = p - x.get()

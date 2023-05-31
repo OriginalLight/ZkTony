@@ -23,19 +23,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,12 +41,10 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,10 +56,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -192,10 +189,9 @@ fun ProgramMainPage(
                     } else {
                         MaterialTheme.colorScheme.surfaceVariant
                     }
-
-                    OutlinedCard(
+                    Card(
                         modifier = Modifier
-                            .wrapContentHeight()
+                            .height(48.dp)
                             .clickable {
                                 if (it.id == uiState.selected) {
                                     toggleSelected(0L)
@@ -206,24 +202,24 @@ fun ProgramMainPage(
                         colors = CardDefaults.cardColors(containerColor = background),
                     ) {
                         Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
                             verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
                         ) {
                             Image(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .padding(start = 16.dp),
-                                imageVector = Icons.Default.Code,
+                                modifier = Modifier.size(32.dp),
+                                painter = painterResource(id = R.drawable.ic_flow),
                                 contentDescription = null,
                             )
                             Text(
-                                modifier = Modifier.padding(horizontal = 16.dp),
                                 text = it.name,
                                 style = MaterialTheme.typography.bodyLarge,
                                 maxLines = 1,
                             )
                             Spacer(modifier = Modifier.weight(1f))
                             Text(
-                                modifier = Modifier.padding(horizontal = 16.dp),
                                 text = it.createTime.simpleDateFormat("yyyy - MM - dd"),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
@@ -253,7 +249,8 @@ fun ProgramMainPage(
                 Icon(
                     modifier = Modifier.size(36.dp),
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(id = R.string.add),
+                    contentDescription = null,
+                    tint = Color.Black,
                 )
             }
             AnimatedVisibility(visible = uiState.selected != 0L) {
@@ -294,6 +291,7 @@ fun ProgramMainPage(
                         modifier = Modifier.size(36.dp),
                         imageVector = Icons.Default.Edit,
                         contentDescription = null,
+                        tint = Color.Black,
                     )
                 }
             }
@@ -379,8 +377,8 @@ fun ProgramEditPage(
                             )
                         },
                         leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Dashboard,
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_module),
                                 contentDescription = null,
                                 modifier = Modifier.size(FilterChipDefaults.IconSize),
                             )
@@ -405,34 +403,31 @@ fun ProgramEditPage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = stringResource(id = R.string.glue_making),
+                    fontSize = 20.sp
+                )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
-                    TextField(
+                    OutlinedTextField(
                         modifier = Modifier.weight(1f),
                         value = v1,
                         onValueChange = { v1 = it },
                         shape = MaterialTheme.shapes.medium,
-                        label = { Text("制胶-胶体") },
-                        textStyle = TextStyle(
-                            fontSize = 24.sp,
-                        ),
-                        colors = TextFieldDefaults.colors(
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
-                        ),
-                        trailingIcon = {
-                            Icon(
-                                modifier = Modifier
-                                    .clickable { v1 = "" },
-                                imageVector = Icons.Outlined.Clear,
-                                contentDescription = null,
+                        leadingIcon = {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                text = stringResource(id = R.string.colloid)
                             )
                         },
+                        textStyle = TextStyle(
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.Center,
+                        ),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -444,28 +439,82 @@ fun ProgramEditPage(
                             }
                         ),
                     )
-                    TextField(
+                    OutlinedTextField(
                         modifier = Modifier.weight(1f),
                         value = v2,
                         onValueChange = { v2 = it },
                         shape = MaterialTheme.shapes.medium,
-                        label = { Text("制胶-促凝剂") },
-                        textStyle = TextStyle(
-                            fontSize = 24.sp,
-                        ),
-                        colors = TextFieldDefaults.colors(
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
-                        ),
-                        trailingIcon = {
-                            Icon(
-                                modifier = Modifier
-                                    .clickable { v2 = "" },
-                                imageVector = Icons.Outlined.Clear,
-                                contentDescription = null,
+                        leadingIcon = {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                text = stringResource(id = R.string.coagulant)
                             )
                         },
+                        textStyle = TextStyle(
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.Center,
+                        ),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboard?.hide()
+                            }
+                        ),
+                    )
+                }
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    text = stringResource(id = R.string.pre_drain),
+                    fontSize = 20.sp
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier.weight(1f),
+                        value = v3,
+                        onValueChange = { v3 = it },
+                        shape = MaterialTheme.shapes.medium,
+                        leadingIcon = {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                text = stringResource(id = R.string.colloid)
+                            )
+                        },
+                        textStyle = TextStyle(
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.Center,
+                        ),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboard?.hide()
+                            }
+                        ),
+                    )
+                    OutlinedTextField(
+                        modifier = Modifier.weight(1f),
+                        value = v4,
+                        onValueChange = { v4 = it },
+                        shape = MaterialTheme.shapes.medium,
+                        leadingIcon = {
+                            Text(
+                                modifier = Modifier.padding(horizontal = 16.dp),
+                                text = stringResource(id = R.string.coagulant)
+                            )
+                        },
+                        textStyle = TextStyle(
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.Center,
+                        ),
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -479,104 +528,41 @@ fun ProgramEditPage(
                     )
                 }
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
                 ) {
-                    TextField(
-                        modifier = Modifier.weight(1f),
-                        value = v3,
-                        onValueChange = { v3 = it },
-                        shape = MaterialTheme.shapes.medium,
-                        label = { Text("预排-胶体") },
-                        textStyle = TextStyle(
-                            fontSize = 24.sp,
-                        ),
-                        colors = TextFieldDefaults.colors(
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
-                        ),
-                        trailingIcon = {
-                            Icon(
-                                modifier = Modifier
-                                    .clickable { v3 = "" },
-                                imageVector = Icons.Outlined.Clear,
-                                contentDescription = null,
-                            )
-                        },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
-                    )
-                    TextField(
-                        modifier = Modifier.weight(1f),
-                        value = v4,
-                        onValueChange = { v4 = it },
-                        shape = MaterialTheme.shapes.medium,
-                        label = { Text("预排-促凝剂") },
-                        textStyle = TextStyle(
-                            fontSize = 24.sp,
-                        ),
-                        colors = TextFieldDefaults.colors(
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedContainerColor = Color.Transparent,
-                            disabledContainerColor = Color.Transparent,
-                        ),
-                        trailingIcon = {
-                            Icon(
-                                modifier = Modifier
-                                    .clickable { v4 = "" },
-                                imageVector = Icons.Outlined.Clear,
-                                contentDescription = null,
-                            )
-                        },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
-                    )
-                }
-                AnimatedVisibility(
-                    visible = v1 != entity.volume[0].format(1)
-                            || v2 != entity.volume[1].toString()
-                            || v3 != entity.volume[2].toString()
-                            || v4 != entity.volume[3].toString(),
-                ) {
-                    FloatingActionButton(
-                        modifier = Modifier.width(128.dp),
-                        onClick = {
-                            scope.launch {
-                                update(
-                                    entity.copy(
-                                        volume = listOf(
-                                            v1.toFloatOrNull() ?: 0f,
-                                            v2.toFloatOrNull() ?: 0f,
-                                            v3.toFloatOrNull() ?: 0f,
-                                            v4.toFloatOrNull() ?: 0f,
+                    AnimatedVisibility(
+                        visible = (v1.toFloatOrNull() ?: 0f) != entity.volume[0]
+                                || (v2.toFloatOrNull() ?: 0f) != entity.volume[1]
+                                || (v3.toFloatOrNull() ?: 0f) != entity.volume[2]
+                                || (v4.toFloatOrNull() ?: 0f) != entity.volume[3],
+                    ) {
+                        Button(
+                            modifier = Modifier
+                                .width(196.dp)
+                                .padding(16.dp),
+                            onClick = {
+                                scope.launch {
+                                    update(
+                                        entity.copy(
+                                            volume = listOf(
+                                                v1.toFloatOrNull() ?: 0f,
+                                                v2.toFloatOrNull() ?: 0f,
+                                                v3.toFloatOrNull() ?: 0f,
+                                                v4.toFloatOrNull() ?: 0f,
+                                            )
                                         )
                                     )
-                                )
-                                showSnackbar("已更新数据")
-                            }
-                        },
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(32.dp),
-                            imageVector = Icons.Filled.Done,
-                            contentDescription = null,
-                        )
+                                    showSnackbar("已更新数据")
+                                }
+                            },
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(32.dp),
+                                imageVector = Icons.Filled.Done,
+                                contentDescription = null,
+                            )
+                        }
                     }
                 }
             }
