@@ -37,7 +37,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".transfer.full"
+            applicationIdSuffix = ".transfer.alpha"
             matchingFallbacks += listOf("debug", "release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -46,7 +46,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".transfer.full"
+            applicationIdSuffix = ".transfer.beta"
             matchingFallbacks += listOf("debug", "release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
