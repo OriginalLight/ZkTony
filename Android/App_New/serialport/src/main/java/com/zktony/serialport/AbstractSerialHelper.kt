@@ -30,6 +30,7 @@ abstract class AbstractSerialHelper {
 
     private var cache: ByteArray = byteArrayOf()
     var callback: (ByteArray) -> Unit = { }
+    var exception: (Exception) -> Unit = { }
 
 
     @Throws(SecurityException::class, IOException::class, InvalidParameterException::class)
@@ -93,7 +94,6 @@ abstract class AbstractSerialHelper {
                 e.printStackTrace()
             }
         }
-        if (!isOpen) return
     }
 
     /**
@@ -102,12 +102,17 @@ abstract class AbstractSerialHelper {
     private fun dataProcess(byteArray: ByteArray?) {
         if (byteArray == null) {
             if (cache.isNotEmpty()) {
-                callback.invoke(cache)
-                cache = byteArrayOf()
+                try {
+                    callback.invoke(cache)
+                } catch (e: Exception) {
+                    exception.invoke(e)
+                } finally {
+                    cache = byteArrayOf()
+                }
             }
-            return
+        } else {
+            cache += byteArray
         }
-        cache += byteArray
     }
 
     /**

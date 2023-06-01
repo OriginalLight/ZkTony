@@ -62,7 +62,6 @@ fun AppNavigationRail(
         modifier = Modifier.fillMaxHeight(),
         containerColor = MaterialTheme.colorScheme.inverseOnSurface
     ) {
-        // TODO remove custom nav rail positioning when NavRail component supports it. ticket : b/232495216
         Layout(
             modifier = Modifier.widthIn(max = 80.dp), content = {
                 Column(
@@ -188,8 +187,6 @@ fun PermanentNavigationDrawerContent(
                             },
                             colors = NavigationDrawerItemDefaults.colors(
                                 unselectedContainerColor = Color.Transparent,
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
                             ),
                             shape = CutCornerShape(topEnd = 36.dp, bottomStart = 16.dp),
                             onClick = { navigateToTopLevelDestination(destination) })

@@ -6,6 +6,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
+import com.zktony.core.BuildConfig
 import com.zktony.core.base.BaseActivity
 import com.zktony.core.ext.noticeDialog
 import com.zktony.core.ext.setLanguage
@@ -45,4 +46,5 @@ class MainActivity : BaseActivity<ActivityMainBinding>(ActivityMainBinding::infl
             newBase?.setLanguage(language)
         )
     }
+
 }

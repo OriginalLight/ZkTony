@@ -17,13 +17,12 @@ abstract class AbstractSerial : AbstractSerialHelper() {
 
     init {
         callback = {
-            try {
-                callbackProcess(it) { bytes ->
-                    byteArrayProcess(bytes)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+            callbackProcess(it) { bytes ->
+                byteArrayProcess(bytes)
             }
+        }
+        exception = {
+            it.printStackTrace()
         }
     }
 

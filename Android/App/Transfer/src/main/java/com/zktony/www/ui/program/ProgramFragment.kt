@@ -15,6 +15,7 @@ import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
 import com.zktony.core.ext.messageDialog
+import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.adapter.ProgramAdapter
 import com.zktony.www.databinding.FragmentProgramBinding
@@ -76,25 +77,37 @@ class ProgramFragment :
             with(add) {
                 clickScale()
                 clickNoRepeat(interval = 100L) {
-                    CustomDialog.build()
-                        .setCustomView(object :
-                            OnBindView<CustomDialog>(R.layout.layout_select) {
-                            override fun onBind(dialog: CustomDialog, v: View) {
-                                val zm = v.findViewById<MaterialButton>(R.id.zm)
-                                val rs = v.findViewById<MaterialButton>(R.id.rs)
-                                zm.clickNoRepeat(1000L) {
-                                    dialog.dismiss()
-                                    findNavController().navigate(R.id.action_navigation_program_to_navigation_zm)
-                                }
-                                rs.clickNoRepeat(1000L) {
-                                    dialog.dismiss()
-                                    findNavController().navigate(R.id.action_navigation_program_to_navigation_rs)
-                                }
-                            }
-                        })
-                        .setCancelable(true)
-                        .setMaskColor(Color.parseColor("#4D000000"))
-                        .show()
+                    when (BuildConfig.BUILD_TYPE) {
+                        "alpha" -> {
+                            findNavController().navigate(R.id.action_navigation_program_to_navigation_zm)
+                        }
+
+                        "beta" -> {
+                            findNavController().navigate(R.id.action_navigation_program_to_navigation_rs)
+                        }
+
+                        else -> {
+                            CustomDialog.build()
+                                .setCustomView(object :
+                                    OnBindView<CustomDialog>(R.layout.layout_select) {
+                                    override fun onBind(dialog: CustomDialog, v: View) {
+                                        val zm = v.findViewById<MaterialButton>(R.id.zm)
+                                        val rs = v.findViewById<MaterialButton>(R.id.rs)
+                                        zm.clickNoRepeat(1000L) {
+                                            dialog.dismiss()
+                                            findNavController().navigate(R.id.action_navigation_program_to_navigation_zm)
+                                        }
+                                        rs.clickNoRepeat(1000L) {
+                                            dialog.dismiss()
+                                            findNavController().navigate(R.id.action_navigation_program_to_navigation_rs)
+                                        }
+                                    }
+                                })
+                                .setCancelable(true)
+                                .setMaskColor(Color.parseColor("#4D000000"))
+                                .show()
+                        }
+                    }
                 }
             }
         }

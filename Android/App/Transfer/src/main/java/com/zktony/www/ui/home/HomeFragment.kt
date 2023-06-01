@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.lifecycle.*
 import com.google.android.material.tabs.TabLayout
 import com.zktony.core.base.BaseFragment
@@ -11,6 +12,7 @@ import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
 import com.zktony.core.utils.Constants.MAX_MOTOR
 import com.zktony.core.utils.Constants.MAX_TIME
+import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.databinding.FragmentHomeBinding
 import kotlinx.coroutines.delay
@@ -75,7 +77,10 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         viewModel.pumpUpOrBack(1, 1, i)
                     })
 
-                    bind.tabLayout.addOnTabSelectedListener(object :
+                    tabLayout.isVisible =
+                        (BuildConfig.BUILD_TYPE != "beta") && (BuildConfig.BUILD_TYPE != "alpha")
+
+                    tabLayout.addOnTabSelectedListener(object :
                         TabLayout.OnTabSelectedListener {
                         override fun onTabSelected(tab: TabLayout.Tab?) {
                             viewModel.setModel(tab?.position ?: 0, i)

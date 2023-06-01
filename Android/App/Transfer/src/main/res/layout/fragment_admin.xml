@@ -216,12 +216,14 @@
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/interval_module"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
-                        android:background="@drawable/bg_line_bottom">
+                        android:background="@drawable/bg_line_bottom"
+                        android:visibility="gone">
 
                         <ImageView
                             android:id="@+id/iv_interval"
@@ -256,12 +258,14 @@
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/duration_module"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
-                        android:background="@drawable/bg_line_bottom">
+                        android:background="@drawable/bg_line_bottom"
+                        android:visibility="gone">
 
                         <ImageView
                             android:id="@+id/iv_duration"
@@ -297,12 +301,14 @@
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/motor_module"
                         android:layout_width="match_parent"
                         android:layout_height="64dp"
                         android:layout_marginStart="16dp"
                         android:layout_marginTop="8dp"
                         android:layout_marginEnd="16dp"
-                        android:background="@drawable/bg_line_bottom">
+                        android:background="@drawable/bg_line_bottom"
+                        android:visibility="gone">
 
                         <ImageView
                             android:id="@+id/iv_motor"
@@ -527,9 +533,11 @@
             </RelativeLayout>
 
             <RelativeLayout
+                android:id="@+id/pump_module"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:visibility="gone">
 
                 <ImageButton
                     android:id="@+id/pump"

@@ -32,6 +32,24 @@ android {
             applicationIdSuffix = ".transfer.release"
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+
+        create("alpha") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".transfer.full"
+            matchingFallbacks += listOf("debug", "release")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+
+        create("beta") {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix = ".transfer.full"
+            matchingFallbacks += listOf("debug", "release")
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
     }
 
     signingConfigs {

@@ -17,6 +17,7 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
             app:tabBackground="@drawable/tab_background"
             app:tabGravity="fill"
             app:tabIndicatorColor="@color/purple_700"

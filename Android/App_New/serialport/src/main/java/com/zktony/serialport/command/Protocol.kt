@@ -14,15 +14,14 @@ class Protocol {
     var end: ByteArray = byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
 
     fun toByteArray(): ByteArray {
-        val byteArray =
-            byteArrayOf(head, id, cmd)
-                .plus(len.writeInt16LE(data.size, 0))
-                .plus(data)
-                .plus(crc)
-                .plus(end)
-        
+        val byteArray = byteArrayOf(head, id, cmd)
+            .plus(len.writeInt16LE(data.size, 0))
+            .plus(data)
+            .plus(crc)
+            .plus(end)
 
-        // replace crc
+
+        // crc
         return byteArray.replaceByteArrayBE(
             byteArray.copyOfRange(0, byteArray.size - 6).crc16LE(),
             byteArray.size - 6,

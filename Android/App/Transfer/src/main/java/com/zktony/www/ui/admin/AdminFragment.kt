@@ -110,6 +110,12 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     @SuppressLint("ClickableViewAccessibility", "HardwareIds")
     private fun initView() {
         binding.apply {
+
+            intervalModule.isVisible = BuildConfig.BUILD_TYPE != "beta"
+            durationModule.isVisible = BuildConfig.BUILD_TYPE != "beta"
+            motorModule.isVisible = BuildConfig.BUILD_TYPE != "beta"
+            pumpModule.isVisible = BuildConfig.BUILD_TYPE != "beta"
+
             tvVersionName.text = BuildConfig.VERSION_NAME
             tvDeviceName.text = BuildConfig.BUILD_TYPE
 

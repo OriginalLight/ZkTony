@@ -21,6 +21,7 @@ import com.zktony.core.utils.Constants.MAX_TIME
 import com.zktony.core.utils.Constants.MAX_VOLTAGE_RS
 import com.zktony.core.utils.Constants.MAX_VOLTAGE_ZM
 import com.zktony.datastore.ext.read
+import com.zktony.www.BuildConfig
 import com.zktony.www.R
 import com.zktony.www.core.SerialPort
 import com.zktony.www.data.dao.LogDataDao
@@ -43,8 +44,10 @@ class HomeViewModel constructor(
     private val DS: DataStore<Preferences>
 ) : BaseViewModel() {
 
-    private val _uiStateX = MutableStateFlow(HomeUiState())
-    private val _uiStateY = MutableStateFlow(HomeUiState())
+    private val _uiStateX =
+        MutableStateFlow(HomeUiState(model = if (BuildConfig.BUILD_TYPE == "beta") 1 else 0))
+    private val _uiStateY =
+        MutableStateFlow(HomeUiState(model = if (BuildConfig.BUILD_TYPE == "beta") 1 else 0))
     private val _setting = MutableStateFlow(Setting())
     private val _programList = MutableStateFlow<List<Program>>(emptyList())
     val uiStateX = _uiStateX.asStateFlow()

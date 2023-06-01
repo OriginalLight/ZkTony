@@ -47,7 +47,7 @@
     <string name="speed_hint">转速 RPM</string>
     <string name="title_admin">管理员</string>
     <string name="title_dye">染色</string>
-    <string name="title_home">转膜/染色</string>
+    <string name="title_home">主页面</string>
     <string name="title_log">日志</string>
     <string name="title_log_chart">电压图/电流图</string>
     <string name="title_program">实验程序</string>
