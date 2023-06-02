@@ -166,7 +166,7 @@ void uart_init(u32 bound){
 
 void USART1_IRQHandler(void)                	//串口1中断服务程序
 {
-	u8 Res;
+	//u8 Res;
 	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)  //接收中断
 	{
 //		 Res =USART_ReceiveData(USART1);//(USART1->DR);	//读取接收到的数据，同时硬件自动清除中断
@@ -181,46 +181,13 @@ void USART3_IRQHandler(void)                	//串口3中断服务程序
 	u8 Res;
 	if(USART_GetITStatus(USART3, USART_IT_RXNE) != RESET)  //接收中断()
 	{
-			//USART_ClearITPendingBit(USART3, USART_IT_RXNE);
+			
 			//buffer[Cmd_Cnt] = USART_ReceiveData(USART3); //(USART3->DR);	//读取接收到的数据，同时硬件自动清除中断
 			Res = USART_ReceiveData(USART3); //(USART3->DR);
 
 
 			  queue_push(Res);
 			  
-		
-			
-/////////////////////////////////////////////////////////////////////////////
-//		buffer[Cmd_Cnt] = Res;
-//		cmdstate = ((cmdstate<<8)|Res);
-//			Cmd_Cnt++;
-//		
-//			if (Cmd_Cnt >= 5)
-//			{
-//				if ((buffer[0] == PACK_HEAD) && (buffer[1] == PACK_CMD)) // 收到包头 地址
-//				{
-//					
-//					
-//					//if (buffer[Cmd_Cnt - 1] == PACK_END)
-//						if (cmdstate == PACK_END)
-//					{
-//						memcpy(cmd_buffer,buffer,Cmd_Cnt);
-//						//memset(buffer,Cmd_Cnt);
-//						revflag = 1;
-//					}
-//				}
-//				else
-//				{
-//					Cmd_Cnt = 0;
-//				}
-//			}
-//			if (Cmd_Cnt >= _PACKLENGTH)
-//			{
-//				Cmd_Cnt = 0;
-//			}
-			
-///////////////////////////////////////////////////////////////////////////////////////		
-
 			
   } 
 	if(USART_GetFlagStatus(USART3,USART_FLAG_ORE) != RESET) //溢出 

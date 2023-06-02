@@ -24,28 +24,22 @@ extern Moto_Struct Moto[MOTONUM];
 extern SpeedRampData srd[MOTONUM];
 extern COMM_EVENT DoComEvent;
 extern uint16 Cmd_Cnt;
+extern uint8 cmd_buffer[CMD_MAX_SIZE]; //
 
-uint8 cmd_DA[32] = {0x01, 0x01, 0xC2, 0x00, 0x01, 0x01, 0x01, 0x01, 0x10, 0x02, 0x58, 0x64, 0x64, 0x01, 0x00, 0x00, 0x10, 0x02, 0x58, 0x64, 0x64, 0x01, 0x00, 0x00, 0x10, 0x02, 0x58, 0x64, 0x64, 0x00, 0x00, 0x00};
 
-// u8 canbuf[]={0x10,0x06};
-extern uint8 cmd_buffer[CMD_MAX_SIZE]; // ָ���
-extern uint16 revflag;
-// extern uint16 USART_RX_STA;
 
 int main(void)
 {
-
-	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); // ����ϵͳ�ж����ȼ�����2
+	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2); // 设置系统中断优先级分组2
 
 	delay_init(168);
-	uart_init(115200); // ��ʼ�����ڲ�����Ϊ115200
+	uart_init(115200); // init usart 
 
-	// ��ʱ
-	TIM_GPIO_Config(); // 168M ����
 
-	MotoInitConfig(); // ����˶�������ʼ��
+	TIM_GPIO_Config(); // 
 
-	//
+	MotoInitConfig(); // 
+
 	TIM8_PWM_Init(4000 - 1, 168 - 1);
 	TIM2_PWM_Init(4000 - 1, 168 - 1);
 	TIM3_PWM_Init(4000 - 1, 168 - 1);
@@ -57,15 +51,15 @@ int main(void)
 	{
 
 		uint8 size = queue_find_cmd(cmd_buffer, CMD_MAX_SIZE);
-		if (size > 0) // ���յ�ָ��
+		if (size > 0) // 
 		{
 			Cmd_Cnt = size;
-			CmdAnalysis(); // ָ��� ����
+			CmdAnalysis(); //command Analysis
 		}
 
 		if (DoComEvent != NO_COMEVENT)
 		{
-			CmdProcess();
+			CmdProcess();// DO command
 			DoComEvent = NO_COMEVENT;
 		}
 	}

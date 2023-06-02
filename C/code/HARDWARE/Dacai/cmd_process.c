@@ -111,7 +111,7 @@ void CmdRun(uint8 *RXbuffer)
 		Moto[id].Mdecel = *(p + 7) | (*(p + 8) << 8);
 		Moto[id].MotoSpeed = *(p + 9) | (*(p + 10) << 8);
 
-		AxisMove(Moto[id].MID, Moto[id].Mstep, Moto[id].Maccel, Moto[id].Mdecel, Moto[id].MotoSpeed);
+		STEPMOTOR_AxisMoveRel(Moto[id].MID, Moto[id].Mstep, Moto[id].Maccel, Moto[id].Mdecel, Moto[id].MotoSpeed);
 	}
 }
 
@@ -195,8 +195,9 @@ void CmdProcess()
 		break;
 	default:
 		tx_data[0] = CMD_NO_COM & 0xff;
-		tx_data[1] = CMD_NO_COM >> 8 & 0xff;
+		tx_data[1] = (CMD_NO_COM >> 8) & 0xff;
 		ComAckPack(PACK_ACK, CMD_TX_ERROR, tx_data, 2);
 		break;
 	}
 }
+

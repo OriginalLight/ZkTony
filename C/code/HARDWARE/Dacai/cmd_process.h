@@ -65,8 +65,8 @@ typedef enum
 	USART_COMEVENT,
 } COMM_EVENT;
 
-void CmdProcess();
-void CmdAnalysis();
+void CmdProcess(void);
+void CmdAnalysis(void);
 void CmdRun(uint8 *RXbuffer);
 void CmdStop(uint8 *RXbuffer);
 void CmdQuery(uint8 *RXbuffer);

@@ -27,40 +27,55 @@ void EXTI_Check(void)
 {
 	
 			if(MSensor7 == 1){
-								if(Moto[7].Mstate == 2)
+								if(Moto[6].Mstate == 2)
 								{
-									srd[7].run_state = DECEL;
+									srd[6].run_state = DECEL;
 									
 								}
-								else if(Moto[7].Mstate == 1)
+								else if(Moto[6].Mstate == 1)
 								{
-									srd[7].run_state = STOP;
+									srd[6].run_state = STOP;
 									
 								}
 								else
 								{
-									srd[7].run_state = STOP;
+									srd[6].run_state = STOP;
 									TIMxCH3OutControl(TIM1,0);
 									
 								}
 				
 			}
 			if(MSensor10 == 1){
-								if (Moto[10].Mstate == 2)
+								if (Moto[9].Mstate == 2)
 								{
-									srd[10].run_state = DECEL;
+									srd[9].run_state = DECEL;
 								}
-								else if (Moto[10].Mstate == 1)
+								else if (Moto[9].Mstate == 1)
 								{
-									srd[10].run_state = STOP;
+									srd[9].run_state = STOP;
 								}
 								else
 								{
-									srd[10].run_state = STOP;
+									srd[9].run_state = STOP;
 									TIMxCH2OutControl(TIM2, 0);
 								}
 			}
 			if(MSensor12 == 1){
+								if (Moto[11].Mstate == 2)
+								{
+									srd[11].run_state = DECEL;
+								}
+								else if (Moto[11].Mstate == 1)
+								{
+									srd[11].run_state = STOP;
+								}
+								else
+								{
+									srd[11].run_state = STOP;
+									TIMxCH1OutControl(TIM1, 0);
+								}
+			}
+			if(MSensor13 == 1){
 								if (Moto[12].Mstate == 2)
 								{
 									srd[12].run_state = DECEL;
@@ -72,25 +87,25 @@ void EXTI_Check(void)
 								else
 								{
 									srd[12].run_state = STOP;
-									TIMxCH1OutControl(TIM1, 0);
-								}
-			}
-			if(MSensor13 == 1){
-								if (Moto[13].Mstate == 2)
-								{
-									srd[13].run_state = DECEL;
-								}
-								else if (Moto[13].Mstate == 1)
-								{
-									srd[13].run_state = STOP;
-								}
-								else
-								{
-									srd[13].run_state = STOP;
 									TIMxCH1OutControl(TIM8, 0);
 								}
 			}
 			if(MSensor15 == 1){
+								if (Moto[14].Mstate == 2)
+								{
+									srd[14].run_state = DECEL;
+								}
+								else if (Moto[14].Mstate == 1)
+								{
+									srd[14].run_state = STOP;
+								}
+								else
+								{
+									srd[14].run_state = STOP;
+									TIMxCH3OutControl(TIM8, 0);
+								}
+			}
+			if(MSensor16 == 1){
 								if (Moto[15].Mstate == 2)
 								{
 									srd[15].run_state = DECEL;
@@ -102,21 +117,6 @@ void EXTI_Check(void)
 								else
 								{
 									srd[15].run_state = STOP;
-									TIMxCH3OutControl(TIM8, 0);
-								}
-			}
-			if(MSensor16 == 1){
-								if (Moto[16].Mstate == 2)
-								{
-									srd[16].run_state = DECEL;
-								}
-								else if (Moto[16].Mstate == 1)
-								{
-									srd[16].run_state = STOP;
-								}
-								else
-								{
-									srd[16].run_state = STOP;
 									TIMxCH4OutControl(TIM8, 0);
 								}
 			}	

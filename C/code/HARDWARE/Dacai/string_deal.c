@@ -146,7 +146,7 @@ float Convert_HEX_to_FLOAT(u8 *s)
 	
 	
 	
-	
+	return 0;
 }
 
 

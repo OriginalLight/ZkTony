@@ -2,10 +2,7 @@
 #include "usart.h"
 #include "delay.h"
 #include "moto.h"
-#include "DeviceVibration.h"
 #include "exti.h"
-#include "128S085.h"
-#include "adc.h"
 #include "cmd_process.h"
 #include "cmd_queue.h"
 
@@ -15,27 +12,7 @@ extern uint8 cmd_RXbuffer[];
 extern SpeedRampData srd[MOTONUM];
 extern Moto_Struct Moto[MOTONUM];
 
-void Tim2Config(void)
-{
 
-	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStructure;
-
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
-
-	TIM_TimeBaseStructInit(&TIM_TimeBaseInitStructure);
-
-	TIM_TimeBaseInitStructure.TIM_ClockDivision = TIM_CKD_DIV1;
-
-	TIM_TimeBaseInitStructure.TIM_Prescaler = 42 - 1; // 2M;
-
-	TIM_TimeBaseInitStructure.TIM_Period = 199; // 10us; 44
-
-	TIM_TimeBaseInitStructure.TIM_CounterMode = TIM_CounterMode_Up;
-
-	TIM_TimeBaseInit(TIM2, &TIM_TimeBaseInitStructure);
-
-	TIM_SelectOutputTrigger(TIM2, TIM_TRGOSource_Update);
-}
 
 void TIM4_Int_Init(u16 arr, u16 psc)
 {

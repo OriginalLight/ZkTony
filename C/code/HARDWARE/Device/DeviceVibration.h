@@ -4,16 +4,6 @@
 //////////////////////////////////////////////////////////////////////////////////	 
 //All rights reserved									  
 ////////////////////////////////////////////////////////////////////////////////// 	 
-//#define J1  PDout(0)
-//#define J2  PDout(1)
-//#define J3  PDout(2)
-//#define J4  PDout(3)
-//#define J5  PDout(4)
-//#define J6  PDout(5)
-//#define J7  PDout(6)
-//#define J8  PDout(7)
-
-
 
 //2.0.1 修改了CX_OVER 从160---80
 
@@ -49,12 +39,6 @@ typedef struct {
 	u32 VibrationTime; //52
 
 } DeviceVibration;
-
-
-
-extern u8 Flag_run;
-
-extern u8 Moto_State;  //0 位动作  1 复位  2 运动中  3 暂停  4 运动停止
 
 //#define	DISTANCE_Y1_UP 2000  //3250
 #define	V_Y1_UP 800
