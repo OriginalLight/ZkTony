@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui
 
 import android.graphics.Point
 import androidx.activity.compose.BackHandler
@@ -40,8 +40,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -70,12 +68,12 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.logic.data.entities.ContainerEntity
 import com.zktony.android.ui.components.DynamicMixPlate
-import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
-import com.zktony.android.ui.components.ZkTonyScaffold
-import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.utils.PageEnum
+import com.zktony.android.ui.components.InputDialog
+import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.utils.PageType
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.format
+import com.zktony.core.ext.showShortToast
 import com.zktony.core.ext.simpleDateFormat
 import kotlinx.coroutines.launch
 
@@ -88,89 +86,93 @@ import kotlinx.coroutines.launch
  * @return Unit
  */
 @Composable
-fun ContainerScreen(
+fun ZktyContainer(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: ContainerViewModel,
+    viewModel: ZktyContainerViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    val page = remember { mutableStateOf(PageType.LIST) }
 
     BackHandler {
-        if (uiState.page == PageEnum.MAIN) {
-            navController.navigateUp()
-        } else {
-            viewModel.navigationTo(PageEnum.MAIN)
+        when (page.value) {
+            PageType.LIST -> navController.navigateUp()
+            else -> page.value = PageType.LIST
         }
     }
 
-    ZkTonyScaffold(
-        modifier = modifier,
-        topBar = {
-            AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
-                ZkTonyTopAppBar(
-                    title = stringResource(id = R.string.edit),
-                    navigation = {
-                        if (uiState.page == PageEnum.MAIN) {
-                            navController.navigateUp()
-                        } else {
-                            viewModel.navigationTo(PageEnum.MAIN)
-                        }
+    Column(modifier = Modifier) {
+        // app bar for edit page
+        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+            ZktyTopAppBar(
+                title = stringResource(id = R.string.edit),
+                navigation = {
+                    when (page.value) {
+                        PageType.LIST -> navController.navigateUp()
+                        else -> page.value = PageType.LIST
                     }
-                )
-            }
-        },
-        bottomBar = {
-            AnimatedVisibility(visible = uiState.page == PageEnum.ADD) {
-                ZkTonyBottomAddAppBar(
-                    strings = uiState.entities.map { it.name },
-                    insert = viewModel::insert,
-                    navigationTo = viewModel::navigationTo,
-                )
-            }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) {
-        AnimatedVisibility(visible = uiState.page in listOf(PageEnum.MAIN, PageEnum.ADD)) {
-            ContainerMainPage(
+                }
+            )
+        }
+        // list page
+        AnimatedVisibility(visible = page.value == PageType.LIST) {
+            ContainerList(
                 modifier = modifier,
                 uiState = uiState,
+                insert = viewModel::insert,
                 delete = viewModel::delete,
-                navigationTo = viewModel::navigationTo,
+                navigationToEdit = { page.value = PageType.EDIT },
                 toggleSelected = viewModel::toggleSelected,
             )
         }
-        AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
-            ContainerEditPage(
+        // edit page
+        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+            ContainerEdit(
                 modifier = modifier,
                 entity = uiState.entities.find { it.id == uiState.selected }!!,
                 update = viewModel::update,
-                showSnackbar = { message ->
-                    scope.launch {
-                        snackbarHostState.showSnackbar(message)
-                    }
-                },
             )
         }
     }
 }
 
 @Composable
-fun ContainerMainPage(
+fun ContainerList(
     modifier: Modifier = Modifier,
     uiState: ContainerUiState = ContainerUiState(),
+    insert: (String) -> Unit = {},
     delete: (Long) -> Unit = {},
-    navigationTo: (PageEnum) -> Unit = {},
+    navigationToEdit: () -> Unit = {},
     toggleSelected: (Long) -> Unit = {},
 ) {
+
+    val scope = rememberCoroutineScope()
+    val columnState = rememberLazyListState()
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        InputDialog(
+            onConfirm = {
+                scope.launch {
+                    val nameList = uiState.entities.map { it.text }
+                    if (nameList.contains(it)) {
+                        "Name already exists".showShortToast()
+                    } else {
+                        insert(it)
+                        showDialog = false
+                    }
+                }
+            },
+            onCancel = { showDialog = false },
+        )
+    }
+
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
     ) {
-        val columnState = rememberLazyListState()
-
         // list
         LazyColumn(
             modifier = Modifier
@@ -217,7 +219,7 @@ fun ContainerMainPage(
                                 contentDescription = null,
                             )
                             Text(
-                                text = it.name,
+                                text = it.text,
                                 style = MaterialTheme.typography.bodyLarge,
                                 maxLines = 1,
                             )
@@ -243,11 +245,12 @@ fun ContainerMainPage(
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Add
             FloatingActionButton(
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
-                onClick = { navigationTo(PageEnum.ADD) }
+                onClick = { showDialog = true },
             ) {
                 Icon(
                     modifier = Modifier.size(36.dp),
@@ -256,7 +259,7 @@ fun ContainerMainPage(
                     tint = Color.Black,
                 )
             }
-
+            // Delete
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 var count by remember { mutableStateOf(0) }
 
@@ -282,13 +285,13 @@ fun ContainerMainPage(
                     )
                 }
             }
-
+            // Edit
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier
                         .padding(8.dp)
                         .fillMaxWidth(),
-                    onClick = { navigationTo(PageEnum.EDIT) }
+                    onClick = navigationToEdit,
                 ) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -304,11 +307,10 @@ fun ContainerMainPage(
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
-fun ContainerEditPage(
+fun ContainerEdit(
     modifier: Modifier = Modifier,
     entity: ContainerEntity = ContainerEntity(),
     update: (ContainerEntity) -> Unit = {},
-    showSnackbar: (String) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
@@ -399,7 +401,7 @@ fun ContainerEditPage(
                                     )
                                 )
                             )
-                            showSnackbar(Ext.ctx.getString(R.string.save_success))
+                            Ext.ctx.getString(R.string.save_success).showShortToast()
                         }
                     },
                 ) {
@@ -471,7 +473,7 @@ fun ContainerEditPage(
                                     )
                                 )
                             )
-                            showSnackbar(Ext.ctx.getString(R.string.save_success))
+                            Ext.ctx.getString(R.string.save_success).showShortToast()
                         }
                     },
                 ) {
@@ -489,18 +491,18 @@ fun ContainerEditPage(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ContainerMainPagePreview() {
-    ContainerMainPage(
+fun ContainerListPreview() {
+    ContainerList(
         uiState = ContainerUiState(entities = listOf(ContainerEntity())),
     )
 }
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ContainerEditPagePreview() {
+fun ContainerEditPreview() {
     val pointList = mutableListOf<Point>()
     repeat(6) {
         pointList.add(Point())
     }
-    ContainerEditPage(entity = ContainerEntity())
+    ContainerEdit(entity = ContainerEntity())
 }

@@ -16,6 +16,7 @@ abstract class ProgramDao : BaseDao<ProgramEntity> {
         SELECT * FROM programs
         """
     )
+    @Transaction
     abstract fun getAll(): Flow<List<PWC>>
 
     @Query(

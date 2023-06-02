@@ -47,4 +47,5 @@
     <string name="coagulant">Coagulant</string>
     <string name="glue_making">Glue making</string>
     <string name="pre_drain">Pre-drain</string>
+    <string name="confirm">Confirm</string>
 </resources>

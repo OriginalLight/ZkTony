@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui
 
 import android.content.Intent
 import android.provider.Settings
@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.ui.utils.PageEnum
 import com.zktony.core.ext.DownloadState
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.download
@@ -14,10 +13,10 @@ import com.zktony.core.ext.installApk
 import com.zktony.core.ext.isNetworkAvailable
 import com.zktony.core.ext.restartApp
 import com.zktony.core.ext.showShortToast
-import com.zktony.proto.SettingsPreferences
 import com.zktony.datastore.ext.saveSettings
 import com.zktony.datastore.ext.settingsFlow
 import com.zktony.proto.Application
+import com.zktony.proto.SettingsPreferences
 import com.zktony.proto.copy
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,14 +30,13 @@ import java.io.File
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class SettingViewModel constructor(
+class ZktySettingViewModel constructor(
     private val grpc: ApplicationGrpc,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
     private val _application = MutableStateFlow<Application?>(null)
     private val _progress = MutableStateFlow(0)
-    private val _page = MutableStateFlow(PageEnum.MAIN)
 
     val uiState = _uiState.asStateFlow()
 
@@ -49,13 +47,11 @@ class SettingViewModel constructor(
                     _application,
                     settingsFlow,
                     _progress,
-                    _page,
-                ) { application, settings, progress, page ->
+                ) { application, settings, progress ->
                     SettingUiState(
                         application = application,
                         settings = settings,
                         progress = progress,
-                        page = page,
                     )
                 }.catch { ex ->
                     ex.printStackTrace()
@@ -76,10 +72,6 @@ class SettingViewModel constructor(
                 }
             }
         }
-    }
-
-    fun navigationTo(page: PageEnum) {
-        _page.value = page
     }
 
     /**
@@ -225,5 +217,4 @@ data class SettingUiState(
     val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
     val application: Application? = null,
     val progress: Int = 0,
-    val page: PageEnum = PageEnum.MAIN,
 )

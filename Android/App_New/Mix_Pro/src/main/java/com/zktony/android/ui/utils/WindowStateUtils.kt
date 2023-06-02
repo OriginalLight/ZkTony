@@ -7,6 +7,9 @@ enum class NavigationType {
     NONE, NAVIGATION_RAIL, PERMANENT_NAVIGATION_DRAWER
 }
 
-enum class PageEnum {
-    ADD, AUTHENTICATION, EDIT, MAIN,
+/**
+ * Different type of page supported by app depending on each screen.
+ */
+enum class PageType {
+    LIST, EDIT, AUTH
 }

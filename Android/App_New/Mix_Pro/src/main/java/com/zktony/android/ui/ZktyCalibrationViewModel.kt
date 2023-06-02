@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,7 +6,6 @@ import com.zktony.android.logic.data.dao.CalibrationDao
 import com.zktony.android.logic.data.entities.CalibrationData
 import com.zktony.android.logic.data.entities.CalibrationEntity
 import com.zktony.android.logic.ext.syncTransmit
-import com.zktony.android.ui.utils.PageEnum
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -17,11 +16,10 @@ import kotlinx.coroutines.launch
  * @author 刘贺贺
  * @date 2023/5/9 13:19
  */
-class CalibrationViewModel constructor(
+class ZktyCalibrationViewModel constructor(
     private val dao: CalibrationDao,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CalibrationUiState())
-    private val _page = MutableStateFlow(PageEnum.MAIN)
     private val _selected = MutableStateFlow(0L)
     val uiState = _uiState.asStateFlow()
 
@@ -30,9 +28,8 @@ class CalibrationViewModel constructor(
             combine(
                 dao.getAll(),
                 _selected,
-                _page,
-            ) { entities, selected, page ->
-                CalibrationUiState(entities = entities, selected = selected, page = page)
+            ) { entities, selected ->
+                CalibrationUiState(entities = entities, selected = selected)
             }.catch { ex ->
                 ex.printStackTrace()
             }.collect {
@@ -41,17 +38,13 @@ class CalibrationViewModel constructor(
         }
     }
 
-    fun navigationTo(page: PageEnum) {
-        _page.value = page
-    }
-
     fun toggleSelected(id: Long) {
         _selected.value = id
     }
 
     fun insert(name: String) {
         viewModelScope.launch {
-            dao.insert(CalibrationEntity(name = name))
+            dao.insert(CalibrationEntity(text = name))
         }
     }
 
@@ -114,5 +107,4 @@ class CalibrationViewModel constructor(
 data class CalibrationUiState(
     val entities: List<CalibrationEntity> = emptyList(),
     val selected: Long = 0L,
-    val page: PageEnum = PageEnum.MAIN,
 )

@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -23,14 +23,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,11 +41,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.logic.data.entities.MotorEntity
-import com.zktony.android.ui.components.ZkTonyScaffold
-import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.utils.PageEnum
-import com.zktony.core.ext.Ext
-import kotlinx.coroutines.launch
+import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.utils.PageType
 
 /**
  * Motor screen
@@ -59,67 +53,62 @@ import kotlinx.coroutines.launch
  * @return Unit
  */
 @Composable
-fun MotorScreen(
+fun ZktyMotor(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: MotorViewModel,
+    viewModel: ZktyMotorViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    val page = remember { mutableStateOf(PageType.LIST) }
 
     BackHandler {
-        if (uiState.page == PageEnum.MAIN) {
-            navController.navigateUp()
-        } else {
-            viewModel.navigationTo(PageEnum.MAIN)
+        when (page.value) {
+            PageType.LIST -> navController.navigateUp()
+            else -> page.value = PageType.LIST
         }
     }
 
-    ZkTonyScaffold(
-        modifier = modifier,
-        topBar = {
-            ZkTonyTopAppBar(title = if (uiState.page == PageEnum.MAIN) {
+    Column(modifier = modifier) {
+        // app bar
+        ZktyTopAppBar(
+            title = if (page.value == PageType.LIST) {
                 stringResource(id = R.string.motor_config)
             } else {
                 uiState.entities.find { it.id == uiState.selected }!!.text
-            }, navigation = {
-                if (uiState.page == PageEnum.MAIN) {
-                    navController.navigateUp()
-                } else {
-                    viewModel.navigationTo(PageEnum.MAIN)
+            },
+            navigation = {
+                when (page.value) {
+                    PageType.LIST -> navController.navigateUp()
+                    else -> page.value = PageType.LIST
                 }
-            })
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) {
-        AnimatedVisibility(visible = uiState.page == PageEnum.MAIN) {
-            MotorMainPage(
+            }
+        )
+        // motor list
+        AnimatedVisibility(visible = page.value == PageType.LIST) {
+            MotorList(
                 modifier = Modifier,
                 uiState = uiState,
-                navigationTo = viewModel::navigationTo,
+                navigationToEdit = { page.value = PageType.EDIT },
                 toggleSelected = viewModel::toggleSelected,
             )
         }
-        AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
-            MotorEditPage(modifier = Modifier,
+        // motor edit
+        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+            MotorEdit(
+                modifier = Modifier,
                 entity = uiState.entities.find { it.id == uiState.selected }!!,
-                navigationTo = viewModel::navigationTo,
+                navigationToList = { page.value = PageType.LIST },
                 update = viewModel::update,
-                showSnackbar = { message ->
-                    scope.launch {
-                        snackbarHostState.showSnackbar(message = message)
-                    }
-                })
+            )
         }
     }
 }
 
 @Composable
-fun MotorMainPage(
+fun MotorList(
     modifier: Modifier = Modifier,
     uiState: MotorUiState = MotorUiState(),
-    navigationTo: (PageEnum) -> Unit = {},
+    navigationToEdit: () -> Unit = {},
     toggleSelected: (Long) -> Unit = {},
 ) {
     LazyVerticalGrid(
@@ -140,7 +129,7 @@ fun MotorMainPage(
                 Card(
                     modifier = Modifier.clickable {
                         toggleSelected(it.id)
-                        navigationTo(PageEnum.EDIT)
+                        navigationToEdit()
                     },
                 ) {
                     Row(
@@ -178,12 +167,11 @@ fun MotorMainPage(
 }
 
 @Composable
-fun MotorEditPage(
+fun MotorEdit(
     modifier: Modifier = Modifier,
     entity: MotorEntity = MotorEntity(),
-    navigationTo: (PageEnum) -> Unit = {},
+    navigationToList: () -> Unit = {},
     update: (MotorEntity) -> Unit = {},
-    showSnackbar: (String) -> Unit = {},
 ) {
     var speed by remember { mutableStateOf(entity.speed) }
     var acc by remember { mutableStateOf(entity.acc) }
@@ -294,8 +282,7 @@ fun MotorEditPage(
                         .padding(top = 16.dp),
                     onClick = {
                         update(entity.copy(speed = speed, acc = acc, dec = dec))
-                        navigationTo(PageEnum.MAIN)
-                        showSnackbar(Ext.ctx.getString(R.string.save_success))
+                        navigationToList()
                     },
                 ) {
                     Icon(
@@ -311,8 +298,8 @@ fun MotorEditPage(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun MotorMainPagePreview() {
-    MotorMainPage(
+fun MotorListPreview() {
+    MotorList(
         modifier = Modifier, uiState = MotorUiState(
             entities = listOf(
                 MotorEntity(text = "M1"), MotorEntity(text = "M2")
@@ -323,8 +310,8 @@ fun MotorMainPagePreview() {
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun MotorEditPagePreview() {
-    MotorEditPage(
+fun MotorEditPreview() {
+    MotorEdit(
         modifier = Modifier, entity = MotorEntity(text = "M1")
     )
 }

@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -29,8 +29,6 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -58,11 +56,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.ui.components.CustomTextField
-import com.zktony.android.ui.components.ZkTonyScaffold
-import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.utils.PageEnum
+import com.zktony.android.ui.components.ZktyTopAppBar
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.format
+import com.zktony.core.ext.showShortToast
 import kotlinx.coroutines.launch
 
 /**
@@ -74,64 +71,43 @@ import kotlinx.coroutines.launch
  * @return Unit
  */
 @Composable
-fun ConfigScreen(
+fun ZktyConfig(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: ConfigViewModel,
+    viewModel: ZktyConfigViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
-    BackHandler {
-        if (uiState.page == PageEnum.MAIN) {
-            navController.navigateUp()
-        } else {
-            viewModel.navigationTo(PageEnum.MAIN)
-        }
-    }
+    BackHandler { navController.navigateUp() }
 
-    ZkTonyScaffold(
-        modifier = modifier,
-        topBar = {
-            ZkTonyTopAppBar(title = stringResource(id = R.string.system_config), navigation = {
-                if (uiState.page == PageEnum.MAIN) {
-                    navController.navigateUp()
-                } else {
-                    viewModel.navigationTo(PageEnum.MAIN)
-                }
-            })
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) {
-        AnimatedVisibility(visible = uiState.page == PageEnum.MAIN) {
-            ConfigMainPage(
-                modifier = Modifier,
-                uiState = uiState,
-                setTravel = viewModel::setTravel,
-                setWaste = viewModel::setWaste,
-                moveTo = viewModel::moveTo,
-                showSnackBar = { message ->
-                    scope.launch {
-                        snackbarHostState.showSnackbar(message)
-                    }
-                }
-            )
-        }
+    Column(modifier = modifier) {
+
+        ZktyTopAppBar(
+            title = stringResource(id = R.string.system_config),
+            navigation = { navController.navigateUp() }
+        )
+
+        ConfigList(
+            modifier = Modifier,
+            uiState = uiState,
+            setTravel = viewModel::setTravel,
+            setWaste = viewModel::setWaste,
+            moveTo = viewModel::moveTo,
+        )
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
-fun ConfigMainPage(
+fun ConfigList(
     modifier: Modifier = Modifier,
     uiState: ConfigUiState,
     setTravel: (Int, Float) -> Unit = { _, _ -> },
     setWaste: (Int, Float) -> Unit = { _, _ -> },
     moveTo: (Int, Float) -> Unit = { _, _ -> },
-    showSnackBar: (String) -> Unit = {},
 ) {
     val softKeyboard = LocalSoftwareKeyboardController.current
+    val scope = rememberCoroutineScope()
 
     LazyColumn(
         modifier = modifier
@@ -231,10 +207,12 @@ fun ConfigMainPage(
                         Button(
                             modifier = Modifier.width(128.dp),
                             onClick = {
-                                val value = text.toFloatOrNull() ?: 0f
-                                text = value.format(1)
-                                setTravel(index, value)
-                                showSnackBar(Ext.ctx.getString(R.string.save_success))
+                                scope.launch {
+                                    val value = text.toFloatOrNull() ?: 0f
+                                    text = value.format(1)
+                                    setTravel(index, value)
+                                    Ext.ctx.getString(R.string.save_success).showShortToast()
+                                }
                             },
                         ) {
                             Icon(
@@ -333,10 +311,12 @@ fun ConfigMainPage(
                         Button(
                             modifier = Modifier.width(128.dp),
                             onClick = {
-                                val value = text.toFloatOrNull() ?: 0f
-                                text = value.format(1)
-                                setWaste(index, value)
-                                showSnackBar(Ext.ctx.getString(R.string.save_success))
+                                scope.launch {
+                                    val value = text.toFloatOrNull() ?: 0f
+                                    text = value.format(1)
+                                    setWaste(index, value)
+                                    Ext.ctx.getString(R.string.save_success).showShortToast()
+                                }
                             },
                         ) {
                             Icon(
@@ -354,8 +334,8 @@ fun ConfigMainPage(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960)
-fun ConfigMainPagePreview() {
-    ConfigMainPage(
+fun ConfigListPreview() {
+    ConfigList(
         uiState = ConfigUiState()
     )
 }

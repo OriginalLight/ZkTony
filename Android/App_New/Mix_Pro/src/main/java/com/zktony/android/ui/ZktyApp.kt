@@ -3,6 +3,8 @@ package com.zktony.android.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,14 +21,6 @@ import com.zktony.android.ui.navigation.AppNavigationRail
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.PermanentNavigationDrawerContent
 import com.zktony.android.ui.navigation.Route
-import com.zktony.android.ui.screen.CalibrationScreen
-import com.zktony.android.ui.screen.ConfigScreen
-import com.zktony.android.ui.screen.ContainerScreen
-import com.zktony.android.ui.screen.HomeScreen
-import com.zktony.android.ui.screen.MotorScreen
-import com.zktony.android.ui.screen.ProgramScreen
-import com.zktony.android.ui.screen.SettingScreen
-import com.zktony.android.ui.screen.SplashScreen
 import com.zktony.android.ui.utils.NavigationType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -35,7 +29,7 @@ import org.koin.androidx.compose.koinViewModel
  * Main entry point for the app.
  */
 @Composable
-fun ZkTonyApp() {
+fun ZktyApp() {
 
     val navController = rememberNavController()
     val navigationActions = remember(navController) {
@@ -78,7 +72,6 @@ fun ZkTonyApp() {
             }
         }) {
         AppNavHost(
-            modifier = Modifier,
             navController = navController,
         ) {
             scope.launch {
@@ -101,61 +94,63 @@ private fun AppNavHost(
     openDrawer: () -> Unit = {},
 ) {
     NavHost(
-        modifier = modifier,
+        modifier = modifier.background(
+            color = MaterialTheme.colorScheme.secondaryContainer
+        ),
         navController = navController,
         startDestination = Route.SPLASH,
     ) {
         composable(Route.SPLASH) {
-            SplashScreen(
+            ZktySplash(
                 modifier = Modifier,
                 navController = navController,
                 openDrawer = openDrawer,
             )
         }
         composable(Route.HOME) {
-            HomeScreen(
+            ZktyHome(
                 modifier = Modifier,
                 navController = navController,
                 viewModel = koinViewModel(),
             )
         }
         composable(Route.PROGRAM) {
-            ProgramScreen(
+            ZktyProgram(
                 modifier = Modifier,
                 navController = navController,
                 viewModel = koinViewModel(),
             )
         }
         composable(Route.CONTAINER) {
-            ContainerScreen(
+            ZktyContainer(
                 modifier = Modifier,
                 navController = navController,
                 viewModel = koinViewModel(),
             )
         }
         composable(Route.CALIBRATION) {
-            CalibrationScreen(
+            ZktyCalibration(
                 modifier = Modifier,
                 navController = navController,
                 viewModel = koinViewModel(),
             )
         }
         composable(Route.SETTING) {
-            SettingScreen(
+            ZktySetting(
                 modifier = Modifier,
                 navController = navController,
                 viewModel = koinViewModel(),
             )
         }
         composable(Route.MOTOR) {
-            MotorScreen(
+            ZktyMotor(
                 modifier = Modifier,
                 navController = navController,
                 viewModel = koinViewModel(),
             )
         }
         composable(Route.CONFIG) {
-            ConfigScreen(
+            ZktyConfig(
                 modifier = Modifier,
                 navController = navController,
                 viewModel = koinViewModel(),

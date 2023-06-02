@@ -20,7 +20,7 @@ import java.util.Date
 @Entity(
     tableName = "programs",
     indices = [
-        Index(value = ["name"], unique = true)
+        Index(value = ["text"], unique = true)
     ]
 )
 @Immutable
@@ -31,7 +31,7 @@ import java.util.Date
 data class ProgramEntity(
     @PrimaryKey @ColumnInfo(name = "id") val id: Long = nextId(),
     @ColumnInfo(name = "sub_id") val subId: Long = 0L,
-    @ColumnInfo(name = "name") val name: String = "None",
+    @ColumnInfo(name = "text") val text: String = "None",
     @ColumnInfo(name = "active") val active: List<Int> = listOf(0, 1, 2, 3, 4, 5),
     @ColumnInfo(name = "volume") val volume: List<Float> = listOf(0f, 0f, 0f, 0f),
     @ColumnInfo(name = "count") val count: Int = 0,

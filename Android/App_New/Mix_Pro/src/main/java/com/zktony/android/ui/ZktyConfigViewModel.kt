@@ -1,9 +1,8 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.logic.ext.syncTransmit
-import com.zktony.android.ui.utils.PageEnum
 import com.zktony.datastore.ext.saveSettings
 import com.zktony.datastore.ext.settingsFlow
 import com.zktony.proto.SettingsPreferences
@@ -18,9 +17,8 @@ import kotlinx.coroutines.launch
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class ConfigViewModel : ViewModel() {
+class ZktyConfigViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ConfigUiState())
-    private val _page = MutableStateFlow(PageEnum.MAIN)
     private val _lock = MutableStateFlow(false)
     val uiState = _uiState.asStateFlow()
 
@@ -28,20 +26,15 @@ class ConfigViewModel : ViewModel() {
         viewModelScope.launch {
             combine(
                 settingsFlow,
-                _page,
                 _lock
-            ) { settings, page, lock ->
-                ConfigUiState(settings = settings, page = page, lock = lock)
+            ) { settings, lock ->
+                ConfigUiState(settings = settings, lock = lock)
             }.catch { ex ->
                 ex.printStackTrace()
             }.collect {
                 _uiState.value = it
             }
         }
-    }
-
-    fun navigationTo(page: PageEnum) {
-        _page.value = page
     }
 
     fun setTravel(index: Int, distance: Float) {
@@ -110,6 +103,5 @@ class ConfigViewModel : ViewModel() {
 
 data class ConfigUiState(
     val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
-    val page: PageEnum = PageEnum.MAIN,
     val lock: Boolean = false,
 )

@@ -17,14 +17,14 @@ import java.util.Date
 @Entity(
     tableName = "containers",
     indices = [
-        Index(value = ["name"], unique = true)
+        Index(value = ["text"], unique = true)
     ]
 )
 @Immutable
 @TypeConverters(FloatConverters::class)
 data class ContainerEntity(
     @PrimaryKey @ColumnInfo(name = "id") val id: Long = nextId(),
-    @ColumnInfo(name = "name") val name: String = "默认",
+    @ColumnInfo(name = "text") val text: String = "默认",
     @ColumnInfo(name = "axis") val axis: List<Float> = listOf(0f, 0f),
     @ColumnInfo(name = "active") val active: Boolean = false,
     @ColumnInfo(name = "create_time") val createTime: Date = Date(System.currentTimeMillis()),

@@ -3,13 +3,13 @@ package com.zktony.android.logic
 import androidx.room.Room
 import com.zktony.android.R
 import com.zktony.android.logic.data.AppDatabase
-import com.zktony.android.ui.screen.CalibrationViewModel
-import com.zktony.android.ui.screen.ConfigViewModel
-import com.zktony.android.ui.screen.ContainerViewModel
-import com.zktony.android.ui.screen.HomeViewModel
-import com.zktony.android.ui.screen.MotorViewModel
-import com.zktony.android.ui.screen.ProgramViewModel
-import com.zktony.android.ui.screen.SettingViewModel
+import com.zktony.android.ui.ZktyCalibrationViewModel
+import com.zktony.android.ui.ZktyConfigViewModel
+import com.zktony.android.ui.ZktyContainerViewModel
+import com.zktony.android.ui.ZktyHomeViewModel
+import com.zktony.android.ui.ZktyMotorViewModel
+import com.zktony.android.ui.ZktyProgramViewModel
+import com.zktony.android.ui.ZktySettingViewModel
 import com.zktony.core.utils.Constants
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import io.grpc.TlsChannelCredentials
@@ -56,11 +56,11 @@ val koinModule = module {
     singleOf(::SerialPort)
 
     // viewModel
-    viewModelOf(::CalibrationViewModel)
-    viewModelOf(::ConfigViewModel)
-    viewModelOf(::ContainerViewModel)
-    viewModelOf(::HomeViewModel)
-    viewModelOf(::MotorViewModel)
-    viewModelOf(::ProgramViewModel)
-    viewModelOf(::SettingViewModel)
+    viewModelOf(::ZktyCalibrationViewModel)
+    viewModelOf(::ZktyConfigViewModel)
+    viewModelOf(::ZktyContainerViewModel)
+    viewModelOf(::ZktyHomeViewModel)
+    viewModelOf(::ZktyMotorViewModel)
+    viewModelOf(::ZktyProgramViewModel)
+    viewModelOf(::ZktySettingViewModel)
 }

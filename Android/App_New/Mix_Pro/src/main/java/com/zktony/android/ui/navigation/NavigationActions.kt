@@ -5,14 +5,14 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 
 object Route {
-    const val HOME = "Home"
-    const val PROGRAM = "Program"
-    const val CONTAINER = "Container"
-    const val CALIBRATION = "Calibration"
-    const val SETTING = "Setting"
-    const val MOTOR = "Motor"
-    const val CONFIG = "Config"
-    const val SPLASH = "Splash"
+    const val HOME = "HOME"
+    const val PROGRAM = "PROGRAM"
+    const val CONTAINER = "CONTAINER"
+    const val CALIBRATION = "CALIBRATION"
+    const val SETTING = "SETTING"
+    const val MOTOR = "MOTOR"
+    const val CONFIG = "CONFIG"
+    const val SPLASH = "SPLASH"
 }
 
 data class TopLevelDestination(

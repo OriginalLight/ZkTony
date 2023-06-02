@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
             AppTheme(
                 dynamicColor = false
             ) {
-                ZkTonyApp()
+                ZktyApp()
             }
         }
     }

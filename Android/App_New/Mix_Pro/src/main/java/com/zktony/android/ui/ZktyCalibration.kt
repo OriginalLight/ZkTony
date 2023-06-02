@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
@@ -45,13 +45,12 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -74,12 +73,13 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.logic.data.entities.CalibrationData
 import com.zktony.android.logic.data.entities.CalibrationEntity
-import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
-import com.zktony.android.ui.components.ZkTonyScaffold
-import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.utils.PageEnum
+import com.zktony.android.ui.components.InputDialog
+import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.utils.PageType
 import com.zktony.core.ext.format
+import com.zktony.core.ext.showShortToast
 import com.zktony.core.ext.simpleDateFormat
+import kotlinx.coroutines.launch
 
 /**
  * Calibration screen
@@ -90,59 +90,49 @@ import com.zktony.core.ext.simpleDateFormat
  * @return Unit
  */
 @Composable
-fun CalibrationScreen(
+fun ZktyCalibration(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: CalibrationViewModel,
+    viewModel: ZktyCalibrationViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
+    val page = remember { mutableStateOf(PageType.LIST) }
 
     BackHandler {
-        if (uiState.page == PageEnum.MAIN) {
-            navController.navigateUp()
-        } else {
-            viewModel.navigationTo(PageEnum.MAIN)
+        when (page.value) {
+            PageType.LIST -> navController.navigateUp()
+            else -> page.value = PageType.LIST
         }
     }
 
-    ZkTonyScaffold(
-        modifier = modifier,
-        topBar = {
-            AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
-                ZkTonyTopAppBar(title = stringResource(id = R.string.edit), navigation = {
-                    if (uiState.page == PageEnum.MAIN) {
-                        navController.navigateUp()
-                    } else {
-                        viewModel.navigationTo(PageEnum.MAIN)
+    Column(modifier = modifier) {
+        // app bar with edit page is visible
+        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+            ZktyTopAppBar(
+                title = stringResource(id = R.string.edit),
+                navigation = {
+                    when (page.value) {
+                        PageType.LIST -> navController.navigateUp()
+                        else -> page.value = PageType.LIST
                     }
-                })
-            }
-        },
-        bottomBar = {
-            AnimatedVisibility(visible = uiState.page == PageEnum.ADD) {
-                ZkTonyBottomAddAppBar(
-                    strings = uiState.entities.map { it.name },
-                    insert = viewModel::insert,
-                    navigationTo = viewModel::navigationTo,
-                )
-            }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) {
-        AnimatedVisibility(visible = uiState.page in listOf(PageEnum.MAIN, PageEnum.ADD)) {
-            CalibrationMainPage(
+                }
+            )
+        }
+        // list page
+        AnimatedVisibility(visible = page.value == PageType.LIST) {
+            CalibrationList(
                 modifier = modifier,
                 uiState = uiState,
                 active = viewModel::active,
+                insert = viewModel::insert,
                 delete = viewModel::delete,
-                navigationTo = viewModel::navigationTo,
+                navigationToEdit = { page.value = PageType.EDIT },
                 toggleSelected = viewModel::toggleSelected,
             )
         }
-
-        AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
-            CalibrationEditPage(
+        // edit page
+        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+            CalibrationEdit(
                 modifier = modifier,
                 addLiquid = viewModel::addLiquid,
                 entity = uiState.entities.find { it.id == uiState.selected }!!,
@@ -154,159 +144,185 @@ fun CalibrationScreen(
 }
 
 @Composable
-fun CalibrationMainPage(
+fun CalibrationList(
     modifier: Modifier = Modifier,
     uiState: CalibrationUiState = CalibrationUiState(),
     active: (Long) -> Unit = {},
+    insert: (String) -> Unit = {},
     delete: (Long) -> Unit = {},
-    navigationTo: (PageEnum) -> Unit = {},
+    navigationToEdit: () -> Unit = {},
     toggleSelected: (Long) -> Unit = {},
 ) {
-    Column(
+
+    val scope = rememberCoroutineScope()
+    val columnState = rememberLazyListState()
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        InputDialog(
+            onConfirm = {
+                scope.launch {
+                    val nameList = uiState.entities.map { it.text }
+                    if (nameList.contains(it)) {
+                        "Name already exists".showShortToast()
+                    } else {
+                        insert(it)
+                        showDialog = false
+                    }
+                }
+            },
+            onCancel = { showDialog = false },
+        )
+    }
+
+    Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
     ) {
-        Row(
-            modifier = Modifier.weight(1f)
+        LazyColumn(
+            modifier = Modifier
+                .weight(6f)
+                .fillMaxHeight()
+                .padding(end = 8.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = MaterialTheme.shapes.medium
+                ),
+            state = columnState,
+            contentPadding = PaddingValues(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            val columnState = rememberLazyListState()
-
-            LazyColumn(
-                modifier = Modifier
-                    .weight(6f)
-                    .padding(end = 8.dp)
-                    .fillMaxHeight()
-                    .background(
-                        color = MaterialTheme.colorScheme.background,
-                        shape = MaterialTheme.shapes.medium
-                    ),
-                state = columnState,
-                contentPadding = PaddingValues(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                uiState.entities.forEach {
-                    item {
-                        val background = if (it.id == uiState.selected) {
-                            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant
-                        }
-                        Card(
+            uiState.entities.forEach {
+                item {
+                    val background = if (it.id == uiState.selected) {
+                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    }
+                    Card(
+                        modifier = Modifier
+                            .height(48.dp)
+                            .clickable {
+                                if (it.id == uiState.selected) {
+                                    toggleSelected(0L)
+                                } else {
+                                    toggleSelected(it.id)
+                                }
+                            }, colors = CardDefaults.cardColors(
+                            containerColor = background,
+                        )
+                    ) {
+                        Row(
                             modifier = Modifier
-                                .height(48.dp)
-                                .clickable {
-                                    if (it.id == uiState.selected) {
-                                        toggleSelected(0L)
-                                    } else {
-                                        toggleSelected(it.id)
-                                    }
-                                }, colors = CardDefaults.cardColors(
-                                containerColor = background,
-                            )
+                                .fillMaxSize()
+                                .padding(horizontal = 16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(horizontal = 16.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                Image(
+                            Image(
+                                modifier = Modifier.size(32.dp),
+                                painter = painterResource(id = R.drawable.ic_scale),
+                                contentDescription = null,
+                            )
+                            Text(
+                                text = it.text,
+                                style = MaterialTheme.typography.bodyLarge,
+                                maxLines = 1,
+                            )
+                            AnimatedVisibility(visible = it.active) {
+                                Icon(
                                     modifier = Modifier.size(32.dp),
-                                    painter = painterResource(id = R.drawable.ic_scale),
+                                    imageVector = Icons.Default.Check,
                                     contentDescription = null,
                                 )
-                                Text(
-                                    text = it.name,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    maxLines = 1,
-                                )
-                                AnimatedVisibility(visible = it.active) {
-                                    Icon(
-                                        modifier = Modifier.size(32.dp),
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = null,
-                                    )
-                                }
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = it.createTime.simpleDateFormat("yyyy - MM - dd"),
-                                    style = MaterialTheme.typography.bodyLarge,
-                                )
                             }
+                            Spacer(modifier = Modifier.weight(1f))
+                            Text(
+                                text = it.createTime.simpleDateFormat("yyyy - MM - dd"),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
                         }
                     }
                 }
             }
-            Column(
+        }
+        // operation column
+        Column(
+            modifier = modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = MaterialTheme.shapes.medium
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            // Add
+            FloatingActionButton(
                 modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .background(
-                        color = MaterialTheme.colorScheme.background,
-                        shape = MaterialTheme.shapes.medium
-                    ), horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                onClick = { showDialog = true }) {
+                Icon(
+                    modifier = Modifier.size(36.dp),
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = Color.Black,
+                )
+            }
+            // Delete
+            AnimatedVisibility(visible = uiState.selected != 0L) {
+                var count by remember { mutableStateOf(0) }
+
                 FloatingActionButton(modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
-                    onClick = { navigationTo(PageEnum.ADD) }) {
+                    onClick = {
+                        if (count == 1) {
+                            delete(uiState.selected)
+                            toggleSelected(0L)
+                            count = 0
+                        } else {
+                            count++
+                        }
+                    }) {
                     Icon(
                         modifier = Modifier.size(36.dp),
-                        imageVector = Icons.Default.Add,
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = if (count == 1) Color.Red else Color.Black,
+                    )
+                }
+            }
+            // Edit
+            AnimatedVisibility(visible = uiState.selected != 0L) {
+                FloatingActionButton(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    onClick = navigationToEdit,
+                ) {
+                    Icon(
+                        modifier = Modifier.size(36.dp),
+                        imageVector = Icons.Default.Edit,
                         contentDescription = null,
                         tint = Color.Black,
                     )
                 }
-                AnimatedVisibility(visible = uiState.selected != 0L) {
-                    var count by remember { mutableStateOf(0) }
-
-                    FloatingActionButton(modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                        onClick = {
-                            if (count == 1) {
-                                delete(uiState.selected)
-                                toggleSelected(0L)
-                                count = 0
-                            } else {
-                                count++
-                            }
-                        }) {
-                        Icon(
-                            modifier = Modifier.size(36.dp),
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = null,
-                            tint = if (count == 1) Color.Red else Color.Black,
-                        )
-                    }
-                }
-                AnimatedVisibility(visible = uiState.selected != 0L) {
-                    FloatingActionButton(modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                        onClick = { navigationTo(PageEnum.EDIT) }) {
-                        Icon(
-                            modifier = Modifier.size(36.dp),
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null,
-                            tint = Color.Black,
-                        )
-                    }
-                }
-                AnimatedVisibility(visible = uiState.selected != 0L) {
-                    FloatingActionButton(modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                        onClick = { active(uiState.selected) }) {
-                        Icon(
-                            modifier = Modifier.size(36.dp),
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            tint = Color.Black,
-                        )
-                    }
+            }
+            // Active
+            AnimatedVisibility(visible = uiState.selected != 0L) {
+                FloatingActionButton(modifier = Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth(),
+                    onClick = { active(uiState.selected) }) {
+                    Icon(
+                        modifier = Modifier.size(36.dp),
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        tint = Color.Black,
+                    )
                 }
             }
         }
@@ -319,7 +335,7 @@ fun CalibrationMainPage(
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun CalibrationEditPage(
+fun CalibrationEdit(
     modifier: Modifier = Modifier,
     addLiquid: (Int) -> Unit = { },
     entity: CalibrationEntity = CalibrationEntity(),
@@ -503,12 +519,12 @@ fun CalibrationEditPage(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun CalibrationMainPagePreview() {
-    CalibrationMainPage(uiState = CalibrationUiState(entities = listOf(CalibrationEntity())))
+fun CalibrationListPreview() {
+    CalibrationList(uiState = CalibrationUiState(entities = listOf(CalibrationEntity())))
 }
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun CalibrationEditPagePreview() {
-    CalibrationEditPage()
+fun CalibrationEditPreview() {
+    CalibrationEdit()
 }

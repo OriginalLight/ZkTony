@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -6,7 +6,6 @@ import com.zktony.android.logic.data.dao.ContainerDao
 import com.zktony.android.logic.data.dao.ProgramDao
 import com.zktony.android.logic.data.entities.ContainerEntity
 import com.zktony.android.logic.data.entities.ProgramEntity
-import com.zktony.android.ui.utils.PageEnum
 import com.zktony.core.ext.showShortToast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,12 +17,11 @@ import kotlinx.coroutines.launch
  * @author 刘贺贺
  * @date 2023/5/15 14:51
  */
-class ProgramViewModel constructor(
+class ZktyProgramViewModel constructor(
     private val dao: ProgramDao,
     private val containerDao: ContainerDao,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProgramUiState())
-    private val _page = MutableStateFlow(PageEnum.MAIN)
     private val _selected = MutableStateFlow(0L)
     val uiState = _uiState.asStateFlow()
 
@@ -32,14 +30,12 @@ class ProgramViewModel constructor(
             combine(
                 dao.getAll(),
                 containerDao.getAll(),
-                _page,
                 _selected,
-            ) { entities, containers, page, selectedId ->
+            ) { entities, containers, selected ->
                 ProgramUiState(
                     entities = entities.map { it.program },
                     containers = containers,
-                    page = page,
-                    selected = selectedId
+                    selected = selected
                 )
             }.catch { ex ->
                 ex.printStackTrace()
@@ -47,10 +43,6 @@ class ProgramViewModel constructor(
                 _uiState.value = it
             }
         }
-    }
-
-    fun navigationTo(page: PageEnum) {
-        _page.value = page
     }
 
     fun toggleSelected(id: Long) {
@@ -62,7 +54,7 @@ class ProgramViewModel constructor(
             if (uiState.value.containers.isEmpty()) {
                 "请先添加容器".showShortToast()
             } else {
-                dao.insert(ProgramEntity(name = name, subId = uiState.value.containers[0].id))
+                dao.insert(ProgramEntity(text = name, subId = uiState.value.containers[0].id))
             }
         }
     }
@@ -108,5 +100,4 @@ data class ProgramUiState(
     val entities: List<ProgramEntity> = emptyList(),
     val containers: List<ContainerEntity> = emptyList(),
     val selected: Long = 0L,
-    val page: PageEnum = PageEnum.MAIN,
 )

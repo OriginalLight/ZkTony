@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui
 
 import android.annotation.SuppressLint
 import android.graphics.Color
@@ -36,8 +36,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -73,10 +71,9 @@ import androidx.navigation.compose.rememberNavController
 import com.google.gson.Gson
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.ui.components.ZkTonyScaffold
-import com.zktony.android.ui.components.ZkTonyTopAppBar
+import com.zktony.android.ui.components.ZktyTopAppBar
 import com.zktony.android.ui.navigation.Route
-import com.zktony.android.ui.utils.PageEnum
+import com.zktony.android.ui.utils.PageType
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.createQRCodeBitmap
 import com.zktony.core.utils.QrCode
@@ -91,64 +88,62 @@ import kotlinx.coroutines.launch
  * @param viewModel SettingViewModel
  */
 @Composable
-fun SettingScreen(
+fun ZktySetting(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: SettingViewModel,
+    viewModel: ZktySettingViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-
+    val page = remember { mutableStateOf(PageType.LIST) }
 
     BackHandler {
-        if (uiState.page == PageEnum.MAIN) {
-            navController.navigateUp()
-        } else {
-            viewModel.navigationTo(PageEnum.MAIN)
+        when (page.value) {
+            PageType.LIST -> navController.navigateUp()
+            else -> page.value = PageType.LIST
         }
     }
 
-    ZkTonyScaffold(
-        modifier = modifier,
-        topBar = {
-            AnimatedVisibility(visible = uiState.page == PageEnum.AUTHENTICATION) {
-                ZkTonyTopAppBar(title = stringResource(id = R.string.authentication), navigation = {
-                    if (uiState.page == PageEnum.MAIN) {
-                        navController.navigateUp()
-                    } else {
-                        viewModel.navigationTo(PageEnum.MAIN)
+    Column(modifier = modifier) {
+        // Top app bar when authentication page is visible
+        AnimatedVisibility(visible = page.value == PageType.AUTH) {
+            ZktyTopAppBar(
+                title = stringResource(id = R.string.authentication),
+                navigation = {
+                    when (page.value) {
+                        PageType.LIST -> navController.navigateUp()
+                        else -> page.value = PageType.LIST
                     }
-                })
-            }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) {
-        AnimatedVisibility(visible = uiState.page == PageEnum.MAIN) {
-            SettingMainPage(
+                }
+            )
+        }
+        // main page
+        AnimatedVisibility(visible = page.value == PageType.LIST) {
+            SettingList(
                 modifier = modifier,
                 uiState = uiState,
                 checkUpdate = viewModel::checkUpdate,
-                navigationTo = viewModel::navigationTo,
+                navigationToAuth = { page.value = PageType.AUTH },
                 openWifi = viewModel::openWifi,
                 setLanguage = viewModel::setLanguage,
                 setNavigation = viewModel::setNavigation,
             )
         }
-        AnimatedVisibility(visible = uiState.page == PageEnum.AUTHENTICATION) {
-            AuthenticationPage(
+        // authentication page
+        AnimatedVisibility(visible = page.value == PageType.AUTH) {
+            Authentication(
                 modifier = modifier,
                 navController = navController,
-                navigationTo = viewModel::navigationTo,
+                navigationToList = { page.value = PageType.LIST },
             )
         }
     }
 }
 
 @Composable
-fun SettingMainPage(
+fun SettingList(
     modifier: Modifier = Modifier,
     checkUpdate: () -> Unit = {},
-    navigationTo: (PageEnum) -> Unit = {},
+    navigationToAuth: () -> Unit = {},
     openWifi: () -> Unit = {},
     setLanguage: (String) -> Unit = {},
     setNavigation: (Boolean) -> Unit = {},
@@ -175,7 +170,7 @@ fun SettingMainPage(
         OperationContent(
             modifier = Modifier.wrapContentHeight(),
             checkUpdate = checkUpdate,
-            navigationTo = navigationTo,
+            navigationToAuth = navigationToAuth,
             openWifi = openWifi,
             uiState = uiState,
         )
@@ -420,7 +415,7 @@ fun InfoContent(
 fun OperationContent(
     modifier: Modifier = Modifier,
     checkUpdate: () -> Unit = {},
-    navigationTo: (PageEnum) -> Unit = {},
+    navigationToAuth: () -> Unit = {},
     openWifi: () -> Unit = {},
     uiState: SettingUiState,
 ) {
@@ -438,7 +433,7 @@ fun OperationContent(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp)
-                .clickable { navigationTo(PageEnum.AUTHENTICATION) },
+                .clickable { navigationToAuth() },
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -625,16 +620,12 @@ fun VerificationCodeField(
 }
 
 @Composable
-fun AuthenticationPage(
+fun Authentication(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    navigationTo: (PageEnum) -> Unit = {},
+    navigationToList: () -> Unit = {},
 ) {
     var show by remember { mutableStateOf(false) }
-
-    BackHandler {
-        navigationTo(PageEnum.MAIN)
-    }
 
     Column(
         modifier = modifier
@@ -661,7 +652,7 @@ fun AuthenticationPage(
             ) {
                 ElevatedCard(
                     modifier = Modifier.clickable {
-                        navigationTo(PageEnum.MAIN)
+                        navigationToList()
                         navController.navigate(Route.MOTOR)
                     },
                 ) {
@@ -684,7 +675,7 @@ fun AuthenticationPage(
                 }
                 ElevatedCard(
                     modifier = Modifier.clickable {
-                        navigationTo(PageEnum.MAIN)
+                        navigationToList()
                         navController.navigate(Route.CONFIG)
                     },
                 ) {
@@ -750,12 +741,12 @@ fun SettingsCard(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun SettingMainPagePreview() {
-    SettingMainPage(uiState = SettingUiState())
+fun SettingListPreview() {
+    SettingList(uiState = SettingUiState())
 }
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun AuthenticationPagePreview() {
-    AuthenticationPage(navController = rememberNavController())
+fun AuthenticationPreview() {
+    Authentication(navController = rememberNavController())
 }

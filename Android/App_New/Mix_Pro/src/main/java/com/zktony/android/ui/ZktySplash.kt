@@ -1,10 +1,11 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui
 
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,7 +43,7 @@ import com.zktony.android.ui.navigation.Route
  */
 
 @Composable
-fun SplashScreen(
+fun ZktySplash(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     openDrawer: () -> Unit = {},
@@ -64,7 +66,13 @@ fun SplashScreen(
     }
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp)
+            .background(
+                color = MaterialTheme.colorScheme.background,
+                shape = MaterialTheme.shapes.medium
+            ),
         contentAlignment = Alignment.Center,
     ) {
         AnimatedVisibility(visible = splash) {
@@ -91,8 +99,9 @@ fun SplashScreen(
                     modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 32.dp),
                     text = stringResource(id = R.string.notice_content),
                     style = TextStyle(
-                        fontSize = 24.sp,
-                        lineHeight = 36.sp,
+                        fontSize = 22.sp,
+                        lineHeight = 32.sp,
+                        fontWeight = FontWeight.Medium,
                     ),
                 )
                 Button(
@@ -112,5 +121,4 @@ fun SplashScreen(
             }
         }
     }
-
 }

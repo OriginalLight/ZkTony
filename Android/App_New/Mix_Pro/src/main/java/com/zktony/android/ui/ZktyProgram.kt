@@ -1,4 +1,4 @@
-package com.zktony.android.ui.screen
+package com.zktony.android.ui
 
 import android.graphics.Point
 import androidx.activity.compose.BackHandler
@@ -42,8 +42,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -71,97 +69,98 @@ import com.zktony.android.R
 import com.zktony.android.logic.data.entities.ContainerEntity
 import com.zktony.android.logic.data.entities.ProgramEntity
 import com.zktony.android.ui.components.DynamicMixPlate
-import com.zktony.android.ui.components.ZkTonyBottomAddAppBar
-import com.zktony.android.ui.components.ZkTonyScaffold
-import com.zktony.android.ui.components.ZkTonyTopAppBar
-import com.zktony.android.ui.utils.PageEnum
+import com.zktony.android.ui.components.InputDialog
+import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.utils.PageType
 import com.zktony.core.ext.format
+import com.zktony.core.ext.showShortToast
 import com.zktony.core.ext.simpleDateFormat
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun ProgramScreen(
+fun ZktyProgram(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: ProgramViewModel,
+    viewModel: ZktyProgramViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    val page = remember { mutableStateOf(PageType.LIST) }
 
     BackHandler {
-        if (uiState.page == PageEnum.MAIN) {
-            navController.navigateUp()
-        } else {
-            viewModel.navigationTo(PageEnum.MAIN)
+        when (page.value) {
+            PageType.LIST -> navController.navigateUp()
+            else -> page.value = PageType.LIST
         }
     }
 
-    ZkTonyScaffold(
-        modifier = modifier,
-        topBar = {
-            AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
-                ZkTonyTopAppBar(
-                    title = stringResource(id = R.string.edit),
-                    navigation = {
-                        if (uiState.page == PageEnum.MAIN) {
-                            navController.navigateUp()
-                        } else {
-                            viewModel.navigationTo(PageEnum.MAIN)
-                        }
+    Column(modifier = modifier) {
+        // app bar for edit page
+        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+            ZktyTopAppBar(
+                title = stringResource(id = R.string.edit),
+                navigation = {
+                    when (page.value) {
+                        PageType.LIST -> navController.navigateUp()
+                        else -> page.value = PageType.LIST
                     }
-                )
-            }
-        },
-        bottomBar = {
-            AnimatedVisibility(visible = uiState.page == PageEnum.ADD) {
-                ZkTonyBottomAddAppBar(
-                    strings = uiState.entities.map { it.name },
-                    insert = viewModel::insert,
-                    navigationTo = viewModel::navigationTo,
-                )
-            }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) {
-        AnimatedVisibility(visible = uiState.page in listOf(PageEnum.MAIN, PageEnum.ADD)) {
-            ProgramMainPage(
+                }
+            )
+        }
+        // list page
+        AnimatedVisibility(visible = page.value == PageType.LIST) {
+            ProgramList(
                 modifier = Modifier,
                 uiState = uiState,
+                insert = viewModel::insert,
                 delete = viewModel::delete,
-                navigationTo = viewModel::navigationTo,
+                navigationToEdit = { page.value = PageType.EDIT },
                 toggleSelected = viewModel::toggleSelected,
             )
         }
-        AnimatedVisibility(visible = uiState.page == PageEnum.EDIT) {
-            ProgramEditPage(
+        // edit page
+        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+            ProgramEdit(
                 modifier = Modifier,
                 entity = uiState.entities.find { it.id == uiState.selected }!!,
                 containers = uiState.containers,
                 update = viewModel::update,
                 toggleActive = viewModel::toggleActive,
                 toggleContainer = viewModel::toggleContainer,
-                showSnackbar = {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(it)
-                    }
-                },
             )
         }
     }
 }
 
 @Composable
-fun ProgramMainPage(
+fun ProgramList(
     modifier: Modifier = Modifier,
     uiState: ProgramUiState = ProgramUiState(),
+    insert: (String) -> Unit = {},
     delete: (Long) -> Unit = {},
-    navigationTo: (PageEnum) -> Unit = {},
+    navigationToEdit: () -> Unit = {},
     toggleSelected: (Long) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val columnState = rememberLazyListState()
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        InputDialog(
+            onConfirm = {
+                scope.launch {
+                    val nameList = uiState.entities.map { it.text }
+                    if (nameList.contains(it)) {
+                        "Name already exists".showShortToast()
+                    } else {
+                        insert(it)
+                        showDialog = false
+                    }
+                }
+            },
+            onCancel = { showDialog = false },
+        )
+    }
 
     Row(
         modifier = modifier
@@ -214,7 +213,7 @@ fun ProgramMainPage(
                                 contentDescription = null,
                             )
                             Text(
-                                text = it.name,
+                                text = it.text,
                                 style = MaterialTheme.typography.bodyLarge,
                                 maxLines = 1,
                             )
@@ -240,11 +239,12 @@ fun ProgramMainPage(
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Add
             FloatingActionButton(
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
-                onClick = { navigationTo(PageEnum.ADD) }
+                onClick = { showDialog = true }
             ) {
                 Icon(
                     modifier = Modifier.size(36.dp),
@@ -253,6 +253,7 @@ fun ProgramMainPage(
                     tint = Color.Black,
                 )
             }
+            // Delete
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 var count by remember { mutableStateOf(0) }
 
@@ -280,12 +281,13 @@ fun ProgramMainPage(
                     )
                 }
             }
+            // Edit
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier
                         .padding(8.dp)
                         .fillMaxWidth(),
-                    onClick = { navigationTo(PageEnum.EDIT) }
+                    onClick = navigationToEdit,
                 ) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -300,18 +302,18 @@ fun ProgramMainPage(
 }
 
 @OptIn(
-    ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalLayoutApi::class,
+    ExperimentalMaterial3Api::class,
     ExperimentalComposeUiApi::class
 )
 @Composable
-fun ProgramEditPage(
+fun ProgramEdit(
     modifier: Modifier = Modifier,
     entity: ProgramEntity = ProgramEntity(),
     containers: List<ContainerEntity> = emptyList(),
     update: (ProgramEntity) -> Unit = {},
     toggleActive: (Int) -> Unit = {},
     toggleContainer: (Long) -> Unit = {},
-    showSnackbar: (String) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
@@ -366,13 +368,12 @@ fun ProgramEditPage(
                         onClick = {
                             scope.launch {
                                 toggleContainer(it.id)
-                                showSnackbar("已切换容器- ${it.name}")
                             }
                         },
                         label = {
                             Text(
                                 modifier = Modifier.padding(horizontal = 8.dp),
-                                text = it.name,
+                                text = it.text,
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         },
@@ -553,7 +554,7 @@ fun ProgramEditPage(
                                             )
                                         )
                                     )
-                                    showSnackbar("已更新数据")
+                                    "已更新数据".showShortToast()
                                 }
                             },
                         ) {
@@ -572,11 +573,11 @@ fun ProgramEditPage(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ProgramMainPagePreview() {
-    ProgramMainPage(
+fun ProgramListPreview() {
+    ProgramList(
         uiState = ProgramUiState(
             entities = listOf(
-                ProgramEntity(name = "test")
+                ProgramEntity(text = "test")
             )
         )
     )
@@ -584,7 +585,7 @@ fun ProgramMainPagePreview() {
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ProgramEditPagePreview() {
+fun ProgramEditPreview() {
     val pointList = mutableListOf<Point>()
     repeat(6) {
         pointList.add(Point())
@@ -593,7 +594,7 @@ fun ProgramEditPagePreview() {
     repeat(10) {
         containers.add(ContainerEntity())
     }
-    ProgramEditPage(
+    ProgramEdit(
         entity = ProgramEntity(),
         containers = containers,
     )
