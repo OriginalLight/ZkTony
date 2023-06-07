@@ -132,7 +132,7 @@ abstract class AbstractSerialHelper {
                         dataProcess(null)
                     }
                     try {
-                        sleep(1L)
+                        sleep(4L)
                     } catch (e: InterruptedException) {
                         e.printStackTrace()
                     }

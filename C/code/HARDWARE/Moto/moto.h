@@ -32,33 +32,33 @@ typedef struct
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 // #define T1_FREQ 2000000
-//#define T1_FREQ_2 1000000
+// #define T1_FREQ_2 1000000
 // #define SPR 1000
 
-// ¶¨Òå¶¨Ê±Æ÷Ô¤·ÖÆµ£¬¶¨Ê±Æ÷Êµ¼ÊÊ±ÖÓÆµÂÊÎª£º168MHz/£¨STEPMOTOR_TIMx_PRESCALER+1£©
-//  #define STEPMOTOR_TIM_PRESCALER               5  // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   32  Ï¸·Ö
- #define STEPMOTOR_TIM_PRESCALER 9 					// ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   16  Ï¸·Ö
-// #define STEPMOTOR_TIM_PRESCALER               19  // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   8  Ï¸·Ö
-// #define STEPMOTOR_TIM_PRESCALER               39  // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   4  Ï¸·Ö
-// #define STEPMOTOR_TIM_PRESCALER               79  // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   2  Ï¸·Ö
-// #define STEPMOTOR_TIM_PRESCALER               159 // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   1  Ï¸·Ö
+// ï¿½ï¿½ï¿½å¶¨Ê±ï¿½ï¿½Ô¤ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Êµï¿½ï¿½Ê±ï¿½ï¿½Æµï¿½ï¿½Îªï¿½ï¿½168MHz/ï¿½ï¿½STEPMOTOR_TIMx_PRESCALER+1ï¿½ï¿½
+//  #define STEPMOTOR_TIM_PRESCALER               5  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   32  Ï¸ï¿½ï¿½
+#define STEPMOTOR_TIM_PRESCALER 9 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   16  Ï¸ï¿½ï¿½
+// #define STEPMOTOR_TIM_PRESCALER               19  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   8  Ï¸ï¿½ï¿½
+// #define STEPMOTOR_TIM_PRESCALER               39  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   4  Ï¸ï¿½ï¿½
+// #define STEPMOTOR_TIM_PRESCALER               79  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   2  Ï¸ï¿½ï¿½
+// #define STEPMOTOR_TIM_PRESCALER               159 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   1  Ï¸ï¿½ï¿½
 
-// ¶¨Òå¶¨Ê±Æ÷ÖÜÆÚ£¬Êä³ö±È½ÏÄ£Ê½ÖÜÆÚÉèÖÃÎª0xFFFF
-#define STEPMOTOR_TIM_PERIOD                  0xFFFF
+// ï¿½ï¿½ï¿½å¶¨Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½È½ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª0xFFFF
+#define STEPMOTOR_TIM_PERIOD 0xFFFF
 
-#define STOP 0													  // ¼Ó¼õËÙÇúÏß×´Ì¬£ºÍ£Ö¹
-#define ACCEL 1													  // ¼Ó¼õËÙÇúÏß×´Ì¬£º¼ÓËÙ½×¶Î
-#define DECEL 2													  // ¼Ó¼õËÙÇúÏß×´Ì¬£º¼õËÙ½×¶Î
-#define RUN 3													  // ¼Ó¼õËÙÇúÏß×´Ì¬£ºÔÈËÙ½×¶Î
-#define T1_FREQ (SystemCoreClock / (STEPMOTOR_TIM_PRESCALER + 1)) // ÆµÂÊftÖµ
-#define FSPR 200												  // ²½½øµç»úµ¥È¦²½Êý
-#define MICRO_STEP 16											  // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÊý
-#define SPR (FSPR * MICRO_STEP)									  // Ðý×ªÒ»È¦ÐèÒªµÄÂö³åÊý
+#define STOP 0													  // ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½Í£Ö¹
+#define ACCEL 1													  // ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ù½×¶ï¿½
+#define DECEL 2													  // ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ù½×¶ï¿½
+#define RUN 3													  // ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ù½×¶ï¿½
+#define T1_FREQ (SystemCoreClock / (STEPMOTOR_TIM_PRESCALER + 1)) // Æµï¿½ï¿½ftÖµ
+#define FSPR 200												  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¦ï¿½ï¿½ï¿½ï¿½
+#define MICRO_STEP 16											  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½
+#define SPR (FSPR * MICRO_STEP)									  // ï¿½ï¿½×ªÒ»È¦ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-// ÊýÑ§³£Êý
-#define ALPHA ((float)(2 * 3.14159 / SPR)) // ¦Á= 2*pi/spr
+// ï¿½ï¿½Ñ§ï¿½ï¿½ï¿½ï¿½
+#define ALPHA ((float)(2 * 3.14159 / SPR)) // ï¿½ï¿½= 2*pi/spr
 #define A_T_x10 ((float)(10 * ALPHA * T1_FREQ))
-#define T1_FREQ_148 ((float)((T1_FREQ * 0.676) / 10)) // 0.676ÎªÎó²îÐÞÕýÖµ
+#define T1_FREQ_148 ((float)((T1_FREQ * 0.676) / 10)) // 0.676Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 #define A_SQ ((float)(2 * 100000 * ALPHA))
 #define A_x200 ((float)(200 * ALPHA))
 
@@ -77,19 +77,19 @@ typedef struct
 
 #define MOTONUM 16
 
-#define Moto_For 1	// µç»úÕý×ª
-#define Moto_Back 0 // µç»ú·´×ª
+#define Moto_For 1	// ï¿½ï¿½ï¿½ï¿½ï¿½×ª
+#define Moto_Back 0 // ï¿½ï¿½ï¿½ï¿½ï¿½×ª
 
 typedef struct
 {
 	uint8_t MotoDir; //
-	uint8_t Mxf;		// Ï¸·Ö
+	uint8_t Mxf;	 // Ï¸ï¿½ï¿½
 	uint8_t MAccfactor;
 	uint8_t MDelfactor;
-	uint8_t Mmode;	// µç»úÔË¶¯Ä£Ê½
-	uint8_t Maction; // µç»ú¶¯×÷
+	uint8_t Mmode;	 // ï¿½ï¿½ï¿½ï¿½Ë¶ï¿½Ä£Ê½
+	uint8_t Maction; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	uint8_t Mlevel;
-	uint8_t Mstate; // µç»ú×´Ì¬
+	uint8_t Mstate; // ï¿½ï¿½ï¿½×´Ì¬
 	uint8_t MID;
 	uint8_t Mflag;
 	uint8_t MotionStatus;
@@ -101,32 +101,29 @@ typedef struct
 	uint16_t Maccel;
 	uint16_t Mdecel;
 
-	uint32_t MotoPosCurr; // µ±Ç°Î»ÖÃ
-	uint32_t MotoPosLast; // ÉÏÒ»´ÎÎ»ÖÃ
-	uint32_t MotoDis;	 // ÕûÌå¾àÀë
+	uint32_t MotoPosCurr; // ï¿½ï¿½Ç°Î»ï¿½ï¿½
+	uint32_t MotoPosLast; // ï¿½ï¿½Ò»ï¿½ï¿½Î»ï¿½ï¿½
+	uint32_t MotoDis;	  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-	int32_t Mstep; // ²½Êý
+	int32_t Mstep; // ï¿½ï¿½ï¿½ï¿½
 
 } Moto_Struct;
 
 typedef struct
 {
-	uint8_t addr;   //
+	uint8_t addr;	//
 	uint8_t lamode; //
 	uint8_t lbmode;
 	uint8_t lcmode;
 	uint8_t ldmode;
-	uint32_t baud; // Ï¸·Ö
+	uint32_t baud; // Ï¸ï¿½ï¿½
 } Device_Struct;
 
-
-
-
 #define M1_EN PBout(6)
-#define M1_DIR PCout(15) // DS0 
+#define M1_DIR PCout(15) // DS0
 
 #define M2_EN PBout(6)	// DS1
-#define M2_DIR PCout(0) // DS0    
+#define M2_DIR PCout(0) // DS0
 
 #define M3_EN PBout(6)	// DS1
 #define M3_DIR PCout(1) // DS0
@@ -170,7 +167,7 @@ typedef struct
 #define M16_EN PEout(0)	  // DS1
 #define M16_DIR PCout(14) // DS0
 
-void TIM_SetCompare(uint8_t num,uint16_t val);
+void TIM_SetCompare(uint8_t num, uint16_t val);
 uint16_t TIM_GetCompare(uint8_t num);
 void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t accel, uint32_t decel, uint32_t speed);
 

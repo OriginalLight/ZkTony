@@ -1,662 +1,660 @@
-/*! 
+/*!
  *  \file hmi_driver.h
- *  \brief ´®¿ÚÆÁÇý¶¯ÎÄ¼þ
+ *  \brief ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
  *  \version 1.0
  *  \date 2012-2015
- *  \copyright ¹ãÖÝ´ó²Ê¹âµç¿Æ¼¼ÓÐÏÞ¹«Ë¾
+ *  \copyright ï¿½ï¿½ï¿½Ý´ï¿½Ê¹ï¿½ï¿½Æ¼ï¿½ï¿½ï¿½ï¿½Þ¹ï¿½Ë¾
  */
 
 #ifndef _HMI_DRIVER_
 #define _HMI_DRIVER_
 
-#define CRC16_ENABLE 0         /*!< Èç¹ûÐèÒªCRC16Ð£Ñé¹¦ÄÜ£¬ÐÞ¸Ä´ËºêÎª1(´ËÊ±ÐèÒªÔÚVisualTFT¹¤³ÌÖÐÅäCRCÐ£Ñé)*/
+#define CRC16_ENABLE 0 /*!< ï¿½ï¿½ï¿½ï¿½ï¿½ÒªCRC16Ð£ï¿½é¹¦ï¿½Ü£ï¿½ï¿½Þ¸Ä´Ëºï¿½Îª1(ï¿½ï¿½Ê±ï¿½ï¿½Òªï¿½ï¿½VisualTFTï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½CRCÐ£ï¿½ï¿½)*/
 
-#define QUEUE_MAX_SIZE 8202   /*!< Ö¸Áî½ÓÊÕ»º³åÇø´óÐ¡£¬¸ù¾ÝÐèÒªµ÷Õû£¬¾¡Á¿ÉèÖÃ´óÒ»Ð©*/
+#define QUEUE_MAX_SIZE 8202 /*!< Ö¸ï¿½ï¿½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã´ï¿½Ò»Ð©*/
 
+// extern uint8 cmd_buffer[CMD_MAX_SIZE];
 
-//extern uint8 cmd_buffer[CMD_MAX_SIZE];
-
-#include "usart.h"	
-/*! 
- *  \brief  ¼ì²éÊý¾ÝÊÇ·ñ·ûºÏCRC16Ð£Ñé
- *  \param buffer ´ýÐ£ÑéµÄÊý¾Ý£¬Ä©Î²´æ´¢CRC16
- *  \param n Êý¾Ý³¤¶È£¬°üº¬CRC16
- *  \return Ð£ÑéÍ¨¹ý·µ»Ø1£¬·ñÔò·µ»Ø0
+#include "usart.h"
+/*!
+ *  \brief  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½CRC16Ð£ï¿½ï¿½
+ *  \param buffer ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½Ä©Î²ï¿½æ´¢CRC16
+ *  \param n ï¿½ï¿½ï¿½Ý³ï¿½ï¿½È£ï¿½ï¿½ï¿½ï¿½ï¿½CRC16
+ *  \return Ð£ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½ò·µ»ï¿½0
  */
-uint16 CheckCRC16(uint8 *buffer,uint16 n);
+uint16 CheckCRC16(uint8 *buffer, uint16 n);
 
-/*! 
- *  \brief  ÑÓÊ±
- *  \param  n ÑÓÊ±Ê±¼ä(ºÁÃëµ¥Î»)
+/*!
+ *  \brief  ï¿½ï¿½Ê±
+ *  \param  n ï¿½ï¿½Ê±Ê±ï¿½ï¿½(ï¿½ï¿½ï¿½ëµ¥Î»)
  */
 void DelayMS(unsigned int n);
 
-/*! 
- *  \brief  Ëø¶¨Éè±¸ÅäÖÃ£¬Ëø¶¨Ö®ºóÐèÒª½âËø£¬²ÅÄÜÐÞ¸Ä²¨ÌØÂÊ¡¢´¥ÃþÆÁ¡¢·äÃùÆ÷¹¤×÷·½Ê½
+/*!
+ *  \brief  ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ¸Ä²ï¿½ï¿½ï¿½ï¿½Ê¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê½
  */
 void LockDeviceConfig(void);
 
-/*! 
- *  \brief  ½âËøÉè±¸ÅäÖÃ
+/*!
+ *  \brief  ï¿½ï¿½ï¿½ï¿½ï¿½è±¸ï¿½ï¿½ï¿½ï¿½
  */
 void UnlockDeviceConfig(void);
 
-/*! 
- *  \brief     ÐÞ¸Ä´®¿ÚÆÁµÄ²¨ÌØÂÊ
- *  \details  ²¨ÌØÂÊÑ¡Ïî·¶Î§[0~14]£¬¶ÔÓ¦Êµ¼Ê²¨ÌØÂÊ
+/*!
+ *  \brief     ï¿½Þ¸Ä´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \details  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½î·¶Î§[0~14]ï¿½ï¿½ï¿½ï¿½Ó¦Êµï¿½Ê²ï¿½ï¿½ï¿½ï¿½ï¿½
                    {1200,2400,4800,9600,19200,38400,57600,115200,1000000,2000000,218750,437500,875000,921800,2500000}
- *  \param  option ²¨ÌØÂÊÑ¡Ïî
+ *  \param  option ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½
  */
 void SetCommBps(uint8 option);
 
-/*! 
- *  \brief  ·¢ËÍÎÕÊÖÃüÁî
+/*!
+ *  \brief  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 void SetHandShake(void);
-void DisText(uint16 x, uint16 y,uint16 z,uint8 back,uint8 font,uchar *strings );
-void DisCursor(uint8 enable,uint16 x, uint16 y,uint16 z,uint8 width,uint8 height );
-void DisArea_Image(uint16 x,uint16 y,uint16 z,uint16 image_id,uint8 masken);
-void DisCut_Image(uint16 x,uint16 y,uint16 z,uint16 image_id,uint16 image_x,uint16 image_y,uint16 image_z,uint16 image_l, uint16 image_w,uint8 masken);
-void DisFlashImage(uint16 x,uint16 y,uint16 z,uint16 flashimage_id,uint8 enable,uint8 playnum);
-void GUI_Dot(uint16 x,uint16 y,uint16 z);
+void DisText(uint16 x, uint16 y, uint16 z, uint8 back, uint8 font, uchar *strings);
+void DisCursor(uint8 enable, uint16 x, uint16 y, uint16 z, uint8 width, uint8 height);
+void DisArea_Image(uint16 x, uint16 y, uint16 z, uint16 image_id, uint8 masken);
+void DisCut_Image(uint16 x, uint16 y, uint16 z, uint16 image_id, uint16 image_x, uint16 image_y, uint16 image_z, uint16 image_l, uint16 image_w, uint8 masken);
+void DisFlashImage(uint16 x, uint16 y, uint16 z, uint16 flashimage_id, uint8 enable, uint8 playnum);
+void GUI_Dot(uint16 x, uint16 y, uint16 z);
 void GUI_Line(uint16 x0, uint16 y0, uint16 z0, uint16 x1, uint16 y1, uint16 z1);
 void GUI_Circle(uint16 x, uint16 y, uint16 z, uint16 r);
-void GUI_CircleFill(uint16 x, uint16 y, uint16 z,uint16 r);
-void GUI_Arc(uint16 x,uint16 y,uint16 z, uint16 r,uint16 sa, uint16 ea);
-void GUI_EllipseFill(uint16 x0, uint16 y0, uint16 x1,uint16 y1,uint16 z0 ,uint16 z1  );
-void GraphSetViewport(uint16 screen_id,uint16 control_id,int16 x_offset,uint16 x_mul,int16 y_offset,uint16 y_mul,int16 z_offset,uint16 z_mul);
-void ShowKeyboard(uint8 show,uint16 x,uint16 y,uint16 z,uint8 type,uint8 option,uint8 max_len);
-/*! 
- *  \brief  ÉèÖÃÇ°¾°É«
- *  \param  color Ç°¾°É«
+void GUI_CircleFill(uint16 x, uint16 y, uint16 z, uint16 r);
+void GUI_Arc(uint16 x, uint16 y, uint16 z, uint16 r, uint16 sa, uint16 ea);
+void GUI_EllipseFill(uint16 x0, uint16 y0, uint16 x1, uint16 y1, uint16 z0, uint16 z1);
+void GraphSetViewport(uint16 screen_id, uint16 control_id, int16 x_offset, uint16 x_mul, int16 y_offset, uint16 y_mul, int16 z_offset, uint16 z_mul);
+void ShowKeyboard(uint8 show, uint16 x, uint16 y, uint16 z, uint8 type, uint8 option, uint8 max_len);
+/*!
+ *  \brief  ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½É«
+ *  \param  color Ç°ï¿½ï¿½É«
  */
 void SetFcolor(uint16 color);
 
-/*! 
- *  \brief  ÉèÖÃ±³¾°É«
- *  \param  color ±³¾°É«
+/*!
+ *  \brief  ï¿½ï¿½ï¿½Ã±ï¿½ï¿½ï¿½É«
+ *  \param  color ï¿½ï¿½ï¿½ï¿½É«
  */
 void SetBcolor(uint16 color);
 
-/*! 
- *  \brief  Çå³ý»­Ãæ
+/*!
+ *  \brief  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 void GUI_CleanScreen(void);
 
-/*! 
- *  \brief  ÉèÖÃÎÄ×Ö¼ä¸ô
- *  \param  x_w ºáÏò¼ä¸ô
-  *  \param  y_w ×ÝÏò¼ä¸ô
+/*!
+ *  \brief  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½
+ *  \param  x_w ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  y_w ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
-void SetTextSpace(uint8 x_w, uint8 y_w,uint8 z_w);
+void SetTextSpace(uint8 x_w, uint8 y_w, uint8 z_w);
 
-/*! 
- *  \brief  ÉèÖÃÎÄ×ÖÏÔÊ¾ÏÞÖÆ
- *  \param  enable ÊÇ·ñÆôÓÃÏÞÖÆ
- *  \param  width ¿í¶È
- *  \param  height ¸ß¶È
+/*!
+ *  \brief  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½
+ *  \param  enable ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  width ï¿½ï¿½ï¿½ï¿½
+ *  \param  height ï¿½ß¶ï¿½
  */
-void SetFont_Region(uint8 enable,uint16 width,uint16 height );
+void SetFont_Region(uint8 enable, uint16 width, uint16 height);
 
-/*! 
- *  \brief  ÉèÖÃ¹ýÂËÉ«
- *  \param  fillcolor_dwon ÑÕÉ«ÏÂ½ç
- *  \param  fillcolor_up ÑÕÉ«ÉÏ½ç
+/*!
+ *  \brief  ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½É«
+ *  \param  fillcolor_dwon ï¿½ï¿½É«ï¿½Â½ï¿½
+ *  \param  fillcolor_up ï¿½ï¿½É«ï¿½Ï½ï¿½
  */
 void SetFilterColor(uint16 fillcolor_dwon, uint16 fillcolor_up);
 
-/*! 
- *  \brief  ÉèÖÃ¹ýÂËÉ«
- *  \param  x Î»ÖÃX×ø±ê
- *  \param  y Î»ÖÃY×ø±ê
- *  \param  back ÑÕÉ«ÉÏ½ç
- *  \param  font ×ÖÌå
- *  \param  strings ×Ö·û´®ÄÚÈÝ
+/*!
+ *  \brief  ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½É«
+ *  \param  x Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  back ï¿½ï¿½É«ï¿½Ï½ï¿½
+ *  \param  font ï¿½ï¿½ï¿½ï¿½
+ *  \param  strings ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
-//void DisText(uint16 x, uint16 y,uint8 back,uint8 font,uchar *strings );
+// void DisText(uint16 x, uint16 y,uint8 back,uint8 font,uchar *strings );
 
-/*! 
- *  \brief    ÏÔÊ¾¹â±ê
- *  \param  enable ÊÇ·ñÏÔÊ¾
- *  \param  x Î»ÖÃX×ø±ê
- *  \param  y Î»ÖÃY×ø±ê
- *  \param  width ¿í¶È
- *  \param  height ¸ß¶È
+/*!
+ *  \brief    ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½
+ *  \param  enable ï¿½Ç·ï¿½ï¿½ï¿½Ê¾
+ *  \param  x Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  width ï¿½ï¿½ï¿½ï¿½
+ *  \param  height ï¿½ß¶ï¿½
  */
-//void DisCursor(uint8 enable,uint16 x, uint16 y,uint8 width,uint8 height );
+// void DisCursor(uint8 enable,uint16 x, uint16 y,uint8 width,uint8 height );
 
-/*! 
- *  \brief      ÏÔÊ¾È«ÆÁÍ¼Æ¬
- *  \param  image_id Í¼Æ¬Ë÷Òý
- *  \param  masken ÊÇ·ñÆôÓÃÍ¸Ã÷ÑÚÂë
+/*!
+ *  \brief      ï¿½ï¿½Ê¾È«ï¿½ï¿½Í¼Æ¬
+ *  \param  image_id Í¼Æ¬ï¿½ï¿½ï¿½ï¿½
+ *  \param  masken ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
-void DisFull_Image(uint16 image_id,uint8 masken);
+void DisFull_Image(uint16 image_id, uint8 masken);
 
-/*! 
- *  \brief      Ö¸¶¨Î»ÖÃÏÔÊ¾Í¼Æ¬
- *  \param  x Î»ÖÃX×ø±ê
- *  \param  y Î»ÖÃY×ø±ê
- *  \param  image_id Í¼Æ¬Ë÷Òý
- *  \param  masken ÊÇ·ñÆôÓÃÍ¸Ã÷ÑÚÂë
+/*!
+ *  \brief      Ö¸ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½Ê¾Í¼Æ¬
+ *  \param  x Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  image_id Í¼Æ¬ï¿½ï¿½ï¿½ï¿½
+ *  \param  masken ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
-//void DisArea_Image(uint16 x,uint16 y,uint16 image_id,uint8 masken);
+// void DisArea_Image(uint16 x,uint16 y,uint16 image_id,uint8 masken);
 
-/*! 
- *  \brief      ÏÔÊ¾²Ã¼ôÍ¼Æ¬
- *  \param  x Î»ÖÃX×ø±ê
- *  \param  y Î»ÖÃY×ø±ê
- *  \param  image_id Í¼Æ¬Ë÷Òý
- *  \param  image_x Í¼Æ¬²Ã¼ôÎ»ÖÃX×ø±ê
- *  \param  image_y Í¼Æ¬²Ã¼ôÎ»ÖÃY×ø±ê
- *  \param  image_l Í¼Æ¬²Ã¼ô³¤¶È
- *  \param  image_w Í¼Æ¬²Ã¼ô¸ß¶È
- *  \param  masken ÊÇ·ñÆôÓÃÍ¸Ã÷ÑÚÂë
+/*!
+ *  \brief      ï¿½ï¿½Ê¾ï¿½Ã¼ï¿½Í¼Æ¬
+ *  \param  x Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  image_id Í¼Æ¬ï¿½ï¿½ï¿½ï¿½
+ *  \param  image_x Í¼Æ¬ï¿½Ã¼ï¿½Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  image_y Í¼Æ¬ï¿½Ã¼ï¿½Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  image_l Í¼Æ¬ï¿½Ã¼ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  image_w Í¼Æ¬ï¿½Ã¼ï¿½ï¿½ß¶ï¿½
+ *  \param  masken ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
-//void DisCut_Image(uint16 x,uint16 y,uint16 image_id,uint16 image_x,uint16 image_y,uint16 image_l, uint16 image_w,uint8 masken);
+// void DisCut_Image(uint16 x,uint16 y,uint16 image_id,uint16 image_x,uint16 image_y,uint16 image_l, uint16 image_w,uint8 masken);
 
-/*! 
- *  \brief      ÏÔÊ¾GIF¶¯»­
- *  \param  x Î»ÖÃX×ø±ê
- *  \param  y Î»ÖÃY×ø±ê
- *  \param  flashimage_id Í¼Æ¬Ë÷Òý
- *  \param  enable ÊÇ·ñÏÔÊ¾
- *  \param  playnum ²¥·Å´ÎÊý
+/*!
+ *  \brief      ï¿½ï¿½Ê¾GIFï¿½ï¿½ï¿½ï¿½
+ *  \param  x Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  flashimage_id Í¼Æ¬ï¿½ï¿½ï¿½ï¿½
+ *  \param  enable ï¿½Ç·ï¿½ï¿½ï¿½Ê¾
+ *  \param  playnum ï¿½ï¿½ï¿½Å´ï¿½ï¿½ï¿½
  */
-//void DisFlashImage(uint16 x,uint16 y,uint16 flashimage_id,uint8 enable,uint8 playnum);
+// void DisFlashImage(uint16 x,uint16 y,uint16 flashimage_id,uint8 enable,uint8 playnum);
 
-/*! 
- *  \brief      »­µã
- *  \param  x Î»ÖÃX×ø±ê
- *  \param  y Î»ÖÃY×ø±ê
+/*!
+ *  \brief      ï¿½ï¿½ï¿½ï¿½
+ *  \param  x Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
  */
-//void GUI_Dot(uint16 x,uint16 y);
+// void GUI_Dot(uint16 x,uint16 y);
 
-/*! 
- *  \brief      »­Ïß
- *  \param  x0 ÆðÊ¼Î»ÖÃX×ø±ê
- *  \param  y0 ÆðÊ¼Î»ÖÃY×ø±ê
- *  \param  x1 ½áÊøÎ»ÖÃX×ø±ê
- *  \param  y1 ½áÊøÎ»ÖÃY×ø±ê
+/*!
+ *  \brief      ï¿½ï¿½ï¿½ï¿½
+ *  \param  x0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  x1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
  */
-//void GUI_Line(uint16 x0, uint16 y0, uint16 x1, uint16 y1);
+// void GUI_Line(uint16 x0, uint16 y0, uint16 x1, uint16 y1);
 
-/*! 
- *  \brief      »­ÕÛÏß
+/*!
+ *  \brief      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  *  \param  mode Ä£Ê½
- *  \param  dot Êý¾Ýµã
- *  \param  dot_cnt µãÊý
+ *  \param  dot ï¿½ï¿½ï¿½Ýµï¿½
+ *  \param  dot_cnt ï¿½ï¿½ï¿½ï¿½
  */
-void GUI_ConDots(uint8 mode,uint16 *dot,uint16 dot_cnt);
+void GUI_ConDots(uint8 mode, uint16 *dot, uint16 dot_cnt);
 
-/*! 
- *  \brief      »­¿ÕÐÄÔ²
- *  \param  x0 Ô²ÐÄÎ»ÖÃX×ø±ê
- *  \param  y0 Ô²ÐÄÎ»ÖÃY×ø±ê
- *  \param  r °ë¾¶
+/*!
+ *  \brief      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô²
+ *  \param  x0 Ô²ï¿½ï¿½Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y0 Ô²ï¿½ï¿½Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  r ï¿½ë¾¶
  */
-//void GUI_Circle(uint16 x0, uint16 y0, uint16 r);
+// void GUI_Circle(uint16 x0, uint16 y0, uint16 r);
 
-/*! 
- *  \brief      »­ÊµÐÄÔ²
- *  \param  x0 Ô²ÐÄÎ»ÖÃX×ø±ê
- *  \param  y0 Ô²ÐÄÎ»ÖÃY×ø±ê
- *  \param  r °ë¾¶
+/*!
+ *  \brief      ï¿½ï¿½Êµï¿½ï¿½Ô²
+ *  \param  x0 Ô²ï¿½ï¿½Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y0 Ô²ï¿½ï¿½Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  r ï¿½ë¾¶
  */
-//void GUI_CircleFill(uint16 x0, uint16 y0, uint16 r);
+// void GUI_CircleFill(uint16 x0, uint16 y0, uint16 r);
 
-/*! 
- *  \brief      »­»¡Ïß
- *  \param  x0 Ô²ÐÄÎ»ÖÃX×ø±ê
- *  \param  y0 Ô²ÐÄÎ»ÖÃY×ø±ê
- *  \param  r °ë¾¶
- *  \param  sa ÆðÊ¼½Ç¶È
- *  \param  ea ÖÕÖ¹½Ç¶È
+/*!
+ *  \brief      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  x0 Ô²ï¿½ï¿½Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y0 Ô²ï¿½ï¿½Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  r ï¿½ë¾¶
+ *  \param  sa ï¿½ï¿½Ê¼ï¿½Ç¶ï¿½
+ *  \param  ea ï¿½ï¿½Ö¹ï¿½Ç¶ï¿½
  */
-//void GUI_Arc(uint16 x,uint16 y, uint16 r,uint16 sa, uint16 ea);
+// void GUI_Arc(uint16 x,uint16 y, uint16 r,uint16 sa, uint16 ea);
 
-/*! 
- *  \brief      »­¿ÕÐÄ¾ØÐÎ
- *  \param  x0 ÆðÊ¼Î»ÖÃX×ø±ê
- *  \param  y0 ÆðÊ¼Î»ÖÃY×ø±ê
- *  \param  x1 ½áÊøÎ»ÖÃX×ø±ê
- *  \param  y1 ½áÊøÎ»ÖÃY×ø±ê
+/*!
+ *  \brief      ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½
+ *  \param  x0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  x1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
  */
-void GUI_Rectangle(uint16 x0, uint16 y0, uint16 x1,uint16 y1 );
+void GUI_Rectangle(uint16 x0, uint16 y0, uint16 x1, uint16 y1);
 
-/*! 
- *  \brief      »­ÊµÐÄ¾ØÐÎ
- *  \param  x0 ÆðÊ¼Î»ÖÃX×ø±ê
- *  \param  y0 ÆðÊ¼Î»ÖÃY×ø±ê
- *  \param  x1 ½áÊøÎ»ÖÃX×ø±ê
- *  \param  y1 ½áÊøÎ»ÖÃY×ø±ê
+/*!
+ *  \brief      ï¿½ï¿½Êµï¿½Ä¾ï¿½ï¿½ï¿½
+ *  \param  x0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  x1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
  */
-void GUI_RectangleFill(uint16 x0, uint16 y0, uint16 x1,uint16 y1 );
+void GUI_RectangleFill(uint16 x0, uint16 y0, uint16 x1, uint16 y1);
 
-/*! 
- *  \brief      »­¿ÕÐÄÍÖÔ²
- *  \param  x0 ÆðÊ¼Î»ÖÃX×ø±ê
- *  \param  y0 ÆðÊ¼Î»ÖÃY×ø±ê
- *  \param  x1 ½áÊøÎ»ÖÃX×ø±ê
- *  \param  y1 ½áÊøÎ»ÖÃY×ø±ê
+/*!
+ *  \brief      ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô²
+ *  \param  x0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  x1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
  */
-void GUI_Ellipse (uint16 x0, uint16 y0, uint16 x1,uint16 y1 );
+void GUI_Ellipse(uint16 x0, uint16 y0, uint16 x1, uint16 y1);
 
-/*! 
- *  \brief      »­ÊµÐÄÍÖÔ²
- *  \param  x0 ÆðÊ¼Î»ÖÃX×ø±ê
- *  \param  y0 ÆðÊ¼Î»ÖÃY×ø±ê
- *  \param  x1 ½áÊøÎ»ÖÃX×ø±ê
- *  \param  y1 ½áÊøÎ»ÖÃY×ø±ê
+/*!
+ *  \brief      ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½Ô²
+ *  \param  x0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  x1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
  */
-//void GUI_EllipseFill (uint16 x0, uint16 y0, uint16 x1,uint16 y1 );
+// void GUI_EllipseFill (uint16 x0, uint16 y0, uint16 x1,uint16 y1 );
 
-/*! 
- *  \brief      »­Ïß
- *  \param  x0 ÆðÊ¼Î»ÖÃX×ø±ê
- *  \param  y0 ÆðÊ¼Î»ÖÃY×ø±ê
- *  \param  x1 ½áÊøÎ»ÖÃX×ø±ê
- *  \param  y1 ½áÊøÎ»ÖÃY×ø±ê
+/*!
+ *  \brief      ï¿½ï¿½ï¿½ï¿½
+ *  \param  x0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y0 ï¿½ï¿½Ê¼Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  x1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y1 ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
  */
 void SetBackLight(uint8 light_level);
 
-/*! 
- *  \brief   ·äÃùÆ÷ÉèÖÃ
- *  \time  time ³ÖÐøÊ±¼ä(ºÁÃëµ¥Î»)
+/*!
+ *  \brief   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \time  time ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½(ï¿½ï¿½ï¿½ëµ¥Î»)
  */
 void SetBuzzer(uint8 time);
 
-/*! 
- *  \brief   ´¥ÃþÆÁÉèÖÃ
- *  \param enable ´¥ÃþÊ¹ÄÜ
- *  \param beep_on ´¥Ãþ·äÃùÆ÷
- *  \param work_mode ´¥Ãþ¹¤×÷Ä£Ê½£º0°´ÏÂ¾ÍÉÏ´«£¬1ËÉ¿ª²ÅÉÏ´«£¬2²»¶ÏÉÏ´«×ø±êÖµ£¬3°´ÏÂºÍËÉ¿ª¾ùÉÏ´«Êý¾Ý
- *  \param press_calibration Á¬Ðøµã»÷´¥ÃþÆÁ20ÏÂÐ£×¼´¥ÃþÆÁ£º0½ûÓÃ£¬1ÆôÓÃ
+/*!
+ *  \brief   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param enable ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½
+ *  \param beep_on ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param work_mode ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½0ï¿½ï¿½ï¿½Â¾ï¿½ï¿½Ï´ï¿½ï¿½ï¿½1ï¿½É¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ï¿½ï¿½2ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½3ï¿½ï¿½ï¿½Âºï¿½ï¿½É¿ï¿½ï¿½ï¿½ï¿½Ï´ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param press_calibration ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½20ï¿½ï¿½Ð£×¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½ï¿½Ã£ï¿½1ï¿½ï¿½ï¿½ï¿½
  */
-void SetTouchPaneOption(uint8 enbale,uint8 beep_on,uint8 work_mode,uint8 press_calibration);
+void SetTouchPaneOption(uint8 enbale, uint8 beep_on, uint8 work_mode, uint8 press_calibration);
 
-/*! 
- *  \brief   Ð£×¼´¥ÃþÆÁ
+/*!
+ *  \brief   Ð£×¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
-void	CalibrateTouchPane(void);
+void CalibrateTouchPane(void);
 
-/*! 
- *  \brief  ´¥ÃþÆÁ²âÊÔ
+/*!
+ *  \brief  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 void TestTouchPane(void);
 
-/*! 
- *  \brief      ÉèÖÃµ±Ç°Ð´ÈëÍ¼²ã
- *  \details  Ò»°ãÓÃÓÚÊµÏÖË«»º´æÐ§¹û(»æÍ¼Ê±±ÜÃâÉÁË¸)£º
+/*!
+ *  \brief      ï¿½ï¿½ï¿½Ãµï¿½Ç°Ð´ï¿½ï¿½Í¼ï¿½ï¿½
+ *  \details  Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½Ë«ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½(ï¿½ï¿½Í¼Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ë¸)ï¿½ï¿½
  *  \details  uint8 layer = 0;
- *  \details  WriteLayer(layer);    //ÉèÖÃÐ´Èë²ã
- *  \details  ClearLayer(layer);    //Ê¹Í¼²ã±äÍ¸Ã÷
- *  \details  //Ìí¼ÓÒ»ÏµÁÐ»æÍ¼Ö¸Áî
+ *  \details  WriteLayer(layer);    //ï¿½ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½
+ *  \details  ClearLayer(layer);    //Ê¹Í¼ï¿½ï¿½ï¿½Í¸ï¿½ï¿½
+ *  \details  //ï¿½ï¿½ï¿½ï¿½Ò»Ïµï¿½Ð»ï¿½Í¼Ö¸ï¿½ï¿½
  *  \details  //DisText(100,100,0,4,"hello hmi!!!");
- *  \details  DisplyLayer(layer);  //ÇÐ»»ÏÔÊ¾²ã
- *  \details  layer = (layer+1)%2;  //Ë«»º´æÇÐ»»
+ *  \details  DisplyLayer(layer);  //ï¿½Ð»ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½
+ *  \details  layer = (layer+1)%2;  //Ë«ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½
  *  \see DisplyLayer
  *  \see ClearLayer
- *  \param  layer Í¼²ã±àºÅ
+ *  \param  layer Í¼ï¿½ï¿½ï¿½ï¿½
  */
 void WriteLayer(uint8 layer);
 
-/*! 
- *  \brief      ÉèÖÃµ±Ç°ÏÔÊ¾Í¼²ã
- *  \param  layer Í¼²ã±àºÅ
+/*!
+ *  \brief      ï¿½ï¿½ï¿½Ãµï¿½Ç°ï¿½ï¿½Ê¾Í¼ï¿½ï¿½
+ *  \param  layer Í¼ï¿½ï¿½ï¿½ï¿½
  */
 void DisplyLayer(uint8 layer);
 
-/*! 
- *  \brief      Çå³ýÍ¼²ã£¬Ê¹Í¼²ã±ä³ÉÍ¸Ã÷
- *  \param  layer Í¼²ã±àºÅ
+/*!
+ *  \brief      ï¿½ï¿½ï¿½Í¼ï¿½ã£¬Ê¹Í¼ï¿½ï¿½ï¿½ï¿½Í¸ï¿½ï¿½
+ *  \param  layer Í¼ï¿½ï¿½ï¿½ï¿½
  */
 void ClearLayer(uint8 layer);
 
-/*! 
- *  \brief  Ð´Êý¾Ýµ½´®¿ÚÆÁÓÃ»§´æ´¢Çø
- *  \param  startAddress ÆðÊ¼µØÖ·
- *  \param  length ×Ö½ÚÊý
- *  \param  _data ´ýÐ´ÈëµÄÊý¾Ý
+/*!
+ *  \brief  Ð´ï¿½ï¿½ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½æ´¢ï¿½ï¿½
+ *  \param  startAddress ï¿½ï¿½Ê¼ï¿½ï¿½Ö·
+ *  \param  length ï¿½Ö½ï¿½ï¿½ï¿½
+ *  \param  _data ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
-void WriteUserFlash(uint32 startAddress,uint16 length,uint8 *_data);
+void WriteUserFlash(uint32 startAddress, uint16 length, uint8 *_data);
 
-/*! 
- *  \brief  ´Ó´®¿ÚÆÁÓÃ»§´æ´¢Çø¶ÁÈ¡Êý¾Ý
- *  \param  startAddress ÆðÊ¼µØÖ·
- *  \param  length ×Ö½ÚÊý
+/*!
+ *  \brief  ï¿½Ó´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½ï¿½æ´¢ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
+ *  \param  startAddress ï¿½ï¿½Ê¼ï¿½ï¿½Ö·
+ *  \param  length ï¿½Ö½ï¿½ï¿½ï¿½
  */
-void ReadUserFlash(uint32 startAddress,uint16 length);
+void ReadUserFlash(uint32 startAddress, uint16 length);
 
-/*! 
- *  \brief      ¿½±´Í¼²ã
- *  \param  src_layer Ô­Ê¼Í¼²ã
- *  \param  dest_layer Ä¿±êÍ¼²ã
+/*!
+ *  \brief      ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½
+ *  \param  src_layer Ô­Ê¼Í¼ï¿½ï¿½
+ *  \param  dest_layer Ä¿ï¿½ï¿½Í¼ï¿½ï¿½
  */
-void CopyLayer(uint8 src_layer,uint8 dest_layer);
+void CopyLayer(uint8 src_layer, uint8 dest_layer);
 
-/*! 
- *  \brief      ÉèÖÃµ±Ç°»­Ãæ
- *  \param  screen_id »­ÃæID
+/*!
+ *  \brief      ï¿½ï¿½ï¿½Ãµï¿½Ç°ï¿½ï¿½ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
  */
 void SetScreen(uint16 screen_id);
 
-/*! 
- *  \brief      »ñÈ¡µ±Ç°»­Ãæ
+/*!
+ *  \brief      ï¿½ï¿½È¡ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½
  */
 void GetScreen(void);
 
-/*! 
- *  \brief     ½ûÓÃ\ÆôÓÃ»­Ãæ¸üÐÂ
- *  \details ½ûÓÃ\ÆôÓÃÒ»°ã³É¶ÔÊ¹ÓÃ£¬ÓÃÓÚ±ÜÃâÉÁË¸¡¢Ìá¸ßË¢ÐÂËÙ¶È
- *  \details ÓÃ·¨£º
- *	\details SetScreenUpdateEnable(0);//½ûÖ¹¸üÐÂ
- *	\details Ò»ÏµÁÐ¸üÐÂ»­ÃæµÄÖ¸Áî
- *	\details SetScreenUpdateEnable(1);//Á¢¼´¸üÐÂ
- *  \param  enable 0½ûÓÃ£¬1ÆôÓÃ
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \details ï¿½ï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½É¶ï¿½Ê¹ï¿½Ã£ï¿½ï¿½ï¿½ï¿½Ú±ï¿½ï¿½ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½ï¿½ï¿½ï¿½Ë¢ï¿½ï¿½ï¿½Ù¶ï¿½
+ *  \details ï¿½Ã·ï¿½ï¿½ï¿½
+ *	\details SetScreenUpdateEnable(0);//ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½
+ *	\details Ò»Ïµï¿½Ð¸ï¿½ï¿½Â»ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
+ *	\details SetScreenUpdateEnable(1);//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  enable 0ï¿½ï¿½ï¿½Ã£ï¿½1ï¿½ï¿½ï¿½ï¿½
  */
 void SetScreenUpdateEnable(uint8 enable);
 
-/*! 
- *  \brief     ÉèÖÃ¿Ø¼þÊäÈë½¹µã
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  focus ÊÇ·ñ¾ßÓÐÊäÈë½¹µã
+/*!
+ *  \brief     ï¿½ï¿½ï¿½Ã¿Ø¼ï¿½ï¿½ï¿½ï¿½ë½¹ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  focus ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ë½¹ï¿½ï¿½
  */
-void SetControlFocus(uint16 screen_id,uint16 control_id,uint8 focus);
+void SetControlFocus(uint16 screen_id, uint16 control_id, uint8 focus);
 
-/*! 
- *  \brief     ÏÔÊ¾\Òþ²Ø¿Ø¼þ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  visible ÊÇ·ñÏÔÊ¾
+/*!
+ *  \brief     ï¿½ï¿½Ê¾\ï¿½ï¿½ï¿½Ø¿Ø¼ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  visible ï¿½Ç·ï¿½ï¿½ï¿½Ê¾
  */
-void SetControlVisiable(uint16 screen_id,uint16 control_id,uint8 visible);
+void SetControlVisiable(uint16 screen_id, uint16 control_id, uint8 visible);
 
-/*! 
- *  \brief     ÉèÖÃ´¥Ãþ¿Ø¼þÊ¹ÄÜ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  enable ¿Ø¼þÊÇ·ñÊ¹ÄÜ
+/*!
+ *  \brief     ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½Ê¹ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  enable ï¿½Ø¼ï¿½ï¿½Ç·ï¿½Ê¹ï¿½ï¿½
  */
-void SetControlEnable(uint16 screen_id,uint16 control_id,uint8 enable);
+void SetControlEnable(uint16 screen_id, uint16 control_id, uint8 enable);
 
-/*! 
- *  \brief     »ñÈ¡¿Ø¼þÖµ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
+/*!
+ *  \brief     ï¿½ï¿½È¡ï¿½Ø¼ï¿½Öµ
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
  */
-void GetControlValue(uint16 screen_id,uint16 control_id);
+void GetControlValue(uint16 screen_id, uint16 control_id);
 
-/*! 
- *  \brief     ÉèÖÃ°´Å¥×´Ì¬
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  value °´Å¥×´Ì¬
+/*!
+ *  \brief     ï¿½ï¿½ï¿½Ã°ï¿½Å¥×´Ì¬
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  value ï¿½ï¿½Å¥×´Ì¬
  */
-void SetButtonValue(uint16 screen_id,uint16 control_id,uchar value);
+void SetButtonValue(uint16 screen_id, uint16 control_id, uchar value);
 
-/*! 
- *  \brief     ÉèÖÃÎÄ±¾Öµ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  str ÎÄ±¾Öµ
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½Öµ
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  str ï¿½Ä±ï¿½Öµ
  */
-void SetTextValue(uint16 screen_id,uint16 control_id,uchar *str);
+void SetTextValue(uint16 screen_id, uint16 control_id, uchar *str);
 
-/*! 
- *  \brief      ÉèÖÃ½ø¶ÈÖµ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  value ÊýÖµ
+/*!
+ *  \brief      ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½Öµ
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  value ï¿½ï¿½Öµ
  */
-void SetProgressValue(uint16 screen_id,uint16 control_id,uint32 value);
+void SetProgressValue(uint16 screen_id, uint16 control_id, uint32 value);
 
-/*! 
- *  \brief     ÉèÖÃÒÇ±íÖµ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  value ÊýÖµ
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½Ç±ï¿½Öµ
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  value ï¿½ï¿½Öµ
  */
-void SetMeterValue(uint16 screen_id,uint16 control_id,uint32 value);
+void SetMeterValue(uint16 screen_id, uint16 control_id, uint32 value);
 
-/*! 
- *  \brief      ÉèÖÃ»¬¶¯Ìõ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  value ÊýÖµ
+/*!
+ *  \brief      ï¿½ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  value ï¿½ï¿½Öµ
  */
-void SetSliderValue(uint16 screen_id,uint16 control_id,uint32 value);
+void SetSliderValue(uint16 screen_id, uint16 control_id, uint32 value);
 
-/*! 
- *  \brief      ÉèÖÃÑ¡Ôñ¿Ø¼þ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  item µ±Ç°Ñ¡Ïî
+/*!
+ *  \brief      ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½Ø¼ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  item ï¿½ï¿½Ç°Ñ¡ï¿½ï¿½
  */
-void SetSelectorValue(uint16 screen_id,uint16 control_id,uint8 item);
+void SetSelectorValue(uint16 screen_id, uint16 control_id, uint8 item);
 
-/*! 
- *  \brief      ¿ªÊ¼²¥·Å¶¯»­
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
+/*!
+ *  \brief      ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½Å¶ï¿½ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
  */
-void AnimationStart(uint16 screen_id,uint16 control_id);
+void AnimationStart(uint16 screen_id, uint16 control_id);
 
-/*! 
- *  \brief      Í£Ö¹²¥·Å¶¯»­
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
+/*!
+ *  \brief      Í£Ö¹ï¿½ï¿½ï¿½Å¶ï¿½ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
  */
-void AnimationStop(uint16 screen_id,uint16 control_id);
+void AnimationStop(uint16 screen_id, uint16 control_id);
 
-/*! 
- *  \brief      ÔÝÍ£²¥·Å¶¯»­
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
+/*!
+ *  \brief      ï¿½ï¿½Í£ï¿½ï¿½ï¿½Å¶ï¿½ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
  */
-void AnimationPause(uint16 screen_id,uint16 control_id);
+void AnimationPause(uint16 screen_id, uint16 control_id);
 
-/*! 
- *  \brief     ²¥·ÅÖÆ¶¨Ö¡
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½Ö¡
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
  *  \param  frame_id Ö¡ID
  */
-void AnimationPlayFrame(uint16 screen_id,uint16 control_id,uint8 frame_id);
+void AnimationPlayFrame(uint16 screen_id, uint16 control_id, uint8 frame_id);
 
-/*! 
- *  \brief     ²¥·ÅÉÏÒ»Ö¡
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ö¡
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
  */
-void AnimationPlayPrev(uint16 screen_id,uint16 control_id);
+void AnimationPlayPrev(uint16 screen_id, uint16 control_id);
 
-/*! 
- *  \brief     ²¥·ÅÏÂÒ»Ö¡
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»Ö¡
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
  */
-void AnimationPlayNext(uint16 screen_id,uint16 control_id);
+void AnimationPlayNext(uint16 screen_id, uint16 control_id);
 
-/*! 
- *  \brief     ÇúÏß¿Ø¼þ-Ìí¼ÓÍ¨µÀ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  channel Í¨µÀºÅ
- *  \param  color ÑÕÉ«
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ß¿Ø¼ï¿½-ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  channel Í¨ï¿½ï¿½ï¿½ï¿½
+ *  \param  color ï¿½ï¿½É«
  */
-void GraphChannelAdd(uint16 screen_id,uint16 control_id,uint8 channel,uint16 color);
+void GraphChannelAdd(uint16 screen_id, uint16 control_id, uint8 channel, uint16 color);
 
-/*! 
- *  \brief     ÇúÏß¿Ø¼þ-É¾³ýÍ¨µÀ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  channel Í¨µÀºÅ
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ß¿Ø¼ï¿½-É¾ï¿½ï¿½Í¨ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  channel Í¨ï¿½ï¿½ï¿½ï¿½
  */
-void GraphChannelDel(uint16 screen_id,uint16 control_id,uint8 channel);
+void GraphChannelDel(uint16 screen_id, uint16 control_id, uint8 channel);
 
-/*! 
- *  \brief     ÇúÏß¿Ø¼þ-Ìí¼ÓÊý¾Ý
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  channel Í¨µÀºÅ
- *  \param  pData ÇúÏßÊý¾Ý
- *  \param  nDataLen Êý¾Ý¸öÊý
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ß¿Ø¼ï¿½-ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  channel Í¨ï¿½ï¿½ï¿½ï¿½
+ *  \param  pData ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  nDataLen ï¿½ï¿½ï¿½Ý¸ï¿½ï¿½ï¿½
  */
-void GraphChannelDataAdd(uint16 screen_id,uint16 control_id,uint8 channel,uint8 *pData,uint16 nDataLen);
+void GraphChannelDataAdd(uint16 screen_id, uint16 control_id, uint8 channel, uint8 *pData, uint16 nDataLen);
 
-/*! 
- *  \brief     ÇúÏß¿Ø¼þ-Çå³ýÊý¾Ý
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  channel Í¨µÀºÅ
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ß¿Ø¼ï¿½-ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  channel Í¨ï¿½ï¿½ï¿½ï¿½
  */
-void GraphChannelDataClear(uint16 screen_id,uint16 control_id,uint8 channel);
+void GraphChannelDataClear(uint16 screen_id, uint16 control_id, uint8 channel);
 
-/*! 
- *  \brief     ÇúÏß¿Ø¼þ-ÉèÖÃÊÓÍ¼´°¿Ú
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  x_offset Ë®Æ½Æ«ÒÆ
- *  \param  x_mul Ë®Æ½Ëõ·ÅÏµÊý
- *  \param  y_offset ´¹Ö±Æ«ÒÆ
- *  \param  y_mul ´¹Ö±Ëõ·ÅÏµÊý
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ß¿Ø¼ï¿½-ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  x_offset Ë®Æ½Æ«ï¿½ï¿½
+ *  \param  x_mul Ë®Æ½ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½
+ *  \param  y_offset ï¿½ï¿½Ö±Æ«ï¿½ï¿½
+ *  \param  y_mul ï¿½ï¿½Ö±ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½
  */
-//void GraphSetViewport(uint16 screen_id,uint16 control_id,int16 x_offset,uint16 x_mul,int16 y_offset,uint16 y_mul);
+// void GraphSetViewport(uint16 screen_id,uint16 control_id,int16 x_offset,uint16 x_mul,int16 y_offset,uint16 y_mul);
 
-/*! 
- *  \brief     ¿ªÊ¼ÅúÁ¿¸üÐÂ
- *  \param  screen_id »­ÃæID
+/*!
+ *  \brief     ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
  */
 void BatchBegin(uint16 screen_id);
 
-/*! 
- *  \brief     ÅúÁ¿¸üÐÂ°´Å¥¿Ø¼þ
- *  \param  control_id ¿Ø¼þID
- *  \param  value ÊýÖµ
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â°ï¿½Å¥ï¿½Ø¼ï¿½
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  value ï¿½ï¿½Öµ
  */
-void BatchSetButtonValue(uint16 control_id,uint8 state);
+void BatchSetButtonValue(uint16 control_id, uint8 state);
 
-/*! 
- *  \brief     ÅúÁ¿¸üÐÂ½ø¶ÈÌõ¿Ø¼þ
- *  \param  control_id ¿Ø¼þID
- *  \param  value ÊýÖµ
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  value ï¿½ï¿½Öµ
  */
-void BatchSetProgressValue(uint16 control_id,uint32 value);
+void BatchSetProgressValue(uint16 control_id, uint32 value);
 
-/*! 
- *  \brief     ÅúÁ¿¸üÐÂ»¬¶¯Ìõ¿Ø¼þ
- *  \param  control_id ¿Ø¼þID
- *  \param  value ÊýÖµ
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  value ï¿½ï¿½Öµ
  */
-void BatchSetSliderValue(uint16 control_id,uint32 value);
+void BatchSetSliderValue(uint16 control_id, uint32 value);
 
-/*! 
- *  \brief     ÅúÁ¿¸üÐÂÒÇ±í¿Ø¼þ
- *  \param  control_id ¿Ø¼þID
- *  \param  value ÊýÖµ
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç±ï¿½ï¿½Ø¼ï¿½
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  value ï¿½ï¿½Öµ
  */
-void BatchSetMeterValue(uint16 control_id,uint32 value);
+void BatchSetMeterValue(uint16 control_id, uint32 value);
 
-/*! 
- *  \brief     ÅúÁ¿¸üÐÂÎÄ±¾¿Ø¼þ
- *  \param  control_id ¿Ø¼þID
- *  \param  strings ×Ö·û´®
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½Ø¼ï¿½
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  strings ï¿½Ö·ï¿½ï¿½ï¿½
  */
-void BatchSetText(uint16 control_id,uchar *strings);
+void BatchSetText(uint16 control_id, uchar *strings);
 
-/*! 
- *  \brief     ÅúÁ¿¸üÐÂ¶¯»­\Í¼±ê¿Ø¼þ
- *  \param  control_id ¿Ø¼þID
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¶ï¿½ï¿½ï¿½\Í¼ï¿½ï¿½Ø¼ï¿½
+ *  \param  control_id ï¿½Ø¼ï¿½ID
  *  \param  frame_id Ö¡ID
  */
-void BatchSetFrame(uint16 control_id,uint16 frame_id);
+void BatchSetFrame(uint16 control_id, uint16 frame_id);
 
-/*! 
- *  \brief    ½áÊøÅúÁ¿¸üÐÂ
+/*!
+ *  \brief    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
 void BatchEnd(void);
 
-/*! 
- *  \brief     ÉèÖÃµ¹¼ÆÊ±¿Ø¼þ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  timeout µ¹¼ÆÊ±(Ãë)
+/*!
+ *  \brief     ï¿½ï¿½ï¿½Ãµï¿½ï¿½ï¿½Ê±ï¿½Ø¼ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  timeout ï¿½ï¿½ï¿½ï¿½Ê±(ï¿½ï¿½)
  */
-void SeTimer(uint16 screen_id,uint16 control_id,uint32 timeout);
+void SeTimer(uint16 screen_id, uint16 control_id, uint32 timeout);
 
-/*! 
- *  \brief     ¿ªÆôµ¹¼ÆÊ±¿Ø¼þ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
+/*!
+ *  \brief     ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ø¼ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
  */
-void StartTimer(uint16 screen_id,uint16 control_id);
+void StartTimer(uint16 screen_id, uint16 control_id);
 
-/*! 
- *  \brief     Í£Ö¹µ¹¼ÆÊ±¿Ø¼þ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
+/*!
+ *  \brief     Í£Ö¹ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ø¼ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
  */
-void StopTimer(uint16 screen_id,uint16 control_id);
+void StopTimer(uint16 screen_id, uint16 control_id);
 
-/*! 
- *  \brief     ÔÝÍ£µ¹¼ÆÊ±¿Ø¼þ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
+/*!
+ *  \brief     ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ø¼ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
  */
-void PauseTimer(uint16 screen_id,uint16 control_id);
+void PauseTimer(uint16 screen_id, uint16 control_id);
 
-/*! 
- *  \brief     ÉèÖÃ¿Ø¼þ±³¾°É«
- *  \details  Ö§³Ö¿Ø¼þ£º½ø¶ÈÌõ¡¢ÎÄ±¾
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  color ±³¾°É«
+/*!
+ *  \brief     ï¿½ï¿½ï¿½Ã¿Ø¼ï¿½ï¿½ï¿½ï¿½ï¿½É«
+ *  \details  Ö§ï¿½Ö¿Ø¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  color ï¿½ï¿½ï¿½ï¿½É«
  */
-void SetControlBackColor(uint16 screen_id,uint16 control_id,uint16 color);
+void SetControlBackColor(uint16 screen_id, uint16 control_id, uint16 color);
 
-/*! 
- *  \brief     ÉèÖÃ¿Ø¼þÇ°¾°É«
-  * \details  Ö§³Ö¿Ø¼þ£º½ø¶ÈÌõ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  color Ç°¾°É«
+/*!
+ *  \brief     ï¿½ï¿½ï¿½Ã¿Ø¼ï¿½Ç°ï¿½ï¿½É«
+ * \details  Ö§ï¿½Ö¿Ø¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  color Ç°ï¿½ï¿½É«
  */
-void SetControlForeColor(uint16 screen_id,uint16 control_id,uint16 color);
+void SetControlForeColor(uint16 screen_id, uint16 control_id, uint16 color);
 
-/*! 
- *  \brief     ÏÔÊ¾\Òþ²Øµ¯³ö²Ëµ¥¿Ø¼þ
- *  \param  screen_id »­ÃæID
- *  \param  control_id ¿Ø¼þID
- *  \param  show ÊÇ·ñÏÔÊ¾£¬Îª0Ê±focus_control_idÎÞÐ§
- *  \param  focus_control_id ¹ØÁªµÄÎÄ±¾¿Ø¼þ(²Ëµ¥¿Ø¼þµÄÄÚÈÝÊä³öµ½ÎÄ±¾¿Ø¼þ)
+/*!
+ *  \brief     ï¿½ï¿½Ê¾\ï¿½ï¿½ï¿½Øµï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½Ø¼ï¿½
+ *  \param  screen_id ï¿½ï¿½ï¿½ï¿½ID
+ *  \param  control_id ï¿½Ø¼ï¿½ID
+ *  \param  show ï¿½Ç·ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Îª0Ê±focus_control_idï¿½ï¿½Ð§
+ *  \param  focus_control_id ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½Ø¼ï¿½(ï¿½Ëµï¿½ï¿½Ø¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½Ø¼ï¿½)
  */
-void ShowPopupMenu(uint16 screen_id,uint16 control_id,uint8 show,uint16 focus_control_id);
+void ShowPopupMenu(uint16 screen_id, uint16 control_id, uint8 show, uint16 focus_control_id);
 
-/*! 
- *  \brief     ÏÔÊ¾\Òþ²ØÏµÍ³¼üÅÌ
- *  \param  show 0Òþ²Ø£¬1ÏÔÊ¾
- *  \param  x ¼üÅÌÏÔÊ¾Î»ÖÃX×ø±ê
- *  \param  y ¼üÅÌÏÔÊ¾Î»ÖÃY×ø±ê
- *  \param  type 0Ð¡¼üÅÌ£¬1È«¼üÅÌ
- *  \param  option 0Õý³£×Ö·û£¬1ÃÜÂë£¬2Ê±¼äÉèÖÃ
- *  \param  max_len ¼üÅÌÂ¼Èë×Ö·û³¤¶ÈÏÞÖÆ
+/*!
+ *  \brief     ï¿½ï¿½Ê¾\ï¿½ï¿½ï¿½ï¿½ÏµÍ³ï¿½ï¿½ï¿½ï¿½
+ *  \param  show 0ï¿½ï¿½ï¿½Ø£ï¿½1ï¿½ï¿½Ê¾
+ *  \param  x ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Î»ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½
+ *  \param  y ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾Î»ï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½
+ *  \param  type 0Ð¡ï¿½ï¿½ï¿½Ì£ï¿½1È«ï¿½ï¿½ï¿½ï¿½
+ *  \param  option 0ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½ë£¬2Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+ *  \param  max_len ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  */
-//void ShowKeyboard(uint8 show,uint16 x,uint16 y,uint8 type,uint8 option,uint8 max_len);
+// void ShowKeyboard(uint8 show,uint16 x,uint16 y,uint8 type,uint8 option,uint8 max_len);
 
+void CMD_ACK_R(uint8 control_id, uint8 state);
+void CMD_ACK_Move_R(uint8 control_id, uint8 state);
 
-void CMD_ACK_R(uint8 control_id,uint8 state);
-void CMD_ACK_Move_R(uint8 control_id,uint8 state);
+void CMD_ACK_W(uint8 control_id, uint8 state);
+void CMD_ACK_Move_W(uint8 control_id, uint8 state);
 
-void CMD_ACK_W(uint8 control_id,uint8 state);
-void CMD_ACK_Move_W(uint8 control_id,uint8 state);
+void SET_Para_ACK(uint8 screen_id, uint8 control_id, uint8 state);
+void Read_MotoPara_ACK(uint8 screen_id, uint8 control_id, uint16 moto_speed, uint8 acc, uint8 dcc, uint8 state);
+void Read_MotoParas__ACK(uint8 screen_id, uint8 control_id, uint16 moto_speed, uint8 acc, uint8 dcc, uint8 state, uint16 moto_delay);
 
-void SET_Para_ACK(uint8 screen_id, uint8 control_id,uint8 state);
-void Read_MotoPara_ACK(uint8 screen_id,uint8 control_id,uint16 moto_speed,uint8 acc,uint8 dcc,uint8 state);
-void Read_MotoParas__ACK(uint8 screen_id,uint8 control_id,uint16 moto_speed,uint8 acc,uint8 dcc,uint8 state,uint16 moto_delay);	
+void SET_KW_ACK(uint8 screen_id, uint8 control_id, uint8 state);
 
-void SET_KW_ACK(uint8 screen_id,uint8 control_id,uint8 state);
-
-void SET_KW_Move_ACK(uint16 screen_id,uint16 control_id,uint8 state);
+void SET_KW_Move_ACK(uint16 screen_id, uint16 control_id, uint8 state);
 
 #endif

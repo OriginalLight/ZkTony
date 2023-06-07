@@ -1,13 +1,16 @@
 #include "hmi_driver.h"
 
+#define TX_8(P1) SEND_DATA((P1)&0xFF)	   // ���͵����ֽ�
+#define TX_8N(P, N) SendNU8((uint8 *)P, N) // ����N���ֽ�
+#define TX_16(P1)    \
+	TX_8((P1) >> 8); \
+	TX_8(P1)								  // ����16λ����
+#define TX_16N(P, N) SendNU16((uint16 *)P, N) // ����N��16λ����
+#define TX_32(P1)      \
+	TX_16((P1) >> 16); \
+	TX_16((P1)&0xFFFF) // ����32λ����
 
-#define TX_8(P1) SEND_DATA((P1)&0xFF)  //���͵����ֽ�
-#define TX_8N(P,N) SendNU8((uint8 *)P,N)  //����N���ֽ�
-#define TX_16(P1) TX_8((P1)>>8);TX_8(P1)  //����16λ����
-#define TX_16N(P,N) SendNU16((uint16 *)P,N)  //����N��16λ����
-#define TX_32(P1) TX_16((P1)>>16);TX_16((P1)&0xFFFF)  //����32λ����
-
-#if(CRC16_ENABLE)
+#if (CRC16_ENABLE)
 
 static uint16 _crc16 = 0xffff;
 static void AddCRC16(uint8 *buffer, uint16 n, uint16 *pcrc)

@@ -1,18 +1,20 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.zktony.android.R
+import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.utils.PageType
 
 
 @Composable
@@ -23,21 +25,31 @@ fun ZktyHome(
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val page = remember { mutableStateOf(PageType.MENU) }
     val content = LocalContext.current
 
-    BackHandler {}
+    BackHandler {
+        when (page.value) {
+            PageType.MENU -> {}
+            else -> page.value = PageType.MENU
+        }
+    }
 
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            modifier = Modifier.clickable {
-                launchRuntimeActivity(content, 1L)
-            },
-            text = "Home",
-            style = MaterialTheme.typography.titleLarge,
-        )
+    Column(modifier = modifier) {
+        // app bar
+        AnimatedVisibility(visible = page.value == PageType.MENU) {
+            ZktyTopAppBar(
+                title = stringResource(id = R.string.tab_home),
+                navigation = { page.value = PageType.MENU },
+            )
+        }
+        // menu
+        AnimatedVisibility(visible = page.value == PageType.MENU) {
+
+        }
+        // select
+        AnimatedVisibility(visible = page.value == PageType.SELECT) {
+            
+        }
     }
 }

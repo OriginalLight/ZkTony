@@ -113,7 +113,6 @@ void CmdRun(uint8 *RXbuffer)
 		Moto[id].MotoSpeed = *(p + 9) | (*(p + 10) << 8);
 
 		STEPMOTOR_AxisMoveRel(Moto[id].MID, Moto[id].Mstep, Moto[id].Maccel, Moto[id].Mdecel, Moto[id].MotoSpeed);
-		
 	}
 }
 
@@ -127,8 +126,8 @@ void CmdStop(uint8 *RXbuffer)
 	{
 		uint8 id = *p;
 		srd[id].run_state = STOP;
-//		srd[id].lock = 0;
-//		Moto[id].Mflag = 0;
+		//		srd[id].lock = 0;
+		//		Moto[id].Mflag = 0;
 	}
 }
 
@@ -148,7 +147,7 @@ void CmdQueryMotor(uint8 *RXbuffer)
 		*tx_p++ = run_state;
 	}
 
-	ComAckPack(PACK_ACK, CMD_TX_STATUS, tx_data, data_len * 2);
+	ComAckPack(PACK_ACK, CMD_TX_MOTOR_STATUS, tx_data, data_len * 2);
 }
 
 void CmdQueryGpio(uint8 *RXbuffer)
@@ -162,13 +161,13 @@ void CmdQueryGpio(uint8 *RXbuffer)
 	for (int i = 0; i < data_len; i++, p++)
 	{
 		uint8 id = *p;
-		
+
 		uint8 run_state = GPIO_CHECK(id);
 		*tx_p++ = id;
 		*tx_p++ = run_state;
 	}
 
-	ComAckPack(PACK_ACK, CMD_TX_STATUS, tx_data, data_len * 2);
+	ComAckPack(PACK_ACK, CMD_TX_GPIO_STATUS, tx_data, data_len * 2);
 }
 
 void CmdAnalysis()
@@ -207,8 +206,8 @@ void CmdProcess()
 	switch (cmd_RXbuffer[_DICTATE_INDEX])
 	{
 	case CMD_RX_RESET:
-		__set_FAULTMASK(1); //关闭所有中断
-		NVIC_SystemReset(); //进行软件复位
+		__set_FAULTMASK(1); // 关闭所有中断
+		NVIC_SystemReset(); // 进行软件复位
 		break;
 	case CMD_RX_RUN:
 		CmdRun(cmd_RXbuffer);
@@ -229,4 +228,3 @@ void CmdProcess()
 		break;
 	}
 }
-

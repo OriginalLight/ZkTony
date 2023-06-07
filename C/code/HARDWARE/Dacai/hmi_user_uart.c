@@ -1,33 +1,32 @@
-/************************************°æÈ¨ÉêÃ÷********************************************
-**                             ¹ãÖÝ´ó²Ê¹âµç¿Æ¼¼ÓÐÏÞ¹«Ë¾
+/************************************ï¿½ï¿½È¨ï¿½ï¿½ï¿½ï¿½********************************************
+**                             ï¿½ï¿½ï¿½Ý´ï¿½Ê¹ï¿½ï¿½Æ¼ï¿½ï¿½ï¿½ï¿½Þ¹ï¿½Ë¾
 **                             http://www.gz-dc.com
-**-----------------------------------ÎÄ¼þÐÅÏ¢--------------------------------------------
-** ÎÄ¼þÃû³Æ:   hmi_user_uart.c
-** ÐÞ¸ÄÊ±¼ä:   2011-05-18
-** ÎÄ¼þËµÃ÷:   ÓÃ»§MCU´®¿ÚÇý¶¯º¯Êý¿â
-** ¼¼ÊõÖ§³Ö£º  Tel: 020-82186683  Email: hmi@gz-dc.com Web:www.gz-dc.com
+**-----------------------------------ï¿½Ä¼ï¿½ï¿½ï¿½Ï¢--------------------------------------------
+** ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½:   hmi_user_uart.c
+** ï¿½Þ¸ï¿½Ê±ï¿½ï¿½:   2011-05-18
+** ï¿½Ä¼ï¿½Ëµï¿½ï¿½:   ï¿½Ã»ï¿½MCUï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+** ï¿½ï¿½ï¿½ï¿½Ö§ï¿½Ö£ï¿½  Tel: 020-82186683  Email: hmi@gz-dc.com Web:www.gz-dc.com
 --------------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------------
-                                  Ê¹ÓÃ±Ø¶Á
-   hmi_user_uart.cÖÐµÄ´®¿Ú·¢ËÍ½ÓÊÕº¯Êý¹²3¸öº¯Êý£º´®¿Ú³õÊ¼»¯Uartinti()¡¢·¢ËÍ1¸ö×Ö½ÚSendChar()¡¢
-   ·¢ËÍ×Ö·û´®SendStrings().ÈôÒÆÖ²µ½ÆäËûÆ½Ì¨£¬ÐèÒªÐÞ¸Äµ×²ã¼Ä
-   ´æÆ÷ÉèÖÃ,µ«½ûÖ¹ÐÞ¸Äº¯ÊýÃû³Æ£¬·ñÔòÎÞ·¨ÓëHMIÇý¶¯¿â(hmi_driver.c)Æ¥Åä¡£
+                                  Ê¹ï¿½Ã±Ø¶ï¿½
+   hmi_user_uart.cï¿½ÐµÄ´ï¿½ï¿½Ú·ï¿½ï¿½Í½ï¿½ï¿½Õºï¿½ï¿½ï¿½ï¿½ï¿½3ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú³ï¿½Ê¼ï¿½ï¿½Uartinti()ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½Ö½ï¿½SendChar()ï¿½ï¿½
+   ï¿½ï¿½ï¿½ï¿½ï¿½Ö·ï¿½ï¿½ï¿½SendStrings().ï¿½ï¿½ï¿½ï¿½Ö²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ½Ì¨ï¿½ï¿½ï¿½ï¿½Òªï¿½Þ¸Äµ×²ï¿½ï¿½
+   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ï¿½ï¿½ï¿½ï¿½Ö¹ï¿½Þ¸Äºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Þ·ï¿½ï¿½ï¿½HMIï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(hmi_driver.c)Æ¥ï¿½ä¡£
 --------------------------------------------------------------------------------------
 
 
 
 ----------------------------------------------------------------------------------------
-                          1. »ùÓÚSTM32Æ½Ì¨´®¿ÚÇý¶¯
+                          1. ï¿½ï¿½ï¿½ï¿½STM32Æ½Ì¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 ----------------------------------------------------------------------------------------*/
 #include "hmi_user_uart.h"
 /****************************************************************************
-* Ãû    ³Æ£º UartInit()
-* ¹¦    ÄÜ£º ´®¿Ú³õÊ¼»¯
-* Èë¿Ú²ÎÊý£º ÎÞ
-* ³ö¿Ú²ÎÊý£º ÎÞ
-****************************************************************************/
-
+ * ï¿½ï¿½    ï¿½Æ£ï¿½ UartInit()
+ * ï¿½ï¿½    ï¿½Ü£ï¿½ ï¿½ï¿½ï¿½Ú³ï¿½Ê¼ï¿½ï¿½
+ * ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+ * ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+ ****************************************************************************/
 
 void UartInit(uint32 BaudRate)
 {
@@ -38,7 +37,7 @@ void UartInit(uint32 BaudRate)
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 
     /* Configure USART Tx as alternate function push-pull */
-    GPIO_InitStructure.GPIO_Pin =GPIO_Pin_9;
+    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
@@ -47,32 +46,33 @@ void UartInit(uint32 BaudRate)
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
-    USART_DeInit(USART1);//¸´Î»USART1
+    USART_DeInit(USART1); // ï¿½ï¿½Î»USART1
     USART_InitStructure.USART_BaudRate = BaudRate;
     USART_InitStructure.USART_WordLength = USART_WordLength_8b;
     USART_InitStructure.USART_StopBits = USART_StopBits_1;
     USART_InitStructure.USART_Parity = USART_Parity_No;
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-    USART_InitStructure.USART_Mode =   USART_Mode_Tx|USART_Mode_Rx;
+    USART_InitStructure.USART_Mode = USART_Mode_Tx | USART_Mode_Rx;
 
     /* USART configuration */
     USART_Init(USART1, &USART_InitStructure);
-    USART_ITConfig(USART1, USART_IT_RXNE, ENABLE); //½ÓÊÕÖÐ¶ÏÊ¹ÄÜ
+    USART_ITConfig(USART1, USART_IT_RXNE, ENABLE); // ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½Ê¹ï¿½ï¿½
 
     /* Enable USART */
     USART_Cmd(USART1, ENABLE);
 }
 
-
 /*****************************************************************
-* Ãû    ³Æ£º SendChar()
-* ¹¦    ÄÜ£º ·¢ËÍ1¸ö×Ö½Ú
-* Èë¿Ú²ÎÊý£º t  ·¢ËÍµÄ×Ö½Ú
-* ³ö¿Ú²ÎÊý£º ÎÞ
+ * ï¿½ï¿½    ï¿½Æ£ï¿½ SendChar()
+ * ï¿½ï¿½    ï¿½Ü£ï¿½ ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½Ö½ï¿½
+ * ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½ t  ï¿½ï¿½ï¿½Íµï¿½ï¿½Ö½ï¿½
+ * ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
  *****************************************************************/
-void  SendChar(uchar t)
+void SendChar(uchar t)
 {
-    USART_SendData(USART1,t);
-    while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
-    while((USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET));//µÈ´ý´®¿Ú·¢ËÍÍê±Ï
+    USART_SendData(USART1, t);
+    while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+        ;
+    while ((USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET))
+        ; // ï¿½È´ï¿½ï¿½ï¿½ï¿½Ú·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 }

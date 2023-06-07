@@ -2,68 +2,63 @@
 #define __STRING_DEAL_H
 #include "sys.h"
 
+typedef union
+{
+	u8 CharData[4];
+	float FloatData;
+} Hex_Float;
 
-	typedef union 
-	{
-		u8 CharData[4];
-		float FloatData;	
-	}Hex_Float;
+typedef union
+{
+	u8 CharData[4];
+	u32 Int32Data;
+} HEX_Int32;
 
-  typedef union 
-  {
-	 		u8 CharData[4];
-		  u32 Int32Data;	
- }HEX_Int32;
-	
+float Hex_to_Float(u8 *hex);
+void Float_to_Hex(u8 *s, float data);
 
- 	float Hex_to_Float(u8 *hex);
-  void Float_to_Hex(u8 *s,float data);
- 
-   	u32 Hex_to_Int32(u8 *hex);
-  void Int32_to_Hex(u8 *s,u32 data);
+u32 Hex_to_Int32(u8 *hex);
+void Int32_to_Hex(u8 *s, u32 data);
 
 u32 ASCII_U32(char *s);
 u16 ASCII_U16(char *s);
 
- 
- 
-uint8_t is_digit(u8 ch);   //ÅÐ¶ÏÊÇ·ñÊÇÊý×Ö
-uint8_t is_letter(u8 ch);  //ÅÐ¶ÏÊÇ·ñÊÇ×ÖÄ¸
-uint8_t is_space(u8 ch);   //ÅÐ¶ÏÊÇ·ñÊÇ¿Õ¸ñ
-uint8_t is_inquiry(u8 *s); //ÅÐ¶ÏÊÇ·ñÊÇ²éÑ¯Ö¸Áî
+uint8_t is_digit(u8 ch);   // ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+uint8_t is_letter(u8 ch);  // ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½Ä¸
+uint8_t is_space(u8 ch);   // ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½Ç¿Õ¸ï¿½
+uint8_t is_inquiry(u8 *s); // ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½Ç²ï¿½Ñ¯Ö¸ï¿½ï¿½
 
-//ASCII-TO-INT32/Float
-uint8_t Convert_ASCII_to_INT32(u8 *s); //ÌáÈ¡×Ö·û´®ÖÐµÈºÅ'='ºóµÄÕûÊý,ASCII--->INT32
-uint8_t Convert_ASCII_to_INT1(u8 *s);  //ÌáÈ¡×Ö·û´®ÖÐµÈºÅ'='ºóµÄÕûÊý1Öµ,ASCII--->INT
-uint8_t Convert_ASCII_to_INT2(u8 *s);  //ÌáÈ¡×Ö·û´®ÖÐµÈºÅ'='ºóµÄÕûÊý2Öµ,ASCII--->INT
+// ASCII-TO-INT32/Float
+uint8_t Convert_ASCII_to_INT32(u8 *s); // ï¿½ï¿½È¡ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ÐµÈºï¿½'='ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½,ASCII--->INT32
+uint8_t Convert_ASCII_to_INT1(u8 *s);  // ï¿½ï¿½È¡ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ÐµÈºï¿½'='ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1Öµ,ASCII--->INT
+uint8_t Convert_ASCII_to_INT2(u8 *s);  // ï¿½ï¿½È¡ï¿½Ö·ï¿½ï¿½ï¿½ï¿½ÐµÈºï¿½'='ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½2Öµ,ASCII--->INT
 
-float Convert_ASCII_to_FLOAT(u8 *s);   //ASCII--->Float
-void Convert_ASCII_to_FLOAT_Array(u8 *s,float *p); //ASCII--->Float_array (8 values)
-void Convert_ASCII_to_INT_Array(u8 *s,u8 *p); //ASCII--->INT_array (8 values)
+float Convert_ASCII_to_FLOAT(u8 *s);				// ASCII--->Float
+void Convert_ASCII_to_FLOAT_Array(u8 *s, float *p); // ASCII--->Float_array (8 values)
+void Convert_ASCII_to_INT_Array(u8 *s, u8 *p);		// ASCII--->INT_array (8 values)
 
 float Convert_HEX_to_FLOAT(u8 *s);
-	
 
-//Float-TO-ASCII
+// Float-TO-ASCII
 
-char *Float_to_String2(float number,char *strnum,uint8_t precision);
-char *Float_to_String(float number,char *strnum,uint8_t precision);  //Float--->ASCII
-char *Int_to_String(int16_t number,char *strnum); //Int--->ASCII
-char *Int_to_String_Time(u8 number1,u8 number2,char *strnum);//INT_Time--->ASCII
+char *Float_to_String2(float number, char *strnum, uint8_t precision);
+char *Float_to_String(float number, char *strnum, uint8_t precision); // Float--->ASCII
+char *Int_to_String(int16_t number, char *strnum);					  // Int--->ASCII
+char *Int_to_String_Time(u8 number1, u8 number2, char *strnum);		  // INT_Time--->ASCII
 
-float Extract_Floatfrom_PM1200(u8 *s); //Extract the float value from the frame
-void Extract_Floatfrom_HM29(u8 *s,float *p); //Extract the float value from the frame
+float Extract_Floatfrom_PM1200(u8 *s);		  // Extract the float value from the frame
+void Extract_Floatfrom_HM29(u8 *s, float *p); // Extract the float value from the frame
 u16 Extract_Floatfrom_DTSD1352(u8 *s);
 
 u32 Extract_Floatfrom_DTSD1352P(u8 *s);
 
-void Extract_Floatfrom_DTSD1352_V(u8 *s,float *p,float *p1,float *p2);
-void Extract_Floatfrom_DTSD1352_I(u8 *s,float *p,float *p1,float *p2);
-void Extract_Floatfrom_DTSD1352_P(u8 *s,float *p);
-void  Extract_Floatfrom_DTSD1352_W(u8 *s,float *p);
+void Extract_Floatfrom_DTSD1352_V(u8 *s, float *p, float *p1, float *p2);
+void Extract_Floatfrom_DTSD1352_I(u8 *s, float *p, float *p1, float *p2);
+void Extract_Floatfrom_DTSD1352_P(u8 *s, float *p);
+void Extract_Floatfrom_DTSD1352_W(u8 *s, float *p);
 
-void Extract_Floatfrom_Wind(u8 *s,float *p);
-void Extract_Floatfrom_SM1911(u8 *s,float *p,float *p1);
+void Extract_Floatfrom_Wind(u8 *s, float *p);
+void Extract_Floatfrom_SM1911(u8 *s, float *p, float *p1);
 
 extern u8 pMem[4];
 

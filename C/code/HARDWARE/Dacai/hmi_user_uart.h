@@ -1,30 +1,29 @@
 #ifndef _USER_UART__
 #define _USER_UART__
 
-#include "stm32f10x_it.h"     //¸ù¾ÝÓÃ»§MCU½øÐÐÐÞ¸Ä
+#include "stm32f10x_it.h" //ï¿½ï¿½ï¿½ï¿½ï¿½Ã»ï¿½MCUï¿½ï¿½ï¿½ï¿½ï¿½Þ¸ï¿½
 
-#define uchar    unsigned char
-#define uint8    unsigned char
-#define uint16   unsigned short int
-#define uint32   unsigned long
-#define int16    short int
-#define int32    long
+#define uchar unsigned char
+#define uint8 unsigned char
+#define uint16 unsigned short int
+#define uint32 unsigned long
+#define int16 short int
+#define int32 long
 
 /****************************************************************************
-* Ãû    ³Æ£º UartInit()
-* ¹¦    ÄÜ£º ´®¿Ú³õÊ¼»¯
-* Èë¿Ú²ÎÊý£º ÎÞ
-* ³ö¿Ú²ÎÊý£º ÎÞ
-****************************************************************************/
+ * ï¿½ï¿½    ï¿½Æ£ï¿½ UartInit()
+ * ï¿½ï¿½    ï¿½Ü£ï¿½ ï¿½ï¿½ï¿½Ú³ï¿½Ê¼ï¿½ï¿½
+ * ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+ * ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+ ****************************************************************************/
 void UartInit(uint32 Baudrate);
 
 /*****************************************************************
-* Ãû    ³Æ£º SendChar()
-* ¹¦    ÄÜ£º ·¢ËÍ1¸ö×Ö½Ú
-* Èë¿Ú²ÎÊý£º t  ·¢ËÍµÄ×Ö½Ú
-* ³ö¿Ú²ÎÊý£º ÎÞ
+ * ï¿½ï¿½    ï¿½Æ£ï¿½ SendChar()
+ * ï¿½ï¿½    ï¿½Ü£ï¿½ ï¿½ï¿½ï¿½ï¿½1ï¿½ï¿½ï¿½Ö½ï¿½
+ * ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½ t  ï¿½ï¿½ï¿½Íµï¿½ï¿½Ö½ï¿½
+ * ï¿½ï¿½ï¿½Ú²ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
  *****************************************************************/
-void  SendChar(uchar t);
-
+void SendChar(uchar t);
 
 #endif
