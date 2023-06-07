@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -156,7 +158,23 @@ fun LcScreen(
                 ) {
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        text = "Test"
+                        text = "单个测试"
+                    )
+                }
+                Spacer(modifier = Modifier.width(32.dp))
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (uiState.job != null) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.primary
+                        }
+                    ),
+                    onClick = { viewModel.test1() }
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        text = "多个测试"
                     )
                 }
             }

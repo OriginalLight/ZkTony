@@ -84,12 +84,65 @@ class LcViewModel : ViewModel() {
                     }
                 }
                 launch {
+                    while (_uiState.value.start) {
+                        repeat(8) {
+                            try {
+                                setLock(it)
+                                withTimeout(100000L) {
+                                    val p = protocol {
+                                        data = combine(it, 3200L)
+                                    }
+                                    p.toByteArray().toHexString().loge()
+                                    sendByteArray(p.toByteArray())
+                                    history(p.toByteArray())
+                                    while (getLock(it)) {
+                                        delay(10L)
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                _uiState.value = _uiState.value.copy(start = false)
+                            }
+
+                        }
+                    }
+                }
+            }
+            _uiState.value = _uiState.value.copy(job = job, start = true)
+            job.start()
+        }
+    }
+
+    fun test1() {
+        if (_uiState.value.start) {
+            if (_uiState.value.job!!.isActive) {
+                _uiState.value.job!!.cancel()
+                _uiState.value = _uiState.value.copy(job = null, start = false)
+            } else {
+                _uiState.value = _uiState.value.copy(job = null, start = false)
+            }
+            _uiState.value = _uiState.value.copy(
+                job = null,
+                replyIndex = 0,
+                replyHistory = emptyList(),
+                queryIndex = 0,
+                queryHistory = emptyList(),
+                time = 0L,
+            )
+        } else {
+            val job = viewModelScope.launch(start = CoroutineStart.LAZY) {
+                launch {
+                    while (_uiState.value.start) {
+                        _uiState.value = _uiState.value.copy(time = _uiState.value.time + 1)
+                        delay(1000L)
+                    }
+                }
+                launch {
                     val maxIndex = 8
                     val indexList = mutableListOf<Int>()
                     var bytes = byteArrayOf()
                     repeat(maxIndex) {
                         indexList.add(it)
-                        bytes += combine(it, 1600L)
+                        bytes += combine(it, 6400L)
                     }
                     while (_uiState.value.start) {
                         try {
@@ -121,9 +174,9 @@ class LcViewModel : ViewModel() {
         val bytes = ByteArray(11)
         return bytes.writeInt8(id, 0)
             .writeInt32LE(step, 1)
-            .writeInt16LE(3200, 5)
-            .writeInt16LE(3200, 7)
-            .writeInt16LE(12800, 9)
+            .writeInt16LE(150, 5)
+            .writeInt16LE(300, 7)
+            .writeInt16LE(500, 9)
     }
 
 

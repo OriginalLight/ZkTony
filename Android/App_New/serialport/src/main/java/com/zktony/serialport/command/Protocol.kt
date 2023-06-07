@@ -6,7 +6,7 @@ import com.zktony.serialport.ext.writeInt16LE
 
 class Protocol {
     var head: Byte = 0xEE.toByte()
-    var id: Byte = 0x01.toByte()
+    var addr: Byte = 0x01.toByte()
     var cmd: Byte = 0x01.toByte()
     var len: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
     var data: ByteArray = byteArrayOf()
@@ -14,7 +14,7 @@ class Protocol {
     var end: ByteArray = byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
 
     fun toByteArray(): ByteArray {
-        val byteArray = byteArrayOf(head, id, cmd)
+        val byteArray = byteArrayOf(head, addr, cmd)
             .plus(len.writeInt16LE(data.size, 0))
             .plus(data)
             .plus(crc)
@@ -38,7 +38,7 @@ fun ByteArray.protocol(): Protocol {
     val bytes = this
     return protocol {
         head = bytes[0]
-        id = bytes[1]
+        addr = bytes[1]
         cmd = bytes[2]
         len = bytes.copyOfRange(3, 5)
         data = bytes.copyOfRange(5, bytes.size - 6)
