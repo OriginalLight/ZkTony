@@ -40,10 +40,10 @@ int main(void)
 
 	MotoInitConfig(); // 
 
-	TIM8_PWM_Init(4000 - 1, 168 - 1);
-	TIM2_PWM_Init(4000 - 1, 168 - 1);
-	TIM3_PWM_Init(4000 - 1, 168 - 1);
-	TIM1_PWM_Init(4000 - 1, 168 - 1);
+	TIM8_PWM_Init();
+	TIM2_PWM_Init();
+	TIM3_PWM_Init();
+	TIM1_PWM_Init();
 
 	TIM4_Int_Init(999 - 1, 168 - 1);
 	printf("test for usart1\n");

@@ -125,8 +125,8 @@ void CmdStop(uint8 *RXbuffer)
 	{
 		uint8 id = *p;
 		srd[id].run_state = STOP;
-		srd[id].lock = 0;
-		Moto[id].Mflag = 0;
+//		srd[id].lock = 0;
+//		Moto[id].Mflag = 0;
 	}
 }
 

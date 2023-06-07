@@ -32,7 +32,7 @@ typedef struct
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 // #define T1_FREQ 2000000
-#define T1_FREQ_2 1000000
+//#define T1_FREQ_2 1000000
 // #define SPR 1000
 
 // 定义定时器预分频，定时器实际时钟频率为：168MHz/（STEPMOTOR_TIMx_PRESCALER+1）

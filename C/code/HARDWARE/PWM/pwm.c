@@ -112,8 +112,8 @@ void TIM_GPIO_Config()
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;															   //
 	GPIO_Init(GPIOE, &GPIO_InitStructure);																	   //
 }
-//arr ÖµÒÑ±»¹Ì¶¨Ð´ËÀ£¬´«¹ýÀ´arrÖµÎÞÐ§
-void TIM1_PWM_Init(u32 arr, u32 psc)
+//arr psc  ÖµÒÑ±»¹Ì¶¨Ð´ËÀ£¬´«¹ýÀ´arr pscÖµÎÞÐ§
+void TIM1_PWM_Init(void)
 {
 
 	// ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½ï¿½Þ¸ï¿½IOï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
@@ -124,7 +124,7 @@ void TIM1_PWM_Init(u32 arr, u32 psc)
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE); // TIM1Ê±ï¿½ï¿½Ê¹ï¿½ï¿½
 
-	TIM_TimeBaseStructure.TIM_Prescaler = psc;					// ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Æµ
+	TIM_TimeBaseStructure.TIM_Prescaler = STEPMOTOR_TIM_PRESCALER;					// ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Æµ
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; // ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½Ä£Ê½
 
 	TIM_TimeBaseStructure.TIM_Period = STEPMOTOR_TIM_PERIOD; // ï¿½Ô¶ï¿½ï¿½ï¿½×°ï¿½ï¿½
@@ -174,7 +174,7 @@ void TIM1_PWM_Init(u32 arr, u32 psc)
 	TIM_CtrlPWMOutputs(TIM1, ENABLE);
 	TIM_Cmd(TIM1, ENABLE); // Ê¹ï¿½ï¿½TIM1
 }
-void TIM3_PWM_Init(u32 arr, u32 psc)
+void TIM3_PWM_Init(void)
 {
 	//
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -184,7 +184,7 @@ void TIM3_PWM_Init(u32 arr, u32 psc)
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); //
 
-	TIM_TimeBaseStructure.TIM_Prescaler = psc;					//
+	TIM_TimeBaseStructure.TIM_Prescaler = STEPMOTOR_TIM_PRESCALER;					//
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; //
 
 	TIM_TimeBaseStructure.TIM_Period = STEPMOTOR_TIM_PERIOD; //
@@ -233,7 +233,7 @@ void TIM3_PWM_Init(u32 arr, u32 psc)
 
 	TIM_Cmd(TIM3, ENABLE);
 }
-void TIM2_PWM_Init(u32 arr, u32 psc)
+void TIM2_PWM_Init(void)
 {
 	//
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -243,7 +243,7 @@ void TIM2_PWM_Init(u32 arr, u32 psc)
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //
 
-	TIM_TimeBaseStructure.TIM_Prescaler = psc;					//
+	TIM_TimeBaseStructure.TIM_Prescaler = STEPMOTOR_TIM_PRESCALER;					//
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; //
 
 	TIM_TimeBaseStructure.TIM_Period = STEPMOTOR_TIM_PERIOD; //
@@ -294,7 +294,7 @@ void TIM2_PWM_Init(u32 arr, u32 psc)
 	TIM_Cmd(TIM2, ENABLE);
 }
 
-void TIM8_PWM_Init(u32 arr, u32 psc)
+void TIM8_PWM_Init(void)
 {
 	//
 	NVIC_InitTypeDef NVIC_InitStructure;
@@ -304,7 +304,7 @@ void TIM8_PWM_Init(u32 arr, u32 psc)
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE); //
 
-	TIM_TimeBaseStructure.TIM_Prescaler = psc;					//
+	TIM_TimeBaseStructure.TIM_Prescaler = STEPMOTOR_TIM_PRESCALER;					//
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; //
 
 	TIM_TimeBaseStructure.TIM_Period = STEPMOTOR_TIM_PERIOD; //

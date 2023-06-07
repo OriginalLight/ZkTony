@@ -239,8 +239,10 @@ void SendData(char *s,u8 len)
   {
 		 //SendChar(s[t]);
 		 SendChar_USART3(s[t]);
+		//printf("%x\t",s[t]);
 
   }	
+	//printf("\n");
 	
 }
 
