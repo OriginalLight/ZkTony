@@ -67,7 +67,7 @@ void TIM4_IRQHandler(void)
 		{
 			uint8 tx[len * 2];
 			memcpy(tx, tx_data, len * 2);
-			ComAckPack(PACK_ACK, CMD_TX_STATUS, tx,(len * 2));
+			ComAckPack(PACK_ACK, CMD_TX_MOTOR_STATUS, tx,(len * 2));
 		}
 	}
 }

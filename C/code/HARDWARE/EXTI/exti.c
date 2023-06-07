@@ -123,9 +123,10 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
         if (MSensor9 == 1)
         {
-            if (Moto[9].MotoDir == Moto_Back)
+            if (Moto[8].MotoDir == Moto_Back)
             {
-                srd[9].run_state = STOP;
+                srd[8].run_state = STOP;
+                
             }
         }
     }
@@ -134,9 +135,9 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         if (MSensor11 == 1)
         {
 
-            if (Moto[11].MotoDir == Moto_Back)
+            if (Moto[10].MotoDir == Moto_Back)
             {
-                srd[11].run_state = STOP;
+                srd[10].run_state = STOP;
             }
         }
     }
@@ -144,9 +145,9 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
         if (MSensor2 == 1)
         {
-            if (Moto[2].MotoDir == Moto_Back)
+            if (Moto[1].MotoDir == Moto_Back)
             {
-                srd[2].run_state = STOP;
+                srd[1].run_state = STOP;
             }
         }
     }
@@ -154,9 +155,9 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
         if (MSensor4 == 1)
         {
-            if (Moto[4].MotoDir == Moto_Back)
+            if (Moto[3].MotoDir == Moto_Back)
             {
-                srd[4].run_state = STOP;
+                srd[3].run_state = STOP;
             }
         }
     }
@@ -164,9 +165,9 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
         if (MSensor6 == 1)
         {
-            if (Moto[6].MotoDir == Moto_Back)
+            if (Moto[5].MotoDir == Moto_Back)
             {
-                srd[6].run_state = STOP;
+                srd[5].run_state = STOP;
             }
         }
     }
@@ -174,9 +175,9 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
         if (MSensor14 == 1)
         {
-            if (Moto[14].MotoDir == Moto_Back)
+            if (Moto[13].MotoDir == Moto_Back)
             {
-                srd[14].run_state = STOP;
+                srd[13].run_state = STOP;
             }
         }
     }
@@ -184,9 +185,9 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
         if (MSensor8 == 1)
         {
-            if (Moto[8].MotoDir == Moto_Back)
+            if (Moto[7].MotoDir == Moto_Back)
             {
-                srd[8].run_state = STOP;
+                srd[7].run_state = STOP;
             }
         }
     }
@@ -194,9 +195,9 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
         if (MSensor1 == 1)
         {
-            if (Moto[1].MotoDir == Moto_Back)
+            if (Moto[0].MotoDir == Moto_Back)
             {
-                srd[1].run_state = STOP;
+                srd[0].run_state = STOP;
             }
         }
     }
@@ -204,9 +205,9 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
         if (MSensor3 == 1)
         {
-            if (Moto[3].MotoDir == Moto_Back)
+            if (Moto[2].MotoDir == Moto_Back)
             {
-                srd[3].run_state = STOP;
+                srd[2].run_state = STOP;
             }
         }
     }
@@ -214,20 +215,16 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     {
         if (MSensor5 == 1)
         {
-            if (Moto[5].MotoDir == Moto_Back)
+            if (Moto[4].MotoDir == Moto_Back)
             {
-                srd[5].run_state = STOP;
+                srd[4].run_state = STOP;
             }
         }
     }
     }
 }
 
-void EXTI1_IRQHandler(void)
-{
 
-    EXTI_ClearITPendingBit(EXTI_Line1); // 清除LINE 上的中断标志位
-}
 
 void EXTI2_IRQHandler(void)
 {
@@ -242,11 +239,7 @@ void EXTI3_IRQHandler(void)
     GPIO_EXTI_Callback(GPIO_Pin_3);
 }
 
-void EXTI0_IRQHandler(void)
-{
 
-    EXTI_ClearITPendingBit(EXTI_Line0); // 清除LINE 上的中断标志位
-}
 
 void EXTI9_5_IRQHandler(void)
 {

@@ -12,7 +12,7 @@ Feature(s) : RDI,FlashDL,FlashBP,JFlash,GDBFull
 * JLink Info: InitTarget() start
 * JLink Info: SWD selected. Executing JTAG -> SWD switching sequence.
 * JLink Info: DAP initialized successfully.
-* JLink Info: InitTarget() end - Took 30.9ms
+* JLink Info: InitTarget() end - Took 28.4ms
 * JLink Info: Found SW-DP with ID 0x2BA01477
 * JLink Info: DPv0 detected
 * JLink Info: CoreSight SoC-400 or earlier
@@ -51,5 +51,5 @@ Erase Done.Programming Done.Verify OK.* JLink Info: Reset: Halt core after reset
 * JLink Info: Reset: Reset device via AIRCR.SYSRESETREQ.
 Application running ...
 * JLink Info: OnDisconnectTarget() start
-* JLink Info: OnDisconnectTarget() end - Took 1.47ms
-Flash Load finished at 16:35:49
+* JLink Info: OnDisconnectTarget() end - Took 1.66ms
+Flash Load finished at 17:23:35

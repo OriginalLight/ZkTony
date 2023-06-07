@@ -34,7 +34,7 @@ int main(void)
 
 	delay_init(168);
 	uart_init(115200); // init usart 
-
+	EXTIX_Init();
 
 	TIM_GPIO_Config(); // 
 
