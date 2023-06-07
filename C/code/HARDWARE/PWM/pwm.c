@@ -8,7 +8,7 @@
 extern SpeedRampData srd[MOTONUM];
 extern Moto_Struct Moto[MOTONUM];
 
-__IO int32_t  step_position[MOTONUM] = {0};           // µ±Ç°Î»ÖÃ
+__IO int32_t  step_position[MOTONUM] = {0};           // ï¿½ï¿½Ç°Î»ï¿½ï¿½
 
 
 /*
@@ -29,10 +29,10 @@ void TIM_GPIO_Config()
 	GPIO_PinAFConfig(GPIOE, GPIO_PinSource11, GPIO_AF_TIM1); //
 	GPIO_PinAFConfig(GPIOE, GPIO_PinSource9, GPIO_AF_TIM1);	 //
 
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14 | GPIO_Pin_13 | GPIO_Pin_11 | GPIO_Pin_9; // GPIOF9
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_14 | GPIO_Pin_13 | GPIO_Pin_11 | GPIO_Pin_9; // GPIO
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;										// ï¿½ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;									// ï¿½Ù¶ï¿½100MHz
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;										// ï¿½ï¿½ï¿½ì¸´ï¿½ï¿½ï¿½ï¿½ï¿?
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;										// ï¿½ï¿½ï¿½ì¸´ï¿½ï¿½ï¿½ï¿½ï¿½??
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;										// ï¿½ï¿½ï¿½ï¿½
 	GPIO_Init(GPIOE, &GPIO_InitStructure);
 
@@ -42,7 +42,7 @@ void TIM_GPIO_Config()
 	GPIO_PinAFConfig(GPIOB, GPIO_PinSource4, GPIO_AF_TIM3);
 	GPIO_PinAFConfig(GPIOB, GPIO_PinSource5, GPIO_AF_TIM3);
 
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5; // GPIOF9
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5; // GPIO
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
@@ -77,13 +77,13 @@ void TIM_GPIO_Config()
 
 	// EN GPIO
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9; // GPIOF9  //DIR AND ENABLE
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;									 // ï¿½ï¿½ï¿½Ä£Ê?
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;									 // ï¿½ï¿½ï¿½Ä£ï¿½?
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;								 // ï¿½Ù¶ï¿½100MHz
-	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;									 // ï¿½ï¿½ï¿½ì¸´ï¿½ï¿½ï¿½ï¿½ï¿?
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;									 // ï¿½ï¿½ï¿½ì¸´ï¿½ï¿½ï¿½ï¿½ï¿½??
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;									 //
 	GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;		   // GPIOF9  //DIR AND ENABLE
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;		   // GPIO  //DIR AND ENABLE
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;	   //
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz; //
 	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;	   //
@@ -112,50 +112,53 @@ void TIM_GPIO_Config()
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;															   //
 	GPIO_Init(GPIOE, &GPIO_InitStructure);																	   //
 }
-//arr psc  ÖµÒÑ±»¹Ì¶¨Ğ´ËÀ£¬´«¹ıÀ´arr pscÖµÎŞĞ§
+/*
+// é«˜çº§å®šæ—¶å™¨ æ—¶é’Ÿé¢‘ç‡ä¸º168MHz é€šç”¨å®šæ—¶å™¨ æ—¶é’Ÿé¢‘ç‡ä¸º84MHz  
+ä¸ºäº†ä½¿è¾“å‡ºé¢‘ç‡ä¸€è‡´ é«˜çº§å®šæ—¶å™¨10åˆ†é¢‘ï¼Œæ™®é€šå®šæ—¶å™¨5åˆ†é¢‘
+*/ 
+
 void TIM1_PWM_Init(void)
 {
-
-	// ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¶ï¿½ï¿½Ş¸ï¿½IOï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	NVIC_InitTypeDef NVIC_InitStructure;
 
 	TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure;
 	TIM_OCInitTypeDef TIM_OCInitStructure;
 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE); // TIM1Ê±ï¿½ï¿½Ê¹ï¿½ï¿½
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1, ENABLE); // TIMæ—¶é’Ÿä½¿èƒ½
 
-	TIM_TimeBaseStructure.TIM_Prescaler = STEPMOTOR_TIM_PRESCALER;					// ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Æµ
-	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; // ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½Ä£Ê½
+	TIM_TimeBaseStructure.TIM_Prescaler = 10-1;	// å®šæ—¶å™¨åˆ†é¢‘
+	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; // å‘ä¸Šè®¡æ•°æ¨¡å¼
 
-	TIM_TimeBaseStructure.TIM_Period = STEPMOTOR_TIM_PERIOD; // ï¿½Ô¶ï¿½ï¿½ï¿½×°ï¿½ï¿½
+	TIM_TimeBaseStructure.TIM_Period = STEPMOTOR_TIM_PERIOD; // è‡ªåŠ¨é‡è£…è½½ ARRå€¼
 	TIM_TimeBaseStructure.TIM_RepetitionCounter = 0;
 
 	TIM_TimeBaseStructure.TIM_ClockDivision = TIM_CKD_DIV1;
 
-	TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure); // ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+	TIM_TimeBaseInit(TIM1, &TIM_TimeBaseStructure); // åˆå§‹åŒ–å®šæ—¶å™¨
 
 	TIM_OCInitStructure.TIM_Pulse = STEPMOTOR_TIM_PERIOD;
 
-	// ï¿½ï¿½Ê¼ï¿½ï¿½TIM1 Channel 1 2 3 4
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Toggle;			  // Ñ¡ï¿½ï¿½Ê±ï¿½ï¿½Ä£Ê½:toggleÄ£Ê½
-	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; // ï¿½È½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿?
-	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;	  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿?:TIMï¿½ï¿½ï¿½ï¿½È½Ï¼ï¿½ï¿½Ôµï¿?
+	// init TIM1 Channel 1 2 3 4
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Toggle;			  // toggle mode
+	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; // æ¯”è¾ƒè¾“å‡ºä½¿èƒ½
+	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;	  // è¾“å‡ºææ€§:TIMè¾“å‡ºæ¯”è¾ƒææ€§ä½
 	TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Set;
 	TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCNIdleState_Reset;
 
-	TIM_OC1Init(TIM1, &TIM_OCInitStructure); // ï¿½ï¿½ï¿½ï¿½TÖ¸ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½TIM3 4OC1
+	TIM_OC1Init(TIM1, &TIM_OCInitStructure); // æ ¹æ®æŒ‡å®šçš„å‚æ•°åˆå§‹åŒ–å¤–è®¾TIM OC1
 	TIM_OC2Init(TIM1, &TIM_OCInitStructure); //
 	TIM_OC3Init(TIM1, &TIM_OCInitStructure); //
 	TIM_OC4Init(TIM1, &TIM_OCInitStructure); //
 
-	TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Disable); // Ê§ï¿½ï¿½TIM1ï¿½ï¿½CCR1ï¿½Ïµï¿½Ô¤×°ï¿½Ø¼Ä´ï¿½ï¿½ï¿½
+	TIM_OC1PreloadConfig(TIM1, TIM_OCPreload_Disable); // å¤±èƒ½TIM1åœ¨CCR1ä¸Šçš„é¢„è£…è½½å¯„å­˜å™¨
 	TIM_OC2PreloadConfig(TIM1, TIM_OCPreload_Disable);
 	TIM_OC3PreloadConfig(TIM1, TIM_OCPreload_Disable);
 	TIM_OC4PreloadConfig(TIM1, TIM_OCPreload_Disable);
 
-	TIM_ARRPreloadConfig(TIM1, DISABLE); // ARPEÊ§ï¿½ï¿½
+	TIM_ARRPreloadConfig(TIM1, DISABLE); // ARPE disable
+	
 
-	TIM_CCxCmd(TIM1, TIM_Channel_1, TIM_CCx_Disable); // TIMÍ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È½ï¿½Ê§ï¿½ï¿?
+	TIM_CCxCmd(TIM1, TIM_Channel_1, TIM_CCx_Disable); //TIMé€šé“æ•è·æ¯”è¾ƒå¤±èƒ½
 	TIM_CCxCmd(TIM1, TIM_Channel_2, TIM_CCx_Disable);
 	TIM_CCxCmd(TIM1, TIM_Channel_3, TIM_CCx_Disable);
 	TIM_CCxCmd(TIM1, TIM_Channel_4, TIM_CCx_Disable);
@@ -171,8 +174,8 @@ void TIM1_PWM_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
-	TIM_CtrlPWMOutputs(TIM1, ENABLE);
-	TIM_Cmd(TIM1, ENABLE); // Ê¹ï¿½ï¿½TIM1
+	TIM_CtrlPWMOutputs(TIM1, ENABLE);//é«˜çº§å®šæ—¶å™¨å¿…é¡»è®¾ç½®
+	TIM_Cmd(TIM1, ENABLE); // enable TIM1
 }
 void TIM3_PWM_Init(void)
 {
@@ -184,7 +187,7 @@ void TIM3_PWM_Init(void)
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); //
 
-	TIM_TimeBaseStructure.TIM_Prescaler = STEPMOTOR_TIM_PRESCALER;					//
+	TIM_TimeBaseStructure.TIM_Prescaler = 5-1;					//
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; //
 
 	TIM_TimeBaseStructure.TIM_Period = STEPMOTOR_TIM_PERIOD; //
@@ -195,7 +198,7 @@ void TIM3_PWM_Init(void)
 	TIM_TimeBaseInit(TIM3, &TIM_TimeBaseStructure); //
 
 	TIM_OCInitStructure.TIM_Pulse = STEPMOTOR_TIM_PERIOD;
-	//  Channel 1/2/3/4 toggleÄ£Ê½
+	//  Channel 1/2/3/4 toggle
 
 	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Toggle;			  //
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; //
@@ -243,7 +246,7 @@ void TIM2_PWM_Init(void)
 
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE); //
 
-	TIM_TimeBaseStructure.TIM_Prescaler = STEPMOTOR_TIM_PRESCALER;					//
+	TIM_TimeBaseStructure.TIM_Prescaler = 5-1;					
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; //
 
 	TIM_TimeBaseStructure.TIM_Period = STEPMOTOR_TIM_PERIOD; //
@@ -256,7 +259,7 @@ void TIM2_PWM_Init(void)
 	TIM_OCInitStructure.TIM_Pulse = STEPMOTOR_TIM_PERIOD;
 	//
 
-	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Toggle;			  // :toggleÄ£Ê½
+	TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_Toggle;			  // toggle mode
 	TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; //
 	TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_Low;	  //
 	TIM_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Set;
@@ -290,7 +293,7 @@ void TIM2_PWM_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);
 
-	TIM_CtrlPWMOutputs(TIM2, ENABLE);
+	
 	TIM_Cmd(TIM2, ENABLE);
 }
 
@@ -304,7 +307,7 @@ void TIM8_PWM_Init(void)
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8, ENABLE); //
 
-	TIM_TimeBaseStructure.TIM_Prescaler = STEPMOTOR_TIM_PRESCALER;					//
+	TIM_TimeBaseStructure.TIM_Prescaler = 10-1;					//
 	TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up; //
 
 	TIM_TimeBaseStructure.TIM_Period = STEPMOTOR_TIM_PERIOD; //
@@ -362,9 +365,13 @@ void TIM1_CC_IRQHandler(void)
 		/* Clear TIM1 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM1, TIM_IT_CC1);
 
-		if (Moto[3].MotoDir == 0)
+		if (Moto[3].MotoDir == Moto_Back)
 		{
-			M4_DIR = 0;
+			M4_DIR = Moto_Back;
+		}
+		else
+		{
+			M4_DIR = Moto_For;
 		}
 
 		if (Moto[3].Mstate == 1)
@@ -378,9 +385,13 @@ void TIM1_CC_IRQHandler(void)
 		/* Clear TIM1 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM1, TIM_IT_CC2);
 
-		if (Moto[2].MotoDir == 0)
+		if (Moto[2].MotoDir == Moto_Back)
 		{
-			M3_DIR = 0;
+			M3_DIR = Moto_Back;
+		}
+		else
+		{
+			M3_DIR = Moto_For;
 		}
 
 		if (Moto[2].Mstate == 1)
@@ -394,9 +405,13 @@ void TIM1_CC_IRQHandler(void)
 		/* Clear TIM1 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM1, TIM_IT_CC3);
 
-		if (Moto[0].MotoDir == 0)
+		if (Moto[0].MotoDir == Moto_Back)
 		{
 			M1_DIR = Moto_Back;
+		}
+		else
+		{
+			M1_DIR = Moto_For;
 		}
 
 		if (Moto[0].Mstate == 1)
@@ -411,9 +426,13 @@ void TIM1_CC_IRQHandler(void)
 		/* Clear TIM1 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM1, TIM_IT_CC4);
 
-		if (Moto[1].MotoDir == 0)
+		if (Moto[1].MotoDir == Moto_Back)
 		{
 			M2_DIR = Moto_Back;
+		}
+		else
+		{
+			M2_DIR = Moto_For;
 		}
 		if (Moto[1].Mstate == 1)
 		{
@@ -431,9 +450,13 @@ void TIM8_CC_IRQHandler(void)
 		/* Clear TIM3 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM8, TIM_IT_CC1);
 
-		if (Moto[12].MotoDir == 0)
+		if (Moto[12].MotoDir == Moto_Back)
 		{
-			M13_DIR = 0;
+			M13_DIR = Moto_Back;
+		}
+		else
+		{
+			M13_DIR = Moto_For;
 		}
 		if (Moto[12].Mstate == 1)
 		{
@@ -447,9 +470,13 @@ void TIM8_CC_IRQHandler(void)
 		/* Clear TIM3 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM8, TIM_IT_CC2);
 
-		if (Moto[13].MotoDir == 0)
+		if (Moto[13].MotoDir == Moto_Back)
 		{
-			M14_DIR = 0;
+			M14_DIR = Moto_Back;
+		}
+		else
+		{
+			M14_DIR = Moto_For;
 		}
 		if (Moto[13].Mstate == 1)
 		{
@@ -462,9 +489,13 @@ void TIM8_CC_IRQHandler(void)
 
 		TIM_ClearITPendingBit(TIM8, TIM_IT_CC3);
 
-		if (Moto[14].MotoDir == 0)
+		if (Moto[14].MotoDir == Moto_Back)
 		{
-			M15_DIR = 0;
+			M15_DIR = Moto_Back;
+		}
+		else
+		{
+			M15_DIR = Moto_For;
 		}
 
 		if (Moto[14].Mstate == 1)
@@ -478,9 +509,13 @@ void TIM8_CC_IRQHandler(void)
 
 		TIM_ClearITPendingBit(TIM8, TIM_IT_CC4);
 
-		if (Moto[15].MotoDir == 0)
+		if (Moto[15].MotoDir == Moto_Back)
 		{
-			M16_DIR = 0;
+			M16_DIR = Moto_Back;
+		}
+		else
+		{
+			M16_DIR = Moto_For;
 		}
 
 		if (Moto[15].Mstate == 1)
@@ -498,9 +533,13 @@ void TIM3_IRQHandler(void)
 		/* Clear TIM3 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM3, TIM_IT_CC1);
 
-		if (Moto[11].MotoDir == 0)
+		if (Moto[11].MotoDir == Moto_Back)
 		{
-			M12_DIR = 0;
+			M12_DIR = Moto_Back;
+		}
+		else
+		{
+			M12_DIR = Moto_For;
 		}
 
 		if (Moto[11].Mstate == 1)
@@ -514,10 +553,15 @@ void TIM3_IRQHandler(void)
 		/* Clear TIM3 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM3, TIM_IT_CC2);
 
-		if (Moto[10].MotoDir == 0)
+		if (Moto[10].MotoDir == Moto_Back)
 		{
-			M11_DIR = 0;
+			M11_DIR = Moto_Back;
 		}
+		else
+		{
+			M11_DIR = Moto_For;
+		}
+
 		if (Moto[10].Mstate == 1)
 		{
 
@@ -530,9 +574,13 @@ void TIM3_IRQHandler(void)
 		/* Clear TIM3 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM3, TIM_IT_CC3);
 
-		if (Moto[5].MotoDir == 0)
+		if (Moto[5].MotoDir == Moto_Back)
 		{
-			M6_DIR = 0;
+			M6_DIR = Moto_Back;
+		}
+		else
+		{
+			M6_DIR = Moto_For;
 		}
 		if (Moto[5].Mstate == 1)
 		{
@@ -546,9 +594,13 @@ void TIM3_IRQHandler(void)
 		/* Clear TIM3 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM3, TIM_IT_CC4);
 
-		if (Moto[4].MotoDir == 0)
+		if (Moto[4].MotoDir == Moto_Back)
 		{
-			M5_DIR = 0;
+			M5_DIR = Moto_Back;
+		}
+		else
+		{
+			M5_DIR = Moto_For;
 		}
 		if (Moto[4].Mstate == 1)
 		{
@@ -566,9 +618,13 @@ void TIM2_IRQHandler(void)
 		/* Clear TIM3 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM2, TIM_IT_CC1);
 
-		if (Moto[8].MotoDir == 0)
+		if (Moto[8].MotoDir == Moto_Back)
 		{
-			M9_DIR = 0;
+			M9_DIR = Moto_Back;
+		}
+		else
+		{
+			M9_DIR = Moto_For;
 		}
 
 		if (Moto[8].Mstate == 1)
@@ -584,9 +640,13 @@ void TIM2_IRQHandler(void)
 		/* Clear TIM3 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM2, TIM_IT_CC2);
 
-		if (Moto[9].MotoDir == 0)
+		if (Moto[9].MotoDir == Moto_Back)
 		{
-			M10_DIR = 0;
+			M10_DIR = Moto_Back;
+		}
+		else
+		{
+			M10_DIR = Moto_For;
 		}
 		if (Moto[9].Mstate == 1)
 		{
@@ -600,9 +660,13 @@ void TIM2_IRQHandler(void)
 		/* Clear TIM3 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM2, TIM_IT_CC4);
 
-		if (Moto[6].MotoDir == 0)
+		if (Moto[6].MotoDir == Moto_Back)
 		{
-			M7_DIR = 0;
+			M7_DIR = Moto_Back;
+		}
+		else
+		{
+			M7_DIR = Moto_For;
 		}
 		if (Moto[6].Mstate == 1)
 		{
@@ -615,9 +679,13 @@ void TIM2_IRQHandler(void)
 		/* Clear TIM3 Capture Compare1 interrupt pending bit*/
 		TIM_ClearITPendingBit(TIM2, TIM_IT_CC3);
 
-		if (Moto[7].MotoDir == 0)
+		if (Moto[7].MotoDir == Moto_Back)
 		{
-			M8_DIR = 0;
+			M8_DIR = Moto_Back;
+		}
+		else
+		{
+			M8_DIR = Moto_For;
 		}
 		if (Moto[7].Mstate == 1)
 		{
@@ -673,7 +741,7 @@ void TIMxCHxOutControl(TIM_TypeDef *TIMx, uint8_t channelx, uint8_t operation)
 }
 
 /*
-function: TIMÍ¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ control channel open or close
+function: TIM  control channel open or close
 
 TIMx: where x can be 1 to 14 to select the TIMx peripheral.
 operation :1 enable
@@ -734,14 +802,11 @@ void TIMxCH4OutControl(TIM_TypeDef *TIMx, uint8_t operation)
 }
 
 
-//************************************************************************
 /**
-  * º¯Êı¹¦ÄÜ: ¶¨Ê±Æ÷ÖĞ¶Ï»Øµ÷º¯Êı
-  * ÊäÈë²ÎÊı: ÎŞ
-  * ·µ »Ø Öµ: ÎŞ
-  * Ëµ    Ã÷: ÊµÏÖ¼Ó¼õËÙ¹ı³Ì
-
-Ó²Ê¯°æ±¾Ëã·¨
+  * å‡½æ•°åŠŸèƒ½: å®šæ—¶å™¨ä¸­æ–­å›è°ƒå‡½æ•°
+  * è¾“å…¥å‚æ•°: æ— 
+  * è¿” å› å€¼: æ— 
+  * è¯´    æ˜: å®ç°åŠ å‡é€Ÿè¿‡ç¨‹
   */
 
 void TIM_Callback(uint8_t num)
@@ -750,39 +815,39 @@ void TIM_Callback(uint8_t num)
   __IO  uint32_t new_step_delay = 0;
   __IO static uint8_t  i[MOTONUM]={0};
 	__IO static uint16_t last_accel_delay[MOTONUM] = {0};
-	// ×ÜÒÆ¶¯²½Êı¼ÆÊıÆ÷
+	// æ€»ç§»åŠ¨æ­¥æ•°è®¡æ•°å™¨
 	__IO static uint32_t step_count[MOTONUM] = {0};
-	// ¼ÇÂ¼new_step_delayÖĞµÄÓàÊı£¬Ìá¸ßÏÂÒ»²½¼ÆËãµÄ¾«¶È
+	// è®°å½•new_step_delayä¸­çš„ä½™æ•°ï¼Œæé«˜ä¸‹ä¸€æ­¥è®¡ç®—çš„ç²¾åº¦
 	__IO static int32_t rest[MOTONUM] = {0};
-	//¶¨Ê±Æ÷Ê¹ÓÃ·­×ªÄ£Ê½£¬ĞèÒª½øÈëÁ½´ÎÖĞ¶Ï²ÅÊä³öÒ»¸öÍêÕûÂö³å
+	//å®šæ—¶å™¨ä½¿ç”¨ç¿»è½¬æ¨¡å¼ï¼Œéœ€è¦è¿›å…¥ä¸¤æ¬¡ä¸­æ–­æ‰è¾“å‡ºä¸€ä¸ªå®Œæ•´è„‰å†²
   
 
     
-    // ÉèÖÃ±È½ÏÖµ
+    // è®¾ç½®æ¯”è¾ƒå€¼
 
 		tim_count = TIM_GetCompare(num);
 		tim_count += (srd[num].step_delay/2);
 		TIM_SetCompare(num,tim_count);
 
-    i[num]++;     // ¶¨Ê±Æ÷ÖĞ¶Ï´ÎÊı¼ÆÊıÖµ
-    if(i[num] == 2) // 2´Î£¬ËµÃ÷ÒÑ¾­Êä³öÒ»¸öÍêÕûÂö³å
+    i[num]++;     // å®šæ—¶å™¨ä¸­æ–­æ¬¡æ•°è®¡æ•°å€¼
+    if(i[num] == 2) // 2æ¬¡ï¼Œè¯´æ˜å·²ç»è¾“å‡ºä¸€ä¸ªå®Œæ•´è„‰å†²
     {
-      i[num] = 0;   // ÇåÁã¶¨Ê±Æ÷ÖĞ¶Ï´ÎÊı¼ÆÊıÖµ
-      switch(srd[num].run_state) // ¼Ó¼õËÙÇúÏß½×¶Î
+      i[num] = 0;   // æ¸…é›¶å®šæ—¶å™¨ä¸­æ–­æ¬¡æ•°è®¡æ•°å€¼
+      switch(srd[num].run_state) // åŠ å‡é€Ÿæ›²çº¿é˜¶æ®µ
       {
         case STOP:
-
-		Moto[num].MotionStatus = STOP;  		//  µç»úÎªÍ£Ö¹×´Ì¬
-        step_count[num] = 0;  // ÇåÁã²½Êı¼ÆÊıÆ÷
-        rest[num] = 0;        // ÇåÁãÓàÖµ
+	
+		Moto[num].MotionStatus = STOP;  		//  ç”µæœºä¸ºåœæ­¢çŠ¶æ€
+        step_count[num] = 0;  // æ¸…é›¶æ­¥æ•°è®¡æ•°å™¨
+        rest[num] = 0;        // æ¸…é›¶ä½™å€¼
         last_accel_delay[num] = 0;
         srd[num].accel_count = 0;
         srd[num].step_delay = 0;
         srd[num].min_delay = 0;
-          // ¹Ø±ÕÍ¨µÀ	
+          // å…³é—­é€šé“
 			TIMControl(num,0);	
 
-				//////////////////////////////////////////////////
+			//////////////////////////////////////////////////
 			if (srd[num].lock == 1)
 			{
 				Moto[num].Mflag = 0;
@@ -793,7 +858,7 @@ void TIM_Callback(uint8_t num)
 
         case ACCEL:
 				
-//////////////////////////////////////////////////
+		//////////////////////////////////////////////////
 		if (srd[num].lock == 0)
 		{
 			Moto[num].Mflag = 1;
@@ -801,70 +866,70 @@ void TIM_Callback(uint8_t num)
 		}
 		///////////////////////////////////////////////				
 				
-          step_count[num]++;      // ²½Êı¼Ó1
+          step_count[num]++;      // æ­¥æ•°åŠ 1
           if(srd[num].dir==Moto_For)
           {	  	
-            step_position[num]++; // ¾ø¶ÔÎ»ÖÃ¼Ó1
+            step_position[num]++; // ç»å¯¹ä½ç½®åŠ 1
           }
           else
           {
-            step_position[num]--; // ¾ø¶ÔÎ»ÖÃ¼õ1
+            step_position[num]--; // ç»å¯¹ä½ç½®å‡1
           }
-          srd[num].accel_count++; // ¼ÓËÙ¼ÆÊıÖµ¼Ó1
+          srd[num].accel_count++; // åŠ é€Ÿè®¡æ•°å€¼åŠ 1
           
-					new_step_delay = srd[num].step_delay - (((2 *srd[num].step_delay) + rest[num])/(4 * srd[num].accel_count + 1));//¼ÆËãĞÂ(ÏÂ)Ò»²½Âö³åÖÜÆÚ(Ê±¼ä¼ä¸ô)
-          rest[num] = ((2 * srd[num].step_delay)+rest[num])%(4 * srd[num].accel_count + 1);// ¼ÆËãÓàÊı£¬ÏÂ´Î¼ÆËã²¹ÉÏÓàÊı£¬¼õÉÙÎó²î
+			new_step_delay = srd[num].step_delay - (((2 *srd[num].step_delay) + rest[num])/(4 * srd[num].accel_count + 1));//è®¡ç®—æ–°(ä¸‹)ä¸€æ­¥è„‰å†²å‘¨æœŸ(æ—¶é—´é—´éš”)
+        	rest[num] = ((2 * srd[num].step_delay)+rest[num])%(4 * srd[num].accel_count + 1);// è®¡ç®—ä½™æ•°ï¼Œä¸‹æ¬¡è®¡ç®—è¡¥ä¸Šä½™æ•°ï¼Œå‡å°‘è¯¯å·®
           
-					if(step_count[num] >= srd[num].decel_start)// ¼ì²éÊÇ¹»Ó¦¸Ã¿ªÊ¼¼õËÙ
+			if(step_count[num] >= srd[num].decel_start)// æ£€æŸ¥æ˜¯å¦åº”è¯¥å¼€å§‹å‡é€Ÿ
           {
-            srd[num].accel_count = srd[num].decel_val; // ¼ÓËÙ¼ÆÊıÖµÎª¼õËÙ½×¶Î¼ÆÊıÖµµÄ³õÊ¼Öµ
-            srd[num].run_state = DECEL;           // ÏÂ¸öÂö³å½øÈë¼õËÙ½×¶Î
+            srd[num].accel_count = srd[num].decel_val; // åŠ é€Ÿè®¡æ•°å€¼ä¸ºå‡é€Ÿé˜¶æ®µè®¡æ•°å€¼çš„åˆå§‹å€¼
+            srd[num].run_state = DECEL;           // ä¸‹ä¸ªè„‰å†²è¿›å…¥å‡é€Ÿé˜¶æ®µ
           }
-          else if(new_step_delay <= srd[num].min_delay) // ¼ì²éÊÇ·ñµ½´ïÆÚÍûµÄ×î´óËÙ¶È
+          else if(new_step_delay <= srd[num].min_delay) // æ£€æŸ¥æ˜¯å¦åˆ°è¾¾æœŸæœ›çš„æœ€å¤§é€Ÿåº¦
           {
-						srd[num].accel_count = srd[num].decel_val; 	// ¼ÓËÙ¼ÆÊıÖµÎª¼õËÙ½×¶Î¼ÆÊıÖµµÄ³õÊ¼Öµ
-          last_accel_delay[num] = new_step_delay; 	// ±£´æ¼ÓËÙ¹ı³ÌÖĞ×îºóÒ»´ÎÑÓÊ±£¨Âö³åÖÜÆÚ£©
-          new_step_delay = srd[num].min_delay;    	// Ê¹ÓÃmin_delay£¨¶ÔÓ¦×î´óËÙ¶Èspeed£©
-          rest[num] = 0;                          	// ÇåÁãÓàÖµ
-          srd[num].run_state = RUN;               	// ÉèÖÃÎªÔÈËÙÔËĞĞ×´Ì¬
-          }
-					last_accel_delay[num] = new_step_delay; 	  // ±£´æ¼ÓËÙ¹ı³ÌÖĞ×îºóÒ»´ÎÑÓÊ±£¨Âö³åÖÜÆÚ£©
+			srd[num].accel_count = srd[num].decel_val; // åŠ é€Ÿè®¡æ•°å€¼ä¸ºå‡é€Ÿé˜¶æ®µè®¡æ•°å€¼çš„åˆå§‹å€¼
+			last_accel_delay[num] = new_step_delay;	   // ä¿å­˜åŠ é€Ÿè¿‡ç¨‹ä¸­æœ€åä¸€æ¬¡å»¶æ—¶ï¼ˆè„‰å†²å‘¨æœŸï¼‰
+			new_step_delay = srd[num].min_delay;	   // ä½¿ç”¨min_delayï¼ˆå¯¹åº”æœ€å¤§é€Ÿåº¦speedï¼‰
+			rest[num] = 0;							   // æ¸…é›¶ä½™å€¼
+			srd[num].run_state = RUN;				   //è®¾ç½®ä¸ºåŒ€é€Ÿè¿è¡ŒçŠ¶æ€
+		  }
+		last_accel_delay[num] = new_step_delay; 	  // ä¿å­˜åŠ é€Ÿè¿‡ç¨‹ä¸­æœ€åä¸€æ¬¡å»¶æ—¶ï¼ˆè„‰å†²å‘¨æœŸï¼‰
           break;
 
         case RUN:
-          step_count[num]++;  // ²½Êı¼Ó1
+          step_count[num]++;  // æ­¥æ•°åŠ 1
           if(srd[num].dir==Moto_For)
           {	  	
-            step_position[num]++; // ¾ø¶ÔÎ»ÖÃ¼Ó1
+            step_position[num]++; // ç»å¯¹ä½ç½®åŠ 1
           }
           else
           {
-            step_position[num]--; // ¾ø¶ÔÎ»ÖÃ¼õ1
+            step_position[num]--; //ç»å¯¹ä½ç½®å‡1
           }
-          new_step_delay = srd[num].min_delay;     // Ê¹ÓÃmin_delay£¨¶ÔÓ¦×î´óËÙ¶Èspeed£©
-          if(step_count[num] >= srd[num].decel_start)   // ĞèÒª¿ªÊ¼¼õËÙ
+          new_step_delay = srd[num].min_delay;     // ä½¿ç”¨min_delayï¼ˆå¯¹åº”æœ€å¤§é€Ÿåº¦
+          if(step_count[num] >= srd[num].decel_start)   // éœ€è¦å¼€å§‹å‡é€Ÿ
           {
-            srd[num].accel_count = srd[num].decel_val;  // ¼õËÙ²½Êı×öÎª¼ÓËÙ¼ÆÊıÖµ
-            new_step_delay = last_accel_delay[num];// ¼Ó½×¶Î×îºóµÄÑÓÊ±×öÎª¼õËÙ½×¶ÎµÄÆğÊ¼ÑÓÊ±(Âö³åÖÜÆÚ)
-            srd[num].run_state = DECEL;            // ×´Ì¬¸Ä±äÎª¼õËÙ
+            srd[num].accel_count = srd[num].decel_val;  //å‡é€Ÿæ­¥æ•°åšä¸ºåŠ é€Ÿè®¡æ•°å€¼
+            new_step_delay = last_accel_delay[num];// åŠ é˜¶æ®µæœ€åçš„å»¶æ—¶åšä¸ºå‡é€Ÿé˜¶æ®µçš„èµ·å§‹å»¶æ—¶(è„‰å†²å‘¨æœŸ)
+            srd[num].run_state = DECEL;            // çŠ¶æ€æ”¹å˜ä¸ºå‡é€Ÿ
           }
           break;
 
         case DECEL:
-          step_count[num]++;  // ²½Êı¼Ó1
+          step_count[num]++;  // æ­¥æ•°åŠ 1
           if(srd[num].dir==Moto_For)
           {	  	
-            step_position[num]++; // ¾ø¶ÔÎ»ÖÃ¼Ó1
+            step_position[num]++; // ç»å¯¹ä½ç½®åŠ 1
           }
           else
           {
-            step_position[num]--; // ¾ø¶ÔÎ»ÖÃ¼õ1
+            step_position[num]--; // ç»å¯¹ä½ç½®å‡1
           }
           srd[num].accel_count++;
-          new_step_delay = srd[num].step_delay - (((2 * srd[num].step_delay) + rest[num])/(4 * srd[num].accel_count + 1)); //¼ÆËãĞÂ(ÏÂ)Ò»²½Âö³åÖÜÆÚ(Ê±¼ä¼ä¸ô)
-          rest[num] = ((2 * srd[num].step_delay)+rest[num])%(4 * srd[num].accel_count + 1);// ¼ÆËãÓàÊı£¬ÏÂ´Î¼ÆËã²¹ÉÏÓàÊı£¬¼õÉÙÎó²î
+          new_step_delay = srd[num].step_delay - (((2 * srd[num].step_delay) + rest[num])/(4 * srd[num].accel_count + 1)); ////è®¡ç®—æ–°(ä¸‹)ä¸€æ­¥è„‰å†²å‘¨æœŸ(æ—¶é—´é—´éš”)
+          rest[num] = ((2 * srd[num].step_delay)+rest[num])%(4 * srd[num].accel_count + 1);// è®¡ç®—ä½™æ•°ï¼Œä¸‹æ¬¡è®¡ç®—è¡¥ä¸Šä½™æ•°ï¼Œå‡å°‘è¯¯å·®
           
-          //¼ì²éÊÇ·ñÎª×îºóÒ»²½
+          //æ£€æŸ¥æ˜¯å¦ä¸ºæœ€åä¸€æ­¥
           if(srd[num].accel_count >= 0)
           {
             srd[num].run_state = STOP;
@@ -875,7 +940,7 @@ void TIM_Callback(uint8_t num)
 			{
 				new_step_delay = 0x1FFFF;
 			}
-      srd[num].step_delay = new_step_delay; // ÎªÏÂ¸ö(ĞÂµÄ)ÑÓÊ±(Âö³åÖÜÆÚ)¸³Öµ
+      srd[num].step_delay = new_step_delay; // ä¸ºä¸‹ä¸ª(æ–°çš„)å»¶æ—¶(è„‰å†²å‘¨æœŸ)èµ‹å€¼
     
   }
 	

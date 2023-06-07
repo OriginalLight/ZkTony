@@ -28,11 +28,12 @@
 #define PACK_END 0XFFFFFCFF
 
 /** RX DICTATE */
-#define CMD_RX_RUN 0x01
-#define CMD_RX_STOP 0x02
-#define CMD_RX_QUERY 0x03
-
-/** TX DICTATE */
+#define CMD_RX_RESET 0x00 	// reset
+#define CMD_RX_RUN 0x01 	// run
+#define CMD_RX_STOP 0x02	// stop
+#define CMD_RX_QUERY_MOTOR 0x03	// query motor
+#define CMD_RX_QUERY_GPIO 0x04	// query
+/** TX DICTATE */ 
 #define CMD_TX_STATUS 0x01
 #define CMD_TX_ERROR 0xFF
 
@@ -69,7 +70,8 @@ void CmdProcess(void);
 void CmdAnalysis(void);
 void CmdRun(uint8 *RXbuffer);
 void CmdStop(uint8 *RXbuffer);
-void CmdQuery(uint8 *RXbuffer);
+void CmdQueryMotor(uint8 *RXbuffer);
+void CmdQueryGpio(uint8 *RXbuffer);
 NetLH_Res CmdCheckPack(uint8 *RXbuffer);
 void ComAckPack(uint8 ack, uint8 dictate, uint8 data[], uint16 length);
 #endif

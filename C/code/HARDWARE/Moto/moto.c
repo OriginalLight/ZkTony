@@ -225,13 +225,13 @@ void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t accel, uint32_t d
     return;
   if(step < 0) // 步数为负数
   {
-    srd[num].dir = Moto_Back; // 逆时针方向旋转
-    
+    Moto[num].MotoDir = Moto_Back; // 逆时针方向旋转
+   
     step =-step;   // 获取步数绝对值
   }
   else
   {
-    srd[num].dir = Moto_For; // 顺时针方向旋转
+    Moto[num].MotoDir = Moto_For; // 顺时针方向旋转
     
   }
   

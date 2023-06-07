@@ -24,7 +24,7 @@ extern Moto_Struct Moto[MOTONUM];
 extern SpeedRampData srd[MOTONUM];
 extern COMM_EVENT DoComEvent;
 extern uint16 Cmd_Cnt;
-extern uint8 cmd_buffer[CMD_MAX_SIZE]; //
+extern uint8 cmd_buffer[CMD_MAX_SIZE]; 
 
 
 

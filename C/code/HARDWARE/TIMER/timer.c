@@ -28,7 +28,7 @@ void TIM4_Int_Init(u16 arr, u16 psc)
 
 	TIM_TimeBaseInit(TIM4, &TIM_TimeBaseInitStructure); //
 
-	TIM_ClearITPendingBit(TIM4, TIM_IT_Update); // ����жϱ�־λ
+	TIM_ClearITPendingBit(TIM4, TIM_IT_Update); // 
 
 	TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE); //
 

@@ -10,6 +10,7 @@
 #include "bsp_i2c_gpio.h"
 #include "crc16.h"
 #include "SEGGER_RTT.h"
+#include "exti.h"
 
 uint8 cmd_buffer[CMD_MAX_SIZE]; // ָCommand buffer
 uint8 cmd_RXbuffer[_PACK_LEN];	// Rx buffer
@@ -58,7 +59,7 @@ NetLH_Res CmdCheckPack(uint8 *RXbuffer)
 		Cmd_Cnt = 0;
 		uint8 tx_data[2];
 		tx_data[0] = CMD_Error_Header & 0xff;
-		tx_data[1] = CMD_Error_Header >> 8 & 0xff;
+		tx_data[1] = (CMD_Error_Header >> 8) & 0xff;
 		ComAckPack(PACK_ACK, CMD_TX_ERROR, tx_data, 2);
 		return NetLH_HEAD_ERR;
 	}
@@ -68,7 +69,7 @@ NetLH_Res CmdCheckPack(uint8 *RXbuffer)
 		Cmd_Cnt = 0;
 		uint8 tx_data[2];
 		tx_data[0] = CMD_Error_Addr & 0xff;
-		tx_data[1] = CMD_Error_Addr >> 8 & 0xff;
+		tx_data[1] = (CMD_Error_Addr >> 8) & 0xff;
 		ComAckPack(PACK_ACK, CMD_TX_ERROR, tx_data, 2);
 		return NetLH_DEVICE_ADD_ERR;
 	}
@@ -86,7 +87,7 @@ NetLH_Res CmdCheckPack(uint8 *RXbuffer)
 		Cmd_Cnt = 0;
 		uint8 tx_data[2];
 		tx_data[0] = CMD_Error_Crc & 0xff;
-		tx_data[1] = CMD_Error_Crc >> 8 & 0xff;
+		tx_data[1] = (CMD_Error_Crc >> 8) & 0xff;
 		ComAckPack(PACK_ACK, CMD_TX_ERROR, tx_data, 2);
 		return NetLH_CRC_ERR;
 	}
@@ -112,6 +113,7 @@ void CmdRun(uint8 *RXbuffer)
 		Moto[id].MotoSpeed = *(p + 9) | (*(p + 10) << 8);
 
 		STEPMOTOR_AxisMoveRel(Moto[id].MID, Moto[id].Mstep, Moto[id].Maccel, Moto[id].Mdecel, Moto[id].MotoSpeed);
+		
 	}
 }
 
@@ -130,7 +132,7 @@ void CmdStop(uint8 *RXbuffer)
 	}
 }
 
-void CmdQuery(uint8 *RXbuffer)
+void CmdQueryMotor(uint8 *RXbuffer)
 {
 	uint8 *p = &RXbuffer[_LENGTH_INDEX];
 	uint16 data_len = *p | (*(p + 1) << 8);
@@ -141,7 +143,27 @@ void CmdQuery(uint8 *RXbuffer)
 	for (int i = 0; i < data_len; i++, p++)
 	{
 		uint8 id = *p;
-		uint8 run_state = srd[id].run_state == STOP ? CMD_03_Stop : CMD_03_Runing;
+		uint8 run_state = ((srd[id].run_state == STOP) ? CMD_03_Stop : CMD_03_Runing);
+		*tx_p++ = id;
+		*tx_p++ = run_state;
+	}
+
+	ComAckPack(PACK_ACK, CMD_TX_STATUS, tx_data, data_len * 2);
+}
+
+void CmdQueryGpio(uint8 *RXbuffer)
+{
+	uint8 *p = &RXbuffer[_LENGTH_INDEX];
+	uint16 data_len = *p | (*(p + 1) << 8);
+	p += 2;
+	uint8 tx_data[data_len * 2];
+	uint8 *tx_p = tx_data;
+
+	for (int i = 0; i < data_len; i++, p++)
+	{
+		uint8 id = *p;
+		
+		uint8 run_state = GPIO_CHECK(id);
 		*tx_p++ = id;
 		*tx_p++ = run_state;
 	}
@@ -184,14 +206,21 @@ void CmdProcess()
 	uint8 tx_data[2];
 	switch (cmd_RXbuffer[_DICTATE_INDEX])
 	{
+	case CMD_RX_RESET:
+		__set_FAULTMASK(1); //关闭所有中断
+		NVIC_SystemReset(); //进行软件复位
+		break;
 	case CMD_RX_RUN:
 		CmdRun(cmd_RXbuffer);
 		break;
 	case CMD_RX_STOP:
 		CmdStop(cmd_RXbuffer);
 		break;
-	case CMD_RX_QUERY:
-		CmdQuery(cmd_RXbuffer);
+	case CMD_RX_QUERY_MOTOR:
+		CmdQueryMotor(cmd_RXbuffer);
+		break;
+	case CMD_RX_QUERY_GPIO:
+		CmdQueryGpio(cmd_RXbuffer);
 		break;
 	default:
 		tx_data[0] = CMD_NO_COM & 0xff;

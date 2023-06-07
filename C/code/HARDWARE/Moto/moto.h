@@ -36,8 +36,8 @@ typedef struct
 // #define SPR 1000
 
 // 定义定时器预分频，定时器实际时钟频率为：168MHz/（STEPMOTOR_TIMx_PRESCALER+1）
-// #define STEPMOTOR_TIM_PRESCALER               5  // 步进电机驱动器细分设置为：   32  细分
-#define STEPMOTOR_TIM_PRESCALER 9 // 步进电机驱动器细分设置为：   16  细分
+//  #define STEPMOTOR_TIM_PRESCALER               5  // 步进电机驱动器细分设置为：   32  细分
+ #define STEPMOTOR_TIM_PRESCALER 9 					// 步进电机驱动器细分设置为：   16  细分
 // #define STEPMOTOR_TIM_PRESCALER               19  // 步进电机驱动器细分设置为：   8  细分
 // #define STEPMOTOR_TIM_PRESCALER               39  // 步进电机驱动器细分设置为：   4  细分
 // #define STEPMOTOR_TIM_PRESCALER               79  // 步进电机驱动器细分设置为：   2  细分
@@ -70,10 +70,10 @@ typedef struct
 // #define A_x20000 (int)(ALPHA*20000)              // ALPHA*20000
 //  Speed ramp states
 
-#define STOP 0
-#define ACCEL 1
-#define DECEL 2
-#define RUN 3
+// #define STOP 0
+// #define ACCEL 1
+// #define DECEL 2
+// #define RUN 3
 
 #define MOTONUM 16
 

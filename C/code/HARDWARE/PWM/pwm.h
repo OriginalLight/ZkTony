@@ -18,7 +18,6 @@ void TIMxCH4OutControl(TIM_TypeDef* TIMx,uint8_t operation);
 void TIM_Callback(uint8_t num);
 
 void TIM2_IRQHandler(void);
-
 void TIM1_CC_IRQHandler(void);
 void TIM3_IRQHandler(void);
 void TIM8_CC_IRQHandler(void);
