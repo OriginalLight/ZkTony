@@ -81,6 +81,7 @@ import com.zktony.core.ext.format
 import com.zktony.core.ext.showShortToast
 import com.zktony.core.ext.simpleDateFormat
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Calibration screen
@@ -94,7 +95,7 @@ import kotlinx.coroutines.launch
 fun ZktyCalibration(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: ZktyCalibrationViewModel,
+    viewModel: ZktyCalibrationViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val page = remember { mutableStateOf(PageType.LIST) }

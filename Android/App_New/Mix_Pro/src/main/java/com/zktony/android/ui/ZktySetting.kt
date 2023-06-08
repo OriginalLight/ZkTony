@@ -79,6 +79,7 @@ import com.zktony.core.ext.createQRCodeBitmap
 import com.zktony.core.utils.QrCode
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Setting screen
@@ -91,7 +92,7 @@ import kotlinx.coroutines.launch
 fun ZktySetting(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: ZktySettingViewModel,
+    viewModel: ZktySettingViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val page = remember { mutableStateOf(PageType.LIST) }

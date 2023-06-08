@@ -61,6 +61,7 @@ import com.zktony.core.ext.Ext
 import com.zktony.core.ext.format
 import com.zktony.core.ext.showShortToast
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * 系统配置
@@ -74,7 +75,7 @@ import kotlinx.coroutines.launch
 fun ZktyConfig(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: ZktyConfigViewModel,
+    viewModel: ZktyConfigViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

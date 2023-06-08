@@ -30,48 +30,56 @@ class ScheduleTask constructor(
     init {
         scope.launch {
             launch {
-                motorDao.getAll().collect {
-                    if (it.isNotEmpty()) {
-                        it.forEach { it1 ->
-                            hpm[it1.index] = it1
-                        }
-                    } else {
-                        val list = mutableListOf<MotorEntity>()
-                        for (i in 0..15) {
-                            list.add(MotorEntity(text = "M$i", index = i))
-                        }
-                        motorDao.insertAll(list)
-                    }
-                }
+                motorMonitor()
             }
             launch {
-                calibrationDao.getAll().collect {
-                    if (it.isNotEmpty()) {
-                        val active = it.find { c -> c.active }
-                        if (active == null) {
-                            calibrationDao.update(it[0].copy(active = true))
-                        } else {
-                            hpc.clear()
-                            hpc[0] = 10.0 / 3200
-                            hpc[1] = 10.0 / 3200
-                            hpc[2] = 10.0 / 3200
-                            active.vps().forEachIndexed { index, vps ->
-                                hpc[index + 3] = vps
-                            }
-                        }
-                    } else {
-                        hpc.clear()
-                        hpc[0] = 10.0 / 3200
-                        hpc[1] = 10.0 / 3200
-                        hpc[2] = 10.0 / 3200
-                        repeat(13) { index ->
-                            hpc[index + 3] = 0.01
-                        }
-                    }
-                }
+                containerMonitor()
             }
             launch {
                 axisInitializer()
+            }
+        }
+    }
+
+    private suspend fun motorMonitor() {
+        motorDao.getAll().collect {
+            if (it.isNotEmpty()) {
+                it.forEach { it1 ->
+                    hpm[it1.index] = it1
+                }
+            } else {
+                val list = mutableListOf<MotorEntity>()
+                for (i in 0..15) {
+                    list.add(MotorEntity(text = "M$i", index = i))
+                }
+                motorDao.insertAll(list)
+            }
+        }
+    }
+
+    private suspend fun containerMonitor() {
+        calibrationDao.getAll().collect {
+            if (it.isNotEmpty()) {
+                val active = it.find { c -> c.active }
+                if (active == null) {
+                    calibrationDao.update(it[0].copy(active = true))
+                } else {
+                    hpc.clear()
+                    hpc[0] = 10.0 / 3200
+                    hpc[1] = 10.0 / 3200
+                    hpc[2] = 10.0 / 3200
+                    active.vps().forEachIndexed { index, vps ->
+                        hpc[index + 3] = vps
+                    }
+                }
+            } else {
+                hpc.clear()
+                hpc[0] = 10.0 / 3200
+                hpc[1] = 10.0 / 3200
+                hpc[2] = 10.0 / 3200
+                repeat(13) { index ->
+                    hpc[index + 3] = 0.01
+                }
             }
         }
     }

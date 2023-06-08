@@ -111,49 +111,42 @@ private fun AppNavHost(
             ZktyHome(
                 modifier = Modifier,
                 navController = navController,
-                viewModel = koinViewModel(),
             )
         }
         composable(Route.PROGRAM) {
             ZktyProgram(
                 modifier = Modifier,
                 navController = navController,
-                viewModel = koinViewModel(),
             )
         }
         composable(Route.CONTAINER) {
             ZktyContainer(
                 modifier = Modifier,
                 navController = navController,
-                viewModel = koinViewModel(),
             )
         }
         composable(Route.CALIBRATION) {
             ZktyCalibration(
                 modifier = Modifier,
                 navController = navController,
-                viewModel = koinViewModel(),
             )
         }
         composable(Route.SETTING) {
             ZktySetting(
                 modifier = Modifier,
                 navController = navController,
-                viewModel = koinViewModel(),
             )
         }
         composable(Route.MOTOR) {
             ZktyMotor(
                 modifier = Modifier,
                 navController = navController,
-                viewModel = koinViewModel(),
             )
         }
         composable(Route.CONFIG) {
             ZktyConfig(
                 modifier = Modifier,
                 navController = navController,
-                viewModel = koinViewModel(),
             )
         }
     }

@@ -12,13 +12,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.ui.utils.PageType
+import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
 fun ZktyHome(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: ZktyHomeViewModel,
+    viewModel: ZktyHomeViewModel = koinViewModel(),
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

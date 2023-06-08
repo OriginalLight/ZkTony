@@ -44,6 +44,7 @@ import com.zktony.android.R
 import com.zktony.android.logic.data.entities.MotorEntity
 import com.zktony.android.ui.components.ZktyTopAppBar
 import com.zktony.android.ui.utils.PageType
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Motor screen
@@ -57,7 +58,7 @@ import com.zktony.android.ui.utils.PageType
 fun ZktyMotor(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: ZktyMotorViewModel,
+    viewModel: ZktyMotorViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val page = remember { mutableStateOf(PageType.LIST) }
