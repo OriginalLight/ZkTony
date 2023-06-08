@@ -15,7 +15,6 @@ import com.zktony.protobuf.grpc.ApplicationGrpc
 import io.grpc.TlsChannelCredentials
 import io.grpc.okhttp.OkHttpChannelBuilder
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
@@ -56,11 +55,11 @@ val koinModule = module {
     singleOf(::SerialPort)
 
     // viewModel
-    viewModelOf(::ZktyCalibrationViewModel)
-    viewModelOf(::ZktyConfigViewModel)
-    viewModelOf(::ZktyContainerViewModel)
-    viewModelOf(::ZktyHomeViewModel)
-    viewModelOf(::ZktyMotorViewModel)
-    viewModelOf(::ZktyProgramViewModel)
-    viewModelOf(::ZktySettingViewModel)
+    singleOf(::ZktyCalibrationViewModel)
+    singleOf(::ZktyConfigViewModel)
+    singleOf(::ZktyContainerViewModel)
+    singleOf(::ZktyHomeViewModel)
+    singleOf(::ZktyMotorViewModel)
+    singleOf(::ZktyProgramViewModel)
+    singleOf(::ZktySettingViewModel)
 }

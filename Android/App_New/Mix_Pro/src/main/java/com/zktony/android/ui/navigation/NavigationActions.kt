@@ -48,7 +48,7 @@ val TOP_LEVEL_DESTINATIONS = listOf(
     ),
     TopLevelDestination(
         route = Route.PROGRAM,
-        imageId = R.drawable.ic_flow,
+        imageId = R.drawable.ic_program,
         iconTextId = R.string.tab_program
     ),
     TopLevelDestination(

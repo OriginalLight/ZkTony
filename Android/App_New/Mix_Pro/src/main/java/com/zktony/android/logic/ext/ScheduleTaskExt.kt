@@ -48,6 +48,37 @@ fun pulse(index: Int, dv: Float): Long {
 }
 
 /**
+ * 脉冲
+ *
+ * @param index Int
+ * @param pulse Long
+ * @return Long
+ */
+fun pulse(index: Int, pulse: Long): Long {
+    return when (index) {
+        0 -> {
+            val d = pulse - x.get()
+            x.set(maxOf(pulse, 0L))
+            d
+        }
+
+        1 -> {
+            val d = pulse - y.get()
+            y.set(maxOf(pulse, 0))
+            d
+        }
+
+        2 -> {
+            val d = pulse - z.get()
+            z.set(maxOf(pulse, 0))
+            d
+        }
+
+        else -> pulse
+    }
+}
+
+/**
  * distance or volume pulse with config
  *
  * @param index Int
@@ -68,5 +99,5 @@ fun pwc(index: Int, dv: Float, config: MotorEntity): ByteArray {
  */
 fun pwc(index: Int, pulse: Long, config: MotorEntity): ByteArray {
     val ba = ByteArray(5)
-    return ba.writeInt8(index, 0).writeInt32LE(pulse, 1) + config.toByteArray()
+    return ba.writeInt8(index, 0).writeInt32LE(pulse(index, pulse), 1) + config.toByteArray()
 }

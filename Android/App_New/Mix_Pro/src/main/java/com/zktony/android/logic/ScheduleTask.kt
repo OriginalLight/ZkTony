@@ -3,6 +3,7 @@ package com.zktony.android.logic
 import com.zktony.android.logic.data.dao.CalibrationDao
 import com.zktony.android.logic.data.dao.MotorDao
 import com.zktony.android.logic.data.entities.MotorEntity
+import com.zktony.android.logic.ext.axisInitializer
 import com.zktony.core.ext.logi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +69,9 @@ class ScheduleTask constructor(
                         }
                     }
                 }
+            }
+            launch {
+                axisInitializer()
             }
         }
     }

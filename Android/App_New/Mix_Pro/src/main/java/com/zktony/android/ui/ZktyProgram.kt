@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,19 +33,19 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,9 +57,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,6 +71,7 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.logic.data.entities.ContainerEntity
 import com.zktony.android.logic.data.entities.ProgramEntity
+import com.zktony.android.ui.components.CustomTextField
 import com.zktony.android.ui.components.DynamicMixPlate
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.components.ZktyTopAppBar
@@ -209,7 +213,7 @@ fun ProgramList(
                         ) {
                             Image(
                                 modifier = Modifier.size(32.dp),
-                                painter = painterResource(id = R.drawable.ic_flow),
+                                painter = painterResource(id = R.drawable.ic_program),
                                 contentDescription = null,
                             )
                             Text(
@@ -255,7 +259,7 @@ fun ProgramList(
             }
             // Delete
             AnimatedVisibility(visible = uiState.selected != 0L) {
-                var count by remember { mutableStateOf(0) }
+                var count by remember { mutableIntStateOf(0) }
 
                 FloatingActionButton(
                     modifier = Modifier
@@ -359,8 +363,8 @@ fun ProgramEdit(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.Center
             ) {
                 containers.forEach {
                     FilterChip(
@@ -403,33 +407,80 @@ fun ProgramEdit(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                    .padding(16.dp)
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = MaterialTheme.shapes.medium,
+                    ),
             ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = stringResource(id = R.string.glue_making),
-                    fontSize = 20.sp
-                )
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    OutlinedTextField(
+                    Spacer(modifier = Modifier.weight(0.5f))
+                    // 画竖线
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Text(
                         modifier = Modifier.weight(1f),
-                        value = v1,
-                        onValueChange = { v1 = it },
-                        shape = MaterialTheme.shapes.medium,
-                        leadingIcon = {
-                            Text(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                text = stringResource(id = R.string.colloid)
-                            )
+                        text = stringResource(id = R.string.colloid),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(id = R.string.coagulant),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                Divider(color = Color.Black)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        modifier = Modifier.weight(0.5f),
+                        text = stringResource(id = R.string.glue_making),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    CustomTextField(
+                        modifier = Modifier.weight(1f),
+                        value = TextFieldValue(v1, TextRange(v1.length)),
+                        onValueChange = {
+                            scope.launch {
+                                v1 = it.text
+                                val volume = entity.volume.toMutableList()
+                                volume[0] = v1.toFloatOrNull() ?: 0f
+                                update(entity.copy(volume = volume))
+                            }
                         },
                         textStyle = TextStyle(
-                            fontSize = 24.sp,
+                            fontSize = 20.sp,
                             textAlign = TextAlign.Center,
                         ),
-                        singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
@@ -440,22 +491,27 @@ fun ProgramEdit(
                             }
                         ),
                     )
-                    OutlinedTextField(
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    CustomTextField(
                         modifier = Modifier.weight(1f),
-                        value = v2,
-                        onValueChange = { v2 = it },
-                        shape = MaterialTheme.shapes.medium,
-                        leadingIcon = {
-                            Text(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                text = stringResource(id = R.string.coagulant)
-                            )
+                        value = TextFieldValue(v2, TextRange(v2.length)),
+                        onValueChange = {
+                            scope.launch {
+                                v2 = it.text
+                                val volume = entity.volume.toMutableList()
+                                volume[1] = v2.toFloatOrNull() ?: 0f
+                                update(entity.copy(volume = volume))
+                            }
                         },
                         textStyle = TextStyle(
-                            fontSize = 24.sp,
+                            fontSize = 20.sp,
                             textAlign = TextAlign.Center,
                         ),
-                        singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
@@ -467,30 +523,40 @@ fun ProgramEdit(
                         ),
                     )
                 }
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    text = stringResource(id = R.string.pre_drain),
-                    fontSize = 20.sp
-                )
+                Divider(color = Color.Black)
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    OutlinedTextField(
+                    Text(
+                        modifier = Modifier.weight(0.5f),
+                        text = stringResource(id = R.string.pre_drain),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    CustomTextField(
                         modifier = Modifier.weight(1f),
-                        value = v3,
-                        onValueChange = { v3 = it },
-                        shape = MaterialTheme.shapes.medium,
-                        leadingIcon = {
-                            Text(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                text = stringResource(id = R.string.colloid)
-                            )
+                        value = TextFieldValue(v3, TextRange(v3.length)),
+                        onValueChange = {
+                            scope.launch {
+                                v3 = it.text
+                                val volume = entity.volume.toMutableList()
+                                volume[2] = v3.toFloatOrNull() ?: 0f
+                                update(entity.copy(volume = volume))
+                            }
                         },
                         textStyle = TextStyle(
-                            fontSize = 24.sp,
+                            fontSize = 20.sp,
                             textAlign = TextAlign.Center,
                         ),
-                        singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
@@ -501,22 +567,27 @@ fun ProgramEdit(
                             }
                         ),
                     )
-                    OutlinedTextField(
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    CustomTextField(
                         modifier = Modifier.weight(1f),
-                        value = v4,
-                        onValueChange = { v4 = it },
-                        shape = MaterialTheme.shapes.medium,
-                        leadingIcon = {
-                            Text(
-                                modifier = Modifier.padding(horizontal = 16.dp),
-                                text = stringResource(id = R.string.coagulant)
-                            )
+                        value = TextFieldValue(v4, TextRange(v4.length)),
+                        onValueChange = {
+                            scope.launch {
+                                v4 = it.text
+                                val volume = entity.volume.toMutableList()
+                                volume[3] = v4.toFloatOrNull() ?: 0f
+                                update(entity.copy(volume = volume))
+                            }
                         },
                         textStyle = TextStyle(
-                            fontSize = 24.sp,
+                            fontSize = 20.sp,
                             textAlign = TextAlign.Center,
                         ),
-                        singleLine = true,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
                             imeAction = ImeAction.Done,
@@ -527,44 +598,6 @@ fun ProgramEdit(
                             }
                         ),
                     )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                ) {
-                    AnimatedVisibility(
-                        visible = (v1.toFloatOrNull() ?: 0f) != entity.volume[0]
-                                || (v2.toFloatOrNull() ?: 0f) != entity.volume[1]
-                                || (v3.toFloatOrNull() ?: 0f) != entity.volume[2]
-                                || (v4.toFloatOrNull() ?: 0f) != entity.volume[3],
-                    ) {
-                        Button(
-                            modifier = Modifier
-                                .width(196.dp)
-                                .padding(16.dp),
-                            onClick = {
-                                scope.launch {
-                                    update(
-                                        entity.copy(
-                                            volume = listOf(
-                                                v1.toFloatOrNull() ?: 0f,
-                                                v2.toFloatOrNull() ?: 0f,
-                                                v3.toFloatOrNull() ?: 0f,
-                                                v4.toFloatOrNull() ?: 0f,
-                                            )
-                                        )
-                                    )
-                                    "已更新数据".showShortToast()
-                                }
-                            },
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(32.dp),
-                                imageVector = Icons.Filled.Done,
-                                contentDescription = null,
-                            )
-                        }
-                    }
                 }
             }
         }

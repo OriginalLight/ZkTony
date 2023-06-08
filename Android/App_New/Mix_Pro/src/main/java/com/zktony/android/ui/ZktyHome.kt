@@ -9,11 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.zktony.android.R
-import com.zktony.android.ui.components.ZktyTopAppBar
 import com.zktony.android.ui.utils.PageType
 
 
@@ -36,20 +33,13 @@ fun ZktyHome(
     }
 
     Column(modifier = modifier) {
-        // app bar
-        AnimatedVisibility(visible = page.value == PageType.MENU) {
-            ZktyTopAppBar(
-                title = stringResource(id = R.string.tab_home),
-                navigation = { page.value = PageType.MENU },
-            )
-        }
         // menu
         AnimatedVisibility(visible = page.value == PageType.MENU) {
 
         }
         // select
         AnimatedVisibility(visible = page.value == PageType.SELECT) {
-            
+
         }
     }
 }

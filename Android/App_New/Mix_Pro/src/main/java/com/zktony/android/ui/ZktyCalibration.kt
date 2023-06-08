@@ -48,6 +48,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -273,7 +274,7 @@ fun CalibrationList(
             }
             // Delete
             AnimatedVisibility(visible = uiState.selected != 0L) {
-                var count by remember { mutableStateOf(0) }
+                var count by remember { mutableIntStateOf(0) }
 
                 FloatingActionButton(modifier = Modifier
                     .padding(8.dp)
@@ -342,7 +343,7 @@ fun CalibrationEdit(
     insertData: (Int, Double) -> Unit = { _, _ -> },
     deleteData: (CalibrationData) -> Unit = { },
 ) {
-    var index by remember { mutableStateOf(0) }
+    var index by remember { mutableIntStateOf(0) }
     var volume by remember { mutableStateOf("") }
     val softKeyboard = LocalSoftwareKeyboardController.current
 

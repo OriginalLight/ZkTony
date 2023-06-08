@@ -19,11 +19,15 @@ class SerialPort : AbstractSerial() {
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    val arrayList: CopyOnWriteArrayList<Int> = CopyOnWriteArrayList<Int>()
+    val axis: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>()
+    val gpio: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>()
 
     init {
         scope.launch {
-            repeat(16) { arrayList.add(0) }
+            repeat(16) {
+                axis.add(false)
+                gpio.add(false)
+            }
             openDevice(SerialConfig())
         }
     }
@@ -78,7 +82,15 @@ class SerialPort : AbstractSerial() {
                     for (i in 0 until rec.data.size / 2) {
                         val index = rec.data.readInt8(offset = i * 2)
                         val status = rec.data.readInt8(offset = i * 2 + 1)
-                        arrayList[index] = status
+                        axis[index] = status == 1
+                    }
+                }
+
+                0x02.toByte() -> {
+                    for (i in 0 until rec.data.size / 2) {
+                        val index = rec.data.readInt8(offset = i * 2)
+                        val status = rec.data.readInt8(offset = i * 2 + 1)
+                        gpio[index] = status == 1
                     }
                 }
 

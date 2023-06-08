@@ -26,6 +26,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -173,9 +174,9 @@ fun MotorEdit(
     navigationToList: () -> Unit = {},
     update: (MotorEntity) -> Unit = {},
 ) {
-    var speed by remember { mutableStateOf(entity.speed) }
-    var acc by remember { mutableStateOf(entity.acc) }
-    var dec by remember { mutableStateOf(entity.dec) }
+    var speed by remember { mutableIntStateOf(entity.speed) }
+    var acc by remember { mutableIntStateOf(entity.acc) }
+    var dec by remember { mutableIntStateOf(entity.dec) }
 
     Column(
         modifier = modifier

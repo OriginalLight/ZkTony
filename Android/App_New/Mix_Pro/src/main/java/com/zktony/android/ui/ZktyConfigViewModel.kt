@@ -2,7 +2,7 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.logic.ext.syncTransmit
+import com.zktony.android.logic.ext.syncTx
 import com.zktony.datastore.ext.saveSettings
 import com.zktony.datastore.ext.settingsFlow
 import com.zktony.proto.SettingsPreferences
@@ -76,24 +76,8 @@ class ZktyConfigViewModel : ViewModel() {
     fun moveTo(index: Int, distance: Float) {
         viewModelScope.launch {
             _lock.value = true
-            syncTransmit {
-                when (index) {
-                    0 -> {
-                        m0(distance)
-                    }
-
-                    1 -> {
-                        m1(distance)
-                    }
-
-                    2 -> {
-                        m2(distance)
-                    }
-
-                    else -> {
-                        m0(distance)
-                    }
-                }
+            syncTx {
+                dv(index = index + 3, dv = distance)
             }
             _lock.value = false
         }

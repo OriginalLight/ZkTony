@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.logic.data.dao.CalibrationDao
 import com.zktony.android.logic.data.entities.CalibrationData
 import com.zktony.android.logic.data.entities.CalibrationEntity
-import com.zktony.android.logic.ext.syncTransmit
+import com.zktony.android.logic.ext.syncTx
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -68,10 +68,10 @@ class ZktyCalibrationViewModel constructor(
 
     fun addLiquid(index: Int) {
         viewModelScope.launch {
-            syncTransmit {
+            syncTx {
                 when (index) {
-                    0 -> m3(3200L * 10)
-                    1 -> m4(3200L * 10)
+                    0 -> pulse(index = 3, pulse = 3200L * 30)
+                    1 -> pulse(index = 4, pulse = 3200L * 30)
                 }
             }
         }

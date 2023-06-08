@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,7 +32,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -39,10 +39,10 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -67,11 +67,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.logic.data.entities.ContainerEntity
+import com.zktony.android.ui.components.CustomTextField
 import com.zktony.android.ui.components.DynamicMixPlate
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.components.ZktyTopAppBar
 import com.zktony.android.ui.utils.PageType
-import com.zktony.core.ext.Ext
 import com.zktony.core.ext.format
 import com.zktony.core.ext.showShortToast
 import com.zktony.core.ext.simpleDateFormat
@@ -261,7 +261,7 @@ fun ContainerList(
             }
             // Delete
             AnimatedVisibility(visible = uiState.selected != 0L) {
-                var count by remember { mutableStateOf(0) }
+                var count by remember { mutableIntStateOf(0) }
 
                 FloatingActionButton(
                     modifier = Modifier
@@ -313,7 +313,7 @@ fun ContainerEdit(
     update: (ContainerEntity) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
-    val softKeyboard = LocalSoftwareKeyboardController.current
+    val keyboard = LocalSoftwareKeyboardController.current
     var y by remember { mutableStateOf(entity.axis[0].format(1)) }
     var z by remember { mutableStateOf(entity.axis[1].format(1)) }
 
@@ -343,148 +343,184 @@ fun ContainerEdit(
         }
 
         item {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(16.dp)
+                    .border(
+                        width = 1.dp,
+                        color = Color.Black,
+                        shape = MaterialTheme.shapes.medium,
+                    ),
             ) {
-                OutlinedTextField(
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.medium,
-                    value = TextFieldValue(text = y, selection = TextRange(y.length)),
-                    onValueChange = { y = it.text },
-                    leadingIcon = {
-                        Text(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            text = "容器位置"
-                        )
-                    },
-                    textStyle = TextStyle(
-                        fontSize = 24.sp,
-                        textAlign = TextAlign.Center,
-                    ),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal,
-                        imeAction = ImeAction.Done,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            softKeyboard?.hide()
-                        }
-                    ),
-                    singleLine = true,
-                )
-
-                Button(
-                    modifier = Modifier.width(156.dp),
-                    onClick = { softKeyboard?.hide() },
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Filled.ArrowForward,
-                        contentDescription = null,
+                    Spacer(modifier = Modifier.weight(0.5f))
+                    // 画竖线
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(id = R.string.moving_distance),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(id = R.string.actions),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
                     )
                 }
-                Button(
-                    modifier = Modifier.width(156.dp),
-                    enabled = (y.toFloatOrNull() ?: 0f) != entity.axis[0],
-                    onClick = {
-                        softKeyboard?.hide()
-                        scope.launch {
-                            update(
-                                entity.copy(
-                                    axis = listOf(
-                                        y.toFloatOrNull() ?: 0f,
-                                        z.toFloatOrNull() ?: 0f
-                                    )
-                                )
-                            )
-                            Ext.ctx.getString(R.string.save_success).showShortToast()
-                        }
-                    },
+                Divider(color = Color.Black)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Filled.Save,
-                        contentDescription = null,
+                    Text(
+                        modifier = Modifier.weight(0.5f),
+                        text = stringResource(id = R.string.y_axis),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
                     )
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    CustomTextField(
+                        modifier = Modifier.weight(1f),
+                        value = TextFieldValue(y, TextRange(y.length)),
+                        onValueChange = {
+                            scope.launch {
+                                y = it.text
+                                val axis = entity.axis.toMutableList()
+                                axis[0] = y.toFloatOrNull() ?: 0f
+                                update(entity.copy(axis = axis))
+                            }
+                        },
+                        textStyle = TextStyle(
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboard?.hide()
+                            }
+                        ),
+                    )
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Button(
+                            modifier = Modifier.width(96.dp),
+                            onClick = { keyboard?.hide() },
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = Icons.Filled.ArrowForward,
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                }
+                Divider(color = Color.Black)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        modifier = Modifier.weight(0.5f),
+                        text = stringResource(id = R.string.z_axis),
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center,
+                    )
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    CustomTextField(
+                        modifier = Modifier.weight(1f),
+                        value = TextFieldValue(z, TextRange(z.length)),
+                        onValueChange = {
+                            scope.launch {
+                                z = it.text
+                                val axis = entity.axis.toMutableList()
+                                axis[1] = z.toFloatOrNull() ?: 0f
+                                update(entity.copy(axis = axis))
+                            }
+                        },
+                        textStyle = TextStyle(
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboard?.hide()
+                            }
+                        ),
+                    )
+                    Divider(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Button(
+                            modifier = Modifier.width(96.dp),
+                            onClick = { keyboard?.hide() },
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = Icons.Filled.ArrowForward,
+                                contentDescription = null,
+                            )
+                        }
+                    }
                 }
             }
-            Divider(modifier = Modifier.padding(horizontal = 16.dp))
-        }
-
-        item {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                OutlinedTextField(
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.medium,
-                    value = TextFieldValue(text = z, selection = TextRange(z.length)),
-                    onValueChange = { z = it.text },
-                    leadingIcon = {
-                        Text(
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            text = "下降高度"
-                        )
-                    },
-                    textStyle = TextStyle(
-                        fontSize = 24.sp,
-                        textAlign = TextAlign.Center,
-                    ),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal,
-                        imeAction = ImeAction.Done,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            softKeyboard?.hide()
-                        }
-                    ),
-                    singleLine = true,
-                )
-                Button(
-                    modifier = Modifier.width(156.dp),
-                    onClick = { softKeyboard?.hide() },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Filled.ArrowForward,
-                        contentDescription = null,
-                    )
-                }
-                Button(
-                    modifier = Modifier.width(156.dp),
-                    enabled = (z.toFloatOrNull() ?: 0f) != entity.axis[1],
-                    onClick = {
-                        softKeyboard?.hide()
-                        scope.launch {
-                            update(
-                                entity.copy(
-                                    axis = listOf(
-                                        y.toFloatOrNull() ?: 0f,
-                                        z.toFloatOrNull() ?: 0f
-                                    )
-                                )
-                            )
-                            Ext.ctx.getString(R.string.save_success).showShortToast()
-                        }
-                    },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Filled.Save,
-                        contentDescription = null,
-                    )
-                }
-            }
-            Divider(modifier = Modifier.padding(horizontal = 16.dp))
         }
     }
 }

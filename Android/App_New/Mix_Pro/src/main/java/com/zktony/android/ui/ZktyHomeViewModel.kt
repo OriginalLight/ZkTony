@@ -12,6 +12,9 @@ class ZktyHomeViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState = _uiState.asStateFlow()
 
+    init {
+    }
+
 }
 
 data class HomeUiState(

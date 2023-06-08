@@ -1,5 +1,7 @@
 package com.zktony.core.ext
 
+import java.math.BigDecimal
+
 
 /**
  * 格式化
@@ -8,8 +10,7 @@ package com.zktony.core.ext
  * @return String
  */
 fun Float.format(digits: Int = 0): String {
-    val format = "%.${digits}f"
-    return String.format(format, this)
+    return BigDecimal(String.format("%.${digits}f", this)).stripTrailingZeros().toPlainString()
 }
 
 /**
@@ -19,6 +20,5 @@ fun Float.format(digits: Int = 0): String {
  * @return String
  */
 fun Double.format(digits: Int = 0): String {
-    val format = "%.${digits}f"
-    return String.format(format, this)
+    return BigDecimal(String.format("%.${digits}f", this)).stripTrailingZeros().toPlainString()
 }
