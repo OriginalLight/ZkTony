@@ -7,7 +7,6 @@ import com.zktony.android.R
 object Route {
     const val HOME = "HOME"
     const val PROGRAM = "PROGRAM"
-    const val CONTAINER = "CONTAINER"
     const val CALIBRATION = "CALIBRATION"
     const val SETTING = "SETTING"
     const val MOTOR = "MOTOR"
@@ -50,11 +49,6 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         route = Route.PROGRAM,
         imageId = R.drawable.ic_program,
         iconTextId = R.string.tab_program
-    ),
-    TopLevelDestination(
-        route = Route.CONTAINER,
-        imageId = R.drawable.ic_module,
-        iconTextId = R.string.tab_container
     ),
     TopLevelDestination(
         route = Route.CALIBRATION,

@@ -13,13 +13,44 @@ import com.zktony.android.logic.ext.scheduleTask
 class DVP {
     val byteList: MutableList<Byte> = mutableListOf()
     val indexList: MutableList<Int> = mutableListOf()
-    fun dv(index: Int, dv: Float, config: MotorEntity = scheduleTask.hpm[index]!!) {
-        byteList.addAll(pwc(index, dv, config).toList())
-        indexList.add(index)
+    fun dv(block: DM.() -> Unit) {
+        val dm = DM().apply(block)
+
+        byteList.addAll(
+            pwc(
+                dm.index,
+                dm.dv,
+                MotorEntity(speed = dm.speed, acc = dm.acc, dec = dm.dec)
+            ).toList()
+        )
+        indexList.add(dm.index)
     }
 
-    fun pulse(index: Int, pulse: Long, config: MotorEntity = scheduleTask.hpm[index]!!) {
-        byteList.addAll(pwc(index, pulse, config).toList())
-        indexList.add(index)
+    fun pulse(block: PM.() -> Unit) {
+        val pm = PM().apply(block)
+        byteList.addAll(
+            pwc(
+                pm.index,
+                pm.pulse,
+                MotorEntity(speed = pm.speed, acc = pm.acc, dec = pm.dec)
+            ).toList()
+        )
+        indexList.add(pm.index)
     }
+}
+
+class DM {
+    var index: Int = 0
+    var dv: Float = 0f
+    var acc: Int = scheduleTask.hpm[index]!!.acc
+    var dec: Int = scheduleTask.hpm[index]!!.dec
+    var speed: Int = scheduleTask.hpm[index]!!.speed
+}
+
+class PM {
+    var index: Int = 0
+    var pulse: Long = 0
+    var acc: Int = scheduleTask.hpm[index]!!.acc
+    var dec: Int = scheduleTask.hpm[index]!!.dec
+    var speed: Int = scheduleTask.hpm[index]!!.speed
 }

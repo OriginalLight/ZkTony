@@ -70,8 +70,15 @@ class ZktyCalibrationViewModel constructor(
         viewModelScope.launch {
             syncTx {
                 when (index) {
-                    0 -> pulse(index = 3, pulse = 3200L * 30)
-                    1 -> pulse(index = 4, pulse = 3200L * 30)
+                    0 -> pulse {
+                        this.index = 3
+                        pulse = 3200L * 30
+                    }
+
+                    1 -> pulse {
+                        this.index = 4
+                        pulse = 3200L * 30
+                    }
                 }
             }
         }

@@ -9,7 +9,6 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -34,6 +33,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -412,6 +412,7 @@ fun InfoContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OperationContent(
     modifier: Modifier = Modifier,
@@ -424,17 +425,17 @@ fun OperationContent(
         modifier = modifier
             .fillMaxWidth()
             .padding(top = 4.dp)
+            .animateContentSize()
             .background(
                 color = MaterialTheme.colorScheme.background,
                 shape = MaterialTheme.shapes.medium,
-            )
-            .animateContentSize(),
+            ),
     ) {
         ElevatedCard(
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 32.dp, vertical = 8.dp)
-                .clickable { navigationToAuth() },
+                .padding(horizontal = 32.dp, vertical = 8.dp),
+            onClick = { navigationToAuth() }
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -455,8 +456,8 @@ fun OperationContent(
         ElevatedCard(
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 32.dp, vertical = 8.dp)
-                .clickable { openWifi() },
+                .padding(horizontal = 32.dp, vertical = 8.dp),
+            onClick = { openWifi() }
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -477,8 +478,8 @@ fun OperationContent(
         ElevatedCard(
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = 32.dp, vertical = 8.dp)
-                .clickable { checkUpdate() },
+                .padding(horizontal = 32.dp, vertical = 8.dp),
+            onClick = { checkUpdate() }
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -620,6 +621,7 @@ fun VerificationCodeField(
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Authentication(
     modifier: Modifier = Modifier,
@@ -652,10 +654,10 @@ fun Authentication(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 ElevatedCard(
-                    modifier = Modifier.clickable {
+                    onClick = {
                         navigationToList()
                         navController.navigate(Route.MOTOR)
-                    },
+                    }
                 ) {
                     Column(
                         modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
@@ -675,10 +677,10 @@ fun Authentication(
                     }
                 }
                 ElevatedCard(
-                    modifier = Modifier.clickable {
+                    onClick = {
                         navigationToList()
                         navController.navigate(Route.CONFIG)
-                    },
+                    }
                 ) {
                     Column(
                         modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
@@ -702,6 +704,7 @@ fun Authentication(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsCard(
     paddingStart: Dp = 8.dp,
@@ -713,8 +716,8 @@ fun SettingsCard(
     Card(
         modifier = Modifier
             .wrapContentHeight()
-            .padding(start = paddingStart, top = 16.dp, end = 8.dp)
-            .clickable { onClick() },
+            .padding(start = paddingStart, top = 16.dp, end = 8.dp),
+        onClick = onClick,
     ) {
         Row(
             modifier = Modifier

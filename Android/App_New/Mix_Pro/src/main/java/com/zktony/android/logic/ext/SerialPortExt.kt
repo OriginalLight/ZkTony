@@ -1,7 +1,6 @@
 package com.zktony.android.logic.ext
 
 import com.zktony.android.logic.SerialPort
-import com.zktony.android.logic.data.entities.MotorEntity
 import com.zktony.android.logic.utils.DVP
 import com.zktony.android.logic.utils.ExceptionStrategy
 import com.zktony.serialport.command.Protocol
@@ -318,62 +317,50 @@ suspend fun axisInitializer() {
         delay(100L)
         if (getGpio(it)) {
             syncTx {
-                pulse(
-                    index = it,
-                    pulse = 3200L * 2,
-                    config = MotorEntity(
-                        acc = 30,
-                        dec = 30,
-                        speed = 50,
-                    )
-                )
+                pulse {
+                    index = it
+                    pulse = 3200L * 2
+                    acc = 30
+                    dec = 30
+                    speed = 50
+                }
             }
             syncTx {
-                pulse(
-                    index = it,
-                    pulse = 3200L * -3,
-                    config = MotorEntity(
-                        acc = 15,
-                        dec = 15,
-                        speed = 30,
-                    )
-                )
+                pulse {
+                    index = it
+                    pulse = 3200L * -3
+                    acc = 15
+                    dec = 15
+                    speed = 30
+                }
             }
         } else {
-            syncTx(
-                timeOut = 10000L,
-            ) {
-                pulse(
-                    index = it,
-                    pulse = 3200L * -100,
-                    config = MotorEntity(
-                        acc = 50,
-                        dec = 80,
-                        speed = 100,
-                    )
-                )
+            syncTx(timeOut = 10000L) {
+                pulse {
+                    index = it
+                    pulse = 3200L * -100
+                    acc = 50
+                    dec = 80
+                    speed = 100
+                }
             }
             syncTx {
-                pulse(
-                    index = it,
-                    pulse = 3200L * 2,
-                    config = MotorEntity(
-                        acc = 30,
-                        dec = 30,
-                        speed = 50,
-                    )
-                )
+                pulse {
+                    index = it
+                    pulse = 3200L * 2
+                    acc = 30
+                    dec = 30
+                    speed = 50
+                }
             }
             syncTx {
-                pulse(
-                    index = it,
-                    pulse = 3200L * -3,
-                    config = MotorEntity(
-                        acc = 15,
-                        dec = 15,
-                        speed = 30,
-                    )
-                )
+                pulse {
+                    index = it
+                    pulse = 3200L * -3
+                    acc = 15
+                    dec = 15
+                    speed = 30
+                }
             }
         }
     }

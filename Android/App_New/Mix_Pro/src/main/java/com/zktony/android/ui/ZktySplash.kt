@@ -14,7 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -104,7 +104,7 @@ fun ZktySplash(
                         fontWeight = FontWeight.Medium,
                     ),
                 )
-                Button(
+                FloatingActionButton(
                     modifier = Modifier.width(192.dp),
                     onClick = {
                         openDrawer()
@@ -113,7 +113,7 @@ fun ZktySplash(
                     },
                 ) {
                     Icon(
-                        modifier = Modifier.size(24.dp),
+                        modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Done,
                         contentDescription = null
                     )

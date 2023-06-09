@@ -77,7 +77,10 @@ class ZktyConfigViewModel : ViewModel() {
         viewModelScope.launch {
             _lock.value = true
             syncTx {
-                dv(index = index + 3, dv = distance)
+                dv {
+                    this.index = index + 3
+                    dv = distance
+                }
             }
             _lock.value = false
         }

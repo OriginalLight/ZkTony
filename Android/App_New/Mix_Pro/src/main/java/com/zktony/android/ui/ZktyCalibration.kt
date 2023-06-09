@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -33,12 +32,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -69,6 +68,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
@@ -145,6 +145,7 @@ fun ZktyCalibration(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalibrationList(
     modifier: Modifier = Modifier,
@@ -203,17 +204,17 @@ fun CalibrationList(
                         MaterialTheme.colorScheme.surfaceVariant
                     }
                     Card(
-                        modifier = Modifier
-                            .height(48.dp)
-                            .clickable {
-                                if (it.id == uiState.selected) {
-                                    toggleSelected(0L)
-                                } else {
-                                    toggleSelected(it.id)
-                                }
-                            }, colors = CardDefaults.cardColors(
+                        modifier = Modifier.height(48.dp),
+                        colors = CardDefaults.cardColors(
                             containerColor = background,
-                        )
+                        ),
+                        onClick = {
+                            if (it.id == uiState.selected) {
+                                toggleSelected(0L)
+                            } else {
+                                toggleSelected(it.id)
+                            }
+                        }
                     ) {
                         Row(
                             modifier = Modifier
@@ -233,11 +234,7 @@ fun CalibrationList(
                                 maxLines = 1,
                             )
                             AnimatedVisibility(visible = it.active) {
-                                Icon(
-                                    modifier = Modifier.size(32.dp),
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = null,
-                                )
+                                Text(text = "✔️")
                             }
                             Spacer(modifier = Modifier.weight(1f))
                             Text(
@@ -347,6 +344,43 @@ fun CalibrationEdit(
     var index by remember { mutableIntStateOf(0) }
     var volume by remember { mutableStateOf("") }
     val softKeyboard = LocalSoftwareKeyboardController.current
+    var showDialog by remember { mutableStateOf(false) }
+
+    if (showDialog) {
+        Dialog(onDismissRequest = { showDialog = false }) {
+            ElevatedCard {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    contentPadding = PaddingValues(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    repeat(9) {
+                        item {
+                            FilterChip(selected = index == it,
+                                shape = MaterialTheme.shapes.small,
+                                onClick = {
+                                    index = it
+                                    showDialog = false
+                                },
+                                trailingIcon = {
+                                    if (index == it) {
+                                        Text(text = "✔️")
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        modifier = Modifier.padding(horizontal = 8.dp),
+                                        text = "V${it + 1}",
+                                        style = TextStyle(fontSize = 24.sp),
+                                    )
+                                })
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     Column(
         modifier = modifier.windowInsetsPadding(WindowInsets.imeAnimationSource)
@@ -377,11 +411,6 @@ fun CalibrationEdit(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Image(
-                                modifier = Modifier.size(32.dp),
-                                painter = painterResource(id = R.drawable.ic_note),
-                                contentDescription = null,
-                            )
                             Text(
                                 text = "V ${it.index + 1}",
                                 style = MaterialTheme.typography.bodyLarge,
@@ -412,42 +441,6 @@ fun CalibrationEdit(
             }
         }
 
-        LazyRow(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = MaterialTheme.shapes.medium
-                ),
-            contentPadding = PaddingValues(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            repeat(9) {
-                item {
-                    FilterChip(selected = index == it,
-                        shape = MaterialTheme.shapes.small,
-                        onClick = { index = it },
-                        trailingIcon = {
-                            if (index == it) {
-                                Icon(
-                                    imageVector = Icons.Default.Done,
-                                    contentDescription = null,
-                                )
-                            }
-                        },
-                        label = {
-                            Text(
-                                modifier = Modifier.padding(horizontal = 8.dp),
-                                text = "V${it + 1}",
-                                style = TextStyle(fontSize = 24.sp),
-                            )
-                        })
-                }
-            }
-        }
-
         Row(
             modifier = Modifier
                 .height(128.dp)
@@ -460,13 +453,22 @@ fun CalibrationEdit(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            FloatingActionButton(
+                modifier = Modifier.padding(start = 16.dp),
+                onClick = { showDialog = true },
+            ) {
+                Text(
+                    text = "V${index + 1}",
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
             OutlinedTextField(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 16.dp),
+                    .padding(horizontal = 16.dp),
                 value = TextFieldValue(volume, TextRange(volume.length)),
                 onValueChange = { volume = it.text },
-                leadingIcon = {
+                trailingIcon = {
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         text = stringResource(id = R.string.volume)

@@ -6,11 +6,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,15 +28,14 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -69,7 +66,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.logic.data.entities.ContainerEntity
 import com.zktony.android.logic.data.entities.ProgramEntity
 import com.zktony.android.ui.components.CustomTextField
 import com.zktony.android.ui.components.DynamicMixPlate
@@ -128,15 +124,14 @@ fun ZktyProgram(
             ProgramEdit(
                 modifier = Modifier,
                 entity = uiState.entities.find { it.id == uiState.selected }!!,
-                containers = uiState.containers,
                 update = viewModel::update,
                 toggleActive = viewModel::toggleActive,
-                toggleContainer = viewModel::toggleContainer,
             )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgramList(
     modifier: Modifier = Modifier,
@@ -194,16 +189,15 @@ fun ProgramList(
                         MaterialTheme.colorScheme.surfaceVariant
                     }
                     Card(
-                        modifier = Modifier
-                            .height(48.dp)
-                            .clickable {
-                                if (it.id == uiState.selected) {
-                                    toggleSelected(0L)
-                                } else {
-                                    toggleSelected(it.id)
-                                }
-                            },
+                        modifier = Modifier.height(48.dp),
                         colors = CardDefaults.cardColors(containerColor = background),
+                        onClick = {
+                            if (it.id == uiState.selected) {
+                                toggleSelected(0L)
+                            } else {
+                                toggleSelected(it.id)
+                            }
+                        }
                     ) {
                         Row(
                             modifier = Modifier
@@ -308,17 +302,14 @@ fun ProgramList(
 
 @OptIn(
     ExperimentalLayoutApi::class,
-    ExperimentalMaterial3Api::class,
     ExperimentalComposeUiApi::class
 )
 @Composable
 fun ProgramEdit(
     modifier: Modifier = Modifier,
     entity: ProgramEntity = ProgramEntity(),
-    containers: List<ContainerEntity> = emptyList(),
     update: (ProgramEntity) -> Unit = {},
     toggleActive: (Int) -> Unit = {},
-    toggleContainer: (Long) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
@@ -326,6 +317,8 @@ fun ProgramEdit(
     var v2 by remember { mutableStateOf(entity.volume[1].format(1)) }
     var v3 by remember { mutableStateOf(entity.volume[2].format(1)) }
     var v4 by remember { mutableStateOf(entity.volume[3].format(1)) }
+    var y by remember { mutableStateOf(entity.axis[0].format(1)) }
+    var z by remember { mutableStateOf(entity.axis[1].format(1)) }
 
     LazyColumn(
         modifier = modifier
@@ -360,51 +353,6 @@ fun ProgramEdit(
             }
         }
         item {
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                containers.forEach {
-                    FilterChip(
-                        selected = it.id == entity.subId,
-                        onClick = {
-                            scope.launch {
-                                toggleContainer(it.id)
-                            }
-                        },
-                        label = {
-                            Text(
-                                modifier = Modifier.padding(horizontal = 8.dp),
-                                text = it.text,
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        },
-                        leadingIcon = {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_module),
-                                contentDescription = null,
-                                modifier = Modifier.size(FilterChipDefaults.IconSize),
-                            )
-                        },
-                        trailingIcon = if (it.id == entity.subId) {
-                            {
-                                Icon(
-                                    imageVector = Icons.Filled.Done,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(FilterChipDefaults.IconSize),
-                                )
-                            }
-                        } else {
-                            null
-                        }
-                    )
-                }
-            }
-        }
-        item {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -412,43 +360,50 @@ fun ProgramEdit(
                     .border(
                         width = 1.dp,
                         color = Color.Black,
-                        shape = MaterialTheme.shapes.medium,
                     ),
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .background(
+                            color = Color.LightGray
+                        )
                         .height(48.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Spacer(modifier = Modifier.weight(0.5f))
+                    Text(
+                        modifier = Modifier.weight(0.5f),
+                        text = stringResource(id = R.string.actions),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                    )
                     // 画竖线
                     Divider(
                         modifier = Modifier
-                            .width(1.dp)
+                            .width(2.dp)
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
                     Text(
                         modifier = Modifier.weight(1f),
                         text = stringResource(id = R.string.colloid),
-                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                     )
                     Divider(
                         modifier = Modifier
-                            .width(1.dp)
+                            .width(2.dp)
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
                     Text(
                         modifier = Modifier.weight(1f),
                         text = stringResource(id = R.string.coagulant),
-                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                     )
                 }
-                Divider(color = Color.Black)
+                Divider(color = Color.Black, thickness = 2.dp)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -458,73 +413,79 @@ fun ProgramEdit(
                     Text(
                         modifier = Modifier.weight(0.5f),
                         text = stringResource(id = R.string.glue_making),
-                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                     )
                     Divider(
                         modifier = Modifier
-                            .width(1.dp)
+                            .width(2.dp)
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
-                    CustomTextField(
-                        modifier = Modifier.weight(1f),
-                        value = TextFieldValue(v1, TextRange(v1.length)),
-                        onValueChange = {
-                            scope.launch {
-                                v1 = it.text
-                                val volume = entity.volume.toMutableList()
-                                volume[0] = v1.toFloatOrNull() ?: 0f
-                                update(entity.copy(volume = volume))
-                            }
-                        },
-                        textStyle = TextStyle(
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
-                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        CustomTextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = TextFieldValue(v1, TextRange(v1.length)),
+                            onValueChange = {
+                                scope.launch {
+                                    v1 = it.text
+                                    val volume = entity.volume.toMutableList()
+                                    volume[0] = v1.toFloatOrNull() ?: 0f
+                                    update(entity.copy(volume = volume))
+                                }
+                            },
+                            textStyle = TextStyle(
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Center,
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboard?.hide()
+                                }
+                            ),
+                        )
+                        Divider()
+                    }
                     Divider(
                         modifier = Modifier
-                            .width(1.dp)
+                            .width(2.dp)
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
-                    CustomTextField(
-                        modifier = Modifier.weight(1f),
-                        value = TextFieldValue(v2, TextRange(v2.length)),
-                        onValueChange = {
-                            scope.launch {
-                                v2 = it.text
-                                val volume = entity.volume.toMutableList()
-                                volume[1] = v2.toFloatOrNull() ?: 0f
-                                update(entity.copy(volume = volume))
-                            }
-                        },
-                        textStyle = TextStyle(
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
-                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        CustomTextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = TextFieldValue(v2, TextRange(v2.length)),
+                            onValueChange = {
+                                scope.launch {
+                                    v2 = it.text
+                                    val volume = entity.volume.toMutableList()
+                                    volume[1] = v2.toFloatOrNull() ?: 0f
+                                    update(entity.copy(volume = volume))
+                                }
+                            },
+                            textStyle = TextStyle(
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Center,
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboard?.hide()
+                                }
+                            ),
+                        )
+                        Divider()
+                    }
                 }
-                Divider(color = Color.Black)
+                Divider(color = Color.Black, thickness = 2.dp)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -534,71 +495,259 @@ fun ProgramEdit(
                     Text(
                         modifier = Modifier.weight(0.5f),
                         text = stringResource(id = R.string.pre_drain),
-                        fontSize = 16.sp,
+                        style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                     )
                     Divider(
                         modifier = Modifier
-                            .width(1.dp)
+                            .width(2.dp)
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
-                    CustomTextField(
+                    Column(modifier = Modifier.weight(1f)) {
+                        CustomTextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = TextFieldValue(v3, TextRange(v3.length)),
+                            onValueChange = {
+                                scope.launch {
+                                    v3 = it.text
+                                    val volume = entity.volume.toMutableList()
+                                    volume[2] = v3.toFloatOrNull() ?: 0f
+                                    update(entity.copy(volume = volume))
+                                }
+                            },
+                            textStyle = TextStyle(
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Center,
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboard?.hide()
+                                }
+                            ),
+                        )
+                        Divider()
+                    }
+                    Divider(
+                        modifier = Modifier
+                            .width(2.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        CustomTextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = TextFieldValue(v4, TextRange(v4.length)),
+                            onValueChange = {
+                                scope.launch {
+                                    v4 = it.text
+                                    val volume = entity.volume.toMutableList()
+                                    volume[3] = v4.toFloatOrNull() ?: 0f
+                                    update(entity.copy(volume = volume))
+                                }
+                            },
+                            textStyle = TextStyle(
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Center,
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboard?.hide()
+                                }
+                            ),
+                        )
+                        Divider()
+                    }
+                }
+                Divider(color = Color.Black, thickness = 2.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(
+                            color = Color.LightGray,
+                        )
+                        .height(48.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        modifier = Modifier.weight(0.5f),
+                        text = stringResource(id = R.string.motor),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                    )
+                    // 画竖线
+                    Divider(
+                        modifier = Modifier
+                            .width(2.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Text(
                         modifier = Modifier.weight(1f),
-                        value = TextFieldValue(v3, TextRange(v3.length)),
-                        onValueChange = {
-                            scope.launch {
-                                v3 = it.text
-                                val volume = entity.volume.toMutableList()
-                                volume[2] = v3.toFloatOrNull() ?: 0f
-                                update(entity.copy(volume = volume))
-                            }
-                        },
-                        textStyle = TextStyle(
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
+                        text = stringResource(id = R.string.moving_distance),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
                     )
                     Divider(
                         modifier = Modifier
-                            .width(1.dp)
+                            .width(2.dp)
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
-                    CustomTextField(
+                    Text(
                         modifier = Modifier.weight(1f),
-                        value = TextFieldValue(v4, TextRange(v4.length)),
-                        onValueChange = {
-                            scope.launch {
-                                v4 = it.text
-                                val volume = entity.volume.toMutableList()
-                                volume[3] = v4.toFloatOrNull() ?: 0f
-                                update(entity.copy(volume = volume))
-                            }
-                        },
-                        textStyle = TextStyle(
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center,
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
+                        text = stringResource(id = R.string.actions),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
                     )
+                }
+                Divider(color = Color.Black, thickness = 2.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        modifier = Modifier.weight(0.5f),
+                        text = stringResource(id = R.string.y_axis),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                    )
+                    Divider(
+                        modifier = Modifier
+                            .width(2.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        CustomTextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = TextFieldValue(y, TextRange(y.length)),
+                            onValueChange = {
+                                scope.launch {
+                                    y = it.text
+                                    val axis = entity.axis.toMutableList()
+                                    axis[0] = y.toFloatOrNull() ?: 0f
+                                    update(entity.copy(axis = axis))
+                                }
+                            },
+                            textStyle = TextStyle(
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Center,
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboard?.hide()
+                                }
+                            ),
+                        )
+                        Divider()
+                    }
+                    Divider(
+                        modifier = Modifier
+                            .width(2.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Button(
+                            modifier = Modifier.width(96.dp),
+                            onClick = { keyboard?.hide() },
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = Icons.Filled.ArrowForward,
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                }
+                Divider(color = Color.Black, thickness = 2.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(48.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        modifier = Modifier.weight(0.5f),
+                        text = stringResource(id = R.string.z_axis),
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center,
+                    )
+                    Divider(
+                        modifier = Modifier
+                            .width(2.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        CustomTextField(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = TextFieldValue(z, TextRange(z.length)),
+                            onValueChange = {
+                                scope.launch {
+                                    z = it.text
+                                    val axis = entity.axis.toMutableList()
+                                    axis[1] = z.toFloatOrNull() ?: 0f
+                                    update(entity.copy(axis = axis))
+                                }
+                            },
+                            textStyle = TextStyle(
+                                fontSize = 20.sp,
+                                textAlign = TextAlign.Center,
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Done,
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    keyboard?.hide()
+                                }
+                            ),
+                        )
+                        Divider()
+                    }
+                    Divider(
+                        modifier = Modifier
+                            .width(2.dp)
+                            .fillMaxHeight(),
+                        color = Color.Black,
+                    )
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center,
+                    ) {
+                        Button(
+                            modifier = Modifier.width(96.dp),
+                            onClick = { keyboard?.hide() },
+                        ) {
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                imageVector = Icons.Filled.ArrowForward,
+                                contentDescription = null,
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -624,13 +773,8 @@ fun ProgramEditPreview() {
     repeat(6) {
         pointList.add(Point())
     }
-    val containers = mutableListOf<ContainerEntity>()
-    repeat(10) {
-        containers.add(ContainerEntity())
-    }
     ProgramEdit(
         entity = ProgramEntity(),
-        containers = containers,
     )
 }
 

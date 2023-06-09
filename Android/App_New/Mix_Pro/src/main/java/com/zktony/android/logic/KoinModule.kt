@@ -5,7 +5,6 @@ import com.zktony.android.R
 import com.zktony.android.logic.data.AppDatabase
 import com.zktony.android.ui.ZktyCalibrationViewModel
 import com.zktony.android.ui.ZktyConfigViewModel
-import com.zktony.android.ui.ZktyContainerViewModel
 import com.zktony.android.ui.ZktyHomeViewModel
 import com.zktony.android.ui.ZktyMotorViewModel
 import com.zktony.android.ui.ZktyProgramViewModel
@@ -15,7 +14,6 @@ import com.zktony.protobuf.grpc.ApplicationGrpc
 import io.grpc.TlsChannelCredentials
 import io.grpc.okhttp.OkHttpChannelBuilder
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -33,7 +31,6 @@ val koinModule = module {
         ).build()
     }
     single { get<AppDatabase>().calibrationDao() }
-    single { get<AppDatabase>().containerDao() }
     single { get<AppDatabase>().motorDao() }
     single { get<AppDatabase>().programDao() }
 
@@ -57,11 +54,10 @@ val koinModule = module {
     singleOf(::SerialPort)
 
     // viewModel
-    singleOf(::ZktyCalibrationViewModel)
-    singleOf(::ZktyConfigViewModel)
-    singleOf(::ZktyContainerViewModel)
-    singleOf(::ZktyHomeViewModel)
-    singleOf(::ZktyMotorViewModel)
-    singleOf(::ZktyProgramViewModel)
-    singleOf(::ZktySettingViewModel)
+    viewModelOf(::ZktyCalibrationViewModel)
+    viewModelOf(::ZktyConfigViewModel)
+    viewModelOf(::ZktyHomeViewModel)
+    viewModelOf(::ZktyMotorViewModel)
+    viewModelOf(::ZktyProgramViewModel)
+    viewModelOf(::ZktySettingViewModel)
 }

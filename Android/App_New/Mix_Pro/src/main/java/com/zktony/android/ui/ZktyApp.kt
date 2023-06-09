@@ -23,7 +23,6 @@ import com.zktony.android.ui.navigation.PermanentNavigationDrawerContent
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 
 /**
  * Main entry point for the app.
@@ -115,12 +114,6 @@ private fun AppNavHost(
         }
         composable(Route.PROGRAM) {
             ZktyProgram(
-                modifier = Modifier,
-                navController = navController,
-            )
-        }
-        composable(Route.CONTAINER) {
-            ZktyContainer(
                 modifier = Modifier,
                 navController = navController,
             )

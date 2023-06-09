@@ -28,7 +28,3 @@ fun String.ascii2ByteArray(hasSpace: Boolean = false): ByteArray {
     val s = if (hasSpace) this else this.replace(" ", "")
     return s.toByteArray(charset("US-ASCII"))
 }
-
-fun String.addFirst(s: String) = "$s$this"
-
-fun String.addLast(s: String) = "$this$s"

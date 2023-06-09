@@ -168,17 +168,17 @@ fun ByteArray.crc16dnp(): Int {
  * @param type CrcEnum
  * @return ByteArray
  */
-fun ByteArray.crc16LE(type: CrcEnum = CrcEnum.MODBUS): ByteArray {
+fun ByteArray.crc16LE(type: CrcType = CrcType.MODBUS): ByteArray {
     val crc = when (type) {
-        CrcEnum.CCITT -> crc16ccitt()
-        CrcEnum.CCITT_FALSE -> crc16ccittFalse()
-        CrcEnum.XMODEM -> crc16xmodem()
-        CrcEnum.X25 -> crc16x25()
-        CrcEnum.MODBUS -> crc16modbus()
-        CrcEnum.IBM -> crc16ibm()
-        CrcEnum.MAXIM -> crc16maxim()
-        CrcEnum.USB -> crc16usb()
-        CrcEnum.DNP -> crc16dnp()
+        CrcType.CCITT -> crc16ccitt()
+        CrcType.CCITT_FALSE -> crc16ccittFalse()
+        CrcType.XMODEM -> crc16xmodem()
+        CrcType.X25 -> crc16x25()
+        CrcType.MODBUS -> crc16modbus()
+        CrcType.IBM -> crc16ibm()
+        CrcType.MAXIM -> crc16maxim()
+        CrcType.USB -> crc16usb()
+        CrcType.DNP -> crc16dnp()
     }
     return byteArrayOf((crc and 0xff).toByte(), (crc shr 8 and 0xff).toByte())
 }
@@ -190,21 +190,21 @@ fun ByteArray.crc16LE(type: CrcEnum = CrcEnum.MODBUS): ByteArray {
  * @param type CrcEnum
  * @return ByteArray
  */
-fun ByteArray.crc16BE(type: CrcEnum = CrcEnum.MODBUS): ByteArray {
+fun ByteArray.crc16BE(type: CrcType = CrcType.MODBUS): ByteArray {
     val crc = when (type) {
-        CrcEnum.CCITT -> crc16ccitt()
-        CrcEnum.CCITT_FALSE -> crc16ccittFalse()
-        CrcEnum.XMODEM -> crc16xmodem()
-        CrcEnum.X25 -> crc16x25()
-        CrcEnum.MODBUS -> crc16modbus()
-        CrcEnum.IBM -> crc16ibm()
-        CrcEnum.MAXIM -> crc16maxim()
-        CrcEnum.USB -> crc16usb()
-        CrcEnum.DNP -> crc16dnp()
+        CrcType.CCITT -> crc16ccitt()
+        CrcType.CCITT_FALSE -> crc16ccittFalse()
+        CrcType.XMODEM -> crc16xmodem()
+        CrcType.X25 -> crc16x25()
+        CrcType.MODBUS -> crc16modbus()
+        CrcType.IBM -> crc16ibm()
+        CrcType.MAXIM -> crc16maxim()
+        CrcType.USB -> crc16usb()
+        CrcType.DNP -> crc16dnp()
     }
     return byteArrayOf((crc shr 8 and 0xff).toByte(), (crc and 0xff).toByte())
 }
 
-enum class CrcEnum {
+enum class CrcType {
     CCITT, CCITT_FALSE, XMODEM, X25, MODBUS, IBM, MAXIM, USB, DNP
 }

@@ -50,4 +50,5 @@
     <string name="confirm">Confirm</string>
     <string name="moving_distance">Moving distance</string>
     <string name="actions">Actions</string>
+    <string name="motor">Motor</string>
 </resources>
