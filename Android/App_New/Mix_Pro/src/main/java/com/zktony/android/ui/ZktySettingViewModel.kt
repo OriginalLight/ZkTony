@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
+import com.zktony.android.ui.utils.PageType
 import com.zktony.core.ext.DownloadState
 import com.zktony.core.ext.Ext
 import com.zktony.core.ext.download
@@ -37,6 +38,7 @@ class ZktySettingViewModel constructor(
     private val _uiState = MutableStateFlow(SettingUiState())
     private val _application = MutableStateFlow<Application?>(null)
     private val _progress = MutableStateFlow(0)
+    private val _page = MutableStateFlow(PageType.LIST)
 
     val uiState = _uiState.asStateFlow()
 
@@ -47,11 +49,13 @@ class ZktySettingViewModel constructor(
                     _application,
                     settingsFlow,
                     _progress,
-                ) { application, settings, progress ->
+                    _page
+                ) { application, settings, progress, page ->
                     SettingUiState(
                         application = application,
                         settings = settings,
                         progress = progress,
+                        page = page
                     )
                 }.catch { ex ->
                     ex.printStackTrace()
@@ -72,6 +76,10 @@ class ZktySettingViewModel constructor(
                 }
             }
         }
+    }
+
+    fun navTo(page: PageType) {
+        _page.value = page
     }
 
     /**
@@ -217,4 +225,5 @@ data class SettingUiState(
     val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
     val application: Application? = null,
     val progress: Int = 0,
+    val page: PageType = PageType.LIST,
 )

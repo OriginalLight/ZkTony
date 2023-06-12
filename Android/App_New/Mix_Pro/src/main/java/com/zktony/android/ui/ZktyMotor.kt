@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -61,45 +60,44 @@ fun ZktyMotor(
     viewModel: ZktyMotorViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val page = remember { mutableStateOf(PageType.LIST) }
 
     BackHandler {
-        when (page.value) {
+        when (uiState.page) {
             PageType.LIST -> navController.navigateUp()
-            else -> page.value = PageType.LIST
+            else -> viewModel.navTo(PageType.LIST)
         }
     }
 
     Column(modifier = modifier) {
         // app bar
         ZktyTopAppBar(
-            title = if (page.value == PageType.LIST) {
+            title = if (uiState.page == PageType.LIST) {
                 stringResource(id = R.string.motor_config)
             } else {
                 uiState.entities.find { it.id == uiState.selected }!!.text
             },
             navigation = {
-                when (page.value) {
+                when (uiState.page) {
                     PageType.LIST -> navController.navigateUp()
-                    else -> page.value = PageType.LIST
+                    else -> viewModel.navTo(PageType.LIST)
                 }
             }
         )
         // motor list
-        AnimatedVisibility(visible = page.value == PageType.LIST) {
+        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
             MotorList(
                 modifier = Modifier,
                 uiState = uiState,
-                navigationToEdit = { page.value = PageType.EDIT },
+                navTo = viewModel::navTo,
                 toggleSelected = viewModel::toggleSelected,
             )
         }
         // motor edit
-        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             MotorEdit(
                 modifier = Modifier,
                 entity = uiState.entities.find { it.id == uiState.selected }!!,
-                navigationToList = { page.value = PageType.LIST },
+                navTo = viewModel::navTo,
                 update = viewModel::update,
             )
         }
@@ -111,7 +109,7 @@ fun ZktyMotor(
 fun MotorList(
     modifier: Modifier = Modifier,
     uiState: MotorUiState = MotorUiState(),
-    navigationToEdit: () -> Unit = {},
+    navTo: (PageType) -> Unit = {},
     toggleSelected: (Long) -> Unit = {},
 ) {
     LazyVerticalGrid(
@@ -132,7 +130,7 @@ fun MotorList(
                 Card(
                     onClick = {
                         toggleSelected(it.id)
-                        navigationToEdit()
+                        navTo(PageType.EDIT)
                     }
                 ) {
                     Row(
@@ -173,7 +171,7 @@ fun MotorList(
 fun MotorEdit(
     modifier: Modifier = Modifier,
     entity: MotorEntity = MotorEntity(),
-    navigationToList: () -> Unit = {},
+    navTo: (PageType) -> Unit = {},
     update: (MotorEntity) -> Unit = {},
 ) {
     var speed by remember { mutableIntStateOf(entity.speed) }
@@ -285,7 +283,7 @@ fun MotorEdit(
                         .padding(top = 16.dp),
                     onClick = {
                         update(entity.copy(speed = speed, acc = acc, dec = dec))
-                        navigationToList()
+                        navTo(PageType.LIST)
                     },
                 ) {
                     Icon(

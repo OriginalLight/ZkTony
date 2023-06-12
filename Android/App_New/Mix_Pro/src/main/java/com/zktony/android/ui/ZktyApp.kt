@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -22,7 +21,6 @@ import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.PermanentNavigationDrawerContent
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
-import kotlinx.coroutines.launch
 
 /**
  * Main entry point for the app.
@@ -37,7 +35,6 @@ fun ZktyApp() {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val selectedDestination = navBackStackEntry?.destination?.route ?: Route.HOME
     val navigationType = remember { mutableStateOf(NavigationType.NONE) }
-    val scope = rememberCoroutineScope()
 
     PermanentNavigationDrawer(
         drawerContent = {
@@ -49,11 +46,8 @@ fun ZktyApp() {
                 PermanentNavigationDrawerContent(
                     selectedDestination = selectedDestination,
                     navigateToTopLevelDestination = navigationActions::navigateTo,
-                ) {
-                    scope.launch {
-                        navigationType.value = NavigationType.NAVIGATION_RAIL
-                    }
-                }
+                    onDrawerClicked = { navigationType.value = NavigationType.NAVIGATION_RAIL },
+                )
             }
             AnimatedVisibility(
                 visible = navigationType.value == NavigationType.NAVIGATION_RAIL,
@@ -62,22 +56,20 @@ fun ZktyApp() {
             ) {
                 AppNavigationRail(
                     selectedDestination = selectedDestination,
-                    navigateToTopLevelDestination = navigationActions::navigateTo
-                ) {
-                    scope.launch {
+                    navigateToTopLevelDestination = navigationActions::navigateTo,
+                    onDrawerClicked = {
                         navigationType.value = NavigationType.PERMANENT_NAVIGATION_DRAWER
-                    }
-                }
+                    },
+                )
             }
-        }) {
-        AppNavHost(
-            navController = navController,
-        ) {
-            scope.launch {
-                navigationType.value = NavigationType.PERMANENT_NAVIGATION_DRAWER
-            }
+        },
+        content = {
+            AppNavHost(
+                navController = navController,
+                toggleDrawer = { navigationType.value = it }
+            )
         }
-    }
+    )
 }
 
 /**
@@ -90,7 +82,7 @@ fun ZktyApp() {
 private fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    openDrawer: () -> Unit = {},
+    toggleDrawer: (NavigationType) -> Unit = {},
 ) {
     NavHost(
         modifier = modifier.background(
@@ -103,13 +95,14 @@ private fun AppNavHost(
             ZktySplash(
                 modifier = Modifier,
                 navController = navController,
-                openDrawer = openDrawer,
+                toggleDrawer = toggleDrawer,
             )
         }
         composable(Route.HOME) {
             ZktyHome(
                 modifier = Modifier,
                 navController = navController,
+                toggleDrawer = toggleDrawer,
             )
         }
         composable(Route.PROGRAM) {

@@ -19,6 +19,14 @@ abstract class ProgramDao : BaseDao<ProgramEntity> {
 
     @Query(
         """
+        SELECT * FROM programs
+        WHERE id = :id
+        """
+    )
+    abstract fun getById(id: Long): Flow<ProgramEntity>
+
+    @Query(
+        """
         DELETE FROM programs
         WHERE id = :id
         """

@@ -95,46 +95,45 @@ fun ZktySetting(
     viewModel: ZktySettingViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val page = remember { mutableStateOf(PageType.LIST) }
 
     BackHandler {
-        when (page.value) {
+        when (uiState.page) {
             PageType.LIST -> navController.navigateUp()
-            else -> page.value = PageType.LIST
+            else -> viewModel.navTo(PageType.LIST)
         }
     }
 
     Column(modifier = modifier) {
         // Top app bar when authentication page is visible
-        AnimatedVisibility(visible = page.value == PageType.AUTH) {
+        AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
             ZktyTopAppBar(
                 title = stringResource(id = R.string.authentication),
                 navigation = {
-                    when (page.value) {
+                    when (uiState.page) {
                         PageType.LIST -> navController.navigateUp()
-                        else -> page.value = PageType.LIST
+                        else -> viewModel.navTo(PageType.LIST)
                     }
                 }
             )
         }
         // main page
-        AnimatedVisibility(visible = page.value == PageType.LIST) {
+        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
             SettingList(
                 modifier = modifier,
                 uiState = uiState,
                 checkUpdate = viewModel::checkUpdate,
-                navigationToAuth = { page.value = PageType.AUTH },
+                navTo = viewModel::navTo,
                 openWifi = viewModel::openWifi,
                 setLanguage = viewModel::setLanguage,
                 setNavigation = viewModel::setNavigation,
             )
         }
         // authentication page
-        AnimatedVisibility(visible = page.value == PageType.AUTH) {
+        AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
             Authentication(
                 modifier = modifier,
+                navTo = viewModel::navTo,
                 navController = navController,
-                navigationToList = { page.value = PageType.LIST },
             )
         }
     }
@@ -144,7 +143,7 @@ fun ZktySetting(
 fun SettingList(
     modifier: Modifier = Modifier,
     checkUpdate: () -> Unit = {},
-    navigationToAuth: () -> Unit = {},
+    navTo: (PageType) -> Unit = {},
     openWifi: () -> Unit = {},
     setLanguage: (String) -> Unit = {},
     setNavigation: (Boolean) -> Unit = {},
@@ -171,7 +170,7 @@ fun SettingList(
         OperationContent(
             modifier = Modifier.wrapContentHeight(),
             checkUpdate = checkUpdate,
-            navigationToAuth = navigationToAuth,
+            navTo = navTo,
             openWifi = openWifi,
             uiState = uiState,
         )
@@ -417,7 +416,7 @@ fun InfoContent(
 fun OperationContent(
     modifier: Modifier = Modifier,
     checkUpdate: () -> Unit = {},
-    navigationToAuth: () -> Unit = {},
+    navTo: (PageType) -> Unit = {},
     openWifi: () -> Unit = {},
     uiState: SettingUiState,
 ) {
@@ -435,7 +434,7 @@ fun OperationContent(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp),
-            onClick = { navigationToAuth() }
+            onClick = { navTo(PageType.AUTH) }
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -457,7 +456,7 @@ fun OperationContent(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp),
-            onClick = { openWifi() }
+            onClick = openWifi
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -479,7 +478,7 @@ fun OperationContent(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp),
-            onClick = { checkUpdate() }
+            onClick = checkUpdate
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -625,8 +624,8 @@ fun VerificationCodeField(
 @Composable
 fun Authentication(
     modifier: Modifier = Modifier,
+    navTo: (PageType) -> Unit = {},
     navController: NavHostController,
-    navigationToList: () -> Unit = {},
 ) {
     var show by remember { mutableStateOf(false) }
 
@@ -655,7 +654,7 @@ fun Authentication(
             ) {
                 ElevatedCard(
                     onClick = {
-                        navigationToList()
+                        navTo(PageType.LIST)
                         navController.navigate(Route.MOTOR)
                     }
                 ) {
@@ -678,7 +677,7 @@ fun Authentication(
                 }
                 ElevatedCard(
                     onClick = {
-                        navigationToList()
+                        navTo(PageType.LIST)
                         navController.navigate(Route.CONFIG)
                     }
                 ) {

@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.ui.navigation.Route
+import com.zktony.android.ui.utils.NavigationType
 
 /**
  * @author 刘贺贺
@@ -46,7 +47,7 @@ import com.zktony.android.ui.navigation.Route
 fun ZktySplash(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    openDrawer: () -> Unit = {},
+    toggleDrawer: (NavigationType) -> Unit = {},
 ) {
 
     val scale = remember { Animatable(0f) }
@@ -107,7 +108,7 @@ fun ZktySplash(
                 FloatingActionButton(
                     modifier = Modifier.width(192.dp),
                     onClick = {
-                        openDrawer()
+                        toggleDrawer(NavigationType.PERMANENT_NAVIGATION_DRAWER)
                         navController.popBackStack()
                         navController.navigate(Route.HOME)
                     },

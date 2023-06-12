@@ -98,42 +98,41 @@ fun ZktyCalibration(
     viewModel: ZktyCalibrationViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val page = remember { mutableStateOf(PageType.LIST) }
 
     BackHandler {
-        when (page.value) {
+        when (uiState.page) {
             PageType.LIST -> navController.navigateUp()
-            else -> page.value = PageType.LIST
+            else -> viewModel.navTo(PageType.LIST)
         }
     }
 
     Column(modifier = modifier) {
         // app bar with edit page is visible
-        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             ZktyTopAppBar(
                 title = stringResource(id = R.string.edit),
                 navigation = {
-                    when (page.value) {
+                    when (uiState.page) {
                         PageType.LIST -> navController.navigateUp()
-                        else -> page.value = PageType.LIST
+                        else -> viewModel.navTo(PageType.LIST)
                     }
                 }
             )
         }
         // list page
-        AnimatedVisibility(visible = page.value == PageType.LIST) {
+        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
             CalibrationList(
                 modifier = modifier,
                 uiState = uiState,
                 active = viewModel::active,
                 insert = viewModel::insert,
                 delete = viewModel::delete,
-                navigationToEdit = { page.value = PageType.EDIT },
+                navTo = viewModel::navTo,
                 toggleSelected = viewModel::toggleSelected,
             )
         }
         // edit page
-        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             CalibrationEdit(
                 modifier = modifier,
                 addLiquid = viewModel::addLiquid,
@@ -153,7 +152,7 @@ fun CalibrationList(
     active: (Long) -> Unit = {},
     insert: (String) -> Unit = {},
     delete: (Long) -> Unit = {},
-    navigationToEdit: () -> Unit = {},
+    navTo: (PageType) -> Unit = {},
     toggleSelected: (Long) -> Unit = {},
 ) {
 
@@ -300,7 +299,7 @@ fun CalibrationList(
                     modifier = Modifier
                         .padding(8.dp)
                         .fillMaxWidth(),
-                    onClick = navigationToEdit,
+                    onClick = { navTo(PageType.EDIT) },
                 ) {
                     Icon(
                         modifier = Modifier.size(36.dp),

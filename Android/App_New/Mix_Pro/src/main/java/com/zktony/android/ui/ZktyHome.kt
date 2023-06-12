@@ -18,25 +18,33 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
+import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.navigation.Route
+import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
+import com.zktony.core.ext.format
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -44,30 +52,41 @@ import org.koin.androidx.compose.koinViewModel
 fun ZktyHome(
     modifier: Modifier = Modifier,
     navController: NavHostController,
+    toggleDrawer: (NavigationType) -> Unit = {},
     viewModel: ZktyHomeViewModel = koinViewModel(),
 ) {
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val page = remember { mutableStateOf(PageType.MENU) }
-    val content = LocalContext.current
 
     BackHandler {
-        when (page.value) {
-            PageType.MENU -> {}
-            else -> page.value = PageType.MENU
+        when (uiState.page) {
+            PageType.LIST -> {}
+            else -> viewModel.navTo(PageType.LIST)
         }
     }
 
     Column(modifier = modifier) {
-        // menu
-        AnimatedVisibility(visible = page.value == PageType.MENU) {
-            HomeMenu(
-                modifier = Modifier
+        AnimatedVisibility(visible = uiState.page == PageType.START) {
+            ZktyTopAppBar(
+                title = stringResource(id = R.string.tab_program),
+                navigation = { viewModel.navTo(PageType.LIST) }
             )
         }
-        // select
-        AnimatedVisibility(visible = page.value == PageType.SELECT) {
-
+        // menu
+        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+            HomeMenu(
+                modifier = Modifier,
+                uiState = uiState,
+                navTo = viewModel::navTo,
+                navController = navController,
+            )
+        }
+        // start
+        AnimatedVisibility(visible = uiState.page == PageType.START) {
+            HomeStart(
+                modifier = Modifier,
+                uiState = uiState,
+            )
         }
     }
 }
@@ -76,6 +95,9 @@ fun ZktyHome(
 @Composable
 fun HomeMenu(
     modifier: Modifier = Modifier,
+    uiState: HomeUiState,
+    navTo: (PageType) -> Unit = {},
+    navController: NavHostController,
 ) {
     Column(
         modifier = modifier
@@ -89,7 +111,7 @@ fun HomeMenu(
     ) {
 
         LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
+            columns = GridCells.Fixed(4),
             contentPadding = PaddingValues(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -171,7 +193,14 @@ fun HomeMenu(
 
         MenuCard(
             modifier = Modifier.padding(horizontal = 196.dp),
-            title = "开始程序"
+            title = "开始程序",
+            onClick = {
+                if (uiState.entities.isEmpty()) {
+                    navController.navigate(Route.PROGRAM)
+                } else {
+                    navTo(PageType.START)
+                }
+            }
         ) {
             Image(
                 modifier = Modifier.size(64.dp),
@@ -179,32 +208,119 @@ fun HomeMenu(
                 contentDescription = null,
             )
         }
-
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuCard(
     modifier: Modifier = Modifier,
     title: String,
     onClick: () -> Unit = { },
+    colors: CardColors = CardDefaults.elevatedCardColors(),
     image: @Composable () -> Unit,
 ) {
-    FloatingActionButton(
+    ElevatedCard(
         modifier = modifier,
         onClick = onClick,
+        colors = colors,
     ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        Column(
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             image()
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = title,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 textAlign = TextAlign.Center,
             )
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeStart(
+    modifier: Modifier = Modifier,
+    uiState: HomeUiState,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp)
+            .background(
+                color = MaterialTheme.colorScheme.background,
+                shape = MaterialTheme.shapes.medium
+            ),
+    ) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            contentPadding = PaddingValues(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            uiState.entities.forEach {
+                item {
+                    Card(
+                        onClick = { }
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                        ) {
+                            Box {
+                                Image(
+                                    modifier = Modifier
+                                        .size(24.dp)
+                                        .align(Alignment.CenterStart),
+                                    painter = painterResource(id = R.drawable.ic_program),
+                                    contentDescription = null,
+                                )
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = it.text,
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.titleMedium,
+                                )
+                            }
+                            Divider()
+                            Row {
+                                Text(
+                                    modifier = Modifier.weight(1f),
+                                    text = it.volume[0].format(1) + " μL",
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                                Text(
+                                    modifier = Modifier.weight(1f),
+                                    text = it.volume[1].format(1) + " μL",
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                            }
+                            Divider()
+                            Row {
+                                Text(
+                                    modifier = Modifier.weight(1f),
+                                    text = it.volume[2].format(1) + " μL",
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                                Text(
+                                    modifier = Modifier.weight(1f),
+                                    text = it.volume[3].format(1) + " μL",
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                )
+                            }
+                            Divider()
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -213,5 +329,14 @@ fun MenuCard(
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun HomeMenuPreview() {
-    HomeMenu()
+    HomeMenu(
+        uiState = HomeUiState(),
+        navController = rememberNavController()
+    )
+}
+
+@Composable
+@Preview(showBackground = true, widthDp = 960, heightDp = 640)
+fun HomeStartPreview() {
+    HomeStart(uiState = HomeUiState())
 }

@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.logic.data.dao.ProgramDao
 import com.zktony.android.logic.data.entities.ProgramEntity
-import com.zktony.core.ext.loge
+import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -20,6 +20,7 @@ class ZktyProgramViewModel constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProgramUiState())
     private val _selected = MutableStateFlow(0L)
+    private val _page = MutableStateFlow(PageType.LIST)
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -27,18 +28,19 @@ class ZktyProgramViewModel constructor(
             combine(
                 dao.getAll(),
                 _selected,
-            ) { entities, selected ->
-                ProgramUiState(
-                    entities = entities,
-                    selected = selected
-                )
+                _page,
+            ) { entities, selected, page ->
+                ProgramUiState(entities = entities, selected = selected, page = page)
             }.catch { ex ->
                 ex.printStackTrace()
             }.collect {
-                it.toString().loge()
                 _uiState.value = it
             }
         }
+    }
+
+    fun navTo(page: PageType) {
+        _page.value = page
     }
 
     fun toggleSelected(id: Long) {
@@ -82,4 +84,5 @@ class ZktyProgramViewModel constructor(
 data class ProgramUiState(
     val entities: List<ProgramEntity> = emptyList(),
     val selected: Long = 0L,
+    val page: PageType = PageType.LIST,
 )

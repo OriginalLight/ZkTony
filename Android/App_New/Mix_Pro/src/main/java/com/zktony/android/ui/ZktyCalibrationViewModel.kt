@@ -6,6 +6,7 @@ import com.zktony.android.logic.data.dao.CalibrationDao
 import com.zktony.android.logic.data.entities.CalibrationData
 import com.zktony.android.logic.data.entities.CalibrationEntity
 import com.zktony.android.logic.ext.syncTx
+import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -21,6 +22,7 @@ class ZktyCalibrationViewModel constructor(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(CalibrationUiState())
     private val _selected = MutableStateFlow(0L)
+    private val _page = MutableStateFlow(PageType.LIST)
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -28,14 +30,19 @@ class ZktyCalibrationViewModel constructor(
             combine(
                 dao.getAll(),
                 _selected,
-            ) { entities, selected ->
-                CalibrationUiState(entities = entities, selected = selected)
+                _page,
+            ) { entities, selected, page ->
+                CalibrationUiState(entities = entities, selected = selected, page = page)
             }.catch { ex ->
                 ex.printStackTrace()
             }.collect {
                 _uiState.value = it
             }
         }
+    }
+
+    fun navTo(page: PageType) {
+        _page.value = page
     }
 
     fun toggleSelected(id: Long) {
@@ -114,4 +121,5 @@ class ZktyCalibrationViewModel constructor(
 data class CalibrationUiState(
     val entities: List<CalibrationEntity> = emptyList(),
     val selected: Long = 0L,
+    val page: PageType = PageType.LIST
 )

@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
@@ -86,41 +87,40 @@ fun ZktyProgram(
     viewModel: ZktyProgramViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val page = remember { mutableStateOf(PageType.LIST) }
 
     BackHandler {
-        when (page.value) {
+        when (uiState.page) {
             PageType.LIST -> navController.navigateUp()
-            else -> page.value = PageType.LIST
+            else -> viewModel.navTo(PageType.LIST)
         }
     }
 
     Column(modifier = modifier) {
         // app bar for edit page
-        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             ZktyTopAppBar(
                 title = stringResource(id = R.string.edit),
                 navigation = {
-                    when (page.value) {
+                    when (uiState.page) {
                         PageType.LIST -> navController.navigateUp()
-                        else -> page.value = PageType.LIST
+                        else -> viewModel.navTo(PageType.LIST)
                     }
                 }
             )
         }
         // list page
-        AnimatedVisibility(visible = page.value == PageType.LIST) {
+        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
             ProgramList(
                 modifier = Modifier,
                 uiState = uiState,
                 insert = viewModel::insert,
                 delete = viewModel::delete,
-                navigationToEdit = { page.value = PageType.EDIT },
+                navTo = viewModel::navTo,
                 toggleSelected = viewModel::toggleSelected,
             )
         }
         // edit page
-        AnimatedVisibility(visible = page.value == PageType.EDIT) {
+        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             ProgramEdit(
                 modifier = Modifier,
                 entity = uiState.entities.find { it.id == uiState.selected }!!,
@@ -138,7 +138,7 @@ fun ProgramList(
     uiState: ProgramUiState = ProgramUiState(),
     insert: (String) -> Unit = {},
     delete: (Long) -> Unit = {},
-    navigationToEdit: () -> Unit = {},
+    navTo: (PageType) -> Unit = {},
     toggleSelected: (Long) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
@@ -286,7 +286,7 @@ fun ProgramList(
                     modifier = Modifier
                         .padding(8.dp)
                         .fillMaxWidth(),
-                    onClick = navigationToEdit,
+                    onClick = { navTo(PageType.EDIT) },
                 ) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -422,7 +422,7 @@ fun ProgramEdit(
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
-                    Column(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.weight(1f)) {
                         CustomTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = TextFieldValue(v1, TextRange(v1.length)),
@@ -448,7 +448,13 @@ fun ProgramEdit(
                                 }
                             ),
                         )
-                        Divider()
+                        Icon(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterEnd),
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null
+                        )
                     }
                     Divider(
                         modifier = Modifier
@@ -456,7 +462,7 @@ fun ProgramEdit(
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
-                    Column(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.weight(1f)) {
                         CustomTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = TextFieldValue(v2, TextRange(v2.length)),
@@ -482,7 +488,13 @@ fun ProgramEdit(
                                 }
                             ),
                         )
-                        Divider()
+                        Icon(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterEnd),
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null
+                        )
                     }
                 }
                 Divider(color = Color.Black, thickness = 2.dp)
@@ -504,7 +516,7 @@ fun ProgramEdit(
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
-                    Column(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.weight(1f)) {
                         CustomTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = TextFieldValue(v3, TextRange(v3.length)),
@@ -530,7 +542,13 @@ fun ProgramEdit(
                                 }
                             ),
                         )
-                        Divider()
+                        Icon(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterEnd),
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null
+                        )
                     }
                     Divider(
                         modifier = Modifier
@@ -538,7 +556,7 @@ fun ProgramEdit(
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
-                    Column(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.weight(1f)) {
                         CustomTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = TextFieldValue(v4, TextRange(v4.length)),
@@ -564,7 +582,13 @@ fun ProgramEdit(
                                 }
                             ),
                         )
-                        Divider()
+                        Icon(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterEnd),
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null
+                        )
                     }
                 }
                 Divider(color = Color.Black, thickness = 2.dp)
@@ -628,7 +652,7 @@ fun ProgramEdit(
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
-                    Column(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.weight(1f)) {
                         CustomTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = TextFieldValue(y, TextRange(y.length)),
@@ -654,7 +678,13 @@ fun ProgramEdit(
                                 }
                             ),
                         )
-                        Divider()
+                        Icon(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterEnd),
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null
+                        )
                     }
                     Divider(
                         modifier = Modifier
@@ -698,7 +728,7 @@ fun ProgramEdit(
                             .fillMaxHeight(),
                         color = Color.Black,
                     )
-                    Column(modifier = Modifier.weight(1f)) {
+                    Box(modifier = Modifier.weight(1f)) {
                         CustomTextField(
                             modifier = Modifier.fillMaxWidth(),
                             value = TextFieldValue(z, TextRange(z.length)),
@@ -724,7 +754,13 @@ fun ProgramEdit(
                                 }
                             ),
                         )
-                        Divider()
+                        Icon(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .align(Alignment.CenterEnd),
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null
+                        )
                     }
                     Divider(
                         modifier = Modifier
