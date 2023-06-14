@@ -99,7 +99,7 @@ fun ZktySetting(
     BackHandler {
         when (uiState.page) {
             PageType.LIST -> navController.navigateUp()
-            else -> viewModel.navTo(PageType.LIST)
+            else -> viewModel.event(SettingEvent.NavTo(PageType.LIST))
         }
     }
 
@@ -111,7 +111,7 @@ fun ZktySetting(
                 navigation = {
                     when (uiState.page) {
                         PageType.LIST -> navController.navigateUp()
-                        else -> viewModel.navTo(PageType.LIST)
+                        else -> viewModel.event(SettingEvent.NavTo(PageType.LIST))
                     }
                 }
             )
@@ -121,18 +121,14 @@ fun ZktySetting(
             SettingList(
                 modifier = modifier,
                 uiState = uiState,
-                checkUpdate = viewModel::checkUpdate,
-                navTo = viewModel::navTo,
-                openWifi = viewModel::openWifi,
-                setLanguage = viewModel::setLanguage,
-                setNavigation = viewModel::setNavigation,
+                event = viewModel::event,
             )
         }
         // authentication page
         AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
             Authentication(
                 modifier = modifier,
-                navTo = viewModel::navTo,
+                event = viewModel::event,
                 navController = navController,
             )
         }
@@ -142,12 +138,8 @@ fun ZktySetting(
 @Composable
 fun SettingList(
     modifier: Modifier = Modifier,
-    checkUpdate: () -> Unit = {},
-    navTo: (PageType) -> Unit = {},
-    openWifi: () -> Unit = {},
-    setLanguage: (String) -> Unit = {},
-    setNavigation: (Boolean) -> Unit = {},
-    uiState: SettingUiState,
+    uiState: SettingUiState = SettingUiState(),
+    event: (SettingEvent) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -159,9 +151,8 @@ fun SettingList(
         ) {
             SettingsContent(
                 modifier = Modifier.weight(1f),
-                setLanguage = setLanguage,
-                setNavigation = setNavigation,
                 uiState = uiState,
+                event = event,
             )
             InfoContent(
                 modifier = Modifier.weight(1f),
@@ -169,10 +160,8 @@ fun SettingList(
         }
         OperationContent(
             modifier = Modifier.wrapContentHeight(),
-            checkUpdate = checkUpdate,
-            navTo = navTo,
-            openWifi = openWifi,
             uiState = uiState,
+            event = event,
         )
     }
 }
@@ -180,9 +169,8 @@ fun SettingList(
 @Composable
 fun SettingsContent(
     modifier: Modifier = Modifier,
-    setLanguage: (String) -> Unit = {},
-    setNavigation: (Boolean) -> Unit = {},
     uiState: SettingUiState,
+    event: (SettingEvent) -> Unit = {},
 ) {
     val lazyColumnState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -223,7 +211,7 @@ fun SettingsContent(
                         paddingStart = 32.dp,
                         onClick = {
                             scope.launch {
-                                setLanguage(code)
+                                event(SettingEvent.Language(code))
                                 expanded = false
                             }
                         }) {
@@ -244,7 +232,7 @@ fun SettingsContent(
                     checked = uiState.settings.navigation,
                     onCheckedChange = {
                         scope.launch {
-                            setNavigation(it)
+                            event(SettingEvent.Navigation(it))
                         }
                     },
                 )
@@ -415,10 +403,8 @@ fun InfoContent(
 @Composable
 fun OperationContent(
     modifier: Modifier = Modifier,
-    checkUpdate: () -> Unit = {},
-    navTo: (PageType) -> Unit = {},
-    openWifi: () -> Unit = {},
     uiState: SettingUiState,
+    event: (SettingEvent) -> Unit = {},
 ) {
     Row(
         modifier = modifier
@@ -434,7 +420,7 @@ fun OperationContent(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp),
-            onClick = { navTo(PageType.AUTH) }
+            onClick = { event(SettingEvent.NavTo(PageType.AUTH)) }
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -456,7 +442,7 @@ fun OperationContent(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp),
-            onClick = openWifi
+            onClick = { event(SettingEvent.Network) }
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -478,7 +464,7 @@ fun OperationContent(
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 32.dp, vertical = 8.dp),
-            onClick = checkUpdate
+            onClick = { event(SettingEvent.Update) }
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -624,7 +610,7 @@ fun VerificationCodeField(
 @Composable
 fun Authentication(
     modifier: Modifier = Modifier,
-    navTo: (PageType) -> Unit = {},
+    event: (SettingEvent) -> Unit = {},
     navController: NavHostController,
 ) {
     var show by remember { mutableStateOf(false) }
@@ -654,7 +640,7 @@ fun Authentication(
             ) {
                 ElevatedCard(
                     onClick = {
-                        navTo(PageType.LIST)
+                        event(SettingEvent.NavTo(PageType.LIST))
                         navController.navigate(Route.MOTOR)
                     }
                 ) {
@@ -677,7 +663,7 @@ fun Authentication(
                 }
                 ElevatedCard(
                     onClick = {
-                        navTo(PageType.LIST)
+                        event(SettingEvent.NavTo(PageType.LIST))
                         navController.navigate(Route.CONFIG)
                     }
                 ) {

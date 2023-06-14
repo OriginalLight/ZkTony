@@ -11,11 +11,11 @@ import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
-import com.zktony.core.model.QrCode
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
 import com.zktony.www.BuildConfig
 import com.zktony.www.R
+import com.zktony.www.core.ext.aboutDialog
 import com.zktony.www.databinding.FragmentAdminBinding
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -43,15 +43,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 launch {
                     viewModel.uiState.collect {
                         binding.apply {
-                            progress.progress = it.progress
-                            progress.isVisible = it.progress != 0
                             tvUpdate.text =
-                                if (it.progress == 0) resources.getString(com.zktony.core.R.string.check_update) else "${it.progress}%"
+                                if (it.progress == 0) resources.getString(R.string.check_update) else "${it.progress}%"
                             it.application?.let { app ->
                                 if (app.versionCode > BuildConfig.VERSION_CODE) {
-                                    update.setBackgroundResource(com.zktony.core.R.mipmap.new_icon)
+                                    update.setBackgroundResource(R.mipmap.new_icon)
                                     tvUpdate.text =
-                                        if (it.progress == 0) resources.getString(com.zktony.core.R.string.new_version) else "${it.progress}%"
+                                        if (it.progress == 0) resources.getString(R.string.new_version) else "${it.progress}%"
                                 }
                             }
                         }
@@ -88,15 +86,6 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                             if (it > 0) binding.motorSpeed.setEqualText(it.toString())
                         }
                     }
-                    launch {
-                        dataStore.read(Constants.LANGUAGE, "zh").collect {
-                            binding.btnLanguage.text = when (it) {
-                                "zh" -> "简体中文"
-                                "en" -> "English"
-                                else -> "简体中文"
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -105,31 +94,22 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
     /**
      * 初始化Button
      */
-    @SuppressLint("ClickableViewAccessibility", "HardwareIds")
+    @SuppressLint("ClickableViewAccessibility", "HardwareIds", "UseCompatLoadingForDrawables")
     private fun initView() {
         binding.apply {
             tvVersionName.text = BuildConfig.VERSION_NAME
-            tvDeviceName.text = BuildConfig.BUILD_TYPE
 
             pump.addTouchEvent({
                 it.scaleX = 0.8f
                 it.scaleY = 0.8f
+                it.background = resources.getDrawable(R.drawable.bg_img_btn_pressed)
                 viewModel.touchPump(true)
             }, {
                 it.scaleX = 1f
                 it.scaleY = 1f
+                it.background = resources.getDrawable(R.drawable.bg_img_btn_unpressed)
                 viewModel.touchPump(false)
             })
-
-            btnLanguage.clickNoRepeat {
-                spannerDialog(
-                    it,
-                    menu = listOf(
-                        "简体中文", "English"
-                    ),
-                    block = { _, index -> viewModel.setLanguage(index) }
-                )
-            }
 
             interval.afterTextChange {
                 viewModel.toggleInterval(it.toIntOrNull() ?: 0)
@@ -164,11 +144,11 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                 clickScale()
                 clickNoRepeat {
                     if (viewModel.uiState.value.progress > 0) {
-                        PopTip.show(resources.getString(com.zktony.core.R.string.updating))
+                        PopTip.show(resources.getString(R.string.updating))
                         return@clickNoRepeat
                     }
                     if (viewModel.uiState.value.loading) {
-                        PopTip.show(resources.getString(com.zktony.core.R.string.checking_for_updates))
+                        PopTip.show(resources.getString(R.string.checking_for_updates))
                         return@clickNoRepeat
                     }
                     viewModel.checkUpdate()
@@ -178,34 +158,13 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
             with(version) {
                 clickScale()
                 clickNoRepeat {
-                    PopTip.show("${resources.getString(com.zktony.core.R.string.version)} ${BuildConfig.VERSION_NAME}")
+                    PopTip.show("${resources.getString(R.string.version)} ${BuildConfig.VERSION_NAME}")
                 }
             }
 
             with(about) {
                 clickScale()
-                clickNoRepeat {
-                    aboutDialog { webDialog() }
-                }
-            }
-
-            with(device) {
-                clickScale()
-                clickNoRepeat {
-                    deviceDialog(
-                        Gson().toJson(
-                            QrCode(
-                                id = Settings.Secure.getString(
-                                    Ext.ctx.contentResolver, Settings.Secure.ANDROID_ID
-                                ),
-                                `package` = BuildConfig.APPLICATION_ID,
-                                version_name = BuildConfig.VERSION_NAME,
-                                version_code = BuildConfig.VERSION_CODE,
-                                build_type = BuildConfig.BUILD_TYPE,
-                            )
-                        )
-                    )
-                }
+                clickNoRepeat { aboutDialog() }
             }
         }
     }

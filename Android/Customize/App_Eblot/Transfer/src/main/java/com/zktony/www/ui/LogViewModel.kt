@@ -37,11 +37,9 @@ class LogViewModel constructor(
     /**
      * 获取日志记录
      */
-    fun search() {
+    fun search(date: Date) {
         viewModelScope.launch {
-            val start = _uiState.value.startTime
-            val end = _uiState.value.endTime
-            LRD.getByDate(start.getDayStart(), end.getDayEnd())
+            LRD.getByDate(date.getDayStart(), date.getDayEnd())
                 .collect {
                     _uiState.value = _uiState.value.copy(list = it)
                     if (it.isEmpty()) {
@@ -65,23 +63,15 @@ class LogViewModel constructor(
     /**
      * 切换搜索栏
      */
-    fun showSearchBar() {
-        val search = _uiState.value.bar
-        _uiState.value = _uiState.value.copy(bar = !search)
+    fun select(logRecord: LogRecord?) {
+        _uiState.value = _uiState.value.copy(selected = logRecord)
     }
 
-    fun setStartTime(date: Date) {
-        _uiState.value = _uiState.value.copy(startTime = date)
-    }
-
-    fun setEndTime(date: Date) {
-        _uiState.value = _uiState.value.copy(endTime = date)
-    }
 }
 
 data class LogUiState(
     val list: List<LogRecord> = emptyList(),
-    val bar: Boolean = false,
+    val selected: LogRecord? = null,
     val startTime: Date = Date(System.currentTimeMillis()),
     val endTime: Date = Date(System.currentTimeMillis())
 )

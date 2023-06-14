@@ -14,7 +14,7 @@ import com.kongzue.dialogx.interfaces.OnBindView
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.clickNoRepeat
 import com.zktony.core.ext.clickScale
-import com.zktony.core.ext.messageDialog
+import com.zktony.www.core.ext.messageDialog
 import com.zktony.www.R
 import com.zktony.www.adapter.ProgramAdapter
 import com.zktony.www.databinding.FragmentProgramBinding

@@ -1,6 +1,5 @@
 package com.zktony.www.di
 
-import com.zktony.core.R
 import com.zktony.core.utils.Constants.GRPC_AUTHORITY
 import com.zktony.core.utils.Constants.GRPC_HOST
 import com.zktony.core.utils.Constants.GRPC_PORT
@@ -8,6 +7,7 @@ import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.protobuf.grpc.LogDetailGrpc
 import com.zktony.protobuf.grpc.LogGrpc
 import com.zktony.protobuf.grpc.ProgramGrpc
+import com.zktony.www.R
 import io.grpc.TlsChannelCredentials
 import io.grpc.okhttp.OkHttpChannelBuilder
 import org.koin.android.ext.koin.androidContext

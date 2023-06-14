@@ -91,9 +91,7 @@ fun ZktyConfig(
         ConfigList(
             modifier = Modifier,
             uiState = uiState,
-            setTravel = viewModel::setTravel,
-            setWaste = viewModel::setWaste,
-            moveTo = viewModel::moveTo,
+            event = viewModel::event
         )
     }
 }
@@ -103,9 +101,7 @@ fun ZktyConfig(
 fun ConfigList(
     modifier: Modifier = Modifier,
     uiState: ConfigUiState,
-    setTravel: (Int, Float) -> Unit = { _, _ -> },
-    setWaste: (Int, Float) -> Unit = { _, _ -> },
-    moveTo: (Int, Float) -> Unit = { _, _ -> },
+    event: (ConfigEvent) -> Unit = { },
 ) {
     val softKeyboard = LocalSoftwareKeyboardController.current
     val scope = rememberCoroutineScope()
@@ -195,7 +191,7 @@ fun ConfigList(
                     Button(
                         modifier = Modifier.width(128.dp),
                         enabled = !uiState.lock,
-                        onClick = { moveTo(index, text.toFloatOrNull() ?: 0f) },
+                        onClick = { event(ConfigEvent.MoveTo(index, text.toFloatOrNull() ?: 0f)) },
                     ) {
                         Icon(
                             modifier = Modifier.size(24.dp),
@@ -211,7 +207,7 @@ fun ConfigList(
                                 scope.launch {
                                     val value = text.toFloatOrNull() ?: 0f
                                     text = value.format(1)
-                                    setTravel(index, value)
+                                    event(ConfigEvent.SetTravel(index, value))
                                     Ext.ctx.getString(R.string.save_success).showShortToast()
                                 }
                             },
@@ -299,7 +295,7 @@ fun ConfigList(
                     Button(
                         modifier = Modifier.width(128.dp),
                         enabled = !uiState.lock,
-                        onClick = { moveTo(index, text.toFloatOrNull() ?: 0f) },
+                        onClick = { event(ConfigEvent.MoveTo(index, text.toFloatOrNull() ?: 0f)) },
                     ) {
                         Icon(
                             modifier = Modifier.size(24.dp),
@@ -315,7 +311,7 @@ fun ConfigList(
                                 scope.launch {
                                     val value = text.toFloatOrNull() ?: 0f
                                     text = value.format(1)
-                                    setWaste(index, value)
+                                    event(ConfigEvent.SetWaste(index, value))
                                     Ext.ctx.getString(R.string.save_success).showShortToast()
                                 }
                             },

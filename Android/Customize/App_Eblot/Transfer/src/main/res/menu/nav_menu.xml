@@ -1,29 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group android:id="@+id/g1">
-        <item
-            android:id="@+id/navigation_home"
-            android:icon="@mipmap/home"
-            android:title="@string/title_home" />
-    </group>
-    <group android:id="@+id/g2">
-        <item
-            android:id="@+id/navigation_program"
-            android:icon="@mipmap/program"
-            android:title="@string/title_program" />
-    </group>
-    <group android:id="@+id/g3">
-        <item
-            android:id="@+id/navigation_log"
-            android:icon="@mipmap/log"
-            android:title="@string/title_log" />
-    </group>
-    <group android:id="@+id/g4">
-        <item
-            android:id="@+id/navigation_admin"
-            android:icon="@mipmap/admin"
-            android:title="@string/title_admin" />
-    </group>
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@mipmap/ic_home"
+        android:title="@string/title_home" />
+    <item
+        android:id="@+id/navigation_program"
+        android:icon="@mipmap/ic_program"
+        android:title="@string/title_program" />
+    <item
+        android:id="@+id/navigation_log"
+        android:icon="@mipmap/ic_log"
+        android:title="@string/title_log" />
+    <item
+        android:id="@+id/navigation_admin"
+        android:icon="@mipmap/ic_admin"
+        android:title="@string/title_admin" />
 
 </menu>

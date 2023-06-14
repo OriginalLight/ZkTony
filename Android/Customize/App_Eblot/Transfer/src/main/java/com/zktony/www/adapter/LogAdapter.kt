@@ -1,8 +1,11 @@
 package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.*
 import com.zktony.core.ext.*
 import com.zktony.www.R
@@ -15,8 +18,15 @@ import com.zktony.www.data.entities.LogRecord
  */
 class LogAdapter : ListAdapter<LogRecord, LogViewHolder>(diffCallback) {
 
-    var onDeleteButtonClick: (LogRecord) -> Unit = {}
-    var onChartButtonClick: (LogRecord) -> Unit = {}
+    var selected: LogRecord? = null
+        @SuppressLint("NotifyDataSetChanged")
+        set(value) {
+            field = value
+            callback(value)
+            notifyDataSetChanged()
+        }
+
+    var callback : (LogRecord?) -> Unit = {}
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LogViewHolder {
@@ -25,14 +35,16 @@ class LogAdapter : ListAdapter<LogRecord, LogViewHolder>(diffCallback) {
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            ),
-            onDeleteButtonClick,
-            onChartButtonClick
-        )
+            )
+        ) {
+            selected = it
+        }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onBindViewHolder(holder: LogViewHolder, position: Int) {
         holder.bind(getItem(position))
+        holder.select(selected?.id == getItem(position).id)
     }
 
     companion object {
@@ -52,8 +64,7 @@ class LogAdapter : ListAdapter<LogRecord, LogViewHolder>(diffCallback) {
 @SuppressLint("SetTextI18n")
 class LogViewHolder(
     private val binding: ItemLogBinding,
-    private val onDeleteButtonClick: (LogRecord) -> Unit,
-    private val onChartButtonClick: (LogRecord) -> Unit
+    private val onItemClick: (LogRecord) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: LogRecord) {
         binding.apply {
@@ -78,19 +89,35 @@ class LogViewHolder(
                 3 -> "B-$rs"
                 else -> zm
             }
-            delete.run {
-                this.clickScale()
-                clickNoRepeat {
-                    onDeleteButtonClick(item)
-                }
-            }
-            chart.run {
-                this.clickScale()
-                clickNoRepeat {
-                    onChartButtonClick(item)
-                }
+            itemView.setOnClickListener {
+                onItemClick(item)
             }
             executePendingBindings()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun select(bool: Boolean) {
+        binding.apply {
+            if (bool) {
+                order.setBackgroundColor(itemView.context.getColor(R.color.orange))
+                order.setTextColor(itemView.context.getColor(R.color.white))
+                experimentTime.setBackgroundColor(itemView.context.getColor(R.color.orange))
+                experimentTime.setTextColor(itemView.context.getColor(R.color.white))
+                model.setBackgroundColor(itemView.context.getColor(R.color.orange))
+                model.setTextColor(itemView.context.getColor(R.color.white))
+                parameter.setBackgroundColor(itemView.context.getColor(R.color.orange))
+                parameter.setTextColor(itemView.context.getColor(R.color.white))
+            } else {
+                order.setBackgroundColor(itemView.context.getColor(R.color.white))
+                order.setTextColor(itemView.context.getColor(R.color.black))
+                experimentTime.setBackgroundColor(itemView.context.getColor(R.color.white))
+                experimentTime.setTextColor(itemView.context.getColor(R.color.black))
+                model.setBackgroundColor(itemView.context.getColor(R.color.white))
+                model.setTextColor(itemView.context.getColor(R.color.black))
+                parameter.setBackgroundColor(itemView.context.getColor(R.color.white))
+                parameter.setTextColor(itemView.context.getColor(R.color.black))
+            }
         }
     }
 }

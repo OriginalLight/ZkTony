@@ -19,19 +19,22 @@
             android:id="@+id/nav_view"
             android:layout_width="200dp"
             android:layout_height="0dp"
+            android:background="@color/gray"
             android:fitsSystemWindows="false"
             app:bottomInsetScrimEnabled="false"
             app:headerLayout="@layout/nav_header"
             app:itemIconPadding="16dp"
             app:itemIconSize="36dp"
             app:itemMaxLines="1"
+            app:itemVerticalPadding="32dp"
             app:itemShapeFillColor="@drawable/shape_selector"
             app:itemTextAppearance="@style/TextAppearance.AppCompat.Large"
             app:itemTextColor="@drawable/text_color_selector"
+            app:itemIconTint="@drawable/color_selector"
+            app:itemBackground="@drawable/box"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0"
             app:menu="@menu/nav_menu" />
 
         <fragment

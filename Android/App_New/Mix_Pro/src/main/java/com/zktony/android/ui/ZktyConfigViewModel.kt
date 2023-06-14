@@ -37,7 +37,15 @@ class ZktyConfigViewModel : ViewModel() {
         }
     }
 
-    fun setTravel(index: Int, distance: Float) {
+    fun event(event: ConfigEvent) {
+        when (event) {
+            is ConfigEvent.SetTravel -> setTravel(event.index, event.distance)
+            is ConfigEvent.SetWaste -> setWaste(event.index, event.distance)
+            is ConfigEvent.MoveTo -> moveTo(event.index, event.distance)
+        }
+    }
+
+    private fun setTravel(index: Int, distance: Float) {
         viewModelScope.launch {
             val list = _uiState.value.settings.travelList.toMutableList()
             if (list.size == 0) {
@@ -55,7 +63,7 @@ class ZktyConfigViewModel : ViewModel() {
         }
     }
 
-    fun setWaste(index: Int, distance: Float) {
+    private fun setWaste(index: Int, distance: Float) {
         viewModelScope.launch {
             val list = _uiState.value.settings.wasteList.toMutableList()
             if (list.size == 0) {
@@ -73,7 +81,7 @@ class ZktyConfigViewModel : ViewModel() {
         }
     }
 
-    fun moveTo(index: Int, distance: Float) {
+    private fun moveTo(index: Int, distance: Float) {
         viewModelScope.launch {
             _lock.value = true
             syncTx {
@@ -92,3 +100,9 @@ data class ConfigUiState(
     val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
     val lock: Boolean = false,
 )
+
+sealed class ConfigEvent {
+    data class SetTravel(val index: Int, val distance: Float) : ConfigEvent()
+    data class SetWaste(val index: Int, val distance: Float) : ConfigEvent()
+    data class MoveTo(val index: Int, val distance: Float) : ConfigEvent()
+}

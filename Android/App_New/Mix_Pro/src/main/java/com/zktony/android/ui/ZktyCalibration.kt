@@ -72,7 +72,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.logic.data.entities.CalibrationData
 import com.zktony.android.logic.data.entities.CalibrationEntity
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.components.ZktyTopAppBar
@@ -102,7 +101,7 @@ fun ZktyCalibration(
     BackHandler {
         when (uiState.page) {
             PageType.LIST -> navController.navigateUp()
-            else -> viewModel.navTo(PageType.LIST)
+            else -> viewModel.event(CalibrationEvent.NavTo(PageType.LIST))
         }
     }
 
@@ -114,7 +113,7 @@ fun ZktyCalibration(
                 navigation = {
                     when (uiState.page) {
                         PageType.LIST -> navController.navigateUp()
-                        else -> viewModel.navTo(PageType.LIST)
+                        else -> viewModel.event(CalibrationEvent.NavTo(PageType.LIST))
                     }
                 }
             )
@@ -124,21 +123,15 @@ fun ZktyCalibration(
             CalibrationList(
                 modifier = modifier,
                 uiState = uiState,
-                active = viewModel::active,
-                insert = viewModel::insert,
-                delete = viewModel::delete,
-                navTo = viewModel::navTo,
-                toggleSelected = viewModel::toggleSelected,
+                event = viewModel::event,
             )
         }
         // edit page
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             CalibrationEdit(
                 modifier = modifier,
-                addLiquid = viewModel::addLiquid,
-                entity = uiState.entities.find { it.id == uiState.selected }!!,
-                insertData = viewModel::insertData,
-                deleteData = viewModel::deleteData,
+                uiState = uiState,
+                event = viewModel::event,
             )
         }
     }
@@ -149,11 +142,7 @@ fun ZktyCalibration(
 fun CalibrationList(
     modifier: Modifier = Modifier,
     uiState: CalibrationUiState = CalibrationUiState(),
-    active: (Long) -> Unit = {},
-    insert: (String) -> Unit = {},
-    delete: (Long) -> Unit = {},
-    navTo: (PageType) -> Unit = {},
-    toggleSelected: (Long) -> Unit = {},
+    event: (CalibrationEvent) -> Unit = {},
 ) {
 
     val scope = rememberCoroutineScope()
@@ -168,7 +157,7 @@ fun CalibrationList(
                     if (nameList.contains(it)) {
                         "Name already exists".showShortToast()
                     } else {
-                        insert(it)
+                        event(CalibrationEvent.Insert(it))
                         showDialog = false
                     }
                 }
@@ -209,9 +198,9 @@ fun CalibrationList(
                         ),
                         onClick = {
                             if (it.id == uiState.selected) {
-                                toggleSelected(0L)
+                                event(CalibrationEvent.ToggleSelected(0L))
                             } else {
-                                toggleSelected(it.id)
+                                event(CalibrationEvent.ToggleSelected(it.id))
                             }
                         }
                     ) {
@@ -224,7 +213,7 @@ fun CalibrationList(
                         ) {
                             Image(
                                 modifier = Modifier.size(32.dp),
-                                painter = painterResource(id = R.drawable.ic_scale),
+                                painter = painterResource(id = R.drawable.ic_water),
                                 contentDescription = null,
                             )
                             Text(
@@ -278,8 +267,8 @@ fun CalibrationList(
                     .fillMaxWidth(),
                     onClick = {
                         if (count == 1) {
-                            delete(uiState.selected)
-                            toggleSelected(0L)
+                            event(CalibrationEvent.Delete(uiState.selected))
+                            event(CalibrationEvent.ToggleSelected(0L))
                             count = 0
                         } else {
                             count++
@@ -299,7 +288,7 @@ fun CalibrationList(
                     modifier = Modifier
                         .padding(8.dp)
                         .fillMaxWidth(),
-                    onClick = { navTo(PageType.EDIT) },
+                    onClick = { event(CalibrationEvent.NavTo(PageType.EDIT)) },
                 ) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -314,7 +303,7 @@ fun CalibrationList(
                 FloatingActionButton(modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
-                    onClick = { active(uiState.selected) }) {
+                    onClick = { event(CalibrationEvent.Active(uiState.selected)) }) {
                     Icon(
                         modifier = Modifier.size(36.dp),
                         imageVector = Icons.Default.Check,
@@ -335,11 +324,10 @@ fun CalibrationList(
 @Composable
 fun CalibrationEdit(
     modifier: Modifier = Modifier,
-    addLiquid: (Int) -> Unit = { },
-    entity: CalibrationEntity = CalibrationEntity(),
-    insertData: (Int, Double) -> Unit = { _, _ -> },
-    deleteData: (CalibrationData) -> Unit = { },
+    uiState: CalibrationUiState = CalibrationUiState(),
+    event: (CalibrationEvent) -> Unit = {},
 ) {
+    val entity = uiState.entities.find { it.id == uiState.selected } ?: CalibrationEntity()
     var index by remember { mutableIntStateOf(0) }
     var volume by remember { mutableStateOf("") }
     val softKeyboard = LocalSoftwareKeyboardController.current
@@ -429,7 +417,7 @@ fun CalibrationEdit(
                             Icon(
                                 modifier = Modifier
                                     .size(32.dp)
-                                    .clickable { deleteData(it) },
+                                    .clickable { event(CalibrationEvent.DeleteData(it)) },
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = null,
                                 tint = Color.Red,
@@ -493,7 +481,7 @@ fun CalibrationEdit(
                     .width(156.dp),
                 onClick = {
                     softKeyboard?.hide()
-                    addLiquid(index)
+                    event(CalibrationEvent.AddLiquid(index))
                 }) {
                 Icon(
                     modifier = Modifier.size(32.dp),
@@ -508,7 +496,7 @@ fun CalibrationEdit(
                 enabled = (volume.toDoubleOrNull() ?: 0.0) > 0.0,
                 onClick = {
                     softKeyboard?.hide()
-                    insertData(index, volume.toDoubleOrNull() ?: 0.0)
+                    event(CalibrationEvent.InsertData(index, volume.toDoubleOrNull() ?: 0.0))
                 }) {
                 Icon(
                     modifier = Modifier.size(32.dp),
@@ -529,5 +517,10 @@ fun CalibrationListPreview() {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun CalibrationEditPreview() {
-    CalibrationEdit()
+    CalibrationEdit(
+        uiState = CalibrationUiState(
+            entities = listOf(CalibrationEntity(id = 1L)),
+            selected = 1L,
+        )
+    )
 }

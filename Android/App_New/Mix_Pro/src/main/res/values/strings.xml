@@ -47,7 +47,7 @@
     <string name="colloid">胶体 μL</string>
     <string name="coagulant">促凝剂 μL</string>
     <string name="glue_making">制胶</string>
-    <string name="pre_drain">预排液</string>
+    <string name="pre_drain">预排</string>
     <string name="confirm">确认</string>
     <string name="moving_distance">移动距离</string>
     <string name="actions">操作</string>

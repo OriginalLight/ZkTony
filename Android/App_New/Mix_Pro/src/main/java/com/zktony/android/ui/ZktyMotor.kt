@@ -64,7 +64,7 @@ fun ZktyMotor(
     BackHandler {
         when (uiState.page) {
             PageType.LIST -> navController.navigateUp()
-            else -> viewModel.navTo(PageType.LIST)
+            else -> viewModel.event(MotorEvent.NavTo(PageType.LIST))
         }
     }
 
@@ -79,7 +79,7 @@ fun ZktyMotor(
             navigation = {
                 when (uiState.page) {
                     PageType.LIST -> navController.navigateUp()
-                    else -> viewModel.navTo(PageType.LIST)
+                    else -> viewModel.event(MotorEvent.NavTo(PageType.LIST))
                 }
             }
         )
@@ -88,17 +88,15 @@ fun ZktyMotor(
             MotorList(
                 modifier = Modifier,
                 uiState = uiState,
-                navTo = viewModel::navTo,
-                toggleSelected = viewModel::toggleSelected,
+                event = viewModel::event
             )
         }
         // motor edit
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             MotorEdit(
                 modifier = Modifier,
-                entity = uiState.entities.find { it.id == uiState.selected }!!,
-                navTo = viewModel::navTo,
-                update = viewModel::update,
+                uiState = uiState,
+                event = viewModel::event
             )
         }
     }
@@ -109,8 +107,7 @@ fun ZktyMotor(
 fun MotorList(
     modifier: Modifier = Modifier,
     uiState: MotorUiState = MotorUiState(),
-    navTo: (PageType) -> Unit = {},
-    toggleSelected: (Long) -> Unit = {},
+    event: (MotorEvent) -> Unit = {},
 ) {
     LazyVerticalGrid(
         modifier = modifier
@@ -129,8 +126,8 @@ fun MotorList(
             item {
                 Card(
                     onClick = {
-                        toggleSelected(it.id)
-                        navTo(PageType.EDIT)
+                        event(MotorEvent.ToggleSelected(it.id))
+                        event(MotorEvent.NavTo(PageType.EDIT))
                     }
                 ) {
                     Row(
@@ -170,10 +167,10 @@ fun MotorList(
 @Composable
 fun MotorEdit(
     modifier: Modifier = Modifier,
-    entity: MotorEntity = MotorEntity(),
-    navTo: (PageType) -> Unit = {},
-    update: (MotorEntity) -> Unit = {},
+    uiState: MotorUiState = MotorUiState(),
+    event: (MotorEvent) -> Unit = {},
 ) {
+    val entity = uiState.entities.find { it.id == uiState.selected }!!
     var speed by remember { mutableIntStateOf(entity.speed) }
     var acc by remember { mutableIntStateOf(entity.acc) }
     var dec by remember { mutableIntStateOf(entity.dec) }
@@ -282,8 +279,8 @@ fun MotorEdit(
                         .width(192.dp)
                         .padding(top = 16.dp),
                     onClick = {
-                        update(entity.copy(speed = speed, acc = acc, dec = dec))
-                        navTo(PageType.LIST)
+                        event(MotorEvent.Update(entity.copy(speed = speed, acc = acc, dec = dec)))
+                        event(MotorEvent.NavTo(PageType.LIST))
                     },
                 ) {
                     Icon(
@@ -313,6 +310,11 @@ fun MotorListPreview() {
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun MotorEditPreview() {
     MotorEdit(
-        modifier = Modifier, entity = MotorEntity(text = "M1")
+        modifier = Modifier, uiState = MotorUiState(
+            entities = listOf(
+                MotorEntity(text = "M1", id = 1L)
+            ),
+            selected = 1L
+        )
     )
 }

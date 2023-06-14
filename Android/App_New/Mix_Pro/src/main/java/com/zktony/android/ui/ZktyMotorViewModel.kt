@@ -38,17 +38,17 @@ class ZktyMotorViewModel constructor(
         }
     }
 
-    fun navTo(page: PageType) {
-        _page.value = page
+    fun event(event: MotorEvent) {
+        when (event) {
+            is MotorEvent.NavTo -> _page.value = event.page
+            is MotorEvent.ToggleSelected -> _selected.value = event.id
+            is MotorEvent.Update -> async { dao.update(event.entity) }
+        }
     }
 
-    fun toggleSelected(id: Long) {
-        _selected.value = id
-    }
-
-    fun update(entity: MotorEntity) {
+    private fun async(block: suspend () -> Unit) {
         viewModelScope.launch {
-            dao.update(entity)
+            block()
         }
     }
 }
@@ -58,3 +58,9 @@ data class MotorUiState(
     val selected: Long = 0L,
     val page: PageType = PageType.LIST,
 )
+
+sealed class MotorEvent {
+    data class NavTo(val page: PageType) : MotorEvent()
+    data class ToggleSelected(val id: Long) : MotorEvent()
+    data class Update(val entity: MotorEntity) : MotorEvent()
+}

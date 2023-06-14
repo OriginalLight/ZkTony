@@ -39,44 +39,19 @@ class ZktyProgramViewModel constructor(
         }
     }
 
-    fun navTo(page: PageType) {
-        _page.value = page
-    }
-
-    fun toggleSelected(id: Long) {
-        _selected.value = id
-    }
-
-    fun insert(name: String) {
-        viewModelScope.launch {
-            dao.insert(ProgramEntity(text = name))
+    fun event(event: ProgramEvent) {
+        when (event) {
+            is ProgramEvent.NavTo -> _page.value = event.page
+            is ProgramEvent.ToggleSelected -> _selected.value = event.id
+            is ProgramEvent.Insert -> async { dao.insert(ProgramEntity(text = event.name)) }
+            is ProgramEvent.Update -> async { dao.update(event.entity) }
+            is ProgramEvent.Delete -> async { dao.deleteById(event.id) }
         }
     }
 
-    fun update(entity: ProgramEntity) {
+    private fun async(block: suspend () -> Unit) {
         viewModelScope.launch {
-            dao.update(entity)
-        }
-    }
-
-    fun delete(id: Long) {
-        viewModelScope.launch {
-            dao.deleteById(id)
-        }
-    }
-
-    fun toggleActive(index: Int) {
-        viewModelScope.launch {
-            val entity = uiState.value.entities.find { it.id == uiState.value.selected }
-            entity?.let {
-                val al = it.active.toMutableList()
-                if (al.contains(index)) {
-                    al.remove(index)
-                } else {
-                    al.add(index)
-                }
-                dao.update(it.copy(active = al))
-            }
+            block()
         }
     }
 }
@@ -86,3 +61,11 @@ data class ProgramUiState(
     val selected: Long = 0L,
     val page: PageType = PageType.LIST,
 )
+
+sealed class ProgramEvent {
+    data class NavTo(val page: PageType) : ProgramEvent()
+    data class ToggleSelected(val id: Long) : ProgramEvent()
+    data class Insert(val name: String) : ProgramEvent()
+    data class Update(val entity: ProgramEntity) : ProgramEvent()
+    data class Delete(val id: Long) : ProgramEvent()
+}

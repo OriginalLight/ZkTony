@@ -15,7 +15,9 @@ import com.zktony.proto.Application
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.www.BuildConfig
 import com.zktony.www.MainActivity
+import com.zktony.www.R
 import com.zktony.www.core.SerialPort
+import com.zktony.www.core.ext.updateDialog
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.File
@@ -28,23 +30,6 @@ class AdminViewModel constructor(
 
     private val _uiState = MutableStateFlow(AdminUiState())
     val uiState = _uiState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            if (Ext.ctx.isNetworkAvailable()) {
-                AG.getApplication(BuildConfig.APPLICATION_ID)
-                    .catch {
-                        _uiState.value = _uiState.value.copy(
-                            application = null
-                        )
-                    }.collect {
-                        _uiState.value = _uiState.value.copy(
-                            application = it
-                        )
-                    }
-            }
-        }
-    }
 
     /**
      * 泵开关
@@ -73,11 +58,11 @@ class AdminViewModel constructor(
                 putExtra("extra_prefs_show_button_bar", true)
                 putExtra(
                     "extra_prefs_set_next_text",
-                    Ext.ctx.getString(com.zktony.core.R.string.finish)
+                    Ext.ctx.getString(R.string.finish)
                 )
                 putExtra(
                     "extra_prefs_set_back_text",
-                    Ext.ctx.getString(com.zktony.core.R.string.cancel)
+                    Ext.ctx.getString(R.string.cancel)
                 )
             }
             Ext.ctx.startActivity(intent)
@@ -138,27 +123,6 @@ class AdminViewModel constructor(
     }
 
     /**
-     * 设置语言
-     * @param index [Int]
-     */
-    fun setLanguage(index: Int) {
-        viewModelScope.launch {
-            val language = when (index) {
-                0 -> "zh"
-                1 -> "en"
-                else -> "zh"
-            }
-            DS.save(Constants.LANGUAGE, language)
-            val old = DS.read(Constants.LANGUAGE, "zh").first()
-            if (old != language) {
-                Ext.ctx.startActivity(Intent(Ext.ctx, MainActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                })
-            }
-        }
-    }
-
-    /**
      * 检查更新
      */
     fun checkUpdate() {
@@ -166,8 +130,8 @@ class AdminViewModel constructor(
             val apk = checkLocalUpdate()
             if (apk != null) {
                 updateDialog(
-                    title = Ext.ctx.getString(com.zktony.core.R.string.new_local_update),
-                    message = Ext.ctx.getString(com.zktony.core.R.string.whether_to_update),
+                    title = Ext.ctx.getString(R.string.new_local_update),
+                    message = Ext.ctx.getString(R.string.whether_to_update),
                     block = {
                         Ext.ctx.installApk(apk)
                     })
@@ -183,7 +147,7 @@ class AdminViewModel constructor(
      */
     private fun downloadApk(application: Application) {
         viewModelScope.launch {
-            PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.start_downloading))
+            PopTip.show(Ext.ctx.getString(R.string.start_downloading))
             application.downloadUrl.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
                 .collect {
                     when (it) {
@@ -198,7 +162,7 @@ class AdminViewModel constructor(
                             _uiState.value = _uiState.value.copy(
                                 progress = 0
                             )
-                            PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.download_failed))
+                            PopTip.show(Ext.ctx.getString(R.string.download_failed))
                                 .showLong()
                         }
 
@@ -223,13 +187,13 @@ class AdminViewModel constructor(
                 if (application != null) {
                     if (application.versionCode > BuildConfig.VERSION_CODE) {
                         updateDialog(
-                            title = Ext.ctx.getString(com.zktony.core.R.string.new_remote_update),
-                            message = application.description + "\n${Ext.ctx.getString(com.zktony.core.R.string.whether_to_update)}",
+                            title = Ext.ctx.getString(R.string.new_remote_update),
+                            message = application.description + "\n${Ext.ctx.getString(R.string.whether_to_update)}",
                             block = {
                                 downloadApk(application)
                             })
                     } else {
-                        PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_latest_version))
+                        PopTip.show(Ext.ctx.getString(R.string.already_latest_version))
                     }
                 } else {
                     _uiState.value = _uiState.value.copy(
@@ -237,15 +201,15 @@ class AdminViewModel constructor(
                     )
                     AG.getApplication(BuildConfig.APPLICATION_ID)
                         .catch {
-                            PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.failed_get_version_information))
+                            PopTip.show(Ext.ctx.getString(R.string.failed_get_version_information))
                             _uiState.value = _uiState.value.copy(
                                 loading = false
                             )
                         }.collect {
                             if (it.versionCode > BuildConfig.VERSION_CODE) {
                                 updateDialog(
-                                    title = Ext.ctx.getString(com.zktony.core.R.string.new_remote_update),
-                                    message = it.description + "\n${Ext.ctx.getString(com.zktony.core.R.string.whether_to_update)}",
+                                    title = Ext.ctx.getString(R.string.new_remote_update),
+                                    message = it.description + "\n${Ext.ctx.getString(R.string.whether_to_update)}",
                                     block = {
                                         downloadApk(it)
                                     })
@@ -253,7 +217,7 @@ class AdminViewModel constructor(
                                     loading = false
                                 )
                             } else {
-                                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_latest_version))
+                                PopTip.show(Ext.ctx.getString(R.string.already_latest_version))
                                 _uiState.value = _uiState.value.copy(
                                     application = it,
                                     loading = false
@@ -262,7 +226,7 @@ class AdminViewModel constructor(
                         }
                 }
             } else {
-                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.no_network_usb))
+                PopTip.show(Ext.ctx.getString(R.string.no_network_usb))
             }
         }
     }

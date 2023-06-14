@@ -444,11 +444,11 @@ class HomeViewModel constructor(
                                 OnBindView<CustomDialog>(R.layout.layout_error) {
                                 override fun onBind(dialog: CustomDialog, v: View) {
                                     val tvTitle =
-                                        v.findViewById<TextView>(com.zktony.core.R.id.title)
+                                        v.findViewById<TextView>(R.id.title)
                                     val tvMessage =
-                                        v.findViewById<TextView>(com.zktony.core.R.id.message)
+                                        v.findViewById<TextView>(R.id.message)
                                     val btnOk =
-                                        v.findViewById<MaterialButton>(com.zktony.core.R.id.ok)
+                                        v.findViewById<MaterialButton>(R.id.ok)
                                     tvTitle.text = Ext.ctx.getString(R.string.module_exception)
                                     tvMessage.text = msg
                                     btnOk.clickNoRepeat {

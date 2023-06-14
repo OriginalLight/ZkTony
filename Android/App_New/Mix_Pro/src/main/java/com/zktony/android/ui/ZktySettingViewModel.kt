@@ -78,8 +78,14 @@ class ZktySettingViewModel constructor(
         }
     }
 
-    fun navTo(page: PageType) {
-        _page.value = page
+    fun event(event: SettingEvent) {
+        when (event) {
+            is SettingEvent.NavTo -> _page.value = event.page
+            is SettingEvent.Language -> language(event.language)
+            is SettingEvent.Navigation -> navigation(event.navigation)
+            is SettingEvent.Network -> network()
+            is SettingEvent.Update -> update()
+        }
     }
 
     /**
@@ -87,7 +93,7 @@ class ZktySettingViewModel constructor(
      *
      * @param new String
      */
-    fun setLanguage(new: String) {
+    private fun language(new: String) {
         viewModelScope.launch {
             val old = _uiState.value.settings.language
             saveSettings { it.copy { language = new } }
@@ -102,7 +108,7 @@ class ZktySettingViewModel constructor(
      *
      * @param nav Boolean
      */
-    fun setNavigation(nav: Boolean) {
+    private fun navigation(nav: Boolean) {
         viewModelScope.launch {
             saveSettings { it.copy { navigation = nav } }
             val intent = Intent().apply {
@@ -116,7 +122,7 @@ class ZktySettingViewModel constructor(
     /**
      * 跳转到wifi设置界面
      */
-    fun openWifi() {
+    private fun network() {
         val intent = Intent(Settings.ACTION_WIFI_SETTINGS).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
             //是否显示button bar
@@ -136,13 +142,13 @@ class ZktySettingViewModel constructor(
     /**
      * 检查更新
      */
-    fun checkUpdate() {
+    private fun update() {
         viewModelScope.launch {
-            val apk = checkLocalUpdate()
+            val apk = localUpdate()
             if (apk != null) {
                 Ext.ctx.installApk(apk)
             } else {
-                checkRemoteUpdate()
+                remoteUpdate()
             }
         }
     }
@@ -151,7 +157,7 @@ class ZktySettingViewModel constructor(
      * 查找目录下apk文件并安装
      * @return File? [File]
      */
-    private fun checkLocalUpdate(): File? {
+    private fun localUpdate(): File? {
         File("/storage").listFiles()?.forEach {
             it.listFiles()?.forEach { apk ->
                 if (apk.name.endsWith(".apk") && apk.name.contains("zktony-mix-pro")) {
@@ -165,7 +171,7 @@ class ZktySettingViewModel constructor(
     /**
      * 获取版本信息
      */
-    private fun checkRemoteUpdate() {
+    private fun remoteUpdate() {
         viewModelScope.launch {
             if (Ext.ctx.isNetworkAvailable()) {
                 val application = _application.value
@@ -174,7 +180,7 @@ class ZktySettingViewModel constructor(
                         && application.downloadUrl.isNotEmpty()
                         && _progress.value == 0
                     ) {
-                        downloadApk(application.downloadUrl)
+                        download(application.downloadUrl)
                         _progress.value = 1
                     }
                 } else {
@@ -197,7 +203,7 @@ class ZktySettingViewModel constructor(
      *
      * @param url String
      */
-    private fun downloadApk(url: String) {
+    private fun download(url: String) {
         viewModelScope.launch {
             url.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
                 .collect {
@@ -227,3 +233,12 @@ data class SettingUiState(
     val progress: Int = 0,
     val page: PageType = PageType.LIST,
 )
+
+sealed class SettingEvent {
+    object Network : SettingEvent()
+    object Update : SettingEvent()
+    data class NavTo(val page: PageType) : SettingEvent()
+    data class Language(val language: String) : SettingEvent()
+    data class Navigation(val navigation: Boolean) : SettingEvent()
+
+}

@@ -1,11 +1,9 @@
 package com.zktony.android.ui
 
-import android.graphics.Point
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,11 +33,11 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -91,7 +89,7 @@ fun ZktyProgram(
     BackHandler {
         when (uiState.page) {
             PageType.LIST -> navController.navigateUp()
-            else -> viewModel.navTo(PageType.LIST)
+            else -> viewModel.event(ProgramEvent.NavTo(PageType.LIST))
         }
     }
 
@@ -103,7 +101,7 @@ fun ZktyProgram(
                 navigation = {
                     when (uiState.page) {
                         PageType.LIST -> navController.navigateUp()
-                        else -> viewModel.navTo(PageType.LIST)
+                        else -> viewModel.event(ProgramEvent.NavTo(PageType.LIST))
                     }
                 }
             )
@@ -113,19 +111,15 @@ fun ZktyProgram(
             ProgramList(
                 modifier = Modifier,
                 uiState = uiState,
-                insert = viewModel::insert,
-                delete = viewModel::delete,
-                navTo = viewModel::navTo,
-                toggleSelected = viewModel::toggleSelected,
+                event = viewModel::event,
             )
         }
         // edit page
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             ProgramEdit(
                 modifier = Modifier,
-                entity = uiState.entities.find { it.id == uiState.selected }!!,
-                update = viewModel::update,
-                toggleActive = viewModel::toggleActive,
+                uiState = uiState,
+                event = viewModel::event,
             )
         }
     }
@@ -136,10 +130,7 @@ fun ZktyProgram(
 fun ProgramList(
     modifier: Modifier = Modifier,
     uiState: ProgramUiState = ProgramUiState(),
-    insert: (String) -> Unit = {},
-    delete: (Long) -> Unit = {},
-    navTo: (PageType) -> Unit = {},
-    toggleSelected: (Long) -> Unit = {},
+    event: (ProgramEvent) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val columnState = rememberLazyListState()
@@ -153,7 +144,7 @@ fun ProgramList(
                     if (nameList.contains(it)) {
                         "Name already exists".showShortToast()
                     } else {
-                        insert(it)
+                        event(ProgramEvent.Insert(it))
                         showDialog = false
                     }
                 }
@@ -193,9 +184,9 @@ fun ProgramList(
                         colors = CardDefaults.cardColors(containerColor = background),
                         onClick = {
                             if (it.id == uiState.selected) {
-                                toggleSelected(0L)
+                                event(ProgramEvent.ToggleSelected(0L))
                             } else {
-                                toggleSelected(it.id)
+                                event(ProgramEvent.ToggleSelected(it.id))
                             }
                         }
                     ) {
@@ -263,8 +254,8 @@ fun ProgramList(
                     onClick = {
                         scope.launch {
                             if (count == 1) {
-                                delete(uiState.selected)
-                                toggleSelected(0L)
+                                event(ProgramEvent.Delete(uiState.selected))
+                                event(ProgramEvent.ToggleSelected(0L))
                                 count = 0
                             } else {
                                 count++
@@ -286,7 +277,7 @@ fun ProgramList(
                     modifier = Modifier
                         .padding(8.dp)
                         .fillMaxWidth(),
-                    onClick = { navTo(PageType.EDIT) },
+                    onClick = { event(ProgramEvent.NavTo(PageType.EDIT)) },
                 ) {
                     Icon(
                         modifier = Modifier.size(36.dp),
@@ -302,17 +293,17 @@ fun ProgramList(
 
 @OptIn(
     ExperimentalLayoutApi::class,
-    ExperimentalComposeUiApi::class
+    ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class
 )
 @Composable
 fun ProgramEdit(
     modifier: Modifier = Modifier,
-    entity: ProgramEntity = ProgramEntity(),
-    update: (ProgramEntity) -> Unit = {},
-    toggleActive: (Int) -> Unit = {},
+    uiState: ProgramUiState = ProgramUiState(),
+    event: (ProgramEvent) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
+    val entity = uiState.entities.find { it.id == uiState.selected } ?: ProgramEntity()
     var v1 by remember { mutableStateOf(entity.volume[0].format(1)) }
     var v2 by remember { mutableStateOf(entity.volume[1].format(1)) }
     var v3 by remember { mutableStateOf(entity.volume[2].format(1)) }
@@ -342,13 +333,6 @@ fun ProgramEdit(
                         .padding(horizontal = 16.dp),
                     count = 6,
                     active = entity.active,
-                    onItemClick = { width, x ->
-                        scope.launch {
-                            val space = width / 6
-                            val index = (x / space).toInt()
-                            toggleActive(index)
-                        }
-                    }
                 )
             }
         }
@@ -356,431 +340,441 @@ fun ProgramEdit(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
-                    .border(
-                        width = 1.dp,
-                        color = Color.Black,
-                    ),
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = Color.LightGray
-                        )
-                        .height(48.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        modifier = Modifier.weight(0.5f),
-                        text = stringResource(id = R.string.actions),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    // 画竖线
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(id = R.string.colloid),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(id = R.string.coagulant),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                Divider(color = Color.Black, thickness = 2.dp)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        modifier = Modifier.weight(0.5f),
-                        text = stringResource(id = R.string.glue_making),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
-                    Box(modifier = Modifier.weight(1f)) {
-                        CustomTextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = TextFieldValue(v1, TextRange(v1.length)),
-                            onValueChange = {
-                                scope.launch {
-                                    v1 = it.text
-                                    val volume = entity.volume.toMutableList()
-                                    volume[0] = v1.toFloatOrNull() ?: 0f
-                                    update(entity.copy(volume = volume))
-                                }
-                            },
-                            textStyle = TextStyle(
-                                fontSize = 20.sp,
-                                textAlign = TextAlign.Center,
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
-                                }
-                            ),
-                        )
-                        Icon(
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterEnd),
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null
-                        )
-                    }
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
-                    Box(modifier = Modifier.weight(1f)) {
-                        CustomTextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = TextFieldValue(v2, TextRange(v2.length)),
-                            onValueChange = {
-                                scope.launch {
-                                    v2 = it.text
-                                    val volume = entity.volume.toMutableList()
-                                    volume[1] = v2.toFloatOrNull() ?: 0f
-                                    update(entity.copy(volume = volume))
-                                }
-                            },
-                            textStyle = TextStyle(
-                                fontSize = 20.sp,
-                                textAlign = TextAlign.Center,
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
-                                }
-                            ),
-                        )
-                        Icon(
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterEnd),
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null
-                        )
-                    }
-                }
-                Divider(color = Color.Black, thickness = 2.dp)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        modifier = Modifier.weight(0.5f),
-                        text = stringResource(id = R.string.pre_drain),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
-                    Box(modifier = Modifier.weight(1f)) {
-                        CustomTextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = TextFieldValue(v3, TextRange(v3.length)),
-                            onValueChange = {
-                                scope.launch {
-                                    v3 = it.text
-                                    val volume = entity.volume.toMutableList()
-                                    volume[2] = v3.toFloatOrNull() ?: 0f
-                                    update(entity.copy(volume = volume))
-                                }
-                            },
-                            textStyle = TextStyle(
-                                fontSize = 20.sp,
-                                textAlign = TextAlign.Center,
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
-                                }
-                            ),
-                        )
-                        Icon(
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterEnd),
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null
-                        )
-                    }
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
-                    Box(modifier = Modifier.weight(1f)) {
-                        CustomTextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = TextFieldValue(v4, TextRange(v4.length)),
-                            onValueChange = {
-                                scope.launch {
-                                    v4 = it.text
-                                    val volume = entity.volume.toMutableList()
-                                    volume[3] = v4.toFloatOrNull() ?: 0f
-                                    update(entity.copy(volume = volume))
-                                }
-                            },
-                            textStyle = TextStyle(
-                                fontSize = 20.sp,
-                                textAlign = TextAlign.Center,
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
-                                }
-                            ),
-                        )
-                        Icon(
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterEnd),
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null
-                        )
-                    }
-                }
-                Divider(color = Color.Black, thickness = 2.dp)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = Color.LightGray,
-                        )
-                        .height(48.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        modifier = Modifier.weight(0.5f),
-                        text = stringResource(id = R.string.motor),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    // 画竖线
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(id = R.string.moving_distance),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
-                    Text(
-                        modifier = Modifier.weight(1f),
-                        text = stringResource(id = R.string.actions),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                }
-                Divider(color = Color.Black, thickness = 2.dp)
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        modifier = Modifier.weight(0.5f),
-                        text = stringResource(id = R.string.y_axis),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
-                    Box(modifier = Modifier.weight(1f)) {
-                        CustomTextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = TextFieldValue(y, TextRange(y.length)),
-                            onValueChange = {
-                                scope.launch {
-                                    y = it.text
-                                    val axis = entity.axis.toMutableList()
-                                    axis[0] = y.toFloatOrNull() ?: 0f
-                                    update(entity.copy(axis = axis))
-                                }
-                            },
-                            textStyle = TextStyle(
-                                fontSize = 20.sp,
-                                textAlign = TextAlign.Center,
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
-                                }
-                            ),
-                        )
-                        Icon(
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterEnd),
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null
-                        )
-                    }
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center,
+                    Card(
+                        modifier = Modifier.weight(0.5f)
                     ) {
-                        Button(
-                            modifier = Modifier.width(96.dp),
-                            onClick = { keyboard?.hide() },
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            text = stringResource(id = R.string.actions),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    Card(modifier = Modifier.weight(1f)) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            text = stringResource(id = R.string.colloid),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    Card(modifier = Modifier.weight(1f)) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            text = stringResource(id = R.string.coagulant),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Card(modifier = Modifier.weight(0.5f)) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            text = stringResource(id = R.string.glue_making),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+
+                    OutlinedCard(
+                        modifier = Modifier.weight(1f),
+                        onClick = {}
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
                         ) {
+                            CustomTextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = TextFieldValue(v1, TextRange(v1.length)),
+                                onValueChange = {
+                                    scope.launch {
+                                        v1 = it.text
+                                        val volume = entity.volume.toMutableList()
+                                        volume[0] = v1.toFloatOrNull() ?: 0f
+                                        event(ProgramEvent.Update(entity.copy(volume = volume)))
+                                    }
+                                },
+                                textStyle = TextStyle(
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center,
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboard?.hide()
+                                    }
+                                ),
+                            )
                             Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = Icons.Filled.ArrowForward,
-                                contentDescription = null,
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterEnd),
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null
+                            )
+                        }
+                    }
+
+                    OutlinedCard(
+                        modifier = Modifier.weight(1f),
+                        onClick = {}
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                        ) {
+                            CustomTextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = TextFieldValue(v2, TextRange(v2.length)),
+                                onValueChange = {
+                                    scope.launch {
+                                        v2 = it.text
+                                        val volume = entity.volume.toMutableList()
+                                        volume[1] = v2.toFloatOrNull() ?: 0f
+                                        event(ProgramEvent.Update(entity.copy(volume = volume)))
+                                    }
+                                },
+                                textStyle = TextStyle(
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center,
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboard?.hide()
+                                    }
+                                ),
+                            )
+                            Icon(
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterEnd),
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null
                             )
                         }
                     }
                 }
-                Divider(color = Color.Black, thickness = 2.dp)
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        modifier = Modifier.weight(0.5f),
-                        text = stringResource(id = R.string.z_axis),
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
-                    )
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
-                    Box(modifier = Modifier.weight(1f)) {
-                        CustomTextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = TextFieldValue(z, TextRange(z.length)),
-                            onValueChange = {
-                                scope.launch {
-                                    z = it.text
-                                    val axis = entity.axis.toMutableList()
-                                    axis[1] = z.toFloatOrNull() ?: 0f
-                                    update(entity.copy(axis = axis))
-                                }
-                            },
-                            textStyle = TextStyle(
-                                fontSize = 20.sp,
-                                textAlign = TextAlign.Center,
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Done,
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    keyboard?.hide()
-                                }
-                            ),
-                        )
-                        Icon(
+                    Card(modifier = Modifier.weight(0.5f)) {
+                        Text(
                             modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .align(Alignment.CenterEnd),
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = null
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            text = stringResource(id = R.string.pre_drain),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
                         )
                     }
-                    Divider(
-                        modifier = Modifier
-                            .width(2.dp)
-                            .fillMaxHeight(),
-                        color = Color.Black,
-                    )
+                    OutlinedCard(
+                        modifier = Modifier.weight(1f),
+                        onClick = {}
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                        ) {
+                            CustomTextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = TextFieldValue(v3, TextRange(v3.length)),
+                                onValueChange = {
+                                    scope.launch {
+                                        v3 = it.text
+                                        val volume = entity.volume.toMutableList()
+                                        volume[2] = v3.toFloatOrNull() ?: 0f
+                                        event(ProgramEvent.Update(entity.copy(volume = volume)))
+                                    }
+                                },
+                                textStyle = TextStyle(
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center,
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboard?.hide()
+                                    }
+                                ),
+                            )
+                            Icon(
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterEnd),
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                    OutlinedCard(
+                        modifier = Modifier.weight(1f),
+                        onClick = {}
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                        ) {
+                            CustomTextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = TextFieldValue(v4, TextRange(v4.length)),
+                                onValueChange = {
+                                    scope.launch {
+                                        v4 = it.text
+                                        val volume = entity.volume.toMutableList()
+                                        volume[3] = v4.toFloatOrNull() ?: 0f
+                                        event(ProgramEvent.Update(entity.copy(volume = volume)))
+                                    }
+                                },
+                                textStyle = TextStyle(
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center,
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboard?.hide()
+                                    }
+                                ),
+                            )
+                            Icon(
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterEnd),
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Card(modifier = Modifier.weight(0.5f)) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            text = stringResource(id = R.string.motor),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    Card(modifier = Modifier.weight(1f)) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            text = stringResource(id = R.string.moving_distance),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    Card(modifier = Modifier.weight(1f)) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            text = stringResource(id = R.string.actions),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Card(modifier = Modifier.weight(0.5f)) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            text = stringResource(id = R.string.y_axis),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    OutlinedCard(
+                        modifier = Modifier.weight(1f),
+                        onClick = {}
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                        ) {
+                            CustomTextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = TextFieldValue(y, TextRange(y.length)),
+                                onValueChange = {
+                                    scope.launch {
+                                        y = it.text
+                                        val axis = entity.axis.toMutableList()
+                                        axis[0] = y.toFloatOrNull() ?: 0f
+                                        event(ProgramEvent.Update(entity.copy(axis = axis)))
+                                    }
+                                },
+                                textStyle = TextStyle(
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center,
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboard?.hide()
+                                    }
+                                ),
+                            )
+                            Icon(
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterEnd),
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null
+                            )
+                        }
+                    }
                     Row(
                         modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Button(
                             modifier = Modifier.width(96.dp),
-                            onClick = { keyboard?.hide() },
+                            onClick = {
+                                scope.launch {
+                                    keyboard?.hide()
+                                }
+                            }
                         ) {
                             Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = Icons.Filled.ArrowForward,
-                                contentDescription = null,
+                                imageVector = Icons.Default.ArrowForward,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Card(modifier = Modifier.weight(0.5f)) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            text = stringResource(id = R.string.y_axis),
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    OutlinedCard(
+                        modifier = Modifier.weight(1f),
+                        onClick = {}
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp)
+                        ) {
+                            CustomTextField(
+                                modifier = Modifier.fillMaxWidth(),
+                                value = TextFieldValue(z, TextRange(z.length)),
+                                onValueChange = {
+                                    scope.launch {
+                                        z = it.text
+                                        val axis = entity.axis.toMutableList()
+                                        axis[1] = z.toFloatOrNull() ?: 0f
+                                        event(ProgramEvent.Update(entity.copy(axis = axis)))
+                                    }
+                                },
+                                textStyle = TextStyle(
+                                    fontSize = 20.sp,
+                                    textAlign = TextAlign.Center,
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        keyboard?.hide()
+                                    }
+                                ),
+                            )
+                            Icon(
+                                modifier = Modifier
+                                    .padding(horizontal = 8.dp)
+                                    .align(Alignment.CenterEnd),
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Button(
+                            modifier = Modifier.width(96.dp),
+                            onClick = {
+                                scope.launch {
+                                    keyboard?.hide()
+                                }
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowForward,
+                                contentDescription = null
                             )
                         }
                     }
@@ -805,12 +799,13 @@ fun ProgramListPreview() {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun ProgramEditPreview() {
-    val pointList = mutableListOf<Point>()
-    repeat(6) {
-        pointList.add(Point())
-    }
     ProgramEdit(
-        entity = ProgramEntity(),
+        uiState = ProgramUiState(
+            entities = listOf(
+                ProgramEntity(text = "test", id = 1L)
+            ),
+            selected = 1L
+        )
     )
 }
 
