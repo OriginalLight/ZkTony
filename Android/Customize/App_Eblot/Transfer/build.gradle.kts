@@ -22,14 +22,14 @@ android {
         debug {
             isDebuggable = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".transfer.debug"
+            applicationIdSuffix = ".transfer.eblot.debug"
         }
 
         release {
             isMinifyEnabled = true
             isShrinkResources = true
             signingConfig = signingConfigs.getByName("debug")
-            applicationIdSuffix = ".transfer.release"
+            applicationIdSuffix = ".transfer.eblot.release"
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -64,7 +64,7 @@ android {
     applicationVariants.all {
         outputs.all {
             (this as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.outputFileName =
-                "zktony-transfer-${versionName}-${name}.apk"
+                "zktony-transfer-eblot-${versionName}-${name}.apk"
         }
     }
 }

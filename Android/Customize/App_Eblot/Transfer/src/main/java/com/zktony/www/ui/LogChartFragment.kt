@@ -21,7 +21,7 @@ import com.zktony.www.data.entities.LogData
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class LogChartFragment :
+class                                                                                      LogChartFragment :
     BaseFragment<LogChartViewModel, FragmentLogChartBinding>(R.layout.fragment_log_chart) {
 
     override val viewModel: LogChartViewModel by viewModel()
@@ -63,10 +63,10 @@ class LogChartFragment :
         chart.description = Description().apply {
             text = getString(R.string.chart_description)
             textSize = 11f
-            textColor = Color.BLACK
+            textColor = Color.WHITE
         }
         chart.setNoDataText(getString(R.string.no_data))
-        chart.setNoDataTextColor(Color.BLACK)
+        chart.setNoDataTextColor(Color.WHITE)
         initXY(chart)
 
     }

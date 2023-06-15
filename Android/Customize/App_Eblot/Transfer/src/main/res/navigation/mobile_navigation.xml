@@ -15,52 +15,7 @@
         android:id="@+id/navigation_program"
         android:name="com.zktony.www.ui.ProgramFragment"
         android:label="@string/title_program"
-        tools:layout="@layout/fragment_program" >
-        <action
-            android:id="@+id/action_navigation_program_to_navigation_zm"
-            app:destination="@id/navigation_zm"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right">
-        </action>
-        <action
-            android:id="@+id/action_navigation_program_to_navigation_rs"
-            app:destination="@id/navigation_rs"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right">
-        </action>
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_zm"
-        android:name="com.zktony.www.ui.TransferFragment"
-        android:label="@string/title_transfer"
-        tools:layout="@layout/fragment_transfer" >
-        <action
-            android:id="@+id/action_navigation_zm_to_navigation_program"
-            app:destination="@id/navigation_program"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_rs"
-        android:name="com.zktony.www.ui.DyeFragment"
-        android:label="@string/title_dye"
-        tools:layout="@layout/fragment_dye" >
-        <action
-            android:id="@+id/action_navigation_rs_to_navigation_program"
-            app:destination="@id/navigation_program"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
-    </fragment>
+        tools:layout="@layout/fragment_program" />
 
     <fragment
         android:id="@+id/navigation_log"

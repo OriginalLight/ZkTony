@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.lifecycle.*
+import com.google.android.material.tabs.TabItem
 import com.google.android.material.tabs.TabLayout
 import com.zktony.core.base.BaseFragment
 import com.zktony.core.ext.*
@@ -50,6 +51,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun initView() {
         lifecycleScope.launch {
             for (i in 0..1) {
@@ -60,19 +62,23 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     pumpUp.addTouchEvent({
                         it.scaleX = 0.9f
                         it.scaleY = 0.9f
+                        it.background = resources.getDrawable(R.drawable.bg_btn_orange_pressed)
                         viewModel.pumpUpOrBack(0, 0, i)
                     }, {
                         it.scaleX = 1f
                         it.scaleY = 1f
+                        it.background = resources.getDrawable(R.drawable.bg_btn_orange)
                         viewModel.pumpUpOrBack(0, 1, i)
                     })
                     pumpBack.addTouchEvent({
                         it.scaleX = 0.9f
                         it.scaleY = 0.9f
+                        it.background = resources.getDrawable(R.drawable.bg_btn_orange_pressed)
                         viewModel.pumpUpOrBack(1, 0, i)
                     }, {
                         it.scaleX = 1f
                         it.scaleY = 1f
+                        it.background = resources.getDrawable(R.drawable.bg_btn_orange)
                         viewModel.pumpUpOrBack(1, 1, i)
                     })
 
@@ -88,6 +94,14 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         override fun onTabReselected(tab: TabLayout.Tab?) {
                         }
                     })
+
+                    // 设置tabitem的文字
+                    val tabLayout = bind.tabLayout
+                    val tabItem1 = tabLayout.getTabAt(0)
+                    val tabItem2 = tabLayout.getTabAt(1)
+                    tabItem1?.text = "转膜${'A' + i}"
+                    tabItem2?.text = "染色${'A' + i}"
+
 
                     with(selector) {
                         clickScale()
@@ -106,30 +120,27 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }
                     delay(100L)
                     with(motor) {
-                        addSuffix(" RPM")
                         afterTextChange {
                             viewModel.setMotor(
-                                motor = it.replace(" RPM", "").format().toIntOrNull() ?: 0,
+                                motor = it.toIntOrNull() ?: 0,
                                 xy = i,
                                 block = { bind.motor.setText(MAX_MOTOR.toString()) }
                             )
                         }
                     }
                     with(voltage) {
-                        addSuffix(" V")
                         afterTextChange {
                             viewModel.setVoltage(
-                                voltage = it.replace(" V", "").format().toFloatOrNull() ?: 0f,
+                                voltage = it.toFloatOrNull() ?: 0f,
                                 xy = i,
                                 block = { max -> bind.voltage.setText(max.format()) }
                             )
                         }
                     }
                     with(time) {
-                        addSuffix(" MIN")
                         afterTextChange {
                             viewModel.setTime(
-                                time = it.replace(" MIN", "").format().toFloatOrNull() ?: 0f,
+                                time = it.toFloatOrNull() ?: 0f,
                                 xy = i,
                                 block = { bind.time.setText(MAX_TIME.format()) }
                             )
@@ -148,29 +159,26 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             bind.apply {
                 tabLayout.getTabAt(0)?.select()
                 pump.visibility = View.VISIBLE
-                motor.isEnabled = true
+                layoutSpeed.visibility = View.VISIBLE
             }
         } else {
             bind.apply {
                 tabLayout.getTabAt(1)?.select()
                 pump.visibility = View.GONE
-                motor.isEnabled = false
+                layoutSpeed.visibility = View.GONE
             }
         }
         // 程序选择部分
         bind.apply {
             selector.text = uiState.programName
-            selector.iconTint = null
             if (uiState.model == 0) {
                 if (motor.isFocused.not()) {
                     if (uiState.motor > 0) {
-                        motor.setText(uiState.motor.toString() + " RPM")
+                        motor.setText(uiState.motor.toString())
                     } else {
                         motor.setText("")
                     }
                 }
-            } else {
-                motor.setText("/")
             }
 
             if (uiState.programName == getString(R.string.wash)) {
@@ -180,7 +188,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 voltage.isEnabled = true
                 if (voltage.isFocused.not()) {
                     if (uiState.voltage > 0f) {
-                        voltage.setText(uiState.voltage.format() + " V")
+                        voltage.setText(uiState.voltage.format())
                     } else {
                         voltage.setText("")
                     }
@@ -188,7 +196,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             }
             if (time.isFocused.not()) {
                 if (uiState.time > 0) {
-                    time.setText(uiState.time.format() + " MIN")
+                    time.setText(uiState.time.format())
                 } else {
                     time.setText("")
                 }
@@ -197,7 +205,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         // 实时信息显示部分
         bind.apply {
             currentStatus.text = if (xy == 0) "A" else "B"
-            currentStatus.setBackgroundColor(Color.parseColor("#287DF133"))
         }
 
         if (uiState.currentMotor == 0) {
@@ -209,7 +216,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         if (uiState.currentVoltage == 0f) {
             bind.apply {
                 currentVoltage.text = "OFF"
-                currentVoltage.setBackgroundColor(Color.parseColor("#287DF133"))
             }
 
         } else {
@@ -218,32 +224,23 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 currentVoltage.text =
                     uiState.currentVoltage.format()
                         .substring(0, sub) + " V"
-                currentVoltage.setBackgroundColor(Color.parseColor("#287DF133"))
-            }
-            if (uiState.currentVoltage > uiState.voltage + 1 || uiState.currentVoltage < uiState.voltage - 1) {
-                bind.currentVoltage.setBackgroundColor(Color.parseColor("#36FFD600"))
             }
         }
         if (uiState.currentCurrent == 0f) {
             bind.apply {
                 currentCurrent.text = "OFF"
-                currentCurrent.setBackgroundColor(Color.parseColor("#287DF133"))
             }
         } else {
             if (uiState.currentCurrent < 1f && uiState.currentCurrent > 0f) {
                 bind.apply {
                     currentCurrent.text =
                         (uiState.currentCurrent * 1000).toInt().toString() + " mA"
-                    currentCurrent.setBackgroundColor(Color.parseColor("#287DF133"))
                 }
-                if (uiState.currentCurrent < Constants.ERROR_CURRENT) {
-                    bind.currentCurrent.setBackgroundColor(Color.parseColor("#41D50000"))
-                }
+
             } else {
                 bind.apply {
                     currentCurrent.text = uiState.currentCurrent.format()
                         .substring(0, 4) + " A"
-                    currentCurrent.setBackgroundColor(Color.parseColor("#287DF133"))
                 }
             }
         }

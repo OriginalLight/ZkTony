@@ -10,19 +10,20 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
+        android:padding="8dp"
         android:orientation="vertical">
-
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_layout"
             app:tabBackground="@drawable/tab_background"
+            app:tabIndicator="@null"
             app:tabGravity="fill"
-            app:tabIndicatorColor="@color/purple_700"
-            app:tabSelectedTextColor="@color/light_onPrimary"
+            app:tabIndicatorColor="@null"
             app:tabTextAppearance="@style/TextAppearance.AppCompat.Large"
-            app:tabTextColor="@color/black">
+            app:tabTextColor="@color/white">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
@@ -38,187 +39,309 @@
 
         </com.google.android.material.tabs.TabLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="参数设置"
+            android:textColor="@color/white"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:textSize="16sp"
+            tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="4dp"
-            android:layout_marginEnd="4dp"
-            android:background="@color/black"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:background="@drawable/bg_layout"
             android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginStart="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginEnd="2dp"
-                android:layout_marginBottom="1dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/selector"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:backgroundTint="@color/light_onPrimary"
-                    android:ellipsize="end"
-                    android:gravity="center"
-                    android:insetTop="0dp"
-                    android:insetBottom="0dp"
-                    android:singleLine="true"
-                    android:textAllCaps="false"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    app:cornerRadius="0dp"
-                    app:elevation="0dp"
-                    app:icon="@mipmap/program"
-                    app:iconPadding="0dp"
-                    app:iconSize="32dp"
-                    app:rippleColor="@color/purple_700"
-                    tools:ignore="NestedWeights,SpeakableTextPresentCheck" />
+                    android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/motor"
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="程序"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+                    <Button
+                        android:id="@+id/selector"
+                        android:layout_width="match_parent"
+                        android:layout_height="36dp"
+                        android:background="@drawable/bg_et"
+                        android:gravity="center"
+                        android:textAllCaps="false"
+                        android:backgroundTint="@null"
+                        android:text="转膜"
+                        android:drawableEnd="@drawable/ic_arrow_drop_down"
+                        android:drawableTint="@color/white"
+                        android:textColor="@color/white"
+                        android:textSize="16sp" />
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="0dp"/>
+
+                <LinearLayout
+                    android:id="@+id/layout_speed"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="1dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@color/light_onPrimary"
-                    android:gravity="center"
-                    android:hint="@string/speed_hint"
-                    android:imeOptions="actionNext"
-                    android:inputType="numberDecimal"
-                    android:nextFocusForward="@id/voltage"
-                    android:textSize="20sp"
-                    tools:ignore="Autofill" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="转速"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/motor"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_et"
+                            android:gravity="center"
+                            android:hint="请输入转速"
+                            android:imeOptions="actionDone"
+                            android:inputType="number"
+                            android:textColor="@color/white"
+                            android:textColorHint="@color/light_outline"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="40dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="rpm"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
+            <Space
+                android:layout_width="8dp"
+                android:layout_height="0dp"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginStart="2dp"
-                android:layout_marginTop="1dp"
-                android:layout_marginEnd="2dp"
-                android:layout_marginBottom="2dp"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/voltage"
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="1dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@color/light_onPrimary"
-                    android:gravity="center"
-                    android:hint="@string/voltage"
-                    android:imeOptions="actionNext"
-                    android:inputType="numberDecimal"
-                    android:nextFocusForward="@id/time"
-                    android:textSize="20sp"
-                    tools:ignore="Autofill,NestedWeights" />
+                    android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/time"
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="电压"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/voltage"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_et"
+                            android:gravity="center"
+                            android:hint="请输入电压"
+                            android:imeOptions="actionDone"
+                            android:inputType="number"
+                            android:textColor="@color/white"
+                            android:textColorHint="@color/light_outline"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="40dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="v"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="0dp"/>
+
+                <LinearLayout
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="1dp"
+                    android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:background="@color/light_onPrimary"
-                    android:gravity="center"
-                    android:hint="@string/duration"
-                    android:imeOptions="actionDone"
-                    android:inputType="numberDecimal"
-                    android:textSize="20sp"
-                    tools:ignore="Autofill" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="时间"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <EditText
+                            android:id="@+id/time"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_et"
+                            android:gravity="center"
+                            android:hint="请输入电压"
+                            android:imeOptions="actionDone"
+                            android:inputType="number"
+                            android:textColor="@color/white"
+                            android:textColorHint="@color/light_outline"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="40dp"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="min"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
 
             </LinearLayout>
 
         </LinearLayout>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="实时状态"
+            android:textColor="@color/white"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:textSize="16sp"
+            tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="4dp"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_layout">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginStart="2dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginEnd="2dp"
-                android:layout_marginBottom="1dp"
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/current_status"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="1dp"
+                    android:layout_height="36dp"
                     android:layout_weight="1"
-                    android:background="#41D50000"
                     android:gravity="center"
                     android:text="@string/off"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="20sp"
                     tools:ignore="NestedWeights" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    app:dividerColor="@color/black"/>
 
                 <TextView
                     android:id="@+id/current_motor"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="1dp"
+                    android:layout_height="36dp"
                     android:layout_weight="1"
-                    android:background="#287DF133"
                     android:gravity="center"
                     android:text="@string/off"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="20sp"
                     tools:ignore="NestedWeights" />
 
             </LinearLayout>
 
+            <com.google.android.material.divider.MaterialDivider
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                app:dividerColor="@color/black"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginStart="2dp"
-                android:layout_marginTop="1dp"
-                android:layout_marginEnd="2dp"
-                android:layout_marginBottom="2dp"
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/current_voltage"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginEnd="1dp"
+                    android:layout_height="36dp"
                     android:layout_weight="1"
-                    android:background="#287DF133"
                     android:gravity="center"
                     android:text="@string/off"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="20sp"
                     tools:ignore="NestedWeights" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    app:dividerColor="@color/black"/>
 
                 <TextView
                     android:id="@+id/current_current"
                     android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="1dp"
+                    android:layout_height="36dp"
                     android:layout_weight="1"
-                    android:background="#287DF133"
                     android:gravity="center"
                     android:text="@string/off"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="20sp"
                     tools:ignore="NestedWeights" />
 
@@ -229,87 +352,91 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:orientation="vertical">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/stop"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/stop"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_btn_orange_selector"
+                    android:layout_weight="1"
+                    android:text="@string/stop"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="0dp"/>
+
+                <Button
+                    android:id="@+id/start"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_btn_orange_selector"
+                    android:layout_weight="1"
+                    android:text="@string/start"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <Space
                 android:layout_width="0dp"
-                android:layout_height="54dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_weight="1"
-                android:text="@string/stop"
-                android:textAllCaps="false"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:cornerRadius="24dp"
-                app:rippleColor="@color/purple_700" />
+                android:layout_height="8dp"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/start"
-                android:layout_width="0dp"
-                android:layout_height="54dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_weight="1"
-                android:text="@string/start"
-                android:textAllCaps="false"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:cornerRadius="24dp"
-                app:rippleColor="@color/purple_700" />
+            <LinearLayout
+                android:id="@+id/pump"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-        </LinearLayout>
+                <Button
+                    android:id="@+id/pump_up"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_btn_orange_selector"
+                    android:layout_weight="1"
+                    android:text="@string/fill"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
 
-        <LinearLayout
-            android:id="@+id/pump"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
+                <Space
+                    android:layout_width="8dp"
+                    android:layout_height="0dp"/>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/pump_up"
-                android:layout_width="0dp"
-                android:layout_height="54dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_weight="1"
-                android:text="@string/fill"
-                android:textAllCaps="false"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:cornerRadius="24dp"
-                app:rippleColor="@color/purple_700" />
+                <Button
+                    android:id="@+id/pump_back"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_btn_orange_selector"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:text="@string/back"
+                    android:textAllCaps="false"
+                    android:textSize="16sp" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/pump_back"
-                android:layout_width="0dp"
-                android:layout_height="54dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:layout_weight="1"
-                android:text="@string/back"
-                android:textAllCaps="false"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                app:cornerRadius="24dp"
-                app:rippleColor="@color/purple_700" />
-
+            </LinearLayout>
         </LinearLayout>
 
         <TextView
             android:id="@+id/current_time"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_line"
+            android:background="@drawable/bg_layout"
             android:gravity="center"
             android:text="00:00"
+            android:textColor="@color/white"
+            android:textStyle="bold"
             android:textSize="100sp"
             tools:ignore="HardcodedText" />
 

@@ -2,6 +2,7 @@ package com.zktony.www.ui
 
 import android.graphics.Color
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -448,7 +449,7 @@ class HomeViewModel constructor(
                                     val tvMessage =
                                         v.findViewById<TextView>(R.id.message)
                                     val btnOk =
-                                        v.findViewById<MaterialButton>(R.id.ok)
+                                        v.findViewById<Button>(R.id.ok)
                                     tvTitle.text = Ext.ctx.getString(R.string.module_exception)
                                     tvMessage.text = msg
                                     btnOk.clickNoRepeat {

@@ -13,7 +13,7 @@ import java.util.*
  * 将秒数转化为分秒格式
  */
 fun Int.getTimeFormat(): String {
-    val mm = this % 3600 / 60
+    val mm = this / 60
     val ss = this % 3600 % 60
     return String.format("%02d:%02d", mm, ss)
 }

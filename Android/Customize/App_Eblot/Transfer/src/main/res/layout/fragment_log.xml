@@ -39,11 +39,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_btn_orange_selector"
+                android:minHeight="42dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:text="日期查询"
                 android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <Button
                 android:id="@+id/line_chart"
@@ -52,11 +54,28 @@
                 android:layout_marginStart="16dp"
                 android:background="@drawable/bg_btn_orange_selector"
                 android:enabled="false"
+                android:minHeight="42dp"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:text="@string/title_log_chart"
                 android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:background="@drawable/bg_btn_orange_selector"
+                android:enabled="false"
+                android:minHeight="42dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="删除日志"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -132,41 +151,8 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 app:layoutManager="androidx.recyclerview.widget.StaggeredGridLayoutManager"
+                tools:ignore="NestedWeights"
                 tools:listitem="@layout/item_log" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/page_up"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_btn_orange_selector"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="上一页"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <Space
-                    android:layout_width="16dp"
-                    android:layout_height="0dp" />
-
-                <Button
-                    android:id="@+id/page_down"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/bg_btn_orange_selector"
-                    android:enabled="false"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="下一页"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-            </LinearLayout>
 
         </LinearLayout>
 

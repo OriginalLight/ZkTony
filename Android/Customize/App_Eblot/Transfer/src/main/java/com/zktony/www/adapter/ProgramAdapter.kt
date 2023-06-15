@@ -1,8 +1,10 @@
 package com.zktony.www.adapter
 
 import android.annotation.SuppressLint
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.*
 import com.zktony.core.ext.*
 import com.zktony.www.R
@@ -15,8 +17,15 @@ import com.zktony.www.data.entities.Program
  */
 class ProgramAdapter : ListAdapter<Program, ProgramViewHolder>(diffCallback) {
 
-    var onDeleteButtonClick: (Program) -> Unit = {}
-    var onEditButtonClick: (Program) -> Unit = {}
+    var selected: Program? = null
+        @SuppressLint("NotifyDataSetChanged")
+        set(value) {
+            field = value
+            callback(value)
+            notifyDataSetChanged()
+        }
+
+    var callback : (Program?) -> Unit = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProgramViewHolder {
         return ProgramViewHolder(
@@ -25,13 +34,15 @@ class ProgramAdapter : ListAdapter<Program, ProgramViewHolder>(diffCallback) {
                 parent,
                 false
             ),
-            onDeleteButtonClick,
-            onEditButtonClick
-        )
+        ) {
+            selected = it
+        }
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onBindViewHolder(holder: ProgramViewHolder, position: Int) {
         holder.bind(getItem(position))
+        holder.select(selected?.id == getItem(position).id)
     }
 
     companion object {
@@ -51,8 +62,7 @@ class ProgramAdapter : ListAdapter<Program, ProgramViewHolder>(diffCallback) {
 @SuppressLint("SetTextI18n")
 class ProgramViewHolder(
     private val binding: ItemProgramBinding,
-    private val onDeleteButtonClick: (Program) -> Unit,
-    private val onEditButtonClick: (Program) -> Unit
+    private val onItemClick: (Program) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
     fun bind(item: Program) {
         binding.apply {
@@ -72,15 +82,36 @@ class ProgramViewHolder(
             str.append(item.time.format())
             str.append("MIN")
             parameter.text = str.toString()
-            delete.run {
-                clickScale()
-                clickNoRepeat { onDeleteButtonClick(item) }
-            }
-            edit.run {
-                clickScale()
-                clickNoRepeat { onEditButtonClick(item) }
+
+            itemView.setOnClickListener {
+                onItemClick(item)
             }
             executePendingBindings()
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun select(bool: Boolean) {
+        binding.apply {
+            if (bool) {
+                order.setBackgroundColor(itemView.context.getColor(R.color.orange))
+                order.setTextColor(itemView.context.getColor(R.color.white))
+                name.setBackgroundColor(itemView.context.getColor(R.color.orange))
+                name.setTextColor(itemView.context.getColor(R.color.white))
+                model.setBackgroundColor(itemView.context.getColor(R.color.orange))
+                model.setTextColor(itemView.context.getColor(R.color.white))
+                parameter.setBackgroundColor(itemView.context.getColor(R.color.orange))
+                parameter.setTextColor(itemView.context.getColor(R.color.white))
+            } else {
+                order.setBackgroundColor(itemView.context.getColor(R.color.white))
+                order.setTextColor(itemView.context.getColor(R.color.black))
+                name.setBackgroundColor(itemView.context.getColor(R.color.white))
+                name.setTextColor(itemView.context.getColor(R.color.black))
+                model.setBackgroundColor(itemView.context.getColor(R.color.white))
+                model.setTextColor(itemView.context.getColor(R.color.black))
+                parameter.setBackgroundColor(itemView.context.getColor(R.color.white))
+                parameter.setTextColor(itemView.context.getColor(R.color.black))
+            }
         }
     }
 }

@@ -45,13 +45,6 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                         binding.apply {
                             tvUpdate.text =
                                 if (it.progress == 0) resources.getString(R.string.check_update) else "${it.progress}%"
-                            it.application?.let { app ->
-                                if (app.versionCode > BuildConfig.VERSION_CODE) {
-                                    update.setBackgroundResource(R.mipmap.new_icon)
-                                    tvUpdate.text =
-                                        if (it.progress == 0) resources.getString(R.string.new_version) else "${it.progress}%"
-                                }
-                            }
                         }
                     }
                 }

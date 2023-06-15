@@ -8,50 +8,62 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        android:background="@color/dark_onBackground"
+        android:background="@color/black"
         android:orientation="vertical"
+        android:padding="16dp"
         tools:context=".ui.LogChartFragment">
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:background="@color/light_onPrimary"
-            tools:ignore="TextSizeCheck">
-
-            <ImageButton
-                android:id="@+id/back"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerVertical="true"
-                android:background="@mipmap/left"
-                tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
                 android:text="@string/title_log_chart"
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                android:textSize="24sp" />
+                android:textColor="@color/white"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
-        </RelativeLayout>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_btn_orange_selector"
+                android:minHeight="42dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:text="@string/cancel"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
 
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/line_chart"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:background="@color/light_onPrimary" />
+            android:padding="8dp"
+            android:background="@drawable/bg_layout"
+            android:layout_marginTop="8dp">
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/line_chart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white" />
+        </LinearLayout>
+
+
 
     </LinearLayout>
 

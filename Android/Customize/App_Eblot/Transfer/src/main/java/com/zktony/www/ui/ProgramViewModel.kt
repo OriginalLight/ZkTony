@@ -3,6 +3,7 @@ package com.zktony.www.ui
 import androidx.lifecycle.viewModelScope
 import com.zktony.core.base.BaseViewModel
 import com.zktony.www.data.dao.ProgramDao
+import com.zktony.www.data.entities.LogRecord
 import com.zktony.www.data.entities.Program
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,13 +13,13 @@ class ProgramViewModel constructor(
     private val PD: ProgramDao
 ) : BaseViewModel() {
 
-    private val _programList = MutableStateFlow(emptyList<Program>())
-    val programList = _programList.asStateFlow()
+    private val _uiState = MutableStateFlow(ProgramUiState())
+    val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             PD.getAll().collect {
-                _programList.value = it
+                _uiState.value = _uiState.value.copy(list = it)
             }
         }
     }
@@ -33,4 +34,27 @@ class ProgramViewModel constructor(
         }
     }
 
+    fun select(program: Program?) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(selected = program)
+        }
+    }
+
+    fun insert(program: Program) {
+        viewModelScope.launch {
+            PD.insert(program)
+        }
+    }
+
+    fun update(program: Program) {
+        viewModelScope.launch {
+            PD.update(program)
+        }
+    }
+
 }
+
+data class ProgramUiState(
+    val list: List<Program> = emptyList(),
+    val selected: Program? = null,
+)

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="600dp"
     android:layout_height="wrap_content"
-    android:background="@color/light_onPrimary"
+    android:background="@drawable/bg_layout"
+    android:padding="16dp"
     android:orientation="vertical">
 
     <TextView
@@ -15,7 +16,7 @@
         android:layout_marginTop="8dp"
         android:text="@string/notice"
         android:textAlignment="center"
-        android:textColor="@color/light_primary"
+        android:textColor="@color/white"
         android:textSize="26sp"
         tools:ignore="RelativeOverlap" />
 
@@ -33,25 +34,22 @@
                 android:lineSpacingExtra="8dp"
             android:paddingStart="16dp"
             android:textAlignment="textStart"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="18sp"
             tools:ignore="RtlSymmetry,VisualLintLocaleText" />
     </ScrollView>
 
-    <com.google.android.material.button.MaterialButton
+    <Button
         android:id="@+id/btn_ok"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginTop="36dp"
+        android:background="@drawable/bg_btn_orange_selector"
         android:insetTop="0dp"
         android:insetBottom="0dp"
         android:text="@string/confirm"
         android:textAllCaps="false"
         android:textSize="16sp"
         android:textStyle="bold"
-        app:cornerRadius="0dp"
-        app:rippleColor="@color/purple_500"
-        app:strokeColor="@color/light_primary"
-        app:strokeWidth="3dp"
-        tools:ignore="VisualLintButtonSize" />
+        android:textColor="@color/white"/>
 </LinearLayout>

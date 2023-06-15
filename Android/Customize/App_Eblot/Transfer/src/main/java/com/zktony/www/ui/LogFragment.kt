@@ -38,6 +38,7 @@ class LogFragment :
                     adapter.submitList(it.list)
                     binding.apply {
                         lineChart.isEnabled = it.selected != null && adapter.selected != null
+                        delete.isEnabled = it.selected != null && adapter.selected != null
                     }
                 }
             }
@@ -57,6 +58,17 @@ class LogFragment :
             }
             datePicker.clickNoRepeat {
                 showDatePickerDialog(0, Calendar.getInstance())
+            }
+            delete.clickNoRepeat {
+                messageDialog(
+                    title = getString(R.string.delete_log),
+                    message = "您确定要删除该日志吗？",
+                    block = {
+                        viewModel.delete(adapter.selected!!)
+                        adapter.selected = null
+                        viewModel.select(null)
+                    },
+                )
             }
         }
     }
@@ -85,8 +97,8 @@ class LogFragment :
         ).show()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
+    override fun onDestroy() {
+        super.onDestroy()
         viewModel.select(null)
     }
 }

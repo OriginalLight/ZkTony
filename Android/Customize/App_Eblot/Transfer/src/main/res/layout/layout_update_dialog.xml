@@ -2,17 +2,19 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="300dp"
+    android:layout_width="332dp"
     android:layout_height="wrap_content"
-    android:background="@color/light_onPrimary"
-    android:orientation="vertical">
+    android:background="@drawable/bg_layout"
+    android:orientation="vertical"
+    android:padding="16dp">
 
     <ImageView
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="16dp"
-        android:src="@mipmap/upgrade"
+        android:src="@mipmap/ic_update"
+        app:tint="@color/orange"
         tools:ignore="ContentDescription" />
 
     <TextView
@@ -24,7 +26,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:textAlignment="center"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="16sp" />
 
     <TextView
@@ -36,7 +38,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
         android:textAlignment="center"
-        android:textColor="@color/black" />
+        android:textColor="@color/white" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,36 +46,31 @@
         android:layout_marginTop="36dp"
         android:orientation="horizontal">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_ok"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:text="@string/upgrade"
-            android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:cornerRadius="0dp"
-            app:rippleColor="#6200EA"
-            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
-
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/btn_cancel"
             android:layout_width="0dp"
-            android:layout_height="48dp"
+            android:layout_height="44dp"
             android:layout_weight="1"
-            android:backgroundTint="@color/dark_outline"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
+            android:background="@drawable/bg_btn_orange_pressed"
             android:text="@string/cancel"
             android:textAllCaps="false"
             android:textSize="16sp"
-            android:textStyle="bold"
-            app:cornerRadius="0dp"
-            app:rippleColor="#6200EA"
-            tools:ignore="HardcodedText,TouchTargetSizeCheck" />
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="8dp"
+            android:layout_height="0dp" />
+
+        <Button
+            android:id="@+id/btn_ok"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_btn_orange_selector"
+            android:text="@string/upgrade"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
     </LinearLayout>
 

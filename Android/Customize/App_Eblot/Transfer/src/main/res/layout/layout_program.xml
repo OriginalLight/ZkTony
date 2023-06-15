@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="600dp"
+    android:layout_height="wrap_content"
+    android:background="@color/black"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="添加程序"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_layout"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:dividerColor="@color/black" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="实验程序名称"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <EditText
+                android:id="@+id/name"
+                android:layout_width="300dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_et"
+                android:gravity="center"
+                android:hint="请输入程序名"
+                android:imeOptions="actionNext"
+                android:inputType="text"
+                android:textColor="@color/white"
+                android:textColorHint="@color/light_outline"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:dividerColor="@color/black" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="实验程序模式"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <Button
+                android:id="@+id/mode"
+                android:layout_width="300dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_et"
+                android:gravity="center"
+                android:backgroundTint="@null"
+                android:text="转膜"
+                android:textAllCaps="false"
+                android:drawableEnd="@drawable/ic_arrow_drop_down"
+                android:drawableTint="@color/white"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:dividerColor="@color/black" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/voltage_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="转膜电压 (0-55)"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <EditText
+                android:id="@+id/voltage"
+                android:layout_width="260dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_et"
+                android:gravity="center"
+                android:hint="请输入电压"
+                android:imeOptions="actionNext"
+                android:inputType="numberDecimal"
+                android:textColor="@color/white"
+                android:textColorHint="@color/light_outline"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="v"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+        </LinearLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:dividerColor="@color/black" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="转膜/染色时间 (0-99)"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <EditText
+                android:id="@+id/time"
+                android:layout_width="260dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_et"
+                android:gravity="center"
+                android:hint="请输入时间"
+                android:imeOptions="actionNext"
+                android:inputType="numberDecimal"
+                android:textColor="@color/white"
+                android:textColorHint="@color/light_outline"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="min"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+        </LinearLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:dividerColor="@color/black" />
+
+        <LinearLayout
+            android:id="@+id/layout_speed"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="蠕动泵转速 (0-250)"
+                android:textColor="@color/white"
+                android:textSize="16sp" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <EditText
+                android:id="@+id/speed"
+                android:layout_width="260dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_et"
+                android:gravity="center"
+                android:hint="请输入转速"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:textColor="@color/white"
+                android:textColorHint="@color/light_outline"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="rpm"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:ignore="RelativeOverlap,VisualLintOverlap" />
+
+        </LinearLayout>
+
+        <com.google.android.material.divider.MaterialDivider
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            app:dividerColor="@color/black" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_btn_orange_pressed"
+            android:minHeight="42dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="@string/cancel"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/bg_btn_orange_selector"
+            android:minHeight="42dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="@string/confirm"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+</LinearLayout>

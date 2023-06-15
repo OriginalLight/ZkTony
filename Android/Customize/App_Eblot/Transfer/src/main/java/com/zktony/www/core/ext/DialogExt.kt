@@ -1,32 +1,19 @@
 package com.zktony.www.core.ext
 
-import android.annotation.SuppressLint
 import android.app.Application
 import android.graphics.Color
-import android.text.InputType
 import android.view.Gravity
 import android.view.View
-import android.webkit.WebView
-import android.webkit.WebViewClient
-import android.widget.EditText
-import android.widget.ImageView
+import android.widget.Button
 import android.widget.TextView
-import androidx.core.view.isVisible
-import com.google.android.material.button.MaterialButton
 import com.kongzue.dialogx.DialogX
 import com.kongzue.dialogx.dialogs.CustomDialog
-import com.kongzue.dialogx.dialogs.FullScreenDialog
 import com.kongzue.dialogx.dialogs.PopMenu
-import com.kongzue.dialogx.dialogs.PopTip
 import com.kongzue.dialogx.interfaces.OnBindView
 import com.kongzue.dialogx.style.MaterialStyle
 import com.kongzue.dialogx.util.TextInfo
 import com.zktony.core.BuildConfig
-import com.zktony.core.ext.Ext
 import com.zktony.core.ext.clickNoRepeat
-import com.zktony.core.ext.createQRCodeBitmap
-import com.zktony.core.ext.isNetworkAvailable
-import com.zktony.core.utils.Constants
 import com.zktony.www.R
 
 fun initDialogX(application: Application) {
@@ -60,80 +47,13 @@ fun noticeDialog(text: String) {
         .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_notice_dialog) {
             override fun onBind(dialog: CustomDialog, v: View) {
                 val content = v.findViewById<TextView>(R.id.content)
-                val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
+                val btnOk = v.findViewById<Button>(R.id.btn_ok)
                 content.text = text
                 btnOk.setOnClickListener {
                     dialog.dismiss()
                 }
             }
         }).setMaskColor(Color.parseColor("#4D000000")).show()
-}
-
-fun webDialog() {
-    FullScreenDialog.build(object : OnBindView<FullScreenDialog>(R.layout.layout_about_webview) {
-        @SuppressLint("SetJavaScriptEnabled")
-        override fun onBind(dialog: FullScreenDialog, v: View) {
-            val btnClose = v.findViewById<View>(R.id.btn_close)
-            val webView = v.findViewById<View>(R.id.webView)
-            btnClose.setOnClickListener { dialog.dismiss() }
-            (webView as WebView).settings.apply {
-                javaScriptEnabled = true
-                loadWithOverviewMode = true
-                useWideViewPort = true
-                setSupportZoom(true)
-                allowFileAccess = true
-                javaScriptCanOpenWindowsAutomatically = true
-                loadsImagesAutomatically = true
-                defaultTextEncodingName = "utf-8"
-            }
-            webView.webViewClient = object : WebViewClient() {
-                @Deprecated("Deprecated in Java")
-                override fun shouldOverrideUrlLoading(
-                    view: WebView, url: String
-                ): Boolean {
-                    view.loadUrl(url)
-                    return true
-                }
-
-                override fun onPageFinished(view: WebView, url: String) {
-                    super.onPageFinished(view, url)
-                }
-            }
-            webView.loadUrl(Constants.DOMAIN)
-        }
-    }).setMaxWidth(1920).show()
-}
-
-fun inputDialog(
-    title: String,
-    hint: String = "",
-    value: String = "",
-    inputType: Int = InputType.TYPE_CLASS_TEXT,
-    block: (String) -> Unit
-) {
-    CustomDialog.build()
-        .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_input) {
-            override fun onBind(dialog: CustomDialog, v: View) {
-                val tvTitle = v.findViewById<TextView>(R.id.title)
-                val etInput = v.findViewById<EditText>(R.id.input)
-                val btnOk = v.findViewById<MaterialButton>(R.id.ok)
-                val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
-                tvTitle.text = title
-                etInput.hint = hint
-                etInput.inputType = inputType
-                etInput.setText(value)
-                btnOk.clickNoRepeat {
-                    block(etInput.text.toString())
-                    dialog.dismiss()
-                }
-                btnCancel.clickNoRepeat {
-                    dialog.dismiss()
-                }
-            }
-        })
-        .setCancelable(false)
-        .setMaskColor(Color.parseColor("#4D000000"))
-        .show()
 }
 
 fun messageDialog(
@@ -146,8 +66,8 @@ fun messageDialog(
             override fun onBind(dialog: CustomDialog, v: View) {
                 val tvTitle = v.findViewById<TextView>(R.id.title)
                 val tvMessage = v.findViewById<TextView>(R.id.message)
-                val btnOk = v.findViewById<MaterialButton>(R.id.ok)
-                val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
+                val btnOk = v.findViewById<Button>(R.id.ok)
+                val btnCancel = v.findViewById<Button>(R.id.cancel)
                 tvTitle.text = title
                 tvMessage.text = message
                 btnOk.clickNoRepeat {
@@ -176,8 +96,8 @@ fun updateDialog(
             override fun onBind(dialog: CustomDialog, v: View) {
                 val tvTitle = v.findViewById<TextView>(R.id.title)
                 val tvMessage = v.findViewById<TextView>(R.id.message)
-                val btnOk = v.findViewById<MaterialButton>(R.id.btn_ok)
-                val btnCancel = v.findViewById<MaterialButton>(R.id.btn_cancel)
+                val btnOk = v.findViewById<Button>(R.id.btn_ok)
+                val btnCancel = v.findViewById<Button>(R.id.btn_cancel)
                 tvTitle.text = title
                 tvMessage.text = message
                 btnOk.clickNoRepeat {
