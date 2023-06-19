@@ -16,24 +16,24 @@ import java.util.concurrent.ConcurrentHashMap
  * @date: 2023-01-30 14:27
  */
 class ScheduleTask constructor(
-    private val motorDao: MotorDao,
-    private val calibrationDao: CalibrationDao,
+    private val md: MotorDao,
+    private val cd: CalibrationDao,
 ) {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    /**
-     *  0: Y轴 1: 泵1 2: 泵2 1: 泵3
-     */
+    // 电机信息
     val hpm: MutableMap<Int, MotorEntity> = ConcurrentHashMap()
+
+    // 校准信息
     val hpc: MutableMap<Int, Double> = ConcurrentHashMap()
 
     init {
         scope.launch {
             launch {
-                motorMonitor()
+                asyncTaskOne()
             }
             launch {
-                containerMonitor()
+                asyncTaskTwo()
             }
             launch {
                 axisInitializer()
@@ -41,8 +41,15 @@ class ScheduleTask constructor(
         }
     }
 
-    private suspend fun motorMonitor() {
-        motorDao.getAll().collect {
+    /**
+     * 从数据库中获取所有的电机信息
+     * 如果数据库中没有数据，则插入默认数据
+     * 如果数据库中有数据，则将数据存入hpm中
+     *
+     * @return Unit
+     */
+    private suspend fun asyncTaskOne() {
+        md.getAll().collect {
             if (it.isNotEmpty()) {
                 it.forEach { it1 ->
                     hpm[it1.index] = it1
@@ -52,17 +59,24 @@ class ScheduleTask constructor(
                 for (i in 0..15) {
                     list.add(MotorEntity(text = "M$i", index = i))
                 }
-                motorDao.insertAll(list)
+                md.insertAll(list)
             }
         }
     }
 
-    private suspend fun containerMonitor() {
-        calibrationDao.getAll().collect {
+    /**
+     * 从数据库中获取所有的校准信息
+     * 如果数据库中没有数据，则使用默认数据
+     * 如果数据库中有数据，则将数据存入hpc中
+     *
+     * @return Unit
+     */
+    private suspend fun asyncTaskTwo() {
+        cd.getAll().collect {
             if (it.isNotEmpty()) {
                 val active = it.find { c -> c.active }
                 if (active == null) {
-                    calibrationDao.update(it[0].copy(active = true))
+                    cd.update(it[0].copy(active = true))
                 } else {
                     hpc.clear()
                     hpc[0] = 10.0 / 3200

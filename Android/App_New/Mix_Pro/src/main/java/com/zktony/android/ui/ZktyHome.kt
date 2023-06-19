@@ -33,7 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -353,7 +353,7 @@ fun HomeRuntime(
     toggleDrawer: (NavigationType) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
-    var time by remember { mutableLongStateOf(0L) }
+    var time by remember { mutableStateOf(0L) }
     val item = uiState.entities.find { it.id == uiState.selected }!!
 
     LaunchedEffect(key1 = uiState.job) {

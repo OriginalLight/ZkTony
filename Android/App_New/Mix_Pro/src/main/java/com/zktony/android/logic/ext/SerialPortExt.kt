@@ -57,7 +57,7 @@ fun sendAsciiString(ascii: String) {
  * @param list List<Int>
  * @return Unit
  */
-fun setAxis(list: List<Int>, isLock: Boolean = true) {
+fun setLock(list: List<Int>, isLock: Boolean = true) {
     list.forEach {
         serialPort.axis[it] = isLock
     }
@@ -69,7 +69,7 @@ fun setAxis(list: List<Int>, isLock: Boolean = true) {
  * @param list IntArray
  * @return Unit
  */
-fun setAxis(vararg list: Int, isLock: Boolean = true) {
+fun setLock(vararg list: Int, isLock: Boolean = true) {
     list.forEach {
         serialPort.axis[it] = isLock
     }
@@ -81,7 +81,7 @@ fun setAxis(vararg list: Int, isLock: Boolean = true) {
  * @param list List<Int>
  * @return Boolean
  */
-fun getAxis(list: List<Int>): Boolean {
+fun getLock(list: List<Int>): Boolean {
     return list.any {
         serialPort.axis[it] == true
     }
@@ -93,7 +93,7 @@ fun getAxis(list: List<Int>): Boolean {
  * @param list List<Int>
  * @return Boolean
  */
-fun getAxis(vararg list: Int): Boolean {
+fun getLock(vararg list: Int): Boolean {
     return list.any { serialPort.axis[it] }
 }
 
@@ -153,13 +153,13 @@ suspend fun syncTx(
 ) {
     val dvp = DVP().apply(block)
     try {
-        setAxis(dvp.indexList)
+        setLock(dvp.indexList)
         withTimeout(timeOut) {
             sendProtocol {
                 data = dvp.byteList.toByteArray()
             }
             delay(100L)
-            while (getAxis(dvp.indexList)) {
+            while (getLock(dvp.indexList)) {
                 delay(100L)
             }
         }
@@ -167,7 +167,7 @@ suspend fun syncTx(
         when (strategy) {
             ExceptionStrategy.RETRY -> syncTx(timeOut, strategy, block)
             ExceptionStrategy.QUERY -> queryTx(dvp.indexList)
-            ExceptionStrategy.SKIP -> setAxis(dvp.indexList, false)
+            ExceptionStrategy.SKIP -> setLock(dvp.indexList, false)
             ExceptionStrategy.RESET -> cmdInitializer()
             ExceptionStrategy.THROW -> throw e
         }

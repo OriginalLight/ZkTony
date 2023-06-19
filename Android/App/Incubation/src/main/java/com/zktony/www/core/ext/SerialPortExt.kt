@@ -169,10 +169,6 @@ suspend fun waitDrawer(timerTask: () -> Unit, block: suspend () -> Unit) {
     block()
 }
 
-suspend fun temp(temp: String, addr: Int) {
-    asyncText("TC1:TCSW=0@$addr\r")
-    delay(30 * 1000L)
-    asyncText("TC1:TCSW=1@$addr\r")
-    delay(1000L)
+fun temp(temp: String, addr: Int) {
     asyncText("TC1:TCADJUSTTEMP=$temp@$addr\r")
 }

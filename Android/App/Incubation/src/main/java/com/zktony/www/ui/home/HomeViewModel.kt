@@ -83,6 +83,18 @@ class HomeViewModel constructor(
                 }
             }
             launch {
+                launch {
+                    DS.read(Constants.TEMP, 3.0f).collect {
+                        _uiState.value = _uiState.value.copy(temp = it)
+                    }
+                }
+                launch {
+                    DS.read(Constants.RECYCLE, true).collect {
+                        _uiState.value = _uiState.value.copy(recycle = it)
+                    }
+                }
+            }
+            launch {
                 // 设置和定时查询温控
                 for (i in 0..4) {
                     delay(500L)
@@ -93,7 +105,7 @@ class HomeViewModel constructor(
                         )
                     }
                 }
-                delay(500L)
+                delay(1000L)
                 // 每十秒钟查询一次温度
                 while (true) {
                     for (i in 0..4) {
@@ -101,18 +113,6 @@ class HomeViewModel constructor(
                         asyncText("TC1:TCACTUALTEMP?@$i\r")
                     }
                     delay(5 * 1000L)
-                }
-            }
-            launch {
-                launch {
-                    DS.read(Constants.TEMP, 3.0f).collect {
-                        _uiState.value = _uiState.value.copy(temp = it)
-                    }
-                }
-                launch {
-                    DS.read(Constants.RECYCLE, true).collect {
-                        _uiState.value = _uiState.value.copy(recycle = it)
-                    }
                 }
             }
         }

@@ -41,7 +41,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -172,9 +171,9 @@ fun ProgramList(
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            uiState.entities.forEach {
+            uiState.entities.forEachIndexed { index, item ->
                 item {
-                    val background = if (it.id == uiState.selected) {
+                    val background = if (item.id == uiState.selected) {
                         MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
                     } else {
                         MaterialTheme.colorScheme.surfaceVariant
@@ -183,10 +182,10 @@ fun ProgramList(
                         modifier = Modifier.height(48.dp),
                         colors = CardDefaults.cardColors(containerColor = background),
                         onClick = {
-                            if (it.id == uiState.selected) {
+                            if (item.id == uiState.selected) {
                                 event(ProgramEvent.ToggleSelected(0L))
                             } else {
-                                event(ProgramEvent.ToggleSelected(it.id))
+                                event(ProgramEvent.ToggleSelected(item.id))
                             }
                         }
                     ) {
@@ -203,13 +202,17 @@ fun ProgramList(
                                 contentDescription = null,
                             )
                             Text(
-                                text = it.text,
+                                text = item.text,
                                 style = MaterialTheme.typography.bodyLarge,
                                 maxLines = 1,
                             )
                             Spacer(modifier = Modifier.weight(1f))
                             Text(
-                                text = it.createTime.simpleDateFormat("yyyy - MM - dd"),
+                                text = "${index + 1}",
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                            Text(
+                                text = item.createTime.simpleDateFormat("yyyy - MM - dd"),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
@@ -245,7 +248,7 @@ fun ProgramList(
             }
             // Delete
             AnimatedVisibility(visible = uiState.selected != 0L) {
-                var count by remember { mutableIntStateOf(0) }
+                var count by remember { mutableStateOf(0) }
 
                 FloatingActionButton(
                     modifier = Modifier
@@ -293,7 +296,8 @@ fun ProgramList(
 
 @OptIn(
     ExperimentalLayoutApi::class,
-    ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class
+    ExperimentalComposeUiApi::class,
+    ExperimentalMaterial3Api::class
 )
 @Composable
 fun ProgramEdit(

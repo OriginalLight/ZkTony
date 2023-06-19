@@ -13,17 +13,10 @@ abstract class ProgramDao : BaseDao<ProgramEntity> {
     @Query(
         """
         SELECT * FROM programs
+        ORDER BY create_time DESC
         """
     )
     abstract fun getAll(): Flow<List<ProgramEntity>>
-
-    @Query(
-        """
-        SELECT * FROM programs
-        WHERE id = :id
-        """
-    )
-    abstract fun getById(id: Long): Flow<ProgramEntity>
 
     @Query(
         """

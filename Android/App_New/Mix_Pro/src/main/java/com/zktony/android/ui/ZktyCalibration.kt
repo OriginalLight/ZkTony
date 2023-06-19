@@ -47,7 +47,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -184,9 +183,9 @@ fun CalibrationList(
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            uiState.entities.forEach {
+            uiState.entities.forEachIndexed { index, item ->
                 item {
-                    val background = if (it.id == uiState.selected) {
+                    val background = if (item.id == uiState.selected) {
                         MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
                     } else {
                         MaterialTheme.colorScheme.surfaceVariant
@@ -197,10 +196,10 @@ fun CalibrationList(
                             containerColor = background,
                         ),
                         onClick = {
-                            if (it.id == uiState.selected) {
+                            if (item.id == uiState.selected) {
                                 event(CalibrationEvent.ToggleSelected(0L))
                             } else {
-                                event(CalibrationEvent.ToggleSelected(it.id))
+                                event(CalibrationEvent.ToggleSelected(item.id))
                             }
                         }
                     ) {
@@ -217,16 +216,20 @@ fun CalibrationList(
                                 contentDescription = null,
                             )
                             Text(
-                                text = it.text,
+                                text = item.text,
                                 style = MaterialTheme.typography.bodyLarge,
                                 maxLines = 1,
                             )
-                            AnimatedVisibility(visible = it.active) {
+                            AnimatedVisibility(visible = item.active) {
                                 Text(text = "✔️")
                             }
                             Spacer(modifier = Modifier.weight(1f))
                             Text(
-                                text = it.createTime.simpleDateFormat("yyyy - MM - dd"),
+                                text = "${index + 1}",
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                            Text(
+                                text = item.createTime.simpleDateFormat("yyyy - MM - dd"),
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                         }
@@ -260,7 +263,7 @@ fun CalibrationList(
             }
             // Delete
             AnimatedVisibility(visible = uiState.selected != 0L) {
-                var count by remember { mutableIntStateOf(0) }
+                var count by remember { mutableStateOf(0) }
 
                 FloatingActionButton(modifier = Modifier
                     .padding(8.dp)
@@ -328,7 +331,7 @@ fun CalibrationEdit(
     event: (CalibrationEvent) -> Unit = {},
 ) {
     val entity = uiState.entities.find { it.id == uiState.selected } ?: CalibrationEntity()
-    var index by remember { mutableIntStateOf(0) }
+    var index by remember { mutableStateOf(0) }
     var volume by remember { mutableStateOf("") }
     val softKeyboard = LocalSoftwareKeyboardController.current
     var showDialog by remember { mutableStateOf(false) }
