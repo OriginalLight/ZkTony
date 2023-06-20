@@ -66,7 +66,7 @@ typedef enum
 	NO_COMEVENT = 0,
 	USART_COMEVENT,
 } COMM_EVENT;
-
+void CmdSystemReset(void);
 void CmdProcess(void);
 void CmdAnalysis(void);
 void CmdRun(uint8 *RXbuffer);

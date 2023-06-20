@@ -33,7 +33,7 @@ void TIM4_Int_Init(u16 arr, u16 psc)
 	TIM_ITConfig(TIM4, TIM_IT_Update, ENABLE); //
 
 	NVIC_InitStructure.NVIC_IRQChannel = TIM4_IRQn;				 //
-	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x00; //
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x01; //
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x1;		 //
 	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	NVIC_Init(&NVIC_InitStructure);

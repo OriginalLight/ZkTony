@@ -46,7 +46,7 @@ void ComAckPack(uint8 ack, uint8 dictate, uint8 data[], uint16 length)
 	*p++ = (PACK_END >> 16) & 0xff;
 	*p++ = (PACK_END >> 24) & 0xff;
 	// send data
-	SendData(TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
+	SendData((char *)TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
 }
 
 NetLH_Res CmdCheckPack(uint8 *RXbuffer)
@@ -200,14 +200,18 @@ void CmdAnalysis()
 	}
 }
 
+void CmdSystemReset(void)
+{
+		__set_FAULTMASK(1); // 关闭所有中断
+		NVIC_SystemReset(); // 进行软件复位
+}
 void CmdProcess()
 {
 	uint8 tx_data[2];
 	switch (cmd_RXbuffer[_DICTATE_INDEX])
 	{
 	case CMD_RX_RESET:
-		__set_FAULTMASK(1); // 关闭所有中断
-		NVIC_SystemReset(); // 进行软件复位
+		CmdSystemReset();
 		break;
 	case CMD_RX_RUN:
 		CmdRun(cmd_RXbuffer);

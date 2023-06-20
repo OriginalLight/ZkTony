@@ -204,7 +204,7 @@ void NMOS_Init(void)
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;//普通输入模式
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;//100M
   GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;//下拉
-  GPIO_Init(GPIOB, &GPIO_InitStructure);//初始化GPIO
+  GPIO_Init(GPIOC, &GPIO_InitStructure);//初始化GPIO
 	
 	/*GPIOD*/
   GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11|GPIO_Pin_12|GPIO_Pin_13|GPIO_Pin_14; 

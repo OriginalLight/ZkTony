@@ -34,7 +34,7 @@ int main(void)
 
 	delay_init(168);
 	uart_init(115200); // init usart 
-	EXTIX_Init();
+	//EXTIX_Init();
 
 	TIM_GPIO_Config(); // 
 
@@ -45,7 +45,7 @@ int main(void)
 	TIM3_PWM_Init();
 	TIM1_PWM_Init();
 
-	TIM4_Int_Init(999 - 1, 168 - 1);
+	TIM4_Int_Init(19999 - 1, 84 - 1);
 	printf("test for usart1\n");
 	while (1)
 	{
