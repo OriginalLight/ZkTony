@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -88,7 +89,7 @@ fun ZktyConfig(
             navigation = { navController.navigateUp() }
         )
 
-        ConfigList(
+        ContentWrapper(
             modifier = Modifier,
             uiState = uiState,
             event = viewModel::event
@@ -98,7 +99,7 @@ fun ZktyConfig(
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
-fun ConfigList(
+fun ContentWrapper(
     modifier: Modifier = Modifier,
     uiState: ConfigUiState,
     event: (ConfigEvent) -> Unit = { },
@@ -120,208 +121,204 @@ fun ConfigList(
     ) {
 
         val travel = uiState.settings.travelList.ifEmpty { listOf(0f, 0f, 0f) }
-        travel.forEachIndexed { index, item ->
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+        itemsIndexed(items = travel) { index, item ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                var text by remember { mutableStateOf(item.format(1)) }
+
+                ElevatedCard(
+                    modifier = Modifier
+                        .height(48.dp)
+                        .weight(1f),
                 ) {
-                    var text by remember { mutableStateOf(item.format(1)) }
-
-                    ElevatedCard(
-                        modifier = Modifier
-                            .height(48.dp)
-                            .weight(1f),
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                        Image(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .padding(start = 16.dp),
+                            painter = painterResource(id = R.drawable.ic_distance),
+                            contentDescription = null,
+                        )
+
+                        Text(
+                            modifier = Modifier.padding(start = 8.dp),
+                            text = stringResource(id = R.string.maximum_stroke) + " " +
+                                    when (index) {
+                                        0 -> stringResource(id = R.string.x_axis)
+                                        1 -> stringResource(id = R.string.y_axis)
+                                        2 -> stringResource(id = R.string.z_axis)
+                                        else -> ""
+                                    },
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        Column(
+                            modifier = Modifier
+                                .width(196.dp)
+                                .padding(end = 16.dp),
                         ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .padding(start = 16.dp),
-                                painter = painterResource(id = R.drawable.ic_distance),
-                                contentDescription = null,
-                            )
-
-                            Text(
-                                modifier = Modifier.padding(start = 8.dp),
-                                text = stringResource(id = R.string.maximum_stroke) + " " +
-                                        when (index) {
-                                            0 -> stringResource(id = R.string.x_axis)
-                                            1 -> stringResource(id = R.string.y_axis)
-                                            2 -> stringResource(id = R.string.z_axis)
-                                            else -> ""
-                                        },
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-
-                            Spacer(modifier = Modifier.weight(1f))
-
-                            Column(
-                                modifier = Modifier
-                                    .width(196.dp)
-                                    .padding(end = 16.dp),
-                            ) {
-                                CustomTextField(
-                                    modifier = Modifier.weight(1f),
-                                    value = TextFieldValue(text, TextRange(text.length)),
-                                    onValueChange = { text = it.text },
-                                    textStyle = TextStyle(
-                                        fontSize = 24.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        textAlign = TextAlign.Center,
-                                    ),
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Decimal,
-                                        imeAction = ImeAction.Done,
-                                    ),
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {
-                                            softKeyboard?.hide()
-                                        }
-                                    )
+                            CustomTextField(
+                                modifier = Modifier.weight(1f),
+                                value = TextFieldValue(text, TextRange(text.length)),
+                                onValueChange = { text = it.text },
+                                textStyle = TextStyle(
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center,
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Decimal,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        softKeyboard?.hide()
+                                    }
                                 )
-                                Divider()
-                            }
+                            )
+                            Divider()
                         }
                     }
+                }
 
 
+                Button(
+                    modifier = Modifier.width(128.dp),
+                    enabled = !uiState.lock,
+                    onClick = { event(ConfigEvent.MoveTo(index, text.toFloatOrNull() ?: 0f)) },
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = null,
+                    )
+                }
+
+                AnimatedVisibility(visible = (text.toFloatOrNull() ?: 0f) != item) {
                     Button(
                         modifier = Modifier.width(128.dp),
-                        enabled = !uiState.lock,
-                        onClick = { event(ConfigEvent.MoveTo(index, text.toFloatOrNull() ?: 0f)) },
+                        onClick = {
+                            scope.launch {
+                                val value = text.toFloatOrNull() ?: 0f
+                                text = value.format(1)
+                                event(ConfigEvent.SetTravel(index, value))
+                                Ext.ctx.getString(R.string.save_success).showShortToast()
+                            }
+                        },
                     ) {
                         Icon(
                             modifier = Modifier.size(24.dp),
-                            imageVector = Icons.Filled.ArrowForward,
+                            imageVector = Icons.Filled.Save,
                             contentDescription = null,
                         )
-                    }
-
-                    AnimatedVisibility(visible = (text.toFloatOrNull() ?: 0f) != item) {
-                        Button(
-                            modifier = Modifier.width(128.dp),
-                            onClick = {
-                                scope.launch {
-                                    val value = text.toFloatOrNull() ?: 0f
-                                    text = value.format(1)
-                                    event(ConfigEvent.SetTravel(index, value))
-                                    Ext.ctx.getString(R.string.save_success).showShortToast()
-                                }
-                            },
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = Icons.Filled.Save,
-                                contentDescription = null,
-                            )
-                        }
                     }
                 }
             }
         }
 
         val waste = uiState.settings.wasteList.ifEmpty { listOf(0f, 0f, 0f) }
-        waste.forEachIndexed { index, item ->
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+        itemsIndexed(items = waste) { index, item ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                var text by remember { mutableStateOf(item.format(1)) }
+
+                ElevatedCard(
+                    modifier = Modifier
+                        .height(48.dp)
+                        .weight(1f),
                 ) {
-                    var text by remember { mutableStateOf(item.format(1)) }
-
-                    ElevatedCard(
-                        modifier = Modifier
-                            .height(48.dp)
-                            .weight(1f),
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
+                        Image(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .padding(start = 16.dp),
+                            painter = painterResource(id = R.drawable.ic_abscissa),
+                            contentDescription = null,
+                        )
+
+                        Text(
+                            modifier = Modifier.padding(start = 8.dp),
+                            text = stringResource(id = R.string.waste_tank) + " " +
+                                    when (index) {
+                                        0 -> stringResource(id = R.string.x_axis)
+                                        1 -> stringResource(id = R.string.y_axis)
+                                        2 -> stringResource(id = R.string.z_axis)
+                                        else -> ""
+                                    },
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        Column(
+                            modifier = Modifier
+                                .width(196.dp)
+                                .padding(end = 16.dp),
                         ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(48.dp)
-                                    .padding(start = 16.dp),
-                                painter = painterResource(id = R.drawable.ic_abscissa),
-                                contentDescription = null,
-                            )
-
-                            Text(
-                                modifier = Modifier.padding(start = 8.dp),
-                                text = stringResource(id = R.string.waste_tank) + " " +
-                                        when (index) {
-                                            0 -> stringResource(id = R.string.x_axis)
-                                            1 -> stringResource(id = R.string.y_axis)
-                                            2 -> stringResource(id = R.string.z_axis)
-                                            else -> ""
-                                        },
-                                style = MaterialTheme.typography.bodyLarge
-                            )
-
-                            Spacer(modifier = Modifier.weight(1f))
-
-                            Column(
-                                modifier = Modifier
-                                    .width(196.dp)
-                                    .padding(end = 16.dp),
-                            ) {
-                                CustomTextField(
-                                    modifier = Modifier.weight(1f),
-                                    value = TextFieldValue(text, TextRange(text.length)),
-                                    onValueChange = { text = it.text },
-                                    textStyle = TextStyle(
-                                        fontSize = 24.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        textAlign = TextAlign.Center,
-                                    ),
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Decimal,
-                                        imeAction = ImeAction.Done,
-                                    ),
-                                    keyboardActions = KeyboardActions(
-                                        onDone = {
-                                            softKeyboard?.hide()
-                                        }
-                                    )
+                            CustomTextField(
+                                modifier = Modifier.weight(1f),
+                                value = TextFieldValue(text, TextRange(text.length)),
+                                onValueChange = { text = it.text },
+                                textStyle = TextStyle(
+                                    fontSize = 24.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center,
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Decimal,
+                                    imeAction = ImeAction.Done,
+                                ),
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        softKeyboard?.hide()
+                                    }
                                 )
-                                Divider()
-                            }
+                            )
+                            Divider()
                         }
                     }
+                }
 
 
+                Button(
+                    modifier = Modifier.width(128.dp),
+                    enabled = !uiState.lock,
+                    onClick = { event(ConfigEvent.MoveTo(index, text.toFloatOrNull() ?: 0f)) },
+                ) {
+                    Icon(
+                        modifier = Modifier.size(24.dp),
+                        imageVector = Icons.Filled.ArrowForward,
+                        contentDescription = null,
+                    )
+                }
+
+                AnimatedVisibility(visible = (text.toFloatOrNull() ?: 0f) != item) {
                     Button(
                         modifier = Modifier.width(128.dp),
-                        enabled = !uiState.lock,
-                        onClick = { event(ConfigEvent.MoveTo(index, text.toFloatOrNull() ?: 0f)) },
+                        onClick = {
+                            scope.launch {
+                                val value = text.toFloatOrNull() ?: 0f
+                                text = value.format(1)
+                                event(ConfigEvent.SetWaste(index, value))
+                                Ext.ctx.getString(R.string.save_success).showShortToast()
+                            }
+                        },
                     ) {
                         Icon(
                             modifier = Modifier.size(24.dp),
-                            imageVector = Icons.Filled.ArrowForward,
+                            imageVector = Icons.Filled.Save,
                             contentDescription = null,
                         )
-                    }
-
-                    AnimatedVisibility(visible = (text.toFloatOrNull() ?: 0f) != item) {
-                        Button(
-                            modifier = Modifier.width(128.dp),
-                            onClick = {
-                                scope.launch {
-                                    val value = text.toFloatOrNull() ?: 0f
-                                    text = value.format(1)
-                                    event(ConfigEvent.SetWaste(index, value))
-                                    Ext.ctx.getString(R.string.save_success).showShortToast()
-                                }
-                            },
-                        ) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = Icons.Filled.Save,
-                                contentDescription = null,
-                            )
-                        }
                     }
                 }
             }
@@ -331,8 +328,8 @@ fun ConfigList(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960)
-fun ConfigListPreview() {
-    ConfigList(
+fun ConfigContentWrapperPreview() {
+    ContentWrapper(
         uiState = ConfigUiState()
     )
 }

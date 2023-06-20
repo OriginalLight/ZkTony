@@ -16,10 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -77,64 +79,88 @@ fun ZktyHome(
 
     BackHandler {
         when (uiState.page) {
-            PageType.LIST -> {}
-            else -> viewModel.event(HomeEvent.NavTo(PageType.LIST))
+            PageType.START -> viewModel.event(HomeEvent.NavTo(PageType.LIST))
+            else -> {}
         }
     }
 
+    ContentWrapper(
+        modifier = modifier,
+        uiState = uiState,
+        event = viewModel::event,
+        toggleDrawer = toggleDrawer,
+        navController = navController
+    )
+}
+
+@Composable
+fun ContentWrapper(
+    modifier: Modifier = Modifier,
+    uiState: HomeUiState,
+    event: (HomeEvent) -> Unit = {},
+    toggleDrawer: (NavigationType) -> Unit = {},
+    navController: NavHostController,
+) {
     Column(modifier = modifier) {
+        // when page is start, show top app bar
         AnimatedVisibility(visible = uiState.page == PageType.START) {
             ZktyTopAppBar(
                 title = stringResource(id = R.string.tab_program),
-                navigation = { viewModel.event(HomeEvent.NavTo(PageType.LIST)) }
+                navigation = { event(HomeEvent.NavTo(PageType.LIST)) }
             )
         }
-        // list
-        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-            HomeList(
-                modifier = Modifier,
-                uiState = uiState,
-                event = viewModel::event,
-                navController = navController,
-            )
-        }
-        // start
-        AnimatedVisibility(visible = uiState.page == PageType.START) {
-            HomeStart(
-                modifier = Modifier,
-                uiState = uiState,
-                event = viewModel::event,
-                toggleDrawer = toggleDrawer,
-            )
-        }
-        // Runtime
-        AnimatedVisibility(visible = uiState.page == PageType.RUNTIME) {
-            HomeRuntime(
-                modifier = Modifier,
-                uiState = uiState,
-                event = viewModel::event,
-                toggleDrawer = toggleDrawer,
-            )
+
+        // background
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(8.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = MaterialTheme.shapes.medium
+                ),
+        ) {
+            // List content
+            AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+                ListContent(
+                    modifier = Modifier,
+                    uiState = uiState,
+                    event = event,
+                    navController = navController,
+                )
+            }
+            // Start content
+            AnimatedVisibility(visible = uiState.page == PageType.START) {
+                StartContent(
+                    modifier = Modifier,
+                    uiState = uiState,
+                    event = event,
+                    toggleDrawer = toggleDrawer,
+                )
+            }
+            // Runtime content
+            AnimatedVisibility(visible = uiState.page == PageType.RUNTIME) {
+                RuntimeContent(
+                    modifier = Modifier,
+                    uiState = uiState,
+                    event = event,
+                    toggleDrawer = toggleDrawer,
+                )
+            }
         }
     }
 }
 
 
 @Composable
-fun HomeList(
+fun ListContent(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
     event: (HomeEvent) -> Unit = {},
     navController: NavHostController,
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.background,
-                shape = MaterialTheme.shapes.medium
-            ),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
     ) {
 
@@ -248,10 +274,14 @@ fun ListItem(
     colors: CardColors = CardDefaults.elevatedCardColors(),
     image: @Composable () -> Unit,
 ) {
-    ElevatedCard(
+    Card(
         modifier = modifier,
         onClick = onClick,
         colors = colors,
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp,
+            pressedElevation = 8.dp,
+        )
     ) {
         Column(
             modifier = Modifier.padding(8.dp),
@@ -272,7 +302,7 @@ fun ListItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeStart(
+fun StartContent(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
     event: (HomeEvent) -> Unit = {},
@@ -280,62 +310,51 @@ fun HomeStart(
 ) {
     val scope = rememberCoroutineScope()
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.background,
-                shape = MaterialTheme.shapes.medium
-            ),
+    LazyVerticalGrid(
+        modifier = modifier.fillMaxSize(),
+        columns = GridCells.Fixed(3),
+        contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            uiState.entities.forEach {
-                item {
-                    Card(
-                        onClick = {
-                            scope.launch {
-                                event(HomeEvent.ToggleSelected(it.id))
-                                event(HomeEvent.NavTo(PageType.RUNTIME))
-                                toggleDrawer(NavigationType.NONE)
-                            }
-                        },
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Row {
-                                Image(
-                                    modifier = Modifier.size(32.dp),
-                                    painter = painterResource(id = R.drawable.ic_program),
-                                    contentDescription = null,
-                                )
-                                Spacer(modifier = Modifier.weight(1f))
-                                Text(
-                                    text = it.text,
-                                    style = MaterialTheme.typography.titleMedium,
-                                )
-                            }
+        items(items = uiState.entities) {
+            Card(
+                onClick = {
+                    scope.launch {
+                        event(HomeEvent.ToggleSelected(it.id))
+                        event(HomeEvent.NavTo(PageType.RUNTIME))
+                        toggleDrawer(NavigationType.NONE)
+                    }
+                },
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row {
+                        Image(
+                            modifier = Modifier.size(32.dp),
+                            painter = painterResource(id = R.drawable.ic_program),
+                            contentDescription = null,
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = it.text,
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
 
-                            Column {
-                                Text(
-                                    text = "${it.volume[0].format(1)} μL - ${it.volume[1].format(1)} μL",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontFamily = FontFamily.Monospace,
-                                )
-                                Text(
-                                    text = "${it.volume[2].format(1)} μL - ${it.volume[3].format(1)} μL",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontFamily = FontFamily.Monospace,
-                                )
-                            }
-                        }
+                    Column {
+                        Text(
+                            text = "${it.volume[0].format(1)} μL - ${it.volume[1].format(1)} μL",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontFamily = FontFamily.Monospace,
+                        )
+                        Text(
+                            text = "${it.volume[2].format(1)} μL - ${it.volume[3].format(1)} μL",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontFamily = FontFamily.Monospace,
+                        )
                     }
                 }
             }
@@ -346,7 +365,7 @@ fun HomeStart(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeRuntime(
+fun RuntimeContent(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
     event: (HomeEvent) -> Unit = {},
@@ -363,18 +382,12 @@ fun HomeRuntime(
             } else {
                 time = 0
             }
-            delay(1000)
+            delay(1000L)
         }
     }
 
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.background,
-                shape = MaterialTheme.shapes.medium
-            ),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         FloatingActionButton(
@@ -390,10 +403,17 @@ fun HomeRuntime(
                 }
             }
         ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = null
-            )
+            if (uiState.job == null) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = null
+                )
+            }
         }
 
         Row(
@@ -559,8 +579,8 @@ fun HomeRuntime(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun HomeMenuPreview() {
-    HomeList(
+fun HomeListContentPreview() {
+    ListContent(
         uiState = HomeUiState(),
         navController = rememberNavController()
     )
@@ -568,20 +588,20 @@ fun HomeMenuPreview() {
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun HomeStartPreview() {
+fun HomeStartContentPreview() {
     val entities = listOf(
         ProgramEntity(),
         ProgramEntity(),
     )
-    HomeStart(uiState = HomeUiState(entities = entities))
+    StartContent(uiState = HomeUiState(entities = entities))
 }
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun HomeRuntimePreview() {
+fun HomeRuntimeContentPreview() {
     val entities = listOf(
         ProgramEntity(id = 1),
         ProgramEntity(),
     )
-    HomeRuntime(uiState = HomeUiState(entities = entities, selected = 1L))
+    RuntimeContent(uiState = HomeUiState(entities = entities, selected = 1L))
 }

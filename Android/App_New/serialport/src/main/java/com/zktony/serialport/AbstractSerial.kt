@@ -110,7 +110,7 @@ abstract class AbstractSerial : AbstractSerialHelper() {
     abstract fun byteArrayProcess(byteArray: ByteArray)
 
     companion object {
-        private const val TAG = "SerialHelper"
+        private const val TAG = "AbstractSerial"
     }
 
 }

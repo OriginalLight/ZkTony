@@ -103,66 +103,65 @@ fun ZktySetting(
         }
     }
 
+    ContentWrapper(
+        modifier = modifier,
+        uiState = uiState,
+        event = viewModel::event,
+        navController = navController,
+    )
+}
+
+@Composable
+fun ContentWrapper(
+    modifier: Modifier = Modifier,
+    uiState: SettingUiState,
+    event: (SettingEvent) -> Unit = {},
+    navController: NavHostController,
+) {
     Column(modifier = modifier) {
         // Top app bar when authentication page is visible
         AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
             ZktyTopAppBar(
                 title = stringResource(id = R.string.authentication),
-                navigation = {
-                    when (uiState.page) {
-                        PageType.LIST -> navController.navigateUp()
-                        else -> viewModel.event(SettingEvent.NavTo(PageType.LIST))
-                    }
-                }
+                navigation = { event(SettingEvent.NavTo(PageType.LIST)) }
             )
         }
         // main page
         AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-            SettingList(
-                modifier = modifier,
-                uiState = uiState,
-                event = viewModel::event,
-            )
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    SettingsContent(
+                        modifier = Modifier.weight(1f),
+                        uiState = uiState,
+                        event = event,
+                    )
+                    InfoContent(
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                OperationContent(
+                    modifier = Modifier.wrapContentHeight(),
+                    uiState = uiState,
+                    event = event,
+                )
+            }
         }
         // authentication page
         AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
             Authentication(
                 modifier = modifier,
-                event = viewModel::event,
+                event = event,
                 navController = navController,
             )
         }
-    }
-}
-
-@Composable
-fun SettingList(
-    modifier: Modifier = Modifier,
-    uiState: SettingUiState = SettingUiState(),
-    event: (SettingEvent) -> Unit = {},
-) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp),
-    ) {
-        Row(
-            modifier = Modifier.weight(1f),
-        ) {
-            SettingsContent(
-                modifier = Modifier.weight(1f),
-                uiState = uiState,
-                event = event,
-            )
-            InfoContent(
-                modifier = Modifier.weight(1f),
-            )
-        }
-        OperationContent(
-            modifier = Modifier.wrapContentHeight(),
-            uiState = uiState,
-            event = event,
-        )
     }
 }
 
@@ -180,7 +179,6 @@ fun SettingsContent(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(end = 4.dp, bottom = 4.dp)
             .animateContentSize()
             .background(
                 color = MaterialTheme.colorScheme.background,
@@ -253,7 +251,6 @@ fun InfoContent(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(start = 4.dp, bottom = 4.dp)
             .animateContentSize()
             .background(
                 color = MaterialTheme.colorScheme.background,
@@ -409,7 +406,6 @@ fun OperationContent(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 4.dp)
             .animateContentSize()
             .background(
                 color = MaterialTheme.colorScheme.background,
@@ -731,7 +727,7 @@ fun SettingsCard(
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun SettingListPreview() {
-    SettingList(uiState = SettingUiState())
+    ContentWrapper(uiState = SettingUiState(), navController = rememberNavController())
 }
 
 @Composable

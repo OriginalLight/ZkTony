@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
@@ -28,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,6 +45,7 @@ import com.zktony.android.R
 import com.zktony.android.logic.data.entities.MotorEntity
 import com.zktony.android.ui.components.ZktyTopAppBar
 import com.zktony.android.ui.utils.PageType
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -68,8 +71,23 @@ fun ZktyMotor(
         }
     }
 
+    ContentWrapper(
+        modifier = modifier,
+        uiState = uiState,
+        event = viewModel::event,
+        navController = navController,
+    )
+}
+
+@Composable
+fun ContentWrapper(
+    modifier: Modifier = Modifier,
+    uiState: MotorUiState,
+    event: (MotorEvent) -> Unit = {},
+    navController: NavHostController,
+) {
     Column(modifier = modifier) {
-        // app bar
+        // show top app bar with title and navigation
         ZktyTopAppBar(
             title = if (uiState.page == PageType.LIST) {
                 stringResource(id = R.string.motor_config)
@@ -79,84 +97,91 @@ fun ZktyMotor(
             navigation = {
                 when (uiState.page) {
                     PageType.LIST -> navController.navigateUp()
-                    else -> viewModel.event(MotorEvent.NavTo(PageType.LIST))
+                    else -> event(MotorEvent.NavTo(PageType.LIST))
                 }
             }
         )
-        // motor list
-        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-            MotorList(
-                modifier = Modifier,
-                uiState = uiState,
-                event = viewModel::event
-            )
-        }
-        // motor edit
-        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-            MotorEdit(
-                modifier = Modifier,
-                uiState = uiState,
-                event = viewModel::event
-            )
+        // background
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(8.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.background,
+                    shape = MaterialTheme.shapes.medium
+                ),
+        ) {
+            // list content
+            AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+                ListContent(
+                    modifier = Modifier,
+                    uiState = uiState,
+                    event = event,
+                )
+            }
+            // edit content
+            AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
+                EditContent(
+                    modifier = Modifier,
+                    uiState = uiState,
+                    event = event,
+                )
+            }
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MotorList(
+fun ListContent(
     modifier: Modifier = Modifier,
     uiState: MotorUiState = MotorUiState(),
     event: (MotorEvent) -> Unit = {},
 ) {
+    val scope = rememberCoroutineScope()
+
     LazyVerticalGrid(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = MaterialTheme.shapes.medium,
-            ),
+        modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         columns = GridCells.Fixed(3)
     ) {
-        uiState.entities.forEach {
-            item {
-                Card(
-                    onClick = {
+        items(items = uiState.entities) {
+            Card(
+                onClick = {
+                    scope.launch {
                         event(MotorEvent.ToggleSelected(it.id))
                         event(MotorEvent.NavTo(PageType.EDIT))
                     }
+                }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(vertical = 16.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
+                    Text(
+                        text = it.text,
+                        fontSize = 50.sp,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    Column(
+                        modifier = Modifier.padding(start = 16.dp),
                     ) {
                         Text(
-                            text = it.text,
-                            fontSize = 50.sp,
-                            fontWeight = FontWeight.SemiBold,
+                            text = "S - ${it.speed}", style = MaterialTheme.typography.bodyLarge
                         )
-                        Column(
-                            modifier = Modifier.padding(start = 16.dp),
-                        ) {
-                            Text(
-                                text = "S - ${it.speed}", style = MaterialTheme.typography.bodyLarge
-                            )
 
-                            Text(
-                                text = "A - ${it.acc}", style = MaterialTheme.typography.bodyLarge
-                            )
+                        Text(
+                            text = "A - ${it.acc}", style = MaterialTheme.typography.bodyLarge
+                        )
 
-                            Text(
-                                text = "D - ${it.dec}", style = MaterialTheme.typography.bodyLarge
-                            )
-                        }
+                        Text(
+                            text = "D - ${it.dec}", style = MaterialTheme.typography.bodyLarge
+                        )
                     }
                 }
             }
@@ -165,7 +190,7 @@ fun MotorList(
 }
 
 @Composable
-fun MotorEdit(
+fun EditContent(
     modifier: Modifier = Modifier,
     uiState: MotorUiState = MotorUiState(),
     event: (MotorEvent) -> Unit = {},
@@ -176,15 +201,9 @@ fun MotorEdit(
     var dec by remember { mutableStateOf(entity.dec) }
 
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium
-            ),
+        modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
     ) {
-
         Text(
             modifier = Modifier.padding(start = 32.dp),
             text = stringResource(id = R.string.speed),
@@ -296,8 +315,8 @@ fun MotorEdit(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun MotorListPreview() {
-    MotorList(
+fun MotorListContentPreview() {
+    ListContent(
         modifier = Modifier, uiState = MotorUiState(
             entities = listOf(
                 MotorEntity(text = "M1"), MotorEntity(text = "M2")
@@ -308,8 +327,8 @@ fun MotorListPreview() {
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun MotorEditPreview() {
-    MotorEdit(
+fun MotorEditContentPreview() {
+    EditContent(
         modifier = Modifier, uiState = MotorUiState(
             entities = listOf(
                 MotorEntity(text = "M1", id = 1L)

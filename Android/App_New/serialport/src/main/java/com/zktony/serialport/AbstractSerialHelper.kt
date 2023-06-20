@@ -12,7 +12,7 @@ import java.io.OutputStream
 import java.security.InvalidParameterException
 
 /**
- * Serial port auxiliary tool class
+ * Serial port helper class (abstract class)
  */
 abstract class AbstractSerialHelper {
 

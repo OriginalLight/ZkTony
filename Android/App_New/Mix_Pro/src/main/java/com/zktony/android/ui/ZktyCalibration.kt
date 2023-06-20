@@ -24,6 +24,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -104,33 +106,42 @@ fun ZktyCalibration(
         }
     }
 
+    ContentWrapper(
+        modifier = modifier,
+        uiState = uiState,
+        event = viewModel::event,
+    )
+
+}
+
+@Composable
+fun ContentWrapper(
+    modifier: Modifier = Modifier,
+    uiState: CalibrationUiState,
+    event: (CalibrationEvent) -> Unit = {},
+) {
     Column(modifier = modifier) {
         // app bar with edit page is visible
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             ZktyTopAppBar(
                 title = stringResource(id = R.string.edit),
-                navigation = {
-                    when (uiState.page) {
-                        PageType.LIST -> navController.navigateUp()
-                        else -> viewModel.event(CalibrationEvent.NavTo(PageType.LIST))
-                    }
-                }
+                navigation = { event(CalibrationEvent.NavTo(PageType.LIST)) }
             )
         }
         // list page
         AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-            CalibrationList(
+            ListContent(
                 modifier = modifier,
                 uiState = uiState,
-                event = viewModel::event,
+                event = event,
             )
         }
         // edit page
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-            CalibrationEdit(
+            EditContent(
                 modifier = modifier,
                 uiState = uiState,
-                event = viewModel::event,
+                event = event,
             )
         }
     }
@@ -138,7 +149,7 @@ fun ZktyCalibration(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalibrationList(
+fun ListContent(
     modifier: Modifier = Modifier,
     uiState: CalibrationUiState = CalibrationUiState(),
     event: (CalibrationEvent) -> Unit = {},
@@ -169,12 +180,12 @@ fun CalibrationList(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         LazyColumn(
             modifier = Modifier
                 .weight(6f)
                 .fillMaxHeight()
-                .padding(end = 8.dp)
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = MaterialTheme.shapes.medium
@@ -183,56 +194,54 @@ fun CalibrationList(
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            uiState.entities.forEachIndexed { index, item ->
-                item {
-                    val background = if (item.id == uiState.selected) {
-                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
-                    } else {
-                        MaterialTheme.colorScheme.surfaceVariant
+            itemsIndexed(items = uiState.entities) { index, item ->
+                val background = if (item.id == uiState.selected) {
+                    MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant
+                }
+                Card(
+                    modifier = Modifier.height(48.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = background,
+                    ),
+                    onClick = {
+                        if (item.id == uiState.selected) {
+                            event(CalibrationEvent.ToggleSelected(0L))
+                        } else {
+                            event(CalibrationEvent.ToggleSelected(item.id))
+                        }
                     }
-                    Card(
-                        modifier = Modifier.height(48.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = background,
-                        ),
-                        onClick = {
-                            if (item.id == uiState.selected) {
-                                event(CalibrationEvent.ToggleSelected(0L))
-                            } else {
-                                event(CalibrationEvent.ToggleSelected(item.id))
-                            }
-                        }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Image(
-                                modifier = Modifier.size(32.dp),
-                                painter = painterResource(id = R.drawable.ic_water),
-                                contentDescription = null,
-                            )
-                            Text(
-                                text = item.text,
-                                style = MaterialTheme.typography.bodyLarge,
-                                maxLines = 1,
-                            )
-                            AnimatedVisibility(visible = item.active) {
-                                Text(text = "✔️")
-                            }
-                            Spacer(modifier = Modifier.weight(1f))
-                            Text(
-                                text = "${index + 1}",
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Text(
-                                text = item.createTime.simpleDateFormat("yyyy - MM - dd"),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
+                        Image(
+                            modifier = Modifier.size(32.dp),
+                            painter = painterResource(id = R.drawable.ic_water),
+                            contentDescription = null,
+                        )
+                        Text(
+                            text = item.text,
+                            style = MaterialTheme.typography.bodyLarge,
+                            maxLines = 1,
+                        )
+                        AnimatedVisibility(visible = item.active) {
+                            Text(text = "✔️")
                         }
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = "${index + 1}",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Text(
+                            text = item.createTime.simpleDateFormat("yyyy - MM - dd"),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
                     }
                 }
             }
@@ -253,7 +262,8 @@ fun CalibrationList(
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth(),
-                onClick = { showDialog = true }) {
+                onClick = { showDialog = true })
+            {
                 Icon(
                     modifier = Modifier.size(36.dp),
                     imageVector = Icons.Default.Add,
@@ -325,7 +335,7 @@ fun CalibrationList(
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun CalibrationEdit(
+fun EditContent(
     modifier: Modifier = Modifier,
     uiState: CalibrationUiState = CalibrationUiState(),
     event: (CalibrationEvent) -> Unit = {},
@@ -340,14 +350,14 @@ fun CalibrationEdit(
         Dialog(onDismissRequest = { showDialog = false }) {
             ElevatedCard {
                 LazyVerticalGrid(
+                    modifier = Modifier.padding(8.dp),
                     columns = GridCells.Fixed(3),
-                    contentPadding = PaddingValues(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     repeat(9) {
                         item {
-                            FilterChip(selected = index == it,
+                            FilterChip(
+                                selected = index == it,
                                 shape = MaterialTheme.shapes.small,
                                 onClick = {
                                     index = it
@@ -373,13 +383,15 @@ fun CalibrationEdit(
     }
 
     Column(
-        modifier = modifier.windowInsetsPadding(WindowInsets.imeAnimationSource)
+        modifier = modifier
+            .padding(8.dp)
+            .windowInsetsPadding(WindowInsets.imeAnimationSource),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         LazyVerticalGrid(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(8.dp)
                 .background(
                     color = MaterialTheme.colorScheme.surface,
                     shape = MaterialTheme.shapes.medium,
@@ -389,43 +401,41 @@ fun CalibrationEdit(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             columns = GridCells.Fixed(2)
         ) {
-            entity.data.forEach {
-                item {
-                    Card(
-                        modifier = Modifier.height(48.dp),
+            items(items = entity.data) {
+                Card(
+                    modifier = Modifier.height(48.dp),
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Row(
+                        Text(
+                            text = "V ${it.index + 1}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            maxLines = 1,
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        Text(
+                            text = it.volume.format(2) + " μL",
+                            style = MaterialTheme.typography.bodyLarge,
+                            maxLines = 1,
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        Icon(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = "V ${it.index + 1}",
-                                style = MaterialTheme.typography.bodyLarge,
-                                maxLines = 1,
-                            )
-
-                            Spacer(modifier = Modifier.weight(1f))
-
-                            Text(
-                                text = it.volume.format(2) + " μL",
-                                style = MaterialTheme.typography.bodyLarge,
-                                maxLines = 1,
-                            )
-
-                            Spacer(modifier = Modifier.weight(1f))
-
-                            Icon(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .clickable { event(CalibrationEvent.DeleteData(it)) },
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = null,
-                                tint = Color.Red,
-                            )
-                        }
+                                .size(32.dp)
+                                .clickable { event(CalibrationEvent.DeleteData(it)) },
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = Color.Red,
+                        )
                     }
                 }
             }
@@ -435,7 +445,6 @@ fun CalibrationEdit(
             modifier = Modifier
                 .height(128.dp)
                 .fillMaxWidth()
-                .padding(start = 8.dp, end = 8.dp, bottom = 8.dp)
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = MaterialTheme.shapes.medium,
@@ -513,14 +522,14 @@ fun CalibrationEdit(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun CalibrationListPreview() {
-    CalibrationList(uiState = CalibrationUiState(entities = listOf(CalibrationEntity())))
+fun CalibrationListContentPreview() {
+    ListContent(uiState = CalibrationUiState(entities = listOf(CalibrationEntity())))
 }
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun CalibrationEditPreview() {
-    CalibrationEdit(
+fun CalibrationEditContentPreview() {
+    EditContent(
         uiState = CalibrationUiState(
             entities = listOf(CalibrationEntity(id = 1L)),
             selected = 1L,

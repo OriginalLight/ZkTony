@@ -175,9 +175,9 @@ class LcViewModel : ViewModel() {
         val bytes = ByteArray(11)
         return bytes.writeInt8(id, 0)
             .writeInt32LE(step, 1)
-            .writeInt16LE(100, 5)
-            .writeInt16LE(150, 7)
-            .writeInt16LE(300, 9)
+            .writeInt16LE(300, 5)
+            .writeInt16LE(400, 7)
+            .writeInt16LE(600, 9)
     }
 
 

@@ -4,6 +4,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.runtime.Composable
@@ -64,10 +66,17 @@ fun ZktyApp() {
             }
         },
         content = {
-            AppNavHost(
-                navController = navController,
-                toggleDrawer = { navigationType.value = it }
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.inverseOnSurface)
+            ) {
+                AppNavHost(
+                    navController = navController,
+                    toggleDrawer = { navigationType.value = it }
+                )
+            }
+
         }
     )
 }
@@ -85,9 +94,7 @@ private fun AppNavHost(
     toggleDrawer: (NavigationType) -> Unit = {},
 ) {
     NavHost(
-        modifier = modifier.background(
-            color = MaterialTheme.colorScheme.secondaryContainer
-        ),
+        modifier = modifier,
         navController = navController,
         startDestination = Route.SPLASH,
     ) {

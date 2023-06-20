@@ -136,7 +136,7 @@ abstract class AbstractSerialHelper(serialConfig: SerialConfig) {
                         }
                     }
                     try {
-                        sleep(1L)
+                        sleep(4L)
                     } catch (e: InterruptedException) {
                         e.printStackTrace()
                     }

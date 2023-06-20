@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -92,33 +93,41 @@ fun ZktyProgram(
         }
     }
 
+    ContentWrapper(
+        modifier = modifier,
+        uiState = uiState,
+        event = viewModel::event,
+    )
+}
+
+@Composable
+fun ContentWrapper(
+    modifier: Modifier = Modifier,
+    uiState: ProgramUiState,
+    event: (ProgramEvent) -> Unit = {},
+) {
     Column(modifier = modifier) {
         // app bar for edit page
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             ZktyTopAppBar(
                 title = stringResource(id = R.string.edit),
-                navigation = {
-                    when (uiState.page) {
-                        PageType.LIST -> navController.navigateUp()
-                        else -> viewModel.event(ProgramEvent.NavTo(PageType.LIST))
-                    }
-                }
+                navigation = { event(ProgramEvent.NavTo(PageType.LIST)) }
             )
         }
         // list page
         AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-            ProgramList(
+            ListContent(
                 modifier = Modifier,
                 uiState = uiState,
-                event = viewModel::event,
+                event = event,
             )
         }
         // edit page
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-            ProgramEdit(
+            EditContent(
                 modifier = Modifier,
                 uiState = uiState,
-                event = viewModel::event,
+                event = event,
             )
         }
     }
@@ -126,7 +135,7 @@ fun ZktyProgram(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProgramList(
+fun ListContent(
     modifier: Modifier = Modifier,
     uiState: ProgramUiState = ProgramUiState(),
     event: (ProgramEvent) -> Unit = {},
@@ -156,13 +165,13 @@ fun ProgramList(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         // list
         LazyColumn(
             modifier = Modifier
                 .weight(6f)
                 .fillMaxHeight()
-                .padding(end = 8.dp)
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = MaterialTheme.shapes.medium
@@ -171,51 +180,49 @@ fun ProgramList(
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            uiState.entities.forEachIndexed { index, item ->
-                item {
-                    val background = if (item.id == uiState.selected) {
-                        MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
-                    } else {
-                        MaterialTheme.colorScheme.surfaceVariant
+            itemsIndexed(items = uiState.entities) { index, item ->
+                val background = if (item.id == uiState.selected) {
+                    MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant
+                }
+                Card(
+                    modifier = Modifier.height(48.dp),
+                    colors = CardDefaults.cardColors(containerColor = background),
+                    onClick = {
+                        if (item.id == uiState.selected) {
+                            event(ProgramEvent.ToggleSelected(0L))
+                        } else {
+                            event(ProgramEvent.ToggleSelected(item.id))
+                        }
                     }
-                    Card(
-                        modifier = Modifier.height(48.dp),
-                        colors = CardDefaults.cardColors(containerColor = background),
-                        onClick = {
-                            if (item.id == uiState.selected) {
-                                event(ProgramEvent.ToggleSelected(0L))
-                            } else {
-                                event(ProgramEvent.ToggleSelected(item.id))
-                            }
-                        }
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(horizontal = 16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                        ) {
-                            Image(
-                                modifier = Modifier.size(32.dp),
-                                painter = painterResource(id = R.drawable.ic_program),
-                                contentDescription = null,
-                            )
-                            Text(
-                                text = item.text,
-                                style = MaterialTheme.typography.bodyLarge,
-                                maxLines = 1,
-                            )
-                            Spacer(modifier = Modifier.weight(1f))
-                            Text(
-                                text = "${index + 1}",
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Text(
-                                text = item.createTime.simpleDateFormat("yyyy - MM - dd"),
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        }
+                        Image(
+                            modifier = Modifier.size(32.dp),
+                            painter = painterResource(id = R.drawable.ic_program),
+                            contentDescription = null,
+                        )
+                        Text(
+                            text = item.text,
+                            style = MaterialTheme.typography.bodyLarge,
+                            maxLines = 1,
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            text = "${index + 1}",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                        Text(
+                            text = item.createTime.simpleDateFormat("yyyy - MM - dd"),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
                     }
                 }
             }
@@ -300,7 +307,7 @@ fun ProgramList(
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun ProgramEdit(
+fun EditContent(
     modifier: Modifier = Modifier,
     uiState: ProgramUiState = ProgramUiState(),
     event: (ProgramEvent) -> Unit = {},
@@ -315,38 +322,36 @@ fun ProgramEdit(
     var y by remember { mutableStateOf(entity.axis[0].format(1)) }
     var z by remember { mutableStateOf(entity.axis[1].format(1)) }
 
-    LazyColumn(
+    Column(
         modifier = modifier
             .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.imeAnimationSource)
             .padding(8.dp)
             .background(
                 color = MaterialTheme.colorScheme.background,
                 shape = MaterialTheme.shapes.medium
             ),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        item {
-            Card(
-                modifier = Modifier.padding(horizontal = 128.dp, vertical = 16.dp),
-            ) {
-                DynamicMixPlate(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(128.dp)
-                        .padding(horizontal = 16.dp),
-                    count = 6,
-                    active = entity.active,
-                )
-            }
-        }
-        item {
-            Column(
+        Card(
+            modifier = Modifier.padding(horizontal = 128.dp, vertical = 16.dp),
+        ) {
+            DynamicMixPlate(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
+                    .height(128.dp)
+                    .padding(horizontal = 16.dp),
+                count = 6,
+                active = entity.active,
+            )
+        }
+        LazyColumn(
+            modifier = modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.imeAnimationSource)
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -385,6 +390,8 @@ fun ProgramEdit(
                         )
                     }
                 }
+            }
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -489,6 +496,8 @@ fun ProgramEdit(
                         }
                     }
                 }
+            }
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -591,6 +600,8 @@ fun ProgramEdit(
                         }
                     }
                 }
+            }
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -627,6 +638,8 @@ fun ProgramEdit(
                         )
                     }
                 }
+            }
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -705,6 +718,8 @@ fun ProgramEdit(
                         }
                     }
                 }
+            }
+            item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -790,8 +805,8 @@ fun ProgramEdit(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ProgramListPreview() {
-    ProgramList(
+fun ProgramListContentPreview() {
+    ListContent(
         uiState = ProgramUiState(
             entities = listOf(
                 ProgramEntity(text = "test")
@@ -802,8 +817,8 @@ fun ProgramListPreview() {
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ProgramEditPreview() {
-    ProgramEdit(
+fun ProgramEditContentPreview() {
+    EditContent(
         uiState = ProgramUiState(
             entities = listOf(
                 ProgramEntity(text = "test", id = 1L)
