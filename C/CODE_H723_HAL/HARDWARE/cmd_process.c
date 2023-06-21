@@ -118,10 +118,18 @@ void CmdStop(uint8_t *RXbuffer)
 	uint16_t data_len = *p | (*(p + 1) << 8);
 	p += 2;
 
+	
+	
 	for (int i = 0; i < data_len; i++, p++)
 	{
 		uint8_t id = *p;
+		TIMControl(id, 0);
+		srd[id].accel_count = 0;
+		srd[id].step_delay = 0;
+		srd[id].min_delay = 0;
+		Moto[id].MotionStatus = STOP;
 		srd[id].run_state = STOP;
+		//srd[id].run_state = DECEL;
 		
 	}
 }
@@ -201,6 +209,9 @@ void CmdSystemReset(void)
 		__set_FAULTMASK(1); // 关闭所有中断
 		NVIC_SystemReset(); // 进行软件复位
 }
+
+//{CMD_RX_RESET, CmdSystemReset}
+
 void CmdProcess()
 {
 	uint8_t tx_data[2];

@@ -3,19 +3,19 @@
         {
             "name": "UART",
             "includePath": [
-                "e:\\work\\CODE_H723_HAL\\CORE",
-                "e:\\work\\CODE_H723_HAL\\USER",
-                "e:\\work\\CODE_H723_HAL\\SYSTEM\\delay",
-                "e:\\work\\CODE_H723_HAL\\SYSTEM\\sys",
-                "e:\\work\\CODE_H723_HAL\\SYSTEM\\usart",
-                "e:\\work\\CODE_H723_HAL\\HALLIB\\STM32H7xx_HAL_Driver\\Inc",
-                "e:\\work\\CODE_H723_HAL\\HARDWARE\\LED",
-                "e:\\work\\CODE_H723_HAL\\HARDWARE\\KEY",
-                "e:\\work\\CODE_H723_HAL\\HARDWARE",
+                "d:\\Documents\\GitHub\\ZkTony\\C\\CODE_H723_HAL\\CORE",
+                "d:\\Documents\\GitHub\\ZkTony\\C\\CODE_H723_HAL\\USER",
+                "d:\\Documents\\GitHub\\ZkTony\\C\\CODE_H723_HAL\\SYSTEM\\delay",
+                "d:\\Documents\\GitHub\\ZkTony\\C\\CODE_H723_HAL\\SYSTEM\\sys",
+                "d:\\Documents\\GitHub\\ZkTony\\C\\CODE_H723_HAL\\SYSTEM\\usart",
+                "d:\\Documents\\GitHub\\ZkTony\\C\\CODE_H723_HAL\\HALLIB\\STM32H7xx_HAL_Driver\\Inc",
+                "d:\\Documents\\GitHub\\ZkTony\\C\\CODE_H723_HAL\\HARDWARE\\LED",
+                "d:\\Documents\\GitHub\\ZkTony\\C\\CODE_H723_HAL\\HARDWARE\\KEY",
+                "d:\\Documents\\GitHub\\ZkTony\\C\\CODE_H723_HAL\\HARDWARE",
                 "D:\\keil\\ARM\\ARMCC\\include",
                 "D:\\keil\\ARM\\ARMCC\\include\\rw",
-                "e:\\work\\CODE_H723_HAL\\HALLIB\\STM32H7xx_HAL_Driver\\Src",
-                "e:\\work\\CODE_H723_HAL"
+                "d:\\Documents\\GitHub\\ZkTony\\C\\CODE_H723_HAL\\HALLIB\\STM32H7xx_HAL_Driver\\Src",
+                "d:\\Documents\\GitHub\\ZkTony\\C\\CODE_H723_HAL"
             ],
             "defines": [
                 "USE_HAL_DRIVER",

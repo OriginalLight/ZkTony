@@ -495,13 +495,10 @@ void TIM8_CC_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC1);
 
-            if (Moto[12].MotoDir == Moto_Back)
+            srd[12].dir = Moto_Dir_Get(12);
+            if ( srd[12].dir != Moto[12].MotoDir )
             {
-                Moto_Dir_Set(12, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(12, Moto_For);
+                Moto_Dir_Set(12, Moto[12].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(12);
@@ -514,13 +511,10 @@ void TIM8_CC_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC2);
 
-            if (Moto[13].MotoDir == Moto_Back)
+            srd[13].dir = Moto_Dir_Get(13);
+            if ( srd[13].dir != Moto[13].MotoDir )
             {
-                Moto_Dir_Set(13, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(13, Moto_For);
+                Moto_Dir_Set(13, Moto[13].MotoDir);
             }
 
             /* Output compare event */
@@ -534,13 +528,10 @@ void TIM8_CC_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC3);
 
-            if (Moto[14].MotoDir == Moto_Back)
+            srd[14].dir = Moto_Dir_Get(14);
+            if ( srd[14].dir != Moto[14].MotoDir )
             {
-                Moto_Dir_Set(14, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(14, Moto_For);
+                Moto_Dir_Set(14, Moto[14].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(14);
@@ -553,13 +544,10 @@ void TIM8_CC_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC4);
 
-            if (Moto[15].MotoDir == Moto_Back)
+            srd[15].dir = Moto_Dir_Get(15);
+            if ( srd[15].dir != Moto[15].MotoDir )
             {
-                Moto_Dir_Set(15, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(15, Moto_For);
+                Moto_Dir_Set(15, Moto[15].MotoDir);
             }
 
             /* Output compare event */
@@ -579,13 +567,10 @@ void TIM1_CC_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC1);
 
-            if (Moto[3].MotoDir == Moto_Back)
+            srd[3].dir = Moto_Dir_Get(3);
+            if ( srd[3].dir != Moto[3].MotoDir )
             {
-                Moto_Dir_Set(3, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(3, Moto_For);
+                Moto_Dir_Set(3, Moto[3].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(3);
@@ -597,13 +582,10 @@ void TIM1_CC_IRQHandler(void)
         if (__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_CC2) != RESET)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC2);
-            if (Moto[2].MotoDir == Moto_Back)
+            srd[2].dir = Moto_Dir_Get(2);
+            if ( srd[2].dir != Moto[2].MotoDir )
             {
-                Moto_Dir_Set(2, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(2, Moto_For);
+                Moto_Dir_Set(2, Moto[2].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(2);
@@ -616,14 +598,12 @@ void TIM1_CC_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC3);
 
-            if (Moto[0].MotoDir == Moto_Back)
+            srd[0].dir = Moto_Dir_Get(0);
+            if ( srd[0].dir != Moto[0].MotoDir )
             {
-                Moto_Dir_Set(0, Moto_Back);
+                Moto_Dir_Set(0, Moto[0].MotoDir);
             }
-            else
-            {
-                Moto_Dir_Set(0, Moto_For);
-            }
+
             /* Output compare event */
             TIM_Callback(0);
         }
@@ -635,13 +615,10 @@ void TIM1_CC_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC4);
 
-            if (Moto[1].MotoDir == Moto_Back)
+            srd[1].dir = Moto_Dir_Get(1);
+            if ( srd[1].dir != Moto[1].MotoDir )
             {
-                Moto_Dir_Set(1, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(1, Moto_For);
+                Moto_Dir_Set(1, Moto[1].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(1);
@@ -660,13 +637,10 @@ void TIM2_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC1);
 
-            if (Moto[8].MotoDir == Moto_Back)
+            srd[8].dir = Moto_Dir_Get(8);
+            if ( srd[8].dir != Moto[8].MotoDir )
             {
-                Moto_Dir_Set(8, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(8, Moto_For);
+                Moto_Dir_Set(8, Moto[8].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(8);
@@ -679,13 +653,10 @@ void TIM2_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC2);
 
-            if (Moto[9].MotoDir == Moto_Back)
+            srd[9].dir = Moto_Dir_Get(9);
+            if ( srd[9].dir != Moto[9].MotoDir )
             {
-                Moto_Dir_Set(9, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(9, Moto_For);
+                Moto_Dir_Set(9, Moto[9].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(9);
@@ -698,13 +669,10 @@ void TIM2_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC3);
 
-            if (Moto[7].MotoDir == Moto_Back)
+            srd[7].dir = Moto_Dir_Get(7);
+            if ( srd[7].dir != Moto[7].MotoDir )
             {
-                Moto_Dir_Set(7, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(7, Moto_For);
+                Moto_Dir_Set(7, Moto[7].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(7);
@@ -717,13 +685,10 @@ void TIM2_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC4);
 
-            if (Moto[6].MotoDir == Moto_Back)
+            srd[6].dir = Moto_Dir_Get(6);
+            if ( srd[6].dir != Moto[6].MotoDir )
             {
-                Moto_Dir_Set(6, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(6, Moto_For);
+                Moto_Dir_Set(6, Moto[6].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(6);
@@ -743,13 +708,10 @@ void TIM3_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC1);
 
-            if (Moto[11].MotoDir == Moto_Back)
+            srd[11].dir = Moto_Dir_Get(11);
+            if ( srd[11].dir != Moto[11].MotoDir )
             {
-                Moto_Dir_Set(11, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(11, Moto_For);
+                Moto_Dir_Set(11, Moto[11].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(11);
@@ -762,13 +724,10 @@ void TIM3_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC2);
 
-            if (Moto[10].MotoDir == Moto_Back)
+            srd[10].dir = Moto_Dir_Get(10);
+            if ( srd[10].dir != Moto[10].MotoDir )
             {
-                Moto_Dir_Set(10, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(10, Moto_For);
+                Moto_Dir_Set(10, Moto[10].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(10);
@@ -781,13 +740,10 @@ void TIM3_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC3);
 
-            if (Moto[5].MotoDir == Moto_Back)
+            srd[5].dir = Moto_Dir_Get(5);
+            if ( srd[5].dir != Moto[5].MotoDir )
             {
-                Moto_Dir_Set(5, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(5, Moto_For);
+                Moto_Dir_Set(5, Moto[5].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(5);
@@ -800,13 +756,10 @@ void TIM3_IRQHandler(void)
         {
             __HAL_TIM_CLEAR_IT(htim, TIM_IT_CC4);
 
-            if (Moto[4].MotoDir == Moto_Back)
+            srd[4].dir = Moto_Dir_Get(4);
+            if ( srd[4].dir != Moto[4].MotoDir )
             {
-                Moto_Dir_Set(4, Moto_Back);
-            }
-            else
-            {
-                Moto_Dir_Set(4, Moto_For);
+                Moto_Dir_Set(4, Moto[4].MotoDir);
             }
             /* Output compare event */
             TIM_Callback(4);

@@ -33,7 +33,7 @@ int main(void)
 {
 	Cache_Enable();					// 打开L1-Cache
 	HAL_Init();						// 初始化HAL库
-	Stm32_Clock_Init(250, 2, 2, 4); // 250, 2, 2, 4 设置时钟,500Mhz   276 2 2 4 设置时钟,552Mhz
+	Stm32_Clock_Init(250, 2, 2, 4); // 250, 2, 2, 4 设置时钟,500Mhz  
 	delay_init(500);				// 延时初始化
 	uart_init(115200);				// 串口初始化
 

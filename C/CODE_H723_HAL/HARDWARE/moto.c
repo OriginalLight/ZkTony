@@ -431,3 +431,65 @@ void Moto_Dir_Set(uint8_t num,uint8_t set)
 		break;
 	}
 }
+
+/*
+获取电机运动方向 正转为1 ，反转为0
+num：电机ID号 0~15
+ 正转为1 ，反转为0
+*/
+uint8_t Moto_Dir_Get(uint8_t num)
+{
+	uint8_t val;
+	switch (num)
+	{
+	case 0:
+		val = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_15);
+		break;
+	case 1:
+		val = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_0);
+		break;
+	case 2:
+		val = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_1);
+		break;
+	case 3:
+		val = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_2);
+		break;
+	case 4:
+		val = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_3);
+		break;
+	case 5:
+		val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4);
+		break;
+	case 6:
+		val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_5);
+		break;
+	case 7:
+		val = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_6);
+		break;
+	case 8:
+		val = HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_1);
+		break;
+	case 9:
+		val = HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_2);
+		break;
+	case 10:
+		val = HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_3);
+		break;
+	case 11:
+		val = HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_4);
+		break;
+	case 12:
+		val = HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_5);
+		break;
+	case 13:
+		val = HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_6);
+		break;
+	case 14:
+		val = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13);
+		break;
+	case 15:
+		val = HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_14);
+		break;
+	}
+	return val;
+}

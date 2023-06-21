@@ -69,6 +69,11 @@ void EXTI_Check(void)
     {
         if (Moto[6].MotoDir == Moto_Back)
         {
+            TIMControl(6, 0);
+            srd[6].accel_count = 0;
+            srd[6].step_delay = 0;
+            srd[6].min_delay = 0;
+            Moto[6].MotionStatus = STOP;
             srd[6].run_state = STOP;
         }
     }
@@ -76,6 +81,11 @@ void EXTI_Check(void)
     {
         if (Moto[9].MotoDir == Moto_Back)
         {
+            TIMControl(9, 0);
+            srd[9].accel_count = 0;
+            srd[9].step_delay = 0;
+            srd[9].min_delay = 0;
+            Moto[9].MotionStatus = STOP;
             srd[9].run_state = STOP;
         }
     }
@@ -83,6 +93,11 @@ void EXTI_Check(void)
     {
         if (Moto[11].MotoDir == Moto_Back)
         {
+            TIMControl(11, 0);
+            srd[11].accel_count = 0;
+            srd[11].step_delay = 0;
+            srd[11].min_delay = 0;
+            Moto[11].MotionStatus = STOP;
             srd[11].run_state = STOP;
         }
     }
@@ -90,6 +105,11 @@ void EXTI_Check(void)
     {
         if (Moto[12].MotoDir == Moto_Back)
         {
+            TIMControl(12, 0);
+            srd[12].accel_count = 0;
+            srd[12].step_delay = 0;
+            srd[12].min_delay = 0;
+            Moto[12].MotionStatus = STOP;
             srd[12].run_state = STOP;
         }
     }
@@ -97,6 +117,11 @@ void EXTI_Check(void)
     {
         if (Moto[14].MotoDir == Moto_Back)
         {
+            TIMControl(14, 0);
+            srd[14].accel_count = 0;
+            srd[14].step_delay = 0;
+            srd[14].min_delay = 0;
+            Moto[14].MotionStatus = STOP;
             srd[14].run_state = STOP;
         }
     }
@@ -104,6 +129,11 @@ void EXTI_Check(void)
     {
         if (Moto[15].MotoDir == Moto_Back)
         {
+            TIMControl(15, 0);
+            srd[15].accel_count = 0;
+            srd[15].step_delay = 0;
+            srd[15].min_delay = 0;
+            Moto[15].MotionStatus = STOP;
             srd[15].run_state = STOP;
         }
     }
@@ -120,6 +150,11 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
             if (Moto[8].MotoDir == Moto_Back)
             {
+                TIMControl(8, 0);
+                srd[8].accel_count = 0;
+                srd[8].step_delay = 0;
+                srd[8].min_delay = 0;
+                Moto[8].MotionStatus = STOP;
                 srd[8].run_state = STOP;
             }
         }
@@ -132,6 +167,11 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
             if (Moto[10].MotoDir == Moto_Back)
             {
+                TIMControl(10, 0);
+                srd[10].accel_count = 0;
+                srd[10].step_delay = 0;
+                srd[10].min_delay = 0;
+                Moto[10].MotionStatus = STOP;
                 srd[10].run_state = STOP;
             }
         }
@@ -143,6 +183,11 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
             if (Moto[1].MotoDir == Moto_Back)
             {
+                TIMControl(1, 0);
+                srd[1].accel_count = 0;
+                srd[1].step_delay = 0;
+                srd[1].min_delay = 0;
+                Moto[1].MotionStatus = STOP;
                 srd[1].run_state = STOP;
             }
         }
@@ -154,6 +199,11 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
             if (Moto[3].MotoDir == Moto_Back)
             {
+                TIMControl(3, 0);
+                srd[3].accel_count = 0;
+                srd[3].step_delay = 0;
+                srd[3].min_delay = 0;
+                Moto[3].MotionStatus = STOP;
                 srd[3].run_state = STOP;
             }
         }
@@ -165,6 +215,11 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
             if (Moto[5].MotoDir == Moto_Back)
             {
+                TIMControl(5, 0);
+                srd[5].accel_count = 0;
+                srd[5].step_delay = 0;
+                srd[5].min_delay = 0;
+                Moto[5].MotionStatus = STOP;
                 srd[5].run_state = STOP;
             }
         }
@@ -176,6 +231,11 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
             if (Moto[13].MotoDir == Moto_Back)
             {
+                TIMControl(13, 0);
+                srd[13].accel_count = 0;
+                srd[13].step_delay = 0;
+                srd[13].min_delay = 0;
+                Moto[13].MotionStatus = STOP;
                 srd[13].run_state = STOP;
             }
         }
@@ -187,6 +247,11 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
             if (Moto[7].MotoDir == Moto_Back)
             {
+                TIMControl(7, 0);
+                srd[7].accel_count = 0;
+                srd[7].step_delay = 0;
+                srd[7].min_delay = 0;
+                Moto[7].MotionStatus = STOP;
                 srd[7].run_state = STOP;
             }
         }
@@ -198,6 +263,11 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
             if (Moto[0].MotoDir == Moto_Back)
             {
+                TIMControl(0, 0);
+                srd[0].accel_count = 0;
+                srd[0].step_delay = 0;
+                srd[0].min_delay = 0;
+                Moto[0].MotionStatus = STOP;
                 srd[0].run_state = STOP;
             }
         }
@@ -209,6 +279,11 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
             if (Moto[2].MotoDir == Moto_Back)
             {
+                TIMControl(2, 0);
+                srd[2].accel_count = 0;
+                srd[2].step_delay = 0;
+                srd[2].min_delay = 0;
+                Moto[2].MotionStatus = STOP;
                 srd[2].run_state = STOP;
             }
         }
@@ -220,6 +295,11 @@ void GPIO_EXTI_Callback(uint16_t GPIO_Pin)
         {
             if (Moto[4].MotoDir == Moto_Back)
             {
+                TIMControl(4, 0);
+                srd[4].accel_count = 0;
+                srd[4].step_delay = 0;
+                srd[4].min_delay = 0;
+                Moto[4].MotionStatus = STOP;
                 srd[4].run_state = STOP;
             }
         }
