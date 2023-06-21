@@ -10,8 +10,6 @@ import java.util.concurrent.atomic.AtomicLong
 val scheduleTask: ScheduleTask by inject(ScheduleTask::class.java)
 
 
-// x轴坐标
-private var x: AtomicLong = AtomicLong(0L)
 private var y: AtomicLong = AtomicLong(0L)
 private var z: AtomicLong = AtomicLong(0L)
 
@@ -26,18 +24,12 @@ fun pulse(index: Int, dv: Float): Long {
     val p = (dv / scheduleTask.hpc[index]!!).toLong()
     return when (index) {
         0 -> {
-            val d = p - x.get()
-            x.set(maxOf(p, 0L))
-            d
-        }
-
-        1 -> {
             val d = p - y.get()
             y.set(maxOf(p, 0))
             d
         }
 
-        2 -> {
+        1 -> {
             val d = p - z.get()
             z.set(maxOf(p, 0))
             d
@@ -57,18 +49,12 @@ fun pulse(index: Int, dv: Float): Long {
 fun pulse(index: Int, pulse: Long): Long {
     return when (index) {
         0 -> {
-            val d = pulse - x.get()
-            x.set(maxOf(pulse, 0L))
-            d
-        }
-
-        1 -> {
             val d = pulse - y.get()
             y.set(maxOf(pulse, 0))
             d
         }
 
-        2 -> {
+        1 -> {
             val d = pulse - z.get()
             z.set(maxOf(pulse, 0))
             d

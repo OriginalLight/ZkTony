@@ -160,7 +160,7 @@ suspend fun syncTx(
             }
             delay(100L)
             while (getLock(dvp.indexList)) {
-                delay(100L)
+                delay(10L)
             }
         }
     } catch (e: Exception) {
@@ -316,50 +316,53 @@ suspend fun axisInitializer() {
         queryGpioTx(it)
         delay(100L)
         if (getGpio(it)) {
-            syncTx {
+            syncTx(timeOut = 100000L) {
                 pulse {
                     index = it
                     pulse = 3200L * 2
-                    acc = 30
-                    dec = 30
-                    speed = 50
-                }
-            }
-            syncTx {
-                pulse {
-                    index = it
-                    pulse = 3200L * -3
-                    acc = 15
-                    dec = 15
-                    speed = 30
-                }
-            }
-        } else {
-            syncTx(timeOut = 10000L) {
-                pulse {
-                    index = it
-                    pulse = 3200L * -100
                     acc = 50
                     dec = 80
                     speed = 100
                 }
             }
-            syncTx {
-                pulse {
-                    index = it
-                    pulse = 3200L * 2
-                    acc = 30
-                    dec = 30
-                    speed = 50
-                }
-            }
-            syncTx {
+            delay(100L)
+            syncTx(timeOut = 100000L) {
                 pulse {
                     index = it
                     pulse = 3200L * -3
-                    acc = 15
-                    dec = 15
-                    speed = 30
+                    acc = 50
+                    dec = 80
+                    speed = 100
+                }
+            }
+        } else {
+            syncTx(timeOut = 100000L) {
+                pulse {
+                    index = it
+                    pulse = 3200L * -30
+                    acc = 100
+                    dec = 150
+                    speed = 200
+                }
+            }
+            delay(100L)
+            syncTx(timeOut = 100000L) {
+                pulse {
+                    index = it
+                    pulse = 3200L * 2
+                    acc = 150
+                    dec = 180
+                    speed = 200
+                }
+            }
+            delay(100L)
+            syncTx(timeOut = 100000L) {
+                pulse {
+                    index = it
+                    pulse = 3200L * -3
+                    acc = 50
+                    dec = 80
+                    speed = 100
                 }
             }
         }
