@@ -7,19 +7,10 @@
 #include "string.h"
 #include "cmd_queue.h"
 #include "exti.h"
-/************************************************
- ALIENTEK °¢²¨ÂÞSTM32H7¿ª·¢°å ÊµÑé3
- ´®¿ÚÊµÑé-HAL¿âº¯Êý°æ
- ¼¼ÊõÖ§³Ö£ºwww.openedv.com
- ÌÔ±¦µêÆÌ£ºhttp://eboard.taobao.com
- ¹Ø×¢Î¢ÐÅ¹«ÖÚÆ½Ì¨Î¢ÐÅºÅ£º"ÕýµãÔ­×Ó"£¬Ãâ·Ñ»ñÈ¡STM32×ÊÁÏ¡£
- ¹ãÖÝÊÐÐÇÒíµç×Ó¿Æ¼¼ÓÐÏÞ¹«Ë¾
- ×÷Õß£ºÕýµãÔ­×Ó @ALIENTEK
 
-************************************************/
-/* Íâ²¿¾§ÕñÎª8M
+/* å¤–éƒ¨æ™¶æŒ¯ä¸º8M
 :plln=250,pllm=2,pllp=2,pllq=4.
-//µÃµ½:Fvco=8*(250/2)=1000Mhz
+//å¾—åˆ°:Fvco=8*(250/2)=1000Mhz
 //     Fsys=1000/2=500Mhz
 //     Fq=1000/2=500Mhz
 */
@@ -31,30 +22,27 @@ extern uint8_t Frame_flag;
 
 int main(void)
 {
-	Cache_Enable();					// ´ò¿ªL1-Cache
-	HAL_Init();						// ³õÊ¼»¯HAL¿â
-	Stm32_Clock_Init(250, 2, 2, 4); // 250, 2, 2, 4 ÉèÖÃÊ±ÖÓ,500Mhz  
-	delay_init(500);				// ÑÓÊ±³õÊ¼»¯
-	uart_init(115200);				// ´®¿Ú³õÊ¼»¯
+	Cache_Enable();					// æ‰“å¼€L1-Cache
+	HAL_Init();						// åˆå§‹åŒ–HALåº“
+	Stm32_Clock_Init(250, 2, 2, 4); // 250, 2, 2, 4 è®¾ç½®æ—¶é’Ÿ,500Mhz  
+	delay_init(500);				// å»¶æ—¶åˆå§‹åŒ–
+	uart_init(115200);				// ä¸²å£åˆå§‹åŒ–
 
 	EXTIX_Init();
 	STEPMOTOR_TIMx_Init();
 	TIM4_Init(5000 - 1, 125 - 1);
 
-	printf("TEST\n");
-
 	while (1)
 	{
 		EXTI_Check();
 
-		if (Frame_flag) // ½ÓÊÕµ½Ò»¸öÍêÕûÊý¾ÝÖ¡
+		if (Frame_flag) // æŽ¥æ”¶åˆ°ä¸€ä¸ªå®Œæ•´æ•°æ®å¸§
 		{
 			uint8_t size = queue_find_cmd(cmd_buffer, CMD_MAX_SIZE);
 
 			if (size > 0) //
 			{
 				Cmd_Cnt = size;
-				//printf("%d\n",size);
 				CmdAnalysis(); // command Analysis
 			}
 		}

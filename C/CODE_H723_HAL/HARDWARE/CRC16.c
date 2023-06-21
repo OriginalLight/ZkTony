@@ -1,7 +1,7 @@
 #include "crc16.h"
 
 
-// const uint16_t crc_ta_8[256]={ /* CRC ×Ö½ÚÓàÊ½±í */
+// const uint16_t crc_ta_8[256]={ /* CRC ï¿½Ö½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ */
 //     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
 //     0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
 //     0x1231, 0x0210, 0x3273, 0x2252, 0x52b5, 0x4294, 0x72f7, 0x62d6,
@@ -36,7 +36,7 @@
 //     0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
 // };
  
- /* CRCÓàÊ½±í */
+ /* CRCï¿½ï¿½Ê½ï¿½ï¿½ */
 const unsigned int crc_table[256] = {
     0x0000, 0xc0c1, 0xc181, 0x0140, 0xc301, 0x03c0, 0x0280, 0xc241,
     0xc601, 0x06c0, 0x0780, 0xc741, 0x0500, 0xc5c1, 0xc481, 0x0440,
@@ -72,11 +72,11 @@ const unsigned int crc_table[256] = {
     0x8201, 0x42c0, 0x4380, 0x8341, 0x4100, 0x81c1, 0x8081, 0x4040,
 };
  
-/*º¯ÊýÃû³Æ£ºcrc_cal_by_byte;°´×Ö½Ú¼ÆËãCRC
-  º¯Êý²ÎÊý£ºuint8_t *ptr:Ö¸Ïò·¢ËÍ»º³åÇøµÄÊ××Ö½Ú
-            uint32_t len:Òª·¢ËÍµÄ×Ü×Ö½ÚÊý
-  º¯Êý·µ»ØÖµ£ºuint16_t
-  ¶àÏîÊ½²ÉÓÃCRC-CCITT 0x1021 (false°æ Î´È·ÈÏ)
+/*ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ£ï¿½crc_cal_by_byte;ï¿½ï¿½ï¿½Ö½Ú¼ï¿½ï¿½ï¿½CRC
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½uint8_t *ptr:Ö¸ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö½ï¿½
+            uint32_t len:Òªï¿½ï¿½ï¿½Íµï¿½ï¿½ï¿½ï¿½Ö½ï¿½ï¿½ï¿½
+  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½ï¿½uint16_t
+  ï¿½ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½CRC-CCITT 0x1021 (falseï¿½ï¿½ Î´È·ï¿½ï¿½)
 */
 // uint16_t crc_cal_by_byte(uint8_t *ptr, uint32_t len)
 // {
@@ -84,7 +84,7 @@ const unsigned int crc_table[256] = {
  
 //     while(len-- != 0)
 //     {
-//         uint16_t high = (unsigned int)(crc/256); //È¡CRC¸ß8Î»
+//         uint16_t high = (unsigned int)(crc/256); //È¡CRCï¿½ï¿½8Î»
 //         crc <<= 8;
 //         crc ^= crc_ta_8[high^*ptr];
 //         ptr++;
@@ -94,10 +94,10 @@ const unsigned int crc_table[256] = {
 // }
 
 
-///////////CRC MODBUS  µÍÎ»ÔÚÇ°£¬¸ßÎ»ÔÚºó //    
+///////////CRC MODBUS  ï¿½ï¿½Î»ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½Î»ï¿½Úºï¿½ //    
 
 
-//²é±í·¨¼ÆËãcrc
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½crc
 unsigned short do_crc_table(unsigned char *ptr, int len)
 {
     unsigned short crc = 0xFFFF;

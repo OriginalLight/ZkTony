@@ -345,22 +345,6 @@ void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t accel, uint32_t d
 	TIMControl(num, 1);
 }
 
-/*
- init 电机参数
- */
-//void MotoInitConfig()
-//{
-//	u8 i;
-
-//	for (i = 0; i < MOTONUM; i++)
-//	{
-//		Moto[i].Maction = 0;
-
-//		Moto[i].Mlevel = 1;
-//		Moto[i].MotoDir = 1;
-//	}
-//}
-
 
 /*
 设置电机运动方向 正转为1 ，反转为0

@@ -3,9 +3,8 @@
 
 #include "sys.h"
 
-
-/* ÂÖÑ¯·½Ê½
-IO¿Ú¶ÁÈ¡*/
+/* ï¿½ï¿½Ñ¯ï¿½ï¿½Ê½
+IOï¿½Ú¶ï¿½È¡*/
 #define MSensor7 HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_10)
 #define MSensor10 HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_15)
 #define MSensor12 HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)
@@ -13,7 +12,7 @@ IO¿Ú¶ÁÈ¡*/
 #define MSensor15 HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_3)
 #define MSensor16 HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_12)
 
-// ÖÐ¶Ï¼ì²â
+// ï¿½Ð¶Ï¼ï¿½ï¿½
 #define MSensor1 HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_13)
 #define MSensor2 HAL_GPIO_ReadPin(GPIOE, GPIO_PIN_7)
 #define MSensor3 HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14)
@@ -25,8 +24,7 @@ IO¿Ú¶ÁÈ¡*/
 #define MSensor11 HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3)
 #define MSensor14 HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11)
 
-void EXTIX_Init(void); // Íâ²¿ÖÐ¶Ï³õÊ¼»¯
-
+void EXTIX_Init(void); // ï¿½â²¿ï¿½Ð¶Ï³ï¿½Ê¼ï¿½ï¿½
 
 void GPIO_EXTI_Callback(uint16_t GPIO_Pin);
 void EXTI_Check(void);

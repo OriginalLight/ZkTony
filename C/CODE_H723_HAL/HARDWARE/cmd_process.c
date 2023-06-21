@@ -5,10 +5,8 @@
 #include "usart.h"
 #include <string.h>
 
-
-
 uint8_t cmd_buffer[CMD_MAX_SIZE]; // Command buffer
-uint8_t cmd_RXbuffer[_PACK_LEN];	// Rx buffer
+uint8_t cmd_RXbuffer[_PACK_LEN];  // Rx buffer
 COMM_EVENT DoComEvent = NO_COMEVENT;
 uint16_t Cmd_Cnt = 0;
 extern Moto_Struct Moto[MOTONUM];
@@ -41,7 +39,7 @@ void ComAckPack(uint8_t ack, uint8_t dictate, uint8_t data[], uint16_t length)
 	*p++ = (PACK_END >> 16) & 0xff;
 	*p++ = (PACK_END >> 24) & 0xff;
 	// send data
-	//SendData((char *)TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
+	// SendData((char *)TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
 	USART3_Send(TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
 }
 
@@ -118,8 +116,6 @@ void CmdStop(uint8_t *RXbuffer)
 	uint16_t data_len = *p | (*(p + 1) << 8);
 	p += 2;
 
-	
-	
 	for (int i = 0; i < data_len; i++, p++)
 	{
 		uint8_t id = *p;
@@ -129,8 +125,7 @@ void CmdStop(uint8_t *RXbuffer)
 		srd[id].min_delay = 0;
 		Moto[id].MotionStatus = STOP;
 		srd[id].run_state = STOP;
-		//srd[id].run_state = DECEL;
-		
+		// srd[id].run_state = DECEL;
 	}
 }
 
@@ -166,7 +161,7 @@ void CmdQueryGpio(uint8_t *RXbuffer)
 	{
 		uint8_t id = *p;
 
-		// run_state = GPIO_CHECK(id);
+		run_state = GPIO_CHECK(id);
 		*tx_p++ = id;
 		*tx_p++ = run_state;
 	}
@@ -206,15 +201,12 @@ void CmdAnalysis()
 
 void CmdSystemReset(void)
 {
-		__set_FAULTMASK(1); // 关闭所有中断
-		NVIC_SystemReset(); // 进行软件复位
+	__set_FAULTMASK(1); // 关闭所有中断
+	NVIC_SystemReset(); // 进行软件复位
 }
-
-//{CMD_RX_RESET, CmdSystemReset}
 
 void CmdProcess()
 {
-	uint8_t tx_data[2];
 	switch (cmd_RXbuffer[_DICTATE_INDEX])
 	{
 	case CMD_RX_RESET:
@@ -233,9 +225,10 @@ void CmdProcess()
 		CmdQueryGpio(cmd_RXbuffer);
 		break;
 	default:
-		tx_data[0] = CMD_NO_COM & 0xff;
-		tx_data[1] = (CMD_NO_COM >> 8) & 0xff;
-		ComAckPack(PACK_ACK, CMD_TX_ERROR, tx_data, 2);
+	{
+		uint8_t tx_data[] = {CMD_NO_COM & 0xff, (CMD_NO_COM >> 8) & 0xff};
+		ComAckPack(PACK_ACK, CMD_TX_ERROR, tx_data, sizeof(tx_data));
 		break;
+	}
 	}
 }

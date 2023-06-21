@@ -10,8 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
-        android:padding="8dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="8dp">
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
@@ -19,8 +19,8 @@
             android:layout_height="wrap_content"
             android:background="@drawable/bg_layout"
             app:tabBackground="@drawable/tab_background"
-            app:tabIndicator="@null"
             app:tabGravity="fill"
+            app:tabIndicator="@null"
             app:tabIndicatorColor="@null"
             app:tabTextAppearance="@style/TextAppearance.AppCompat.Large"
             app:tabTextColor="@color/white">
@@ -42,19 +42,19 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="参数设置"
-            android:textColor="@color/white"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
+            android:text="参数设置"
+            android:textColor="@color/white"
             android:textSize="16sp"
             tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"
             android:background="@drawable/bg_layout"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -65,81 +65,79 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingEnd="4dp"
                         android:text="程序"
                         android:textColor="@color/white"
-                        android:textSize="12sp"
+                        android:textSize="16sp"
                         tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                     <Button
                         android:id="@+id/selector"
-                        android:layout_width="match_parent"
-                        android:layout_height="36dp"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="1"
                         android:background="@drawable/bg_et"
-                        android:gravity="center"
-                        android:textAllCaps="false"
                         android:backgroundTint="@null"
-                        android:text="转膜"
                         android:drawableEnd="@drawable/ic_arrow_drop_down"
                         android:drawableTint="@color/white"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="转膜"
+                        android:textAllCaps="false"
                         android:textColor="@color/white"
-                        android:textSize="16sp" />
+                        android:textSize="18sp" />
 
                 </LinearLayout>
 
                 <Space
                     android:layout_width="8dp"
-                    android:layout_height="0dp"/>
+                    android:layout_height="0dp" />
 
                 <LinearLayout
                     android:id="@+id/layout_speed"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingEnd="4dp"
                         android:text="转速"
                         android:textColor="@color/white"
-                        android:textSize="12sp"
+                        android:textSize="16sp"
                         tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <EditText
+                        android:id="@+id/motor"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_et"
+                        android:gravity="center"
+                        android:hint="请输入转速"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_outline"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="40dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <EditText
-                            android:id="@+id/motor"
-                            android:layout_width="0dp"
-                            android:layout_height="36dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_et"
-                            android:gravity="center"
-                            android:hint="请输入转速"
-                            android:imeOptions="actionDone"
-                            android:inputType="number"
-                            android:textColor="@color/white"
-                            android:textColorHint="@color/light_outline"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="40dp"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="rpm"
-                            android:textColor="@color/white"
-                            android:textSize="16sp"
-                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
-
-                    </LinearLayout>
+                        android:gravity="center"
+                        android:text="rpm"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                 </LinearLayout>
 
@@ -147,7 +145,7 @@
 
             <Space
                 android:layout_width="8dp"
-                android:layout_height="0dp"/>
+                android:layout_height="8dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -158,97 +156,85 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingEnd="4dp"
                         android:text="电压"
                         android:textColor="@color/white"
-                        android:textSize="12sp"
+                        android:textSize="16sp"
                         tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <EditText
+                        android:id="@+id/voltage"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_et"
+                        android:gravity="center"
+                        android:hint="请输入电压"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_outline"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="40dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <EditText
-                            android:id="@+id/voltage"
-                            android:layout_width="0dp"
-                            android:layout_height="36dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_et"
-                            android:gravity="center"
-                            android:hint="请输入电压"
-                            android:imeOptions="actionDone"
-                            android:inputType="number"
-                            android:textColor="@color/white"
-                            android:textColorHint="@color/light_outline"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="40dp"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="v"
-                            android:textColor="@color/white"
-                            android:textSize="16sp"
-                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
-
-                    </LinearLayout>
+                        android:gravity="center"
+                        android:text="v"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                 </LinearLayout>
 
                 <Space
                     android:layout_width="8dp"
-                    android:layout_height="0dp"/>
+                    android:layout_height="0dp" />
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:paddingEnd="4dp"
                         android:text="时间"
                         android:textColor="@color/white"
-                        android:textSize="12sp"
+                        android:textSize="16sp"
                         tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
+                    <EditText
+                        android:id="@+id/time"
+                        android:layout_width="0dp"
+                        android:layout_height="42dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_et"
+                        android:gravity="center"
+                        android:hint="请输入时间"
+                        android:imeOptions="actionDone"
+                        android:inputType="number"
+                        android:textColor="@color/white"
+                        android:textColorHint="@color/light_outline"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="40dp"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <EditText
-                            android:id="@+id/time"
-                            android:layout_width="0dp"
-                            android:layout_height="36dp"
-                            android:layout_weight="1"
-                            android:background="@drawable/bg_et"
-                            android:gravity="center"
-                            android:hint="请输入电压"
-                            android:imeOptions="actionDone"
-                            android:inputType="number"
-                            android:textColor="@color/white"
-                            android:textColorHint="@color/light_outline"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:layout_width="40dp"
-                            android:layout_height="wrap_content"
-                            android:gravity="center"
-                            android:text="min"
-                            android:textColor="@color/white"
-                            android:textSize="16sp"
-                            tools:ignore="RelativeOverlap,VisualLintOverlap" />
-
-                    </LinearLayout>
+                        android:gravity="center"
+                        android:text="min"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
                 </LinearLayout>
 
@@ -259,18 +245,18 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="实时状态"
-            android:textColor="@color/white"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
+            android:text="实时状态"
+            android:textColor="@color/white"
             android:textSize="16sp"
             tools:ignore="RelativeOverlap,VisualLintOverlap" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/bg_layout">
+            android:background="@drawable/bg_layout"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -292,7 +278,7 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="2dp"
                     android:layout_height="match_parent"
-                    app:dividerColor="@color/black"/>
+                    app:dividerColor="@color/black" />
 
                 <TextView
                     android:id="@+id/current_motor"
@@ -310,7 +296,7 @@
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
-                app:dividerColor="@color/black"/>
+                app:dividerColor="@color/black" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -332,7 +318,7 @@
                 <com.google.android.material.divider.MaterialDivider
                     android:layout_width="2dp"
                     android:layout_height="match_parent"
-                    app:dividerColor="@color/black"/>
+                    app:dividerColor="@color/black" />
 
                 <TextView
                     android:id="@+id/current_current"
@@ -352,9 +338,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:paddingTop="16dp"
-            android:paddingBottom="16dp"
-            android:orientation="vertical">
+            android:paddingBottom="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -365,33 +351,35 @@
                     android:id="@+id/stop"
                     android:layout_width="0dp"
                     android:layout_height="44dp"
-                    android:background="@drawable/bg_btn_orange_selector"
                     android:layout_weight="1"
+                    android:background="@drawable/bg_btn_orange_selector"
                     android:text="@string/stop"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <Space
                     android:layout_width="8dp"
-                    android:layout_height="0dp"/>
+                    android:layout_height="0dp" />
 
                 <Button
                     android:id="@+id/start"
                     android:layout_width="0dp"
                     android:layout_height="44dp"
-                    android:background="@drawable/bg_btn_orange_selector"
                     android:layout_weight="1"
+                    android:background="@drawable/bg_btn_orange_selector"
                     android:text="@string/start"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
             <Space
                 android:layout_width="0dp"
-                android:layout_height="8dp"/>
+                android:layout_height="8dp" />
 
             <LinearLayout
                 android:id="@+id/pump"
@@ -403,27 +391,29 @@
                     android:id="@+id/pump_up"
                     android:layout_width="0dp"
                     android:layout_height="44dp"
-                    android:background="@drawable/bg_btn_orange_selector"
                     android:layout_weight="1"
+                    android:background="@drawable/bg_btn_orange_selector"
                     android:text="@string/fill"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
                 <Space
                     android:layout_width="8dp"
-                    android:layout_height="0dp"/>
+                    android:layout_height="0dp" />
 
                 <Button
                     android:id="@+id/pump_back"
                     android:layout_width="0dp"
                     android:layout_height="44dp"
-                    android:background="@drawable/bg_btn_orange_selector"
                     android:layout_weight="1"
-                    android:textColor="@color/white"
+                    android:background="@drawable/bg_btn_orange_selector"
                     android:text="@string/back"
                     android:textAllCaps="false"
-                    android:textSize="16sp" />
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
         </LinearLayout>
@@ -436,8 +426,8 @@
             android:gravity="center"
             android:text="00:00"
             android:textColor="@color/white"
-            android:textStyle="bold"
             android:textSize="100sp"
+            android:textStyle="bold"
             tools:ignore="HardcodedText" />
 
 

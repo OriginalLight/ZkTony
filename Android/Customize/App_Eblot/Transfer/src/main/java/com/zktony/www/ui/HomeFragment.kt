@@ -67,7 +67,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }, {
                         it.scaleX = 1f
                         it.scaleY = 1f
-                        it.background = resources.getDrawable(R.drawable.bg_btn_orange)
+                        it.background = resources.getDrawable(R.drawable.bg_btn_orange_selector)
                         viewModel.pumpUpOrBack(0, 1, i)
                     })
                     pumpBack.addTouchEvent({
@@ -78,7 +78,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     }, {
                         it.scaleX = 1f
                         it.scaleY = 1f
-                        it.background = resources.getDrawable(R.drawable.bg_btn_orange)
+                        it.background = resources.getDrawable(R.drawable.bg_btn_orange_selector)
                         viewModel.pumpUpOrBack(1, 1, i)
                     })
 
@@ -204,7 +204,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         }
         // 实时信息显示部分
         bind.apply {
-            currentStatus.text = if (xy == 0) "A" else "B"
+            currentStatus.text = if (xy == 0) "模块A" else "模块B"
         }
 
         if (uiState.currentMotor == 0) {
@@ -247,6 +247,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         // button的状态
         if (uiState.job != null) {
             bind.start.isEnabled = false
+            bind.stop.isEnabled = true
+            bind.pumpUp.isEnabled = false
+            bind.pumpBack.isEnabled = false
         } else {
             if (uiState.model == 0) {
                 if (uiState.programName == getString(R.string.wash)) {
@@ -261,6 +264,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     uiState.time > 0f && uiState.voltage > 0f
 
             }
+            bind.stop.isEnabled = false
+            bind.pumpUp.isEnabled = true
+            bind.pumpBack.isEnabled = true
         }
         // time
         bind.currentTime.text = uiState.currentTime

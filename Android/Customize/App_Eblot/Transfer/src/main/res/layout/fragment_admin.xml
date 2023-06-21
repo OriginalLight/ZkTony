@@ -366,7 +366,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/instructions_for_use"
+                        android:text="技术支持"
                         android:textColor="@color/white"
                         android:textSize="20sp"
                         tools:ignore="RelativeOverlap" />
@@ -380,8 +380,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textColor="@color/white"
-                        android:text=">"
-                        android:textSize="30sp"
+                        android:text="+86 4006-621 162"
+                        android:textSize="20sp"
                         tools:ignore="ContentDescription,HardcodedText" />
 
                 </LinearLayout>

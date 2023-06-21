@@ -154,11 +154,6 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                     PopTip.show("${resources.getString(R.string.version)} ${BuildConfig.VERSION_NAME}")
                 }
             }
-
-            with(about) {
-                clickScale()
-                clickNoRepeat { aboutDialog() }
-            }
         }
     }
 }

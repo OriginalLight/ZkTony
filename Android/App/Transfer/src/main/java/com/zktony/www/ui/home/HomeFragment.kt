@@ -254,6 +254,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         // button的状态
         if (uiState.job != null) {
             bind.start.isEnabled = false
+            bind.pumpUp.isEnabled = false
+            bind.pumpBack.isEnabled = false
         } else {
             if (uiState.model == 0) {
                 if (uiState.programName == getString(R.string.wash)) {
@@ -268,6 +270,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     uiState.time > 0f && uiState.voltage > 0f
 
             }
+            bind.pumpUp.isEnabled = true
+            bind.pumpBack.isEnabled = true
         }
         // time
         bind.currentTime.text = uiState.currentTime
