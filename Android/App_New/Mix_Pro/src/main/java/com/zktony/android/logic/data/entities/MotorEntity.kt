@@ -25,8 +25,8 @@ data class MotorEntity(
     @ColumnInfo(name = "index") val index: Int = 0,
     @ColumnInfo(name = "text") val text: String = "",
     @ColumnInfo(name = "speed") val speed: Int = 600,
-    @ColumnInfo(name = "acc") val acc: Int = 100,
-    @ColumnInfo(name = "dec") val dec: Int = 100,
+    @ColumnInfo(name = "acc") val acc: Int = 300,
+    @ColumnInfo(name = "dec") val dec: Int = 400,
     @ColumnInfo(name = "create_time") val createTime: Date = Date(System.currentTimeMillis()),
 ) {
     fun toByteArray(): ByteArray {

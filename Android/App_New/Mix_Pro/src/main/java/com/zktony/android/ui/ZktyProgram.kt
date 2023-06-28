@@ -705,9 +705,11 @@ fun EditContent(
                     ) {
                         Button(
                             modifier = Modifier.width(96.dp),
+                            enabled = !uiState.loading,
                             onClick = {
                                 scope.launch {
                                     keyboard?.hide()
+                                    event(ProgramEvent.MoveTo(0, y.toFloatOrNull() ?: 0f))
                                 }
                             }
                         ) {
@@ -730,7 +732,7 @@ fun EditContent(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp),
-                            text = stringResource(id = R.string.y_axis),
+                            text = stringResource(id = R.string.z_axis),
                             style = MaterialTheme.typography.bodyLarge,
                             textAlign = TextAlign.Center,
                         )
@@ -785,9 +787,11 @@ fun EditContent(
                     ) {
                         Button(
                             modifier = Modifier.width(96.dp),
+                            enabled = !uiState.loading,
                             onClick = {
                                 scope.launch {
                                     keyboard?.hide()
+                                    event(ProgramEvent.MoveTo(1, z.toFloatOrNull() ?: 0f))
                                 }
                             }
                         ) {

@@ -31,7 +31,7 @@ data class CalibrationEntity(
 ) {
     fun vps(): List<Double> {
         val vl = mutableListOf<Double>()
-        for (i in 0..12) {
+        for (i in 0..13) {
             val dataList = this.data.filter { it.index == i }
             if (dataList.isNotEmpty()) {
                 val avg = dataList.map { data -> data.vps }.average()

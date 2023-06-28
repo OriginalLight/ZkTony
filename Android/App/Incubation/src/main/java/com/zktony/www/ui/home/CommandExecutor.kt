@@ -127,6 +127,20 @@ class CommandExecutor constructor(
         }
     }
 
+    suspend fun addPBS(block: suspend () -> Unit) {
+        waitForFree {
+            // 设置温度
+            scope.launch { temp(addr = module + 1, temp = action.temp.toString()) }
+            // 主板运动
+            addLiquid(yAxis = con.washY, zAxis = con.washZ)
+            event("加液中")
+            delay(100L)
+            waitLock(20L) {
+                block.invoke()
+            }
+        }
+    }
+
     /**
      * 回收到废液槽
      *

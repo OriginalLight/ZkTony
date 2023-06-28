@@ -23,6 +23,7 @@ class ZktyCalibrationViewModel constructor(
     private val _uiState = MutableStateFlow(CalibrationUiState())
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.LIST)
+    private val _loading = MutableStateFlow(false)
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -31,8 +32,14 @@ class ZktyCalibrationViewModel constructor(
                 dao.getAll(),
                 _selected,
                 _page,
-            ) { entities, selected, page ->
-                CalibrationUiState(entities = entities, selected = selected, page = page)
+                _loading,
+            ) { entities, selected, page, loading ->
+                CalibrationUiState(
+                    entities = entities,
+                    selected = selected,
+                    page = page,
+                    loading = loading
+                )
             }.catch { ex ->
                 ex.printStackTrace()
             }.collect {
@@ -63,19 +70,14 @@ class ZktyCalibrationViewModel constructor(
 
     private fun addLiquid(index: Int) {
         viewModelScope.launch {
+            _loading.value = true
             syncTx {
-                when (index) {
-                    0 -> pulse {
-                        this.index = 3
-                        pulse = 3200L * 30
-                    }
-
-                    1 -> pulse {
-                        this.index = 4
-                        pulse = 3200L * 30
-                    }
+                pulse {
+                    this.index = index + 2
+                    pulse = 3200L * 20
                 }
             }
+            _loading.value = false
         }
     }
 
@@ -96,7 +98,7 @@ class ZktyCalibrationViewModel constructor(
                     entity.copy(
                         data = entity.data + CalibrationData(
                             index = index,
-                            pulse = 3200 * 10,
+                            pulse = 3200 * 20,
                             volume = volume,
                         )
                     )
@@ -109,7 +111,8 @@ class ZktyCalibrationViewModel constructor(
 data class CalibrationUiState(
     val entities: List<CalibrationEntity> = emptyList(),
     val selected: Long = 0L,
-    val page: PageType = PageType.LIST
+    val page: PageType = PageType.LIST,
+    val loading: Boolean = false,
 )
 
 sealed class CalibrationEvent {

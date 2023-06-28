@@ -312,59 +312,68 @@ fun queryGpioTx(vararg list: Int) {
  */
 suspend fun axisInitializer() {
     delay(1000L)
-    repeat(2) {
-        queryGpioTx(it)
+    axisInitializer(1)
+    axisInitializer(0)
+    injectionInitializer(2)
+}
+
+suspend fun axisInitializer(id: Int) {
+    queryGpioTx(id)
+    delay(100L)
+    if (getGpio(id)) {
+        syncTx(timeOut = 100000L) {
+            pulse {
+                index = id
+                pulse = 3200L * 2
+                acc = 50
+                dec = 80
+                speed = 100
+            }
+        }
         delay(100L)
-        if (getGpio(it)) {
-            syncTx(timeOut = 100000L) {
-                pulse {
-                    index = it
-                    pulse = 3200L * 2
-                    acc = 50
-                    dec = 80
-                    speed = 100
-                }
+        syncTx(timeOut = 100000L) {
+            pulse {
+                index = id
+                pulse = 3200L * -3
+                acc = 50
+                dec = 80
+                speed = 100
             }
-            delay(100L)
-            syncTx(timeOut = 100000L) {
-                pulse {
-                    index = it
-                    pulse = 3200L * -3
-                    acc = 50
-                    dec = 80
-                    speed = 100
-                }
+        }
+    } else {
+        syncTx(timeOut = 100000L) {
+            pulse {
+                index = id
+                pulse = 3200L * -30
+                acc = 100
+                dec = 150
+                speed = 200
             }
-        } else {
-            syncTx(timeOut = 100000L) {
-                pulse {
-                    index = it
-                    pulse = 3200L * -30
-                    acc = 100
-                    dec = 150
-                    speed = 200
-                }
+        }
+        delay(100L)
+        syncTx(timeOut = 100000L) {
+            pulse {
+                index = id
+                pulse = 3200L * 2
+                acc = 150
+                dec = 180
+                speed = 200
             }
-            delay(100L)
-            syncTx(timeOut = 100000L) {
-                pulse {
-                    index = it
-                    pulse = 3200L * 2
-                    acc = 150
-                    dec = 180
-                    speed = 200
-                }
-            }
-            delay(100L)
-            syncTx(timeOut = 100000L) {
-                pulse {
-                    index = it
-                    pulse = 3200L * -3
-                    acc = 50
-                    dec = 80
-                    speed = 100
-                }
+        }
+        delay(100L)
+        syncTx(timeOut = 100000L) {
+            pulse {
+                index = id
+                pulse = 3200L * -3
+                acc = 50
+                dec = 80
+                speed = 100
             }
         }
     }
+}
+
+suspend fun injectionInitializer(vararg id: Int) {
+    queryGpioTx(id.asList())
+    delay(100L)
 }

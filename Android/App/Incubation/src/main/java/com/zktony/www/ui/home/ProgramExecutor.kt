@@ -45,6 +45,7 @@ class ProgramExecutor constructor(
                 ActionEnum.ANTIBODY_ONE.index -> executeAntibodyOne(action)
                 ActionEnum.ANTIBODY_TWO.index -> executeAntibodyTwo(action)
                 ActionEnum.WASHING.index -> executeWashing(action, action.count)
+                ActionEnum.PBS.index -> executePBS(action)
             }
         }
     }
@@ -167,6 +168,16 @@ class ProgramExecutor constructor(
                             }
                         }
                     })
+            }
+        }
+    }
+
+    private suspend fun executePBS(action: Action) {
+        commandExecutor.run {
+            event(ExecutorEvent.Log(module, "开始执行PBS流程"))
+            initAction(action)
+            addPBS {
+                executeNext()
             }
         }
     }

@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -345,6 +346,7 @@ fun EditContent(
     var volume by remember { mutableStateOf("") }
     val softKeyboard = LocalSoftwareKeyboardController.current
     var showDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     if (showDialog) {
         Dialog(onDismissRequest = { showDialog = false }) {
@@ -354,7 +356,7 @@ fun EditContent(
                     columns = GridCells.Fixed(3),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    repeat(9) {
+                    repeat(7) {
                         item {
                             FilterChip(
                                 selected = index == it,
@@ -492,14 +494,26 @@ fun EditContent(
                 modifier = Modifier
                     .width(156.dp),
                 onClick = {
-                    softKeyboard?.hide()
-                    event(CalibrationEvent.AddLiquid(index))
+                    scope.launch {
+                        softKeyboard?.hide()
+                        if (!uiState.loading) {
+                            event(CalibrationEvent.AddLiquid(index))
+                        }
+                    }
                 }) {
-                Icon(
-                    modifier = Modifier.size(32.dp),
-                    imageVector = Icons.Default.ArrowForward,
-                    contentDescription = null,
-                )
+                if (uiState.loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(32.dp),
+                        strokeWidth = 4.dp,
+                        color = Color.White,
+                    )
+                } else {
+                    Icon(
+                        modifier = Modifier.size(32.dp),
+                        imageVector = Icons.Default.ArrowForward,
+                        contentDescription = null,
+                    )
+                }
             }
             Button(
                 modifier = Modifier

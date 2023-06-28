@@ -229,7 +229,7 @@ fun EditContent(
             Slider(
                 value = speed.toFloat(),
                 onValueChange = { speed = it.toInt() },
-                valueRange = 0f..600f,
+                valueRange = 0f..1200f,
             )
         }
         Text(
@@ -257,7 +257,7 @@ fun EditContent(
             Slider(
                 value = acc.toFloat(),
                 onValueChange = { acc = it.toInt() },
-                valueRange = 10f..100f,
+                valueRange = 0f..1200f,
             )
         }
         Text(
@@ -285,7 +285,7 @@ fun EditContent(
             Slider(
                 value = dec.toFloat(),
                 onValueChange = { dec = it.toInt() },
-                valueRange = 10f..100f,
+                valueRange = 0f..1200f,
             )
         }
         AnimatedVisibility(visible = entity.speed != speed || entity.acc != acc || entity.dec != dec) {
