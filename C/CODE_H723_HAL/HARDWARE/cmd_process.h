@@ -5,6 +5,8 @@
 
 #define CMD_MAX_SIZE 512
 
+
+
 /** LEN */
 #define _HEAD_LEN 1
 #define _ADDRESS_LEN 1
@@ -31,11 +33,12 @@
 #define PACK_END 0XFFFFFCFF
 
 /** RX DICTATE */
-#define CMD_RX_RESET 0x00		// reset
+#define CMD_RX_RESET 0x00		// reset board
 #define CMD_RX_RUN 0x01			// run
 #define CMD_RX_STOP 0x02		// stop
 #define CMD_RX_QUERY_MOTOR 0x03 // query motor
-#define CMD_RX_QUERY_GPIO 0x04	// query
+#define CMD_RX_QUERY_GPIO 0x04	// query sensor
+#define CMD_RX_RESET_MOTO 0x05	// reset moto to point 0 
 /** TX DICTATE */
 #define CMD_TX_MOTOR_STATUS 0x01 // motor status
 #define CMD_TX_GPIO_STATUS 0x02	 // gpio status
@@ -69,6 +72,14 @@ typedef enum
 	NO_COMEVENT = 0,
 	USART_COMEVENT,
 } COMM_EVENT;
+
+typedef struct
+{
+	uint8_t flag;
+	uint8_t datalen;
+	uint8_t data[_PACK_LEN];
+}AckPack;
+
 void CmdSystemReset(void);
 void CmdProcess(void);
 void CmdAnalysis(void);

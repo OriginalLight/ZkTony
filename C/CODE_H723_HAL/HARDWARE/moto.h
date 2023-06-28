@@ -64,29 +64,29 @@ typedef struct
 // #define T1_FREQ_2 1000000
 // #define SPR 1000
 
-// ï¿½ï¿½ï¿½å¶¨Ê±ï¿½ï¿½Ô¤ï¿½ï¿½Æµï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Êµï¿½ï¿½Ê±ï¿½ï¿½Æµï¿½ï¿½Îªï¿½ï¿½168MHz/ï¿½ï¿½STEPMOTOR_TIMx_PRESCALER+1ï¿½ï¿½
-// #define STEPMOTOR_TIM_PRESCALER               5  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   32  Ï¸ï¿½ï¿½
-#define STEPMOTOR_TIM_PRESCALER 9 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   16  Ï¸ï¿½ï¿½
-// #define STEPMOTOR_TIM_PRESCALER               19  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   8  Ï¸ï¿½ï¿½
-// #define STEPMOTOR_TIM_PRESCALER               39  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   4  Ï¸ï¿½ï¿½
-// #define STEPMOTOR_TIM_PRESCALER               79  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   2  Ï¸ï¿½ï¿½
-// #define STEPMOTOR_TIM_PRESCALER               159 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½   1  Ï¸ï¿½ï¿½
-//  ï¿½ï¿½ï¿½å¶¨Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½È½ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îª0xFFFF
+// ¶¨Òå¶¨Ê±Æ÷Ô¤·ÖÆµ£¬¶¨Ê±Æ÷Êµ¼ÊÊ±ÖÓÆµÂÊÎª£ºMHz/£¨STEPMOTOR_TIMx_PRESCALER+1£©
+// #define STEPMOTOR_TIM_PRESCALER               5  // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   32  Ï¸·Ö
+#define STEPMOTOR_TIM_PRESCALER 9 					// ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   16  Ï¸·Ö
+// #define STEPMOTOR_TIM_PRESCALER               19  // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   8  Ï¸·Ö
+// #define STEPMOTOR_TIM_PRESCALER               39  // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   4  Ï¸·Ö
+// #define STEPMOTOR_TIM_PRESCALER               79  // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   2  Ï¸·Ö
+// #define STEPMOTOR_TIM_PRESCALER               159 // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÉèÖÃÎª£º   1  Ï¸·Ö
+// ¶¨Òå¶¨Ê±Æ÷ÖÜÆÚ£¬Êä³ö±È½ÏÄ£Ê½ÖÜÆÚÉèÖÃÎª0xFFFF
 #define STEPMOTOR_TIM_PERIOD 0xFFFF
 
-#define STOP 0													  // ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½Í£Ö¹
-#define ACCEL 1													  // ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ù½×¶ï¿½
-#define DECEL 2													  // ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ù½×¶ï¿½
-#define RUN 3													  // ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½Ù½×¶ï¿½
-#define T1_FREQ (SystemCoreClock / (STEPMOTOR_TIM_PRESCALER + 1)) // Æµï¿½ï¿½ftÖµ
-#define FSPR 200												  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¦ï¿½ï¿½ï¿½ï¿½
-#define MICRO_STEP 16											  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ï¿½ï¿½ï¿½
-#define SPR (FSPR * MICRO_STEP)									  // ï¿½ï¿½×ªÒ»È¦ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+#define STOP                                  0 // ¼Ó¼õËÙÇúÏß×´Ì¬£ºÍ£Ö¹
+#define ACCEL                                 1 // ¼Ó¼õËÙÇúÏß×´Ì¬£º¼ÓËÙ½×¶Î
+#define DECEL                                 2 // ¼Ó¼õËÙÇúÏß×´Ì¬£º¼õËÙ½×¶Î
+#define RUN                                   3 // ¼Ó¼õËÙÇúÏß×´Ì¬£ºÔÈËÙ½×¶Î
+#define T1_FREQ                               (SystemCoreClock/(STEPMOTOR_TIM_PRESCALER+1)) // ÆµÂÊftÖµ
+#define FSPR                                  200         //²½½øµç»úµ¥È¦²½Êý
+#define MICRO_STEP                            16          // ²½½øµç»úÇý¶¯Æ÷Ï¸·ÖÊý
+#define SPR                                   (FSPR*MICRO_STEP)   // Ðý×ªÒ»È¦ÐèÒªµÄÂö³åÊý
 
 // Maths constants
-#define ALPHA ((float)(2 * 3.14159 / SPR)) // ï¿½ï¿½= 2*pi/spr
+#define ALPHA ((float)(2 * 3.14159 / SPR)) // ¦Á= 2*pi/spr
 #define A_T_x10 ((float)(10 * ALPHA * T1_FREQ))
-#define T1_FREQ_148 ((float)((T1_FREQ * 0.676) / 10)) // 0.676Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+#define T1_FREQ_148 ((float)((T1_FREQ * 0.676) / 10)) // 0.676ÎªÎó²îÐÞÕýÖµ
 #define A_SQ ((float)(2 * 100000 * ALPHA))
 #define A_x200 ((float)(200 * ALPHA))
 
@@ -105,8 +105,8 @@ typedef struct
 
 #define MOTONUM 16
 
-#define Moto_For 1	// ï¿½ï¿½ï¿½ï¿½ï¿½×ª
-#define Moto_Back 0 // ï¿½ï¿½ï¿½ï¿½ï¿½×ª
+#define Moto_For 1	// Õý×ª
+#define Moto_Back 0 // ·´×ª
 
 void TIM_SetCompare(uint8_t num, uint16_t val);
 uint16_t TIM_GetCompare(uint8_t num);
@@ -117,4 +117,7 @@ void MotoInitConfig(void);
 void TIMControl(uint8_t num, uint8_t operation);
 void Moto_Dir_Set(uint8_t num, uint8_t set);
 uint8_t Moto_Dir_Get(uint8_t num);
+void StopMotor(uint8_t num);
+
+
 #endif

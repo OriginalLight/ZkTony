@@ -6,27 +6,18 @@
 #include <string.h>
 #include <stdint.h>
 //////////////////////////////////////////////////////////////////////////////////
-// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½Ñ§Ï°Ê¹ï¿½Ã£ï¿½Î´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îºï¿½ï¿½ï¿½Í¾
-// ALIENTEK STM32H7ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-// ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-// ï¿½ï¿½ï¿½ï¿½Ô­ï¿½ï¿½@ALIENTEK
-// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì³:www.openedv.com
-// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:2017/8/12
-// ï¿½æ±¾ï¿½ï¿½V1.0
-// ï¿½ï¿½È¨ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ï¿½ï¿½
-// Copyright(C) ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó¿Æ¼ï¿½ï¿½ï¿½ï¿½Þ¹ï¿½Ë¾ 2014-2024
-// All rights reserved
+
 //////////////////////////////////////////////////////////////////////////////////
-/*
-APB1 ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ TIM2, TIM3 ,TIM4, TIM5, TIM6, TIM7, TIM12, TIM13, TIM14ï¿½ï¿½LPTIM1
-APB2 ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ TIM1, TIM8 , TIM15, TIM16ï¿½ï¿½TIM17
-AHB1 = sysclk/2
-APB1 = AHB1/2 MHZ
-AHB2 = sysclk/2
-APB2 = AHB2/2 MHZ
-*/
+// /*
+// // APB1 ¶¨Ê±Æ÷ÓÐ TIM2, TIM3 ,TIM4, TIM5, TIM6, TIM7, TIM12, TIM13, TIM14£¬LPTIM1
+// // APB2 ¶¨Ê±Æ÷ÓÐ TIM1, TIM8 , TIM15, TIM16£¬TIM17
+// // AHB1 = sysclk/2   
+// // APB1 = AHB1/2 MHZ
+// // AHB2 = sysclk/2    
+// // APB2 = AHB2/2 MHZ
+// */
 ////////////////
-TIM_HandleTypeDef TIM4_Handler; // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
+TIM_HandleTypeDef TIM4_Handler; // ¶¨Ê±Æ÷¾ä±ú
 
 TIM_HandleTypeDef htimx_STEPMOTOR;
 TIM_HandleTypeDef *htim = &htimx_STEPMOTOR;
@@ -38,174 +29,170 @@ __IO int32_t step_position[MOTONUM] = {0};
 
 typedef struct
 {
-	uint16_t Pulse_Pin; // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	uint32_t Channel;	// ï¿½ï¿½Ê±ï¿½ï¿½Í¨ï¿½ï¿½
-	uint32_t IT_CCx;	// ï¿½ï¿½Ê±ï¿½ï¿½Í¨ï¿½ï¿½ï¿½Ð¶ï¿½Ê¹ï¿½ï¿½Î»
-	uint32_t Flag_CCx;	// ï¿½ï¿½Ê±ï¿½ï¿½SRï¿½Ð¶Ï±ï¿½ï¿½Î»
+    uint16_t Pulse_Pin; // ¶¨Ê±Æ÷Âö³åÊä³öÒý½Å
+    uint32_t Channel;   // ¶¨Ê±Æ÷Í¨µÀ
+    uint32_t IT_CCx;    // ¶¨Ê±Æ÷Í¨µÀÖÐ¶ÏÊ¹ÄÜÎ»
+    uint32_t Flag_CCx;  // ¶¨Ê±Æ÷SRÖÐ¶Ï±ê¼ÇÎ»
 } Tim;
 
-/* ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½*/
+/* ¶¨Ê±Æ÷Âö³åÊä³öÒý½Å*/
 const Tim Timer8[4] = {
-	{GPIO_PIN_6, TIM_CHANNEL_1, TIM_IT_CC1, TIM_FLAG_CC1},
-	{GPIO_PIN_7, TIM_CHANNEL_2, TIM_IT_CC2, TIM_FLAG_CC2}, // GPIOC
-	{GPIO_PIN_8, TIM_CHANNEL_3, TIM_IT_CC3, TIM_FLAG_CC3}, //
-	{GPIO_PIN_9, TIM_CHANNEL_4, TIM_IT_CC4, TIM_FLAG_CC4}, //
+    {GPIO_PIN_6, TIM_CHANNEL_1, TIM_IT_CC1, TIM_FLAG_CC1},
+    {GPIO_PIN_7, TIM_CHANNEL_2, TIM_IT_CC2, TIM_FLAG_CC2}, // GPIOC
+    {GPIO_PIN_8, TIM_CHANNEL_3, TIM_IT_CC3, TIM_FLAG_CC3}, //
+    {GPIO_PIN_9, TIM_CHANNEL_4, TIM_IT_CC4, TIM_FLAG_CC4}, //
 };
 
 const Tim Timer1[4] = {
-	{GPIO_PIN_9, TIM_CHANNEL_1, TIM_IT_CC1, TIM_FLAG_CC1},
-	{GPIO_PIN_11, TIM_CHANNEL_2, TIM_IT_CC2, TIM_FLAG_CC2}, // GPIOE
-	{GPIO_PIN_13, TIM_CHANNEL_3, TIM_IT_CC3, TIM_FLAG_CC3}, //
-	{GPIO_PIN_14, TIM_CHANNEL_4, TIM_IT_CC4, TIM_FLAG_CC4}, //
+    {GPIO_PIN_9, TIM_CHANNEL_1, TIM_IT_CC1, TIM_FLAG_CC1},
+    {GPIO_PIN_11, TIM_CHANNEL_2, TIM_IT_CC2, TIM_FLAG_CC2}, // GPIOE
+    {GPIO_PIN_13, TIM_CHANNEL_3, TIM_IT_CC3, TIM_FLAG_CC3}, //
+    {GPIO_PIN_14, TIM_CHANNEL_4, TIM_IT_CC4, TIM_FLAG_CC4}, //
 };
 
 const Tim Timer2[4] = {
-	{GPIO_PIN_0, TIM_CHANNEL_1, TIM_IT_CC1, TIM_FLAG_CC1},
-	{GPIO_PIN_1, TIM_CHANNEL_2, TIM_IT_CC2, TIM_FLAG_CC2}, // GPIOA
-	{GPIO_PIN_2, TIM_CHANNEL_3, TIM_IT_CC3, TIM_FLAG_CC3}, //
-	{GPIO_PIN_3, TIM_CHANNEL_4, TIM_IT_CC4, TIM_FLAG_CC4}, //
+    {GPIO_PIN_0, TIM_CHANNEL_1, TIM_IT_CC1, TIM_FLAG_CC1},
+    {GPIO_PIN_1, TIM_CHANNEL_2, TIM_IT_CC2, TIM_FLAG_CC2}, // GPIOA
+    {GPIO_PIN_2, TIM_CHANNEL_3, TIM_IT_CC3, TIM_FLAG_CC3}, //
+    {GPIO_PIN_3, TIM_CHANNEL_4, TIM_IT_CC4, TIM_FLAG_CC4}, //
 };
 
 const Tim Timer3[4] = {
-	{GPIO_PIN_4, TIM_CHANNEL_1, TIM_IT_CC1, TIM_FLAG_CC1},
-	{GPIO_PIN_5, TIM_CHANNEL_2, TIM_IT_CC2, TIM_FLAG_CC2}, // GPIOB
-	{GPIO_PIN_0, TIM_CHANNEL_3, TIM_IT_CC3, TIM_FLAG_CC3}, //
-	{GPIO_PIN_1, TIM_CHANNEL_4, TIM_IT_CC4, TIM_FLAG_CC4}, //
+		{GPIO_PIN_4, TIM_CHANNEL_1, TIM_IT_CC1, TIM_FLAG_CC1},
+		{GPIO_PIN_5, TIM_CHANNEL_2, TIM_IT_CC2, TIM_FLAG_CC2}, // GPIOB
+		{GPIO_PIN_0, TIM_CHANNEL_3, TIM_IT_CC3, TIM_FLAG_CC3}, //
+		{GPIO_PIN_1, TIM_CHANNEL_4, TIM_IT_CC4, TIM_FLAG_CC4}, //
 };
 
-/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ --------------------------------------------------------------------*/
+/* º¯ÊýÌå --------------------------------------------------------------------*/
 /**
- * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: STEPMOTORï¿½ï¿½ï¿½GPIOï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
- * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½
- * ï¿½ï¿½ ï¿½ï¿½ Öµ: ï¿½ï¿½
- * Ëµ    ï¿½ï¿½: ï¿½ï¿½
+ * º¯Êý¹¦ÄÜ: STEPMOTORÏà¹ØGPIO³õÊ¼»¯ÅäÖÃ
+ * ÊäÈë²ÎÊý: ÎÞ
+ * ·µ »Ø Öµ: ÎÞ
+ * Ëµ    Ã÷: ÎÞ
  */
 void STEPMOTOR_GPIO_Init()
 {
-	uint8_t i = 0;
-	GPIO_InitTypeDef GPIO_InitStruct;
+    uint8_t i = 0;
+    GPIO_InitTypeDef GPIO_InitStruct;
 
-	/* ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Ê±ï¿½ï¿½Ê¹ï¿½ï¿½*/
-	__HAL_RCC_GPIOA_CLK_ENABLE();
-	__HAL_RCC_GPIOB_CLK_ENABLE();
-	__HAL_RCC_GPIOC_CLK_ENABLE();
-	__HAL_RCC_GPIOE_CLK_ENABLE();
+    /* µç»ú¶¨Ê±Æ÷Ê±ÖÓÊ¹ÄÜ*/
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOE_CLK_ENABLE();
 
-	for (i = 0; i < 4; i++)
-	{
-		/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-		GPIO_InitStruct.Pin = Timer8[i].Pulse_Pin;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-		GPIO_InitStruct.Alternate = GPIO_AF3_TIM8;
-		GPIO_InitStruct.Pull = GPIO_PULLUP;
-		HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+    for (i = 0; i < 4; i++)
+    {
+        /* ²½½øµç»úÇý¶¯Æ÷£ºÂö³åÊä³ö */
+        GPIO_InitStruct.Pin = Timer8[i].Pulse_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF3_TIM8;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-		GPIO_InitStruct.Pin = Timer1[i].Pulse_Pin;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-		GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
-		GPIO_InitStruct.Pull = GPIO_PULLUP;
-		HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+        GPIO_InitStruct.Pin = Timer1[i].Pulse_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF1_TIM1;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-		GPIO_InitStruct.Pin = Timer2[i].Pulse_Pin;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-		GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
-		GPIO_InitStruct.Pull = GPIO_PULLUP;
-		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+        GPIO_InitStruct.Pin = Timer2[i].Pulse_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-		GPIO_InitStruct.Pin = Timer3[i].Pulse_Pin;
-		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-		GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
-		GPIO_InitStruct.Pull = GPIO_PULLUP;
-		HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-	}
+        GPIO_InitStruct.Pin = Timer3[i].Pulse_Pin;
+        GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+        GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+        GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
+        GPIO_InitStruct.Pull = GPIO_PULLUP;
+        HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    }
 
-	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  Ä¬ï¿½ï¿½Îªï¿½ï¿½×ª Îª1*/
-	// HAL_GPIO_WritePin(GPIOC,(GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15),GPIO_PIN_RESET);//Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªË³Ê±ï¿½ë·½ï¿½ï¿½
-	GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF0_TRACE;
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+    ///* ²½½øµç»úÇý¶¯Æ÷£º·½Ïò¿ØÖÆ  Ä¬ÈÏÎªÕý×ª Îª1*/
+    GPIO_InitStruct.Pin = GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF0_TRACE;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-	// HAL_GPIO_WritePin(GPIOA, (GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6), GPIO_PIN_RESET); // Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªË³Ê±ï¿½ë·½ï¿½ï¿½
-	GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF0_TRACE;
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    GPIO_InitStruct.Pin = GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF0_TRACE;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-	// HAL_GPIO_WritePin(GPIOE,(GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6),GPIO_PIN_RESET);//Ä¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÎªË³Ê±ï¿½ë·½ï¿½ï¿½
-	GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF0_TRACE;
-	GPIO_InitStruct.Pull = GPIO_PULLUP;
-	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+    GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_6;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF0_TRACE;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-	/* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ü¿ï¿½ï¿½ï¿½ */
-	// HAL_GPIO_WritePin();
-	GPIO_InitStruct.Pin = GPIO_PIN_0;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF0_TRACE;
-	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-	HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+    ///* ²½½øµç»úÇý¶¯Æ÷£ºÊ¹ÄÜ¿ØÖÆ */
+    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF0_TRACE;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
-	GPIO_InitStruct.Pin = GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF0_TRACE;
-	GPIO_InitStruct.Pull = GPIO_PULLDOWN;
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    GPIO_InitStruct.Pin = GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF0_TRACE;
+    GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
 //-------------------------------------------------------------------------
 /**
- * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½
- * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½
- * ï¿½ï¿½ ï¿½ï¿½ Öµ: ï¿½ï¿½
- * Ëµ    ï¿½ï¿½: ï¿½ï¿½
+ * º¯Êý¹¦ÄÜ: ²½½øµç»úÇý¶¯Æ÷¶¨Ê±Æ÷³õÊ¼»¯
+ * ÊäÈë²ÎÊý: ÎÞ
+ * ·µ »Ø Öµ: ÎÞ
+ * Ëµ    Ã÷: ÎÞ
  */
 void STEPMOTOR_TIMx_Init()
 {
 	uint8_t i = 0;
-	TIM_ClockConfigTypeDef sClockSourceConfig; // ï¿½ï¿½Ê±ï¿½ï¿½Ê±ï¿½ï¿½
-	TIM_OC_InitTypeDef sConfigOC;			   // ï¿½ï¿½Ê±ï¿½ï¿½Í¨ï¿½ï¿½ï¿½È½ï¿½ï¿½ï¿½ï¿½
+    TIM_ClockConfigTypeDef sClockSourceConfig; // ¶¨Ê±Æ÷Ê±ÖÓ
+    TIM_OC_InitTypeDef sConfigOC;              // ¶¨Ê±Æ÷Í¨µÀ±È½ÏÊä³ö
 
-	/* STEPMOTORï¿½ï¿½ï¿½GPIOï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
+    /* STEPMOTORÏà¹ØGPIO³õÊ¼»¯ÅäÖÃ */
 	STEPMOTOR_GPIO_Init();
 
 	// TIME 8
 	__HAL_RCC_TIM8_CLK_ENABLE();
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	htimx_STEPMOTOR.Instance = TIM8;							 // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.Prescaler = STEPMOTOR_TIM_PRESCALER;	 // ï¿½ï¿½Ê±ï¿½ï¿½Ô¤ï¿½ï¿½Æµï¿½ï¿½
-	htimx_STEPMOTOR.Init.CounterMode = TIM_COUNTERMODE_UP;		 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.Period = STEPMOTOR_TIM_PERIOD;			 // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // Ê±ï¿½Ó·ï¿½Æµ
+    /* ¶¨Ê±Æ÷»ù±¾»·¾³ÅäÖÃ */
+    htimx_STEPMOTOR.Instance = TIM8;                             // ¶¨Ê±Æ÷±àºÅ
+    htimx_STEPMOTOR.Init.Prescaler = STEPMOTOR_TIM_PRESCALER;    // ¶¨Ê±Æ÷Ô¤·ÖÆµÆ÷
+    htimx_STEPMOTOR.Init.CounterMode = TIM_COUNTERMODE_UP;       // ¼ÆÊý·½Ïò£ºÏòÉÏ¼ÆÊý
+    htimx_STEPMOTOR.Init.Period = STEPMOTOR_TIM_PERIOD;          // ¶¨Ê±Æ÷ÖÜÆÚ
+    htimx_STEPMOTOR.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // Ê±ÖÓ·ÖÆµ
 	HAL_TIM_Base_Init(&htimx_STEPMOTOR);
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½Ê±ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ */
-	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL; // Ê¹ï¿½ï¿½ï¿½Ú²ï¿½Ê±ï¿½ï¿½Ô´
+    /* ¶¨Ê±Æ÷Ê±ÖÓÔ´ÅäÖÃ */
+    sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL; // Ê¹ÓÃÄÚ²¿Ê±ÖÓÔ´
 	HAL_TIM_ConfigClockSource(&htimx_STEPMOTOR, &sClockSourceConfig);
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½ï¿½È½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	sConfigOC.OCMode = TIM_OCMODE_TOGGLE;			 // ï¿½È½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½
-	sConfigOC.Pulse = STEPMOTOR_TIM_PERIOD;			 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;		 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;	 // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;		 // ï¿½ï¿½ï¿½ï¿½Ä£Ê½
-	sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;	 // ï¿½ï¿½ï¿½Ðµï¿½Æ½
-	sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET; // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Æ½
+    /* ¶¨Ê±Æ÷±È½ÏÊä³öÅäÖÃ */
+    sConfigOC.OCMode = TIM_OCMODE_TOGGLE;            // ±È½ÏÊä³öÄ£Ê½£º·´×ªÊä³ö
+    sConfigOC.Pulse = STEPMOTOR_TIM_PERIOD;          // Âö³åÊý
+    sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;      // Êä³ö¼«ÐÔ
+    sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;     // »¥²¹Í¨µÀÊä³ö¼«ÐÔ
+    sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;       // ¿ìËÙÄ£Ê½
+    sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;   // ¿ÕÏÐµçÆ½
+    sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET; // »¥²¹Í¨µÀ¿ÕÏÐµçÆ½
 
-	/* Ê¹ï¿½Ü±È½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ */
+    /* Ê¹ÄÜ±È½ÏÊä³öÍ¨µÀ */
 	for (i = 0; i < 4; i++)
 	{
 		HAL_TIM_OC_Stop_IT(&htimx_STEPMOTOR, Timer8[i].Channel);
@@ -213,39 +200,39 @@ void STEPMOTOR_TIMx_Init()
 		TIM_CCxChannelCmd(TIM8, Timer8[i].Channel, TIM_CCx_DISABLE);
 	}
 
-	/* ï¿½ï¿½ï¿½Ã¶ï¿½Ê±ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ */
+    /* ÅäÖÃ¶¨Ê±Æ÷ÖÐ¶ÏÓÅÏÈ¼¶²¢Ê¹ÄÜ */
 	HAL_NVIC_SetPriority(TIM8_CC_IRQn, 1, 0);
 	HAL_NVIC_EnableIRQ(TIM8_CC_IRQn);
 
 	/* Enable the main output */
 	__HAL_TIM_MOE_ENABLE(&htimx_STEPMOTOR);
-	HAL_TIM_Base_Start(&htimx_STEPMOTOR); // Ê¹ï¿½Ü¶ï¿½Ê±ï¿½ï¿½
+	HAL_TIM_Base_Start(&htimx_STEPMOTOR); // Ê¹ÄÜ¶¨Ê±Æ÷
 	//----------------------------------------------------------------------
 	// TIME 1
 	__HAL_RCC_TIM1_CLK_ENABLE();
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	htimx_STEPMOTOR.Instance = TIM1;							 // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.Prescaler = STEPMOTOR_TIM_PRESCALER;	 // ï¿½ï¿½Ê±ï¿½ï¿½Ô¤ï¿½ï¿½Æµï¿½ï¿½
-	htimx_STEPMOTOR.Init.CounterMode = TIM_COUNTERMODE_UP;		 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.Period = STEPMOTOR_TIM_PERIOD;			 // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // Ê±ï¿½Ó·ï¿½Æµ
+	
+	htimx_STEPMOTOR.Instance = TIM1;							
+	htimx_STEPMOTOR.Init.Prescaler = STEPMOTOR_TIM_PRESCALER;	 
+	htimx_STEPMOTOR.Init.CounterMode = TIM_COUNTERMODE_UP;		 
+	htimx_STEPMOTOR.Init.Period = STEPMOTOR_TIM_PERIOD;			 
+	htimx_STEPMOTOR.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; 
 	HAL_TIM_Base_Init(&htimx_STEPMOTOR);
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½Ê±ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ */
-	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL; // Ê¹ï¿½ï¿½ï¿½Ú²ï¿½Ê±ï¿½ï¿½Ô´
+
+	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL; // 
 	HAL_TIM_ConfigClockSource(&htimx_STEPMOTOR, &sClockSourceConfig);
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½ï¿½È½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	sConfigOC.OCMode = TIM_OCMODE_TOGGLE;			 // ï¿½È½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½
-	sConfigOC.Pulse = STEPMOTOR_TIM_PERIOD;			 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;		 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;	 // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;		 // ï¿½ï¿½ï¿½ï¿½Ä£Ê½
-	sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;	 // ï¿½ï¿½ï¿½Ðµï¿½Æ½
-	sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET; // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Æ½
 
-	/* Ê¹ï¿½Ü±È½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ */
+	sConfigOC.OCMode = TIM_OCMODE_TOGGLE;			 // 
+	sConfigOC.Pulse = STEPMOTOR_TIM_PERIOD;			 // 
+	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;		 // 
+	sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;	 // 
+	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;		 // 
+	sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;	 // 
+	sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET; // 
+
+
 	for (i = 0; i < 4; i++)
 	{
 		HAL_TIM_OC_Stop_IT(&htimx_STEPMOTOR, Timer1[i].Channel);
@@ -253,40 +240,40 @@ void STEPMOTOR_TIMx_Init()
 		TIM_CCxChannelCmd(TIM1, Timer1[i].Channel, TIM_CCx_DISABLE);
 	}
 
-	/* ï¿½ï¿½ï¿½Ã¶ï¿½Ê±ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ */
+
 	HAL_NVIC_SetPriority(TIM1_CC_IRQn, 1, 0);
 	HAL_NVIC_EnableIRQ(TIM1_CC_IRQn);
 
 	/* Enable the main output */
 	__HAL_TIM_MOE_ENABLE(&htimx_STEPMOTOR);
-	HAL_TIM_Base_Start(&htimx_STEPMOTOR); // Ê¹ï¿½Ü¶ï¿½Ê±ï¿½ï¿½
+	HAL_TIM_Base_Start(&htimx_STEPMOTOR); // 
 
 	//----------------------------------------------------------------------
 	// TIME 2
 	__HAL_RCC_TIM2_CLK_ENABLE();
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	htimx_STEPMOTOR.Instance = TIM2;							 // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.Prescaler = STEPMOTOR_TIM_PRESCALER;	 // ï¿½ï¿½Ê±ï¿½ï¿½Ô¤ï¿½ï¿½Æµï¿½ï¿½
-	htimx_STEPMOTOR.Init.CounterMode = TIM_COUNTERMODE_UP;		 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.Period = STEPMOTOR_TIM_PERIOD;			 // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // Ê±ï¿½Ó·ï¿½Æµ
+
+	htimx_STEPMOTOR.Instance = TIM2;							 
+	htimx_STEPMOTOR.Init.Prescaler = STEPMOTOR_TIM_PRESCALER;	 
+	htimx_STEPMOTOR.Init.CounterMode = TIM_COUNTERMODE_UP;		 
+	htimx_STEPMOTOR.Init.Period = STEPMOTOR_TIM_PERIOD;			 
+	htimx_STEPMOTOR.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; 
 	HAL_TIM_Base_Init(&htimx_STEPMOTOR);
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½Ê±ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ */
-	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL; // Ê¹ï¿½ï¿½ï¿½Ú²ï¿½Ê±ï¿½ï¿½Ô´
+
+	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL; 
 	HAL_TIM_ConfigClockSource(&htimx_STEPMOTOR, &sClockSourceConfig);
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½ï¿½È½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	sConfigOC.OCMode = TIM_OCMODE_TOGGLE;			 // ï¿½È½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½
-	sConfigOC.Pulse = STEPMOTOR_TIM_PERIOD;			 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;		 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;	 // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;		 // ï¿½ï¿½ï¿½ï¿½Ä£Ê½
-	sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;	 // ï¿½ï¿½ï¿½Ðµï¿½Æ½
-	sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET; // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Æ½
 
-	/* Ê¹ï¿½Ü±È½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ */
+	sConfigOC.OCMode = TIM_OCMODE_TOGGLE;			 
+	sConfigOC.Pulse = STEPMOTOR_TIM_PERIOD;			 
+	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;		 
+	sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;	 
+	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;		 
+	sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;	 
+	sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET; 
+
+
 	for (i = 0; i < 4; i++)
 	{
 		HAL_TIM_OC_Stop_IT(&htimx_STEPMOTOR, Timer2[i].Channel);
@@ -294,40 +281,40 @@ void STEPMOTOR_TIMx_Init()
 		TIM_CCxChannelCmd(TIM2, Timer2[i].Channel, TIM_CCx_DISABLE);
 	}
 
-	/* ï¿½ï¿½ï¿½Ã¶ï¿½Ê±ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ */
+
 	HAL_NVIC_SetPriority(TIM2_IRQn, 1, 1);
 	HAL_NVIC_EnableIRQ(TIM2_IRQn);
 
 	/* Enable the main output */
 	//	__HAL_TIM_MOE_ENABLE(&htimx_STEPMOTOR);
-	HAL_TIM_Base_Start(&htimx_STEPMOTOR); // Ê¹ï¿½Ü¶ï¿½Ê±ï¿½ï¿½
+	HAL_TIM_Base_Start(&htimx_STEPMOTOR); // 
 
 	//----------------------------------------------------------------------
 	// TIME 3
 	__HAL_RCC_TIM3_CLK_ENABLE();
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	htimx_STEPMOTOR.Instance = TIM3;							 // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.Prescaler = STEPMOTOR_TIM_PRESCALER;	 // ï¿½ï¿½Ê±ï¿½ï¿½Ô¤ï¿½ï¿½Æµï¿½ï¿½
-	htimx_STEPMOTOR.Init.CounterMode = TIM_COUNTERMODE_UP;		 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.Period = STEPMOTOR_TIM_PERIOD;			 // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	htimx_STEPMOTOR.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // Ê±ï¿½Ó·ï¿½Æµ
+
+	htimx_STEPMOTOR.Instance = TIM3;							 // 
+	htimx_STEPMOTOR.Init.Prescaler = STEPMOTOR_TIM_PRESCALER;	 // 
+	htimx_STEPMOTOR.Init.CounterMode = TIM_COUNTERMODE_UP;		 // 
+	htimx_STEPMOTOR.Init.Period = STEPMOTOR_TIM_PERIOD;			 // 
+	htimx_STEPMOTOR.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // 
 	HAL_TIM_Base_Init(&htimx_STEPMOTOR);
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½Ê±ï¿½ï¿½Ô´ï¿½ï¿½ï¿½ï¿½ */
-	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL; // Ê¹ï¿½ï¿½ï¿½Ú²ï¿½Ê±ï¿½ï¿½Ô´
+
+	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL; // 
 	HAL_TIM_ConfigClockSource(&htimx_STEPMOTOR, &sClockSourceConfig);
 
-	/* ï¿½ï¿½Ê±ï¿½ï¿½ï¿½È½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	sConfigOC.OCMode = TIM_OCMODE_TOGGLE;			 // ï¿½È½ï¿½ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½
-	sConfigOC.Pulse = STEPMOTOR_TIM_PERIOD;			 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;		 // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;	 // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;		 // ï¿½ï¿½ï¿½ï¿½Ä£Ê½
-	sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;	 // ï¿½ï¿½ï¿½Ðµï¿½Æ½
-	sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET; // ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½Æ½
 
-	/* Ê¹ï¿½Ü±È½ï¿½ï¿½ï¿½ï¿½Í¨ï¿½ï¿½ */
+	sConfigOC.OCMode = TIM_OCMODE_TOGGLE;			 // 
+	sConfigOC.Pulse = STEPMOTOR_TIM_PERIOD;			 // 
+	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;		 // 
+	sConfigOC.OCNPolarity = TIM_OCNPOLARITY_LOW;	 // 
+	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;		 // 
+	sConfigOC.OCIdleState = TIM_OCIDLESTATE_RESET;	 // 
+	sConfigOC.OCNIdleState = TIM_OCNIDLESTATE_RESET; // 
+
+
 	for (i = 0; i < 4; i++)
 	{
 		HAL_TIM_OC_Stop_IT(&htimx_STEPMOTOR, Timer3[i].Channel);
@@ -335,57 +322,59 @@ void STEPMOTOR_TIMx_Init()
 		TIM_CCxChannelCmd(TIM3, Timer3[i].Channel, TIM_CCx_DISABLE);
 	}
 
-	/* ï¿½ï¿½ï¿½Ã¶ï¿½Ê±ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ */
+
 	HAL_NVIC_SetPriority(TIM3_IRQn, 1, 1);
 	HAL_NVIC_EnableIRQ(TIM3_IRQn);
 
 	/* Enable the main output */
 	//	__HAL_TIM_MOE_ENABLE(&htimx_STEPMOTOR);
-	HAL_TIM_Base_Start(&htimx_STEPMOTOR); // Ê¹ï¿½Ü¶ï¿½Ê±ï¿½ï¿½
+	HAL_TIM_Base_Start(&htimx_STEPMOTOR); // 
 }
 /*-------------------------------------------------------------------------*/
 /**
- * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ð¶Ï»Øµï¿½ï¿½ï¿½ï¿½ï¿½
- * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½: ï¿½ï¿½
- * ï¿½ï¿½ ï¿½ï¿½ Öµ: ï¿½ï¿½
- * Ëµ    ï¿½ï¿½: Êµï¿½Ö¼Ó¼ï¿½ï¿½Ù¹ï¿½ï¿½ï¿½
+ * º¯Êý¹¦ÄÜ: ¶¨Ê±Æ÷ÖÐ¶Ï»Øµ÷º¯Êý
+ * ÊäÈë²ÎÊý: ÎÞ
+ * ·µ »Ø Öµ: ÎÞ
+ * Ëµ    Ã÷: ÊµÏÖ¼Ó¼õËÙ¹ý³Ì
  */
 
 void TIM_Callback(uint8_t num)
 {
-	__IO static uint16_t tim_count = 0;
+	__IO  uint16_t tim_count = 0;
 	__IO uint32_t new_step_delay = 0;
 	__IO static uint8_t i[MOTONUM] = {0};
 	__IO static uint16_t last_accel_delay[MOTONUM] = {0};
-	// ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    // ×ÜÒÆ¶¯²½Êý¼ÆÊýÆ÷
 	__IO static uint32_t step_count[MOTONUM] = {0};
-	// ï¿½ï¿½Â¼new_step_delayï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½
+    // ¼ÇÂ¼new_step_delayÖÐµÄÓàÊý£¬Ìá¸ßÏÂÒ»²½¼ÆËãµÄ¾«¶È
 	__IO static int32_t rest[MOTONUM] = {0};
-	// ï¿½ï¿½Ê±ï¿½ï¿½Ê¹ï¿½Ã·ï¿½×ªÄ£Ê½ï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶Ï²ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    // ¶¨Ê±Æ÷Ê¹ÓÃ·­×ªÄ£Ê½£¬ÐèÒª½øÈëÁ½´ÎÖÐ¶Ï²ÅÊä³öÒ»¸öÍêÕûÂö³å
 
-	// ï¿½ï¿½ï¿½Ã±È½ï¿½Öµ
+    // ÉèÖÃ±È½ÏÖµ
 
 	tim_count = TIM_GetCompare(num);
 	tim_count += (srd[num].step_delay / 2);
 	TIM_SetCompare(num, tim_count);
 
-	i[num]++;		 // ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ð¶Ï´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
-	if (i[num] == 2) // 2ï¿½Î£ï¿½Ëµï¿½ï¿½ï¿½Ñ¾ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	i[num]++;		 //  ¶¨Ê±Æ÷ÖÐ¶Ï´ÎÊý¼ÆÊýÖµ
+	if (i[num] == 2) // 2´Î£¬ËµÃ÷ÒÑ¾­Êä³öÒ»¸öÍêÕûÂö³å
 	{
-		i[num] = 0;					// ï¿½ï¿½ï¿½ã¶¨Ê±ï¿½ï¿½ï¿½Ð¶Ï´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
-		switch (srd[num].run_state) // ï¿½Ó¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß½×¶ï¿½
+		i[num] = 0;					// ÇåÁã¶¨Ê±Æ÷ÖÐ¶Ï´ÎÊý¼ÆÊýÖµ
+		switch (srd[num].run_state) // ¼Ó¼õËÙÇúÏß½×¶Î
 		{
 		case STOP:
 
-			Moto[num].MotionStatus = STOP; //  ï¿½ï¿½ï¿½ÎªÍ£Ö¹×´Ì¬
-			step_count[num] = 0;		   // ï¿½ï¿½ï¿½ã²½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-			rest[num] = 0;				   // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
+			Moto[num].MotionStatus = STOP; //  µç»úÎªÍ£Ö¹×´Ì¬
+			step_count[num] = 0;		   // ÇåÁã²½Êý¼ÆÊýÆ÷
+			rest[num] = 0;				   // ÇåÁãÓàÖµ
 			last_accel_delay[num] = 0;
 			srd[num].accel_count = 0;
 			srd[num].step_delay = 0;
 			srd[num].min_delay = 0;
-			// ï¿½Ø±ï¿½Í¨ï¿½ï¿½
-			TIMControl(num, 0);
+			
+			// close channle
+			TIMControl(num, 0);	
+
 
 			//////////////////////////////////////////////////
 			if (srd[num].lock == 1)
@@ -406,73 +395,74 @@ void TIM_Callback(uint8_t num)
 			}
 			///////////////////////////////////////////////
 
-			step_count[num]++; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1
+			step_count[num]++; // ²½Êý¼Ó1
 			if (srd[num].dir == Moto_For)
 			{
-				step_position[num]++; // ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã¼ï¿½1
+				step_position[num]++; // ¾ø¶ÔÎ»ÖÃ¼Ó1
 			}
 			else
 			{
-				step_position[num]--; // ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã¼ï¿½1
+				step_position[num]--; // ¾ø¶ÔÎ»ÖÃ¼õ1
 			}
-			srd[num].accel_count++; // ï¿½ï¿½ï¿½Ù¼ï¿½ï¿½ï¿½Öµï¿½ï¿½1
+			srd[num].accel_count++; // ¼ÓËÙ¼ÆÊýÖµ¼Ó1
 
-			new_step_delay = srd[num].step_delay - (((2 * srd[num].step_delay) + rest[num]) / (4 * srd[num].accel_count + 1)); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½)Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(Ê±ï¿½ï¿½ï¿½ï¿½)
-			rest[num] = ((2 * srd[num].step_delay) + rest[num]) % (4 * srd[num].accel_count + 1);							   // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â´Î¼ï¿½ï¿½ã²¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			new_step_delay = srd[num].step_delay - (((2 * srd[num].step_delay) + rest[num]) / (4 * srd[num].accel_count + 1)); // ¼ÆËãÐÂ(ÏÂ)Ò»²½Âö³åÖÜÆÚ(Ê±¼ä¼ä¸ô)
+			rest[num] = ((2 * srd[num].step_delay) + rest[num]) % (4 * srd[num].accel_count + 1);							   // ¼ÆËãÓàÊý£¬ÏÂ´Î¼ÆËã²¹ÉÏÓàÊý£¬¼õÉÙÎó²î
 
-			if (step_count[num] >= srd[num].decel_start) // ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Ó¦ï¿½Ã¿ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
+			if (step_count[num] >= srd[num].decel_start) // ¼ì²éÊÇ·ñÓ¦¸Ã¿ªÊ¼¼õËÙ
 			{
-				srd[num].accel_count = srd[num].decel_val; // ï¿½ï¿½ï¿½Ù¼ï¿½ï¿½ï¿½ÖµÎªï¿½ï¿½ï¿½Ù½×¶Î¼ï¿½ï¿½ï¿½Öµï¿½Ä³ï¿½Ê¼Öµ
-				srd[num].run_state = DECEL;				   // ï¿½Â¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù½×¶ï¿½
+				srd[num].accel_count = srd[num].decel_val; // ¼ÓËÙ¼ÆÊýÖµÎª¼õËÙ½×¶Î¼ÆÊýÖµµÄ³õÊ¼Öµ
+				srd[num].run_state = DECEL;				   // ÏÂ¸öÂö³å½øÈë¼õËÙ½×¶Î
 			}
-			else if (new_step_delay <= srd[num].min_delay) // ï¿½ï¿½ï¿½ï¿½Ç·ñµ½´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+			else if (new_step_delay <= srd[num].min_delay) // ¼ì²éÊÇ·ñµ½´ïÆÚÍûµÄ×î´óËÙ¶È
 			{
-				srd[num].accel_count = srd[num].decel_val; // ï¿½ï¿½ï¿½Ù¼ï¿½ï¿½ï¿½ÖµÎªï¿½ï¿½ï¿½Ù½×¶Î¼ï¿½ï¿½ï¿½Öµï¿½Ä³ï¿½Ê¼Öµ
-				last_accel_delay[num] = new_step_delay;	   // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½
-				new_step_delay = srd[num].min_delay;	   // Ê¹ï¿½ï¿½min_delayï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½speedï¿½ï¿½
-				rest[num] = 0;							   // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
-				srd[num].run_state = RUN;				   // ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬
+				srd[num].accel_count = srd[num].decel_val; // ¼ÓËÙ¼ÆÊýÖµÎª¼õËÙ½×¶Î¼ÆÊýÖµµÄ³õÊ¼Öµ
+				last_accel_delay[num] = new_step_delay;	   // ±£´æ¼ÓËÙ¹ý³ÌÖÐ×îºóÒ»´ÎÑÓÊ±£¨Âö³åÖÜÆÚ£©
+				new_step_delay = srd[num].min_delay;	   // Ê¹ÓÃmin_delay£¨¶ÔÓ¦×î´óËÙ¶Èspeed£©
+				rest[num] = 0;							   // ÇåÁãÓàÖµ
+				srd[num].run_state = RUN;				   // ÉèÖÃÎªÔÈËÙÔËÐÐ×´Ì¬
 			}
-			last_accel_delay[num] = new_step_delay; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú£ï¿½
+			last_accel_delay[num] = new_step_delay; // ±£´æ¼ÓËÙ¹ý³ÌÖÐ×îºóÒ»´ÎÑÓÊ±£¨Âö³åÖÜÆÚ£©
 			break;
 
 		case RUN:
-			step_count[num]++; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1
+			step_count[num]++; // ²½Êý¼Ó1
 			if (srd[num].dir == Moto_For)
 			{
-				step_position[num]++; // ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã¼ï¿½1
+				step_position[num]++; // ¾ø¶ÔÎ»ÖÃ¼Ó1
 			}
 			else
 			{
-				step_position[num]--; // ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã¼ï¿½1
+				step_position[num]--; // ¾ø¶ÔÎ»ÖÃ¼õ1
 			}
-			new_step_delay = srd[num].min_delay;		 // Ê¹ï¿½ï¿½min_delayï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
-			if (step_count[num] >= srd[num].decel_start) // ï¿½ï¿½Òªï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
+			new_step_delay = srd[num].min_delay;		 // Ê¹ÓÃmin_delay£¨¶ÔÓ¦×î´óËÙ¶È
+			if (step_count[num] >= srd[num].decel_start) // ÐèÒª¿ªÊ¼¼õËÙ
 			{
-				srd[num].accel_count = srd[num].decel_val; // ï¿½ï¿½ï¿½Ù²ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½Ù¼ï¿½ï¿½ï¿½Öµ
-				new_step_delay = last_accel_delay[num];	   // ï¿½Ó½×¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½Îªï¿½ï¿½ï¿½Ù½×¶Îµï¿½ï¿½ï¿½Ê¼ï¿½ï¿½Ê±(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
-				srd[num].run_state = DECEL;				   // ×´Ì¬ï¿½Ä±ï¿½Îªï¿½ï¿½ï¿½ï¿½
+				srd[num].accel_count = srd[num].decel_val; // ¼õËÙ²½Êý×öÎª¼ÓËÙ¼ÆÊýÖµ
+				new_step_delay = last_accel_delay[num];	   // ¼Ó½×¶Î×îºóµÄÑÓÊ±×öÎª¼õËÙ½×¶ÎµÄÆðÊ¼ÑÓÊ±(Âö³åÖÜÆÚ)
+				srd[num].run_state = DECEL;				   // ×´Ì¬¸Ä±äÎª¼õËÙ
 			}
 			break;
 
 		case DECEL:
-			step_count[num]++; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½1
+			step_count[num]++; // ²½Êý¼Ó1
 			if (srd[num].dir == Moto_For)
 			{
-				step_position[num]++; // ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã¼ï¿½1
+				step_position[num]++; // ¾ø¶ÔÎ»ÖÃ¼Ó1
 			}
 			else
 			{
-				step_position[num]--; // ï¿½ï¿½ï¿½ï¿½Î»ï¿½Ã¼ï¿½1
+				step_position[num]--; // ¾ø¶ÔÎ»ÖÃ¼õ1
 			}
 			srd[num].accel_count++;
-			new_step_delay = srd[num].step_delay - (((2 * srd[num].step_delay) + rest[num]) / (4 * srd[num].accel_count + 1)); ////ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(ï¿½ï¿½)Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(Ê±ï¿½ï¿½ï¿½ï¿½)
-			rest[num] = ((2 * srd[num].step_delay) + rest[num]) % (4 * srd[num].accel_count + 1);							   // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â´Î¼ï¿½ï¿½ã²¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+			new_step_delay = srd[num].step_delay - (((2 * srd[num].step_delay) + rest[num]) / (4 * srd[num].accel_count + 1)); //¼ÆËãÐÂ(ÏÂ)Ò»²½Âö³åÖÜÆÚ(Ê±¼ä¼ä¸ô)
+			rest[num] = ((2 * srd[num].step_delay) + rest[num]) % (4 * srd[num].accel_count + 1);							   // ¼ÆËãÓàÊý£¬ÏÂ´Î¼ÆËã²¹ÉÏÓàÊý£¬¼õÉÙÎó²î
 
-			// ï¿½ï¿½ï¿½ï¿½Ç·ï¿½Îªï¿½ï¿½ï¿½Ò»ï¿½ï¿½
+			// ¼ì²éÊÇ·ñÎª×îºóÒ»²½
 			if (srd[num].accel_count >= 0)
 			{
 				srd[num].run_state = STOP;
+               
 			}
 			break;
 		}
@@ -480,13 +470,15 @@ void TIM_Callback(uint8_t num)
 		{
 			new_step_delay = 0x1FFFF;
 		}
-		srd[num].step_delay = new_step_delay; // Îªï¿½Â¸ï¿½(ï¿½Âµï¿½)ï¿½ï¿½Ê±(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½Öµ
+		srd[num].step_delay = new_step_delay; // ÎªÏÂ¸ö(ÐÂµÄ)ÑÓÊ±(Âö³åÖÜÆÚ)¸³Öµ
 	}
 }
 
 /*-------------------------------------------------------------------------*/
 void TIM8_CC_IRQHandler(void)
 {
+	TIM_HandleTypeDef htimx_STEPMOTOR;
+	TIM_HandleTypeDef* htim = &htimx_STEPMOTOR;
 	htimx_STEPMOTOR.Instance = TIM8;
 	/* Capture compare 1 event */
 	if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC1) != RESET)
@@ -559,6 +551,8 @@ void TIM8_CC_IRQHandler(void)
 void TIM1_CC_IRQHandler(void)
 {
 
+		TIM_HandleTypeDef htimx_STEPMOTOR;
+	TIM_HandleTypeDef* htim = &htimx_STEPMOTOR;
 	htimx_STEPMOTOR.Instance = TIM1;
 	/* Capture compare 1 event */
 	if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC1) != RESET)
@@ -620,6 +614,7 @@ void TIM1_CC_IRQHandler(void)
 			{
 				Moto_Dir_Set(1, Moto[1].MotoDir);
 			}
+
 			/* Output compare event */
 			TIM_Callback(1);
 		}
@@ -629,6 +624,8 @@ void TIM1_CC_IRQHandler(void)
 /*-------------------------------------------------------------------------*/
 void TIM2_IRQHandler(void)
 {
+		TIM_HandleTypeDef htimx_STEPMOTOR;
+	TIM_HandleTypeDef* htim = &htimx_STEPMOTOR;
 	htimx_STEPMOTOR.Instance = TIM2;
 	/* Capture compare 1 event */
 	if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC1) != RESET)
@@ -700,6 +697,8 @@ void TIM2_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
 
+		TIM_HandleTypeDef htimx_STEPMOTOR;
+	TIM_HandleTypeDef* htim = &htimx_STEPMOTOR;
 	htimx_STEPMOTOR.Instance = TIM3;
 	/* Capture compare 1 event */
 	if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_CC1) != RESET)
@@ -770,37 +769,32 @@ void TIM3_IRQHandler(void)
 /*-------------------------------------------------------------------------*/
 
 //-------------------------------------------------------------------------
-// Í¨ï¿½Ã¶ï¿½Ê±ï¿½ï¿½ï¿½Ð¶Ï³ï¿½Ê¼ï¿½ï¿½,ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½APB1ï¿½Ï£ï¿½APB1ï¿½Ä¶ï¿½Ê±ï¿½ï¿½Ê±ï¿½ï¿½Îª200MHz
-// arrï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½×°Öµï¿½ï¿½
-// pscï¿½ï¿½Ê±ï¿½ï¿½Ô¤ï¿½ï¿½Æµï¿½ï¿½
-// ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ã·½ï¿½ï¿½:Tout=((arr+1)*(psc+1))/Ft us.
-// Ft=ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½,ï¿½ï¿½Î»:Mhz
-// ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½Ãµï¿½ï¿½Ç¶ï¿½Ê±ï¿½ï¿½3!(ï¿½ï¿½Ê±ï¿½ï¿½3ï¿½ï¿½ï¿½ï¿½APB1ï¿½Ï£ï¿½Ê±ï¿½ï¿½ÎªHCLK/2)
+
 void TIM4_Init(u16 arr, u16 psc)
 {
-	TIM4_Handler.Instance = TIM4;							  // Í¨ï¿½Ã¶ï¿½Ê±ï¿½ï¿½
-	TIM4_Handler.Init.Prescaler = psc;						  // ï¿½ï¿½Æµ
-	TIM4_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;		  // ï¿½ï¿½ï¿½Ï¼ï¿½ï¿½ï¿½ï¿½ï¿½
-	TIM4_Handler.Init.Period = arr;							  // ï¿½Ô¶ï¿½×°ï¿½ï¿½Öµ
-	TIM4_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // Ê±ï¿½Ó·ï¿½Æµï¿½ï¿½ï¿½ï¿½
+    TIM4_Handler.Instance = TIM4;                             // Í¨ÓÃ¶¨Ê±Æ÷
+    TIM4_Handler.Init.Prescaler = psc;                        // ·ÖÆµ
+    TIM4_Handler.Init.CounterMode = TIM_COUNTERMODE_UP;       // ÏòÉÏ¼ÆÊýÆ÷
+    TIM4_Handler.Init.Period = arr;                           // ×Ô¶¯×°ÔØÖµ
+    TIM4_Handler.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1; // Ê±ÖÓ·ÖÆµÒò×Ó
 	HAL_TIM_Base_Init(&TIM4_Handler);
 
-	HAL_TIM_Base_Start_IT(&TIM4_Handler); // Ê¹ï¿½Ü¶ï¿½Ê±ï¿½ï¿½ï¿½Í¶ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶Ï£ï¿½TIM_IT_UPDATE
+	HAL_TIM_Base_Start_IT(&TIM4_Handler); // Ê¹ÄÜ¶¨Ê±Æ÷ºÍ¶¨Ê±Æ÷¸üÐÂÖÐ¶Ï£ºTIM_IT_UPDATE
 }
 
-// ï¿½ï¿½Ê±ï¿½ï¿½ï¿½×²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½Ó£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½È¼ï¿½
-// ï¿½Ëºï¿½ï¿½ï¿½ï¿½á±»HAL_TIM_Base_Init()ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// ¶¨Ê±Æ÷µ×²áÇý¶¯£¬¿ªÆôÊ±ÖÓ£¬ÉèÖÃÖÐ¶ÏÓÅÏÈ¼¶
+// ´Ëº¯Êý»á±»HAL_TIM_Base_Init()º¯Êýµ÷ÓÃ
 void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim)
 {
 	if (htim->Instance == TIM4)
 	{
-		__HAL_RCC_TIM4_CLK_ENABLE();		   // Ê¹ï¿½ï¿½TIMÊ±ï¿½ï¿½
-		HAL_NVIC_SetPriority(TIM4_IRQn, 1, 3); // ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½ï¿½ï¿½Õ¼ï¿½ï¿½ï¿½È¼ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½3
-		HAL_NVIC_EnableIRQ(TIM4_IRQn);		   // ï¿½ï¿½ï¿½ï¿½ITMï¿½Ð¶ï¿½
+        __HAL_RCC_TIM4_CLK_ENABLE();           // Ê¹ÄÜTIMÊ±ÖÓ
+        HAL_NVIC_SetPriority(TIM4_IRQn, 2, 3); // ÉèÖÃÖÐ¶ÏÓÅÏÈ¼¶£¬ÇÀÕ¼ÓÅÏÈ¼¶1£¬×ÓÓÅÏÈ¼¶3
+        HAL_NVIC_EnableIRQ(TIM4_IRQn);         // ¿ªÆôITMÖÐ¶Ï
 	}
 }
 
-// ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ð¶Ï·ï¿½ï¿½ï¿½ï¿½ï¿½
+// ¶¨Ê±Æ÷ÖÐ¶Ï·þÎñº¯Êý
 void TIM4_IRQHandler(void)
 {
 	HAL_TIM_IRQHandler(&TIM4_Handler);
@@ -808,7 +802,7 @@ void TIM4_IRQHandler(void)
 
 uint8_t state[16] = {0};
 uint8_t tx_data[32] = {0};
-// ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ð¶Ï·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+// ¶¨Ê±Æ÷ÖÐ¶Ï·þÎñº¯Êýµ÷ÓÃ
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if (htim == (&TIM4_Handler))

@@ -3,7 +3,7 @@
 /*
  * GPIO set
  NUM vlaue: 0 ~15
- value ï¿½ï¿½   0 low level
+ value :   0 low level
 	  :  1 high level
  */
 void NMOS_Value_Set(uint8_t num, uint8_t val)
@@ -178,44 +178,44 @@ void NMOS_Init(void)
 
 	GPIO_InitTypeDef GPIO_InitStructure;
 
-	__HAL_RCC_GPIOA_CLK_ENABLE(); // ï¿½ï¿½ï¿½ï¿½GPIOAÊ±ï¿½ï¿½
-	__HAL_RCC_GPIOB_CLK_ENABLE(); // ï¿½ï¿½ï¿½ï¿½GPIOÊ±ï¿½ï¿½
-	__HAL_RCC_GPIOC_CLK_ENABLE(); // ï¿½ï¿½ï¿½ï¿½GPIOÊ±ï¿½ï¿½
-	__HAL_RCC_GPIOD_CLK_ENABLE(); // ï¿½ï¿½ï¿½ï¿½GPIOÊ±ï¿½ï¿½
-	__HAL_RCC_GPIOE_CLK_ENABLE(); // ï¿½ï¿½ï¿½ï¿½GPIOÊ±ï¿½ï¿½
+	__HAL_RCC_GPIOA_CLK_ENABLE(); // ¿ªÆôGPIOAÊ±ÖÓ
+	__HAL_RCC_GPIOB_CLK_ENABLE(); // B
+	__HAL_RCC_GPIOC_CLK_ENABLE(); // C
+	__HAL_RCC_GPIOD_CLK_ENABLE(); // D
+	__HAL_RCC_GPIOE_CLK_ENABLE(); // E
 
 	/*GPIOA*/
 	GPIO_InitStructure.Pin = GPIO_PIN_7 | GPIO_PIN_15;
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	 /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH; /* ï¿½ï¿½ï¿½ï¿½ */
-	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		 /* ï¿½ï¿½ï¿½ï¿½ */
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);		 // ï¿½ï¿½Ê¼ï¿½ï¿½GPIO
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	 /* ÍÆÍìÊä³ö */
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH; /* ¸ßËÙ */
+	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		 /* ÏÂÀ­ */
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);		 // ³õÊ¼»¯GPIO
 
 	/*GPIOB*/
 	GPIO_InitStructure.Pin = GPIO_PIN_2 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	 /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH; /* ï¿½ï¿½ï¿½ï¿½ */
-	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		 /* ï¿½ï¿½ï¿½ï¿½ */
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);		 // ï¿½ï¿½Ê¼ï¿½ï¿½GPIO
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	 
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH; 
+	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		 
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);		 // 
 
 	/*GPIOC*/
 	GPIO_InitStructure.Pin = GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	 /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH; /* ï¿½ï¿½ï¿½ï¿½ */
-	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		 /* ï¿½ï¿½ï¿½ï¿½ */
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);		 // ï¿½ï¿½Ê¼ï¿½ï¿½GPIO
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	  
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;   
+	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		  
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);		 // 
 
 	/*GPIOD*/
 	GPIO_InitStructure.Pin = GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14;
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	 /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH; /* ï¿½ï¿½ï¿½ï¿½ */
-	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		 /* ï¿½ï¿½ï¿½ï¿½ */
-	HAL_GPIO_Init(GPIOD, &GPIO_InitStructure);		 // ï¿½ï¿½Ê¼ï¿½ï¿½GPIO
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	  
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;  
+	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		  
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStructure);		 
 
 	/*GPIOE*/
 	GPIO_InitStructure.Pin = GPIO_PIN_15;
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	 /* ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ */
-	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH; /* ï¿½ï¿½ï¿½ï¿½ */
-	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		 /* ï¿½ï¿½ï¿½ï¿½ */
-	HAL_GPIO_Init(GPIOE, &GPIO_InitStructure);		 // ï¿½ï¿½Ê¼ï¿½ï¿½GPIO
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	 
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH; 
+	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		 
+	HAL_GPIO_Init(GPIOE, &GPIO_InitStructure);		
 }

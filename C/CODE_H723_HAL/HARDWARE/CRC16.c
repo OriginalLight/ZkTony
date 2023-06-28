@@ -1,7 +1,7 @@
 #include "crc16.h"
 
 
-// const uint16_t crc_ta_8[256]={ /* CRC �ֽ���ʽ�� */
+// const uint16_t crc_ta_8[256]={ /* CRC ???????? */
 //     0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
 //     0x8108, 0x9129, 0xa14a, 0xb16b, 0xc18c, 0xd1ad, 0xe1ce, 0xf1ef,
 //     0x1231, 0x0210, 0x3273, 0x2252, 0x52b5, 0x4294, 0x72f7, 0x62d6,
@@ -36,7 +36,7 @@
 //     0x6e17, 0x7e36, 0x4e55, 0x5e74, 0x2e93, 0x3eb2, 0x0ed1, 0x1ef0
 // };
  
- /* CRC��ʽ�� */
+ /* CRC????? */
 const unsigned int crc_table[256] = {
     0x0000, 0xc0c1, 0xc181, 0x0140, 0xc301, 0x03c0, 0x0280, 0xc241,
     0xc601, 0x06c0, 0x0780, 0xc741, 0x0500, 0xc5c1, 0xc481, 0x0440,
@@ -72,11 +72,11 @@ const unsigned int crc_table[256] = {
     0x8201, 0x42c0, 0x4380, 0x8341, 0x4100, 0x81c1, 0x8081, 0x4040,
 };
  
-/*�������ƣ�crc_cal_by_byte;���ֽڼ���CRC
-  ����������uint8_t *ptr:ָ���ͻ����������ֽ�
-            uint32_t len:Ҫ���͵����ֽ���
-  ��������ֵ��uint16_t
-  ����ʽ����CRC-CCITT 0x1021 (false�� δȷ��)
+/*函数名称：crc_cal_by_byte;按字节计算CRC
+  函数参数：uint8_t *ptr:指向发送缓冲区的首字节
+            uint32_t len:要发送的总字节数
+  函数返回值：uint16_t
+  多项式采用CRC-CCITT 0x1021 (false版 未确认)
 */
 // uint16_t crc_cal_by_byte(uint8_t *ptr, uint32_t len)
 // {
@@ -84,7 +84,7 @@ const unsigned int crc_table[256] = {
  
 //     while(len-- != 0)
 //     {
-//         uint16_t high = (unsigned int)(crc/256); //ȡCRC��8λ
+//         uint16_t high = (unsigned int)(crc/256); //取CRC高8位
 //         crc <<= 8;
 //         crc ^= crc_ta_8[high^*ptr];
 //         ptr++;
@@ -94,10 +94,10 @@ const unsigned int crc_table[256] = {
 // }
 
 
-///////////CRC MODBUS  ��λ��ǰ����λ�ں� //    
+///////////CRC MODBUS  低位在前，高位在后 //    
 
 
-//���������crc
+//查表法计算crc
 unsigned short do_crc_table(unsigned char *ptr, int len)
 {
     unsigned short crc = 0xFFFF;

@@ -8,9 +8,9 @@
 #include "cmd_queue.h"
 #include "exti.h"
 
-/* å¤–éƒ¨æ™¶æŒ¯ä¸º8M
+/* Íâ²¿¾§ÕñÎª8M
 :plln=250,pllm=2,pllp=2,pllq=4.
-//å¾—åˆ°:Fvco=8*(250/2)=1000Mhz
+//µÃµ½:Fvco=8*(250/2)=1000Mhz
 //     Fsys=1000/2=500Mhz
 //     Fq=1000/2=500Mhz
 */
@@ -19,24 +19,26 @@ extern uint16_t Cmd_Cnt;
 extern uint8_t cmd_buffer[CMD_MAX_SIZE];
 
 extern uint8_t Frame_flag;
+extern AckPack pack[2];
+extern  int32_t step_position[MOTONUM];
 
 int main(void)
 {
-	Cache_Enable();					// æ‰“å¼€L1-Cache
-	HAL_Init();						// åˆå§‹åŒ–HALåº“
-	Stm32_Clock_Init(250, 2, 2, 4); // 250, 2, 2, 4 è®¾ç½®æ—¶é’Ÿ,500Mhz  
-	delay_init(500);				// å»¶æ—¶åˆå§‹åŒ–
-	uart_init(115200);				// ä¸²å£åˆå§‹åŒ–
+	Cache_Enable();					// ´ò¿ªL1-Cache
+	HAL_Init();						// ³õÊ¼»¯HAL¿â
+	Stm32_Clock_Init(250, 2, 2, 4); // 250, 2, 2, 4 ÉèÖÃÊ±ÖÓ,500Mhz  
+	delay_init(500);				// ÑÓÊ±³õÊ¼»¯
+	uart_init(115200);				// ´®¿Ú³õÊ¼»¯
 
 	EXTIX_Init();
 	STEPMOTOR_TIMx_Init();
 	TIM4_Init(5000 - 1, 125 - 1);
-
+	printf("test\n");
 	while (1)
 	{
 		EXTI_Check();
 
-		if (Frame_flag) // æ¥æ”¶åˆ°ä¸€ä¸ªå®Œæ•´æ•°æ®å¸§
+		if (Frame_flag) // ½ÓÊÕµ½Ò»¸öÍêÕûÊı¾İÖ¡
 		{
 			uint8_t size = queue_find_cmd(cmd_buffer, CMD_MAX_SIZE);
 
@@ -52,6 +54,22 @@ int main(void)
 			CmdProcess(); // DO command
 			DoComEvent = NO_COMEVENT;
 		}
+
+	if(1 == pack[0].flag)
+	{
+		USART3_Send(pack[0].data, pack[0].datalen);
+		printf("%d\n",step_position[pack[0].data[5]]);
+		pack[0].flag = 0;
+		memset(pack[0].data,0 ,pack[0].datalen);
+	}
+	else if(1 == pack[1].flag)
+	{
+		USART3_Send(pack[1].data, pack[1].datalen);
+
+		pack[1].flag = 0;
+		memset(pack[1].data,0 ,pack[1].datalen);
+	}
+
 	}
 
 

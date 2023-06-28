@@ -4,6 +4,9 @@
 #include "crc16.h"
 #include "usart.h"
 #include <string.h>
+#include "exti.h"
+
+
 
 uint8_t cmd_buffer[CMD_MAX_SIZE]; // Command buffer
 uint8_t cmd_RXbuffer[_PACK_LEN];  // Rx buffer
@@ -11,6 +14,12 @@ COMM_EVENT DoComEvent = NO_COMEVENT;
 uint16_t Cmd_Cnt = 0;
 extern Moto_Struct Moto[MOTONUM];
 extern SpeedRampData srd[MOTONUM];
+extern  int32_t step_position[MOTONUM];
+AckPack pack[2];
+
+uint16_t step_accel = 150;
+uint16_t step_decel = 300;
+uint16_t step_speed = 500;
 
 void ComAckPack(uint8_t ack, uint8_t dictate, uint8_t data[], uint16_t length)
 {
@@ -40,7 +49,19 @@ void ComAckPack(uint8_t ack, uint8_t dictate, uint8_t data[], uint16_t length)
 	*p++ = (PACK_END >> 24) & 0xff;
 	// send data
 	// SendData((char *)TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
-	USART3_Send(TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
+	//USART3_Send(TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
+	if(0 == pack[0].flag)
+	{
+		pack[0].datalen = (_PACK_HEAD_LEN + length + _PACK_END_LEN);
+		memcpy(pack[0].data,TXbuffer,pack[0].datalen);
+		pack[0].flag = 1;
+	}
+	else if(0 == pack[1].flag)
+	{
+		pack[1].datalen = (_PACK_HEAD_LEN + length + _PACK_END_LEN);
+		memcpy(pack[1].data,TXbuffer,pack[1].datalen);
+		pack[1].flag = 1;
+	}
 }
 
 NetLH_Res CmdCheckPack(uint8_t *RXbuffer)
@@ -119,13 +140,7 @@ void CmdStop(uint8_t *RXbuffer)
 	for (int i = 0; i < data_len; i++, p++)
 	{
 		uint8_t id = *p;
-		TIMControl(id, 0);
-		srd[id].accel_count = 0;
-		srd[id].step_delay = 0;
-		srd[id].min_delay = 0;
-		Moto[id].MotionStatus = STOP;
-		srd[id].run_state = STOP;
-		// srd[id].run_state = DECEL;
+		StopMotor(id);
 	}
 }
 
@@ -169,6 +184,29 @@ void CmdQueryGpio(uint8_t *RXbuffer)
 	ComAckPack(PACK_ACK, CMD_TX_GPIO_STATUS, tx_data, data_len * 2);
 }
 
+void CmdResetMoto(uint8_t *RXbuffer)
+{
+	uint8_t *p = &RXbuffer[_LENGTH_INDEX];
+	uint16_t data_len = *p | (*(p + 1) << 8);
+	p += 2;
+	uint8_t count = data_len;
+
+	for (int i = 0; i < count; i++, p++)
+	{
+		uint8_t id = *p;
+		int32_t step = -(step_position[id]);
+
+		Moto[id].MID = id;
+		Moto[id].Mstep = step;
+		Moto[id].Maccel = step_accel;
+		Moto[id].Mdecel = step_decel;
+		Moto[id].MotoSpeed = step_speed;
+
+		STEPMOTOR_AxisMoveRel(Moto[id].MID, Moto[id].Mstep, Moto[id].Maccel, Moto[id].Mdecel, Moto[id].MotoSpeed);
+	}
+
+
+}
 void CmdAnalysis()
 {
 	if (Cmd_Cnt >= 12)
@@ -201,8 +239,8 @@ void CmdAnalysis()
 
 void CmdSystemReset(void)
 {
-	__set_FAULTMASK(1); // å…³é—­æ‰€æœ‰ä¸­æ–­
-	NVIC_SystemReset(); // è¿›è¡Œè½¯ä»¶å¤ä½
+	__set_FAULTMASK(1); // ¹Ø±ÕËùÓÐÖÐ¶Ï
+	NVIC_SystemReset(); // ½øÐÐÈí¼þ¸´Î»
 }
 
 void CmdProcess()
@@ -224,6 +262,9 @@ void CmdProcess()
 	case CMD_RX_QUERY_GPIO:
 		CmdQueryGpio(cmd_RXbuffer);
 		break;
+	case CMD_RX_RESET_MOTO:
+		CmdResetMoto(cmd_RXbuffer);
+		break;
 	default:
 	{
 		uint8_t tx_data[] = {CMD_NO_COM & 0xff, (CMD_NO_COM >> 8) & 0xff};
@@ -232,3 +273,4 @@ void CmdProcess()
 	}
 	}
 }
+
