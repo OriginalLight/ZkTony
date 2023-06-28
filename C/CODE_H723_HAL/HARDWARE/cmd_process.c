@@ -243,6 +243,7 @@ void CmdSystemReset(void)
 	NVIC_SystemReset(); // 进行软件复位
 }
 
+
 void CmdProcess()
 {
 	switch (cmd_RXbuffer[_DICTATE_INDEX])
