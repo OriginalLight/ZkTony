@@ -5,6 +5,7 @@
 #include "usart.h"
 #include <string.h>
 #include "exti.h"
+#include "nmos.h"
 
 
 
@@ -204,9 +205,32 @@ void CmdResetMoto(uint8_t *RXbuffer)
 
 		STEPMOTOR_AxisMoveRel(Moto[id].MID, Moto[id].Mstep, Moto[id].Maccel, Moto[id].Mdecel, Moto[id].MotoSpeed);
 	}
-
-
 }
+
+
+void CmdSwitch_Nmos(uint8_t *RXbuffer)
+{
+	uint8_t run_state = CMD_RT_OK;
+	uint8_t *p = &RXbuffer[_LENGTH_INDEX];
+	uint16_t data_len = *p | (*(p + 1) << 8);
+	p += 2;
+	uint8_t tx_data[data_len];
+	uint8_t *tx_p = tx_data;
+
+	for (int i = 0; i < data_len/2; i++, p+=2)
+	{
+		uint8_t id = *p;
+		uint8_t val = *(p + 1);
+
+		NMOS_Value_Set(id,val);
+		*tx_p++ = id;
+		*tx_p++ = run_state;
+	}
+
+	ComAckPack(PACK_ACK, CMD_TX_NMOS_STATUS, tx_data, data_len);
+	
+}
+
 void CmdAnalysis()
 {
 	if (Cmd_Cnt >= 12)
@@ -266,6 +290,10 @@ void CmdProcess()
 	case CMD_RX_RESET_MOTO:
 		CmdResetMoto(cmd_RXbuffer);
 		break;
+	case CMD_RX_SWITCH_NMOS:
+		CmdSwitch_Nmos(cmd_RXbuffer);
+		break;
+	
 	default:
 	{
 		uint8_t tx_data[] = {CMD_NO_COM & 0xff, (CMD_NO_COM >> 8) & 0xff};

@@ -39,9 +39,12 @@
 #define CMD_RX_QUERY_MOTOR 0x03 // query motor
 #define CMD_RX_QUERY_GPIO 0x04	// query sensor
 #define CMD_RX_RESET_MOTO 0x05	// reset moto to point 0 
+#define CMD_RX_SWITCH_NMOS 0x06	//set nmos status
+
 /** TX DICTATE */
 #define CMD_TX_MOTOR_STATUS 0x01 // motor status
 #define CMD_TX_GPIO_STATUS 0x02	 // gpio status
+#define CMD_TX_NMOS_STATUS 0x03	 // nmos status
 #define CMD_TX_ERROR 0xFF		 // error
 
 /** REPLY */

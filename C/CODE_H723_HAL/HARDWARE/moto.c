@@ -344,6 +344,8 @@ void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t accel, uint32_t d
 }
 
 
+
+
 /*
 设置电机运动方向 正转为1 ，反转为0
 num：电机ID号 0~15
@@ -493,7 +495,7 @@ void StopMotor(uint8_t num)
 //		srd[num].step_delay = 0;
 //		srd[num].min_delay = 0;
 //		//Moto[num].MotionStatus = STOP;
-		srd[num].run_state = DECEL;
+		srd[num].run_state = STOP;
 	
 //		Moto[num].Mflag = 0;
 //		srd[num].lock = 0;

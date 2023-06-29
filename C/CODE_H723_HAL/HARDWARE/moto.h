@@ -43,15 +43,14 @@ typedef struct
 	uint16_t MotoRpmSpeed;
 	uint16_t MdelayTime;
 
-	uint16_t MotoSpeed; //
-	uint16_t Maccel;
-	uint16_t Mdecel;
-
 	uint32_t MotoPosCurr; //
 	uint32_t MotoPosLast; //
 	uint32_t MotoDis;	  //
 
 	int32_t Mstep; //
+	uint32_t Maccel;
+	uint32_t Mdecel;
+	uint32_t MotoSpeed; //
 
 } Moto_Struct;
 
