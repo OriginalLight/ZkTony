@@ -173,9 +173,13 @@ fun ListContent(
             item {
                 ListItem(
                     title = "复 位",
-                    onClick = { event(HomeEvent.Reset) }
+                    onClick = {
+                        if (uiState.loading == 0) {
+                            event(HomeEvent.Reset)
+                        }
+                    }
                 ) {
-                    if (uiState.lock == 1) {
+                    if (uiState.loading == 1) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(64.dp),
                             strokeWidth = 6.dp,
@@ -192,6 +196,11 @@ fun ListContent(
             item {
                 ListItem(
                     title = "填充-促凝剂",
+                    onClick = {
+                        if (uiState.loading == 0) {
+                            event(HomeEvent.Syringe(0))
+                        }
+                    }
                 ) {
                     Box {
                         Image(

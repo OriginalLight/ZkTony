@@ -26,9 +26,9 @@ dependencies {
     implementation(libs.okhttp3)
     implementation(libs.zxing)
 
-    testImplementation(libs.junit)
-
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
+
+    testImplementation(libs.junit)
 }

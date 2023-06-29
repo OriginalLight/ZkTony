@@ -78,7 +78,7 @@ class ScheduleTask constructor(
                     hpc[0] = 10.0 / 3200
                     hpc[1] = 10.0 / 3200
                     active.vps().forEachIndexed { index, vps ->
-                        hpc[index + 3] = vps
+                        hpc[index + 2] = vps
                     }
                 }
             } else {
