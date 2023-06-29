@@ -24,7 +24,7 @@ class ZktyHomeViewModel constructor(
     private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.LIST)
-    private val _lock = MutableStateFlow(0)
+    private val _loading = MutableStateFlow(0)
     private val _job = MutableStateFlow<Job?>(null)
     val uiState = _uiState.asStateFlow()
 
@@ -34,14 +34,14 @@ class ZktyHomeViewModel constructor(
                 dao.getAll(),
                 _selected,
                 _page,
-                _lock,
+                _loading,
                 _job,
-            ) { entities, selected, page, lock, job ->
+            ) { entities, selected, page, loading, job ->
                 HomeUiState(
                     entities = entities,
                     selected = selected,
                     page = page,
-                    lock = lock,
+                    loading = loading,
                     job = job,
                 )
             }.catch { ex ->
@@ -58,14 +58,16 @@ class ZktyHomeViewModel constructor(
             is HomeEvent.Start -> start()
             is HomeEvent.NavTo -> _page.value = event.page
             is HomeEvent.ToggleSelected -> _selected.value = event.id
+            is HomeEvent.Syringe -> syringe(event.index)
+            is HomeEvent.Pipeline -> pipeline(event.index)
         }
     }
 
     private fun reset() {
         viewModelScope.launch {
-            _lock.value = 1
+            _loading.value = 1
             axisInitializer()
-            _lock.value = 0
+            _loading.value = 0
         }
     }
 
@@ -75,6 +77,22 @@ class ZktyHomeViewModel constructor(
         }
         _job.value?.invokeOnCompletion {
             _job.value = null
+        }
+    }
+
+    private fun syringe(index: Int) {
+        viewModelScope.launch {
+            _loading.value = index + 2
+            delay(1000L)
+            _loading.value = 0
+        }
+    }
+
+    private fun pipeline(index: Int) {
+        viewModelScope.launch {
+            _loading.value = index + 4
+            delay(1000L)
+            _loading.value = 0
         }
     }
 }
@@ -87,7 +105,7 @@ data class HomeUiState(
      * 0: loading closed
      * 1: resting
      */
-    val lock: Int = 0,
+    val loading: Int = 0,
     val job: Job? = null,
 )
 
@@ -96,4 +114,7 @@ sealed class HomeEvent {
     object Start : HomeEvent()
     data class NavTo(val page: PageType) : HomeEvent()
     data class ToggleSelected(val id: Long) : HomeEvent()
+
+    data class Syringe(val index: Int) : HomeEvent()
+    data class Pipeline(val index: Int) : HomeEvent()
 }

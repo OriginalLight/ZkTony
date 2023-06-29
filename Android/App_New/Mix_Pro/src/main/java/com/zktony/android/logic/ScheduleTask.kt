@@ -3,7 +3,6 @@ package com.zktony.android.logic
 import com.zktony.android.logic.data.dao.CalibrationDao
 import com.zktony.android.logic.data.dao.MotorDao
 import com.zktony.android.logic.data.entities.MotorEntity
-import com.zktony.android.logic.ext.axisInitializer
 import com.zktony.core.ext.logi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,9 +33,6 @@ class ScheduleTask constructor(
             }
             launch {
                 asyncTaskTwo()
-            }
-            launch {
-                axisInitializer()
             }
         }
     }
@@ -81,18 +77,16 @@ class ScheduleTask constructor(
                     hpc.clear()
                     hpc[0] = 10.0 / 3200
                     hpc[1] = 10.0 / 3200
-                    hpc[2] = 10.0 / 3200
                     active.vps().forEachIndexed { index, vps ->
-                        hpc[index + 3] = vps
+                        hpc[index + 2] = vps
                     }
                 }
             } else {
                 hpc.clear()
                 hpc[0] = 10.0 / 3200
                 hpc[1] = 10.0 / 3200
-                hpc[2] = 10.0 / 3200
-                repeat(13) { index ->
-                    hpc[index + 3] = 0.01
+                repeat(14) { index ->
+                    hpc[index + 2] = 0.01
                 }
             }
         }

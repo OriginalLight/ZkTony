@@ -15,11 +15,7 @@ import com.zktony.www.data.dao.ActionDao
 import com.zktony.www.data.dao.ContainerDao
 import com.zktony.www.data.dao.LogDao
 import com.zktony.www.data.dao.ProgramDao
-import com.zktony.www.data.entities.Action
-import com.zktony.www.data.entities.Container
-import com.zktony.www.data.entities.Log
-import com.zktony.www.data.entities.Program
-import com.zktony.www.data.entities.getActionEnum
+import com.zktony.www.data.entities.*
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -209,6 +205,7 @@ class HomeViewModel constructor(
                 AD.getBySubId(state.value.program!!.id).first().forEach {
                     actionQueue.enqueue(it)
                 }
+                actionQueue.enqueue(Action(mode = ActionEnum.PBS.index, volume = 8000f, temp = 4f))
                 // 创建程序执行者
                 val executor = ProgramExecutor(
                     queue = actionQueue,
@@ -312,19 +309,6 @@ class HomeViewModel constructor(
                 action = "/",
                 time = if (state.value.status != "已完成") Constants.ZERO_TIME else state.value.time,
             )
-            // 如果有正在执行的程序，提示用户
-            val run = _aFlow.value.job == null
-                    && _bFlow.value.job == null
-                    && _cFlow.value.job == null
-                    && _dFlow.value.job == null
-            if (run) {
-                asyncHex(0) {
-                    pa = "0B"
-                    data = "0100"
-                }
-                _uiState.value = _uiState.value.copy(shakeBed = false)
-                delay(100L)
-            }
             // 恢复到室温
             delay(200L)
             launch {

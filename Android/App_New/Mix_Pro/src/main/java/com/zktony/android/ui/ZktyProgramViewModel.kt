@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.logic.data.dao.ProgramDao
 import com.zktony.android.logic.data.entities.ProgramEntity
+import com.zktony.android.logic.ext.syncTx
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,6 +22,7 @@ class ZktyProgramViewModel constructor(
     private val _uiState = MutableStateFlow(ProgramUiState())
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.LIST)
+    private val _loading = MutableStateFlow(false)
     val uiState = _uiState.asStateFlow()
 
     init {
@@ -29,8 +31,14 @@ class ZktyProgramViewModel constructor(
                 dao.getAll(),
                 _selected,
                 _page,
-            ) { entities, selected, page ->
-                ProgramUiState(entities = entities, selected = selected, page = page)
+                _loading,
+            ) { entities, selected, page, loading ->
+                ProgramUiState(
+                    entities = entities,
+                    selected = selected,
+                    page = page,
+                    loading = loading
+                )
             }.catch { ex ->
                 ex.printStackTrace()
             }.collect {
@@ -46,6 +54,7 @@ class ZktyProgramViewModel constructor(
             is ProgramEvent.Insert -> async { dao.insert(ProgramEntity(text = event.name)) }
             is ProgramEvent.Update -> async { dao.update(event.entity) }
             is ProgramEvent.Delete -> async { dao.deleteById(event.id) }
+            is ProgramEvent.MoveTo -> moveTo(event.id, event.distance)
         }
     }
 
@@ -54,12 +63,26 @@ class ZktyProgramViewModel constructor(
             block()
         }
     }
+
+    private fun moveTo(id: Int, distance: Float) {
+        viewModelScope.launch {
+            _loading.value = true
+            syncTx {
+                dv {
+                    index = id
+                    dv = distance
+                }
+            }
+            _loading.value = false
+        }
+    }
 }
 
 data class ProgramUiState(
     val entities: List<ProgramEntity> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.LIST,
+    val loading: Boolean = false,
 )
 
 sealed class ProgramEvent {
@@ -68,4 +91,5 @@ sealed class ProgramEvent {
     data class Insert(val name: String) : ProgramEvent()
     data class Update(val entity: ProgramEntity) : ProgramEvent()
     data class Delete(val id: Long) : ProgramEvent()
+    data class MoveTo(val id: Int, val distance: Float) : ProgramEvent()
 }

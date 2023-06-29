@@ -45,7 +45,7 @@
                 android:paddingEnd="16dp"
                 android:text="添加程序"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <Button
@@ -60,7 +60,7 @@
                 android:paddingEnd="16dp"
                 android:text="编辑程序"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <Button
@@ -75,7 +75,7 @@
                 android:paddingEnd="16dp"
                 android:text="删除程序"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
         </LinearLayout>

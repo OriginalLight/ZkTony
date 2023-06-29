@@ -171,16 +171,37 @@ fun ListContent(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
-                ListItem(title = "复 位") {
-                    Image(
-                        modifier = Modifier.size(64.dp),
-                        painter = painterResource(id = R.drawable.ic_reset),
-                        contentDescription = null,
-                    )
+                ListItem(
+                    title = "复 位",
+                    onClick = {
+                        if (uiState.loading == 0) {
+                            event(HomeEvent.Reset)
+                        }
+                    }
+                ) {
+                    if (uiState.loading == 1) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(64.dp),
+                            strokeWidth = 6.dp,
+                        )
+                    } else {
+                        Image(
+                            modifier = Modifier.size(64.dp),
+                            painter = painterResource(id = R.drawable.ic_reset),
+                            contentDescription = null,
+                        )
+                    }
                 }
             }
             item {
-                ListItem(title = "填充-促凝剂") {
+                ListItem(
+                    title = "填充-促凝剂",
+                    onClick = {
+                        if (uiState.loading == 0) {
+                            event(HomeEvent.Syringe(0))
+                        }
+                    }
+                ) {
                     Box {
                         Image(
                             modifier = Modifier.size(64.dp),

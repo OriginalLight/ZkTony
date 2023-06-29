@@ -44,7 +44,7 @@
                 android:paddingEnd="16dp"
                 android:text="日期查询"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <Button
@@ -59,7 +59,7 @@
                 android:paddingEnd="16dp"
                 android:text="@string/title_log_chart"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
             <Button
@@ -74,7 +74,7 @@
                 android:paddingEnd="16dp"
                 android:text="删除日志"
                 android:textColor="@color/white"
-                android:textSize="16sp"
+                android:textSize="18sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
