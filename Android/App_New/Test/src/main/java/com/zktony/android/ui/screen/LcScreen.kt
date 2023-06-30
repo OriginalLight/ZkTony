@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.ui.components.ZkTonyScaffold
-import com.zktony.core.ext.getTimeFormat
+import com.zktony.android.core.ext.getTimeFormat
 
 
 @Composable

@@ -15,7 +15,6 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "App"
-include(":core")
 include(":datastore")
 include(":gpio")
 include(":protobuf")
