@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Water
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
@@ -55,13 +56,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
+import com.zktony.android.core.ext.format
+import com.zktony.android.core.ext.getTimeFormat
 import com.zktony.android.data.entities.ProgramEntity
 import com.zktony.android.ui.components.ZktyTopAppBar
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.core.ext.format
-import com.zktony.android.core.ext.getTimeFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -200,17 +201,61 @@ fun ListContent(
             }
             item {
                 ListItem(
+                    title = "管路清理",
+                    onClick = {
+                        if (uiState.loading == 0) {
+                            event(HomeEvent.Clean(1))
+                        }
+                        if (uiState.loading == 2) {
+                            event(HomeEvent.Clean(0))
+                        }
+                    }
+                ) {
+                    if (uiState.loading == 2) {
+                        Box(
+                            modifier = Modifier.size(64.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(48.dp),
+                                strokeWidth = 3.dp,
+                                color = Color.Red,
+                            )
+                            Image(
+                                modifier = Modifier.size(32.dp),
+                                painter = painterResource(id = R.drawable.ic_stop),
+                                contentDescription = null
+                            )
+                        }
+                    } else {
+                        Box {
+                            Image(
+                                modifier = Modifier.size(64.dp),
+                                painter = painterResource(id = R.drawable.ic_pipeline),
+                                contentDescription = null,
+                            )
+                            Icon(
+                                modifier = Modifier.align(Alignment.TopEnd),
+                                imageVector = Icons.Default.Water,
+                                contentDescription = null,
+                            )
+                        }
+                    }
+                }
+            }
+            item {
+                ListItem(
                     title = "填充-促凝剂",
                     onClick = {
                         if (uiState.loading == 0) {
                             event(HomeEvent.Syringe(1))
                         }
-                        if (uiState.loading == 2) {
+                        if (uiState.loading == 3) {
                             event(HomeEvent.Syringe(0))
                         }
                     }
                 ) {
-                    if (uiState.loading == 2) {
+                    if (uiState.loading == 3) {
                         Box(
                             modifier = Modifier.size(64.dp),
                             contentAlignment = Alignment.Center,
@@ -249,12 +294,12 @@ fun ListContent(
                         if (uiState.loading == 0) {
                             event(HomeEvent.Syringe(2))
                         }
-                        if (uiState.loading == 3) {
+                        if (uiState.loading == 4) {
                             event(HomeEvent.Syringe(0))
                         }
                     }
                 ) {
-                    if (uiState.loading == 3) {
+                    if (uiState.loading == 4) {
                         Box(
                             modifier = Modifier.size(64.dp),
                             contentAlignment = Alignment.Center,
@@ -293,12 +338,12 @@ fun ListContent(
                         if (uiState.loading == 0) {
                             event(HomeEvent.Pipeline(1))
                         }
-                        if (uiState.loading == 4) {
+                        if (uiState.loading == 5) {
                             event(HomeEvent.Pipeline(0))
                         }
                     }
                 ) {
-                    if (uiState.loading == 4) {
+                    if (uiState.loading == 5) {
                         Box(
                             modifier = Modifier.size(64.dp),
                             contentAlignment = Alignment.Center,
@@ -337,12 +382,12 @@ fun ListContent(
                         if (uiState.loading == 0) {
                             event(HomeEvent.Pipeline(2))
                         }
-                        if (uiState.loading == 5) {
+                        if (uiState.loading == 6) {
                             event(HomeEvent.Pipeline(0))
                         }
                     }
                 ) {
-                    if (uiState.loading == 5) {
+                    if (uiState.loading == 6) {
                         Box(
                             modifier = Modifier.size(64.dp),
                             contentAlignment = Alignment.Center,
@@ -560,17 +605,19 @@ fun RuntimeContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Card {
-                    Row(
+                    Box(
                         modifier = Modifier.padding(8.dp),
                     ) {
-                        AnimatedVisibility(visible = uiState.job != null) {
+                        if (uiState.job != null) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .align(Alignment.TopStart),
                                 strokeWidth = 4.dp,
                             )
                         }
                         Text(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.fillMaxWidth(),
                             text = time.getTimeFormat(),
                             textAlign = TextAlign.Center,
                             style = TextStyle(
@@ -677,14 +724,35 @@ fun RuntimeContent(
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 ElevatedCard(
-                    onClick = { event(HomeEvent.Start) },
+                    onClick = {
+                        if (uiState.job == null) {
+                            if (uiState.loading == 0) {
+                                event(HomeEvent.Start)
+                            }
+                        } else {
+                            event(HomeEvent.Stop)
+                        }
+                    },
                 ) {
                     if (uiState.job == null) {
-                        Image(
-                            modifier = Modifier.size(196.dp),
-                            painter = painterResource(id = R.drawable.ic_start),
-                            contentDescription = null
-                        )
+                        if (uiState.loading == 0) {
+                            Image(
+                                modifier = Modifier.size(196.dp),
+                                painter = painterResource(id = R.drawable.ic_start),
+                                contentDescription = null
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier.size(196.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(156.dp),
+                                    strokeWidth = 8.dp,
+                                    color = Color.Green,
+                                )
+                            }
+                        }
                     } else {
                         Box(
                             modifier = Modifier.size(196.dp),

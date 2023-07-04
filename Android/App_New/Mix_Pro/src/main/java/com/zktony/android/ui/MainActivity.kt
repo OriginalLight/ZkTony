@@ -8,8 +8,9 @@ import androidx.lifecycle.lifecycleScope
 import com.zktony.android.core.dsl.axisInitializer
 import com.zktony.android.core.dsl.scheduleTask
 import com.zktony.android.core.dsl.serialPort
-import com.zktony.android.ui.theme.AppTheme
+import com.zktony.android.core.dsl.syringeInitializer
 import com.zktony.android.core.ext.setLanguage
+import com.zktony.android.ui.theme.AppTheme
 import com.zktony.datastore.ext.settings
 import kotlinx.coroutines.launch
 
@@ -21,6 +22,7 @@ class MainActivity : ComponentActivity() {
             serialPort.initializer()
             scheduleTask.initializer()
             axisInitializer(1, 0)
+            syringeInitializer(2)
         }
 
         setContent {

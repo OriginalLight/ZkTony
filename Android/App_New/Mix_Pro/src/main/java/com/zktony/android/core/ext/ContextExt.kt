@@ -87,7 +87,7 @@ fun Context.restartApp() {
     val intent = this.packageManager.getLaunchIntentForPackage(this.packageName)
     val pendingIntent = PendingIntent.getActivity(
         this, 0,
-        intent, PendingIntent.FLAG_ONE_SHOT
+        intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
     )
     val mgr = this.getSystemService(Context.ALARM_SERVICE) as? AlarmManager
     mgr?.set(AlarmManager.RTC, System.currentTimeMillis(), pendingIntent)

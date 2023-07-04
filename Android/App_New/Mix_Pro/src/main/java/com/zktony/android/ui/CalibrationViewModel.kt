@@ -2,10 +2,10 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zktony.android.core.dsl.tx
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.entities.CalibrationData
 import com.zktony.android.data.entities.CalibrationEntity
-import com.zktony.android.core.dsl.tx
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,6 +71,9 @@ class CalibrationViewModel constructor(
     private fun addLiquid(index: Int) {
         viewModelScope.launch {
             _loading.value = true
+//            if (index == 0) {
+//                tx { valve(2 to 1) }
+//            }
             tx {
                 mpm {
                     this.index = index + 2

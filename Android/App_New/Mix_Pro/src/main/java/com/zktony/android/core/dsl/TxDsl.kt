@@ -4,6 +4,7 @@ import com.zktony.android.core.utils.ControlType
 import com.zktony.android.core.utils.ExceptionPolicy
 import com.zktony.android.core.utils.ExecuteType
 import com.zktony.android.data.entities.MotorEntity
+import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
 
 /**
@@ -17,7 +18,7 @@ class TxDsl {
     var executeType: ExecuteType = ExecuteType.SYNC
     var exceptionPolicy: ExceptionPolicy = ExceptionPolicy.SKIP
     var controlType: ControlType = ControlType.CONTROL_RESET
-    var timeout: Long = 1000L * 5
+    var timeout: Long = 1000L * 10
 
     /**
      * reset
@@ -38,15 +39,15 @@ class TxDsl {
     fun mdm(block: DM.() -> Unit) {
         controlType = ControlType.CONTROL_MOVE
         val dm = DM().apply(block)
-
-        byteList.addAll(
-            pwc(
-                dm.index,
-                dm.dv,
-                MotorEntity(speed = dm.speed, acc = dm.acc, dec = dm.dec)
-            ).toList()
-        )
-        indexList.add(dm.index)
+        val pulse = pulse(dm.index, dm.dv)
+        val config = MotorEntity(speed = dm.speed, acc = dm.acc, dec = dm.dec)
+        if (pulse != 0L) {
+            val ba = ByteArray(5)
+            ba.writeInt8(dm.index, 0).writeInt32LE(pulse, 1)
+            byteList.addAll(ba.toList())
+            byteList.addAll(config.toByteArray().toList())
+            indexList.add(dm.index)
+        }
     }
 
     /**
@@ -58,14 +59,15 @@ class TxDsl {
     fun mpm(block: PM.() -> Unit) {
         controlType = ControlType.CONTROL_MOVE
         val pm = PM().apply(block)
-        byteList.addAll(
-            pwc(
-                pm.index,
-                pm.pulse,
-                MotorEntity(speed = pm.speed, acc = pm.acc, dec = pm.dec)
-            ).toList()
-        )
-        indexList.add(pm.index)
+        val pulse = pulse(pm.index, pm.pulse)
+        val config = MotorEntity(speed = pm.speed, acc = pm.acc, dec = pm.dec)
+        if (pulse != 0L) {
+            val ba = ByteArray(5)
+            ba.writeInt8(pm.index, 0).writeInt32LE(pulse, 1)
+            byteList.addAll(ba.toList())
+            byteList.addAll(config.toByteArray().toList())
+            indexList.add(pm.index)
+        }
     }
 
     /**

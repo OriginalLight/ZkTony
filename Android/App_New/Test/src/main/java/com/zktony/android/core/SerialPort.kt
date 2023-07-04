@@ -1,6 +1,6 @@
 package com.zktony.android.core
 
-import com.zktony.android.core.ext.logi
+import android.util.Log
 import com.zktony.serialport.AbstractSerial
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.config.SerialConfig
@@ -8,7 +8,6 @@ import com.zktony.serialport.ext.crc16LE
 import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.readInt8
 import com.zktony.serialport.ext.splitByteArray
-import com.zktony.serialport.ext.toHexString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -40,7 +39,6 @@ class SerialPort : AbstractSerial() {
      * @param block Function1<ByteArray, Unit>
      */
     override fun callbackVerify(byteArray: ByteArray, block: (ByteArray) -> Unit) {
-        byteArray.toHexString().logi()
         // 验证包长 >=12
         if (byteArray.size < 12) {
             throw Exception("RX Length Error")
@@ -103,6 +101,6 @@ class SerialPort : AbstractSerial() {
      * 初始化
      */
     fun initializer() {
-        "SerialPort initializer".logi()
+        Log.i("SerialPort", "SerialPort initializer")
     }
 }

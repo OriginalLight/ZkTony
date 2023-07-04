@@ -1,9 +1,9 @@
 package com.zktony.android.core
 
+import com.zktony.android.core.ext.logi
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.entities.MotorEntity
-import com.zktony.android.core.ext.logi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -75,16 +75,16 @@ class ScheduleTask constructor(
                     cd.update(it[0].copy(active = true))
                 } else {
                     hpc.clear()
-                    hpc[0] = 10.0 / 3200
-                    hpc[1] = 10.0 / 3200
+                    hpc[0] = 4.0 / 3200
+                    hpc[1] = 6.35 / 3200
                     active.vps().forEachIndexed { index, vps ->
                         hpc[index + 2] = vps
                     }
                 }
             } else {
                 hpc.clear()
-                hpc[0] = 10.0 / 3200
-                hpc[1] = 10.0 / 3200
+                hpc[0] = 4.0 / 3200
+                hpc[1] = 6.35 / 3200
                 repeat(14) { index ->
                     hpc[index + 2] = 0.01
                 }

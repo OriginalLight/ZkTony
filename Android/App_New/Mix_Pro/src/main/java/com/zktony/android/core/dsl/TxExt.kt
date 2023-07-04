@@ -2,13 +2,13 @@ package com.zktony.android.core.dsl
 
 import com.zktony.android.core.ScheduleTask
 import com.zktony.android.core.SerialPort
+import com.zktony.android.core.ext.logw
+import com.zktony.android.core.utils.Constants
 import com.zktony.android.core.utils.ControlType
 import com.zktony.android.core.utils.ExceptionPolicy
 import com.zktony.android.core.utils.ExecuteType
-import com.zktony.android.data.entities.MotorEntity
 import com.zktony.serialport.command.Protocol
-import com.zktony.serialport.ext.writeInt32LE
-import com.zktony.serialport.ext.writeInt8
+import com.zktony.serialport.ext.toHexString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import org.koin.java.KoinJavaComponent.inject
@@ -25,11 +25,25 @@ private var z: AtomicLong = AtomicLong(0L)
  * 脉冲
  *
  * @param index Int
- * @param dv Int
- * @return Int
+ * @param dvp T
+ * @return T
  */
-fun pulse(index: Int, dv: Float): Long {
-    val p = (dv / scheduleTask.hpc[index]!!).toLong()
+fun <T : Number> pulse(index: Int, dvp: T): Long {
+
+    val p = when (dvp) {
+        is Float -> {
+            (dvp / scheduleTask.hpc[index]!!).toLong()
+        }
+
+        is Long -> {
+            dvp
+        }
+
+        else -> {
+            dvp.toLong()
+        }
+    }
+
     return when (index) {
         0 -> {
             val d = p - y.get()
@@ -45,55 +59,6 @@ fun pulse(index: Int, dv: Float): Long {
 
         else -> p
     }
-}
-
-/**
- * 脉冲
- *
- * @param index Int
- * @param pulse Long
- * @return Long
- */
-fun pulse(index: Int, pulse: Long): Long {
-    return when (index) {
-        0 -> {
-            val d = pulse - y.get()
-            y.set(maxOf(pulse, 0))
-            d
-        }
-
-        1 -> {
-            val d = pulse - z.get()
-            z.set(maxOf(pulse, 0))
-            d
-        }
-
-        else -> pulse
-    }
-}
-
-/**
- * distance or volume pulse with config
- *
- * @param index Int
- * @param dv Int
- * @return ByteArray
- */
-fun pwc(index: Int, dv: Float, config: MotorEntity): ByteArray {
-    val ba = ByteArray(5)
-    return ba.writeInt8(index, 0).writeInt32LE(pulse(index, dv), 1) + config.toByteArray()
-}
-
-/**
- * pulse with config
- *
- * @param index Int
- * @param pulse Long
- * @return ByteArray
- */
-fun pwc(index: Int, pulse: Long, config: MotorEntity): ByteArray {
-    val ba = ByteArray(5)
-    return ba.writeInt8(index, 0).writeInt32LE(pulse(index, pulse), 1) + config.toByteArray()
 }
 
 /**
@@ -113,6 +78,8 @@ fun sendByteArray(byteArray: ByteArray) {
  * @return Unit
  */
 fun sendProtocol(block: Protocol.() -> Unit) {
+    val protocol = Protocol().apply(block)
+    protocol.toByteArray().toHexString().logw()
     serialPort.sendProtocol(Protocol().apply(block))
 }
 
@@ -225,15 +192,17 @@ suspend fun tx(block: TxDsl.() -> Unit) {
             when (tx.executeType) {
                 ExecuteType.SYNC -> {
                     try {
-                        setLock(tx.indexList)
                         withTimeout(tx.timeout) {
-                            sendProtocol {
-                                control = 0x01
-                                data = tx.byteList.toByteArray()
-                            }
-                            delay(10L)
-                            while (getLock(tx.indexList)) {
+                            if (tx.byteList.isNotEmpty()) {
+                                setLock(tx.indexList)
+                                sendProtocol {
+                                    control = 0x01
+                                    data = tx.byteList.toByteArray()
+                                }
                                 delay(10L)
+                                while (getLock(tx.indexList)) {
+                                    delay(10L)
+                                }
                             }
                         }
                     } catch (ex: Exception) {
@@ -248,9 +217,12 @@ suspend fun tx(block: TxDsl.() -> Unit) {
                 }
 
                 ExecuteType.ASYNC -> {
-                    sendProtocol {
-                        control = 0x01
-                        data = tx.byteList.toByteArray()
+                    if (tx.byteList.isNotEmpty()) {
+                        setLock(tx.indexList)
+                        sendProtocol {
+                            control = 0x01
+                            data = tx.byteList.toByteArray()
+                        }
                     }
                 }
             }
@@ -349,6 +321,27 @@ suspend fun axisInitializer(vararg ids: Int) {
                     acc = 50f
                     dec = 80f
                     speed = 100f
+                }
+            }
+        }
+    }
+}
+
+suspend fun syringeInitializer(vararg ids: Int) {
+    ids.forEach {
+        tx { queryGpio(it) }
+        delay(100L)
+        if (!getGpio(it)) {
+            //tx { valve(it to 0) }
+            delay(100L)
+            tx {
+                timeout = 1000L * 60
+                mpm {
+                    index = it
+                    pulse = Constants.MAX_SYRINGE * -1
+                    acc = 300f
+                    dec = 400f
+                    speed = 600f
                 }
             }
         }
