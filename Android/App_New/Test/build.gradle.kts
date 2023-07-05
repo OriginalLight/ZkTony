@@ -91,7 +91,6 @@ dependencies {
 
     ksp(libs.androidx.room.compiler)
 
-    implementation(project(mapOf("path" to ":core")))
     implementation(project(mapOf("path" to ":datastore")))
     implementation(project(mapOf("path" to ":serialport")))
 

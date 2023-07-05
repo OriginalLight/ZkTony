@@ -5,11 +5,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
-import com.zktony.android.logic.ext.axisInitializer
-import com.zktony.android.logic.ext.scheduleTask
-import com.zktony.android.logic.ext.serialPort
+import com.zktony.android.core.dsl.axisInitializer
+import com.zktony.android.core.dsl.scheduleTask
+import com.zktony.android.core.dsl.serialPort
+import com.zktony.android.core.dsl.syringeInitializer
+import com.zktony.android.core.ext.setLanguage
 import com.zktony.android.ui.theme.AppTheme
-import com.zktony.core.ext.setLanguage
 import com.zktony.datastore.ext.settings
 import kotlinx.coroutines.launch
 
@@ -20,12 +21,13 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             serialPort.initializer()
             scheduleTask.initializer()
-            axisInitializer()
+            axisInitializer(1, 0)
+            syringeInitializer(2)
         }
-        
+
         setContent {
             AppTheme {
-                ZktyApp()
+                App()
             }
         }
     }

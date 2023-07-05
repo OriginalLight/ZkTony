@@ -2,12 +2,11 @@ package com.zktony.android.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.logic.ext.collectCallback
-import com.zktony.android.logic.ext.getLock
-import com.zktony.android.logic.ext.sendByteArray
-import com.zktony.android.logic.ext.serialPort
-import com.zktony.android.logic.ext.setLock
-import com.zktony.core.ext.loge
+import com.zktony.android.core.ext.collectCallback
+import com.zktony.android.core.ext.getLock
+import com.zktony.android.core.ext.sendByteArray
+import com.zktony.android.core.ext.serialPort
+import com.zktony.android.core.ext.setLock
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.ext.writeInt16LE
@@ -88,7 +87,6 @@ class LcViewModel : ViewModel() {
                                     val p = protocol {
                                         data = combine(it, 6400L)
                                     }
-                                    p.toByteArray().toHexString().loge()
                                     sendByteArray(p.toByteArray())
                                     history(p.toByteArray())
                                     while (getLock(it)) {
@@ -149,7 +147,6 @@ class LcViewModel : ViewModel() {
                                 val p = protocol {
                                     data = bytes
                                 }
-                                p.toByteArray().toHexString().loge()
                                 sendByteArray(p.toByteArray())
                                 history(p.toByteArray())
                                 while (getLock(indexList)) {

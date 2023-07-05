@@ -1,8 +1,7 @@
 package com.zktony.android
 
 import android.app.Application
-import com.zktony.android.logic.koinModule
-import com.zktony.core.ext.Ext
+import com.zktony.android.core.koinModule
 import com.zktony.datastore.DataStoreFactory
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -17,7 +16,6 @@ class App : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Ext.with(this)
         DataStoreFactory.init(this)
 
         startKoin {

@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.ui.components.ZkTonyScaffold
-import com.zktony.core.ext.getTimeFormat
 
 
 @Composable
@@ -125,7 +124,7 @@ fun LcScreen(
             ) {
                 Text(
                     modifier = Modifier.weight(1f),
-                    text = uiState.time.getTimeFormat(),
+                    text = uiState.time.toString(),
                     textAlign = TextAlign.Center,
                     fontSize = 60.sp,
                 )

@@ -17,8 +17,8 @@ abstract class AbstractSerial : AbstractSerialHelper() {
 
     init {
         callback = {
-            callbackProcess(it) { bytes ->
-                byteArrayProcess(bytes)
+            callbackVerify(it) { bytes ->
+                callbackProcess(bytes)
             }
         }
         exception = {
@@ -95,19 +95,19 @@ abstract class AbstractSerial : AbstractSerialHelper() {
     }
 
     /**
-     * Callback process
+     * Callback verify
      * 包括分包、crc校验等
      *
      * @param byteArray ByteArray
      */
-    abstract fun callbackProcess(byteArray: ByteArray, block: (ByteArray) -> Unit = {})
+    abstract fun callbackVerify(byteArray: ByteArray, block: (ByteArray) -> Unit = {})
 
     /**
-     * ByteArray process
+     * Callback process
      *
      * @param byteArray ByteArray
      */
-    abstract fun byteArrayProcess(byteArray: ByteArray)
+    abstract fun callbackProcess(byteArray: ByteArray)
 
     companion object {
         private const val TAG = "AbstractSerial"

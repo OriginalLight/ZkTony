@@ -91,7 +91,6 @@ dependencies {
 
     ksp(libs.androidx.room.compiler)
 
-    implementation(project(mapOf("path" to ":core")))
     implementation(project(mapOf("path" to ":datastore")))
     implementation(project(mapOf("path" to ":protobuf")))
     implementation(project(mapOf("path" to ":serialport")))
@@ -111,6 +110,8 @@ dependencies {
     implementation(libs.grpc.okhttp)
     implementation(libs.gson)
     implementation(libs.koin.androidx.compose)
+    implementation(libs.okhttp3)
+    implementation(libs.zxing)
 
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
