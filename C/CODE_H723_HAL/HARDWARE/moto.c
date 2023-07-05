@@ -251,6 +251,11 @@ void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t accel, uint32_t d
 	// 必须要开始减速的步数（如果加速没有达到最大速度）
 	__IO uint32_t accel_lim;
 
+	float faccel, fdecel, fspeed;
+	memcpy(&faccel, &accel, sizeof(float));
+	memcpy(&fdecel, &decel, sizeof(float));
+	memcpy(&fspeed, &speed, sizeof(float));
+
 	//Moto[num].Mstate = 1;
 
 	if (Moto[num].MotionStatus != STOP) // 只允许步进电机在停止的时候才继续
@@ -275,20 +280,20 @@ void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t accel, uint32_t d
 	else if (step != 0) // 如果目标运动步数不为0
 	{
 		// ?????????????????§??????é?????????????????????????????????????¨???????¨?
-
+	//srd[num].step_delay = round((((float)SystemCoreClock/(STEPMOTOR_TIM_PRESCALER+1)) * sqrt(A_SQ / accel))/10);
 		///////////////////////////
 		// 设置最大速度极限, 计算得到min_delay用于定时器的计数器的值。
 		// min_delay = (alpha / tt)/ w
-		srd[num].min_delay = (int32_t)(A_T_x10 / speed);
-
+		// srd[num].min_delay = (int32_t)(A_T_x10 / f_speed);
+		srd[num].min_delay = (int32_t)(A_T_x10 / fspeed);
 		// 通过计算第一个(c0) 的步进延时来设定加速度，其中accel单位为0.1rad/sec^2
 		// step_delay = 1/tt * sqrt(2*alpha/accel)
 		// step_delay = ( tfreq*0.676/10 )*10 * sqrt( (2*alpha*100000) / (accel*10) )/100
-		srd[num].step_delay = (int32_t)((T1_FREQ_148 * sqrt(A_SQ / accel)) / 10);
+		srd[num].step_delay = (int32_t)((T1_FREQ_148 * sqrt(A_SQ / faccel)) / 10);
 
 		// 计算多少步之后达到最大速度的限制
 		// max_s_lim = speed^2 / (2*alpha*accel)
-		max_s_lim = (uint32_t)(speed * speed / (A_x200 * accel / 10));
+		max_s_lim = (uint32_t)(fspeed * fspeed / (A_x200 * faccel / 10));
 		// 如果达到最大速度小于0.5步，我们将四舍五入为0
 		// 但实际我们必须移动至少一步才能达到想要的速度
 		if (max_s_lim == 0)
@@ -298,7 +303,7 @@ void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t accel, uint32_t d
 
 		// 计算多少步之后我们必须开始减速
 		// n1 = (n1+n2)decel / (accel + decel)
-		accel_lim = (uint32_t)(step * decel / (accel + decel));
+		accel_lim = (uint32_t)(step * fdecel / (faccel + fdecel));
 		// 我们必须加速至少1步才能才能开始减速
 		if (accel_lim == 0)
 		{
@@ -312,7 +317,7 @@ void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t accel, uint32_t d
 		}
 		else
 		{
-			srd[num].decel_val = -(max_s_lim * accel / decel);
+			srd[num].decel_val = -(max_s_lim * faccel / fdecel);
 		}
 		// 当只剩下一步我们必须减速
 		if (srd[num].decel_val == 0)

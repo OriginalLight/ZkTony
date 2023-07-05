@@ -116,17 +116,17 @@ void CmdRun(uint8_t *RXbuffer)
 	uint8_t *p = &RXbuffer[_LENGTH_INDEX];
 	uint16_t data_len = *p | (*(p + 1) << 8);
 	p += 2;
-	uint8_t count = data_len / 11;
+	uint8_t count = data_len / 17;
 
-	for (int i = 0; i < count; i++, p += 11)
+	for (int i = 0; i < count; i++, p += 17)
 	{
 		uint8_t id = *p;
 
 		Moto[id].MID = id;
 		Moto[id].Mstep = *(p + 1) | (*(p + 2) << 8) | (*(p + 3) << 16) | (*(p + 4) << 24);
-		Moto[id].Maccel = *(p + 5) | (*(p + 6) << 8);
-		Moto[id].Mdecel = *(p + 7) | (*(p + 8) << 8);
-		Moto[id].MotoSpeed = *(p + 9) | (*(p + 10) << 8);
+		Moto[id].Maccel = *(p + 5) | (*(p + 6) << 8) | (*(p + 7) << 16) | (*(p + 8) << 24);
+		Moto[id].Mdecel = *(p + 9) | (*(p + 10) << 8) | (*(p + 11) << 16) | (*(p + 12) << 24);
+		Moto[id].MotoSpeed = *(p + 13) | (*(p + 14) << 8) | (*(p + 15) << 16) | (*(p + 16) << 24);
 
 		STEPMOTOR_AxisMoveRel(Moto[id].MID, Moto[id].Mstep, Moto[id].Maccel, Moto[id].Mdecel, Moto[id].MotoSpeed);
 	}

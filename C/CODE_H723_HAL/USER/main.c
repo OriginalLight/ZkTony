@@ -7,6 +7,7 @@
 #include "string.h"
 #include "cmd_queue.h"
 #include "exti.h"
+#include "nmos.h"
 
 /* Íâ²¿¾§ÕñÎª8M
 :plln=250,pllm=2,pllp=2,pllq=4.
@@ -33,7 +34,10 @@ int main(void)
 	EXTIX_Init();
 	STEPMOTOR_TIMx_Init();
 	TIM4_Init(5000 - 1, 125 - 1);
+	NMOS_Init();
 	printf("test\n");
+
+	
 	while (1)
 	{
 		EXTI_Check();
@@ -58,7 +62,7 @@ int main(void)
 	if(1 == pack[0].flag)
 	{
 		USART3_Send(pack[0].data, pack[0].datalen);
-		printf("%d\n",step_position[pack[0].data[5]]);
+		
 		pack[0].flag = 0;
 		memset(pack[0].data,0 ,pack[0].datalen);
 	}
