@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.ui.utils.PageType
 import com.zktony.android.core.ext.DownloadState
 import com.zktony.android.core.ext.Ext
 import com.zktony.android.core.ext.download
@@ -14,6 +13,7 @@ import com.zktony.android.core.ext.installApk
 import com.zktony.android.core.ext.isNetworkAvailable
 import com.zktony.android.core.ext.restartApp
 import com.zktony.android.core.ext.showShortToast
+import com.zktony.android.ui.utils.PageType
 import com.zktony.datastore.ext.saveSettings
 import com.zktony.datastore.ext.settingsFlow
 import com.zktony.proto.Application
@@ -144,35 +144,6 @@ class SettingViewModel constructor(
      */
     private fun update() {
         viewModelScope.launch {
-            val apk = localUpdate()
-            if (apk != null) {
-                Ext.ctx.installApk(apk)
-            } else {
-                remoteUpdate()
-            }
-        }
-    }
-
-    /**
-     * 查找目录下apk文件并安装
-     * @return File? [File]
-     */
-    private fun localUpdate(): File? {
-        File("/storage").listFiles()?.forEach {
-            it.listFiles()?.forEach { apk ->
-                if (apk.name.endsWith(".apk") && apk.name.contains("zktony-mix-pro")) {
-                    return apk
-                }
-            }
-        }
-        return null
-    }
-
-    /**
-     * 获取版本信息
-     */
-    private fun remoteUpdate() {
-        viewModelScope.launch {
             if (Ext.ctx.isNetworkAvailable()) {
                 val application = _application.value
                 if (application != null) {
@@ -240,5 +211,4 @@ sealed class SettingEvent {
     data class NavTo(val page: PageType) : SettingEvent()
     data class Language(val language: String) : SettingEvent()
     data class Navigation(val navigation: Boolean) : SettingEvent()
-
 }
