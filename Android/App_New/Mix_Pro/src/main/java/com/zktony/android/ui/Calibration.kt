@@ -74,13 +74,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
+import com.zktony.android.core.ext.format
+import com.zktony.android.core.ext.showShortToast
+import com.zktony.android.core.ext.simpleDateFormat
 import com.zktony.android.data.entities.CalibrationEntity
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.components.ZktyTopAppBar
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.core.ext.format
-import com.zktony.android.core.ext.showShortToast
-import com.zktony.android.core.ext.simpleDateFormat
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -401,7 +401,7 @@ fun EditContent(
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            columns = GridCells.Fixed(2)
+            columns = GridCells.Fixed(3)
         ) {
             items(items = entity.data) {
                 Card(
@@ -445,7 +445,7 @@ fun EditContent(
 
         Row(
             modifier = Modifier
-                .height(128.dp)
+                .height(108.dp)
                 .fillMaxWidth()
                 .background(
                     color = MaterialTheme.colorScheme.background,
@@ -454,7 +454,7 @@ fun EditContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            FloatingActionButton(
+            Button(
                 modifier = Modifier.padding(start = 16.dp),
                 onClick = { showDialog = true },
             ) {
@@ -469,9 +469,8 @@ fun EditContent(
                     .padding(horizontal = 16.dp),
                 value = TextFieldValue(volume, TextRange(volume.length)),
                 onValueChange = { volume = it.text },
-                trailingIcon = {
+                label = {
                     Text(
-                        modifier = Modifier.padding(horizontal = 16.dp),
                         text = stringResource(id = R.string.volume)
                     )
                 },

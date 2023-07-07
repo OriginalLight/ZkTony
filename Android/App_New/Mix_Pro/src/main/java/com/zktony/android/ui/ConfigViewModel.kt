@@ -19,16 +19,16 @@ import kotlinx.coroutines.launch
  */
 class ConfigViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(ConfigUiState())
-    private val _lock = MutableStateFlow(false)
+    private val _loading = MutableStateFlow(false)
     val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             combine(
                 settingsFlow,
-                _lock
-            ) { settings, lock ->
-                ConfigUiState(settings = settings, lock = lock)
+                _loading
+            ) { settings, loading ->
+                ConfigUiState(settings = settings, loading = loading)
             }.catch { ex ->
                 ex.printStackTrace()
             }.collect {
@@ -67,7 +67,7 @@ class ConfigViewModel : ViewModel() {
         viewModelScope.launch {
             val list = _uiState.value.settings.wasteList.toMutableList()
             if (list.size == 0) {
-                repeat(3) {
+                repeat(2) {
                     list.add(0f)
                 }
             }
@@ -83,14 +83,14 @@ class ConfigViewModel : ViewModel() {
 
     private fun moveTo(index: Int, distance: Float) {
         viewModelScope.launch {
-            _lock.value = true
+            _loading.value = true
             tx {
                 mdm {
                     this.index = index + 3
                     dv = distance
                 }
             }
-            _lock.value = false
+            _loading.value = false
         }
     }
 
@@ -98,7 +98,7 @@ class ConfigViewModel : ViewModel() {
 
 data class ConfigUiState(
     val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
-    val lock: Boolean = false,
+    val loading: Boolean = false,
 )
 
 sealed class ConfigEvent {

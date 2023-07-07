@@ -5,7 +5,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,6 +38,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -54,26 +54,21 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.data.entities.ProgramEntity
-import com.zktony.android.ui.components.CustomTextField
-import com.zktony.android.ui.components.DynamicMixPlate
-import com.zktony.android.ui.components.InputDialog
-import com.zktony.android.ui.components.ZktyTopAppBar
-import com.zktony.android.ui.utils.PageType
 import com.zktony.android.core.ext.format
 import com.zktony.android.core.ext.showShortToast
 import com.zktony.android.core.ext.simpleDateFormat
+import com.zktony.android.data.entities.ProgramEntity
+import com.zktony.android.ui.components.InputDialog
+import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -315,6 +310,7 @@ fun EditContent(
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
     val entity = uiState.entities.find { it.id == uiState.selected } ?: ProgramEntity()
+    val travel = uiState.settings.travelList.ifEmpty { listOf(100f, 100f) }
     var v1 by remember { mutableStateOf(entity.volume[0].format(1)) }
     var v2 by remember { mutableStateOf(entity.volume[1].format(1)) }
     var v3 by remember { mutableStateOf(entity.volume[2].format(1)) }
@@ -331,18 +327,6 @@ fun EditContent(
                 shape = MaterialTheme.shapes.medium
             ),
     ) {
-        Card(
-            modifier = Modifier.padding(horizontal = 128.dp, vertical = 16.dp),
-        ) {
-            DynamicMixPlate(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(128.dp)
-                    .padding(horizontal = 16.dp),
-                count = 6,
-                active = entity.active,
-            )
-        }
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
@@ -352,73 +336,26 @@ fun EditContent(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                // volume
+                OutlinedCard(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Card(
-                        modifier = Modifier.weight(0.5f)
+                    Column(
+                        modifier = Modifier.padding(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            text = stringResource(id = R.string.actions),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    Card(modifier = Modifier.weight(1f)) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            text = stringResource(id = R.string.colloid),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    Card(modifier = Modifier.weight(1f)) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            text = stringResource(id = R.string.coagulant),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
-            }
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Card(modifier = Modifier.weight(0.5f)) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            text = stringResource(id = R.string.glue_making),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-
-                    OutlinedCard(
-                        modifier = Modifier.weight(1f),
-                        onClick = {}
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            CustomTextField(
-                                modifier = Modifier.fillMaxWidth(),
+                            Text(
+                                text = stringResource(id = R.string.glue_making),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+
+                            OutlinedTextField(
+                                modifier = Modifier.weight(1f),
                                 value = TextFieldValue(v1, TextRange(v1.length)),
                                 onValueChange = {
                                     scope.launch {
@@ -428,10 +365,9 @@ fun EditContent(
                                         event(ProgramEvent.Update(entity.copy(volume = volume)))
                                     }
                                 },
-                                textStyle = TextStyle(
-                                    fontSize = 20.sp,
-                                    textAlign = TextAlign.Center,
-                                ),
+                                label = { Text(text = stringResource(id = R.string.colloid)) },
+                                shape = MaterialTheme.shapes.medium,
+                                textStyle = MaterialTheme.typography.bodyLarge,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -442,27 +378,8 @@ fun EditContent(
                                     }
                                 ),
                             )
-                            Icon(
-                                modifier = Modifier
-                                    .padding(horizontal = 8.dp)
-                                    .align(Alignment.CenterEnd),
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = null
-                            )
-                        }
-                    }
-
-                    OutlinedCard(
-                        modifier = Modifier.weight(1f),
-                        onClick = {}
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        ) {
-                            CustomTextField(
-                                modifier = Modifier.fillMaxWidth(),
+                            OutlinedTextField(
+                                modifier = Modifier.weight(1f),
                                 value = TextFieldValue(v2, TextRange(v2.length)),
                                 onValueChange = {
                                     scope.launch {
@@ -472,10 +389,9 @@ fun EditContent(
                                         event(ProgramEvent.Update(entity.copy(volume = volume)))
                                     }
                                 },
-                                textStyle = TextStyle(
-                                    fontSize = 20.sp,
-                                    textAlign = TextAlign.Center,
-                                ),
+                                label = { Text(text = stringResource(id = R.string.coagulant)) },
+                                shape = MaterialTheme.shapes.medium,
+                                textStyle = MaterialTheme.typography.bodyLarge,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -486,44 +402,18 @@ fun EditContent(
                                     }
                                 ),
                             )
-                            Icon(
-                                modifier = Modifier
-                                    .padding(horizontal = 8.dp)
-                                    .align(Alignment.CenterEnd),
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = null
-                            )
                         }
-                    }
-                }
-            }
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Card(modifier = Modifier.weight(0.5f)) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            text = stringResource(id = R.string.pre_drain),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    OutlinedCard(
-                        modifier = Modifier.weight(1f),
-                        onClick = {}
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            CustomTextField(
-                                modifier = Modifier.fillMaxWidth(),
+                            Text(
+                                text = stringResource(id = R.string.pre_drain),
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            OutlinedTextField(
+                                modifier = Modifier.weight(1f),
                                 value = TextFieldValue(v3, TextRange(v3.length)),
                                 onValueChange = {
                                     scope.launch {
@@ -533,10 +423,9 @@ fun EditContent(
                                         event(ProgramEvent.Update(entity.copy(volume = volume)))
                                     }
                                 },
-                                textStyle = TextStyle(
-                                    fontSize = 20.sp,
-                                    textAlign = TextAlign.Center,
-                                ),
+                                label = { Text(text = stringResource(id = R.string.colloid)) },
+                                shape = MaterialTheme.shapes.medium,
+                                textStyle = MaterialTheme.typography.bodyLarge,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -547,26 +436,8 @@ fun EditContent(
                                     }
                                 ),
                             )
-                            Icon(
-                                modifier = Modifier
-                                    .padding(horizontal = 8.dp)
-                                    .align(Alignment.CenterEnd),
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                    OutlinedCard(
-                        modifier = Modifier.weight(1f),
-                        onClick = {}
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
-                        ) {
-                            CustomTextField(
-                                modifier = Modifier.fillMaxWidth(),
+                            OutlinedTextField(
+                                modifier = Modifier.weight(1f),
                                 value = TextFieldValue(v4, TextRange(v4.length)),
                                 onValueChange = {
                                     scope.launch {
@@ -576,10 +447,9 @@ fun EditContent(
                                         event(ProgramEvent.Update(entity.copy(volume = volume)))
                                     }
                                 },
-                                textStyle = TextStyle(
-                                    fontSize = 20.sp,
-                                    textAlign = TextAlign.Center,
-                                ),
+                                label = { Text(text = stringResource(id = R.string.coagulant)) },
+                                shape = MaterialTheme.shapes.medium,
+                                textStyle = MaterialTheme.typography.bodyLarge,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -590,95 +460,48 @@ fun EditContent(
                                     }
                                 ),
                             )
-                            Icon(
-                                modifier = Modifier
-                                    .padding(horizontal = 8.dp)
-                                    .align(Alignment.CenterEnd),
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = null
-                            )
                         }
                     }
                 }
             }
             item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                OutlinedCard(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Card(modifier = Modifier.weight(0.5f)) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            text = stringResource(id = R.string.motor),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    Card(modifier = Modifier.weight(1f)) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            text = stringResource(id = R.string.moving_distance),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    Card(modifier = Modifier.weight(1f)) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            text = stringResource(id = R.string.actions),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                }
-            }
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Card(modifier = Modifier.weight(0.5f)) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            text = stringResource(id = R.string.y_axis),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    OutlinedCard(
-                        modifier = Modifier.weight(1f),
-                        onClick = {}
+                    Column(
+                        modifier = Modifier.padding(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            CustomTextField(
-                                modifier = Modifier.fillMaxWidth(),
+                            Text(
+                                text = "托盘",
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            OutlinedTextField(
+                                modifier = Modifier.weight(1f),
                                 value = TextFieldValue(y, TextRange(y.length)),
                                 onValueChange = {
                                     scope.launch {
-                                        y = it.text
+                                        val num = it.text.toFloatOrNull() ?: 0f
+                                        y = if (num > travel[0]) {
+                                            travel[0].format(1)
+                                        } else if (num < 0) {
+                                            "0"
+                                        } else {
+                                            it.text
+                                        }
                                         val axis = entity.axis.toMutableList()
                                         axis[0] = y.toFloatOrNull() ?: 0f
                                         event(ProgramEvent.Update(entity.copy(axis = axis)))
                                     }
                                 },
-                                textStyle = TextStyle(
-                                    fontSize = 20.sp,
-                                    textAlign = TextAlign.Center,
-                                ),
+                                label = { Text(text = "坐标(0 ~ ${travel[0].format(1)})") },
+                                shape = MaterialTheme.shapes.medium,
+                                textStyle = MaterialTheme.typography.bodyLarge,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -689,78 +512,58 @@ fun EditContent(
                                     }
                                 ),
                             )
-                            Icon(
-                                modifier = Modifier
-                                    .padding(horizontal = 8.dp)
-                                    .align(Alignment.CenterEnd),
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Button(
-                            modifier = Modifier.width(96.dp),
-                            enabled = !uiState.loading,
-                            onClick = {
-                                scope.launch {
-                                    keyboard?.hide()
-                                    event(ProgramEvent.MoveTo(0, y.toFloatOrNull() ?: 0f))
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Button(
+                                    modifier = Modifier.width(96.dp),
+                                    enabled = !uiState.loading,
+                                    onClick = {
+                                        scope.launch {
+                                            keyboard?.hide()
+                                            event(ProgramEvent.MoveTo(0, y.toFloatOrNull() ?: 0f))
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowForward,
+                                        contentDescription = null
+                                    )
                                 }
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = null
-                            )
                         }
-                    }
-                }
-            }
-            item {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Card(modifier = Modifier.weight(0.5f)) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            text = stringResource(id = R.string.z_axis),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    OutlinedCard(
-                        modifier = Modifier.weight(1f),
-                        onClick = {}
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(4.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            CustomTextField(
-                                modifier = Modifier.fillMaxWidth(),
+                            Text(
+                                text = "针头",
+                                style = MaterialTheme.typography.titleMedium,
+                            )
+                            OutlinedTextField(
+                                modifier = Modifier.weight(1f),
                                 value = TextFieldValue(z, TextRange(z.length)),
                                 onValueChange = {
                                     scope.launch {
-                                        z = it.text
+                                        val num = it.text.toFloatOrNull() ?: 0f
+                                        z = if (num > travel[1]) {
+                                            travel[1].format(1)
+                                        } else if (num < 0) {
+                                            "0"
+                                        } else {
+                                            it.text
+                                        }
                                         val axis = entity.axis.toMutableList()
                                         axis[1] = z.toFloatOrNull() ?: 0f
                                         event(ProgramEvent.Update(entity.copy(axis = axis)))
                                     }
                                 },
-                                textStyle = TextStyle(
-                                    fontSize = 20.sp,
-                                    textAlign = TextAlign.Center,
-                                ),
+                                label = { Text(text = "坐标(0 ~ ${travel[1].format(1)})") },
+                                shape = MaterialTheme.shapes.medium,
+                                textStyle = MaterialTheme.typography.bodyLarge,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
                                     imeAction = ImeAction.Done,
@@ -771,34 +574,27 @@ fun EditContent(
                                     }
                                 ),
                             )
-                            Icon(
-                                modifier = Modifier
-                                    .padding(horizontal = 8.dp)
-                                    .align(Alignment.CenterEnd),
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Button(
-                            modifier = Modifier.width(96.dp),
-                            enabled = !uiState.loading,
-                            onClick = {
-                                scope.launch {
-                                    keyboard?.hide()
-                                    event(ProgramEvent.MoveTo(1, z.toFloatOrNull() ?: 0f))
+                            Row(
+                                modifier = Modifier.weight(1f),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Button(
+                                    modifier = Modifier.width(96.dp),
+                                    enabled = !uiState.loading,
+                                    onClick = {
+                                        scope.launch {
+                                            keyboard?.hide()
+                                            event(ProgramEvent.MoveTo(1, z.toFloatOrNull() ?: 0f))
+                                        }
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.ArrowForward,
+                                        contentDescription = null
+                                    )
                                 }
                             }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = null
-                            )
                         }
                     }
                 }

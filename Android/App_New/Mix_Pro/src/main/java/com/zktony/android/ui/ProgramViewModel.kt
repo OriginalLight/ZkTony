@@ -2,10 +2,12 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.zktony.android.core.dsl.tx
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.ProgramEntity
-import com.zktony.android.core.dsl.tx
 import com.zktony.android.ui.utils.PageType
+import com.zktony.datastore.ext.settingsFlow
+import com.zktony.proto.SettingsPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -28,12 +30,14 @@ class ProgramViewModel constructor(
     init {
         viewModelScope.launch {
             combine(
+                settingsFlow,
                 dao.getAll(),
                 _selected,
                 _page,
                 _loading,
-            ) { entities, selected, page, loading ->
+            ) { settings, entities, selected, page, loading ->
                 ProgramUiState(
+                    settings = settings,
                     entities = entities,
                     selected = selected,
                     page = page,
@@ -79,6 +83,7 @@ class ProgramViewModel constructor(
 }
 
 data class ProgramUiState(
+    val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
     val entities: List<ProgramEntity> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.LIST,

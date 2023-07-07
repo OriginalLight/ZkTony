@@ -70,7 +70,7 @@ fun App() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.inverseOnSurface)
+                    .background(MaterialTheme.colorScheme.outlineVariant)
             ) {
                 AppNavHost(
                     navController = navController,
