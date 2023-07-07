@@ -3,10 +3,8 @@ package com.zktony.android.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.core.dsl.axisInitializer
-import com.zktony.android.core.dsl.setLock
 import com.zktony.android.core.dsl.syringeInitializer
 import com.zktony.android.core.dsl.tx
-import com.zktony.android.core.ext.logw
 import com.zktony.android.core.utils.Constants
 import com.zktony.android.core.utils.ExecuteType
 import com.zktony.android.data.dao.ProgramDao
@@ -14,7 +12,7 @@ import com.zktony.android.data.entities.ProgramEntity
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -80,6 +78,7 @@ class HomeViewModel constructor(
             try {
                 withTimeout(60 * 1000L) {
                     axisInitializer(1, 0)
+                    syringeInitializer(2)
                 }
             } catch (ex: Exception) {
                 _loading.value = 0
@@ -94,20 +93,56 @@ class HomeViewModel constructor(
             val selected = _uiState.value.entities.find { it.id == _selected.value }!!
             _job.value = launch(Dispatchers.Default) {
                 // 步骤： 移动-> 切阀-> 预排-> 制胶
+                // Z -> 0
+                tx {
+                    mdm {
+                        index = 1
+                        dv = 0f
+                    }
+                }
+                // Y -> 0
+                tx {
+                    mdm {
+                        index = 0
+                        dv = 0f
+                    }
+                }
+                // 切阀门
+                tx {
+                    delay = 100L
+                    valve(2 to 1)
+                }
+                // 预排
+                tx {
+                    timeout = 1000L * 60 * 1
+                    mdm {
+                        index = 2
+                        dv = selected.volume[3]
+                    }
+                    repeat(6) {
+                        mdm {
+                            index = it + 3
+                            dv = selected.volume[2]
+                        }
+                    }
+                }
+                // Z -> 1
                 tx {
                     mdm {
                         index = 0
                         dv = selected.axis[0]
                     }
                 }
+                // Y -> 1
                 tx {
                     mdm {
                         index = 1
                         dv = selected.axis[1]
                     }
                 }
-                //tx { valve(2 to 0) }
+                // 制胶
                 tx {
+                    timeout = 1000L * 60 * 3
                     mdm {
                         index = 2
                         dv = selected.volume[1]
@@ -119,23 +154,78 @@ class HomeViewModel constructor(
                         }
                     }
                 }
-                repeat(30) {
-                    it.toString().logw()
-                    delay(1000L)
+            }
+            _job.value?.invokeOnCompletion {
+                launch {
+                    _job.value = null
+                    _loading.value = 1
+                    tx {
+                        mdm {
+                            index = 1
+                            dv = 0f
+                        }
+                    }
+                    tx {
+                        mdm {
+                            index = 0
+                            dv = 0f
+                        }
+                    }
+                    tx {
+                        delay = 100L
+                        valve(2 to 0)
+                    }
+                    tx {
+                        timeout = 1000L * 60
+                        mpm {
+                            index = 2
+                            pulse = Constants.MAX_SYRINGE * -1
+                            acc = 300f
+                            dec = 400f
+                            speed = 600f
+                        }
+                    }
+                    _loading.value = 0
                 }
             }
-            _job.value?.invokeOnCompletion { stop() }
         }
     }
 
     private fun stop() {
         viewModelScope.launch {
-            _job.value?.cancel()
+            _job.value?.cancelAndJoin()
             _job.value = null
             _loading.value = 1
-            //tx { valve(2 to 0) }
-            delay(100L)
-            syringeInitializer(2)
+            tx {
+                delay = 500L
+                reset()
+            }
+            tx {
+                mdm {
+                    index = 1
+                    dv = 0f
+                }
+            }
+            tx {
+                mdm {
+                    index = 0
+                    dv = 0f
+                }
+            }
+            tx {
+                delay = 100L
+                valve(2 to 0)
+            }
+            tx {
+                timeout = 1000L * 60
+                mpm {
+                    index = 2
+                    pulse = Constants.MAX_SYRINGE * -1
+                    acc = 300f
+                    dec = 400f
+                    speed = 600f
+                }
+            }
             _loading.value = 0
         }
     }
@@ -149,7 +239,6 @@ class HomeViewModel constructor(
                 _loading.value = 2
                 tx {
                     executeType = ExecuteType.ASYNC
-                    setLock(9)
                     mpm {
                         this.index = 9
                         pulse = 3200L * 10000L
@@ -163,27 +252,36 @@ class HomeViewModel constructor(
         viewModelScope.launch {
             if (index == 0) {
                 _loading.value = 0
-                syringeJob?.cancel()
+                syringeJob?.cancelAndJoin()
                 syringeJob = null
-                syringeInitializer(2)
+                tx {
+                    timeout = 1000L * 60
+                    mpm {
+                        this.index = 2
+                        pulse = Constants.MAX_SYRINGE * -1
+                    }
+                }
             } else {
                 _loading.value = index + 2
                 syringeJob = launch {
                     while (true) {
-                        tx { valve(2 to if (index == 1) 1 else 0) }
-                        delay(100L)
                         tx {
-                            timeout = 1000L * 30
+                            delay = 100L
+                            valve(2 to if (index == 1) 1 else 0)
+                        }
+                        tx {
+                            timeout = 1000L * 60
                             mpm {
                                 this.index = 2
                                 pulse = Constants.MAX_SYRINGE
                             }
                         }
-                        delay(100L)
-                        tx { valve(2 to if (index == 1) 0 else 1) }
-                        delay(100L)
                         tx {
-                            timeout = 1000L * 30
+                            delay = 100L
+                            valve(2 to if (index == 1) 0 else 1)
+                        }
+                        tx {
+                            timeout = 1000L * 60
                             mpm {
                                 this.index = 2
                                 pulse = Constants.MAX_SYRINGE * -1
@@ -205,7 +303,6 @@ class HomeViewModel constructor(
                 tx {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {
-                        setLock(it + 3)
                         mpm {
                             this.index = it + 3
                             pulse = 3200L * 10000L * if (index == 1) 1 else -1

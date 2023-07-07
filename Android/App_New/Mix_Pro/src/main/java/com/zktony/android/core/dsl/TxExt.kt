@@ -256,6 +256,8 @@ suspend fun tx(block: TxDsl.() -> Unit) {
             }
         }
     }
+
+    delay(tx.delay)
 }
 
 /**
@@ -265,32 +267,12 @@ suspend fun tx(block: TxDsl.() -> Unit) {
  * @return Unit
  */
 suspend fun axisInitializer(vararg ids: Int) {
+    tx {
+        delay = 300L
+        queryGpio(ids.toList())
+    }
     ids.forEach {
-        tx { queryGpio(it) }
-        delay(100L)
-        if (getGpio(it)) {
-            tx {
-                timeout = 1000L * 10
-                mpm {
-                    index = it
-                    pulse = 3200L * 2
-                    acc = 50f
-                    dec = 80f
-                    speed = 100f
-                }
-            }
-            delay(100L)
-            tx {
-                timeout = 1000L * 15
-                mpm {
-                    index = it
-                    pulse = 3200L * -3
-                    acc = 50f
-                    dec = 80f
-                    speed = 100f
-                }
-            }
-        } else {
+        if (!getGpio(it)) {
             tx {
                 timeout = 1000L * 60
                 mpm {
@@ -301,48 +283,49 @@ suspend fun axisInitializer(vararg ids: Int) {
                     speed = 200f
                 }
             }
-            delay(100L)
-            tx {
-                timeout = 1000L * 10
-                mpm {
-                    index = it
-                    pulse = 3200L * 2
-                    acc = 50f
-                    dec = 80f
-                    speed = 100f
-                }
+        }
+        tx {
+            timeout = 1000L * 10
+            mpm {
+                index = it
+                pulse = 3200L * 2
+                acc = 50f
+                dec = 80f
+                speed = 100f
             }
-            delay(100L)
-            tx {
-                timeout = 1000L * 15
-                mpm {
-                    index = it
-                    pulse = 3200L * -3
-                    acc = 50f
-                    dec = 80f
-                    speed = 100f
-                }
+        }
+        tx {
+            timeout = 1000L * 15
+            mpm {
+                index = it
+                pulse = 3200L * -3
+                acc = 50f
+                dec = 80f
+                speed = 100f
             }
         }
     }
 }
 
+/**
+ * 注射泵初始化
+ *
+ * @param ids List<Int>
+ * @return Unit
+ */
 suspend fun syringeInitializer(vararg ids: Int) {
-    ids.forEach {
-        tx { queryGpio(it) }
-        delay(100L)
-        if (!getGpio(it)) {
-            //tx { valve(it to 0) }
-            delay(100L)
-            tx {
-                timeout = 1000L * 60
-                mpm {
-                    index = it
-                    pulse = Constants.MAX_SYRINGE * -1
-                    acc = 300f
-                    dec = 400f
-                    speed = 600f
-                }
+    tx { queryGpio(ids.toList()) }
+    delay(100L)
+    tx { valve(ids.toList().map { it to 0 }) }
+    tx {
+        timeout = 1000L * 60
+        ids.forEach {
+            mpm {
+                index = it
+                pulse = Constants.MAX_SYRINGE * -1
+                acc = 300f
+                dec = 400f
+                speed = 600f
             }
         }
     }

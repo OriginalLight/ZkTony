@@ -19,6 +19,7 @@ class TxDsl {
     var exceptionPolicy: ExceptionPolicy = ExceptionPolicy.SKIP
     var controlType: ControlType = ControlType.CONTROL_RESET
     var timeout: Long = 1000L * 10
+    var delay: Long = 0L
 
     /**
      * reset
