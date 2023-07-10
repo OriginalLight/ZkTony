@@ -2,6 +2,8 @@ package com.zktony.android.core
 
 import androidx.room.Room
 import com.zktony.android.R
+import com.zktony.android.core.utils.Constants
+import com.zktony.android.core.utils.Constants.DATABASE_NAME
 import com.zktony.android.data.AppDatabase
 import com.zktony.android.ui.CalibrationViewModel
 import com.zktony.android.ui.ConfigViewModel
@@ -9,7 +11,6 @@ import com.zktony.android.ui.HomeViewModel
 import com.zktony.android.ui.MotorViewModel
 import com.zktony.android.ui.ProgramViewModel
 import com.zktony.android.ui.SettingViewModel
-import com.zktony.android.core.utils.Constants
 import com.zktony.protobuf.grpc.ApplicationGrpc
 import io.grpc.TlsChannelCredentials
 import io.grpc.okhttp.OkHttpChannelBuilder
@@ -27,7 +28,7 @@ val koinModule = module {
     // data
     single {
         Room.databaseBuilder(
-            androidContext(), AppDatabase::class.java, "data.db"
+            androidContext(), AppDatabase::class.java, DATABASE_NAME
         ).build()
     }
     single { get<AppDatabase>().calibrationDao() }

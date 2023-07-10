@@ -2,13 +2,11 @@ package com.zktony.android.core.dsl
 
 import com.zktony.android.core.ScheduleTask
 import com.zktony.android.core.SerialPort
-import com.zktony.android.core.ext.logw
 import com.zktony.android.core.utils.Constants
 import com.zktony.android.core.utils.ControlType
 import com.zktony.android.core.utils.ExceptionPolicy
 import com.zktony.android.core.utils.ExecuteType
 import com.zktony.serialport.command.Protocol
-import com.zktony.serialport.ext.toHexString
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import org.koin.java.KoinJavaComponent.inject
@@ -78,8 +76,6 @@ fun sendByteArray(byteArray: ByteArray) {
  * @return Unit
  */
 fun sendProtocol(block: Protocol.() -> Unit) {
-    val protocol = Protocol().apply(block)
-    protocol.toByteArray().toHexString().logw()
     serialPort.sendProtocol(Protocol().apply(block))
 }
 
@@ -174,13 +170,16 @@ fun getGpio(vararg ids: Int): Boolean {
 /**
  * 发送命令
  *
- * @param block [@kotlin.ExtensionFunctionType] Function1<TxDsl, Unit>
- * @return Unit
+ * @param block [TxDsl.() -> Unit] 命令构建器
+ * @return [Unit]
  */
-suspend fun tx(block: TxDsl.() -> Unit) {
+suspend fun tx(block: TxDsl.() -> Unit): Unit {
+    // 构建命令
     val tx = TxDsl().apply(block)
 
+    // 根据控制类型执行相应的操作
     when (tx.controlType) {
+        // 复位
         ControlType.CONTROL_RESET -> {
             sendProtocol {
                 control = 0x00
@@ -188,11 +187,15 @@ suspend fun tx(block: TxDsl.() -> Unit) {
             }
         }
 
+        // 运动
         ControlType.CONTROL_MOVE -> {
             when (tx.executeType) {
+                // 同步运动
                 ExecuteType.SYNC -> {
                     try {
+                        // 设置超时时间
                         withTimeout(tx.timeout) {
+                            // 发送运动命令
                             if (tx.byteList.isNotEmpty()) {
                                 setLock(tx.indexList)
                                 sendProtocol {
@@ -200,22 +203,30 @@ suspend fun tx(block: TxDsl.() -> Unit) {
                                     data = tx.byteList.toByteArray()
                                 }
                                 delay(10L)
+                                // 等待运动完成
                                 while (getLock(tx.indexList)) {
                                     delay(10L)
                                 }
                             }
                         }
                     } catch (ex: Exception) {
+                        // 根据异常处理策略进行处理
                         when (tx.exceptionPolicy) {
+                            // 重试
                             ExceptionPolicy.RETRY -> tx(block)
+                            // 查询轴状态
                             ExceptionPolicy.QUERY -> tx { queryAxis(tx.indexList) }
+                            // 跳过
                             ExceptionPolicy.SKIP -> setLock(tx.indexList, false)
+                            // 复位
                             ExceptionPolicy.RESET -> tx { reset() }
+                            // 抛出异常
                             ExceptionPolicy.THROW -> throw ex
                         }
                     }
                 }
 
+                // 异步运动
                 ExecuteType.ASYNC -> {
                     if (tx.byteList.isNotEmpty()) {
                         setLock(tx.indexList)
@@ -228,6 +239,7 @@ suspend fun tx(block: TxDsl.() -> Unit) {
             }
         }
 
+        // 停止
         ControlType.CONTROL_STOP -> {
             sendProtocol {
                 control = 0x02
@@ -235,6 +247,7 @@ suspend fun tx(block: TxDsl.() -> Unit) {
             }
         }
 
+        // 查询轴状态
         ControlType.CONTROL_QUERY_AXIS -> {
             sendProtocol {
                 control = 0x03
@@ -242,6 +255,7 @@ suspend fun tx(block: TxDsl.() -> Unit) {
             }
         }
 
+        // 查询GPIO状态
         ControlType.CONTROL_QUERY_GPIO -> {
             sendProtocol {
                 control = 0x04
@@ -249,6 +263,7 @@ suspend fun tx(block: TxDsl.() -> Unit) {
             }
         }
 
+        // 控制气阀
         ControlType.CONTROL_VALVE -> {
             sendProtocol {
                 control = 0x05
@@ -257,22 +272,28 @@ suspend fun tx(block: TxDsl.() -> Unit) {
         }
     }
 
+    // 延迟
     delay(tx.delay)
 }
 
 /**
  * 电机初始化
  *
- * @param ids IntArray
+ * @param ids IntArray 电机ID列表
  * @return Unit
  */
-suspend fun axisInitializer(vararg ids: Int) {
+suspend fun axisInitializer(vararg ids: Int): Unit {
+    // 查询GPIO状态
     tx {
         delay = 300L
         queryGpio(ids.toList())
     }
+
+    // 针对每个电机进行初始化
     ids.forEach {
+        // 如果电机未初始化，则进行初始化
         if (!getGpio(it)) {
+            // 进行电机初始化
             tx {
                 timeout = 1000L * 60
                 mpm {
@@ -284,6 +305,8 @@ suspend fun axisInitializer(vararg ids: Int) {
                 }
             }
         }
+
+        // 进行正向运动
         tx {
             timeout = 1000L * 10
             mpm {
@@ -294,6 +317,8 @@ suspend fun axisInitializer(vararg ids: Int) {
                 speed = 100f
             }
         }
+
+        // 进行反向运动
         tx {
             timeout = 1000L * 15
             mpm {
@@ -310,16 +335,24 @@ suspend fun axisInitializer(vararg ids: Int) {
 /**
  * 注射泵初始化
  *
- * @param ids List<Int>
+ * @param ids List<Int> 注射泵ID列表
  * @return Unit
  */
 suspend fun syringeInitializer(vararg ids: Int) {
+    // 查询GPIO状态
     tx { queryGpio(ids.toList()) }
+
+    // 延迟
     delay(100L)
+
+    // 关闭所有气阀
     tx { valve(ids.toList().map { it to 0 }) }
+
+    // 对每个注射泵进行初始化
     tx {
         timeout = 1000L * 60
         ids.forEach {
+            // 进行注射泵初始化
             mpm {
                 index = it
                 pulse = Constants.MAX_SYRINGE * -1

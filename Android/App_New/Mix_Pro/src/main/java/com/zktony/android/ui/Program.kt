@@ -67,12 +67,19 @@ import com.zktony.android.core.ext.showShortToast
 import com.zktony.android.core.ext.simpleDateFormat
 import com.zktony.android.data.entities.ProgramEntity
 import com.zktony.android.ui.components.InputDialog
-import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.components.TopAppBar
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 
+/**
+ * The Program composable function for the app.
+ *
+ * @param modifier The modifier for the composable.
+ * @param navController The NavHostController for the app.
+ * @param viewModel The ProgramViewModel for the app.
+ */
 @Composable
 fun Program(
     modifier: Modifier = Modifier,
@@ -81,13 +88,15 @@ fun Program(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // Handle the back button press
     BackHandler {
         when (uiState.page) {
-            PageType.LIST -> navController.navigateUp()
-            else -> viewModel.event(ProgramEvent.NavTo(PageType.LIST))
+            PageType.LIST -> navController.navigateUp() // Step 1: Navigate up if on the list page
+            else -> viewModel.event(ProgramEvent.NavTo(PageType.LIST)) // Step 2: Navigate to the list page if on any other page
         }
     }
 
+    // Display the content wrapper
     ContentWrapper(
         modifier = modifier,
         uiState = uiState,
@@ -95,6 +104,13 @@ fun Program(
     )
 }
 
+/**
+ * The ContentWrapper composable function for the app.
+ *
+ * @param modifier The modifier for the composable.
+ * @param uiState The ProgramUiState for the app.
+ * @param event The event handler for the app.
+ */
 @Composable
 fun ContentWrapper(
     modifier: Modifier = Modifier,
@@ -102,14 +118,14 @@ fun ContentWrapper(
     event: (ProgramEvent) -> Unit = {},
 ) {
     Column(modifier = modifier) {
-        // app bar for edit page
+        // Display the app bar for the edit page
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-            ZktyTopAppBar(
+            TopAppBar(
                 title = stringResource(id = R.string.edit),
-                navigation = { event(ProgramEvent.NavTo(PageType.LIST)) }
+                navigation = { event(ProgramEvent.NavTo(PageType.LIST)) } // Step 1: Navigate to the list page when the back button is pressed
             )
         }
-        // list page
+        // Display the list page
         AnimatedVisibility(visible = uiState.page == PageType.LIST) {
             ListContent(
                 modifier = Modifier,
@@ -117,7 +133,7 @@ fun ContentWrapper(
                 event = event,
             )
         }
-        // edit page
+        // Display the edit page
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             EditContent(
                 modifier = Modifier,
@@ -128,6 +144,13 @@ fun ContentWrapper(
     }
 }
 
+/**
+ * The ListContent composable function for the app.
+ *
+ * @param modifier The modifier for the composable.
+ * @param uiState The ProgramUiState for the app.
+ * @param event The event handler for the app.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListContent(
@@ -139,6 +162,7 @@ fun ListContent(
     val columnState = rememberLazyListState()
     var showDialog by remember { mutableStateOf(false) }
 
+    // Show the input dialog if showDialog is true
     if (showDialog) {
         InputDialog(
             onConfirm = {
@@ -156,13 +180,14 @@ fun ListContent(
         )
     }
 
+    // Display the list and operation columns
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        // list
+        // Display the list column
         LazyColumn(
             modifier = Modifier
                 .weight(6f)
@@ -223,7 +248,7 @@ fun ListContent(
             }
         }
 
-        // operation
+        // Display the operation column
         Column(
             modifier = modifier
                 .weight(1f)
@@ -234,7 +259,7 @@ fun ListContent(
                 ),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Add
+            // Add button
             FloatingActionButton(
                 modifier = Modifier
                     .padding(8.dp)
@@ -248,7 +273,7 @@ fun ListContent(
                     tint = Color.Black,
                 )
             }
-            // Delete
+            // Delete button
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 var count by remember { mutableStateOf(0) }
 
@@ -276,7 +301,7 @@ fun ListContent(
                     )
                 }
             }
-            // Edit
+            // Edit button
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier
@@ -606,6 +631,7 @@ fun EditContent(
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun ProgramListContentPreview() {
+    // Call the ListContent function and pass in a ProgramUiState object as a parameter
     ListContent(
         uiState = ProgramUiState(
             entities = listOf(
@@ -618,6 +644,7 @@ fun ProgramListContentPreview() {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun ProgramEditContentPreview() {
+    // Call the EditContent function and pass in a ProgramUiState object as a parameter
     EditContent(
         uiState = ProgramUiState(
             entities = listOf(
@@ -627,4 +654,3 @@ fun ProgramEditContentPreview() {
         )
     )
 }
-

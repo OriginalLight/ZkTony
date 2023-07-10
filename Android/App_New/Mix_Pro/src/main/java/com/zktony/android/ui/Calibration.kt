@@ -79,7 +79,7 @@ import com.zktony.android.core.ext.showShortToast
 import com.zktony.android.core.ext.simpleDateFormat
 import com.zktony.android.data.entities.CalibrationEntity
 import com.zktony.android.ui.components.InputDialog
-import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.components.TopAppBar
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -90,7 +90,6 @@ import org.koin.androidx.compose.koinViewModel
  * @param modifier Modifier
  * @param navController NavHostController
  * @param viewModel CalibrationViewModel
- * @return Unit
  */
 @Composable
 fun Calibration(
@@ -112,24 +111,30 @@ fun Calibration(
         uiState = uiState,
         event = viewModel::event,
     )
-
 }
 
+/**
+ * Composable function that wraps the content of the calibration screen.
+ *
+ * @param modifier Modifier
+ * @param uiState The current UI state of the calibration screen.
+ * @param event The event handler for the calibration screen.
+ */
 @Composable
 fun ContentWrapper(
     modifier: Modifier = Modifier,
     uiState: CalibrationUiState,
     event: (CalibrationEvent) -> Unit = {},
 ) {
-    Column(modifier = modifier) {
-        // app bar with edit page is visible
+    Column {
+        // App bar with edit page is visible
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-            ZktyTopAppBar(
+            TopAppBar(
                 title = stringResource(id = R.string.edit),
                 navigation = { event(CalibrationEvent.NavTo(PageType.LIST)) }
             )
         }
-        // list page
+        // List page
         AnimatedVisibility(visible = uiState.page == PageType.LIST) {
             ListContent(
                 modifier = modifier,
@@ -137,7 +142,7 @@ fun ContentWrapper(
                 event = event,
             )
         }
-        // edit page
+        // Edit page
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
             EditContent(
                 modifier = modifier,
@@ -155,19 +160,26 @@ fun ListContent(
     uiState: CalibrationUiState = CalibrationUiState(),
     event: (CalibrationEvent) -> Unit = {},
 ) {
-
+    // Coroutine scope for launching coroutines
     val scope = rememberCoroutineScope()
+
+    // Lazy list state for the list of items
     val columnState = rememberLazyListState()
+
+    // Whether to show the input dialog for adding a new item
     var showDialog by remember { mutableStateOf(false) }
 
+    // Show the input dialog if showDialog is true
     if (showDialog) {
         InputDialog(
             onConfirm = {
                 scope.launch {
+                    // Check if the name already exists
                     val nameList = uiState.entities.map { it.text }
                     if (nameList.contains(it)) {
                         "Name already exists".showShortToast()
                     } else {
+                        // Insert the new item
                         event(CalibrationEvent.Insert(it))
                         showDialog = false
                     }
@@ -177,12 +189,14 @@ fun ListContent(
         )
     }
 
+    // Row containing the list of items and the operation column
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        // Lazy column containing the list of items
         LazyColumn(
             modifier = Modifier
                 .weight(6f)
@@ -196,17 +210,21 @@ fun ListContent(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             itemsIndexed(items = uiState.entities) { index, item ->
+                // Background color of the item
                 val background = if (item.id == uiState.selected) {
                     MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
                 } else {
                     MaterialTheme.colorScheme.surfaceVariant
                 }
+
+                // Card containing the item
                 Card(
                     modifier = Modifier.height(48.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = background,
                     ),
                     onClick = {
+                        // Toggle the selected state of the item
                         if (item.id == uiState.selected) {
                             event(CalibrationEvent.ToggleSelected(0L))
                         } else {
@@ -214,6 +232,7 @@ fun ListContent(
                         }
                     }
                 ) {
+                    // Row containing the item details
                     Row(
                         modifier = Modifier
                             .fillMaxSize()
@@ -221,24 +240,33 @@ fun ListContent(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
+                        // Icon for the item
                         Image(
                             modifier = Modifier.size(32.dp),
                             painter = painterResource(id = R.drawable.ic_water),
                             contentDescription = null,
                         )
+
+                        // Text for the item name
                         Text(
                             text = item.text,
                             style = MaterialTheme.typography.bodyLarge,
                             maxLines = 1,
                         )
+
+                        // Checkmark for the active state of the item
                         AnimatedVisibility(visible = item.active) {
                             Text(text = "✔️")
                         }
+
+                        // Index of the item
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
                             text = "${index + 1}",
                             style = MaterialTheme.typography.bodyLarge,
                         )
+
+                        // Creation date of the item
                         Text(
                             text = item.createTime.simpleDateFormat("yyyy - MM - dd"),
                             style = MaterialTheme.typography.bodyLarge,
@@ -247,7 +275,8 @@ fun ListContent(
                 }
             }
         }
-        // operation column
+
+        // Column containing the operation buttons
         Column(
             modifier = modifier
                 .weight(1f)
@@ -258,7 +287,7 @@ fun ListContent(
                 ),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Add
+            // Button for adding a new item
             FloatingActionButton(
                 modifier = Modifier
                     .padding(8.dp)
@@ -272,7 +301,8 @@ fun ListContent(
                     tint = Color.Black,
                 )
             }
-            // Delete
+
+            // Button for deleting the selected item
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 var count by remember { mutableStateOf(0) }
 
@@ -296,7 +326,8 @@ fun ListContent(
                     )
                 }
             }
-            // Edit
+
+            // Button for editing the selected item
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier
@@ -312,7 +343,8 @@ fun ListContent(
                     )
                 }
             }
-            // Active
+
+            // Button for activating the selected item
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(modifier = Modifier
                     .padding(8.dp)
@@ -330,6 +362,13 @@ fun ListContent(
     }
 }
 
+/**
+ * Composable function that displays the edit content UI.
+ *
+ * @param modifier Modifier to be applied to the content.
+ * @param uiState The current state of the calibration UI.
+ * @param event The event to be triggered when the UI state changes.
+ */
 @OptIn(
     ExperimentalComposeUiApi::class,
     ExperimentalLayoutApi::class,
@@ -341,15 +380,26 @@ fun EditContent(
     uiState: CalibrationUiState = CalibrationUiState(),
     event: (CalibrationEvent) -> Unit = {},
 ) {
+    // Get the selected entity or create a new one if none is selected
     val entity = uiState.entities.find { it.id == uiState.selected } ?: CalibrationEntity()
+
+    // Initialize the index and volume variables
     var index by remember { mutableStateOf(0) }
     var volume by remember { mutableStateOf("") }
+
+    // Get the software keyboard controller
     val softKeyboard = LocalSoftwareKeyboardController.current
+
+    // Initialize the showDialog variable
     var showDialog by remember { mutableStateOf(false) }
+
+    // Get the coroutine scope
     val scope = rememberCoroutineScope()
 
+    // Show the dialog if showDialog is true
     if (showDialog) {
         Dialog(onDismissRequest = { showDialog = false }) {
+            // Show the filter chip grid
             ElevatedCard {
                 LazyVerticalGrid(
                     modifier = Modifier.padding(8.dp),
@@ -384,12 +434,14 @@ fun EditContent(
         }
     }
 
+    // Show the edit content UI
     Column(
         modifier = modifier
             .padding(8.dp)
             .windowInsetsPadding(WindowInsets.imeAnimationSource),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        // Show the data grid
         LazyVerticalGrid(
             modifier = Modifier
                 .weight(1f)
@@ -414,6 +466,7 @@ fun EditContent(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
+                        // Show the index
                         Text(
                             text = "V ${it.index + 1}",
                             style = MaterialTheme.typography.bodyLarge,
@@ -422,6 +475,7 @@ fun EditContent(
 
                         Spacer(modifier = Modifier.weight(1f))
 
+                        // Show the volume
                         Text(
                             text = it.volume.format(2) + " μL",
                             style = MaterialTheme.typography.bodyLarge,
@@ -430,6 +484,7 @@ fun EditContent(
 
                         Spacer(modifier = Modifier.weight(1f))
 
+                        // Show the delete icon
                         Icon(
                             modifier = Modifier
                                 .size(32.dp)
@@ -443,6 +498,7 @@ fun EditContent(
             }
         }
 
+        // Show the input row
         Row(
             modifier = Modifier
                 .height(108.dp)
@@ -454,6 +510,7 @@ fun EditContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            // Show the filter chip button
             Button(
                 modifier = Modifier.padding(start = 16.dp),
                 onClick = { showDialog = true },
@@ -463,6 +520,8 @@ fun EditContent(
                     style = MaterialTheme.typography.titleLarge,
                 )
             }
+
+            // Show the volume text field
             OutlinedTextField(
                 modifier = Modifier
                     .weight(1f)
@@ -489,6 +548,8 @@ fun EditContent(
                 ),
                 shape = MaterialTheme.shapes.medium,
             )
+
+            // Show the add button
             Button(
                 modifier = Modifier
                     .width(156.dp),
@@ -514,6 +575,8 @@ fun EditContent(
                     )
                 }
             }
+
+            // Show the save button
             Button(
                 modifier = Modifier
                     .width(156.dp)
@@ -533,19 +596,34 @@ fun EditContent(
     }
 }
 
+/**
+ * Composable function that previews the calibration list content.
+ */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun CalibrationListContentPreview() {
-    ListContent(uiState = CalibrationUiState(entities = listOf(CalibrationEntity())))
+    // Create a calibration entity list with a single entity
+    val entities = listOf(CalibrationEntity())
+
+    // Create a calibration UI state with the entity list
+    val uiState = CalibrationUiState(entities = entities)
+
+    // Show the calibration list content
+    ListContent(uiState = uiState)
 }
 
+/**
+ * Composable function that previews the calibration edit content.
+ */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun CalibrationEditContentPreview() {
-    EditContent(
-        uiState = CalibrationUiState(
-            entities = listOf(CalibrationEntity(id = 1L)),
-            selected = 1L,
-        )
-    )
+    // Create a calibration entity list with a single entity
+    val entities = listOf(CalibrationEntity(id = 1L))
+
+    // Create a calibration UI state with the entity list and a selected entity ID
+    val uiState = CalibrationUiState(entities = entities, selected = 1L)
+
+    // Show the calibration edit content
+    EditContent(uiState = uiState)
 }

@@ -55,21 +55,22 @@ fun InputDialog(
                     text = stringResource(id = R.string.add),
                     style = MaterialTheme.typography.titleMedium,
                 )
+
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
                     value = textFieldValue,
                     onValueChange = { textFieldValue = it },
-                    shape = MaterialTheme.shapes.medium,
+                    textStyle = TextStyle(
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp
+                    ),
                     singleLine = true,
+                    shape = MaterialTheme.shapes.medium,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
                         focusManager.clearFocus()
                         onConfirm(textFieldValue)
                     }),
-                    textStyle = TextStyle(
-                        textAlign = TextAlign.Center,
-                        fontSize = 20.sp
-                    ),
                 )
 
                 Row(

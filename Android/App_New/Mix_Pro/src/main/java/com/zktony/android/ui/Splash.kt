@@ -43,6 +43,13 @@ import com.zktony.android.ui.utils.NavigationType
  * @date 2023/5/17 10:50
  */
 
+/**
+ * Displays a splash screen with an animation and a message, and navigates to the home screen when the user clicks the "Done" button.
+ *
+ * @param modifier The modifier to apply to the splash screen.
+ * @param navController The navigation controller to use for navigating to the home screen.
+ * @param toggleDrawer The function to call to toggle the navigation drawer.
+ */
 @Composable
 fun Splash(
     modifier: Modifier = Modifier,
@@ -50,10 +57,11 @@ fun Splash(
     toggleDrawer: (NavigationType) -> Unit = {},
 ) {
 
+    // Define the animation scale and splash state
     val scale = remember { Animatable(0f) }
     var splash by remember { mutableStateOf(true) }
 
-    // AnimationEffect
+    // Animate the splash screen and hide it when the animation is complete
     LaunchedEffect(key1 = true) {
         scale.animateTo(
             targetValue = 0.7f,
@@ -66,6 +74,7 @@ fun Splash(
         splash = false
     }
 
+    // Display the splash screen with the logo and message
     Box(
         modifier = modifier
             .fillMaxSize()

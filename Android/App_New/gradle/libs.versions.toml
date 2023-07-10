@@ -48,7 +48,6 @@ okhttp = "5.0.0-alpha.11"
 protobuf = "3.23.4"
 protobuf-gradle-plugin = "0.9.3"
 room = "2.5.2"
-zxing = "3.5.1"
 
 [libraries]
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive", version.ref = "accompanist" }
@@ -128,7 +127,6 @@ kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-t
 okhttp3 = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 protobuf-kotlin-lite = { module = "com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }
 protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
-zxing = { module = "com.google.zxing:core", version.ref = "zxing" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

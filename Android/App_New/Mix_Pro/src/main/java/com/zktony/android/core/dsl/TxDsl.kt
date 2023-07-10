@@ -12,6 +12,18 @@ import com.zktony.serialport.ext.writeInt8
  * @date 2023/6/30 9:14
  */
 
+/**
+ * TxDsl
+ *
+ * @property byteList MutableList<Byte>
+ * @property indexList MutableList<Int>
+ * @property executeType ExecuteType
+ * @property exceptionPolicy ExceptionPolicy
+ * @property controlType ControlType
+ * @property timeout Long
+ * @property delay Long
+ * @constructor
+ */
 class TxDsl {
     val byteList: MutableList<Byte> = mutableListOf()
     val indexList: MutableList<Int> = mutableListOf()
@@ -34,7 +46,7 @@ class TxDsl {
     /**
      * move with distance or volume
      *
-     * @param block [@kotlin.ExtensionFunctionType] Function1<DM, Unit>
+     * @param block Function1<DM, Unit>
      * @return Unit
      */
     fun mdm(block: DM.() -> Unit) {
@@ -54,7 +66,7 @@ class TxDsl {
     /**
      * move with pulse
      *
-     * @param block [@kotlin.ExtensionFunctionType] Function1<PM, Unit>
+     * @param block Function1<PM, Unit>
      * @return Unit
      */
     fun mpm(block: PM.() -> Unit) {

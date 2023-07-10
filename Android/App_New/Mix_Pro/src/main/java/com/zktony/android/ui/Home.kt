@@ -59,7 +59,7 @@ import com.zktony.android.R
 import com.zktony.android.core.ext.format
 import com.zktony.android.core.ext.getTimeFormat
 import com.zktony.android.data.entities.ProgramEntity
-import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.components.TopAppBar
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
@@ -68,6 +68,14 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 
+/**
+ * Composable function for the Home screen.
+ *
+ * @param modifier The modifier to apply to the composable.
+ * @param navController The NavHostController used for navigation.
+ * @param toggleDrawer The function to toggle the drawer.
+ * @param viewModel The HomeViewModel used to manage the UI state.
+ */
 @Composable
 fun Home(
     modifier: Modifier = Modifier,
@@ -76,8 +84,10 @@ fun Home(
     viewModel: HomeViewModel = koinViewModel(),
 ) {
 
+    // Observe the UI state from the view model
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // Handle the back button press
     BackHandler {
         when (uiState.page) {
             PageType.START -> viewModel.event(HomeEvent.NavTo(PageType.LIST))
@@ -85,6 +95,7 @@ fun Home(
         }
     }
 
+    // Display the screen content
     ContentWrapper(
         modifier = modifier,
         uiState = uiState,
@@ -94,6 +105,15 @@ fun Home(
     )
 }
 
+/**
+ * Composable function for the content wrapper of the Home screen.
+ *
+ * @param modifier The modifier to apply to the composable.
+ * @param uiState The current UI state of the Home screen.
+ * @param event The function to handle events on the Home screen.
+ * @param toggleDrawer The function to toggle the drawer.
+ * @param navController The NavHostController used for navigation.
+ */
 @Composable
 fun ContentWrapper(
     modifier: Modifier = Modifier,
@@ -103,15 +123,15 @@ fun ContentWrapper(
     navController: NavHostController,
 ) {
     Column(modifier = modifier) {
-        // when page is start, show top app bar
+        // Show top app bar when page is start
         AnimatedVisibility(visible = uiState.page == PageType.START) {
-            ZktyTopAppBar(
+            TopAppBar(
                 title = stringResource(id = R.string.tab_program),
                 navigation = { event(HomeEvent.NavTo(PageType.LIST)) }
             )
         }
 
-        // background
+        // Background
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -153,6 +173,14 @@ fun ContentWrapper(
 }
 
 
+/**
+ * Composable function for the list content of the Home screen.
+ *
+ * @param modifier The modifier to apply to the composable.
+ * @param uiState The HomeUiState used to manage the UI state.
+ * @param event The function to handle events.
+ * @param navController The NavHostController used for navigation.
+ */
 @Composable
 fun ListContent(
     modifier: Modifier = Modifier,
@@ -165,12 +193,14 @@ fun ListContent(
         verticalArrangement = Arrangement.Center,
     ) {
 
+        // Display the list of items
         LazyVerticalGrid(
             columns = GridCells.Fixed(4),
             contentPadding = PaddingValues(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+            // Reset item
             item {
                 ListItem(
                     title = "复 位",
@@ -181,6 +211,7 @@ fun ListContent(
                     }
                 ) {
                     if (uiState.loading == 1) {
+                        // Display loading indicator
                         Box(
                             modifier = Modifier.size(64.dp),
                             contentAlignment = Alignment.Center,
@@ -191,6 +222,7 @@ fun ListContent(
                             )
                         }
                     } else {
+                        // Display reset icon
                         Image(
                             modifier = Modifier.size(64.dp),
                             painter = painterResource(id = R.drawable.ic_reset),
@@ -199,6 +231,7 @@ fun ListContent(
                     }
                 }
             }
+            // Clean item
             item {
                 ListItem(
                     title = "管路清理",
@@ -212,6 +245,7 @@ fun ListContent(
                     }
                 ) {
                     if (uiState.loading == 2) {
+                        // Display stop button and loading indicator
                         Box(
                             modifier = Modifier.size(64.dp),
                             contentAlignment = Alignment.Center,
@@ -228,6 +262,7 @@ fun ListContent(
                             )
                         }
                     } else {
+                        // Display clean icon and arrow icon
                         Box {
                             Image(
                                 modifier = Modifier.size(64.dp),
@@ -243,6 +278,7 @@ fun ListContent(
                     }
                 }
             }
+            // Syringe item
             item {
                 ListItem(
                     title = "填充-促凝剂",
@@ -256,6 +292,7 @@ fun ListContent(
                     }
                 ) {
                     if (uiState.loading == 3) {
+                        // Display stop button and loading indicator
                         Box(
                             modifier = Modifier.size(64.dp),
                             contentAlignment = Alignment.Center,
@@ -272,6 +309,7 @@ fun ListContent(
                             )
                         }
                     } else {
+                        // Display syringe icon and arrow icon
                         Box {
                             Image(
                                 modifier = Modifier.size(64.dp),
@@ -287,6 +325,7 @@ fun ListContent(
                     }
                 }
             }
+            // Reverse syringe item
             item {
                 ListItem(
                     title = "回吸-促凝剂",
@@ -300,6 +339,7 @@ fun ListContent(
                     }
                 ) {
                     if (uiState.loading == 4) {
+                        // Display stop button and loading indicator
                         Box(
                             modifier = Modifier.size(64.dp),
                             contentAlignment = Alignment.Center,
@@ -316,6 +356,7 @@ fun ListContent(
                             )
                         }
                     } else {
+                        // Display syringe icon and arrow icon
                         Box {
                             Image(
                                 modifier = Modifier.size(64.dp),
@@ -331,6 +372,7 @@ fun ListContent(
                     }
                 }
             }
+            // Pipeline item
             item {
                 ListItem(
                     title = "填充-胶体",
@@ -344,6 +386,7 @@ fun ListContent(
                     }
                 ) {
                     if (uiState.loading == 5) {
+                        // Display stop button and loading indicator
                         Box(
                             modifier = Modifier.size(64.dp),
                             contentAlignment = Alignment.Center,
@@ -360,6 +403,7 @@ fun ListContent(
                             )
                         }
                     } else {
+                        // Display pipeline icon and arrow icon
                         Box {
                             Image(
                                 modifier = Modifier.size(64.dp),
@@ -375,6 +419,7 @@ fun ListContent(
                     }
                 }
             }
+            // Reverse pipeline item
             item {
                 ListItem(
                     title = "回吸-胶体",
@@ -388,6 +433,7 @@ fun ListContent(
                     }
                 ) {
                     if (uiState.loading == 6) {
+                        // Display stop button and loading indicator
                         Box(
                             modifier = Modifier.size(64.dp),
                             contentAlignment = Alignment.Center,
@@ -404,6 +450,7 @@ fun ListContent(
                             )
                         }
                     } else {
+                        // Display pipeline icon and arrow icon
                         Box {
                             Image(
                                 modifier = Modifier.size(64.dp),
@@ -421,6 +468,7 @@ fun ListContent(
             }
         }
 
+        // Start program item
         ListItem(
             modifier = Modifier.padding(horizontal = 196.dp),
             title = "开始程序",
@@ -443,6 +491,15 @@ fun ListContent(
     }
 }
 
+/**
+ * Composable function for a list item in the Home screen.
+ *
+ * @param modifier The modifier to apply to the composable.
+ * @param title The title of the list item.
+ * @param onClick The function to handle click events on the list item.
+ * @param colors The colors to apply to the card.
+ * @param image The composable function to display the image of the list item.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListItem(
@@ -478,6 +535,14 @@ fun ListItem(
 }
 
 
+/**
+ * Composable function for the start content of the Home screen.
+ *
+ * @param modifier The modifier to apply to the composable.
+ * @param uiState The current UI state of the Home screen.
+ * @param event The function to handle events on the Home screen.
+ * @param toggleDrawer The function to toggle the drawer.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StartContent(
@@ -488,6 +553,7 @@ fun StartContent(
 ) {
     val scope = rememberCoroutineScope()
 
+    // Display the list of entities in a grid
     LazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
         columns = GridCells.Fixed(3),
@@ -496,9 +562,11 @@ fun StartContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(items = uiState.entities) {
+            // Display each entity as a card
             Card(
                 onClick = {
                     scope.launch {
+                        // Toggle the selected state of the entity and navigate to the runtime page
                         event(HomeEvent.ToggleSelected(it.id))
                         event(HomeEvent.NavTo(PageType.RUNTIME))
                         toggleDrawer(NavigationType.NONE)
@@ -509,6 +577,7 @@ fun StartContent(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    // Display the entity image and title
                     Row {
                         Image(
                             modifier = Modifier.size(32.dp),
@@ -522,6 +591,7 @@ fun StartContent(
                         )
                     }
 
+                    // Display the entity volume range
                     Column {
                         Text(
                             text = "${it.volume[0].format(1)} μL - ${it.volume[1].format(1)} μL",
@@ -541,6 +611,14 @@ fun StartContent(
 }
 
 
+/**
+ * Composable function for the runtime content of the Home screen.
+ *
+ * @param modifier The modifier to apply to the composable.
+ * @param uiState The current UI state of the Home screen.
+ * @param event The function to handle events on the Home screen.
+ * @param toggleDrawer The function to toggle the drawer.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RuntimeContent(
@@ -553,6 +631,7 @@ fun RuntimeContent(
     var time by remember { mutableStateOf(0L) }
     val item = uiState.entities.find { it.id == uiState.selected }!!
 
+    // Start a timer to display the runtime
     LaunchedEffect(key1 = uiState.job) {
         while (true) {
             if (uiState.job != null) {
@@ -568,6 +647,7 @@ fun RuntimeContent(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
+        // Display the close button
         FloatingActionButton(
             modifier = Modifier
                 .padding(8.dp)
@@ -604,6 +684,7 @@ fun RuntimeContent(
                     .weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
+                // Display the runtime timer
                 Card {
                     Box(
                         modifier = Modifier.padding(8.dp),
@@ -629,6 +710,7 @@ fun RuntimeContent(
                     }
                 }
 
+                // Display the volume information
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -723,6 +805,7 @@ fun RuntimeContent(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                // Display the start/stop button
                 ElevatedCard(
                     onClick = {
                         if (uiState.job == null) {
@@ -770,7 +853,6 @@ fun RuntimeContent(
                             )
                         }
                     }
-
                 }
             }
         }
@@ -778,6 +860,9 @@ fun RuntimeContent(
 }
 
 
+/**
+ * Composable function for the preview of the list content of the Home screen.
+ */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun HomeListContentPreview() {
@@ -787,22 +872,34 @@ fun HomeListContentPreview() {
     )
 }
 
+/**
+ * Composable function for the preview of the start content of the Home screen.
+ */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun HomeStartContentPreview() {
+    // Create a list of program entities for the preview
     val entities = listOf(
         ProgramEntity(),
         ProgramEntity(),
     )
+
+    // Display the start content with the preview entities
     StartContent(uiState = HomeUiState(entities = entities))
 }
 
+/**
+ * Composable function for the preview of the runtime content of the Home screen.
+ */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun HomeRuntimeContentPreview() {
+    // Create a list of program entities for the preview
     val entities = listOf(
         ProgramEntity(id = 1),
         ProgramEntity(),
     )
+
+    // Display the runtime content with the preview entities and a selected entity
     RuntimeContent(uiState = HomeUiState(entities = entities, selected = 1L))
 }

@@ -79,21 +79,30 @@ private val lightColorScheme = lightColorScheme(
     scrim = light_scrim
 )
 
+/**
+ * Composable function that sets up the application theme and applies it to the content.
+ *
+ * @param darkTheme Whether to use the dark theme.
+ * @param dynamicColor Whether to use dynamic colors.
+ * @param content The content to apply the theme to.
+ */
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    // Determine the color scheme based on the theme and dynamic color settings
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> darkColorScheme
         else -> lightColorScheme
     }
+
+    // Get the current view and set the system window decorations
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
@@ -103,6 +112,7 @@ fun AppTheme(
         }
     }
 
+    // Apply the material theme to the content
     MaterialTheme(
         colorScheme = colorScheme,
         typography = typography,

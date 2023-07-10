@@ -44,17 +44,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.core.ext.format
-import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.components.TopAppBar
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * 系统配置
+ * Displays the system configuration screen.
  *
- * @param modifier Modifier
- * @param navController NavHostController
- * @param viewModel ConfigViewModel
- * @return Unit
+ * @param modifier The modifier to apply to the composable.
+ * @param navController The NavHostController used for navigation.
+ * @param viewModel The ConfigViewModel used to manage the UI state.
  */
 @Composable
 fun Config(
@@ -62,17 +61,22 @@ fun Config(
     navController: NavHostController,
     viewModel: ConfigViewModel = koinViewModel(),
 ) {
+    // Observe the UI state from the view model
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // Handle the back button press
     BackHandler { navController.navigateUp() }
 
+    // Display the screen content
     Column(modifier = modifier) {
 
-        ZktyTopAppBar(
+        // Display the top app bar
+        TopAppBar(
             title = stringResource(id = R.string.system_config),
             navigation = { navController.navigateUp() }
         )
 
+        // Display the screen content wrapper
         ContentWrapper(
             modifier = Modifier,
             uiState = uiState,
@@ -81,6 +85,13 @@ fun Config(
     }
 }
 
+/**
+ * Wrapper composable for the system configuration screen content.
+ *
+ * @param modifier The modifier to apply to the composable.
+ * @param uiState The ConfigUiState used to manage the UI state.
+ * @param event The event handler for the ConfigEvent.
+ */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun ContentWrapper(
@@ -103,6 +114,7 @@ fun ContentWrapper(
         contentPadding = PaddingValues(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
+        // Display the maximum travel settings
         item {
             val travel = uiState.settings.travelList.ifEmpty { listOf(0f, 0f) }
             var y by remember { mutableStateOf(travel[0].format(1)) }
@@ -229,6 +241,7 @@ fun ContentWrapper(
 
         }
 
+        // Display the waste tank position settings
         item {
             val travel = uiState.settings.wasteList.ifEmpty { listOf(0f, 0f) }
             var y by remember { mutableStateOf(travel[0].format(1)) }
@@ -357,6 +370,9 @@ fun ContentWrapper(
     }
 }
 
+/**
+ * Preview function for the [ContentWrapper] composable.
+ */
 @Composable
 @Preview(showBackground = true, widthDp = 960)
 fun ConfigContentWrapperPreview() {

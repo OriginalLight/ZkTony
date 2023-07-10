@@ -10,16 +10,21 @@ import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 
 /**
- * @author: 刘贺贺
- * @date: 2023-02-14 12:53
+ * The main application class that initializes the application and its dependencies.
  */
 class App : Application() {
 
+    /**
+     * Initializes the application and its dependencies.
+     */
     override fun onCreate() {
         super.onCreate()
+
+        // Initialize the application context and data store factory
         Ext.with(this)
         DataStoreFactory.init(this)
 
+        // Initialize the dependency injection framework with the application context and modules
         startKoin {
             androidContext(this@App)
             androidLogger(level = Level.INFO)

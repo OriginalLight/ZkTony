@@ -43,18 +43,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.entities.MotorEntity
-import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.components.TopAppBar
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * Motor screen
+ * The Motor screen composable function.
  *
- * @param modifier Modifier
- * @param navController NavHostController
- * @param viewModel MotorViewModel
- * @return Unit
+ * @param modifier The modifier for the composable.
+ * @param navController The NavHostController for the screen.
+ * @param viewModel The MotorViewModel for the screen.
  */
 @Composable
 fun Motor(
@@ -62,8 +61,10 @@ fun Motor(
     navController: NavHostController,
     viewModel: MotorViewModel = koinViewModel(),
 ) {
+    // Observe changes in the UI state
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // Handle back button press
     BackHandler {
         when (uiState.page) {
             PageType.LIST -> navController.navigateUp()
@@ -71,6 +72,7 @@ fun Motor(
         }
     }
 
+    // Render the content of the screen
     ContentWrapper(
         modifier = modifier,
         uiState = uiState,
@@ -79,6 +81,14 @@ fun Motor(
     )
 }
 
+/**
+ * The ContentWrapper composable function for the Motor screen.
+ *
+ * @param modifier The modifier for the composable.
+ * @param uiState The MotorUiState for the screen.
+ * @param event The event handler for the screen.
+ * @param navController The NavHostController for the screen.
+ */
 @Composable
 fun ContentWrapper(
     modifier: Modifier = Modifier,
@@ -87,8 +97,8 @@ fun ContentWrapper(
     navController: NavHostController,
 ) {
     Column(modifier = modifier) {
-        // show top app bar with title and navigation
-        ZktyTopAppBar(
+        // Show top app bar with title and navigation
+        TopAppBar(
             title = if (uiState.page == PageType.LIST) {
                 stringResource(id = R.string.motor_config)
             } else {
@@ -96,12 +106,12 @@ fun ContentWrapper(
             },
             navigation = {
                 when (uiState.page) {
-                    PageType.LIST -> navController.navigateUp()
-                    else -> event(MotorEvent.NavTo(PageType.LIST))
+                    PageType.LIST -> navController.navigateUp() // Step 1: Navigate up if the current page is the list page
+                    else -> event(MotorEvent.NavTo(PageType.LIST)) // Step 2: Navigate to the list page if the current page is not the list page
                 }
             }
         )
-        // background
+        // Background
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -111,7 +121,7 @@ fun ContentWrapper(
                     shape = MaterialTheme.shapes.medium
                 ),
         ) {
-            // list content
+            // List content
             AnimatedVisibility(visible = uiState.page == PageType.LIST) {
                 ListContent(
                     modifier = Modifier,
@@ -119,7 +129,7 @@ fun ContentWrapper(
                     event = event,
                 )
             }
-            // edit content
+            // Edit content
             AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
                 EditContent(
                     modifier = Modifier,
@@ -131,6 +141,13 @@ fun ContentWrapper(
     }
 }
 
+/**
+ * The ListContent composable function for the Motor screen.
+ *
+ * @param modifier The modifier for the composable.
+ * @param uiState The MotorUiState for the screen.
+ * @param event The event handler for the screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListContent(
@@ -151,8 +168,8 @@ fun ListContent(
             Card(
                 onClick = {
                     scope.launch {
-                        event(MotorEvent.ToggleSelected(it.id))
-                        event(MotorEvent.NavTo(PageType.EDIT))
+                        event(MotorEvent.ToggleSelected(it.id)) // Step 1: Toggle the selected state of the entity
+                        event(MotorEvent.NavTo(PageType.EDIT)) // Step 2: Navigate to the edit page
                     }
                 }
             ) {
@@ -189,13 +206,23 @@ fun ListContent(
     }
 }
 
+/**
+ * The EditContent composable function for the Motor screen.
+ *
+ * @param modifier The modifier for the composable.
+ * @param uiState The MotorUiState for the screen.
+ * @param event The event handler for the screen.
+ */
 @Composable
 fun EditContent(
     modifier: Modifier = Modifier,
     uiState: MotorUiState = MotorUiState(),
     event: (MotorEvent) -> Unit = {},
 ) {
+    // Get the selected entity from the UI state
     val entity = uiState.entities.find { it.id == uiState.selected }!!
+
+    // Define the state variables for speed, acceleration, and deceleration
     var speed by remember { mutableStateOf(entity.speed) }
     var acc by remember { mutableStateOf(entity.acc) }
     var dec by remember { mutableStateOf(entity.dec) }
@@ -204,6 +231,7 @@ fun EditContent(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
     ) {
+        // Speed slider
         Text(
             modifier = Modifier.padding(start = 32.dp),
             text = stringResource(id = R.string.speed),
@@ -232,6 +260,8 @@ fun EditContent(
                 valueRange = 0f..1200f,
             )
         }
+
+        // Acceleration slider
         Text(
             modifier = Modifier.padding(start = 32.dp),
             text = stringResource(id = R.string.acceleration),
@@ -260,6 +290,8 @@ fun EditContent(
                 valueRange = 0f..1200f,
             )
         }
+
+        // Deceleration slider
         Text(
             modifier = Modifier.padding(start = 32.dp),
             text = stringResource(id = R.string.deceleration),
@@ -288,6 +320,8 @@ fun EditContent(
                 valueRange = 0f..1200f,
             )
         }
+
+        // Show the update button if any of the values have changed
         AnimatedVisibility(visible = entity.speed != speed || entity.acc != acc || entity.dec != dec) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -298,6 +332,7 @@ fun EditContent(
                         .width(192.dp)
                         .padding(top = 16.dp),
                     onClick = {
+                        // Update the entity with the new values and navigate back to the list page
                         event(MotorEvent.Update(entity.copy(speed = speed, acc = acc, dec = dec)))
                         event(MotorEvent.NavTo(PageType.LIST))
                     },
@@ -313,23 +348,39 @@ fun EditContent(
     }
 }
 
+/**
+ * The MotorListContentPreview composable function for the Motor screen.
+ * This function is used for previewing the ListContent composable.
+ *
+ * @param modifier The modifier for the composable.
+ * @param uiState The MotorUiState for the screen.
+ */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun MotorListContentPreview() {
-    ListContent(
-        modifier = Modifier, uiState = MotorUiState(
-            entities = listOf(
-                MotorEntity(text = "M1"), MotorEntity(text = "M2")
-            )
+fun MotorListContentPreview(
+    modifier: Modifier = Modifier,
+    uiState: MotorUiState = MotorUiState(
+        entities = listOf(
+            MotorEntity(text = "M1"), MotorEntity(text = "M2")
         )
+    )
+) {
+    ListContent(
+        modifier = modifier,
+        uiState = uiState,
     )
 }
 
+/**
+ * The MotorEditContentPreview composable function for the Motor screen.
+ * This function is used for previewing the EditContent composable.
+ */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun MotorEditContentPreview() {
     EditContent(
-        modifier = Modifier, uiState = MotorUiState(
+        modifier = Modifier,
+        uiState = MotorUiState(
             entities = listOf(
                 MotorEntity(text = "M1", id = 1L)
             ),

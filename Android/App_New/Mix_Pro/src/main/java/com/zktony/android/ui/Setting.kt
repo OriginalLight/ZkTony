@@ -1,8 +1,5 @@
 package com.zktony.android.ui
 
-import android.annotation.SuppressLint
-import android.graphics.Color
-import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
@@ -51,8 +48,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -68,13 +63,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.google.gson.Gson
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.core.ext.Ext
-import com.zktony.android.core.ext.createQRCodeBitmap
-import com.zktony.android.core.utils.QrCode
-import com.zktony.android.ui.components.ZktyTopAppBar
+import com.zktony.android.ui.components.TopAppBar
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.delay
@@ -82,11 +73,11 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 /**
- * Setting screen
+ * Composable function that displays the settings screen.
  *
- * @param modifier Modifier
- * @param navController NavHostController
- * @param viewModel SettingViewModel
+ * @param modifier The modifier to apply to the composable.
+ * @param navController The NavHostController used for navigation.
+ * @param viewModel The view model used for the settings screen.
  */
 @Composable
 fun Setting(
@@ -94,8 +85,10 @@ fun Setting(
     navController: NavHostController,
     viewModel: SettingViewModel = koinViewModel(),
 ) {
+    // Collect the UI state from the view model
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // Handle the back button press
     BackHandler {
         when (uiState.page) {
             PageType.LIST -> navController.navigateUp()
@@ -103,6 +96,7 @@ fun Setting(
         }
     }
 
+    // Display the content wrapper
     ContentWrapper(
         modifier = modifier,
         uiState = uiState,
@@ -111,6 +105,14 @@ fun Setting(
     )
 }
 
+/**
+ * Composable function that displays the content wrapper for the settings screen.
+ *
+ * @param modifier The modifier to apply to the composable.
+ * @param uiState The UI state for the settings screen.
+ * @param event The event handler for the settings screen.
+ * @param navController The NavHostController used for navigation.
+ */
 @Composable
 fun ContentWrapper(
     modifier: Modifier = Modifier,
@@ -119,14 +121,14 @@ fun ContentWrapper(
     navController: NavHostController,
 ) {
     Column(modifier = modifier) {
-        // Top app bar when authentication page is visible
+        // Display the top app bar when the authentication page is visible
         AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
-            ZktyTopAppBar(
+            TopAppBar(
                 title = stringResource(id = R.string.authentication),
                 navigation = { event(SettingEvent.NavTo(PageType.LIST)) }
             )
         }
-        // main page
+        // Display the main page
         AnimatedVisibility(visible = uiState.page == PageType.LIST) {
             Column(
                 modifier = modifier
@@ -138,15 +140,18 @@ fun ContentWrapper(
                     modifier = Modifier.weight(1f),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    // Display the settings content
                     SettingsContent(
                         modifier = Modifier.weight(1f),
                         uiState = uiState,
                         event = event,
                     )
+                    // Display the info content
                     InfoContent(
                         modifier = Modifier.weight(1f),
                     )
                 }
+                // Display the operation content
                 OperationContent(
                     modifier = Modifier.wrapContentHeight(),
                     uiState = uiState,
@@ -154,7 +159,7 @@ fun ContentWrapper(
                 )
             }
         }
-        // authentication page
+        // Display the authentication page
         AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
             Authentication(
                 modifier = modifier,
@@ -165,17 +170,30 @@ fun ContentWrapper(
     }
 }
 
+/**
+ * Composable function that displays the settings content.
+ *
+ * @param modifier The modifier to apply to the composable.
+ * @param uiState The UI state for the settings screen.
+ * @param event The event handler for the settings screen.
+ */
 @Composable
 fun SettingsContent(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
     event: (SettingEvent) -> Unit = {},
 ) {
-    val lazyColumnState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
-    var expanded by remember { mutableStateOf(false) }
+    // Define the language list
     val languageList = listOf(Pair("English", "en"), Pair("简体中文", "zh"))
 
+    // Define the lazy column state and coroutine scope
+    val lazyColumnState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
+    // Define the expanded state for the language list
+    var expanded by remember { mutableStateOf(false) }
+
+    // Display the settings content
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -186,11 +204,13 @@ fun SettingsContent(
             ),
         state = lazyColumnState,
     ) {
+        // Display the language setting
         item {
             SettingsCard(
                 image = R.drawable.ic_language,
                 text = stringResource(id = R.string.language),
-                onClick = { expanded = !expanded }) {
+                onClick = { expanded = !expanded }
+            ) {
                 Text(
                     text = when (uiState.settings.language) {
                         "en" -> "English"
@@ -201,6 +221,7 @@ fun SettingsContent(
                 )
             }
         }
+        // Display the language list
         languageList.forEach { (name, code) ->
             item {
                 AnimatedVisibility(visible = expanded) {
@@ -212,7 +233,8 @@ fun SettingsContent(
                                 event(SettingEvent.Language(code))
                                 expanded = false
                             }
-                        }) {
+                        }
+                    ) {
                         Text(
                             text = name,
                             style = MaterialTheme.typography.bodyLarge,
@@ -221,6 +243,7 @@ fun SettingsContent(
                 }
             }
         }
+        // Display the navigation setting
         item {
             SettingsCard(
                 image = R.drawable.ic_navigation,
@@ -239,15 +262,20 @@ fun SettingsContent(
     }
 }
 
-@SuppressLint("HardwareIds")
+/**
+ * Composable function that displays the info content.
+ *
+ * @param modifier The modifier to apply to the composable.
+ */
 @Composable
 fun InfoContent(
     modifier: Modifier = Modifier,
 ) {
+    // Define the lazy column state and expanded state for the help info
     val lazyColumnState = rememberLazyListState()
-    var deviceInfo by remember { mutableStateOf(false) }
     var helpInfo by remember { mutableStateOf(false) }
 
+    // Display the info content
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -259,8 +287,9 @@ fun InfoContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         state = lazyColumnState,
     ) {
+        // Display the version info
         item {
-            AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
+            AnimatedVisibility(visible = !helpInfo) {
                 SettingsCard(
                     image = R.drawable.ic_version,
                     text = stringResource(id = R.string.version),
@@ -274,24 +303,9 @@ fun InfoContent(
                 }
             }
         }
+        // Display the help info toggle
         item {
-            AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
-                SettingsCard(
-                    image = R.drawable.ic_about,
-                    text = stringResource(id = R.string.device_info),
-                    onClick = { deviceInfo = !deviceInfo },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = null,
-                    )
-                }
-            }
-
-        }
-        item {
-            AnimatedVisibility(visible = !deviceInfo && !helpInfo) {
+            AnimatedVisibility(visible = !helpInfo) {
                 SettingsCard(
                     image = R.drawable.ic_help,
                     text = stringResource(id = R.string.help),
@@ -305,55 +319,32 @@ fun InfoContent(
                 }
             }
         }
+        // Display the QR code help info
         item {
-            AnimatedVisibility(visible = deviceInfo) {
-                SettingsCard(
-                    image = R.drawable.ic_about,
-                    text = stringResource(id = R.string.device_info),
-                    onClick = { deviceInfo = !deviceInfo },
+            AnimatedVisibility(visible = helpInfo) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = Icons.Default.Close,
-                        contentDescription = null,
-                    )
-                }
-            }
-        }
-        item {
-            AnimatedVisibility(visible = deviceInfo) {
-                Card(
-                    modifier = Modifier.padding(16.dp),
-                ) {
-                    Column(
+                    SettingsCard(
+                        image = R.drawable.ic_help,
+                        text = stringResource(id = R.string.qrcode),
+                        onClick = { helpInfo = !helpInfo },
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.Default.Close,
+                            contentDescription = null,
+                        )
+                    }
+                    Card(
                         modifier = Modifier.padding(16.dp),
                     ) {
-                        val code = Gson().toJson(
-                            QrCode(
-                                id = Settings.Secure.getString(
-                                    Ext.ctx.contentResolver, Settings.Secure.ANDROID_ID
-                                ),
-                                `package` = BuildConfig.APPLICATION_ID,
-                                version_name = BuildConfig.VERSION_NAME,
-                                version_code = BuildConfig.VERSION_CODE,
-                                build_type = BuildConfig.BUILD_TYPE,
-                            )
-                        )
-                        val bitmap = createQRCodeBitmap(
-                            content = code,
-                            width = 400,
-                            height = 400,
-                            character_set = "UTF-8",
-                            error_correction_level = "H",
-                            margin = "1",
-                            color_black = Color.BLACK,
-                            color_white = Color.WHITE
-                        )
-
-                        if (bitmap != null) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                        ) {
                             Image(
                                 modifier = Modifier.size(200.dp),
-                                painter = BitmapPainter(bitmap.asImageBitmap()),
+                                painter = painterResource(id = R.drawable.qrcode),
                                 contentDescription = null
                             )
                         }
@@ -361,41 +352,16 @@ fun InfoContent(
                 }
             }
         }
-        item {
-            AnimatedVisibility(visible = helpInfo) {
-                SettingsCard(
-                    image = R.drawable.ic_help,
-                    text = stringResource(id = R.string.qrcode),
-                    onClick = { helpInfo = !helpInfo },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = Icons.Default.Close,
-                        contentDescription = null,
-                    )
-                }
-            }
-        }
-        item {
-            AnimatedVisibility(visible = helpInfo) {
-                Card(
-                    modifier = Modifier.padding(16.dp),
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                    ) {
-                        Image(
-                            modifier = Modifier.size(200.dp),
-                            painter = painterResource(id = R.drawable.qrcode),
-                            contentDescription = null
-                        )
-                    }
-                }
-            }
-        }
     }
 }
 
+/**
+ * Composable function that displays the operation content.
+ *
+ * @param modifier The modifier to apply to the composable.
+ * @param uiState The UI state for the settings screen.
+ * @param event The event handler for the settings screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OperationContent(
@@ -403,6 +369,7 @@ fun OperationContent(
     uiState: SettingUiState,
     event: (SettingEvent) -> Unit = {},
 ) {
+    // Display the operation content
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -412,6 +379,7 @@ fun OperationContent(
                 shape = MaterialTheme.shapes.medium,
             ),
     ) {
+        // Display the parameters card
         ElevatedCard(
             modifier = Modifier
                 .weight(1f)
@@ -434,6 +402,7 @@ fun OperationContent(
                 )
             }
         }
+        // Display the network card
         ElevatedCard(
             modifier = Modifier
                 .weight(1f)
@@ -456,6 +425,7 @@ fun OperationContent(
                 )
             }
         }
+        // Display the update card
         ElevatedCard(
             modifier = Modifier
                 .weight(1f)
@@ -466,6 +436,7 @@ fun OperationContent(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                // Determine the icon and text to display based on the UI state
                 val painter = if (uiState.application == null) {
                     painterResource(id = R.drawable.ic_sync)
                 } else {
@@ -488,6 +459,7 @@ fun OperationContent(
                         "${uiState.progress} %"
                     }
                 }
+                // Display the progress indicator or the icon and text
                 AnimatedVisibility(visible = uiState.progress > 0) {
                     CircularProgressIndicator(
                         modifier = Modifier
@@ -514,14 +486,22 @@ fun OperationContent(
     }
 }
 
+/**
+ * Composable function that displays a verification code item.
+ *
+ * @param text The text to display in the verification code item.
+ * @param focused Whether the verification code item is focused.
+ */
 @Composable
 fun VerificationCodeItem(text: String, focused: Boolean) {
+    // Determine the border color based on the focus state
     val borderColor = if (focused) {
         MaterialTheme.colorScheme.onBackground
     } else {
         MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f)
     }
 
+    // Display the verification code item
     Box(
         modifier = Modifier
             .border(4.dp, borderColor, RoundedCornerShape(8.dp))
@@ -532,9 +512,16 @@ fun VerificationCodeItem(text: String, focused: Boolean) {
             text = text, fontSize = 28.sp, textAlign = TextAlign.Center, maxLines = 1
         )
     }
-
 }
 
+/**
+ * Composable function that displays a verification code field.
+ *
+ * @param digits The number of digits in the verification code field.
+ * @param horizontalMargin The horizontal margin to apply between verification code items.
+ * @param inputCallback The callback to invoke when the verification code is entered.
+ * @param itemScope The composable function to use to display each verification code item.
+ */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun VerificationCodeField(
@@ -547,8 +534,9 @@ fun VerificationCodeField(
     val focusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    // Delay the focus request and keyboard show to avoid race conditions
     LaunchedEffect(Unit) {
-        delay(100) //延迟操作(关键点)
+        delay(100)
         focusRequester.requestFocus()
         keyboardController?.show()
     }
@@ -558,34 +546,36 @@ fun VerificationCodeField(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            //绘制框
+            // Display each verification code item
             repeat(digits) {
                 if (it != 0) {
-                    //添加间距
+                    // Add horizontal margin between verification code items
                     Spacer(modifier = Modifier.width(horizontalMargin))
                 }
-                //获取当前框的文本
+                // Determine the text to display in the verification code item
                 val text = if (content.getOrNull(it) != null) "*" else ""
-                //是否正在输入的框
+                // Determine whether the verification code item is focused
                 val focused = it == content.length
-                //绘制文本
+                // Display the verification code item
                 itemScope(text, focused)
             }
-
         }
+        // Display the text field for entering the verification code
         BasicTextField(
             modifier = Modifier
                 .focusRequester(focusRequester)
-                .drawWithContent { }//清楚绘制内容
+                .drawWithContent { }// Clear the content to avoid overlapping with the verification code items
                 .matchParentSize(),
             value = content,
             onValueChange = {
                 content = it
                 if (it.length == digits) {
                     if (it == "123456") {
+                        // Invoke the input callback when the verification code is entered
                         inputCallback(it)
                         keyboardController?.hide()
                     } else {
+                        // Clear the verification code field and request focus again if the verification code is incorrect
                         content = ""
                         focusRequester.requestFocus()
                     }
@@ -599,9 +589,15 @@ fun VerificationCodeField(
             }),
         )
     }
-
 }
 
+/**
+ * Composable function that displays the authentication screen.
+ *
+ * @param modifier The modifier to apply to the composable.
+ * @param event The event handler for the authentication screen.
+ * @param navController The navigation controller for the authentication screen.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Authentication(
@@ -621,7 +617,9 @@ fun Authentication(
             ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        // Display the authentication header
         Spacer(modifier = Modifier.height(128.dp))
+        // Display the verification code field
         AnimatedVisibility(visible = !show) {
             VerificationCodeField(digits = 6, inputCallback = {
                 show = true
@@ -629,11 +627,13 @@ fun Authentication(
                 VerificationCodeItem(text, focused)
             }
         }
+        // Display the navigation buttons
         AnimatedVisibility(visible = show) {
             Row(
                 modifier = Modifier.padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
+                // Display the motor configuration button
                 ElevatedCard(
                     onClick = {
                         event(SettingEvent.NavTo(PageType.LIST))
@@ -657,6 +657,7 @@ fun Authentication(
                         )
                     }
                 }
+                // Display the system configuration button
                 ElevatedCard(
                     onClick = {
                         event(SettingEvent.NavTo(PageType.LIST))
@@ -685,6 +686,15 @@ fun Authentication(
     }
 }
 
+/**
+ * Composable function that displays a settings card.
+ *
+ * @param paddingStart The start padding to apply to the settings card.
+ * @param onClick The click listener for the settings card.
+ * @param image The image resource ID to display in the settings card.
+ * @param text The text to display in the settings card.
+ * @param content The composable function to use to display the content of the settings card.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsCard(
@@ -706,11 +716,13 @@ fun SettingsCard(
                 .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // Display the image in the settings card
             Image(
                 modifier = Modifier.size(32.dp),
                 painter = painterResource(id = image),
                 contentDescription = null,
             )
+            // Display the text in the settings card
             text?.let {
                 Text(
                     modifier = Modifier.padding(start = 8.dp),
@@ -718,20 +730,37 @@ fun SettingsCard(
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
+            // Display the content of the settings card
             Spacer(modifier = Modifier.weight(1f))
             content.invoke()
         }
     }
 }
 
+/**
+ * Composable function that displays a preview of the setting list.
+ */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun SettingListPreview() {
-    ContentWrapper(uiState = SettingUiState(), navController = rememberNavController())
+    // Create a new instance of the setting UI state
+    val uiState = SettingUiState()
+    // Create a new instance of the navigation controller
+    val navController = rememberNavController()
+
+    // Display the content wrapper for the setting list
+    ContentWrapper(uiState = uiState, navController = navController)
 }
 
+/**
+ * Composable function that displays a preview of the authentication screen.
+ */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun AuthenticationPreview() {
-    Authentication(navController = rememberNavController())
+    // Create a new instance of the navigation controller
+    val navController = rememberNavController()
+
+    // Display the authentication screen
+    Authentication(navController = navController)
 }
