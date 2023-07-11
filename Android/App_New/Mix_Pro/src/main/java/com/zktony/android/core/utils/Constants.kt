@@ -5,6 +5,7 @@ package com.zktony.android.core.utils
  * 设置页常量
  */
 object Constants {
+    const val DATABASE_NAME = "zktony-db"
     const val DOMAIN = "https://www.zktony.com"
     const val GRPC_AUTHORITY = "example.com"
     const val GRPC_HOST = "182.160.14.59"

@@ -30,7 +30,6 @@ import org.koin.androidx.compose.koinViewModel
  */
 @Composable
 fun App() {
-
     val navController = rememberNavController()
     val navigationActions = remember(navController) {
         NavigationActions(navController)
@@ -70,15 +69,14 @@ fun App() {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.inverseOnSurface)
+                    .background(MaterialTheme.colorScheme.outlineVariant)
             ) {
                 AppNavHost(
                     navController = navController,
-                    toggleDrawer = { navigationType.value = it }
+                    toggleDrawer = { navigationType.value = it },
                 )
             }
-
-        }
+        },
     )
 }
 

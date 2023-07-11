@@ -111,7 +111,6 @@ dependencies {
     implementation(libs.gson)
     implementation(libs.koin.androidx.compose)
     implementation(libs.okhttp3)
-    implementation(libs.zxing)
 
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)

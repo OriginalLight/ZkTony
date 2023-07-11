@@ -3,10 +3,8 @@ package com.zktony.android.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.core.dsl.axisInitializer
-import com.zktony.android.core.dsl.setLock
 import com.zktony.android.core.dsl.syringeInitializer
 import com.zktony.android.core.dsl.tx
-import com.zktony.android.core.ext.logw
 import com.zktony.android.core.utils.Constants
 import com.zktony.android.core.utils.ExecuteType
 import com.zktony.android.data.dao.ProgramDao
@@ -14,7 +12,7 @@ import com.zktony.android.data.entities.ProgramEntity
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -26,21 +24,24 @@ import kotlinx.coroutines.withTimeout
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class HomeViewModel constructor(
-    private val dao: ProgramDao,
-) : ViewModel() {
+class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.LIST)
     private val _loading = MutableStateFlow(0)
     private val _job = MutableStateFlow<Job?>(null)
     private var syringeJob: Job? = null
+
+    // Expose the UI state as a read-only flow
     val uiState = _uiState.asStateFlow()
 
+    /**
+     * Initializes the Home screen by observing changes in the database and updating the UI state accordingly.
+     */
     init {
         viewModelScope.launch {
             combine(
-                dao.getAll(),
+                dao.getAll(), // Step 1: Observe changes in the database by calling the getAll function
                 _selected,
                 _page,
                 _loading,
@@ -56,11 +57,16 @@ class HomeViewModel constructor(
             }.catch { ex ->
                 ex.printStackTrace()
             }.collect {
-                _uiState.value = it
+                _uiState.value = it // Step 2: Update the UI state with the new values
             }
         }
     }
 
+    /**
+     * Handles the given Home screen event.
+     *
+     * @param event The Home screen event to handle.
+     */
     fun event(event: HomeEvent) {
         when (event) {
             is HomeEvent.Reset -> reset()
@@ -74,12 +80,17 @@ class HomeViewModel constructor(
         }
     }
 
+    /**
+     * Resets the Home screen by initializing the axes and syringe.
+     */
     private fun reset() {
         viewModelScope.launch {
             _loading.value = 1
             try {
+                // Initialize the axes and syringe within a timeout of 60 seconds
                 withTimeout(60 * 1000L) {
-                    axisInitializer(1, 0)
+                    axisInitializer(1, 0) // Step 1: Initialize the X axis to 1 and the Y axis to 0
+                    syringeInitializer(2) // Step 2: Initialize the syringe
                 }
             } catch (ex: Exception) {
                 _loading.value = 0
@@ -89,25 +100,74 @@ class HomeViewModel constructor(
         }
     }
 
+    /**
+     * Starts the execution of the selected program entity.
+     */
     private fun start() {
         viewModelScope.launch {
             val selected = _uiState.value.entities.find { it.id == _selected.value }!!
+
+            // Launch a new job to execute the program entity
             _job.value = launch(Dispatchers.Default) {
-                // 步骤： 移动-> 切阀-> 预排-> 制胶
+                // Move to the starting position
+                // Step 1: Move the Z axis to 0
+                tx {
+                    mdm {
+                        index = 1
+                        dv = 0f
+                    }
+                }
+                // Step 2: Move the Y axis to 0
+                tx {
+                    mdm {
+                        index = 0
+                        dv = 0f
+                    }
+                }
+
+                // Open the valve to start the process
+                // Step 3: Open the valve
+                tx {
+                    delay = 100L
+                    valve(2 to 1)
+                }
+
+                // Perform the pre-dispense operation
+                // Step 4: Perform the pre-dispense operation
+                tx {
+                    timeout = 1000L * 60 * 1
+                    mdm {
+                        index = 2
+                        dv = selected.volume[3]
+                    }
+                    repeat(6) {
+                        mdm {
+                            index = it + 3
+                            dv = selected.volume[2]
+                        }
+                    }
+                }
+
+                // Move to the dispensing position
+                // Step 5: Move the Z axis to 1
                 tx {
                     mdm {
                         index = 0
                         dv = selected.axis[0]
                     }
                 }
+                // Step 6: Move the Y axis to 1
                 tx {
                     mdm {
                         index = 1
                         dv = selected.axis[1]
                     }
                 }
-                //tx { valve(2 to 0) }
+
+                // Perform the dispensing operation
+                // Step 7: Perform the dispensing operation
                 tx {
+                    timeout = 1000L * 60 * 3
                     mdm {
                         index = 2
                         dv = selected.volume[1]
@@ -119,37 +179,119 @@ class HomeViewModel constructor(
                         }
                     }
                 }
-                repeat(30) {
-                    it.toString().logw()
-                    delay(1000L)
+            }
+
+            // Handle the completion of the job
+            _job.value?.invokeOnCompletion {
+                launch {
+                    // Reset the screen and stop the motors
+                    _job.value = null
+                    _loading.value = 1
+                    tx {
+                        mdm {
+                            index = 1
+                            dv = 0f
+                        }
+                    }
+                    tx {
+                        mdm {
+                            index = 0
+                            dv = 0f
+                        }
+                    }
+
+                    // Close the valve
+                    tx {
+                        delay = 100L
+                        valve(2 to 0)
+                    }
+
+                    // Perform a syringe operation to clear the system
+                    tx {
+                        timeout = 1000L * 60
+                        mpm {
+                            index = 2
+                            pulse = Constants.MAX_SYRINGE * -1
+                            acc = 300f
+                            dec = 400f
+                            speed = 600f
+                        }
+                    }
+
+                    // Set the loading state to 0 to indicate that the execution has stopped
+                    _loading.value = 0
                 }
             }
-            _job.value?.invokeOnCompletion { stop() }
         }
     }
 
+    /**
+     * Stops the execution of the Home screen.
+     */
     private fun stop() {
         viewModelScope.launch {
-            _job.value?.cancel()
+            // Cancel and join the current job
+            _job.value?.cancelAndJoin()
             _job.value = null
+
+            // Reset the screen and stop the motors
             _loading.value = 1
-            //tx { valve(2 to 0) }
-            delay(100L)
-            syringeInitializer(2)
+            tx {
+                delay = 500L
+                reset()
+            }
+            tx {
+                mdm {
+                    index = 1
+                    dv = 0f
+                }
+            }
+            tx {
+                mdm {
+                    index = 0
+                    dv = 0f
+                }
+            }
+
+            // Close the syringe valve
+            tx {
+                delay = 100L
+                valve(2 to 0)
+            }
+
+            // Perform a syringe operation to clear the system
+            tx {
+                timeout = 1000L * 60
+                mpm {
+                    index = 2
+                    pulse = Constants.MAX_SYRINGE * -1
+                    acc = 300f
+                    dec = 400f
+                    speed = 600f
+                }
+            }
+
+            // Set the loading state to 0 to indicate that the execution has stopped
             _loading.value = 0
         }
     }
 
+    /**
+     * Performs a clean operation on a program entity.
+     *
+     * @param index The index of the program entity to perform the operation on.
+     */
     private fun clean(index: Int) {
         viewModelScope.launch {
             if (index == 0) {
+                // Stop all clean operations
                 _loading.value = 0
                 tx { stop(9) }
             } else {
+                // Start a clean operation on the selected program entity
                 _loading.value = 2
                 tx {
                     executeType = ExecuteType.ASYNC
-                    setLock(9)
                     mpm {
                         this.index = 9
                         pulse = 3200L * 10000L
@@ -159,31 +301,47 @@ class HomeViewModel constructor(
         }
     }
 
+    /**
+     * Performs a syringe operation on a program entity.
+     *
+     * @param index The index of the program entity to perform the operation on.
+     */
     private fun syringe(index: Int) {
         viewModelScope.launch {
             if (index == 0) {
+                // Stop all syringe operations
                 _loading.value = 0
-                syringeJob?.cancel()
+                syringeJob?.cancelAndJoin()
                 syringeJob = null
-                syringeInitializer(2)
+                tx {
+                    timeout = 1000L * 60
+                    mpm {
+                        this.index = 2
+                        pulse = Constants.MAX_SYRINGE * -1
+                    }
+                }
             } else {
+                // Start a syringe operation on the selected program entity
                 _loading.value = index + 2
                 syringeJob = launch {
                     while (true) {
-                        tx { valve(2 to if (index == 1) 1 else 0) }
-                        delay(100L)
                         tx {
-                            timeout = 1000L * 30
+                            delay = 100L
+                            valve(2 to if (index == 1) 1 else 0)
+                        }
+                        tx {
+                            timeout = 1000L * 60
                             mpm {
                                 this.index = 2
                                 pulse = Constants.MAX_SYRINGE
                             }
                         }
-                        delay(100L)
-                        tx { valve(2 to if (index == 1) 0 else 1) }
-                        delay(100L)
                         tx {
-                            timeout = 1000L * 30
+                            delay = 100L
+                            valve(2 to if (index == 1) 0 else 1)
+                        }
+                        tx {
+                            timeout = 1000L * 60
                             mpm {
                                 this.index = 2
                                 pulse = Constants.MAX_SYRINGE * -1
@@ -195,17 +353,23 @@ class HomeViewModel constructor(
         }
     }
 
+    /**
+     * Performs a pipeline operation on a program entity.
+     *
+     * @param index The index of the program entity to perform the operation on.
+     */
     private fun pipeline(index: Int) {
         viewModelScope.launch {
             if (index == 0) {
+                // Stop all pipeline operations
                 _loading.value = 0
                 tx { stop(3, 4, 5, 6, 7, 8) }
             } else {
+                // Start a pipeline operation on the selected program entity
                 _loading.value = index + 4
                 tx {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {
-                        setLock(it + 3)
                         mpm {
                             this.index = it + 3
                             pulse = 3200L * 10000L * if (index == 1) 1 else -1
@@ -217,6 +381,15 @@ class HomeViewModel constructor(
     }
 }
 
+/**
+ * Data class for the UI state of the Home screen.
+ *
+ * @param entities The list of program entities to display.
+ * @param selected The ID of the selected program entity.
+ * @param page The current page type.
+ * @param loading The loading state of the screen.
+ * @param job The current execution job.
+ */
 data class HomeUiState(
     val entities: List<ProgramEntity> = emptyList(),
     val selected: Long = 0L,
@@ -234,6 +407,9 @@ data class HomeUiState(
     val job: Job? = null,
 )
 
+/**
+ * Sealed class for the events of the Home screen.
+ */
 sealed class HomeEvent {
     object Reset : HomeEvent()
     object Start : HomeEvent()

@@ -14,21 +14,35 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
 /**
- * @author: 刘贺贺
- * @date: 2023-02-14 15:37
+ * ViewModel for the Config screen.
  */
 class ConfigViewModel : ViewModel() {
+
+    /**
+     * Represents the current UI state of the Config screen.
+     */
     private val _uiState = MutableStateFlow(ConfigUiState())
-    private val _lock = MutableStateFlow(false)
+
+    /**
+     * Represents the current loading state of the Config screen.
+     */
+    private val _loading = MutableStateFlow(false)
+
+    /**
+     * Exposes the current UI state of the Config screen as a read-only flow.
+     */
     val uiState = _uiState.asStateFlow()
 
+    /**
+     * Initializes the view model by observing changes to the settings and updating the UI state accordingly.
+     */
     init {
         viewModelScope.launch {
             combine(
                 settingsFlow,
-                _lock
-            ) { settings, lock ->
-                ConfigUiState(settings = settings, lock = lock)
+                _loading
+            ) { settings, loading ->
+                ConfigUiState(settings = settings, loading = loading)
             }.catch { ex ->
                 ex.printStackTrace()
             }.collect {
@@ -37,6 +51,11 @@ class ConfigViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Handles the given event and updates the UI state accordingly.
+     *
+     * @param event The event to handle.
+     */
     fun event(event: ConfigEvent) {
         when (event) {
             is ConfigEvent.SetTravel -> setTravel(event.index, event.distance)
@@ -45,6 +64,12 @@ class ConfigViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Sets the travel distance for the given index in the settings.
+     *
+     * @param index The index of the travel distance to set.
+     * @param distance The distance to set.
+     */
     private fun setTravel(index: Int, distance: Float) {
         viewModelScope.launch {
             val list = _uiState.value.settings.travelList.toMutableList()
@@ -63,11 +88,17 @@ class ConfigViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Sets the waste distance for the given index in the settings.
+     *
+     * @param index The index of the waste distance to set.
+     * @param distance The distance to set.
+     */
     private fun setWaste(index: Int, distance: Float) {
         viewModelScope.launch {
             val list = _uiState.value.settings.wasteList.toMutableList()
             if (list.size == 0) {
-                repeat(3) {
+                repeat(2) {
                     list.add(0f)
                 }
             }
@@ -81,26 +112,41 @@ class ConfigViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Moves to the given index with the given distance.
+     *
+     * @param index The index to move to.
+     * @param distance The distance to move.
+     */
     private fun moveTo(index: Int, distance: Float) {
         viewModelScope.launch {
-            _lock.value = true
+            _loading.value = true
             tx {
                 mdm {
                     this.index = index + 3
                     dv = distance
                 }
             }
-            _lock.value = false
+            _loading.value = false
         }
     }
 
 }
 
+/**
+ * Represents the current UI state of the Config screen.
+ *
+ * @param settings The settings to display.
+ * @param loading The loading state of the screen.
+ */
 data class ConfigUiState(
     val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
-    val lock: Boolean = false,
+    val loading: Boolean = false,
 )
 
+/**
+ * Represents an event that can occur on the Config screen.
+ */
 sealed class ConfigEvent {
     data class SetTravel(val index: Int, val distance: Float) : ConfigEvent()
     data class SetWaste(val index: Int, val distance: Float) : ConfigEvent()

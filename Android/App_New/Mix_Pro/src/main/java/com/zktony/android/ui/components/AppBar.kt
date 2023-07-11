@@ -23,25 +23,19 @@ import androidx.compose.ui.unit.dp
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ZktyTopAppBar(
-    modifier: Modifier = Modifier,
+fun TopAppBar(
     title: String,
+    modifier: Modifier = Modifier,
     navigation: () -> Unit = {},
     actions: @Composable (() -> Unit)? = null,
 ) {
     CenterAlignedTopAppBar(
         modifier = modifier
-            .padding(top = 8.dp, start = 8.dp, end = 8.dp)
+            .padding(start = 8.dp, top = 8.dp, end = 8.dp)
             .background(
                 color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.medium
             ),
-        title = {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleLarge,
-            )
-        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
         ),
@@ -60,6 +54,12 @@ fun ZktyTopAppBar(
                 )
             }
         },
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+            )
+        },
         actions = {
             actions?.invoke()
         }
@@ -69,6 +69,6 @@ fun ZktyTopAppBar(
 @Composable
 @Preview
 fun TopAppBarPreview() {
-    ZktyTopAppBar(title = "Title")
+    TopAppBar(title = "Title")
 }
 

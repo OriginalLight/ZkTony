@@ -14,17 +14,22 @@ import com.zktony.android.ui.theme.AppTheme
 import com.zktony.datastore.ext.settings
 import kotlinx.coroutines.launch
 
+/**
+ * The main activity of the application.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Initialize the serial port, schedule task, and syringe and axis positions
         lifecycleScope.launch {
-            serialPort.initializer()
-            scheduleTask.initializer()
-            axisInitializer(1, 0)
-            syringeInitializer(2)
+            serialPort.initializer() // Step 1: Initialize the serial port
+            scheduleTask.initializer() // Step 2: Initialize the schedule task
+            axisInitializer(1, 0) // Step 3: Initialize the axis
+            syringeInitializer(2) // Step 4: Initialize the syringe
         }
 
+        // Set the content view of the activity
         setContent {
             AppTheme {
                 App()
@@ -32,6 +37,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Attaches the specified context with the specified language to the base context of the activity.
+     *
+     * @param newBase The new base context to attach.
+     */
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(
             newBase?.setLanguage(settings.language)

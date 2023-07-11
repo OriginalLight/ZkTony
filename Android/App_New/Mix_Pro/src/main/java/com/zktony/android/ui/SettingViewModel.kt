@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.ui.utils.PageType
 import com.zktony.android.core.ext.DownloadState
 import com.zktony.android.core.ext.Ext
 import com.zktony.android.core.ext.download
@@ -14,6 +13,7 @@ import com.zktony.android.core.ext.installApk
 import com.zktony.android.core.ext.isNetworkAvailable
 import com.zktony.android.core.ext.restartApp
 import com.zktony.android.core.ext.showShortToast
+import com.zktony.android.ui.utils.PageType
 import com.zktony.datastore.ext.saveSettings
 import com.zktony.datastore.ext.settingsFlow
 import com.zktony.proto.Application
@@ -42,8 +42,12 @@ class SettingViewModel constructor(
 
     val uiState = _uiState.asStateFlow()
 
+    /**
+     * Initializes the setting view model and sets up the UI state.
+     */
     init {
         viewModelScope.launch {
+            // Combine the application, settings, progress, and page values into a single UI state
             launch {
                 combine(
                     _application,
@@ -63,6 +67,7 @@ class SettingViewModel constructor(
                     _uiState.value = it
                 }
             }
+            // Load the latest application instance from the server if the network is available
             launch {
                 if (Ext.ctx.isNetworkAvailable()) {
                     grpc.getApplication(BuildConfig.APPLICATION_ID)
@@ -78,6 +83,11 @@ class SettingViewModel constructor(
         }
     }
 
+    /**
+     * Handles the specified setting event and updates the UI state accordingly.
+     *
+     * @param event The setting event to handle.
+     */
     fun event(event: SettingEvent) {
         when (event) {
             is SettingEvent.NavTo -> _page.value = event.page
@@ -89,14 +99,19 @@ class SettingViewModel constructor(
     }
 
     /**
-     * 设置语言
+     * Sets the language preference for the application and restarts the app if necessary.
      *
-     * @param new String
+     * @param new The new language preference to set.
      */
     private fun language(new: String) {
         viewModelScope.launch {
+            // Get the current language preference
             val old = _uiState.value.settings.language
+
+            // Save the new language preference to the settings
             saveSettings { it.copy { language = new } }
+
+            // Restart the app if the language preference has changed
             if (old != new) {
                 Ext.ctx.restartApp()
             }
@@ -104,86 +119,63 @@ class SettingViewModel constructor(
     }
 
     /**
-     * 设置导航栏
+     * Toggles the navigation bar on or off.
      *
-     * @param nav Boolean
+     * @param nav Whether to show or hide the navigation bar.
      */
     private fun navigation(nav: Boolean) {
         viewModelScope.launch {
+            // Save the navigation setting to the preferences
             saveSettings { it.copy { navigation = nav } }
+
+            // Create an intent to show or hide the navigation bar
             val intent = Intent().apply {
                 action = "ACTION_SHOW_NAVBAR"
                 putExtra("cmd", if (nav) "show" else "hide")
             }
+
+            // Send the broadcast to show or hide the navigation bar
             Ext.ctx.sendBroadcast(intent)
         }
     }
 
     /**
-     * 跳转到wifi设置界面
+     * Launches the Wi-Fi settings screen to allow the user to configure their network settings.
      */
     private fun network() {
+        // Create a new intent to launch the Wi-Fi settings screen
         val intent = Intent(Settings.ACTION_WIFI_SETTINGS).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            //是否显示button bar
+            // Set the extra preferences to show the button bar and custom text
             putExtra("extra_prefs_show_button_bar", true)
-            putExtra(
-                "extra_prefs_set_next_text",
-                Ext.ctx.getString(R.string.finish)
-            )
-            putExtra(
-                "extra_prefs_set_back_text",
-                Ext.ctx.getString(R.string.cancel)
-            )
+            putExtra("extra_prefs_set_next_text", Ext.ctx.getString(R.string.finish))
+            putExtra("extra_prefs_set_back_text", Ext.ctx.getString(R.string.cancel))
         }
+        // Launch the Wi-Fi settings screen
         Ext.ctx.startActivity(intent)
     }
 
     /**
-     * 检查更新
+     * Checks for updates and downloads the latest version of the application if available.
      */
     private fun update() {
         viewModelScope.launch {
-            val apk = localUpdate()
-            if (apk != null) {
-                Ext.ctx.installApk(apk)
-            } else {
-                remoteUpdate()
-            }
-        }
-    }
-
-    /**
-     * 查找目录下apk文件并安装
-     * @return File? [File]
-     */
-    private fun localUpdate(): File? {
-        File("/storage").listFiles()?.forEach {
-            it.listFiles()?.forEach { apk ->
-                if (apk.name.endsWith(".apk") && apk.name.contains("zktony-mix-pro")) {
-                    return apk
-                }
-            }
-        }
-        return null
-    }
-
-    /**
-     * 获取版本信息
-     */
-    private fun remoteUpdate() {
-        viewModelScope.launch {
+            // Check if the network is available
             if (Ext.ctx.isNetworkAvailable()) {
+                // Get the current application instance
                 val application = _application.value
                 if (application != null) {
+                    // Check if a new version of the application is available for download
                     if (application.versionCode > BuildConfig.VERSION_CODE
                         && application.downloadUrl.isNotEmpty()
                         && _progress.value == 0
                     ) {
+                        // Download the latest version of the application
                         download(application.downloadUrl)
                         _progress.value = 1
                     }
                 } else {
+                    // Get the latest application instance from the server
                     grpc.getApplication(BuildConfig.APPLICATION_ID)
                         .catch { ex ->
                             ex.printStackTrace()
@@ -193,32 +185,37 @@ class SettingViewModel constructor(
                         }
                 }
             } else {
+                // Display a message if the network is unavailable
                 Ext.ctx.getString(R.string.network_unavailable).showShortToast()
             }
         }
     }
 
     /**
-     *  下载apk
+     * Downloads an APK file from the specified URL and installs it on the device.
      *
-     * @param url String
+     * @param url The URL of the APK file to download.
      */
     private fun download(url: String) {
         viewModelScope.launch {
+            // Download the APK file and update the progress state
             url.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
                 .collect {
                     when (it) {
                         is DownloadState.Success -> {
+                            // Install the APK file and reset the progress state
                             _progress.value = 0
                             Ext.ctx.installApk(it.file)
                         }
 
                         is DownloadState.Err -> {
+                            // Reset the progress state and display an error message
                             _progress.value = 0
                             Ext.ctx.getString(R.string.download_failed).showShortToast()
                         }
 
                         is DownloadState.Progress -> {
+                            // Update the progress state
                             _progress.value = maxOf(it.progress, 1)
                         }
                     }
@@ -227,6 +224,14 @@ class SettingViewModel constructor(
     }
 }
 
+/**
+ * Data class that represents the UI state of the setting screen.
+ *
+ * @param settings The settings preferences to display in the setting screen.
+ * @param application The application to display in the setting screen.
+ * @param progress The progress to display in the setting screen.
+ * @param page The page type to display in the setting screen.
+ */
 data class SettingUiState(
     val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
     val application: Application? = null,
@@ -234,11 +239,13 @@ data class SettingUiState(
     val page: PageType = PageType.LIST,
 )
 
+/**
+ * Sealed class that defines the possible events that can be triggered in the setting screen.
+ */
 sealed class SettingEvent {
     object Network : SettingEvent()
     object Update : SettingEvent()
     data class NavTo(val page: PageType) : SettingEvent()
     data class Language(val language: String) : SettingEvent()
     data class Navigation(val navigation: Boolean) : SettingEvent()
-
 }
