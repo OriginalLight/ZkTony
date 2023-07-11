@@ -1,12 +1,12 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("multiplatform")
+    kotlin("jvm")
     id("org.jetbrains.compose")
 }
 
 group = "com.zkty"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     google()
@@ -15,20 +15,11 @@ repositories {
 }
 
 kotlin {
-    jvm {
-        jvmToolchain(11)
-        withJava()
-    }
-    sourceSets {
-        val jvmMain by getting {
-            dependencies {
-                implementation(compose.desktop.currentOs)
-                implementation("moe.tlaster:precompose:1.4.3")
+    jvmToolchain(17)
+}
 
-            }
-        }
-        val jvmTest by getting
-    }
+dependencies {
+    implementation(compose.desktop.currentOs)
 }
 
 compose.desktop {
@@ -36,7 +27,7 @@ compose.desktop {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "helper"
+            packageName = "ProtocolHelper"
             packageVersion = "1.0.0"
         }
     }

@@ -1,5 +1,7 @@
 package ext
 
+import java.math.BigDecimal
+
 fun String.reversalEvery2Charts(hasSpace: Boolean = false): String {
     val hex = this.addSpaceEvery2Charts()
     return hex.split(" ").reversed().joinToString(if (hasSpace) " " else "")
@@ -32,3 +34,23 @@ fun String.ascii2ByteArray(hasSpace: Boolean = false): ByteArray {
 fun String.addFirst(s: String) = "$s$this"
 
 fun String.addLast(s: String) = "$this$s"
+
+/**
+ * 格式化
+ *
+ * @receiver Float
+ * @return String
+ */
+fun Float.format(digits: Int = 0): String {
+    return BigDecimal(String.format("%.${digits}f", this)).stripTrailingZeros().toPlainString()
+}
+
+/**
+ * 格式化
+ *
+ * @receiver Double
+ * @return String
+ */
+fun Double.format(digits: Int = 0): String {
+    return BigDecimal(String.format("%.${digits}f", this)).stripTrailingZeros().toPlainString()
+}
