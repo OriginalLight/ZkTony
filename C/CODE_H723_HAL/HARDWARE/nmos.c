@@ -13,11 +13,11 @@ void NMOS_Value_Set(uint8_t num, uint8_t val)
 	case 0:
 		if (val == 1)
 		{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_13, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_SET);
 		}
 		else
 		{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_13, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOE, GPIO_PIN_15, GPIO_PIN_RESET);
 		}
 		break;
 	case 1:
