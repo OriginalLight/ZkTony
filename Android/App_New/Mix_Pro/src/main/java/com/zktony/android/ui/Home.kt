@@ -256,7 +256,6 @@ fun ListContent(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(72.dp),
                                 strokeWidth = 8.dp,
-                                color = Color.Green,
                             )
                         }
                     } else {
@@ -317,7 +316,6 @@ fun ListContent(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(72.dp),
                                 strokeWidth = 8.dp,
-                                color = Color.Yellow,
                             )
                         }
                     } else {
@@ -390,7 +388,6 @@ fun ListContent(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(72.dp),
                                 strokeWidth = 8.dp,
-                                color = Color.Red,
                             )
                         }
                     } else {

@@ -88,7 +88,7 @@ fun Splash(
     ) {
         AnimatedVisibility(visible = splash) {
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.mipmap.logo),
                 contentDescription = "Logo",
                 modifier = Modifier.scale(scale.value)
             )

@@ -344,7 +344,7 @@ fun InfoContent(
                         ) {
                             Image(
                                 modifier = Modifier.size(200.dp),
-                                painter = painterResource(id = R.drawable.qrcode),
+                                painter = painterResource(id = R.mipmap.qrcode),
                                 contentDescription = null
                             )
                         }
