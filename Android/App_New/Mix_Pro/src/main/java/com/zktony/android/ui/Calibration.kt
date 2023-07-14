@@ -21,12 +21,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -63,10 +62,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -74,9 +76,9 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
+import com.zktony.android.core.ext.dateFormat
 import com.zktony.android.core.ext.format
 import com.zktony.android.core.ext.showShortToast
-import com.zktony.android.core.ext.simpleDateFormat
 import com.zktony.android.data.entities.CalibrationEntity
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.components.TopAppBar
@@ -160,13 +162,8 @@ fun ListContent(
     uiState: CalibrationUiState = CalibrationUiState(),
     event: (CalibrationEvent) -> Unit = {},
 ) {
-    // Coroutine scope for launching coroutines
     val scope = rememberCoroutineScope()
-
-    // Lazy list state for the list of items
-    val columnState = rememberLazyListState()
-
-    // Whether to show the input dialog for adding a new item
+    val gridState = rememberLazyGridState()
     var showDialog by remember { mutableStateOf(false) }
 
     // Show the input dialog if showDialog is true
@@ -196,81 +193,88 @@ fun ListContent(
             .padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Lazy column containing the list of items
-        LazyColumn(
-            modifier = Modifier
+        LazyVerticalGrid(
+            modifier = modifier
                 .weight(6f)
                 .fillMaxHeight()
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = MaterialTheme.shapes.medium
                 ),
-            state = columnState,
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            state = gridState,
+            columns = GridCells.Fixed(3),
+            contentPadding = PaddingValues(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             itemsIndexed(items = uiState.entities) { index, item ->
-                // Background color of the item
                 val background = if (item.id == uiState.selected) {
                     MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
                 } else {
                     MaterialTheme.colorScheme.surfaceVariant
                 }
-
-                // Card containing the item
                 Card(
-                    modifier = Modifier.height(48.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = background,
-                    ),
+                    colors = CardDefaults.cardColors(containerColor = background),
                     onClick = {
-                        // Toggle the selected state of the item
                         if (item.id == uiState.selected) {
                             event(CalibrationEvent.ToggleSelected(0L))
                         } else {
                             event(CalibrationEvent.ToggleSelected(item.id))
                         }
-                    }
+                    },
                 ) {
-                    // Row containing the item details
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Icon for the item
-                        Image(
-                            modifier = Modifier.size(32.dp),
-                            painter = painterResource(id = R.drawable.ic_water),
-                            contentDescription = null,
-                        )
-
-                        // Text for the item name
-                        Text(
-                            text = item.text,
-                            style = MaterialTheme.typography.bodyLarge,
-                            maxLines = 1,
-                        )
-
-                        // Checkmark for the active state of the item
-                        AnimatedVisibility(visible = item.active) {
-                            Text(text = "✔️")
+                        // Display the entity image and title
+                        Row(
+                            modifier = Modifier.height(24.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            AnimatedVisibility(visible = item.active) {
+                                Text(text = "✔")
+                            }
+                            if (!item.active) {
+                                Image(
+                                    modifier = Modifier.size(24.dp),
+                                    painter = painterResource(id = R.drawable.ic_water),
+                                    contentDescription = null,
+                                )
+                            }
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                text = item.text,
+                                style = MaterialTheme.typography.titleMedium,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                            )
+                            Text(
+                                text = "${index + 1}",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontFamily = FontFamily.Monospace,
+                                fontStyle = FontStyle.Italic,
+                                fontWeight = FontWeight.SemiBold,
+                            )
                         }
-
-                        // Index of the item
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
-                            text = "${index + 1}",
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-
-                        // Creation date of the item
-                        Text(
-                            text = item.createTime.simpleDateFormat("yyyy - MM - dd"),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.Bottom,
+                        ) {
+                            // Display the entity volume range
+                            Text(
+                                text = "T - ${item.data.size}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontFamily = FontFamily.Monospace,
+                            )
+                            Spacer(modifier = Modifier.weight(1f))
+                            Text(
+                                text = item.createTime.dateFormat("yyyy/MM/dd"),
+                                style = MaterialTheme.typography.bodySmall,
+                                fontFamily = FontFamily.Monospace,
+                            )
+                        }
                     }
                 }
             }
@@ -533,10 +537,6 @@ fun EditContent(
                         text = stringResource(id = R.string.volume)
                     )
                 },
-                textStyle = TextStyle(
-                    fontSize = 24.sp,
-                    textAlign = TextAlign.Center,
-                ),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal,
                     imeAction = ImeAction.Done,

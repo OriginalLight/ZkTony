@@ -25,6 +25,9 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "MainKt"
+        jvmArgs += listOf("-Xmx1G")
+        args += listOf("-customArgument")
+
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ProtocolHelper"

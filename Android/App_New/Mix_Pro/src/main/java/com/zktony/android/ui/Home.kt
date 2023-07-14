@@ -16,15 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Water
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
@@ -42,13 +40,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,8 +57,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
+import com.zktony.android.core.ext.dateFormat
 import com.zktony.android.core.ext.format
-import com.zktony.android.core.ext.getTimeFormat
+import com.zktony.android.core.ext.timeFormat
 import com.zktony.android.data.entities.ProgramEntity
 import com.zktony.android.ui.components.TopAppBar
 import com.zktony.android.ui.navigation.Route
@@ -188,352 +190,307 @@ fun ListContent(
     event: (HomeEvent) -> Unit = {},
     navController: NavHostController,
 ) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-    ) {
+    var pipeline by remember { mutableStateOf(0) }
+    var syringe by remember { mutableStateOf(0) }
 
-        // Display the list of items
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(4),
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            // Reset item
-            item {
-                ListItem(
-                    title = "复 位",
-                    onClick = {
-                        if (uiState.loading == 0) {
-                            event(HomeEvent.Reset)
-                        }
-                    }
-                ) {
+    LazyVerticalGrid(
+        modifier = modifier.fillMaxSize(),
+        columns = GridCells.Fixed(3),
+        contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        // Reset item
+        item {
+            FunctionCard(
+                title = "复位",
+                description = "依次复位Z轴、Y轴、注射泵",
+                image = {
                     if (uiState.loading == 1) {
                         // Display loading indicator
                         Box(
-                            modifier = Modifier.size(64.dp),
+                            modifier = Modifier.size(96.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp),
-                                strokeWidth = 3.dp,
+                                modifier = Modifier.size(72.dp),
+                                strokeWidth = 8.dp,
                             )
                         }
                     } else {
                         // Display reset icon
                         Image(
-                            modifier = Modifier.size(64.dp),
+                            modifier = Modifier.size(96.dp),
                             painter = painterResource(id = R.drawable.ic_reset),
                             contentDescription = null,
                         )
                     }
+                })
+            {
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = uiState.loading == 0,
+                    onClick = { event(HomeEvent.Reset) }
+                ) {
+                    Text(
+                        text = "开始复位",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
+                    )
                 }
             }
-            // Clean item
-            item {
-                ListItem(
-                    title = "管路清理",
-                    onClick = {
-                        if (uiState.loading == 0) {
-                            event(HomeEvent.Clean(1))
-                        }
-                        if (uiState.loading == 2) {
-                            event(HomeEvent.Clean(0))
-                        }
-                    }
-                ) {
+        }
+        // Clean item
+        item {
+            FunctionCard(
+                title = "管路清洗",
+                description = "清洗管路残留胶体、促凝剂",
+                image = {
                     if (uiState.loading == 2) {
-                        // Display stop button and loading indicator
+                        // Display loading indicator
                         Box(
-                            modifier = Modifier.size(64.dp),
+                            modifier = Modifier.size(96.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp),
-                                strokeWidth = 3.dp,
-                                color = Color.Red,
-                            )
-                            Image(
-                                modifier = Modifier.size(32.dp),
-                                painter = painterResource(id = R.drawable.ic_stop),
-                                contentDescription = null
+                                modifier = Modifier.size(72.dp),
+                                strokeWidth = 8.dp,
+                                color = Color.Green,
                             )
                         }
                     } else {
-                        // Display clean icon and arrow icon
-                        Box {
-                            Image(
-                                modifier = Modifier.size(64.dp),
-                                painter = painterResource(id = R.drawable.ic_pipeline),
-                                contentDescription = null,
-                            )
-                            Icon(
-                                modifier = Modifier.align(Alignment.TopEnd),
-                                imageVector = Icons.Default.Water,
-                                contentDescription = null,
-                            )
-                        }
+                        // Display reset icon
+                        Image(
+                            modifier = Modifier.size(96.dp),
+                            painter = painterResource(id = R.drawable.ic_water),
+                            contentDescription = null,
+                        )
+                    }
+                })
+            {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        enabled = uiState.loading == 2,
+                        onClick = { event(HomeEvent.Clean(0)) }
+                    ) {
+                        Text(
+                            text = "取消",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        enabled = uiState.loading == 0,
+                        onClick = { event(HomeEvent.Clean(1)) }
+                    ) {
+                        Text(
+                            text = "开始",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
                     }
                 }
+
             }
-            // Syringe item
-            item {
-                ListItem(
-                    title = "填充-促凝剂",
-                    onClick = {
-                        if (uiState.loading == 0) {
-                            event(HomeEvent.Syringe(1))
-                        }
-                        if (uiState.loading == 3) {
-                            event(HomeEvent.Syringe(0))
-                        }
-                    }
-                ) {
+        }
+        // Syringe item
+        item {
+            FunctionCard(
+                title = "促凝剂 ${if (syringe == 0) "填充" else "回吸"}",
+                description = "填充/回吸促凝剂，点击按钮切换",
+                image = {
                     if (uiState.loading == 3) {
-                        // Display stop button and loading indicator
+                        // Display loading indicator
                         Box(
-                            modifier = Modifier.size(64.dp),
+                            modifier = Modifier.size(96.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp),
-                                strokeWidth = 3.dp,
-                                color = Color.Red,
-                            )
-                            Image(
-                                modifier = Modifier.size(32.dp),
-                                painter = painterResource(id = R.drawable.ic_stop),
-                                contentDescription = null
+                                modifier = Modifier.size(72.dp),
+                                strokeWidth = 8.dp,
+                                color = Color.Yellow,
                             )
                         }
                     } else {
-                        // Display syringe icon and arrow icon
-                        Box {
-                            Image(
-                                modifier = Modifier.size(64.dp),
-                                painter = painterResource(id = R.drawable.ic_syringe),
-                                contentDescription = null,
+                        // Display reset icon
+                        Image(
+                            modifier = Modifier.size(96.dp),
+                            painter = painterResource(id = R.drawable.ic_syringe),
+                            contentDescription = null,
+                        )
+                    }
+                })
+            {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            if (uiState.loading == 3) {
+                                event(HomeEvent.Syringe(0))
+                            } else {
+                                syringe = if (syringe == 0) 1 else 0
+                            }
+                        }
+                    ) {
+                        if (uiState.loading == 3) {
+                            Text(
+                                text = "取消",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = FontWeight.Bold,
                             )
+                        } else {
                             Icon(
-                                modifier = Modifier.align(Alignment.BottomEnd),
-                                imageVector = Icons.Default.ArrowForward,
+                                imageVector = Icons.Default.SwapHoriz,
                                 contentDescription = null,
                             )
                         }
+                    }
+
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        enabled = uiState.loading == 0,
+                        onClick = { event(HomeEvent.Syringe(syringe + 1)) }
+                    ) {
+                        Text(
+                            text = "开始",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
                     }
                 }
+
             }
-            // Reverse syringe item
-            item {
-                ListItem(
-                    title = "回吸-促凝剂",
-                    onClick = {
-                        if (uiState.loading == 0) {
-                            event(HomeEvent.Syringe(2))
-                        }
-                        if (uiState.loading == 4) {
-                            event(HomeEvent.Syringe(0))
-                        }
-                    }
-                ) {
+        }
+        // Pipeline item
+        item {
+            FunctionCard(
+                title = "胶体 ${if (pipeline == 0) "填充" else "回吸"}",
+                description = "填充/回吸胶体，点击按钮切换",
+                image = {
                     if (uiState.loading == 4) {
-                        // Display stop button and loading indicator
+                        // Display loading indicator
                         Box(
-                            modifier = Modifier.size(64.dp),
+                            modifier = Modifier.size(96.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp),
-                                strokeWidth = 3.dp,
+                                modifier = Modifier.size(72.dp),
+                                strokeWidth = 8.dp,
                                 color = Color.Red,
-                            )
-                            Image(
-                                modifier = Modifier.size(32.dp),
-                                painter = painterResource(id = R.drawable.ic_stop),
-                                contentDescription = null
                             )
                         }
                     } else {
-                        // Display syringe icon and arrow icon
-                        Box {
-                            Image(
-                                modifier = Modifier.size(64.dp),
-                                painter = painterResource(id = R.drawable.ic_syringe),
-                                contentDescription = null,
-                            )
-                            Icon(
-                                modifier = Modifier.align(Alignment.BottomEnd),
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = null,
-                            )
-                        }
+                        // Display reset icon
+                        Image(
+                            modifier = Modifier.size(96.dp),
+                            painter = painterResource(id = R.drawable.ic_pipeline),
+                            contentDescription = null,
+                        )
                     }
-                }
-            }
-            // Pipeline item
-            item {
-                ListItem(
-                    title = "填充-胶体",
-                    onClick = {
-                        if (uiState.loading == 0) {
-                            event(HomeEvent.Pipeline(1))
-                        }
-                        if (uiState.loading == 5) {
-                            event(HomeEvent.Pipeline(0))
-                        }
-                    }
+                })
+            {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    if (uiState.loading == 5) {
-                        // Display stop button and loading indicator
-                        Box(
-                            modifier = Modifier.size(64.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp),
-                                strokeWidth = 3.dp,
-                                color = Color.Red,
-                            )
-                            Image(
-                                modifier = Modifier.size(32.dp),
-                                painter = painterResource(id = R.drawable.ic_stop),
-                                contentDescription = null
-                            )
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        onClick = {
+                            if (uiState.loading == 4) {
+                                event(HomeEvent.Pipeline(0))
+                            } else {
+                                pipeline = if (pipeline == 0) 1 else 0
+                            }
                         }
-                    } else {
-                        // Display pipeline icon and arrow icon
-                        Box {
-                            Image(
-                                modifier = Modifier.size(64.dp),
-                                painter = painterResource(id = R.drawable.ic_pipeline),
-                                contentDescription = null,
+                    ) {
+                        if (uiState.loading == 4) {
+                            Text(
+                                text = "取消",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = FontWeight.Bold,
                             )
+                        } else {
                             Icon(
-                                modifier = Modifier.align(Alignment.TopEnd),
-                                imageVector = Icons.Default.ArrowForward,
+                                imageVector = Icons.Default.SwapHoriz,
                                 contentDescription = null,
                             )
                         }
+                    }
+
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        enabled = uiState.loading == 0,
+                        onClick = { event(HomeEvent.Pipeline(pipeline + 1)) }
+                    ) {
+                        Text(
+                            text = "开始",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
                     }
                 }
-            }
-            // Reverse pipeline item
-            item {
-                ListItem(
-                    title = "回吸-胶体",
-                    onClick = {
-                        if (uiState.loading == 0) {
-                            event(HomeEvent.Pipeline(2))
-                        }
-                        if (uiState.loading == 6) {
-                            event(HomeEvent.Pipeline(0))
-                        }
-                    }
-                ) {
-                    if (uiState.loading == 6) {
-                        // Display stop button and loading indicator
-                        Box(
-                            modifier = Modifier.size(64.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp),
-                                strokeWidth = 3.dp,
-                                color = Color.Red,
-                            )
-                            Image(
-                                modifier = Modifier.size(32.dp),
-                                painter = painterResource(id = R.drawable.ic_stop),
-                                contentDescription = null
-                            )
-                        }
-                    } else {
-                        // Display pipeline icon and arrow icon
-                        Box {
-                            Image(
-                                modifier = Modifier.size(64.dp),
-                                painter = painterResource(id = R.drawable.ic_pipeline),
-                                contentDescription = null,
-                            )
-                            Icon(
-                                modifier = Modifier.align(Alignment.TopEnd),
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = null,
-                            )
-                        }
-                    }
-                }
+
             }
         }
-
-        // Start program item
-        ListItem(
-            modifier = Modifier.padding(horizontal = 196.dp),
-            title = "开始程序",
-            onClick = {
-                if (uiState.loading == 0) {
-                    if (uiState.entities.isEmpty()) {
-                        navController.navigate(Route.PROGRAM)
-                    } else {
-                        event(HomeEvent.NavTo(PageType.START))
+        // Start item
+        item {
+            FunctionCard(
+                title = "程序运行",
+                description = "选择并执行制胶程序",
+                image = {
+                    Image(
+                        modifier = Modifier.size(96.dp),
+                        painter = painterResource(id = R.drawable.ic_start),
+                        contentDescription = null,
+                    )
+                })
+            {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        enabled = uiState.loading == 0,
+                        onClick = {
+                            if (uiState.loading == 0) {
+                                if (uiState.entities.isEmpty()) {
+                                    navController.navigate(Route.PROGRAM)
+                                } else {
+                                    event(HomeEvent.NavTo(PageType.START))
+                                }
+                            }
+                        }
+                    ) {
+                        Text(
+                            text = "开始 ✔",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
                     }
                 }
+
             }
-        ) {
-            Image(
-                modifier = Modifier.size(64.dp),
-                painter = painterResource(id = R.drawable.ic_start),
-                contentDescription = null,
-            )
         }
     }
 }
-
-/**
- * Composable function for a list item in the Home screen.
- *
- * @param modifier The modifier to apply to the composable.
- * @param title The title of the list item.
- * @param onClick The function to handle click events on the list item.
- * @param colors The colors to apply to the card.
- * @param image The composable function to display the image of the list item.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ListItem(
-    modifier: Modifier = Modifier,
-    title: String,
-    onClick: () -> Unit = { },
-    colors: CardColors = CardDefaults.elevatedCardColors(),
-    image: @Composable () -> Unit,
-) {
-    Card(
-        modifier = modifier,
-        onClick = onClick,
-        colors = colors,
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp,
-            pressedElevation = 8.dp,
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            image()
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center,
-            )
-        }
-    }
-}
-
 
 /**
  * Composable function for the start content of the Home screen.
@@ -557,50 +514,88 @@ fun StartContent(
     LazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
         columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        items(items = uiState.entities) {
-            // Display each entity as a card
+        itemsIndexed(items = uiState.entities) { index, item ->
             Card(
                 onClick = {
                     scope.launch {
                         // Toggle the selected state of the entity and navigate to the runtime page
-                        event(HomeEvent.ToggleSelected(it.id))
+                        event(HomeEvent.ToggleSelected(item.id))
                         event(HomeEvent.NavTo(PageType.RUNTIME))
                         toggleDrawer(NavigationType.NONE)
                     }
                 },
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     // Display the entity image and title
-                    Row {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
                         Image(
-                            modifier = Modifier.size(32.dp),
+                            modifier = Modifier.size(24.dp),
                             painter = painterResource(id = R.drawable.ic_program),
                             contentDescription = null,
                         )
-                        Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = it.text,
+                            modifier = Modifier.weight(1f),
+                            text = item.text,
                             style = MaterialTheme.typography.titleMedium,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                        )
+                        Text(
+                            text = "${index + 1}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontFamily = FontFamily.Monospace,
+                            fontStyle = FontStyle.Italic,
+                            fontWeight = FontWeight.SemiBold,
                         )
                     }
-
-                    // Display the entity volume range
-                    Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.Bottom,
+                    ) {
+                        // Display the entity volume range
+                        Column {
+                            Text(
+                                text = "G - ${item.volume[0].format(1)}/${
+                                    item.volume[1].format(
+                                        1
+                                    )
+                                }",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontFamily = FontFamily.Monospace,
+                            )
+                            Text(
+                                text = "P - ${item.volume[2].format(1)}/${
+                                    item.volume[3].format(
+                                        1
+                                    )
+                                }",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontFamily = FontFamily.Monospace,
+                            )
+                            Text(
+                                text = "A - ${item.axis[0].format(1)}/${
+                                    item.axis[1].format(
+                                        1
+                                    )
+                                }",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontFamily = FontFamily.Monospace,
+                            )
+                        }
+                        Spacer(modifier = Modifier.weight(1f))
                         Text(
-                            text = "${it.volume[0].format(1)} μL - ${it.volume[1].format(1)} μL",
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontFamily = FontFamily.Monospace,
-                        )
-                        Text(
-                            text = "${it.volume[2].format(1)} μL - ${it.volume[3].format(1)} μL",
-                            style = MaterialTheme.typography.bodyMedium,
+                            text = item.createTime.dateFormat("yyyy/MM/dd"),
+                            style = MaterialTheme.typography.bodySmall,
                             fontFamily = FontFamily.Monospace,
                         )
                     }
@@ -699,7 +694,7 @@ fun RuntimeContent(
                         }
                         Text(
                             modifier = Modifier.fillMaxWidth(),
-                            text = time.getTimeFormat(),
+                            text = time.timeFormat(),
                             textAlign = TextAlign.Center,
                             style = TextStyle(
                                 fontSize = 64.sp,
@@ -859,6 +854,78 @@ fun RuntimeContent(
     }
 }
 
+
+/**
+ * FunctionCard
+ *
+ * @param modifier Modifier
+ * @param title String
+ * @param description String
+ * @param image [@androidx.compose.runtime.Composable] Function0<Unit>
+ * @param button [@androidx.compose.runtime.Composable] Function0<Unit>
+ * @return Unit
+ */
+@Composable
+fun FunctionCard(
+    modifier: Modifier = Modifier,
+    title: String,
+    description: String,
+    image: @Composable () -> Unit,
+    button: @Composable () -> Unit,
+) {
+    ElevatedCard(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp,
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.horizontalGradient(
+                            colors = listOf(
+                                Color.Blue.copy(alpha = 0.1f),
+                                Color.LightGray,
+                            )
+                        ),
+                        shape = MaterialTheme.shapes.medium,
+                    )
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                image()
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Column {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = FontFamily.Serif,
+                    )
+
+                    Text(
+                        text = description,
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontFamily = FontFamily.Serif,
+                    )
+                }
+            }
+            button()
+
+        }
+    }
+}
 
 /**
  * Composable function for the preview of the list content of the Home screen.

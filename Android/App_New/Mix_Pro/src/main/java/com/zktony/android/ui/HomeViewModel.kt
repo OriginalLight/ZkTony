@@ -322,7 +322,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 }
             } else {
                 // Start a syringe operation on the selected program entity
-                _loading.value = index + 2
+                _loading.value = 3
                 syringeJob = launch {
                     while (true) {
                         tx {
@@ -366,7 +366,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 tx { stop(3, 4, 5, 6, 7, 8) }
             } else {
                 // Start a pipeline operation on the selected program entity
-                _loading.value = index + 4
+                _loading.value = 4
                 tx {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {

@@ -40,9 +40,10 @@ import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
-import androidx.compose.ui.unit.sp
 import com.zktony.android.R
 
 /**
@@ -173,9 +174,9 @@ fun PermanentNavigationDrawerContent(
                             label = {
                                 Text(
                                     text = stringResource(id = destination.iconTextId),
-                                    fontSize = 22.sp,
-                                    lineHeight = 28.sp,
-                                    maxLines = 1,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = FontFamily.Serif,
                                 )
                             },
                             icon = {

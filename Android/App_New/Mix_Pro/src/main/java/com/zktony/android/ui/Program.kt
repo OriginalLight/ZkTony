@@ -14,15 +14,16 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imeAnimationSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -54,17 +55,21 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
+import com.zktony.android.core.ext.dateFormat
 import com.zktony.android.core.ext.format
 import com.zktony.android.core.ext.showShortToast
-import com.zktony.android.core.ext.simpleDateFormat
 import com.zktony.android.data.entities.ProgramEntity
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.components.TopAppBar
@@ -159,7 +164,7 @@ fun ListContent(
     event: (ProgramEvent) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
-    val columnState = rememberLazyListState()
+    val gridState = rememberLazyGridState()
     var showDialog by remember { mutableStateOf(false) }
 
     // Show the input dialog if showDialog is true
@@ -187,18 +192,19 @@ fun ListContent(
             .padding(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        // Display the list column
-        LazyColumn(
-            modifier = Modifier
+        LazyVerticalGrid(
+            modifier = modifier
                 .weight(6f)
                 .fillMaxHeight()
                 .background(
                     color = MaterialTheme.colorScheme.background,
                     shape = MaterialTheme.shapes.medium
                 ),
-            state = columnState,
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            state = gridState,
+            columns = GridCells.Fixed(3),
+            contentPadding = PaddingValues(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             itemsIndexed(items = uiState.entities) { index, item ->
                 val background = if (item.id == uiState.selected) {
@@ -207,7 +213,6 @@ fun ListContent(
                     MaterialTheme.colorScheme.surfaceVariant
                 }
                 Card(
-                    modifier = Modifier.height(48.dp),
                     colors = CardDefaults.cardColors(containerColor = background),
                     onClick = {
                         if (item.id == uiState.selected) {
@@ -215,34 +220,78 @@ fun ListContent(
                         } else {
                             event(ProgramEvent.ToggleSelected(item.id))
                         }
-                    }
+                    },
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Image(
-                            modifier = Modifier.size(32.dp),
-                            painter = painterResource(id = R.drawable.ic_program),
-                            contentDescription = null,
-                        )
-                        Text(
-                            text = item.text,
-                            style = MaterialTheme.typography.bodyLarge,
-                            maxLines = 1,
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
-                            text = "${index + 1}",
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
-                        Text(
-                            text = item.createTime.simpleDateFormat("yyyy - MM - dd"),
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
+                        // Display the entity image and title
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Image(
+                                modifier = Modifier.size(24.dp),
+                                painter = painterResource(id = R.drawable.ic_program),
+                                contentDescription = null,
+                            )
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                text = item.text,
+                                style = MaterialTheme.typography.titleMedium,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                            )
+                            Text(
+                                text = "${index + 1}",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontFamily = FontFamily.Monospace,
+                                fontStyle = FontStyle.Italic,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.Bottom,
+                        ) {
+                            // Display the entity volume range
+                            Column {
+                                Text(
+                                    text = "G - ${item.volume[0].format(1)}/${
+                                        item.volume[1].format(
+                                            1
+                                        )
+                                    }",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontFamily = FontFamily.Monospace,
+                                )
+                                Text(
+                                    text = "P - ${item.volume[2].format(1)}/${
+                                        item.volume[3].format(
+                                            1
+                                        )
+                                    }",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontFamily = FontFamily.Monospace,
+                                )
+                                Text(
+                                    text = "A - ${item.axis[0].format(1)}/${
+                                        item.axis[1].format(
+                                            1
+                                        )
+                                    }",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontFamily = FontFamily.Monospace,
+                                )
+                            }
+                            Spacer(modifier = Modifier.weight(1f))
+                            Text(
+                                text = item.createTime.dateFormat("yyyy/MM/dd"),
+                                style = MaterialTheme.typography.bodySmall,
+                                fontFamily = FontFamily.Monospace,
+                            )
+                        }
                     }
                 }
             }

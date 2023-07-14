@@ -171,9 +171,8 @@ fun getGpio(vararg ids: Int): Boolean {
  * 发送命令
  *
  * @param block [TxDsl.() -> Unit] 命令构建器
- * @return [Unit]
  */
-suspend fun tx(block: TxDsl.() -> Unit): Unit {
+suspend fun tx(block: TxDsl.() -> Unit) {
     // 构建命令
     val tx = TxDsl().apply(block)
 
