@@ -7,6 +7,11 @@ enum class NavigationType {
     NONE, NAVIGATION_RAIL, PERMANENT_NAVIGATION_DRAWER
 }
 
+
+enum class NavigationContentPosition {
+    TOP, CENTER
+}
+
 /**
  * Different type of page supported by app depending on each screen.
  */

@@ -124,7 +124,7 @@ fun ContentWrapper(
     toggleDrawer: (NavigationType) -> Unit = {},
     navController: NavHostController,
 ) {
-    Column(modifier = modifier) {
+    Column(modifier = modifier.fillMaxSize()) {
         // Show top app bar when page is start
         AnimatedVisibility(visible = uiState.page == PageType.START) {
             TopAppBar(
@@ -133,43 +133,32 @@ fun ContentWrapper(
             )
         }
 
-        // Background
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(8.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = MaterialTheme.shapes.medium
-                ),
-        ) {
-            // List content
-            AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-                ListContent(
-                    modifier = Modifier,
-                    uiState = uiState,
-                    event = event,
-                    navController = navController,
-                )
-            }
-            // Start content
-            AnimatedVisibility(visible = uiState.page == PageType.START) {
-                StartContent(
-                    modifier = Modifier,
-                    uiState = uiState,
-                    event = event,
-                    toggleDrawer = toggleDrawer,
-                )
-            }
-            // Runtime content
-            AnimatedVisibility(visible = uiState.page == PageType.RUNTIME) {
-                RuntimeContent(
-                    modifier = Modifier,
-                    uiState = uiState,
-                    event = event,
-                    toggleDrawer = toggleDrawer,
-                )
-            }
+        // List content
+        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+            ListContent(
+                modifier = Modifier,
+                uiState = uiState,
+                event = event,
+                navController = navController,
+            )
+        }
+        // Start content
+        AnimatedVisibility(visible = uiState.page == PageType.START) {
+            StartContent(
+                modifier = Modifier,
+                uiState = uiState,
+                event = event,
+                toggleDrawer = toggleDrawer,
+            )
+        }
+        // Runtime content
+        AnimatedVisibility(visible = uiState.page == PageType.RUNTIME) {
+            RuntimeContent(
+                modifier = Modifier,
+                uiState = uiState,
+                event = event,
+                toggleDrawer = toggleDrawer,
+            )
         }
     }
 }
@@ -648,7 +637,7 @@ fun RuntimeContent(
                 scope.launch {
                     if (uiState.job == null) {
                         event(HomeEvent.NavTo(PageType.LIST))
-                        toggleDrawer(NavigationType.PERMANENT_NAVIGATION_DRAWER)
+                        toggleDrawer(NavigationType.NAVIGATION_RAIL)
                     }
                 }
             }

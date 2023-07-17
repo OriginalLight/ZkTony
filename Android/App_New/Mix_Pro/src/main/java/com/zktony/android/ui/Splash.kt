@@ -120,7 +120,7 @@ fun Splash(
                 FloatingActionButton(
                     modifier = Modifier.width(192.dp),
                     onClick = {
-                        toggleDrawer(NavigationType.PERMANENT_NAVIGATION_DRAWER)
+                        toggleDrawer(NavigationType.NAVIGATION_RAIL)
                         navController.popBackStack()
                         navController.navigate(Route.HOME)
                     },

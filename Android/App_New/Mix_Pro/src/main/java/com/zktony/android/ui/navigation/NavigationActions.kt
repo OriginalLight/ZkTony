@@ -52,7 +52,7 @@ val TOP_LEVEL_DESTINATIONS = listOf(
     ),
     TopLevelDestination(
         route = Route.CALIBRATION,
-        imageId = R.drawable.ic_water,
+        imageId = R.drawable.ic_note,
         iconTextId = R.string.tab_calibration
     ),
     TopLevelDestination(

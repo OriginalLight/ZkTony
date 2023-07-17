@@ -1,7 +1,5 @@
 package com.zktony.android.ui.components
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -30,12 +28,7 @@ fun TopAppBar(
     actions: @Composable (() -> Unit)? = null,
 ) {
     CenterAlignedTopAppBar(
-        modifier = modifier
-            .padding(start = 8.dp, top = 8.dp, end = 8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = MaterialTheme.shapes.medium
-            ),
+        modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
         ),
