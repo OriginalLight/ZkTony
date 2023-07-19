@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,14 +13,19 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -29,7 +35,10 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -37,9 +46,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -61,7 +72,6 @@ import com.zktony.android.core.ext.dateFormat
 import com.zktony.android.core.ext.format
 import com.zktony.android.core.ext.timeFormat
 import com.zktony.android.data.entities.ProgramEntity
-import com.zktony.android.ui.components.TopAppBar
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
@@ -124,42 +134,32 @@ fun ContentWrapper(
     toggleDrawer: (NavigationType) -> Unit = {},
     navController: NavHostController,
 ) {
-    Column(modifier = modifier.fillMaxSize()) {
-        // Show top app bar when page is start
-        AnimatedVisibility(visible = uiState.page == PageType.START) {
-            TopAppBar(
-                title = stringResource(id = R.string.tab_program),
-                navigation = { event(HomeEvent.NavTo(PageType.LIST)) }
-            )
-        }
-
-        // List content
-        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-            ListContent(
-                modifier = Modifier,
-                uiState = uiState,
-                event = event,
-                navController = navController,
-            )
-        }
-        // Start content
-        AnimatedVisibility(visible = uiState.page == PageType.START) {
-            StartContent(
-                modifier = Modifier,
-                uiState = uiState,
-                event = event,
-                toggleDrawer = toggleDrawer,
-            )
-        }
-        // Runtime content
-        AnimatedVisibility(visible = uiState.page == PageType.RUNTIME) {
-            RuntimeContent(
-                modifier = Modifier,
-                uiState = uiState,
-                event = event,
-                toggleDrawer = toggleDrawer,
-            )
-        }
+    // List content
+    AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+        ListContent(
+            modifier = modifier,
+            uiState = uiState,
+            event = event,
+            navController = navController,
+        )
+    }
+    // Start content
+    AnimatedVisibility(visible = uiState.page == PageType.START) {
+        StartContent(
+            modifier = modifier,
+            uiState = uiState,
+            event = event,
+            toggleDrawer = toggleDrawer,
+        )
+    }
+    // Runtime content
+    AnimatedVisibility(visible = uiState.page == PageType.RUNTIME) {
+        RuntimeContent(
+            modifier = modifier,
+            uiState = uiState,
+            event = event,
+            toggleDrawer = toggleDrawer,
+        )
     }
 }
 
@@ -181,13 +181,26 @@ fun ListContent(
 ) {
     var pipeline by remember { mutableStateOf(0) }
     var syringe by remember { mutableStateOf(0) }
+    var time by remember { mutableStateOf(0) }
+
+    // Start a timer to display the runtime
+    LaunchedEffect(key1 = uiState.loading) {
+        while (true) {
+            if (uiState.loading != 0) {
+                time += 1
+            } else {
+                time = 0
+            }
+            delay(1000L)
+        }
+    }
 
     LazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
         columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(32.dp),
+        horizontalArrangement = Arrangement.spacedBy(32.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp),
     ) {
         // Reset item
         item {
@@ -204,6 +217,14 @@ fun ListContent(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(72.dp),
                                 strokeWidth = 8.dp,
+                            )
+
+                            Text(
+                                modifier = Modifier.align(Alignment.BottomEnd),
+                                text = "${time}s",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontFamily = FontFamily.Monospace,
+                                fontStyle = FontStyle.Italic,
                             )
                         }
                     } else {
@@ -245,6 +266,13 @@ fun ListContent(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(72.dp),
                                 strokeWidth = 8.dp,
+                            )
+                            Text(
+                                modifier = Modifier.align(Alignment.BottomEnd),
+                                text = "${time}s",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontFamily = FontFamily.Monospace,
+                                fontStyle = FontStyle.Italic,
                             )
                         }
                     } else {
@@ -305,6 +333,13 @@ fun ListContent(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(72.dp),
                                 strokeWidth = 8.dp,
+                            )
+                            Text(
+                                modifier = Modifier.align(Alignment.BottomEnd),
+                                text = "${time}s",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontFamily = FontFamily.Monospace,
+                                fontStyle = FontStyle.Italic,
                             )
                         }
                     } else {
@@ -377,6 +412,13 @@ fun ListContent(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(72.dp),
                                 strokeWidth = 8.dp,
+                            )
+                            Text(
+                                modifier = Modifier.align(Alignment.BottomEnd),
+                                text = "${time}s",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontFamily = FontFamily.Monospace,
+                                fontStyle = FontStyle.Italic,
                             )
                         }
                     } else {
@@ -495,94 +537,134 @@ fun StartContent(
     toggleDrawer: (NavigationType) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
+    var query by rememberSaveable { mutableStateOf("") }
+    var active by rememberSaveable { mutableStateOf(false) }
 
-    // Display the list of entities in a grid
-    LazyVerticalGrid(
-        modifier = modifier.fillMaxSize(),
-        columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        itemsIndexed(items = uiState.entities) { index, item ->
-            Card(
-                onClick = {
-                    scope.launch {
-                        // Toggle the selected state of the entity and navigate to the runtime page
-                        event(HomeEvent.ToggleSelected(item.id))
-                        event(HomeEvent.NavTo(PageType.RUNTIME))
-                        toggleDrawer(NavigationType.NONE)
+        // Display the operation column
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            SearchBar(
+                query = query,
+                onQueryChange = { query = it },
+                onSearch = { active = false },
+                active = active,
+                onActiveChange = { active = it },
+                placeholder = { Text("搜索") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                trailingIcon = {
+                    if (query.isNotEmpty()) {
+                        IconButton(onClick = { query = "" }) {
+                            Icon(Icons.Default.Clear, contentDescription = null)
+                        }
                     }
                 },
             ) {
-                Column(
-                    modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    // Display the entity image and title
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Image(
-                            modifier = Modifier.size(24.dp),
-                            painter = painterResource(id = R.drawable.ic_program),
-                            contentDescription = null,
+                    val items =
+                        uiState.entities.filter { query.isNotEmpty() && it.text.contains(query) }
+                    items(items.size) {
+                        val item = items[it]
+                        ListItem(
+                            headlineContent = { Text(item.text) },
+                            supportingContent = { Text(item.createTime.dateFormat("yyyy/MM/dd")) },
+                            leadingContent = {
+                                if (item.text == query) Icon(
+                                    Icons.Filled.Star,
+                                    contentDescription = null
+                                )
+                            },
+                            modifier = Modifier.clickable {
+                                query = item.text
+                                active = false
+                            }
                         )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            // Display the close button
+            FloatingActionButton(
+                onClick = {
+                    event(HomeEvent.NavTo(PageType.LIST))
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null
+                )
+            }
+        }
+        // Display the list of entities in a grid
+        LazyVerticalGrid(
+            modifier = modifier
+                .fillMaxSize()
+                .shadow(
+                    elevation = 2.dp,
+                    shape = MaterialTheme.shapes.medium,
+                ),
+            columns = GridCells.Fixed(4),
+            contentPadding = PaddingValues(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            val items = uiState.entities.filter { it.text.contains(query) }
+
+            itemsIndexed(items = items) { index, item ->
+                Card(
+                    onClick = {
+                        scope.launch {
+                            // Toggle the selected state of the entity and navigate to the runtime page
+                            event(HomeEvent.ToggleSelected(item.id))
+                            event(HomeEvent.NavTo(PageType.RUNTIME))
+                            toggleDrawer(NavigationType.NONE)
+                        }
+                    },
+                ) {
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // Display the entity image and title
+                        Row(
+                            modifier = Modifier.height(24.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Text(
+                                text = "${index + 1}、",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Monospace,
+                                fontStyle = FontStyle.Italic,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
                         Text(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier.fillMaxWidth(),
                             text = item.text,
-                            style = MaterialTheme.typography.titleMedium,
+                            fontSize = 20.sp,
                             overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
                             maxLines = 1,
                         )
                         Text(
-                            text = "${index + 1}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontFamily = FontFamily.Monospace,
-                            fontStyle = FontStyle.Italic,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.Bottom,
-                    ) {
-                        // Display the entity volume range
-                        Column {
-                            Text(
-                                text = "G - ${item.volume[0].format(1)}/${
-                                    item.volume[1].format(
-                                        1
-                                    )
-                                }",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontFamily = FontFamily.Monospace,
-                            )
-                            Text(
-                                text = "P - ${item.volume[2].format(1)}/${
-                                    item.volume[3].format(
-                                        1
-                                    )
-                                }",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontFamily = FontFamily.Monospace,
-                            )
-                            Text(
-                                text = "A - ${item.axis[0].format(1)}/${
-                                    item.axis[1].format(
-                                        1
-                                    )
-                                }",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontFamily = FontFamily.Monospace,
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
+                            modifier = Modifier.fillMaxWidth(),
                             text = item.createTime.dateFormat("yyyy/MM/dd"),
                             style = MaterialTheme.typography.bodySmall,
                             fontFamily = FontFamily.Monospace,
+                            textAlign = TextAlign.End,
                         )
                     }
                 }
@@ -631,7 +713,7 @@ fun RuntimeContent(
         // Display the close button
         FloatingActionButton(
             modifier = Modifier
-                .padding(8.dp)
+                .padding(16.dp)
                 .align(Alignment.TopEnd),
             onClick = {
                 scope.launch {
@@ -876,7 +958,7 @@ fun FunctionCard(
                         brush = Brush.horizontalGradient(
                             colors = listOf(
                                 Color.Blue.copy(alpha = 0.1f),
-                                Color.LightGray,
+                                Color.Blue.copy(alpha = 0.3f),
                             )
                         ),
                         shape = MaterialTheme.shapes.medium,

@@ -2,77 +2,85 @@ package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imeAnimationSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
@@ -81,7 +89,6 @@ import com.zktony.android.core.ext.format
 import com.zktony.android.core.ext.showShortToast
 import com.zktony.android.data.entities.CalibrationEntity
 import com.zktony.android.ui.components.InputDialog
-import com.zktony.android.ui.components.TopAppBar
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -128,30 +135,21 @@ fun ContentWrapper(
     uiState: CalibrationUiState,
     event: (CalibrationEvent) -> Unit = {},
 ) {
-    Column {
-        // App bar with edit page is visible
-        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-            TopAppBar(
-                title = stringResource(id = R.string.edit),
-                navigation = { event(CalibrationEvent.NavTo(PageType.LIST)) }
-            )
-        }
-        // List page
-        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-            ListContent(
-                modifier = modifier,
-                uiState = uiState,
-                event = event,
-            )
-        }
-        // Edit page
-        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-            EditContent(
-                modifier = modifier,
-                uiState = uiState,
-                event = event,
-            )
-        }
+    // List page
+    AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+        ListContent(
+            modifier = modifier,
+            uiState = uiState,
+            event = event,
+        )
+    }
+    // Edit page
+    AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
+        EditContent(
+            modifier = modifier,
+            uiState = uiState,
+            event = event,
+        )
     }
 }
 
@@ -164,7 +162,10 @@ fun ListContent(
 ) {
     val scope = rememberCoroutineScope()
     val gridState = rememberLazyGridState()
-    var showDialog by remember { mutableStateOf(false) }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var query by rememberSaveable { mutableStateOf("") }
+    var active by rememberSaveable { mutableStateOf(false) }
+
 
     // Show the input dialog if showDialog is true
     if (showDialog) {
@@ -187,33 +188,148 @@ fun ListContent(
     }
 
     // Row containing the list of items and the operation column
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        // Column containing the operation buttons
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            SearchBar(
+                query = query,
+                onQueryChange = { query = it },
+                onSearch = { active = false },
+                active = active,
+                onActiveChange = { active = it },
+                placeholder = { Text("搜索") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                trailingIcon = {
+                    if (query.isNotEmpty()) {
+                        IconButton(onClick = { query = "" }) {
+                            Icon(Icons.Default.Clear, contentDescription = null)
+                        }
+                    }
+                },
+            ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    val items =
+                        uiState.entities.filter { query.isNotEmpty() && it.text.contains(query) }
+                    items(items.size) {
+                        val item = items[it]
+                        ListItem(
+                            headlineContent = { Text(item.text) },
+                            supportingContent = { Text(item.createTime.dateFormat("yyyy/MM/dd")) },
+                            leadingContent = {
+                                if (item.text == query) Icon(
+                                    Icons.Filled.Star,
+                                    contentDescription = null
+                                )
+                            },
+                            modifier = Modifier.clickable {
+                                query = item.text
+                                active = false
+                            }
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            // Button for adding a new item
+            FloatingActionButton(
+                modifier = Modifier.width(128.dp),
+                onClick = { showDialog = true })
+            {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = Color.Black,
+                )
+            }
+
+            // Button for deleting the selected item
+            AnimatedVisibility(visible = uiState.selected != 0L) {
+                var count by remember { mutableStateOf(0) }
+
+                FloatingActionButton(
+                    modifier = Modifier.width(128.dp),
+                    onClick = {
+                        if (count == 1) {
+                            event(CalibrationEvent.Delete(uiState.selected))
+                            event(CalibrationEvent.ToggleSelected(0L))
+                            count = 0
+                        } else {
+                            count++
+                        }
+                    }) {
+                    Icon(
+                        modifier = Modifier.size(32.dp),
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = if (count == 1) Color.Red else Color.Black,
+                    )
+                }
+            }
+
+            // Button for editing the selected item
+            AnimatedVisibility(visible = uiState.selected != 0L) {
+                FloatingActionButton(
+                    modifier = Modifier.width(128.dp),
+                    onClick = { event(CalibrationEvent.NavTo(PageType.EDIT)) }) {
+                    Icon(
+                        modifier = Modifier.size(32.dp),
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        tint = Color.Black,
+                    )
+                }
+            }
+
+            // Button for activating the selected item
+            AnimatedVisibility(visible = uiState.selected != 0L) {
+                FloatingActionButton(
+                    modifier = Modifier.width(128.dp),
+                    onClick = { event(CalibrationEvent.Active(uiState.selected)) }) {
+                    Icon(
+                        modifier = Modifier.size(32.dp),
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        tint = Color.Black,
+                    )
+                }
+            }
+        }
+
         LazyVerticalGrid(
-            modifier = modifier
-                .weight(6f)
+            modifier = Modifier
                 .fillMaxHeight()
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = MaterialTheme.shapes.medium
+                .shadow(
+                    elevation = 2.dp,
+                    shape = MaterialTheme.shapes.medium,
                 ),
             state = gridState,
-            columns = GridCells.Fixed(3),
-            contentPadding = PaddingValues(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            columns = GridCells.Fixed(4),
+            contentPadding = PaddingValues(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            itemsIndexed(items = uiState.entities) { index, item ->
+            val items = uiState.entities.filter { it.text.contains(query) }
+
+            itemsIndexed(items = items) { index, item ->
                 val background = if (item.id == uiState.selected) {
-                    MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
+                    Color.Blue.copy(alpha = 0.3f)
                 } else {
                     MaterialTheme.colorScheme.surfaceVariant
                 }
-                Card(
+                ElevatedCard(
                     colors = CardDefaults.cardColors(containerColor = background),
                     onClick = {
                         if (item.id == uiState.selected) {
@@ -233,133 +349,34 @@ fun ListContent(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            AnimatedVisibility(visible = item.active) {
-                                Text(text = "✔")
-                            }
-                            if (!item.active) {
-                                Image(
-                                    modifier = Modifier.size(24.dp),
-                                    painter = painterResource(id = R.drawable.ic_water),
-                                    contentDescription = null,
-                                )
-                            }
                             Text(
-                                modifier = Modifier.weight(1f),
-                                text = item.text,
+                                text = "${index + 1}、",
                                 style = MaterialTheme.typography.titleMedium,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                            )
-                            Text(
-                                text = "${index + 1}",
-                                style = MaterialTheme.typography.bodyLarge,
                                 fontFamily = FontFamily.Monospace,
                                 fontStyle = FontStyle.Italic,
                                 fontWeight = FontWeight.SemiBold,
                             )
-                        }
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.Bottom,
-                        ) {
-                            // Display the entity volume range
-                            Text(
-                                text = "T - ${item.data.size}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontFamily = FontFamily.Monospace,
-                            )
                             Spacer(modifier = Modifier.weight(1f))
-                            Text(
-                                text = item.createTime.dateFormat("yyyy/MM/dd"),
-                                style = MaterialTheme.typography.bodySmall,
-                                fontFamily = FontFamily.Monospace,
-                            )
+                            AnimatedVisibility(visible = item.active) {
+                                Text(text = "✔")
+                            }
                         }
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = item.text,
+                            fontSize = 20.sp,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                        )
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = item.createTime.dateFormat("yyyy/MM/dd"),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontFamily = FontFamily.Monospace,
+                            textAlign = TextAlign.End,
+                        )
                     }
-                }
-            }
-        }
-
-        // Column containing the operation buttons
-        Column(
-            modifier = modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = MaterialTheme.shapes.medium
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            // Button for adding a new item
-            FloatingActionButton(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                onClick = { showDialog = true })
-            {
-                Icon(
-                    modifier = Modifier.size(36.dp),
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    tint = Color.Black,
-                )
-            }
-
-            // Button for deleting the selected item
-            AnimatedVisibility(visible = uiState.selected != 0L) {
-                var count by remember { mutableStateOf(0) }
-
-                FloatingActionButton(modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                    onClick = {
-                        if (count == 1) {
-                            event(CalibrationEvent.Delete(uiState.selected))
-                            event(CalibrationEvent.ToggleSelected(0L))
-                            count = 0
-                        } else {
-                            count++
-                        }
-                    }) {
-                    Icon(
-                        modifier = Modifier.size(36.dp),
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        tint = if (count == 1) Color.Red else Color.Black,
-                    )
-                }
-            }
-
-            // Button for editing the selected item
-            AnimatedVisibility(visible = uiState.selected != 0L) {
-                FloatingActionButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                    onClick = { event(CalibrationEvent.NavTo(PageType.EDIT)) },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(36.dp),
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        tint = Color.Black,
-                    )
-                }
-            }
-
-            // Button for activating the selected item
-            AnimatedVisibility(visible = uiState.selected != 0L) {
-                FloatingActionButton(modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                    onClick = { event(CalibrationEvent.Active(uiState.selected)) }) {
-                    Icon(
-                        modifier = Modifier.size(36.dp),
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        tint = Color.Black,
-                    )
                 }
             }
         }
@@ -373,11 +390,7 @@ fun ListContent(
  * @param uiState The current state of the calibration UI.
  * @param event The event to be triggered when the UI state changes.
  */
-@OptIn(
-    ExperimentalComposeUiApi::class,
-    ExperimentalLayoutApi::class,
-    ExperimentalMaterial3Api::class
-)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun EditContent(
     modifier: Modifier = Modifier,
@@ -387,108 +400,109 @@ fun EditContent(
     // Get the selected entity or create a new one if none is selected
     val entity = uiState.entities.find { it.id == uiState.selected } ?: CalibrationEntity()
 
-    // Initialize the index and volume variables
-    var index by remember { mutableStateOf(0) }
-    var volume by remember { mutableStateOf("") }
-
-    // Get the software keyboard controller
-    val softKeyboard = LocalSoftwareKeyboardController.current
-
-    // Initialize the showDialog variable
-    var showDialog by remember { mutableStateOf(false) }
-
-    // Get the coroutine scope
-    val scope = rememberCoroutineScope()
-
-    // Show the dialog if showDialog is true
-    if (showDialog) {
-        Dialog(onDismissRequest = { showDialog = false }) {
-            // Show the filter chip grid
-            ElevatedCard {
-                LazyVerticalGrid(
-                    modifier = Modifier.padding(8.dp),
-                    columns = GridCells.Fixed(3),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    repeat(7) {
-                        item {
-                            FilterChip(
-                                selected = index == it,
-                                shape = MaterialTheme.shapes.small,
-                                onClick = {
-                                    index = it
-                                    showDialog = false
-                                },
-                                trailingIcon = {
-                                    if (index == it) {
-                                        Text(text = "✔️")
-                                    }
-                                },
-                                label = {
-                                    Text(
-                                        modifier = Modifier.padding(horizontal = 8.dp),
-                                        text = "V${it + 1}",
-                                        style = TextStyle(fontSize = 24.sp),
-                                    )
-                                })
-                        }
-                    }
-                }
-            }
-        }
+    val list = remember {
+        mutableStateListOf(
+            "注射泵",
+            "一号重液泵",
+            "一号轻液泵",
+            "二号重液泵",
+            "二号轻液泵",
+            "三号重液泵",
+            "三号轻液泵"
+        )
     }
 
-    // Show the edit content UI
+    var index by remember { mutableStateOf(0) }
+    var textFieldSize by remember { mutableStateOf(Size.Zero) }
+    var volume by remember { mutableStateOf("0") }
+    val softKeyboard = LocalSoftwareKeyboardController.current
+    var expanded by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     Column(
         modifier = modifier
-            .padding(8.dp)
-            .windowInsetsPadding(WindowInsets.imeAnimationSource),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Show the data grid
-        LazyVerticalGrid(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .background(
-                    color = MaterialTheme.colorScheme.surface,
-                    shape = MaterialTheme.shapes.medium,
-                ),
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            columns = GridCells.Fixed(3)
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(items = entity.data) {
-                Card(
-                    modifier = Modifier.height(48.dp),
-                ) {
+            // Display the title
+            Icon(
+                modifier = Modifier.size(36.dp),
+                imageVector = Icons.Default.Edit,
+                contentDescription = null,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            // Display the close button
+            FloatingActionButton(
+                onClick = {
+                    event(CalibrationEvent.NavTo(PageType.LIST))
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null
+                )
+            }
+        }
+        // Show the edit content UI
+        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            // Show the data grid
+            LazyVerticalGrid(
+                modifier = Modifier
+                    .weight(2f)
+                    .fillMaxHeight()
+                    .shadow(
+                        elevation = 2.dp,
+                        shape = MaterialTheme.shapes.medium,
+                    ),
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                itemsIndexed(items = entity.data) { index, it ->
                     Row(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp),
+                            .background(
+                                color = if (index % 2 == 0) {
+                                    MaterialTheme.colorScheme.surfaceVariant
+                                } else {
+                                    Color.Transparent
+                                },
+                                shape = MaterialTheme.shapes.medium,
+                            )
+                            .shadow(
+                                elevation = 2.dp,
+                                shape = MaterialTheme.shapes.medium,
+                            )
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Show the index
                         Text(
-                            text = "V ${it.index + 1}",
-                            style = MaterialTheme.typography.bodyLarge,
-                            maxLines = 1,
+                            text = "${index + 1}、",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontStyle = FontStyle.Italic,
                         )
 
+                        Column {
+                            Text(
+                                text = list[it.index],
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontFamily = FontFamily.Serif,
+                            )
+                            Text(
+                                text = it.volume.format(2) + " μL",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontFamily = FontFamily.Monospace,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
                         Spacer(modifier = Modifier.weight(1f))
-
-                        // Show the volume
-                        Text(
-                            text = it.volume.format(2) + " μL",
-                            style = MaterialTheme.typography.bodyLarge,
-                            maxLines = 1,
-                        )
-
-                        Spacer(modifier = Modifier.weight(1f))
-
-                        // Show the delete icon
                         Icon(
                             modifier = Modifier
                                 .size(32.dp)
@@ -500,100 +514,128 @@ fun EditContent(
                     }
                 }
             }
-        }
 
-        // Show the input row
-        Row(
-            modifier = Modifier
-                .height(108.dp)
-                .fillMaxWidth()
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = MaterialTheme.shapes.medium,
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Show the filter chip button
-            Button(
-                modifier = Modifier.padding(start = 16.dp),
-                onClick = { showDialog = true },
-            ) {
-                Text(
-                    text = "V${index + 1}",
-                    style = MaterialTheme.typography.titleLarge,
-                )
-            }
-
-            // Show the volume text field
-            OutlinedTextField(
+            // Show the input row
+            Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 16.dp),
-                value = TextFieldValue(volume, TextRange(volume.length)),
-                onValueChange = { volume = it.text },
-                label = {
-                    Text(
-                        text = stringResource(id = R.string.volume)
+                    .fillMaxHeight()
+                    .shadow(
+                        elevation = 2.dp,
+                        shape = MaterialTheme.shapes.medium,
                     )
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        softKeyboard?.hide()
-                    }
-                ),
-                shape = MaterialTheme.shapes.medium,
-            )
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                // Show the filter chip button
+                Column {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onGloballyPositioned {
+                                textFieldSize = it.size.toSize()
+                            }
+                            .clickable {
+                                expanded = !expanded
+                            },
+                        value = list[index],
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = {
+                            Icon(
+                                modifier = Modifier.clickable { expanded = !expanded },
+                                imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
+                                contentDescription = null,
+                            )
+                        },
+                        shape = MaterialTheme.shapes.medium,
+                    )
 
-            // Show the add button
-            Button(
-                modifier = Modifier
-                    .width(156.dp),
-                onClick = {
-                    scope.launch {
-                        softKeyboard?.hide()
-                        if (!uiState.loading) {
-                            event(CalibrationEvent.AddLiquid(index))
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier
+                            .width(with(LocalDensity.current) { textFieldSize.width.toDp() })
+                    ) {
+                        list.forEachIndexed { ix, label ->
+                            DropdownMenuItem(
+                                text = { Text(text = label) },
+                                onClick = {
+                                    index = ix
+                                    expanded = false
+                                }
+                            )
                         }
                     }
-                }) {
-                if (uiState.loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(32.dp),
-                        strokeWidth = 4.dp,
-                        color = Color.White,
-                    )
-                } else {
+                }
+
+                // Show the volume text field
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = TextFieldValue(volume, TextRange(volume.length)),
+                    onValueChange = { volume = it.text },
+                    label = {
+                        Text(
+                            text = stringResource(id = R.string.volume)
+                        )
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Decimal,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            softKeyboard?.hide()
+                        }
+                    ),
+                    shape = MaterialTheme.shapes.medium,
+                )
+
+                // Show the add button
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = {
+                        scope.launch {
+                            softKeyboard?.hide()
+                            if (!uiState.loading) {
+                                event(CalibrationEvent.AddLiquid(index))
+                            }
+                        }
+                    }) {
+                    if (uiState.loading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(32.dp),
+                            strokeWidth = 4.dp,
+                            color = Color.White,
+                        )
+                    } else {
+                        Icon(
+                            modifier = Modifier.size(32.dp),
+                            imageVector = Icons.Default.ArrowForward,
+                            contentDescription = null,
+                        )
+                    }
+                }
+
+                // Show the save button
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = (volume.toDoubleOrNull() ?: 0.0) > 0.0,
+                    onClick = {
+                        softKeyboard?.hide()
+                        event(CalibrationEvent.InsertData(index, volume.toDoubleOrNull() ?: 0.0))
+                    }) {
                     Icon(
                         modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Default.ArrowForward,
+                        imageVector = Icons.Default.Save,
                         contentDescription = null,
                     )
                 }
             }
-
-            // Show the save button
-            Button(
-                modifier = Modifier
-                    .width(156.dp)
-                    .padding(end = 16.dp),
-                enabled = (volume.toDoubleOrNull() ?: 0.0) > 0.0,
-                onClick = {
-                    softKeyboard?.hide()
-                    event(CalibrationEvent.InsertData(index, volume.toDoubleOrNull() ?: 0.0))
-                }) {
-                Icon(
-                    modifier = Modifier.size(32.dp),
-                    imageVector = Icons.Default.Save,
-                    contentDescription = null,
-                )
-            }
         }
     }
+
+
 }
 
 /**

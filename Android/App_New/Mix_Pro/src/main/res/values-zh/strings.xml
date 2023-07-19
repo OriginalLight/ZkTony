@@ -14,10 +14,10 @@
     <string name="parameters">系统参数</string>
     <string name="qrcode">微信扫码关注公众号</string>
     <string name="system_config">系统参数</string>
-    <string name="tab_calibration">校准</string>
+    <string name="tab_calibration">校准管理</string>
     <string name="tab_container">容器</string>
     <string name="tab_home">主页面</string>
-    <string name="tab_program">程序</string>
+    <string name="tab_program">制胶程序</string>
     <string name="update">检测更新</string>
     <string name="update_available">有新版本</string>
     <string name="version">版本</string>
@@ -31,7 +31,7 @@
     <string name="save">保存</string>
     <string name="edit">编辑</string>
     <string name="delete">删除</string>
-    <string name="tab_setting">设置</string>
+    <string name="tab_setting">系统设置</string>
     <string name="maximum_stroke">最大行程</string>
     <string name="waste_tank">废液槽坐标</string>
     <string name="add">添加</string>

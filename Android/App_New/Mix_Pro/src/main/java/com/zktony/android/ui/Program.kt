@@ -2,8 +2,7 @@ package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -12,8 +11,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imeAnimationSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,30 +28,38 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
@@ -61,9 +68,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
@@ -72,7 +81,6 @@ import com.zktony.android.core.ext.format
 import com.zktony.android.core.ext.showShortToast
 import com.zktony.android.data.entities.ProgramEntity
 import com.zktony.android.ui.components.InputDialog
-import com.zktony.android.ui.components.TopAppBar
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -122,30 +130,21 @@ fun ContentWrapper(
     uiState: ProgramUiState,
     event: (ProgramEvent) -> Unit = {},
 ) {
-    Column(modifier = modifier) {
-        // Display the app bar for the edit page
-        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-            TopAppBar(
-                title = stringResource(id = R.string.edit),
-                navigation = { event(ProgramEvent.NavTo(PageType.LIST)) } // Step 1: Navigate to the list page when the back button is pressed
-            )
-        }
-        // Display the list page
-        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-            ListContent(
-                modifier = Modifier,
-                uiState = uiState,
-                event = event,
-            )
-        }
-        // Display the edit page
-        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-            EditContent(
-                modifier = Modifier,
-                uiState = uiState,
-                event = event,
-            )
-        }
+    // Display the list page
+    AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+        ListContent(
+            modifier = modifier,
+            uiState = uiState,
+            event = event,
+        )
+    }
+    // Display the edit page
+    AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
+        EditContent(
+            modifier = modifier,
+            uiState = uiState,
+            event = event,
+        )
     }
 }
 
@@ -165,7 +164,9 @@ fun ListContent(
 ) {
     val scope = rememberCoroutineScope()
     val gridState = rememberLazyGridState()
-    var showDialog by remember { mutableStateOf(false) }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+    var query by rememberSaveable { mutableStateOf("") }
+    var active by rememberSaveable { mutableStateOf(false) }
 
     // Show the input dialog if showDialog is true
     if (showDialog) {
@@ -186,33 +187,138 @@ fun ListContent(
     }
 
     // Display the list and operation columns
-    Row(
+    Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+
+        // Display the operation column
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            SearchBar(
+                query = query,
+                onQueryChange = { query = it },
+                onSearch = { active = false },
+                active = active,
+                onActiveChange = { active = it },
+                placeholder = { Text("搜索") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                trailingIcon = {
+                    if (query.isNotEmpty()) {
+                        IconButton(onClick = { query = "" }) {
+                            Icon(Icons.Default.Clear, contentDescription = null)
+                        }
+                    }
+                },
+            ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    val items =
+                        uiState.entities.filter { query.isNotEmpty() && it.text.contains(query) }
+                    items(items.size) {
+                        val item = items[it]
+                        ListItem(
+                            headlineContent = { Text(item.text) },
+                            supportingContent = { Text(item.createTime.dateFormat("yyyy/MM/dd")) },
+                            leadingContent = {
+                                if (item.text == query) Icon(
+                                    Icons.Filled.Star,
+                                    contentDescription = null
+                                )
+                            },
+                            modifier = Modifier.clickable {
+                                query = item.text
+                                active = false
+                            }
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            // Button for adding a new item
+            FloatingActionButton(
+                modifier = Modifier.width(128.dp),
+                onClick = { showDialog = true })
+            {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = Color.Black,
+                )
+            }
+            // Delete button
+            AnimatedVisibility(visible = uiState.selected != 0L) {
+                var count by remember { mutableStateOf(0) }
+
+                FloatingActionButton(
+                    modifier = Modifier.width(128.dp),
+                    onClick = {
+                        scope.launch {
+                            if (count == 1) {
+                                event(ProgramEvent.Delete(uiState.selected))
+                                event(ProgramEvent.ToggleSelected(0L))
+                                count = 0
+                            } else {
+                                count++
+                            }
+                        }
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(32.dp),
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = if (count == 1) Color.Red else Color.Black,
+                    )
+                }
+            }
+            // Edit button
+            AnimatedVisibility(visible = uiState.selected != 0L) {
+                FloatingActionButton(
+                    modifier = Modifier.width(128.dp),
+                    onClick = { event(ProgramEvent.NavTo(PageType.EDIT)) },
+                ) {
+                    Icon(
+                        modifier = Modifier.size(32.dp),
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = null,
+                        tint = Color.Black,
+                    )
+                }
+            }
+        }
+
         LazyVerticalGrid(
-            modifier = modifier
-                .weight(6f)
+            modifier = Modifier
                 .fillMaxHeight()
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = MaterialTheme.shapes.medium
+                .shadow(
+                    elevation = 2.dp,
+                    shape = MaterialTheme.shapes.medium,
                 ),
             state = gridState,
-            columns = GridCells.Fixed(3),
-            contentPadding = PaddingValues(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(16.dp),
+            columns = GridCells.Fixed(4),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            itemsIndexed(items = uiState.entities) { index, item ->
+            val items = uiState.entities.filter { it.text.contains(query) }
+
+            itemsIndexed(items = items) { index, item ->
                 val background = if (item.id == uiState.selected) {
-                    MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
+                    Color.Blue.copy(alpha = 0.3f)
                 } else {
                     MaterialTheme.colorScheme.surfaceVariant
                 }
-                Card(
+                ElevatedCard(
                     colors = CardDefaults.cardColors(containerColor = background),
                     onClick = {
                         if (item.id == uiState.selected) {
@@ -228,142 +334,34 @@ fun ListContent(
                     ) {
                         // Display the entity image and title
                         Row(
+                            modifier = Modifier.height(24.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
-                            Image(
-                                modifier = Modifier.size(24.dp),
-                                painter = painterResource(id = R.drawable.ic_program),
-                                contentDescription = null,
-                            )
                             Text(
-                                modifier = Modifier.weight(1f),
-                                text = item.text,
+                                text = "${index + 1}、",
                                 style = MaterialTheme.typography.titleMedium,
-                                overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
-                            )
-                            Text(
-                                text = "${index + 1}",
-                                style = MaterialTheme.typography.bodyLarge,
                                 fontFamily = FontFamily.Monospace,
                                 fontStyle = FontStyle.Italic,
                                 fontWeight = FontWeight.SemiBold,
                             )
                         }
-                        Row(
+                        Text(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.Bottom,
-                        ) {
-                            // Display the entity volume range
-                            Column {
-                                Text(
-                                    text = "G - ${item.volume[0].format(1)}/${
-                                        item.volume[1].format(
-                                            1
-                                        )
-                                    }",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontFamily = FontFamily.Monospace,
-                                )
-                                Text(
-                                    text = "P - ${item.volume[2].format(1)}/${
-                                        item.volume[3].format(
-                                            1
-                                        )
-                                    }",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontFamily = FontFamily.Monospace,
-                                )
-                                Text(
-                                    text = "A - ${item.axis[0].format(1)}/${
-                                        item.axis[1].format(
-                                            1
-                                        )
-                                    }",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontFamily = FontFamily.Monospace,
-                                )
-                            }
-                            Spacer(modifier = Modifier.weight(1f))
-                            Text(
-                                text = item.createTime.dateFormat("yyyy/MM/dd"),
-                                style = MaterialTheme.typography.bodySmall,
-                                fontFamily = FontFamily.Monospace,
-                            )
-                        }
+                            text = item.text,
+                            fontSize = 20.sp,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                        )
+                        Text(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = item.createTime.dateFormat("yyyy/MM/dd"),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontFamily = FontFamily.Monospace,
+                            textAlign = TextAlign.End,
+                        )
                     }
-                }
-            }
-        }
-
-        // Display the operation column
-        Column(
-            modifier = modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = MaterialTheme.shapes.medium
-                ),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            // Add button
-            FloatingActionButton(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth(),
-                onClick = { showDialog = true }
-            ) {
-                Icon(
-                    modifier = Modifier.size(36.dp),
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    tint = Color.Black,
-                )
-            }
-            // Delete button
-            AnimatedVisibility(visible = uiState.selected != 0L) {
-                var count by remember { mutableStateOf(0) }
-
-                FloatingActionButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                    onClick = {
-                        scope.launch {
-                            if (count == 1) {
-                                event(ProgramEvent.Delete(uiState.selected))
-                                event(ProgramEvent.ToggleSelected(0L))
-                                count = 0
-                            } else {
-                                count++
-                            }
-                        }
-                    }
-                ) {
-                    Icon(
-                        modifier = Modifier.size(36.dp),
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        tint = if (count == 1) Color.Red else Color.Black,
-                    )
-                }
-            }
-            // Edit button
-            AnimatedVisibility(visible = uiState.selected != 0L) {
-                FloatingActionButton(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .fillMaxWidth(),
-                    onClick = { event(ProgramEvent.NavTo(PageType.EDIT)) },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(36.dp),
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        tint = Color.Black,
-                    )
                 }
             }
         }
@@ -373,7 +371,6 @@ fun ListContent(
 @OptIn(
     ExperimentalLayoutApi::class,
     ExperimentalComposeUiApi::class,
-    ExperimentalMaterial3Api::class
 )
 @Composable
 fun EditContent(
@@ -385,35 +382,52 @@ fun EditContent(
     val keyboard = LocalSoftwareKeyboardController.current
     val entity = uiState.entities.find { it.id == uiState.selected } ?: ProgramEntity()
     val travel = uiState.settings.travelList.ifEmpty { listOf(100f, 100f) }
-    var v1 by remember { mutableStateOf(entity.volume[0].format(1)) }
-    var v2 by remember { mutableStateOf(entity.volume[1].format(1)) }
-    var v3 by remember { mutableStateOf(entity.volume[2].format(1)) }
-    var v4 by remember { mutableStateOf(entity.volume[3].format(1)) }
-    var y by remember { mutableStateOf(entity.axis[0].format(1)) }
-    var z by remember { mutableStateOf(entity.axis[1].format(1)) }
+    var values by rememberSaveable { mutableStateOf((entity.volume + entity.axis).map { it.format(1) }) }
 
     Column(
         modifier = modifier
-            .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.background,
-                shape = MaterialTheme.shapes.medium
-            ),
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            // Display the title
+            Icon(
+                modifier = Modifier.size(36.dp),
+                imageVector = Icons.Default.Edit,
+                contentDescription = null,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            // Display the close button
+            FloatingActionButton(
+                onClick = {
+                    event(ProgramEvent.NavTo(PageType.LIST))
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null
+                )
+            }
+        }
+
         LazyColumn(
             modifier = modifier
-                .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.imeAnimationSource)
-                .padding(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+                .shadow(
+                    elevation = 2.dp,
+                    shape = MaterialTheme.shapes.medium,
+                )
+                .windowInsetsPadding(WindowInsets.imeAnimationSource),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(16.dp),
         ) {
             item {
                 // volume
-                OutlinedCard(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                OutlinedCard {
                     Column(
                         modifier = Modifier.padding(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -430,12 +444,12 @@ fun EditContent(
 
                             OutlinedTextField(
                                 modifier = Modifier.weight(1f),
-                                value = TextFieldValue(v1, TextRange(v1.length)),
+                                value = TextFieldValue(values[0], TextRange(values[0].length)),
                                 onValueChange = {
                                     scope.launch {
-                                        v1 = it.text
+                                        values = values.toMutableList().apply { set(0, it.text) }
                                         val volume = entity.volume.toMutableList()
-                                        volume[0] = v1.toFloatOrNull() ?: 0f
+                                        volume[0] = values[0].toFloatOrNull() ?: 0f
                                         event(ProgramEvent.Update(entity.copy(volume = volume)))
                                     }
                                 },
@@ -454,12 +468,12 @@ fun EditContent(
                             )
                             OutlinedTextField(
                                 modifier = Modifier.weight(1f),
-                                value = TextFieldValue(v2, TextRange(v2.length)),
+                                value = TextFieldValue(values[1], TextRange(values[1].length)),
                                 onValueChange = {
                                     scope.launch {
-                                        v2 = it.text
+                                        values = values.toMutableList().apply { set(1, it.text) }
                                         val volume = entity.volume.toMutableList()
-                                        volume[1] = v2.toFloatOrNull() ?: 0f
+                                        volume[1] = values[1].toFloatOrNull() ?: 0f
                                         event(ProgramEvent.Update(entity.copy(volume = volume)))
                                     }
                                 },
@@ -488,12 +502,12 @@ fun EditContent(
                             )
                             OutlinedTextField(
                                 modifier = Modifier.weight(1f),
-                                value = TextFieldValue(v3, TextRange(v3.length)),
+                                value = TextFieldValue(values[2], TextRange(values[2].length)),
                                 onValueChange = {
                                     scope.launch {
-                                        v3 = it.text
+                                        values = values.toMutableList().apply { set(2, it.text) }
                                         val volume = entity.volume.toMutableList()
-                                        volume[2] = v3.toFloatOrNull() ?: 0f
+                                        volume[2] = values[2].toFloatOrNull() ?: 0f
                                         event(ProgramEvent.Update(entity.copy(volume = volume)))
                                     }
                                 },
@@ -512,12 +526,12 @@ fun EditContent(
                             )
                             OutlinedTextField(
                                 modifier = Modifier.weight(1f),
-                                value = TextFieldValue(v4, TextRange(v4.length)),
+                                value = TextFieldValue(values[3], TextRange(values[3].length)),
                                 onValueChange = {
                                     scope.launch {
-                                        v4 = it.text
+                                        values = values.toMutableList().apply { set(3, it.text) }
                                         val volume = entity.volume.toMutableList()
-                                        volume[3] = v4.toFloatOrNull() ?: 0f
+                                        volume[3] = values[3].toFloatOrNull() ?: 0f
                                         event(ProgramEvent.Update(entity.copy(volume = volume)))
                                     }
                                 },
@@ -539,9 +553,7 @@ fun EditContent(
                 }
             }
             item {
-                OutlinedCard(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                OutlinedCard {
                     Column(
                         modifier = Modifier.padding(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -557,19 +569,20 @@ fun EditContent(
                             )
                             OutlinedTextField(
                                 modifier = Modifier.weight(1f),
-                                value = TextFieldValue(y, TextRange(y.length)),
+                                value = TextFieldValue(values[4], TextRange(values[4].length)),
                                 onValueChange = {
                                     scope.launch {
                                         val num = it.text.toFloatOrNull() ?: 0f
-                                        y = if (num > travel[0]) {
+                                        val y = if (num > travel[0]) {
                                             travel[0].format(1)
                                         } else if (num < 0) {
                                             "0"
                                         } else {
                                             it.text
                                         }
+                                        values = values.toMutableList().apply { set(4, y) }
                                         val axis = entity.axis.toMutableList()
-                                        axis[0] = y.toFloatOrNull() ?: 0f
+                                        axis[0] = values[4].toFloatOrNull() ?: 0f
                                         event(ProgramEvent.Update(entity.copy(axis = axis)))
                                     }
                                 },
@@ -597,7 +610,12 @@ fun EditContent(
                                     onClick = {
                                         scope.launch {
                                             keyboard?.hide()
-                                            event(ProgramEvent.MoveTo(0, y.toFloatOrNull() ?: 0f))
+                                            event(
+                                                ProgramEvent.MoveTo(
+                                                    0,
+                                                    values[4].toFloatOrNull() ?: 0f
+                                                )
+                                            )
                                         }
                                     }
                                 ) {
@@ -619,19 +637,20 @@ fun EditContent(
                             )
                             OutlinedTextField(
                                 modifier = Modifier.weight(1f),
-                                value = TextFieldValue(z, TextRange(z.length)),
+                                value = TextFieldValue(values[5], TextRange(values[5].length)),
                                 onValueChange = {
                                     scope.launch {
                                         val num = it.text.toFloatOrNull() ?: 0f
-                                        z = if (num > travel[1]) {
+                                        val z = if (num > travel[1]) {
                                             travel[1].format(1)
                                         } else if (num < 0) {
                                             "0"
                                         } else {
                                             it.text
                                         }
+                                        values = values.toMutableList().apply { set(5, z) }
                                         val axis = entity.axis.toMutableList()
-                                        axis[1] = z.toFloatOrNull() ?: 0f
+                                        axis[1] = values[5].toFloatOrNull() ?: 0f
                                         event(ProgramEvent.Update(entity.copy(axis = axis)))
                                     }
                                 },
@@ -659,7 +678,12 @@ fun EditContent(
                                     onClick = {
                                         scope.launch {
                                             keyboard?.hide()
-                                            event(ProgramEvent.MoveTo(1, z.toFloatOrNull() ?: 0f))
+                                            event(
+                                                ProgramEvent.MoveTo(
+                                                    1,
+                                                    values[5].toFloatOrNull() ?: 0f
+                                                )
+                                            )
                                         }
                                     }
                                 ) {

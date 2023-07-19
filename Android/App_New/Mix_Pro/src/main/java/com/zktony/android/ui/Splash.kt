@@ -79,9 +79,8 @@ fun Splash(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(8.dp)
             .background(
-                color = MaterialTheme.colorScheme.background,
+                color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.medium
             ),
         contentAlignment = Alignment.Center,

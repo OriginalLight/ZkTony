@@ -19,10 +19,8 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,11 +60,11 @@ fun AppNavigationRail(
         containerColor = Color.Transparent,
     ) {
         Layout(
-            modifier = Modifier.widthIn(max = 80.dp), content = {
+            modifier = Modifier.widthIn(max = 80.dp),
+            content = {
                 Column(
                     modifier = Modifier.layoutId(LayoutType.HEADER),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Spacer(Modifier.height(16.dp))
 
@@ -78,14 +76,12 @@ fun AppNavigationRail(
                                 contentDescription = null
                             )
                         })
-
-                    Spacer(Modifier.height(16.dp))
                 }
 
                 Column(
                     modifier = Modifier.layoutId(LayoutType.CONTENT),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     TOP_LEVEL_DESTINATIONS.forEach { destination ->
                         NavigationRailItem(
@@ -97,11 +93,7 @@ fun AppNavigationRail(
                                     painter = painterResource(id = destination.imageId),
                                     contentDescription = stringResource(id = destination.iconTextId),
                                 )
-                            },
-                            colors = NavigationRailItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                            )
+                            }
                         )
                     }
                 }
@@ -171,9 +163,6 @@ fun PermanentNavigationDrawerContent(
                                     contentDescription = stringResource(id = destination.iconTextId),
                                 )
                             },
-                            colors = NavigationDrawerItemDefaults.colors(
-                                unselectedContainerColor = Color.Transparent,
-                            ),
                             onClick = { navigateToTopLevelDestination(destination) })
                     }
                 }

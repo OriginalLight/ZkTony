@@ -2,13 +2,12 @@ package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,10 +25,12 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -65,7 +66,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.ui.components.TopAppBar
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.delay
@@ -120,53 +120,41 @@ fun ContentWrapper(
     event: (SettingEvent) -> Unit = {},
     navController: NavHostController,
 ) {
-    Column(modifier = modifier) {
-        // Display the top app bar when the authentication page is visible
-        AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
-            TopAppBar(
-                title = stringResource(id = R.string.authentication),
-                navigation = { event(SettingEvent.NavTo(PageType.LIST)) }
-            )
-        }
-        // Display the main page
-        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+    // Display the main page
+    AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+        Column(
+            modifier = modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Row(
+                // Display the settings content
+                SettingsContent(
                     modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Display the settings content
-                    SettingsContent(
-                        modifier = Modifier.weight(1f),
-                        uiState = uiState,
-                        event = event,
-                    )
-                    // Display the info content
-                    InfoContent(
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                // Display the operation content
-                OperationContent(
-                    modifier = Modifier.wrapContentHeight(),
                     uiState = uiState,
                     event = event,
                 )
+                // Display the info content
+                InfoContent(
+                    modifier = Modifier.weight(1f),
+                )
             }
-        }
-        // Display the authentication page
-        AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
-            Authentication(
-                modifier = modifier,
+            // Display the operation content
+            OperationContent(
+                uiState = uiState,
                 event = event,
-                navController = navController,
             )
         }
+    }
+    // Display the authentication page
+    AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
+        Authentication(
+            modifier = modifier,
+            event = event,
+            navController = navController,
+        )
     }
 }
 
@@ -197,12 +185,13 @@ fun SettingsContent(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .animateContentSize()
-            .background(
-                color = MaterialTheme.colorScheme.background,
+            .shadow(
+                elevation = 2.dp,
                 shape = MaterialTheme.shapes.medium,
             ),
         state = lazyColumnState,
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         // Display the language setting
         item {
@@ -221,28 +210,31 @@ fun SettingsContent(
                 )
             }
         }
-        // Display the language list
-        languageList.forEach { (name, code) ->
-            item {
-                AnimatedVisibility(visible = expanded) {
-                    SettingsCard(
-                        image = R.drawable.ic_language,
-                        paddingStart = 32.dp,
-                        onClick = {
-                            scope.launch {
-                                event(SettingEvent.Language(code))
-                                expanded = false
+
+        if (expanded) {
+            languageList.forEach { (name, code) ->
+                item {
+                    AnimatedVisibility(visible = expanded) {
+                        SettingsCard(
+                            image = R.drawable.ic_language,
+                            paddingStart = 32.dp,
+                            onClick = {
+                                scope.launch {
+                                    event(SettingEvent.Language(code))
+                                    expanded = false
+                                }
                             }
+                        ) {
+                            Text(
+                                text = name,
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
                         }
-                    ) {
-                        Text(
-                            text = name,
-                            style = MaterialTheme.typography.bodyLarge,
-                        )
                     }
                 }
             }
         }
+
         // Display the navigation setting
         item {
             SettingsCard(
@@ -250,6 +242,7 @@ fun SettingsContent(
                 text = stringResource(id = R.string.navigation),
             ) {
                 Switch(
+                    modifier = Modifier.height(32.dp),
                     checked = uiState.settings.navigation,
                     onCheckedChange = {
                         scope.launch {
@@ -279,77 +272,51 @@ fun InfoContent(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .animateContentSize()
-            .background(
-                color = MaterialTheme.colorScheme.background,
+            .shadow(
+                elevation = 2.dp,
                 shape = MaterialTheme.shapes.medium,
             ),
-        horizontalAlignment = Alignment.CenterHorizontally,
         state = lazyColumnState,
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         // Display the version info
         item {
-            AnimatedVisibility(visible = !helpInfo) {
-                SettingsCard(
-                    image = R.drawable.ic_version,
-                    text = stringResource(id = R.string.version),
-                ) {
-                    Text(
-                        text = BuildConfig.VERSION_NAME,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontStyle = FontStyle.Italic,
-                    )
-                }
+            SettingsCard(
+                image = R.drawable.ic_version,
+                text = stringResource(id = R.string.version),
+            ) {
+                Text(
+                    text = BuildConfig.VERSION_NAME,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic,
+                )
             }
         }
         // Display the help info toggle
         item {
-            AnimatedVisibility(visible = !helpInfo) {
-                SettingsCard(
-                    image = R.drawable.ic_help,
-                    text = stringResource(id = R.string.help),
-                    onClick = { helpInfo = !helpInfo },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = null,
-                    )
-                }
+            SettingsCard(
+                image = R.drawable.ic_help,
+                text = if (helpInfo) stringResource(id = R.string.qrcode) else stringResource(id = R.string.help),
+                onClick = { helpInfo = !helpInfo },
+            ) {
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    imageVector = if (helpInfo) Icons.Default.Close else Icons.Default.ArrowForward,
+                    contentDescription = null,
+                )
             }
         }
-        // Display the QR code help info
-        item {
-            AnimatedVisibility(visible = helpInfo) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    SettingsCard(
-                        image = R.drawable.ic_help,
-                        text = stringResource(id = R.string.qrcode),
-                        onClick = { helpInfo = !helpInfo },
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(24.dp),
-                            imageVector = Icons.Default.Close,
-                            contentDescription = null,
-                        )
-                    }
-                    Card(
-                        modifier = Modifier.padding(16.dp),
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                        ) {
-                            Image(
-                                modifier = Modifier.size(200.dp),
-                                painter = painterResource(id = R.mipmap.qrcode),
-                                contentDescription = null
-                            )
-                        }
-                    }
-                }
+
+        if (helpInfo) {
+            // Display the help info
+            item {
+                Image(
+                    modifier = Modifier.size(200.dp),
+                    painter = painterResource(id = R.mipmap.qrcode),
+                    contentDescription = null
+                )
             }
         }
     }
@@ -373,21 +340,17 @@ fun OperationContent(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .animateContentSize()
-            .background(
-                color = MaterialTheme.colorScheme.background,
+            .shadow(
+                elevation = 2.dp,
                 shape = MaterialTheme.shapes.medium,
-            ),
+            )
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         // Display the parameters card
-        ElevatedCard(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 32.dp, vertical = 8.dp),
-            onClick = { event(SettingEvent.NavTo(PageType.AUTH)) }
-        ) {
+        ElevatedCard(onClick = { event(SettingEvent.NavTo(PageType.AUTH)) }) {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.padding(horizontal = 64.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Image(
@@ -396,7 +359,6 @@ fun OperationContent(
                     contentDescription = null,
                 )
                 Text(
-                    modifier = Modifier.padding(bottom = 8.dp),
                     text = stringResource(id = R.string.parameters),
                     style = MaterialTheme.typography.bodyLarge,
                 )
@@ -404,13 +366,10 @@ fun OperationContent(
         }
         // Display the network card
         ElevatedCard(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 32.dp, vertical = 8.dp),
             onClick = { event(SettingEvent.Network) }
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.padding(horizontal = 64.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Image(
@@ -419,7 +378,6 @@ fun OperationContent(
                     contentDescription = null,
                 )
                 Text(
-                    modifier = Modifier.padding(bottom = 8.dp),
                     text = stringResource(id = R.string.wifi),
                     style = MaterialTheme.typography.bodyLarge,
                 )
@@ -427,13 +385,10 @@ fun OperationContent(
         }
         // Display the update card
         ElevatedCard(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 32.dp, vertical = 8.dp),
             onClick = { event(SettingEvent.Update) }
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.padding(horizontal = 64.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Determine the icon and text to display based on the UI state
@@ -477,7 +432,6 @@ fun OperationContent(
                     )
                 }
                 Text(
-                    modifier = Modifier.padding(bottom = 8.dp),
                     text = text,
                     style = MaterialTheme.typography.bodyLarge,
                 )
@@ -610,13 +564,34 @@ fun Authentication(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.background,
-                shape = MaterialTheme.shapes.medium,
-            ),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            // Display the title
+            Icon(
+                modifier = Modifier.size(36.dp),
+                imageVector = Icons.Default.Security,
+                contentDescription = null,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            // Display the close button
+            FloatingActionButton(
+                onClick = {
+                    event(SettingEvent.NavTo(PageType.LIST))
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null
+                )
+            }
+        }
         // Display the authentication header
         Spacer(modifier = Modifier.height(128.dp))
         // Display the verification code field
@@ -698,23 +673,20 @@ fun Authentication(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsCard(
-    paddingStart: Dp = 8.dp,
+    paddingStart: Dp = 0.dp,
     onClick: () -> Unit = { },
     image: Int,
     text: String? = null,
     content: @Composable () -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .wrapContentHeight()
-            .padding(start = paddingStart, top = 16.dp, end = 8.dp),
+        modifier = Modifier.padding(start = paddingStart),
         onClick = onClick,
     ) {
         Row(
-            modifier = Modifier
-                .height(48.dp)
-                .padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Display the image in the settings card
             Image(
@@ -725,7 +697,6 @@ fun SettingsCard(
             // Display the text in the settings card
             text?.let {
                 Text(
-                    modifier = Modifier.padding(start = 8.dp),
                     text = text,
                     style = MaterialTheme.typography.bodyLarge
                 )
