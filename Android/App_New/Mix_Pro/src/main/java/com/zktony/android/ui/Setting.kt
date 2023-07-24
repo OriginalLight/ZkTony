@@ -269,11 +269,15 @@ fun InfoContent(
         if (helpInfo) {
             // Display the help info
             item {
-                Image(
-                    modifier = Modifier.size(200.dp),
-                    painter = painterResource(id = R.mipmap.qrcode),
-                    contentDescription = null
-                )
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Image(
+                        modifier = Modifier
+                            .size(200.dp)
+                            .align(Alignment.Center),
+                        painter = painterResource(id = R.mipmap.qrcode),
+                        contentDescription = null
+                    )
+                }
             }
         }
     }

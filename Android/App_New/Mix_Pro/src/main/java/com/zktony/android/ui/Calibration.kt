@@ -47,6 +47,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.Text
@@ -84,10 +85,10 @@ import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
+import com.zktony.android.data.entities.CalibrationEntity
 import com.zktony.android.ext.dateFormat
 import com.zktony.android.ext.format
 import com.zktony.android.ext.showShortToast
-import com.zktony.android.data.entities.CalibrationEntity
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
@@ -390,7 +391,7 @@ fun ListContent(
  * @param uiState The current state of the calibration UI.
  * @param event The event to be triggered when the UI state changes.
  */
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun EditContent(
     modifier: Modifier = Modifier,
@@ -529,27 +530,31 @@ fun EditContent(
             ) {
                 // Show the filter chip button
                 Column {
-                    OutlinedTextField(
+                    OutlinedCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .onGloballyPositioned {
                                 textFieldSize = it.size.toSize()
-                            }
-                            .clickable {
-                                expanded = !expanded
                             },
-                        value = list[index],
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = {
+                        onClick = { expanded = !expanded },
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(
+                                modifier = Modifier.weight(1f),
+                                text = list[index],
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
                             Icon(
-                                modifier = Modifier.clickable { expanded = !expanded },
                                 imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
                                 contentDescription = null,
                             )
-                        },
-                        shape = MaterialTheme.shapes.medium,
-                    )
+                        }
+                    }
 
                     DropdownMenu(
                         expanded = expanded,
