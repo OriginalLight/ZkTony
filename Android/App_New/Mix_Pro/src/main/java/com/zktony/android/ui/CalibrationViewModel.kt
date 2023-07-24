@@ -2,7 +2,7 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.core.dsl.tx
+import com.zktony.android.ext.dsl.tx
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.entities.CalibrationData
 import com.zktony.android.data.entities.CalibrationEntity

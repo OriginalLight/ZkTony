@@ -3,7 +3,7 @@ package com.zktony.android.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.zktony.android.core.ext.serialPort
+import com.zktony.android.ext.ext.serialPort
 import com.zktony.android.ui.theme.AppTheme
 
 class MainActivity : ComponentActivity() {

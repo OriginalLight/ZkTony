@@ -91,8 +91,6 @@ dependencies {
 
     ksp(libs.androidx.room.compiler)
 
-    implementation(project(mapOf("path" to ":datastore")))
-    implementation(project(mapOf("path" to ":protobuf")))
     implementation(project(mapOf("path" to ":serialport")))
 
     implementation(libs.accompanist.insets)
@@ -101,13 +99,13 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.runtime)
-    implementation(libs.grpc.okhttp)
     implementation(libs.gson)
     implementation(libs.koin.androidx.compose)
     implementation(libs.okhttp3)

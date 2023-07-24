@@ -70,15 +70,16 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {
 }
 
 dependencies {
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.core.ktx)
-    api(libs.grpc.stub)
     api(libs.grpc.kotlin.sub)
     api(libs.grpc.protobuf.lite)
+    api(libs.grpc.stub)
     api(libs.protobuf.kotlin.lite)
 
-    testImplementation(libs.junit)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.core.ktx)
 
-    androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+
+    testImplementation(libs.junit)
 }

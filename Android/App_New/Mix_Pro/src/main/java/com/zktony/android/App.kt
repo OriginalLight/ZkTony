@@ -1,9 +1,8 @@
 package com.zktony.android
 
 import android.app.Application
-import com.zktony.android.core.ext.Ext
-import com.zktony.android.core.koinModule
-import com.zktony.datastore.DataStoreFactory
+import com.zktony.android.di.koinModule
+import com.zktony.android.ext.Ext
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -22,7 +21,6 @@ class App : Application() {
 
         // Initialize the application context and data store factory
         Ext.with(this)
-        DataStoreFactory.init(this)
 
         // Initialize the dependency injection framework with the application context and modules
         startKoin {

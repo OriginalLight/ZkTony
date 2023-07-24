@@ -76,10 +76,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.core.ext.dateFormat
-import com.zktony.android.core.ext.format
-import com.zktony.android.core.ext.showShortToast
+import com.zktony.android.data.datastore.rememberDataSaverListState
 import com.zktony.android.data.entities.ProgramEntity
+import com.zktony.android.ext.dateFormat
+import com.zktony.android.ext.format
+import com.zktony.android.ext.showShortToast
+import com.zktony.android.ext.utils.Constants
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
@@ -381,7 +383,10 @@ fun EditContent(
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
     val entity = uiState.entities.find { it.id == uiState.selected } ?: ProgramEntity()
-    val travel = uiState.settings.travelList.ifEmpty { listOf(100f, 100f) }
+    val stroke by rememberDataSaverListState(
+        key = Constants.MAXIMUM_STROKE,
+        default = listOf(0f, 0f)
+    )
     var values by rememberSaveable { mutableStateOf((entity.volume + entity.axis).map { it.format(1) }) }
 
     Column(
@@ -573,8 +578,8 @@ fun EditContent(
                                 onValueChange = {
                                     scope.launch {
                                         val num = it.text.toFloatOrNull() ?: 0f
-                                        val y = if (num > travel[0]) {
-                                            travel[0].format(1)
+                                        val y = if (num > stroke[0]) {
+                                            stroke[0].format(1)
                                         } else if (num < 0) {
                                             "0"
                                         } else {
@@ -586,7 +591,7 @@ fun EditContent(
                                         event(ProgramEvent.Update(entity.copy(axis = axis)))
                                     }
                                 },
-                                label = { Text(text = "坐标(0 ~ ${travel[0].format(1)})") },
+                                label = { Text(text = "坐标(0 ~ ${stroke[0].format(1)})") },
                                 shape = MaterialTheme.shapes.medium,
                                 textStyle = MaterialTheme.typography.bodyLarge,
                                 keyboardOptions = KeyboardOptions(
@@ -641,8 +646,8 @@ fun EditContent(
                                 onValueChange = {
                                     scope.launch {
                                         val num = it.text.toFloatOrNull() ?: 0f
-                                        val z = if (num > travel[1]) {
-                                            travel[1].format(1)
+                                        val z = if (num > stroke[1]) {
+                                            stroke[1].format(1)
                                         } else if (num < 0) {
                                             "0"
                                         } else {
@@ -654,7 +659,7 @@ fun EditContent(
                                         event(ProgramEvent.Update(entity.copy(axis = axis)))
                                     }
                                 },
-                                label = { Text(text = "坐标(0 ~ ${travel[1].format(1)})") },
+                                label = { Text(text = "坐标(0 ~ ${stroke[1].format(1)})") },
                                 shape = MaterialTheme.shapes.medium,
                                 textStyle = MaterialTheme.typography.bodyLarge,
                                 keyboardOptions = KeyboardOptions(

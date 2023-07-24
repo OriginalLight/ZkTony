@@ -25,4 +25,5 @@ object Constants {
     const val RECYCLE = "RECYCLE"
     const val TEMP = "TEMP"
     const val ZERO_TIME = "00:00:00"
+    const val OSS_APP = "https://njzkty.oss-cn-beijing.aliyuncs.com/App.json"
 }

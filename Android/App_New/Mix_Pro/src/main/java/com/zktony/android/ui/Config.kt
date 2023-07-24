@@ -48,7 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.core.ext.format
+import com.zktony.android.data.datastore.rememberDataSaverListState
+import com.zktony.android.ext.format
+import com.zktony.android.ext.utils.Constants
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -138,9 +140,15 @@ fun ContentWrapper(
     ) {
         // Display the maximum travel settings
         item {
-            val travel = uiState.settings.travelList.ifEmpty { listOf(0f, 0f) }
-            var y by remember { mutableStateOf(travel[0].format(1)) }
-            var z by remember { mutableStateOf(travel[1].format(1)) }
+            var stroke by rememberDataSaverListState(Constants.MAXIMUM_STROKE, listOf(0f, 0f))
+            var strokeEdit by remember {
+                mutableStateOf(
+                    listOf(
+                        stroke[0].format(1),
+                        stroke[1].format(1)
+                    )
+                )
+            }
 
             OutlinedCard(
                 modifier = Modifier.fillMaxWidth()
@@ -161,12 +169,11 @@ fun ContentWrapper(
                         )
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
-                            value = y,
+                            value = strokeEdit[0],
                             onValueChange = {
                                 scope.launch {
-                                    y = it
-                                    val value = it.toFloatOrNull() ?: 0f
-                                    event(ConfigEvent.SetTravel(0, value))
+                                    stroke = listOf(it.toFloatOrNull() ?: 0f, stroke[1])
+                                    strokeEdit = listOf(it, strokeEdit[1])
                                 }
                             },
                             label = { Text(text = "坐标") },
@@ -193,7 +200,7 @@ fun ContentWrapper(
                                 onClick = {
                                     scope.launch {
                                         keyboard?.hide()
-                                        event(ConfigEvent.MoveTo(0, y.toFloatOrNull() ?: 0f))
+                                        event(ConfigEvent.MoveTo(0, stroke[0]))
                                     }
                                 }
                             ) {
@@ -215,12 +222,11 @@ fun ContentWrapper(
                         )
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
-                            value = z,
+                            value = strokeEdit[1],
                             onValueChange = {
                                 scope.launch {
-                                    z = it
-                                    val value = it.toFloatOrNull() ?: 0f
-                                    event(ConfigEvent.SetTravel(1, value))
+                                    stroke = listOf(stroke[0], it.toFloatOrNull() ?: 0f)
+                                    strokeEdit = listOf(strokeEdit[0], it)
                                 }
                             },
                             label = { Text(text = "坐标") },
@@ -247,7 +253,7 @@ fun ContentWrapper(
                                 onClick = {
                                     scope.launch {
                                         keyboard?.hide()
-                                        event(ConfigEvent.MoveTo(1, z.toFloatOrNull() ?: 0f))
+                                        event(ConfigEvent.MoveTo(1, stroke[1]))
                                     }
                                 }
                             ) {
@@ -265,9 +271,18 @@ fun ContentWrapper(
 
         // Display the waste tank position settings
         item {
-            val travel = uiState.settings.wasteList.ifEmpty { listOf(0f, 0f) }
-            var y by remember { mutableStateOf(travel[0].format(1)) }
-            var z by remember { mutableStateOf(travel[1].format(1)) }
+            var location by rememberDataSaverListState(
+                Constants.WASTE_TANK_LOCATION,
+                listOf(0f, 0f)
+            )
+            var locationEdit by remember {
+                mutableStateOf(
+                    listOf(
+                        location[0].format(1),
+                        location[1].format(1)
+                    )
+                )
+            }
 
             OutlinedCard(
                 modifier = Modifier.fillMaxWidth()
@@ -288,12 +303,11 @@ fun ContentWrapper(
                         )
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
-                            value = y,
+                            value = locationEdit[0],
                             onValueChange = {
                                 scope.launch {
-                                    y = it
-                                    val value = it.toFloatOrNull() ?: 0f
-                                    event(ConfigEvent.SetWaste(0, value))
+                                    location = listOf(it.toFloatOrNull() ?: 0f, location[1])
+                                    locationEdit = listOf(it, locationEdit[1])
                                 }
                             },
                             label = { Text(text = "坐标") },
@@ -320,7 +334,7 @@ fun ContentWrapper(
                                 onClick = {
                                     scope.launch {
                                         keyboard?.hide()
-                                        event(ConfigEvent.MoveTo(0, y.toFloatOrNull() ?: 0f))
+                                        event(ConfigEvent.MoveTo(0, location[0]))
                                     }
                                 }
                             ) {
@@ -342,12 +356,11 @@ fun ContentWrapper(
                         )
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
-                            value = z,
+                            value = locationEdit[1],
                             onValueChange = {
                                 scope.launch {
-                                    z = it
-                                    val value = it.toFloatOrNull() ?: 0f
-                                    event(ConfigEvent.SetWaste(1, value))
+                                    location = listOf(location[0], it.toFloatOrNull() ?: 0f)
+                                    locationEdit = listOf(locationEdit[0], it)
                                 }
                             },
                             label = { Text(text = "坐标") },
@@ -374,7 +387,7 @@ fun ContentWrapper(
                                 onClick = {
                                     scope.launch {
                                         keyboard?.hide()
-                                        event(ConfigEvent.MoveTo(1, z.toFloatOrNull() ?: 0f))
+                                        event(ConfigEvent.MoveTo(1, location[1]))
                                     }
                                 }
                             ) {

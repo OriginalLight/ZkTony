@@ -84,9 +84,9 @@ import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.core.ext.dateFormat
-import com.zktony.android.core.ext.format
-import com.zktony.android.core.ext.showShortToast
+import com.zktony.android.ext.dateFormat
+import com.zktony.android.ext.format
+import com.zktony.android.ext.showShortToast
 import com.zktony.android.data.entities.CalibrationEntity
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType

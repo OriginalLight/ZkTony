@@ -12,8 +12,8 @@ android {
         applicationId = "com.zktony.www"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -70,10 +70,12 @@ android {
 }
 
 dependencies {
+    ksp(libs.androidx.room.compiler)
+
     implementation(project(mapOf("path" to ":core")))
     implementation(project(mapOf("path" to ":datastore")))
-    implementation(project(mapOf("path" to ":protobuf")))
     implementation(project(mapOf("path" to ":serialport")))
+
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
@@ -91,10 +93,8 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.material)
 
-    ksp(libs.androidx.room.compiler)
-
-    testImplementation(libs.junit)
-
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
+
+    testImplementation(libs.junit)
 }

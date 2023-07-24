@@ -66,6 +66,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
+import com.zktony.android.data.datastore.rememberDataSaverState
+import com.zktony.android.ext.utils.Constants
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.delay
@@ -133,7 +135,6 @@ fun ContentWrapper(
                 // Display the settings content
                 SettingsContent(
                     modifier = Modifier.weight(1f),
-                    uiState = uiState,
                     event = event,
                 )
                 // Display the info content
@@ -162,24 +163,21 @@ fun ContentWrapper(
  * Composable function that displays the settings content.
  *
  * @param modifier The modifier to apply to the composable.
- * @param uiState The UI state for the settings screen.
  * @param event The event handler for the settings screen.
  */
 @Composable
 fun SettingsContent(
     modifier: Modifier = Modifier,
-    uiState: SettingUiState,
     event: (SettingEvent) -> Unit = {},
 ) {
-    // Define the language list
-    val languageList = listOf(Pair("English", "en"), Pair("简体中文", "zh"))
+    var navigation by rememberDataSaverState(
+        key = Constants.NAVIGATION,
+        default = false
+    )
 
     // Define the lazy column state and coroutine scope
     val lazyColumnState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-
-    // Define the expanded state for the language list
-    var expanded by remember { mutableStateOf(false) }
 
     // Display the settings content
     LazyColumn(
@@ -193,48 +191,6 @@ fun SettingsContent(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Display the language setting
-        item {
-            SettingsCard(
-                image = R.drawable.ic_language,
-                text = stringResource(id = R.string.language),
-                onClick = { expanded = !expanded }
-            ) {
-                Text(
-                    text = when (uiState.settings.language) {
-                        "en" -> "English"
-                        "zh" -> "简体中文"
-                        else -> "简体中文"
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-        }
-
-        if (expanded) {
-            languageList.forEach { (name, code) ->
-                item {
-                    AnimatedVisibility(visible = expanded) {
-                        SettingsCard(
-                            image = R.drawable.ic_language,
-                            paddingStart = 32.dp,
-                            onClick = {
-                                scope.launch {
-                                    event(SettingEvent.Language(code))
-                                    expanded = false
-                                }
-                            }
-                        ) {
-                            Text(
-                                text = name,
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
         // Display the navigation setting
         item {
             SettingsCard(
@@ -243,9 +199,10 @@ fun SettingsContent(
             ) {
                 Switch(
                     modifier = Modifier.height(32.dp),
-                    checked = uiState.settings.navigation,
+                    checked = navigation,
                     onCheckedChange = {
                         scope.launch {
+                            navigation = it
                             event(SettingEvent.Navigation(it))
                         }
                     },
@@ -395,7 +352,7 @@ fun OperationContent(
                 val painter = if (uiState.application == null) {
                     painterResource(id = R.drawable.ic_sync)
                 } else {
-                    if (uiState.application.versionCode > BuildConfig.VERSION_CODE) {
+                    if (uiState.application.version_code > BuildConfig.VERSION_CODE) {
                         painterResource(id = R.drawable.ic_new)
                     } else {
                         painterResource(id = R.drawable.ic_happy_cloud)
@@ -405,7 +362,7 @@ fun OperationContent(
                     stringResource(id = R.string.update)
                 } else {
                     if (uiState.progress == 0) {
-                        if (uiState.application.versionCode > BuildConfig.VERSION_CODE) {
+                        if (uiState.application.version_code > BuildConfig.VERSION_CODE) {
                             stringResource(id = R.string.update_available)
                         } else {
                             stringResource(id = R.string.already_latest)

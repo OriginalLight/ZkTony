@@ -68,9 +68,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
-import com.zktony.android.core.ext.dateFormat
-import com.zktony.android.core.ext.format
-import com.zktony.android.core.ext.timeFormat
+import com.zktony.android.ext.dateFormat
+import com.zktony.android.ext.format
+import com.zktony.android.ext.timeFormat
 import com.zktony.android.data.entities.ProgramEntity
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType

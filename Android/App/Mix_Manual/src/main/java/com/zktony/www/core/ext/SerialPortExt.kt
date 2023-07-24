@@ -1,5 +1,6 @@
 package com.zktony.www.core.ext
 
+import com.zktony.core.ext.loge
 import com.zktony.serialport.ext.asciiToHex
 import com.zktony.serialport.protocol.V1
 import com.zktony.www.core.SerialPort
