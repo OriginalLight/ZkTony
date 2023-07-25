@@ -9,7 +9,6 @@ import theme.AppTheme
 @Preview
 fun App() {
     AppTheme(
-        darkTheme = false,
         dynamicColor = true,
     ) {
         Surface(

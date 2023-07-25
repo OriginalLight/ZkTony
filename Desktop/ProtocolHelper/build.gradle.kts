@@ -25,10 +25,17 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "MainKt"
+        jvmArgs += listOf("-Xmx1G")
+        args += listOf("-customArgument")
+
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "ProtocolHelper"
             packageVersion = "1.0.0"
+
+            windows {
+                iconFile.set(project.file("src/main/resources/image/icon.ico"))
+            }
         }
     }
 }

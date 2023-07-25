@@ -4,15 +4,17 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PermanentNavigationDrawer
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +24,7 @@ import com.zktony.android.ui.navigation.AppNavigationRail
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.PermanentNavigationDrawerContent
 import com.zktony.android.ui.navigation.Route
+import com.zktony.android.ui.utils.NavigationContentPosition
 import com.zktony.android.ui.utils.NavigationType
 import org.koin.androidx.compose.koinViewModel
 
@@ -38,46 +41,51 @@ fun App() {
     val selectedDestination = navBackStackEntry?.destination?.route ?: Route.HOME
     val navigationType = remember { mutableStateOf(NavigationType.NONE) }
 
-    PermanentNavigationDrawer(
-        drawerContent = {
-            AnimatedVisibility(
-                visible = navigationType.value == NavigationType.PERMANENT_NAVIGATION_DRAWER,
-                enter = expandHorizontally(),
-                exit = shrinkHorizontally(),
-            ) {
-                PermanentNavigationDrawerContent(
-                    selectedDestination = selectedDestination,
-                    navigateToTopLevelDestination = navigationActions::navigateTo,
-                    onDrawerClicked = { navigationType.value = NavigationType.NAVIGATION_RAIL },
-                )
-            }
-            AnimatedVisibility(
-                visible = navigationType.value == NavigationType.NAVIGATION_RAIL,
-                enter = expandHorizontally(),
-                exit = shrinkHorizontally(),
-            ) {
-                AppNavigationRail(
-                    selectedDestination = selectedDestination,
-                    navigateToTopLevelDestination = navigationActions::navigateTo,
-                    onDrawerClicked = {
-                        navigationType.value = NavigationType.PERMANENT_NAVIGATION_DRAWER
-                    },
-                )
-            }
-        },
-        content = {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.outlineVariant)
-            ) {
+    Surface(color = MaterialTheme.colorScheme.outlineVariant) {
+        PermanentNavigationDrawer(
+            modifier = Modifier
+                .padding(8.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = MaterialTheme.shapes.medium,
+                ),
+            drawerContent = {
+                AnimatedVisibility(
+                    visible = navigationType.value == NavigationType.PERMANENT_NAVIGATION_DRAWER,
+                    enter = expandHorizontally(),
+                    exit = shrinkHorizontally(),
+                ) {
+                    PermanentNavigationDrawerContent(
+                        selectedDestination = selectedDestination,
+                        navigationContentPosition = NavigationContentPosition.CENTER,
+                        navigateToTopLevelDestination = navigationActions::navigateTo,
+                        onDrawerClicked = { navigationType.value = NavigationType.NAVIGATION_RAIL },
+                    )
+                }
+                AnimatedVisibility(
+                    visible = navigationType.value == NavigationType.NAVIGATION_RAIL,
+                    enter = expandHorizontally(),
+                    exit = shrinkHorizontally(),
+                ) {
+                    AppNavigationRail(
+                        selectedDestination = selectedDestination,
+                        navigationContentPosition = NavigationContentPosition.CENTER,
+                        navigateToTopLevelDestination = navigationActions::navigateTo,
+                        onDrawerClicked = {
+                            navigationType.value = NavigationType.PERMANENT_NAVIGATION_DRAWER
+                        },
+                    )
+                }
+            },
+            content = {
                 AppNavHost(
+                    modifier = Modifier.fillMaxSize(),
                     navController = navController,
                     toggleDrawer = { navigationType.value = it },
                 )
-            }
-        },
-    )
+            },
+        )
+    }
 }
 
 /**

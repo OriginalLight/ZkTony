@@ -2,12 +2,10 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.core.dsl.tx
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.ProgramEntity
+import com.zktony.android.ext.dsl.tx
 import com.zktony.android.ui.utils.PageType
-import com.zktony.datastore.ext.settingsFlow
-import com.zktony.proto.SettingsPreferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -34,14 +32,12 @@ class ProgramViewModel constructor(
         viewModelScope.launch {
             // Combine the various flows into a single program UI state
             combine(
-                settingsFlow,
                 dao.getAll(),
                 _selected,
                 _page,
                 _loading,
-            ) { settings, entities, selected, page, loading ->
+            ) { entities, selected, page, loading ->
                 ProgramUiState(
-                    settings = settings,
                     entities = entities,
                     selected = selected,
                     page = page,
@@ -110,14 +106,12 @@ class ProgramViewModel constructor(
 /**
  * Data class that represents the state of the program UI.
  *
- * @param settings The current settings preferences.
  * @param entities The list of program entities to display.
  * @param selected The ID of the currently selected program.
  * @param page The current page being displayed.
  * @param loading Whether or not the UI is currently loading data.
  */
 data class ProgramUiState(
-    val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
     val entities: List<ProgramEntity> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.LIST,

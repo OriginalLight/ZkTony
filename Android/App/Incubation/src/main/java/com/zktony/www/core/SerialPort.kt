@@ -126,7 +126,6 @@ class SerialPort {
         } else {
             _callback.value = Pair(index, hex.hexToAscii())
         }
-
     }
 
     /**

@@ -2,6 +2,7 @@ package com.zktony.www.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.zktony.serialport.ext.asciiToHex
 import com.zktony.serialport.ext.hexToInt
 import com.zktony.serialport.ext.intToHex
 import java.util.Date

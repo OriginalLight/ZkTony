@@ -70,9 +70,12 @@ android {
 }
 
 dependencies {
+    ksp(libs.androidx.room.compiler)
+
     implementation(project(mapOf("path" to ":core")))
     implementation(project(mapOf("path" to ":datastore")))
     implementation(project(mapOf("path" to ":serialport")))
+
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
@@ -87,13 +90,12 @@ dependencies {
     implementation(libs.dialogx)
     implementation(libs.koin.android)
     implementation(libs.material)
+
     implementation("androidx.legacy:legacy-support-v4:1.0.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
-    ksp(libs.androidx.room.compiler)
-
-    testImplementation(libs.junit)
-
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
+
+    testImplementation(libs.junit)
 }

@@ -2,11 +2,11 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.core.dsl.axisInitializer
-import com.zktony.android.core.dsl.syringeInitializer
-import com.zktony.android.core.dsl.tx
-import com.zktony.android.core.utils.Constants
-import com.zktony.android.core.utils.ExecuteType
+import com.zktony.android.ext.dsl.axisInitializer
+import com.zktony.android.ext.dsl.syringeInitializer
+import com.zktony.android.ext.dsl.tx
+import com.zktony.android.ext.utils.Constants
+import com.zktony.android.ext.utils.ExecuteType
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.ProgramEntity
 import com.zktony.android.ui.utils.PageType
@@ -322,7 +322,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 }
             } else {
                 // Start a syringe operation on the selected program entity
-                _loading.value = index + 2
+                _loading.value = 3
                 syringeJob = launch {
                     while (true) {
                         tx {
@@ -366,7 +366,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 tx { stop(3, 4, 5, 6, 7, 8) }
             } else {
                 // Start a pipeline operation on the selected program entity
-                _loading.value = index + 4
+                _loading.value = 4
                 tx {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {

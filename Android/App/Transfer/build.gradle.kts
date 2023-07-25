@@ -89,11 +89,14 @@ android {
 
 
 dependencies {
+    ksp(libs.androidx.room.compiler)
+
     implementation(project(mapOf("path" to ":core")))
     implementation(project(mapOf("path" to ":datastore")))
     implementation(project(mapOf("path" to ":gpio")))
     implementation(project(mapOf("path" to ":protobuf")))
     implementation(project(mapOf("path" to ":serialport")))
+
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.core.ktx)
@@ -114,10 +117,8 @@ dependencies {
     implementation(libs.koin.androidx.workmanager)
     implementation(libs.material)
 
-    ksp(libs.androidx.room.compiler)
-
-    testImplementation(libs.junit)
-
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.ext.junit)
+
+    testImplementation(libs.junit)
 }

@@ -1,10 +1,8 @@
 package com.zktony.android.ui.navigation
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -15,23 +13,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
@@ -42,51 +37,51 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
-import androidx.compose.ui.unit.sp
 import com.zktony.android.R
+import com.zktony.android.ui.utils.NavigationContentPosition
 
 /**
  * NavigationRailItem
  *
  * @param selectedDestination String
+ * @param navigationContentPosition NavigationContentPosition
  * @param navigateToTopLevelDestination Function1<TopLevelDestination, Unit>
  * @param onDrawerClicked Function0<Unit>
  */
 @Composable
 fun AppNavigationRail(
     selectedDestination: String,
+    navigationContentPosition: NavigationContentPosition,
     navigateToTopLevelDestination: (TopLevelDestination) -> Unit,
     onDrawerClicked: () -> Unit = {},
 ) {
     NavigationRail(
         modifier = Modifier.fillMaxHeight(),
-        containerColor = MaterialTheme.colorScheme.inverseOnSurface
+        containerColor = Color.Transparent,
     ) {
         Layout(
-            modifier = Modifier.widthIn(max = 80.dp), content = {
+            modifier = Modifier.widthIn(max = 80.dp),
+            content = {
                 Column(
                     modifier = Modifier.layoutId(LayoutType.HEADER),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Spacer(Modifier.height(16.dp))
 
                     NavigationRailItem(
                         selected = false, onClick = onDrawerClicked, icon = {
                             Icon(
-                                modifier = Modifier.size(36.dp),
+                                modifier = Modifier.size(32.dp),
                                 imageVector = Icons.Filled.Menu,
                                 contentDescription = null
                             )
                         })
-
-                    Spacer(Modifier.height(16.dp))
                 }
 
                 Column(
                     modifier = Modifier.layoutId(LayoutType.CONTENT),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     TOP_LEVEL_DESTINATIONS.forEach { destination ->
                         NavigationRailItem(
@@ -94,20 +89,16 @@ fun AppNavigationRail(
                             onClick = { navigateToTopLevelDestination(destination) },
                             icon = {
                                 Image(
-                                    modifier = Modifier.size(36.dp),
+                                    modifier = Modifier.size(32.dp),
                                     painter = painterResource(id = destination.imageId),
                                     contentDescription = stringResource(id = destination.iconTextId),
                                 )
-                            },
-                            colors = NavigationRailItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.primary,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                            )
+                            }
                         )
                     }
                 }
             },
-            measurePolicy = navigationMeasurePolicy()
+            measurePolicy = navigationMeasurePolicy(navigationContentPosition)
         )
     }
 }
@@ -116,48 +107,37 @@ fun AppNavigationRail(
  * Navigation drawer content for permanent drawer
  *
  * @param selectedDestination String
+ * @param navigationContentPosition NavigationContentPosition
  * @param navigateToTopLevelDestination Function1<TopLevelDestination, Unit>
  * @param onDrawerClicked Function0<Unit>
  */
 @Composable
 fun PermanentNavigationDrawerContent(
     selectedDestination: String,
+    navigationContentPosition: NavigationContentPosition,
     navigateToTopLevelDestination: (TopLevelDestination) -> Unit,
     onDrawerClicked: () -> Unit = {},
 ) {
     PermanentDrawerSheet(
         modifier = Modifier.sizeIn(minWidth = 200.dp, maxWidth = 200.dp),
-        drawerContainerColor = MaterialTheme.colorScheme.surface,
+        drawerContainerColor = Color.Transparent
     ) {
         Layout(
+            modifier = Modifier.padding(16.dp),
             content = {
                 Column(
                     modifier = Modifier.layoutId(LayoutType.HEADER),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Box(
+                    Image(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(
-                                brush = Brush.horizontalGradient(
-                                    listOf(
-                                        Color.White,
-                                        Color.LightGray.copy(alpha = 0.5f)
-                                    )
-                                )
-                            )
+                            .clip(MaterialTheme.shapes.medium)
                             .clickable { onDrawerClicked() },
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            painter = painterResource(id = R.drawable.logo),
-                            contentDescription = null,
-                            contentScale = ContentScale.Fit,
-                        )
-                    }
+                        painter = painterResource(id = R.mipmap.logo),
+                        contentDescription = null,
+                        contentScale = ContentScale.Fit,
+                    )
                 }
 
                 Column(
@@ -172,33 +152,32 @@ fun PermanentNavigationDrawerContent(
                             selected = selectedDestination == destination.route,
                             label = {
                                 Text(
+                                    modifier = Modifier.padding(horizontal = 8.dp),
                                     text = stringResource(id = destination.iconTextId),
-                                    fontSize = 22.sp,
-                                    lineHeight = 28.sp,
-                                    maxLines = 1,
                                 )
                             },
                             icon = {
                                 Image(
-                                    modifier = Modifier.size(36.dp),
+                                    modifier = Modifier.size(32.dp),
                                     painter = painterResource(id = destination.imageId),
                                     contentDescription = stringResource(id = destination.iconTextId),
                                 )
                             },
-                            colors = NavigationDrawerItemDefaults.colors(
-                                unselectedContainerColor = Color.Transparent,
-                            ),
-                            shape = CutCornerShape(topEnd = 36.dp, bottomStart = 16.dp),
                             onClick = { navigateToTopLevelDestination(destination) })
                     }
                 }
             },
-            measurePolicy = navigationMeasurePolicy()
+            measurePolicy = navigationMeasurePolicy(navigationContentPosition)
         )
     }
 }
 
-fun navigationMeasurePolicy(): MeasurePolicy {
+/**
+ * Different position of navigation content inside Navigation Rail, Navigation Drawer depending on device size and state.
+ */
+fun navigationMeasurePolicy(
+    navigationContentPosition: NavigationContentPosition,
+): MeasurePolicy {
     return MeasurePolicy { measurables, constraints ->
         lateinit var headerMeasurable: Measurable
         lateinit var contentMeasurable: Measurable
@@ -218,7 +197,19 @@ fun navigationMeasurePolicy(): MeasurePolicy {
             // Place the header, this goes at the top
             headerPlaceable.placeRelative(0, 0)
 
-            contentPlaceable.placeRelative(0, headerPlaceable.height)
+            // Determine how much space is not taken up by the content
+            val nonContentVerticalSpace = constraints.maxHeight - contentPlaceable.height
+
+            val contentPlaceableY = when (navigationContentPosition) {
+                // Figure out the place we want to place the content, with respect to the
+                // parent (ignoring the header for now)
+                NavigationContentPosition.TOP -> 0
+                NavigationContentPosition.CENTER -> nonContentVerticalSpace / 2
+            }
+                // And finally, make sure we don't overlap with the header.
+                .coerceAtLeast(headerPlaceable.height)
+
+            contentPlaceable.placeRelative(0, contentPlaceableY)
         }
     }
 }

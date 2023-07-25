@@ -1,6 +1,6 @@
 package com.zktony.android.data.entities
 
-import com.zktony.android.core.ext.nextId
+import com.zktony.android.ext.nextId
 
 /**
  * @author 刘贺贺

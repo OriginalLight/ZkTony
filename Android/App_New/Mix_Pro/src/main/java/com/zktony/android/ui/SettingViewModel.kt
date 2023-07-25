@@ -6,20 +6,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.core.ext.DownloadState
-import com.zktony.android.core.ext.Ext
-import com.zktony.android.core.ext.download
-import com.zktony.android.core.ext.installApk
-import com.zktony.android.core.ext.isNetworkAvailable
-import com.zktony.android.core.ext.restartApp
-import com.zktony.android.core.ext.showShortToast
+import com.zktony.android.ext.Application
+import com.zktony.android.ext.DownloadState
+import com.zktony.android.ext.Ext
+import com.zktony.android.ext.download
+import com.zktony.android.ext.httpCall
+import com.zktony.android.ext.installApk
+import com.zktony.android.ext.isNetworkAvailable
+import com.zktony.android.ext.showShortToast
 import com.zktony.android.ui.utils.PageType
-import com.zktony.datastore.ext.saveSettings
-import com.zktony.datastore.ext.settingsFlow
-import com.zktony.proto.Application
-import com.zktony.proto.SettingsPreferences
-import com.zktony.proto.copy
-import com.zktony.protobuf.grpc.ApplicationGrpc
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -31,9 +26,7 @@ import java.io.File
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class SettingViewModel constructor(
-    private val grpc: ApplicationGrpc,
-) : ViewModel() {
+class SettingViewModel : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
     private val _application = MutableStateFlow<Application?>(null)
@@ -51,13 +44,11 @@ class SettingViewModel constructor(
             launch {
                 combine(
                     _application,
-                    settingsFlow,
                     _progress,
                     _page
-                ) { application, settings, progress, page ->
+                ) { application, progress, page ->
                     SettingUiState(
                         application = application,
-                        settings = settings,
                         progress = progress,
                         page = page
                     )
@@ -69,15 +60,9 @@ class SettingViewModel constructor(
             }
             // Load the latest application instance from the server if the network is available
             launch {
-                if (Ext.ctx.isNetworkAvailable()) {
-                    grpc.getApplication(BuildConfig.APPLICATION_ID)
-                        .catch { ex ->
-                            ex.printStackTrace()
-                        }.collect {
-                            _application.value = it
-                        }
-                } else {
-                    _application.value = null
+                httpCall {
+                    _application.value =
+                        it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
                 }
             }
         }
@@ -91,30 +76,9 @@ class SettingViewModel constructor(
     fun event(event: SettingEvent) {
         when (event) {
             is SettingEvent.NavTo -> _page.value = event.page
-            is SettingEvent.Language -> language(event.language)
             is SettingEvent.Navigation -> navigation(event.navigation)
             is SettingEvent.Network -> network()
             is SettingEvent.Update -> update()
-        }
-    }
-
-    /**
-     * Sets the language preference for the application and restarts the app if necessary.
-     *
-     * @param new The new language preference to set.
-     */
-    private fun language(new: String) {
-        viewModelScope.launch {
-            // Get the current language preference
-            val old = _uiState.value.settings.language
-
-            // Save the new language preference to the settings
-            saveSettings { it.copy { language = new } }
-
-            // Restart the app if the language preference has changed
-            if (old != new) {
-                Ext.ctx.restartApp()
-            }
         }
     }
 
@@ -125,9 +89,6 @@ class SettingViewModel constructor(
      */
     private fun navigation(nav: Boolean) {
         viewModelScope.launch {
-            // Save the navigation setting to the preferences
-            saveSettings { it.copy { navigation = nav } }
-
             // Create an intent to show or hide the navigation bar
             val intent = Intent().apply {
                 action = "ACTION_SHOW_NAVBAR"
@@ -166,23 +127,19 @@ class SettingViewModel constructor(
                 val application = _application.value
                 if (application != null) {
                     // Check if a new version of the application is available for download
-                    if (application.versionCode > BuildConfig.VERSION_CODE
-                        && application.downloadUrl.isNotEmpty()
+                    if (application.version_code > BuildConfig.VERSION_CODE
+                        && application.download_url.isNotEmpty()
                         && _progress.value == 0
                     ) {
                         // Download the latest version of the application
-                        download(application.downloadUrl)
+                        download(application.download_url)
                         _progress.value = 1
                     }
                 } else {
                     // Get the latest application instance from the server
-                    grpc.getApplication(BuildConfig.APPLICATION_ID)
-                        .catch { ex ->
-                            ex.printStackTrace()
-                            Ext.ctx.getString(R.string.interface_exception).showShortToast()
-                        }.collect {
-                            _application.value = it
-                        }
+                    httpCall {
+                        it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                    }
                 }
             } else {
                 // Display a message if the network is unavailable
@@ -227,13 +184,11 @@ class SettingViewModel constructor(
 /**
  * Data class that represents the UI state of the setting screen.
  *
- * @param settings The settings preferences to display in the setting screen.
  * @param application The application to display in the setting screen.
  * @param progress The progress to display in the setting screen.
  * @param page The page type to display in the setting screen.
  */
 data class SettingUiState(
-    val settings: SettingsPreferences = SettingsPreferences.getDefaultInstance(),
     val application: Application? = null,
     val progress: Int = 0,
     val page: PageType = PageType.LIST,
@@ -246,6 +201,5 @@ sealed class SettingEvent {
     object Network : SettingEvent()
     object Update : SettingEvent()
     data class NavTo(val page: PageType) : SettingEvent()
-    data class Language(val language: String) : SettingEvent()
     data class Navigation(val navigation: Boolean) : SettingEvent()
 }

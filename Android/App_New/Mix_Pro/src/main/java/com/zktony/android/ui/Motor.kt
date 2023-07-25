@@ -3,11 +3,11 @@ package com.zktony.android.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,10 +17,12 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -33,6 +35,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -43,10 +46,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.entities.MotorEntity
-import com.zktony.android.ui.components.TopAppBar
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import kotlin.math.roundToInt
 
 /**
  * The Motor screen composable function.
@@ -96,47 +99,54 @@ fun ContentWrapper(
     event: (MotorEvent) -> Unit = {},
     navController: NavHostController,
 ) {
-    Column(modifier = modifier) {
-        // Show top app bar with title and navigation
-        TopAppBar(
-            title = if (uiState.page == PageType.LIST) {
-                stringResource(id = R.string.motor_config)
-            } else {
-                uiState.entities.find { it.id == uiState.selected }!!.text
-            },
-            navigation = {
-                when (uiState.page) {
-                    PageType.LIST -> navController.navigateUp() // Step 1: Navigate up if the current page is the list page
-                    else -> event(MotorEvent.NavTo(PageType.LIST)) // Step 2: Navigate to the list page if the current page is not the list page
-                }
-            }
-        )
-        // Background
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(8.dp)
-                .background(
-                    color = MaterialTheme.colorScheme.background,
-                    shape = MaterialTheme.shapes.medium
-                ),
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // List content
-            AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-                ListContent(
-                    modifier = Modifier,
-                    uiState = uiState,
-                    event = event,
+            // Display the title
+            Image(
+                modifier = Modifier.size(36.dp),
+                painter = painterResource(id = R.drawable.ic_engine),
+                contentDescription = null,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            // Display the close button
+            FloatingActionButton(
+                onClick = {
+                    when (uiState.page) {
+                        PageType.LIST -> navController.navigateUp()
+                        else -> event(MotorEvent.NavTo(PageType.LIST))
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null
                 )
             }
-            // Edit content
-            AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-                EditContent(
-                    modifier = Modifier,
-                    uiState = uiState,
-                    event = event,
-                )
-            }
+        }
+
+        AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+            ListContent(
+                modifier = Modifier,
+                uiState = uiState,
+                event = event,
+            )
+        }
+        // Edit content
+        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
+            EditContent(
+                modifier = Modifier,
+                uiState = uiState,
+                event = event,
+            )
         }
     }
 }
@@ -158,10 +168,15 @@ fun ListContent(
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+            .fillMaxSize()
+            .shadow(
+                elevation = 2.dp,
+                shape = MaterialTheme.shapes.medium,
+            ),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
         columns = GridCells.Fixed(3)
     ) {
         items(items = uiState.entities) {
@@ -228,7 +243,12 @@ fun EditContent(
     var dec by remember { mutableStateOf(entity.dec) }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .shadow(
+                elevation = 2.dp,
+                shape = MaterialTheme.shapes.medium,
+            ),
         verticalArrangement = Arrangement.Center,
     ) {
         // Speed slider
@@ -256,7 +276,7 @@ fun EditContent(
             )
             Slider(
                 value = speed,
-                onValueChange = { speed = it },
+                onValueChange = { speed = it.roundToInt().toFloat() },
                 valueRange = 0f..1200f,
             )
         }
@@ -286,7 +306,7 @@ fun EditContent(
             )
             Slider(
                 value = acc,
-                onValueChange = { acc = it },
+                onValueChange = { acc = it.roundToInt().toFloat() },
                 valueRange = 0f..1200f,
             )
         }
@@ -316,7 +336,7 @@ fun EditContent(
             )
             Slider(
                 value = dec,
-                onValueChange = { dec = it },
+                onValueChange = { dec = it.roundToInt().toFloat() },
                 valueRange = 0f..1200f,
             )
         }

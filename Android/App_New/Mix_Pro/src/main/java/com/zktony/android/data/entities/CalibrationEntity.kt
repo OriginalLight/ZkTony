@@ -1,13 +1,13 @@
 package com.zktony.android.data.entities
 
+import androidx.compose.runtime.Immutable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import com.google.errorprone.annotations.Immutable
 import com.zktony.android.data.CalibrationDataConverters
-import com.zktony.android.core.ext.nextId
+import com.zktony.android.ext.nextId
 import java.util.Date
 
 /**

@@ -1,17 +1,19 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imeAnimationSource
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,7 +21,9 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -34,8 +38,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,8 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.core.ext.format
-import com.zktony.android.ui.components.TopAppBar
+import com.zktony.android.data.datastore.rememberDataSaverListState
+import com.zktony.android.ext.format
+import com.zktony.android.ext.utils.Constants
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -68,13 +74,33 @@ fun Config(
     BackHandler { navController.navigateUp() }
 
     // Display the screen content
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
 
-        // Display the top app bar
-        TopAppBar(
-            title = stringResource(id = R.string.system_config),
-            navigation = { navController.navigateUp() }
-        )
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            // Display the title
+            Image(
+                modifier = Modifier.size(36.dp),
+                painter = painterResource(id = R.drawable.ic_config),
+                contentDescription = null,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            // Display the close button
+            FloatingActionButton(onClick = { navController.navigateUp() }) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null
+                )
+            }
+        }
 
         // Display the screen content wrapper
         ContentWrapper(
@@ -104,21 +130,25 @@ fun ContentWrapper(
 
     LazyColumn(
         modifier = modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.imeAnimationSource)
-            .padding(8.dp)
-            .background(
-                color = MaterialTheme.colorScheme.surface,
+            .shadow(
+                elevation = 2.dp,
                 shape = MaterialTheme.shapes.medium,
-            ),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+            )
+            .windowInsetsPadding(WindowInsets.imeAnimationSource),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         // Display the maximum travel settings
         item {
-            val travel = uiState.settings.travelList.ifEmpty { listOf(0f, 0f) }
-            var y by remember { mutableStateOf(travel[0].format(1)) }
-            var z by remember { mutableStateOf(travel[1].format(1)) }
+            var stroke by rememberDataSaverListState(Constants.MAXIMUM_STROKE, listOf(0f, 0f))
+            var strokeEdit by remember {
+                mutableStateOf(
+                    listOf(
+                        stroke[0].format(1),
+                        stroke[1].format(1)
+                    )
+                )
+            }
 
             OutlinedCard(
                 modifier = Modifier.fillMaxWidth()
@@ -139,12 +169,11 @@ fun ContentWrapper(
                         )
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
-                            value = y,
+                            value = strokeEdit[0],
                             onValueChange = {
                                 scope.launch {
-                                    y = it
-                                    val value = it.toFloatOrNull() ?: 0f
-                                    event(ConfigEvent.SetTravel(0, value))
+                                    stroke = listOf(it.toFloatOrNull() ?: 0f, stroke[1])
+                                    strokeEdit = listOf(it, strokeEdit[1])
                                 }
                             },
                             label = { Text(text = "坐标") },
@@ -171,7 +200,7 @@ fun ContentWrapper(
                                 onClick = {
                                     scope.launch {
                                         keyboard?.hide()
-                                        event(ConfigEvent.MoveTo(0, y.toFloatOrNull() ?: 0f))
+                                        event(ConfigEvent.MoveTo(0, stroke[0]))
                                     }
                                 }
                             ) {
@@ -193,12 +222,11 @@ fun ContentWrapper(
                         )
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
-                            value = z,
+                            value = strokeEdit[1],
                             onValueChange = {
                                 scope.launch {
-                                    z = it
-                                    val value = it.toFloatOrNull() ?: 0f
-                                    event(ConfigEvent.SetTravel(1, value))
+                                    stroke = listOf(stroke[0], it.toFloatOrNull() ?: 0f)
+                                    strokeEdit = listOf(strokeEdit[0], it)
                                 }
                             },
                             label = { Text(text = "坐标") },
@@ -225,7 +253,7 @@ fun ContentWrapper(
                                 onClick = {
                                     scope.launch {
                                         keyboard?.hide()
-                                        event(ConfigEvent.MoveTo(1, z.toFloatOrNull() ?: 0f))
+                                        event(ConfigEvent.MoveTo(1, stroke[1]))
                                     }
                                 }
                             ) {
@@ -243,9 +271,18 @@ fun ContentWrapper(
 
         // Display the waste tank position settings
         item {
-            val travel = uiState.settings.wasteList.ifEmpty { listOf(0f, 0f) }
-            var y by remember { mutableStateOf(travel[0].format(1)) }
-            var z by remember { mutableStateOf(travel[1].format(1)) }
+            var location by rememberDataSaverListState(
+                Constants.WASTE_TANK_LOCATION,
+                listOf(0f, 0f)
+            )
+            var locationEdit by remember {
+                mutableStateOf(
+                    listOf(
+                        location[0].format(1),
+                        location[1].format(1)
+                    )
+                )
+            }
 
             OutlinedCard(
                 modifier = Modifier.fillMaxWidth()
@@ -266,12 +303,11 @@ fun ContentWrapper(
                         )
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
-                            value = y,
+                            value = locationEdit[0],
                             onValueChange = {
                                 scope.launch {
-                                    y = it
-                                    val value = it.toFloatOrNull() ?: 0f
-                                    event(ConfigEvent.SetWaste(0, value))
+                                    location = listOf(it.toFloatOrNull() ?: 0f, location[1])
+                                    locationEdit = listOf(it, locationEdit[1])
                                 }
                             },
                             label = { Text(text = "坐标") },
@@ -298,7 +334,7 @@ fun ContentWrapper(
                                 onClick = {
                                     scope.launch {
                                         keyboard?.hide()
-                                        event(ConfigEvent.MoveTo(0, y.toFloatOrNull() ?: 0f))
+                                        event(ConfigEvent.MoveTo(0, location[0]))
                                     }
                                 }
                             ) {
@@ -320,12 +356,11 @@ fun ContentWrapper(
                         )
                         OutlinedTextField(
                             modifier = Modifier.weight(1f),
-                            value = z,
+                            value = locationEdit[1],
                             onValueChange = {
                                 scope.launch {
-                                    z = it
-                                    val value = it.toFloatOrNull() ?: 0f
-                                    event(ConfigEvent.SetWaste(1, value))
+                                    location = listOf(location[0], it.toFloatOrNull() ?: 0f)
+                                    locationEdit = listOf(locationEdit[0], it)
                                 }
                             },
                             label = { Text(text = "坐标") },
@@ -352,7 +387,7 @@ fun ContentWrapper(
                                 onClick = {
                                     scope.launch {
                                         keyboard?.hide()
-                                        event(ConfigEvent.MoveTo(1, z.toFloatOrNull() ?: 0f))
+                                        event(ConfigEvent.MoveTo(1, location[1]))
                                     }
                                 }
                             ) {

@@ -2,11 +2,11 @@ package com.zktony.android.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.core.ext.collectCallback
-import com.zktony.android.core.ext.getLock
-import com.zktony.android.core.ext.sendByteArray
-import com.zktony.android.core.ext.serialPort
-import com.zktony.android.core.ext.setLock
+import com.zktony.android.ext.ext.collectCallback
+import com.zktony.android.ext.ext.getLock
+import com.zktony.android.ext.ext.sendByteArray
+import com.zktony.android.ext.ext.serialPort
+import com.zktony.android.ext.ext.setLock
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.ext.toHexString
 import com.zktony.serialport.ext.writeInt16LE

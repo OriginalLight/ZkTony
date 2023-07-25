@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -78,16 +79,15 @@ fun Splash(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(8.dp)
             .background(
-                color = MaterialTheme.colorScheme.background,
+                color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.medium
             ),
         contentAlignment = Alignment.Center,
     ) {
         AnimatedVisibility(visible = splash) {
             Image(
-                painter = painterResource(id = R.drawable.logo),
+                painter = painterResource(id = R.mipmap.logo),
                 contentDescription = "Logo",
                 modifier = Modifier.scale(scale.value)
             )
@@ -101,9 +101,10 @@ fun Splash(
                     text = stringResource(id = R.string.notice),
                     style = TextStyle(
                         fontSize = 36.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.SemiBold,
                         lineHeight = 50.sp,
                     ),
+                    fontFamily = FontFamily.Serif,
                 )
                 Text(
                     modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 32.dp),
@@ -113,11 +114,12 @@ fun Splash(
                         lineHeight = 32.sp,
                         fontWeight = FontWeight.Medium,
                     ),
+                    fontFamily = FontFamily.Serif,
                 )
                 FloatingActionButton(
                     modifier = Modifier.width(192.dp),
                     onClick = {
-                        toggleDrawer(NavigationType.PERMANENT_NAVIGATION_DRAWER)
+                        toggleDrawer(NavigationType.NAVIGATION_RAIL)
                         navController.popBackStack()
                         navController.navigate(Route.HOME)
                     },

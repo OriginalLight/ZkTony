@@ -79,9 +79,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
             start.clickNoRepeat {
                 viewModel.start()
             }
-//            stop.clickNoRepeat {
-//                viewModel.stop()
-//            }
             with(reset) {
                 clickScale()
                 clickNoRepeat {
