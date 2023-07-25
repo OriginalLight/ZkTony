@@ -12,8 +12,8 @@ android {
         applicationId = "com.zktony.www"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 15
-        versionName = "1.6"
+        versionCode = 16
+        versionName = "1.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -93,8 +93,6 @@ dependencies {
 
     implementation(project(mapOf("path" to ":core")))
     implementation(project(mapOf("path" to ":datastore")))
-    implementation(project(mapOf("path" to ":gpio")))
-    implementation(project(mapOf("path" to ":protobuf")))
     implementation(project(mapOf("path" to ":serialport")))
 
     implementation(libs.androidx.activity.ktx)

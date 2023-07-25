@@ -50,7 +50,7 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
                             tvUpdate.text =
                                 if (it.progress == 0) resources.getString(com.zktony.core.R.string.check_update) else "${it.progress}%"
                             it.application?.let { app ->
-                                if (app.versionCode > BuildConfig.VERSION_CODE) {
+                                if (app.version_code > BuildConfig.VERSION_CODE) {
                                     update.setBackgroundResource(com.zktony.core.R.mipmap.new_icon)
                                     tvUpdate.text =
                                         if (it.progress == 0) resources.getString(com.zktony.core.R.string.new_version) else "${it.progress}%"
@@ -161,11 +161,6 @@ class AdminFragment : BaseFragment<AdminViewModel, FragmentAdminBinding>(R.layou
 
             swDetect.setOnCheckedChangeListener { _, isChecked ->
                 viewModel.toggleDetect(isChecked)
-            }
-
-            with(reset) {
-                clickScale()
-                clickNoRepeat { viewModel.lowerComputerReset() }
             }
 
             with(wifi) {

@@ -229,7 +229,7 @@
                                 android:layout_weight="1"
                                 android:text="@string/colloid"
                                 android:textColor="@color/black"
-                                android:textSize="24sp"/>
+                                android:textSize="18sp"/>
 
                             <TextView
                                 android:id="@+id/tv_glue_coagulant"
@@ -239,7 +239,7 @@
                                 android:text="@string/coagulant"
                                 android:layout_marginStart="16dp"
                                 android:textColor="@color/black"
-                                android:textSize="24sp"/>
+                                android:textSize="18sp"/>
 
                         </LinearLayout>
 
@@ -260,7 +260,7 @@
                                 android:layout_weight="1"
                                 android:text="@string/colloid"
                                 android:textColor="@color/black"
-                                android:textSize="24sp"/>
+                                android:textSize="18sp"/>
                             <TextView
                                 android:id="@+id/tv_pre_coagulant"
                                 android:layout_width="0dp"
@@ -269,7 +269,7 @@
                                 android:text="@string/coagulant"
                                 android:layout_marginStart="16dp"
                                 android:textColor="@color/black"
-                                android:textSize="24sp"/>
+                                android:textSize="18sp"/>
                         </LinearLayout>
 
                         <com.google.android.material.divider.MaterialDivider
@@ -289,7 +289,7 @@
                                 android:layout_weight="1"
                                 android:text="托盘:"
                                 android:textColor="@color/black"
-                                android:textSize="24sp"/>
+                                android:textSize="18sp"/>
 
                             <TextView
                                 android:id="@+id/tv_z_axis"
@@ -299,7 +299,7 @@
                                 android:text="针头:"
                                 android:layout_marginStart="16dp"
                                 android:textColor="@color/black"
-                                android:textSize="24sp"/>
+                                android:textSize="18sp"/>
 
                         </LinearLayout>
 

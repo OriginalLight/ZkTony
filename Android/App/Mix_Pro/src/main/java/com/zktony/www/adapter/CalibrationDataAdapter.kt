@@ -64,10 +64,14 @@ class CalibrationDataViewHolder(
             cali = item
             order.text = (layoutPosition + 1).toString()
             name.text = when (item.index) {
-                0 -> itemView.context.getString(R.string.pump_one)
-                1 -> itemView.context.getString(R.string.pump_two)
-                2 -> itemView.context.getString(R.string.pump_three)
-                else -> itemView.context.getString(R.string.pump_one)
+                0 -> "注射泵"
+                1 -> "一号重液泵"
+                2 -> "一号轻液泵"
+                3 -> "二号重液泵"
+                4 -> "二号轻液泵"
+                5 -> "三号重液泵"
+                6 -> "三号轻液泵"
+                else -> "注射泵"
             }
             actual.text = item.actual.format()
             with(delete) {

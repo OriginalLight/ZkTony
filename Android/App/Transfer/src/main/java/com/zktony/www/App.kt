@@ -7,7 +7,6 @@ import com.zktony.core.ext.initTypeface
 import com.zktony.datastore.DataStoreFactory
 import com.zktony.www.di.coreModule
 import com.zktony.www.di.localModule
-import com.zktony.www.di.remoteModule
 import com.zktony.www.di.viewModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -35,7 +34,6 @@ class App : Application(), KoinComponent {
             workManagerFactory()
             modules(
                 localModule,
-                remoteModule,
                 coreModule,
                 viewModule
             )

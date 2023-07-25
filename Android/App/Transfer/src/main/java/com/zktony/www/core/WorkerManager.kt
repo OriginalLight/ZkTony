@@ -27,36 +27,6 @@ class WorkerManager {
 
     init {
         scope.launch {
-            WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
-                "worker_program",
-                ExistingPeriodicWorkPolicy.UPDATE,
-                PeriodicWorkRequestBuilder<ProgramWorker>(1, TimeUnit.HOURS)
-                    .setConstraints(
-                        Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build()
-                    ).build()
-            )
-            WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
-                "worker_log_record",
-                ExistingPeriodicWorkPolicy.UPDATE,
-                PeriodicWorkRequestBuilder<LogRecordWorker>(1, TimeUnit.HOURS)
-                    .setConstraints(
-                        Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build()
-                    ).build()
-            )
-            WorkManager.getInstance(Ext.ctx).enqueueUniquePeriodicWork(
-                "worker_log_data",
-                ExistingPeriodicWorkPolicy.UPDATE,
-                PeriodicWorkRequestBuilder<LogDataWorker>(15, TimeUnit.MINUTES)
-                    .setConstraints(
-                        Constraints.Builder()
-                            .setRequiredNetworkType(NetworkType.CONNECTED)
-                            .build()
-                    ).build()
-            )
             WorkManager.getInstance(Ext.ctx).enqueue(
                 OneTimeWorkRequestBuilder<LogWorker>()
                     .setInitialDelay(15, TimeUnit.MINUTES)

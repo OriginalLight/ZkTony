@@ -15,9 +15,6 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "App"
-include(":datastore")
-include(":gpio")
-include(":protobuf")
 include(":serialport")
-include(":Mix_Pro")
+include(":Example")
 include(":Test")

@@ -53,7 +53,7 @@ class CalibrationDataViewModel constructor(
                 syncHex(1) {
                     fn = "05"
                     pa = "04"
-                    data = "0101" + "9600,0,0,".asciiToHex()
+                    data = "0101" + "0,0,96000,".asciiToHex()
                 }
                 delay(100L)
                 waitSyncHex(1) {
@@ -65,7 +65,7 @@ class CalibrationDataViewModel constructor(
                 syncHex(index) {
                     fn = "05"
                     pa = "04"
-                    data = "0101" + "0,${if (state.index % 2 != 0) "32000,0" else "0,32000"},".asciiToHex()
+                    data = "0101" + "${if (state.index % 2 != 0) "32000,0" else "0,32000"},0,".asciiToHex()
                 }
             }
 

@@ -3,6 +3,7 @@ package com.zktony.www.ui.home
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
@@ -38,17 +39,18 @@ class HomeViewModel(
                 )
             }
             launch {
-                dataStore.read("CACHE", "0,0,0,0,0,0").collect {
+                dataStore.read("CACHE", "[0.0,0.0,0.0,0.0,0.0,0.0]").collect {
                     if (it.isNotEmpty()) {
                         _uiState.value = _uiState.value.copy(
-                            cache = it.split(",")
+                            cache = Gson().fromJson(it, Array<Float>::class.java).toList()
                         )
                     } else {
                         _uiState.value = _uiState.value.copy(
-                            cache = listOf("0", "0", "0", "0", "0", "0")
+                            cache = listOf(0f, 0f, 0f, 0f, 0f, 0f)
                         )
                     }
                 }
+
             }
         }
     }
@@ -70,15 +72,11 @@ class HomeViewModel(
 
     fun start() {
         val job = viewModelScope.launch {
-//            val executor = ProgramExecutor(
-//                colloid = _uiState.value.colloid,
-//                coagulant = _uiState.value.coagulant,
-//                mode = _uiState.value.mode,
-//                scope = this,
-//            )
-//
-//            executor.execute()
-            delay(1000L * 10)
+            val executor = ProgramExecutor(
+                params = uiState.value.cache,
+                scope = this,
+            )
+            executor.execute()
         }
         val job1 = viewModelScope.launch {
             launch {
@@ -310,9 +308,9 @@ class HomeViewModel(
         }
     }
 
-    fun setCache(value: String) {
+    fun setCache(value: List<Float>) {
         viewModelScope.launch {
-            dataStore.save("CACHE", value)
+            dataStore.save("CACHE", Gson().toJson(value))
         }
     }
 
@@ -322,6 +320,7 @@ class HomeViewModel(
                 this.y = y
             }
             move {
+                this.y = y
                 this.z = z
             }
         }
@@ -335,5 +334,5 @@ data class HomeUiState(
     val recaptureCoagulant: Boolean = false,
     val lock: Boolean = false,
     val upOrDown: Boolean = true,
-    val cache: List<String> = listOf("0", "0", "0", "0","0", "0"),
+    val cache: List<Float> = listOf(0f, 0f, 0f, 0f, 0f, 0f),
 )

@@ -20,7 +20,6 @@ import com.zktony.www.R
 import com.zktony.www.core.ext.serialPort
 import com.zktony.www.databinding.FragmentHomeBinding
 import kotlinx.coroutines.*
-import org.koin.androidx.scope.scope
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.fragment_home) {
@@ -181,25 +180,29 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
 
                             val cache = viewModel.uiState.value.cache
 
-                            glueColloid.setText(cache[0])
-                            glueCoagulant.setText(cache[1])
-                            preColloid.setText(cache[2])
-                            preCoagulant.setText(cache[3])
-                            yAxis.setText(cache[4])
-                            zAxis.setText(cache[5])
+                            glueColloid.setText(cache[0].format())
+                            glueCoagulant.setText(cache[1].format())
+                            preColloid.setText(cache[2].format())
+                            preCoagulant.setText(cache[3].format())
+                            yAxis.setText(cache[4].format())
+                            zAxis.setText(cache[5].format())
 
                             val scope = CoroutineScope(Dispatchers.Main)
                             btnOk.setOnClickListener {
                                 scope.launch {
-                                    val v1 = glueColloid.text.toString()
-                                    val v2 = glueCoagulant.text.toString()
-                                    val v3 = preColloid.text.toString()
-                                    val v4 = preCoagulant.text.toString()
-                                    val a1 = yAxis.text.toString()
-                                    val a2 = zAxis.text.toString()
-                                    val value = listOf(v1, v2, v3, v4, a1, a2).joinToString { it }
-                                    viewModel.setCache(value)
-                                    dialog.dismiss()
+                                    val v1 = glueColloid.text.toString().toFloatOrNull() ?: 0f
+                                    val v2 = glueCoagulant.text.toString().toFloatOrNull() ?: 0f
+                                    val v3 = preColloid.text.toString().toFloatOrNull() ?: 0f
+                                    val v4 = preCoagulant.text.toString().toFloatOrNull() ?: 0f
+                                    val a1 = yAxis.text.toString().toFloatOrNull() ?: 0f
+                                    val a2 = zAxis.text.toString().toFloatOrNull() ?: 0f
+                                    if (a1 > 80f || a2 > 30f) {
+                                        PopTip.show("超出范围-> Y轴最大80，Z轴最大30")
+                                        return@launch
+                                    } else {
+                                        viewModel.setCache(listOf(v1, v2, v3, v4, a1, a2))
+                                        dialog.dismiss()
+                                    }
                                 }
                             }
                             btnMove.setOnClickListener {

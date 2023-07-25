@@ -34,7 +34,6 @@ class CalibrationDataFragment :
                     binding.apply {
                         select.text = listOf("注射泵", "一号重液泵", "一号轻液泵", "二号重液泵", "二号轻液泵", "三号重液泵", "三号轻液泵")[it.index]
                         if (it.actual > 0f) { actual.setEqualText(it.actual.format()) }
-                        addLiquid.isEnabled = !it.lock
                         save.isEnabled = it.actual > 0f
                     }
                 }

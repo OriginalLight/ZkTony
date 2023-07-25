@@ -90,8 +90,7 @@ dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
 
     ksp(libs.androidx.room.compiler)
-
-    implementation(project(mapOf("path" to ":datastore")))
+    
     implementation(project(mapOf("path" to ":serialport")))
 
     implementation(libs.accompanist.insets)

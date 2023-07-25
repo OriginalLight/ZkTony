@@ -1,5 +1,6 @@
 package com.zktony.www.core.ext
 
+import com.zktony.core.ext.loge
 import com.zktony.serialport.ext.asciiToHex
 import com.zktony.serialport.protocol.V1
 import com.zktony.www.core.SerialPort
@@ -40,17 +41,17 @@ class TX {
         val avg1 = (pulse(dv.v2, 3) + pulse(dv.v3, 4)) / 2
         val avg2 = (pulse(dv.v2, 5) + pulse(dv.v3, 6)) / 2
         val avg3 = (pulse(dv.v2, 7) + pulse(dv.v3, 8)) / 2
-        hex1 = "${pulse(dv.v1, 2)},$avg1,$avg1,"
-        hex2 = "${pulse(dv.v1, 2)},$avg2,$avg2,"
-        hex3 = "${pulse(dv.v1, 2)},$avg3,$avg3,"
+        hex1 = "$avg1,$avg1,${pulse(dv.v1, 2)},"
+        hex2 = "$avg2,$avg2,${pulse(dv.v1, 2)},"
+        hex3 = "$avg3,$avg3,${pulse(dv.v1, 2)},"
     }
 
     fun pre(block: DV.() -> Unit) {
         val dv = DV().apply(block)
         controlType = ControlType.PRE
-        hex1 = "${pulse(dv.v1, 2)},${pulse(dv.v2, 3)},${pulse(dv.v3, 4)},"
-        hex2 = "${pulse(dv.v1, 2)},${pulse(dv.v2, 5)},${pulse(dv.v3, 6)},"
-        hex3 = "${pulse(dv.v1, 2)},${pulse(dv.v2, 7)},${pulse(dv.v3, 8)},"
+        hex1 = "${pulse(dv.v2, 3)},${pulse(dv.v3, 4)},${pulse(dv.v1, 2)},"
+        hex2 = "${pulse(dv.v2, 5)},${pulse(dv.v3, 6)},${pulse(dv.v1, 2)},"
+        hex3 = "${pulse(dv.v2, 7)},${pulse(dv.v3, 8)},${pulse(dv.v1, 2)},"
     }
 }
 
@@ -61,7 +62,7 @@ fun tx(block: TX.() -> Unit) {
         ControlType.MOVE -> {
             syncHex(0) {
                 fn = "05"
-                pa = "04"
+                pa = "01"
                 data = "0101" + tx.hex.asciiToHex()
             }
         }
@@ -121,6 +122,7 @@ suspend fun collectHex(block: (Pair<Int, String?>) -> Unit) {
  * @param block V1协议
  */
 fun syncHex(index: Int, block: V1.() -> Unit) {
+    "$index -> ${V1().apply(block).toHex()}".loge()
     serialPort.sendHex(index, V1().apply(block).toHex(), lock = true)
 }
 
