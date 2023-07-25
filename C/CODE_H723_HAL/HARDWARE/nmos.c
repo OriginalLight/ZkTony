@@ -193,29 +193,29 @@ void NMOS_Init(void)
 
 	/*GPIOB*/
 	GPIO_InitStructure.Pin = GPIO_PIN_2 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	 
-	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH; 
-	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		 
-	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure);		 // 
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStructure.Pull = GPIO_PULLDOWN;
+	HAL_GPIO_Init(GPIOB, &GPIO_InitStructure); //
 
 	/*GPIOC*/
 	GPIO_InitStructure.Pin = GPIO_PIN_4 | GPIO_PIN_5 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	  
-	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;   
-	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		  
-	HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);		 // 
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStructure.Pull = GPIO_PULLDOWN;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStructure); //
 
 	/*GPIOD*/
 	GPIO_InitStructure.Pin = GPIO_PIN_11 | GPIO_PIN_12 | GPIO_PIN_13 | GPIO_PIN_14;
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	  
-	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;  
-	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		  
-	HAL_GPIO_Init(GPIOD, &GPIO_InitStructure);		 
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStructure.Pull = GPIO_PULLDOWN;
+	HAL_GPIO_Init(GPIOD, &GPIO_InitStructure);
 
 	/*GPIOE*/
 	GPIO_InitStructure.Pin = GPIO_PIN_15;
-	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;	 
-	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH; 
-	GPIO_InitStructure.Pull = GPIO_PULLDOWN;		 
-	HAL_GPIO_Init(GPIOE, &GPIO_InitStructure);		
+	GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
+	GPIO_InitStructure.Pull = GPIO_PULLDOWN;
+	HAL_GPIO_Init(GPIOE, &GPIO_InitStructure);
 }

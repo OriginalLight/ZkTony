@@ -7,15 +7,13 @@
 #include "exti.h"
 #include "nmos.h"
 
-
-
 uint8_t cmd_buffer[CMD_MAX_SIZE]; // Command buffer
 uint8_t cmd_RXbuffer[_PACK_LEN];  // Rx buffer
 COMM_EVENT DoComEvent = NO_COMEVENT;
 uint16_t Cmd_Cnt = 0;
 extern Moto_Struct Moto[MOTONUM];
 extern SpeedRampData srd[MOTONUM];
-extern  int32_t step_position[MOTONUM];
+extern int32_t step_position[MOTONUM];
 AckPack pack[2];
 
 uint16_t step_accel = 150;
@@ -50,17 +48,17 @@ void ComAckPack(uint8_t ack, uint8_t dictate, uint8_t data[], uint16_t length)
 	*p++ = (PACK_END >> 24) & 0xff;
 	// send data
 	// SendData((char *)TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
-	//USART3_Send(TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
-	if(0 == pack[0].flag)
+	// USART3_Send(TXbuffer, (_PACK_HEAD_LEN + length + _PACK_END_LEN));
+	if (0 == pack[0].flag)
 	{
 		pack[0].datalen = (_PACK_HEAD_LEN + length + _PACK_END_LEN);
-		memcpy(pack[0].data,TXbuffer,pack[0].datalen);
+		memcpy(pack[0].data, TXbuffer, pack[0].datalen);
 		pack[0].flag = 1;
 	}
-	else if(0 == pack[1].flag)
+	else if (0 == pack[1].flag)
 	{
 		pack[1].datalen = (_PACK_HEAD_LEN + length + _PACK_END_LEN);
-		memcpy(pack[1].data,TXbuffer,pack[1].datalen);
+		memcpy(pack[1].data, TXbuffer, pack[1].datalen);
 		pack[1].flag = 1;
 	}
 }
@@ -185,29 +183,6 @@ void CmdQueryGpio(uint8_t *RXbuffer)
 	ComAckPack(PACK_ACK, CMD_TX_GPIO_STATUS, tx_data, data_len * 2);
 }
 
-void CmdResetMoto(uint8_t *RXbuffer)
-{
-	uint8_t *p = &RXbuffer[_LENGTH_INDEX];
-	uint16_t data_len = *p | (*(p + 1) << 8);
-	p += 2;
-	uint8_t count = data_len;
-
-	for (int i = 0; i < count; i++, p++)
-	{
-		uint8_t id = *p;
-		int32_t step = -(step_position[id]);
-
-		Moto[id].MID = id;
-		Moto[id].Mstep = step;
-		Moto[id].Maccel = step_accel;
-		Moto[id].Mdecel = step_decel;
-		Moto[id].MotoSpeed = step_speed;
-
-		STEPMOTOR_AxisMoveRel(Moto[id].MID, Moto[id].Mstep, Moto[id].Maccel, Moto[id].Mdecel, Moto[id].MotoSpeed);
-	}
-}
-
-
 void CmdSwitch_Nmos(uint8_t *RXbuffer)
 {
 	uint8_t run_state = CMD_RT_OK;
@@ -217,18 +192,17 @@ void CmdSwitch_Nmos(uint8_t *RXbuffer)
 	uint8_t tx_data[data_len];
 	uint8_t *tx_p = tx_data;
 
-	for (int i = 0; i < data_len/2; i++, p+=2)
+	for (int i = 0; i < data_len / 2; i++, p += 2)
 	{
 		uint8_t id = *p;
 		uint8_t val = *(p + 1);
 
-		NMOS_Value_Set(id,val);
+		NMOS_Value_Set(id, val);
 		*tx_p++ = id;
 		*tx_p++ = run_state;
 	}
 
 	ComAckPack(PACK_ACK, CMD_TX_NMOS_STATUS, tx_data, data_len);
-	
 }
 
 void CmdAnalysis()
@@ -267,7 +241,6 @@ void CmdSystemReset(void)
 	NVIC_SystemReset(); // 进行软件复位
 }
 
-
 void CmdProcess()
 {
 	switch (cmd_RXbuffer[_DICTATE_INDEX])
@@ -287,13 +260,10 @@ void CmdProcess()
 	case CMD_RX_QUERY_GPIO:
 		CmdQueryGpio(cmd_RXbuffer);
 		break;
-	case CMD_RX_RESET_MOTO:
-		CmdResetMoto(cmd_RXbuffer);
-		break;
 	case CMD_RX_SWITCH_NMOS:
 		CmdSwitch_Nmos(cmd_RXbuffer);
 		break;
-	
+
 	default:
 	{
 		uint8_t tx_data[] = {CMD_NO_COM & 0xff, (CMD_NO_COM >> 8) & 0xff};
@@ -302,4 +272,3 @@ void CmdProcess()
 	}
 	}
 }
-

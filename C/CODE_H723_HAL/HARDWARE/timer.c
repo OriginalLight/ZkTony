@@ -462,7 +462,6 @@ void TIM_Callback(uint8_t num)
 			if (srd[num].accel_count >= 0)
 			{
 				srd[num].run_state = STOP;
-               
 			}
 			break;
 		}

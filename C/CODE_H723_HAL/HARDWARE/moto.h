@@ -9,7 +9,7 @@ typedef struct
 	//! Direction stepper motor should move.
 	uint8_t dir;
 	//! Peroid of next timer delay. At start this value set the accelration rate.
-	uint32_t step_delay;
+	int32_t step_delay;
 	//! What step_pos to start decelaration
 	uint32_t decel_start;
 
@@ -54,15 +54,6 @@ typedef struct
 
 } Moto_Struct;
 
-/* Private define ------------------------------------------------------------*/
-/* Private macro -------------------------------------------------------------*/
-/* Private variables ---------------------------------------------------------*/
-/* Private function prototypes -----------------------------------------------*/
-/* Private functions ---------------------------------------------------------*/
-// #define T1_FREQ 2000000
-// #define T1_FREQ_2 1000000
-// #define SPR 1000
-
 // 定义定时器预分频，定时器实际时钟频率为：MHz/（STEPMOTOR_TIMx_PRESCALER+1）
 // #define STEPMOTOR_TIM_PRESCALER               5  // 步进电机驱动器细分设置为：   32  细分
 #define STEPMOTOR_TIM_PRESCALER 9 					// 步进电机驱动器细分设置为：   16  细分
@@ -83,24 +74,11 @@ typedef struct
 #define SPR                                   (FSPR*MICRO_STEP)   // 旋转一圈需要的脉冲数
 
 // Maths constants
-#define ALPHA ((float)(2 * 3.14159 / SPR)) // α= 2*pi/spr
-#define A_T_x10 ((float)(10 * ALPHA * T1_FREQ))
-#define T1_FREQ_148 ((float)((T1_FREQ * 0.676) / 10)) // 0.676为误差修正值
-#define A_SQ ((float)(2 * 100000 * ALPHA))
-#define A_x200 ((float)(200 * ALPHA))
-
-//// Maths constants. To simplify maths when calculating in AxisMoveRel().
-// #define ALPHA (2*3.14159/SPR)                    // 2*pi/spr
-// #define A_T_x100 ((long)(ALPHA*T1_FREQ*100))     // (ALPHA / T1_FREQ)*100
-// #define T1_FREQ_148 ((int)((T1_FREQ*0.676)/100)) // divided by 100 and scaled by 0.676
-// #define A_SQ (long)(ALPHA*2*100000*100000)         //
-// #define A_x20000 (int)(ALPHA*20000)              // ALPHA*20000
-//  Speed ramp states
-
-// #define STOP 0
-// #define ACCEL 1
-// #define DECEL 2
-// #define RUN 3
+#define ALPHA 					((float)(2 * 3.14159 / SPR)) // α= 2*pi/spr
+#define A_T_x10 				((float)(10 * ALPHA * T1_FREQ))
+#define T1_FREQ_148 			((float)((T1_FREQ * 0.676) / 10)) // 0.676为误差修正值
+#define A_SQ 					((float)(2 * 100000 * ALPHA))
+#define A_x200 					((float)(200 * ALPHA))
 
 #define MOTONUM 16
 
@@ -109,7 +87,7 @@ typedef struct
 
 void TIM_SetCompare(uint8_t num, uint16_t val);
 uint16_t TIM_GetCompare(uint8_t num);
-void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t accel, uint32_t decel, uint32_t speed);
+void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t faccel, uint32_t fdecel, uint32_t fspeed);
 
 void MotoInitConfig(void);
 
