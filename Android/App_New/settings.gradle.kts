@@ -15,6 +15,8 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "App"
+include(":bluetooth")
 include(":serialport")
 include(":Example")
 include(":Test")
+
