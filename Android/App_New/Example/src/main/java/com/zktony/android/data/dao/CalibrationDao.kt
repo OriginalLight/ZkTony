@@ -1,7 +1,7 @@
 package com.zktony.android.data.dao
 
 import androidx.room.*
-import com.zktony.android.data.entities.CalibrationEntity
+import com.zktony.android.data.model.Calibration
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -9,14 +9,14 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-25 11:09
  */
 @Dao
-abstract class CalibrationDao : BaseDao<CalibrationEntity> {
+abstract class CalibrationDao : BaseDao<Calibration> {
     @Query(
         """
         SELECT * FROM calibrations
         ORDER BY create_time ASC
         """
     )
-    abstract fun getAll(): Flow<List<CalibrationEntity>>
+    abstract fun getAll(): Flow<List<Calibration>>
 
     @Query(
         """

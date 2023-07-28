@@ -24,7 +24,7 @@ import kotlinx.coroutines.runBlocking
  * The implementation using [PreferenceDataStore] to save data. And because DataStore supports coroutine,
  * so does this.
  */
-class DataSaverDataStorePreferences(
+class DataSaverDataStore(
     private val dataStore: DataStore<Preferences>,
     senseExternalDataChange: Boolean = false
 ) : DataSaverInterface(senseExternalDataChange) {

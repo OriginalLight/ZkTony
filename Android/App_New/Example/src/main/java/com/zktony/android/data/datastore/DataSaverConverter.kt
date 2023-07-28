@@ -3,8 +3,26 @@ package com.zktony.android.data.datastore
 import android.util.Log
 
 object DataSaverConverter {
-    val typeSaveConverters: MutableMap<Class<*>, (Any?) -> String> by lazy(LazyThreadSafetyMode.PUBLICATION) { mutableMapOf() }
-    val typeRestoreConverters: MutableMap<Class<*>, (String) -> Any?> by lazy(LazyThreadSafetyMode.PUBLICATION) { mutableMapOf() }
+    val typeSaveConverters: MutableMap<Class<*>, (Any?) -> String> by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        mutableMapOf(
+            String::class.java to { it as String },
+            Int::class.java to { it as String },
+            Long::class.java to { it as String },
+            Float::class.java to { it as String },
+            Double::class.java to { it as String },
+            Boolean::class.java to { it as String }
+        )
+    }
+    val typeRestoreConverters: MutableMap<Class<*>, (String) -> Any?> by lazy(LazyThreadSafetyMode.PUBLICATION) {
+        mutableMapOf(
+            String::class.java to { it },
+            Int::class.java to { it.toInt() },
+            Long::class.java to { it.toLong() },
+            Float::class.java to { it.toFloat() },
+            Double::class.java to { it.toDouble() },
+            Boolean::class.java to { it.toBoolean() }
+        )
+    }
 
     private val logger by lazy(LazyThreadSafetyMode.PUBLICATION) {
         DataSaverLogger("DataSaverConverter")

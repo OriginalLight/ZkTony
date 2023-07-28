@@ -69,7 +69,7 @@ class CalibrationDataFragment :
             }
 
             actual.afterTextChange {
-                viewModel.actual(it.toFloatOrNull() ?: 0f)
+                viewModel.actual(it.toDoubleOrNull() ?: 0.0)
             }
 
             select.clickNoRepeat {

@@ -3,7 +3,6 @@ package com.zktony.android.data
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.zktony.android.data.entities.CalibrationData
 import java.util.Date
 
 /**
@@ -25,17 +24,17 @@ object DateConverters {
     }
 }
 
-object CalibrationDataConverters {
+object TripleConverters {
     @TypeConverter
     @JvmStatic
-    fun stringToObject(value: String): List<CalibrationData> {
-        val listType = object : TypeToken<List<CalibrationData>>() {}.type
+    fun stringToObject(value: String): List<Triple<Int, Double, Double>> {
+        val listType = object : TypeToken<List<Triple<Int, Double, Double>>>() {}.type
         return Gson().fromJson(value, listType)
     }
 
     @TypeConverter
     @JvmStatic
-    fun objectToString(list: List<CalibrationData>): String {
+    fun objectToString(list: List<Triple<Int, Double, Double>>): String {
         return Gson().toJson(list)
     }
 }

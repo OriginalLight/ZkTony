@@ -13,7 +13,7 @@ class ProtocolTest {
             data = byteArrayOf(0x01, 0x06, 0x0A, 0x00, 0x00, 0x00)
         }
         assertEquals(
-            "EE 01 01 00 06 01 06 0A 00 00 00 93 D5 FF FC FF FF",
+            "EE 01 01 06 00 01 06 0A 00 00 00 33 B9 FF FC FF FF",
             p.toByteArray().toHexString()
         )
     }

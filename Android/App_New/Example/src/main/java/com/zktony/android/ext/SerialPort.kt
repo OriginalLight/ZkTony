@@ -30,7 +30,6 @@ class SerialPort : AbstractSerial() {
         }
     }
 
-
     /**
      * callbackVerify
      * crc校验等
@@ -111,10 +110,7 @@ class SerialPort : AbstractSerial() {
         }
     }
 
-    /**
-     * 初始化
-     */
-    fun initializer() {
-        "SerialPort initializer".logi()
+    companion object {
+        val instance: SerialPort by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { SerialPort() }
     }
 }

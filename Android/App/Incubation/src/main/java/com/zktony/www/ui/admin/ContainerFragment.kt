@@ -78,32 +78,72 @@ class ContainerFragment :
                     findNavController().navigateUp()
                 }
             }
-            moveWashPosition.clickNoRepeat { viewModel.toWashY() }
-            moveWashHeight.clickNoRepeat { viewModel.toWashZ() }
-            moveWastePosition.clickNoRepeat { viewModel.toWasteY() }
-            moveWasteHeight.clickNoRepeat { viewModel.toWasteZ() }
-            moveBlockingLiquidPosition.clickNoRepeat { viewModel.toBlockY() }
-            moveBlockingLiquidHeight.clickNoRepeat { viewModel.toBlockZ() }
-            moveAntibodyOnePosition.clickNoRepeat { viewModel.toOneY() }
-            moveAntibodyOneHeight.clickNoRepeat { viewModel.toOneZ() }
-            moveAntibodyOneRecycle.clickNoRepeat { viewModel.toRecycleOneZ() }
-            moveAntibodyTwoPosition.clickNoRepeat { viewModel.toTwoY() }
-            moveAntibodyTwoHeight.clickNoRepeat { viewModel.toTwoZ() }
-            zero.clickNoRepeat { viewModel.toZero() }
+            moveWashPosition.clickNoRepeat {
+                val washY = binding.washPosition.text.toString().toFloatOrNull() ?: 0f
+                viewModel.mveToY(washY)
+            }
+            moveWashHeight.clickNoRepeat {
+                val washY = binding.washPosition.text.toString().toFloatOrNull() ?: 0f
+                val washZ = binding.washHeight.text.toString().toFloatOrNull() ?: 0f
+                viewModel.mveToZ(washY, washZ)
+            }
+            moveWastePosition.clickNoRepeat {
+                val wasteY = binding.wastePosition.text.toString().toFloatOrNull() ?: 0f
+                viewModel.mveToY(wasteY)
+            }
+            moveWasteHeight.clickNoRepeat {
+                val wasteY = binding.wastePosition.text.toString().toFloatOrNull() ?: 0f
+                val wasteZ = binding.wasteHeight.text.toString().toFloatOrNull() ?: 0f
+                viewModel.mveToZ(wasteY, wasteZ)
+            }
+            moveBlockingLiquidPosition.clickNoRepeat {
+                val blockY = binding.blockingLiquidPosition.text.toString().toFloatOrNull() ?: 0f
+                viewModel.mveToY(blockY)
+            }
+            moveBlockingLiquidHeight.clickNoRepeat {
+                val blockY = binding.blockingLiquidPosition.text.toString().toFloatOrNull() ?: 0f
+                val blockZ = binding.blockingLiquidHeight.text.toString().toFloatOrNull() ?: 0f
+                viewModel.mveToZ(blockY, blockZ)
+            }
+            moveAntibodyOnePosition.clickNoRepeat {
+                val oneY = binding.antibodyOnePosition.text.toString().toFloatOrNull() ?: 0f
+                viewModel.mveToY(oneY)
+            }
+            moveAntibodyOneHeight.clickNoRepeat {
+                val oneY = binding.antibodyOnePosition.text.toString().toFloatOrNull() ?: 0f
+                val oneZ = binding.antibodyOneHeight.text.toString().toFloatOrNull() ?: 0f
+                viewModel.mveToZ(oneY, oneZ)
+            }
+            moveAntibodyOneRecycle.clickNoRepeat {
+                val oneY = binding.antibodyOnePosition.text.toString().toFloatOrNull() ?: 0f
+                val oneZ = binding.antibodyOneRecycle.text.toString().toFloatOrNull() ?: 0f
+                viewModel.mveToZ(oneY, oneZ)
+            }
+            moveAntibodyTwoPosition.clickNoRepeat {
+                val twoY = binding.antibodyTwoPosition.text.toString().toFloatOrNull() ?: 0f
+                viewModel.mveToY(twoY)
+            }
+            moveAntibodyTwoHeight.clickNoRepeat {
+                val twoY = binding.antibodyTwoPosition.text.toString().toFloatOrNull() ?: 0f
+                val twoZ = binding.antibodyTwoHeight.text.toString().toFloatOrNull() ?: 0f
+                viewModel.mveToZ(twoY, twoZ)
+            }
+            zero.clickNoRepeat { viewModel.mveToY(0f) }
+
             update.clickNoRepeat {
                 viewModel.update(
                     Container().copy(
-                        wasteY = binding.wastePosition.text.toString().toFloat(),
-                        wasteZ = binding.wasteHeight.text.toString().toFloat(),
-                        washY = binding.washPosition.text.toString().toFloat(),
-                        washZ = binding.washHeight.text.toString().toFloat(),
-                        blockY = binding.blockingLiquidPosition.text.toString().toFloat(),
-                        blockZ = binding.blockingLiquidHeight.text.toString().toFloat(),
-                        oneY = binding.antibodyOnePosition.text.toString().toFloat(),
-                        oneZ = binding.antibodyOneHeight.text.toString().toFloat(),
-                        recycleOneZ = binding.antibodyOneRecycle.text.toString().toFloat(),
-                        twoY = binding.antibodyTwoPosition.text.toString().toFloat(),
-                        twoZ = binding.antibodyTwoHeight.text.toString().toFloat(),
+                        wasteY = binding.wastePosition.text.toString().toFloatOrNull() ?: 0f,
+                        wasteZ = binding.wasteHeight.text.toString().toFloatOrNull() ?: 0f,
+                        washY = binding.washPosition.text.toString().toFloatOrNull() ?: 0f,
+                        washZ = binding.washHeight.text.toString().toFloatOrNull() ?: 0f,
+                        blockY = binding.blockingLiquidPosition.text.toString().toFloatOrNull() ?: 0f,
+                        blockZ = binding.blockingLiquidHeight.text.toString().toFloatOrNull() ?: 0f,
+                        oneY = binding.antibodyOnePosition.text.toString().toFloatOrNull() ?: 0f,
+                        oneZ = binding.antibodyOneHeight.text.toString().toFloatOrNull() ?: 0f,
+                        recycleOneZ = binding.antibodyOneRecycle.text.toString().toFloatOrNull() ?: 0f,
+                        twoY = binding.antibodyTwoPosition.text.toString().toFloatOrNull() ?: 0f,
+                        twoZ = binding.antibodyTwoHeight.text.toString().toFloatOrNull() ?: 0f,
                     )
                 )
             }

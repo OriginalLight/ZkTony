@@ -3,35 +3,15 @@ package com.zktony.android.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Slider
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -44,11 +24,11 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.data.entities.MotorEntity
+import com.zktony.android.data.model.Motor
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 /**
  * The Motor screen composable function.
@@ -269,8 +249,8 @@ fun EditContent(
                 style = MaterialTheme.typography.bodyLarge
             )
             Slider(
-                value = speed,
-                onValueChange = { speed = it.roundToInt().toFloat() },
+                value = speed.toFloat(),
+                onValueChange = { speed = it.roundToLong() },
                 valueRange = 0f..800f,
                 steps = 79,
             )
@@ -295,8 +275,8 @@ fun EditContent(
                 style = MaterialTheme.typography.bodyLarge
             )
             Slider(
-                value = acc,
-                onValueChange = { acc = it.roundToInt().toFloat() },
+                value = acc.toFloat(),
+                onValueChange = { acc = it.roundToLong() },
                 valueRange = 0f..800f,
                 steps = 79,
             )
@@ -321,8 +301,8 @@ fun EditContent(
                 style = MaterialTheme.typography.bodyLarge
             )
             Slider(
-                value = dec,
-                onValueChange = { dec = it.roundToInt().toFloat() },
+                value = dec.toFloat(),
+                onValueChange = { dec = it.roundToLong() },
                 valueRange = 0f..800f,
                 steps = 79,
             )
@@ -366,7 +346,7 @@ fun MotorListContentPreview(
     modifier: Modifier = Modifier,
     uiState: MotorUiState = MotorUiState(
         entities = listOf(
-            MotorEntity(text = "M1"), MotorEntity(text = "M2")
+            Motor(text = "M1"), Motor(text = "M2")
         )
     )
 ) {
@@ -387,7 +367,7 @@ fun MotorEditContentPreview() {
         modifier = Modifier,
         uiState = MotorUiState(
             entities = listOf(
-                MotorEntity(text = "M1", id = 1L)
+                Motor(text = "M1", id = 1L)
             ),
             selected = 1L
         )

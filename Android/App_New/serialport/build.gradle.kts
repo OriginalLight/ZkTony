@@ -31,6 +31,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
 }
 
 dependencies {

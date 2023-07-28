@@ -84,13 +84,17 @@ android {
         }
     }
 
+    lint {
+        baseline = file("lint-baseline.xml")
+    }
+
 }
 
 dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
 
     ksp(libs.androidx.room.compiler)
-    
+
     implementation(project(mapOf("path" to ":serialport")))
 
     implementation(libs.accompanist.insets)
@@ -115,6 +119,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.ext.junit)
 
     testImplementation(libs.junit)
+
     androidTestImplementation(composeBom)
     implementation(composeBom)
 }

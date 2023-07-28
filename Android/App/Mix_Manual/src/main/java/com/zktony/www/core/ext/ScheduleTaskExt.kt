@@ -14,6 +14,6 @@ val scheduleTask: ScheduleTask by inject(ScheduleTask::class.java)
  * @return Int
  */
 fun pulse(dv: Float, index: Int): Int {
-    val ce = scheduleTask.hpc[index] ?: 0.01f
+    val ce = scheduleTask.hpc[index] ?: 0.01
     return (dv / ce).toInt()
 }

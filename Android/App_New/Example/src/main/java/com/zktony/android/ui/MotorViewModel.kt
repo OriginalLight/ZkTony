@@ -3,7 +3,7 @@ package com.zktony.android.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.MotorDao
-import com.zktony.android.data.entities.MotorEntity
+import com.zktony.android.data.model.Motor
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -78,7 +78,7 @@ class MotorViewModel constructor(
  * @param page The current page of the screen.
  */
 data class MotorUiState(
-    val entities: List<MotorEntity> = emptyList(),
+    val entities: List<Motor> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.LIST,
 )
@@ -90,5 +90,5 @@ data class MotorUiState(
 sealed class MotorEvent {
     data class NavTo(val page: PageType) : MotorEvent()
     data class ToggleSelected(val id: Long) : MotorEvent()
-    data class Update(val entity: MotorEntity) : MotorEvent()
+    data class Update(val entity: Motor) : MotorEvent()
 }

@@ -229,6 +229,19 @@ fun TabLayout.disable(disable: Boolean = false) {
     tabLayout?.getChildAt(1)?.isEnabled = disable
 }
 
+fun View.onDoubleClickListener(onClick: (View) -> Unit, onDoubleClick: (View) -> Unit) {
+    val listener = View.OnClickListener { v ->
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastClickTime < 500L) {
+            onDoubleClick(v)
+        } else {
+            onClick(v)
+        }
+        lastClickTime = currentTime
+    }
+    setOnClickListener(listener)
+}
+
 @SuppressLint("ClickableViewAccessibility")
 inline fun View.addTouchEvent(crossinline down: (View) -> Unit, crossinline up: (View) -> Unit) {
     this.setOnTouchListener { v, event ->

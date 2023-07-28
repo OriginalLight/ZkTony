@@ -1,6 +1,7 @@
 package com.zktony.www.core
 
 import com.zktony.core.ext.logi
+import com.zktony.core.ext.logw
 import com.zktony.serialport.ext.intToHex
 import com.zktony.serialport.protocol.toV1
 import com.zktony.www.core.ext.asyncHex

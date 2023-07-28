@@ -34,12 +34,13 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.dialogx)
+    implementation(libs.gson)
     implementation(libs.material)
     implementation(libs.okhttp3)
     implementation(libs.zxing)
 
-    testImplementation(libs.junit)
-
-    androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.test.ext.junit)
+
+    testImplementation(libs.junit)
 }

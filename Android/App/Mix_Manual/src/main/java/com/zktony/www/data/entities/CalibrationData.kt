@@ -10,6 +10,6 @@ data class CalibrationData(
     val id: Long = nextId(),
     val index: Int = 0,
     val step: Int = 32000,
-    val actual: Float = 100f,
-    val vps: Float = actual / step,
+    val actual: Double = 100.0,
+    val vps: Double = actual / step,
 )

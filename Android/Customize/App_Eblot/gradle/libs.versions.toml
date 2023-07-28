@@ -7,7 +7,7 @@ ndk = "25.2.9519653"
 targetSdk = "33"
 ## dependencies
 android-lifecycle = "2.6.1"
-androidGradlePlugin = "8.0.2"
+androidGradlePlugin = "8.1.0"
 androidx-activity = "1.7.1"
 androidx-appcompat = "1.6.1"
 androidx-core-ktx = "1.10.0"

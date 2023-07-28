@@ -2,25 +2,25 @@ package com.zktony.android.ext
 
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.MotorDao
-import com.zktony.android.data.entities.MotorEntity
+import com.zktony.android.data.model.Motor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author: 刘贺贺
  * @date: 2023-01-30 14:27
  */
-class ScheduleTask constructor(
-    private val md: MotorDao,
-    private val cd: CalibrationDao,
-) {
+class ScheduleTask {
+    private val md: MotorDao by inject(MotorDao::class.java)
+    private val cd: CalibrationDao by inject(CalibrationDao::class.java)
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     // 电机信息
-    val hpm: MutableMap<Int, MotorEntity> = ConcurrentHashMap()
+    val hpm: MutableMap<Int, Motor> = ConcurrentHashMap()
 
     // 校准信息
     val hpc: MutableMap<Int, Double> = ConcurrentHashMap()
@@ -38,7 +38,9 @@ class ScheduleTask constructor(
 
     /**
      * 从数据库中获取所有的电机信息
+     *
      * 如果数据库中没有数据，则插入默认数据
+     *
      * 如果数据库中有数据，则将数据存入hpm中
      *
      * @return Unit
@@ -50,9 +52,9 @@ class ScheduleTask constructor(
                     hpm[it1.index] = it1
                 }
             } else {
-                val list = mutableListOf<MotorEntity>()
+                val list = mutableListOf<Motor>()
                 for (i in 0..15) {
-                    list.add(MotorEntity(text = "M$i", index = i))
+                    list.add(Motor(text = "M$i", index = i))
                 }
                 md.insertAll(list)
             }
@@ -61,7 +63,9 @@ class ScheduleTask constructor(
 
     /**
      * 从数据库中获取所有的校准信息
+     *
      * 如果数据库中没有数据，则使用默认数据
+     *
      * 如果数据库中有数据，则将数据存入hpc中
      *
      * @return Unit
@@ -91,8 +95,7 @@ class ScheduleTask constructor(
         }
     }
 
-
-    fun initializer() {
-        "ScheduleTask initializer".logi()
+    companion object {
+        val instance: ScheduleTask by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { ScheduleTask() }
     }
 }

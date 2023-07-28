@@ -4,17 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -23,42 +13,10 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -85,7 +43,7 @@ import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.data.entities.CalibrationEntity
+import com.zktony.android.data.model.Calibration
 import com.zktony.android.ext.dateFormat
 import com.zktony.android.ext.format
 import com.zktony.android.ext.showShortToast
@@ -311,7 +269,7 @@ fun ListContent(
 
         LazyVerticalGrid(
             modifier = Modifier
-                .fillMaxHeight()
+                .fillMaxSize()
                 .shadow(
                     elevation = 2.dp,
                     shape = MaterialTheme.shapes.medium,
@@ -399,7 +357,7 @@ fun EditContent(
     event: (CalibrationEvent) -> Unit = {},
 ) {
     // Get the selected entity or create a new one if none is selected
-    val entity = uiState.entities.find { it.id == uiState.selected } ?: CalibrationEntity()
+    val entity = uiState.entities.find { it.id == uiState.selected } ?: Calibration()
 
     val list = remember {
         mutableStateListOf(
@@ -492,12 +450,12 @@ fun EditContent(
 
                         Column {
                             Text(
-                                text = list[it.index],
+                                text = list[it.first],
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontFamily = FontFamily.Serif,
                             )
                             Text(
-                                text = it.volume.format(2) + " μL",
+                                text = it.second.format(2) + " μL",
                                 style = MaterialTheme.typography.bodySmall,
                                 fontFamily = FontFamily.Monospace,
                                 textAlign = TextAlign.Center,
@@ -650,7 +608,7 @@ fun EditContent(
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun CalibrationListContentPreview() {
     // Create a calibration entity list with a single entity
-    val entities = listOf(CalibrationEntity())
+    val entities = listOf(Calibration())
 
     // Create a calibration UI state with the entity list
     val uiState = CalibrationUiState(entities = entities)
@@ -666,7 +624,7 @@ fun CalibrationListContentPreview() {
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun CalibrationEditContentPreview() {
     // Create a calibration entity list with a single entity
-    val entities = listOf(CalibrationEntity(id = 1L))
+    val entities = listOf(Calibration(id = 1L))
 
     // Create a calibration UI state with the entity list and a selected entity ID
     val uiState = CalibrationUiState(entities = entities, selected = 1L)

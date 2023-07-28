@@ -11,11 +11,4 @@
         android:label="@string/title_tec"
         tools:layout="@layout/fragment_tec" />
 
-    <fragment
-        android:id="@+id/navigation_protocol"
-        android:name="com.zktony.www.ui.protocol.ProtocolFragment"
-        android:label="@string/title_protocol"
-        tools:layout="@layout/fragment_protocol" />
-
-
 </navigation>

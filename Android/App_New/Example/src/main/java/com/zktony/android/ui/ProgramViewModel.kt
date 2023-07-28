@@ -3,7 +3,7 @@ package com.zktony.android.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.ProgramDao
-import com.zktony.android.data.entities.ProgramEntity
+import com.zktony.android.data.model.Program
 import com.zktony.android.ext.dsl.tx
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,7 +61,7 @@ class ProgramViewModel constructor(
         when (event) {
             is ProgramEvent.NavTo -> _page.value = event.page
             is ProgramEvent.ToggleSelected -> _selected.value = event.id
-            is ProgramEvent.Insert -> async { dao.insert(ProgramEntity(text = event.name)) }
+            is ProgramEvent.Insert -> async { dao.insert(Program(text = event.name)) }
             is ProgramEvent.Update -> async { dao.update(event.entity) }
             is ProgramEvent.Delete -> async { dao.deleteById(event.id) }
             is ProgramEvent.MoveTo -> moveTo(event.id, event.distance)
@@ -92,7 +92,7 @@ class ProgramViewModel constructor(
             _loading.value = true
             // Execute the transaction to move the program
             tx {
-                mdm {
+                move {
                     index = id
                     dv = distance
                 }
@@ -112,7 +112,7 @@ class ProgramViewModel constructor(
  * @param loading Whether or not the UI is currently loading data.
  */
 data class ProgramUiState(
-    val entities: List<ProgramEntity> = emptyList(),
+    val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.LIST,
     val loading: Boolean = false,
@@ -125,7 +125,7 @@ sealed class ProgramEvent {
     data class NavTo(val page: PageType) : ProgramEvent()
     data class ToggleSelected(val id: Long) : ProgramEvent()
     data class Insert(val name: String) : ProgramEvent()
-    data class Update(val entity: ProgramEntity) : ProgramEvent()
+    data class Update(val entity: Program) : ProgramEvent()
     data class Delete(val id: Long) : ProgramEvent()
     data class MoveTo(val id: Int, val distance: Float) : ProgramEvent()
 }

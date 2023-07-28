@@ -11,8 +11,6 @@ import com.zktony.core.ext.*
 import com.zktony.core.utils.Constants
 import com.zktony.datastore.ext.read
 import com.zktony.datastore.ext.save
-import com.zktony.proto.Application
-import com.zktony.protobuf.grpc.ApplicationGrpc
 import com.zktony.www.BuildConfig
 import com.zktony.www.MainActivity
 import kotlinx.coroutines.flow.*
@@ -20,8 +18,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class AdminViewModel constructor(
-    private val DS: DataStore<Preferences>,
-    private val AG: ApplicationGrpc,
+    private val DS: DataStore<Preferences>
 ) : BaseViewModel() {
 
     private val _uiState = MutableStateFlow(AdminUiState())
@@ -30,16 +27,11 @@ class AdminViewModel constructor(
     init {
         viewModelScope.launch {
             if (Ext.ctx.isNetworkAvailable()) {
-                AG.getApplication(BuildConfig.APPLICATION_ID)
-                    .catch {
-                        _uiState.value = _uiState.value.copy(
-                            application = null
-                        )
-                    }.collect {
-                        _uiState.value = _uiState.value.copy(
-                            application = it
-                        )
-                    }
+                httpCall {
+                    _uiState.value = _uiState.value.copy(
+                        application = it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                    )
+                }
             }
         }
     }
@@ -93,7 +85,7 @@ class AdminViewModel constructor(
     private fun downloadApk(application: Application) {
         viewModelScope.launch {
             PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.start_downloading))
-            application.downloadUrl.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
+            application.download_url.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
                 .collect {
                     when (it) {
                         is DownloadState.Success -> {
@@ -125,12 +117,15 @@ class AdminViewModel constructor(
     /**
      * 获取版本信息
      */
+    /**
+     * 获取版本信息
+     */
     private fun checkRemoteUpdate() {
         viewModelScope.launch {
             if (Ext.ctx.isNetworkAvailable()) {
                 val application = _uiState.value.application
                 if (application != null) {
-                    if (application.versionCode > BuildConfig.VERSION_CODE) {
+                    if (application.version_code > BuildConfig.VERSION_CODE) {
                         updateDialog(
                             title = Ext.ctx.getString(com.zktony.core.R.string.new_remote_update),
                             message = application.description + "\n${Ext.ctx.getString(com.zktony.core.R.string.whether_to_update)}",
@@ -144,30 +139,25 @@ class AdminViewModel constructor(
                     _uiState.value = _uiState.value.copy(
                         loading = true
                     )
-                    AG.getApplication(BuildConfig.APPLICATION_ID)
-                        .catch {
-                            PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.failed_get_version_information))
+                    httpCall {
+                        val app = it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                        if (app != null && app.version_code > BuildConfig.VERSION_CODE) {
+                            updateDialog(
+                                title = Ext.ctx.getString(com.zktony.core.R.string.new_remote_update),
+                                message = app.description + "\n${Ext.ctx.getString(com.zktony.core.R.string.whether_to_update)}",
+                                block = {
+                                    downloadApk(app)
+                                })
                             _uiState.value = _uiState.value.copy(
                                 loading = false
                             )
-                        }.collect {
-                            if (it.versionCode > BuildConfig.VERSION_CODE) {
-                                updateDialog(
-                                    title = Ext.ctx.getString(com.zktony.core.R.string.new_remote_update),
-                                    message = it.description + "\n${Ext.ctx.getString(com.zktony.core.R.string.whether_to_update)}",
-                                    block = {
-                                        downloadApk(it)
-                                    })
-                                _uiState.value = _uiState.value.copy(
-                                    loading = false
-                                )
-                            } else {
-                                PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_latest_version))
-                                _uiState.value = _uiState.value.copy(
-                                    loading = false
-                                )
-                            }
+                        } else {
+                            PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_latest_version))
+                            _uiState.value = _uiState.value.copy(
+                                loading = false
+                            )
                         }
+                    }
                 }
             } else {
                 PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.no_network_usb))

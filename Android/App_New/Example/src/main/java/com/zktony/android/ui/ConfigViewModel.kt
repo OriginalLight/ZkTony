@@ -12,24 +12,10 @@ import kotlinx.coroutines.launch
  */
 class ConfigViewModel : ViewModel() {
 
-    /**
-     * Represents the current UI state of the Config screen.
-     */
     private val _uiState = MutableStateFlow(ConfigUiState())
-
-    /**
-     * Represents the current loading state of the Config screen.
-     */
     private val _loading = MutableStateFlow(false)
-
-    /**
-     * Exposes the current UI state of the Config screen as a read-only flow.
-     */
     val uiState = _uiState.asStateFlow()
 
-    /**
-     * Initializes the view model by observing changes to the settings and updating the UI state accordingly.
-     */
     init {
         viewModelScope.launch {
             _loading.collect {
@@ -59,7 +45,7 @@ class ConfigViewModel : ViewModel() {
         viewModelScope.launch {
             _loading.value = true
             tx {
-                mdm {
+                move {
                     this.index = index + 3
                     dv = distance
                 }

@@ -40,8 +40,8 @@ class TxDsl {
         controlType = ControlType.CONTROL_MOVE
         val pm = PM().apply(block)
         val ba = ByteArray(17)
-        ba.writeInt8(pm.index, 0).writeInt32LE(pm.steps, 1).writeFloatLE(pm.acc, 5).writeFloatLE(pm.dec, 9)
-            .writeFloatLE(pm.speed, 13)
+        ba.writeInt8(pm.index, 0).writeInt32LE(pm.steps, 1).writeInt32LE(pm.acc, 5).writeInt32LE(pm.dec, 9)
+            .writeInt32LE(pm.speed, 13)
         byteList.addAll(ba.toList())
     }
 
@@ -171,7 +171,7 @@ class TxDsl {
 class PM {
     var index: Int = 0
     var steps: Long = 0
-    var acc: Float = 0f
-    var dec: Float = 0f
-    var speed: Float = 0f
+    var acc: Long = 0
+    var dec: Long = 0
+    var speed: Long = 0
 }

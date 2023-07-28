@@ -30,7 +30,7 @@ class ScheduleTask constructor(
     /**
      *  0: 泵1 1: 泵2 2: 泵3
      */
-    val hpc: MutableMap<Int, Float> = ConcurrentHashMap()
+    val hpc: MutableMap<Int, Double> = ConcurrentHashMap()
 
     init {
         scope.launch {
@@ -72,13 +72,13 @@ class ScheduleTask constructor(
                         } else {
                             hpc.clear()
                             for (i in 0..2) {
-                                hpc[i] = 0.01f
+                                hpc[i] = 0.01
                             }
                         }
                     } else {
                         hpc.clear()
                         for (i in 0..2) {
-                            hpc[i] = 0.01f
+                            hpc[i] = 0.01
                         }
                     }
                 }

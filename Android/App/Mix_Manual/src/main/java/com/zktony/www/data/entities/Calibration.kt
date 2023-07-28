@@ -21,15 +21,15 @@ data class Calibration(
     val active: Int = 0,
     val createTime: Date = Date(System.currentTimeMillis()),
 ) {
-    fun avgRate(): List<Float> {
-        val vl = mutableListOf<Float>()
+    fun avgRate(): List<Double> {
+        val vl = mutableListOf<Double>()
         for (i in 0..2) {
             val dataList = this.data.filter { it.index == i }
             if (dataList.isNotEmpty()) {
-                val avg = dataList.map { data -> data.vps }.average().toFloat()
+                val avg = dataList.map { data -> data.vps }.average()
                 vl.add(avg)
             } else {
-                vl.add(0.01f)
+                vl.add(0.01)
             }
         }
         return vl

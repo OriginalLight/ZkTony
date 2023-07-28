@@ -36,8 +36,8 @@ class ProgramExecutor constructor(
             waitLock {
                 tx {
                     pre {
-                        v1 = params[2]
-                        v3 = params[3]
+                        v1 = params[2] * 2
+                        v3 = params[3] * 2
                     }
                 }
             }
@@ -57,9 +57,9 @@ class ProgramExecutor constructor(
             waitLock {
                 tx {
                     glue {
-                        v2 = params[0] / 2f
-                        v1 = params[0] / 2f
-                        v3 = params[1]
+                        v1 = params[0]
+                        v2 = params[0]
+                        v3 = params[1] * 2
                     }
                 }
             }

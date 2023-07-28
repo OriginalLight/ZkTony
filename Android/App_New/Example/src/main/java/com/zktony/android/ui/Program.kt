@@ -77,7 +77,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverListState
-import com.zktony.android.data.entities.ProgramEntity
+import com.zktony.android.data.model.Program
 import com.zktony.android.ext.dateFormat
 import com.zktony.android.ext.format
 import com.zktony.android.ext.showShortToast
@@ -382,7 +382,7 @@ fun EditContent(
 ) {
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
-    val entity = uiState.entities.find { it.id == uiState.selected } ?: ProgramEntity()
+    val entity = uiState.entities.find { it.id == uiState.selected } ?: Program()
     val stroke by rememberDataSaverListState(
         key = Constants.MAXIMUM_STROKE,
         default = listOf(0f, 0f)
@@ -713,7 +713,7 @@ fun ProgramListContentPreview() {
     ListContent(
         uiState = ProgramUiState(
             entities = listOf(
-                ProgramEntity(text = "test")
+                Program(text = "test")
             )
         )
     )
@@ -726,7 +726,7 @@ fun ProgramEditContentPreview() {
     EditContent(
         uiState = ProgramUiState(
             entities = listOf(
-                ProgramEntity(text = "test", id = 1L)
+                Program(text = "test", id = 1L)
             ),
             selected = 1L
         )

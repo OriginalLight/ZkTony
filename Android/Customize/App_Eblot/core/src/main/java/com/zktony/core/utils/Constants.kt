@@ -19,4 +19,5 @@ object Constants {
     const val MAX_VOLTAGE_RS = 30f
     const val MAX_VOLTAGE_ZM = 55f
     const val MOTOR_SPEED = "MOTOR_SPEED"
+    const val OSS_APP = "https://njzkty.oss-cn-beijing.aliyuncs.com/App.json"
 }

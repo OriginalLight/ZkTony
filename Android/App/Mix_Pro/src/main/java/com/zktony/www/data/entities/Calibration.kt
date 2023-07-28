@@ -26,7 +26,7 @@ data class Calibration(
         for (i in 0..6) {
             val dataList = this.data.filter { it.index == i }
             if (dataList.isNotEmpty()) {
-                val avg = dataList.map { data -> data.vps }.average()
+                val avg = dataList.map { data -> data.actual / data.step }.average()
                 vl.add(avg)
             } else {
                 vl.add(0.01)

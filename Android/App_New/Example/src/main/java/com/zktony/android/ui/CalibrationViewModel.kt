@@ -2,10 +2,10 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.ext.dsl.tx
 import com.zktony.android.data.dao.CalibrationDao
-import com.zktony.android.data.entities.CalibrationData
-import com.zktony.android.data.entities.CalibrationEntity
+import com.zktony.android.data.model.Calibration
+import com.zktony.android.ext.dsl.tx
+import com.zktony.android.ext.utils.MoveType
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -79,7 +79,7 @@ class CalibrationViewModel constructor(
         when (event) {
             is CalibrationEvent.NavTo -> _page.value = event.page
             is CalibrationEvent.ToggleSelected -> _selected.value = event.id
-            is CalibrationEvent.Insert -> async { dao.insert(CalibrationEntity(text = event.name)) }
+            is CalibrationEvent.Insert -> async { dao.insert(Calibration(text = event.name)) }
             is CalibrationEvent.Delete -> async { dao.deleteById(event.id) }
             is CalibrationEvent.Update -> async { dao.update(event.entity) }
             is CalibrationEvent.Active -> async { dao.active(event.id) }
@@ -120,7 +120,7 @@ class CalibrationViewModel constructor(
 
             // Add the new liquid to the calibration entity
             tx {
-                mpm {
+                move(MoveType.MOVE_PULSE) {
                     this.index = index + 2
                     pulse = 3200L * 20
                 }
@@ -132,7 +132,7 @@ class CalibrationViewModel constructor(
                     valve(2 to 0)
                 }
                 tx {
-                    mpm {
+                    move(MoveType.MOVE_PULSE) {
                         this.index = 2
                         pulse = 3200L * 20 * -1
                     }
@@ -149,7 +149,7 @@ class CalibrationViewModel constructor(
      *
      * @param data The calibration data point to delete.
      */
-    private fun deleteData(data: CalibrationData) {
+    private fun deleteData(data: Triple<Int, Double, Double>) {
         viewModelScope.launch {
             // Find the selected calibration entity
             val entity = _uiState.value.entities.find { it.id == _uiState.value.selected }
@@ -176,11 +176,7 @@ class CalibrationViewModel constructor(
             // If the selected calibration entity exists, update it with the new data point
             entity?.let {
                 val updatedEntity = it.copy(
-                    data = it.data + CalibrationData(
-                        index = index,
-                        pulse = 3200 * 20,
-                        volume = volume,
-                    )
+                    data = it.data + Triple(index, volume, 3200 * 20.0)
                 )
                 dao.update(updatedEntity)
             }
@@ -197,7 +193,7 @@ class CalibrationViewModel constructor(
  * @param loading Whether the screen is currently loading.
  */
 data class CalibrationUiState(
-    val entities: List<CalibrationEntity> = emptyList(),
+    val entities: List<Calibration> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.LIST,
     val loading: Boolean = false,
@@ -211,9 +207,9 @@ sealed class CalibrationEvent {
     data class ToggleSelected(val id: Long) : CalibrationEvent()
     data class Insert(val name: String) : CalibrationEvent()
     data class Delete(val id: Long) : CalibrationEvent()
-    data class Update(val entity: CalibrationEntity) : CalibrationEvent()
+    data class Update(val entity: Calibration) : CalibrationEvent()
     data class Active(val id: Long) : CalibrationEvent()
     data class AddLiquid(val index: Int) : CalibrationEvent()
-    data class DeleteData(val data: CalibrationData) : CalibrationEvent()
+    data class DeleteData(val data: Triple<Int, Double, Double>) : CalibrationEvent()
     data class InsertData(val index: Int, val volume: Double) : CalibrationEvent()
 }

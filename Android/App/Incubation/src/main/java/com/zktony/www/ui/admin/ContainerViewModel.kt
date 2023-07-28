@@ -36,181 +36,26 @@ class ContainerViewModel constructor(
         }
     }
 
-    /**
-     * 测试 移动到废液槽
-     */
-    fun toWasteY() {
+    fun mveToY(y: Float) {
         viewModelScope.launch {
             execute {
                 dv {
-                    y = container.value.wasteY
+                    this.y = y
                 }
             }
         }
     }
 
-    /**
-     * 测试 废液槽针头下降
-     */
-    fun toWasteZ() {
+    fun mveToZ(y: Float, z: Float) {
         viewModelScope.launch {
             execute {
                 dv {
-                    y = container.value.wasteY
+                    this.y = y
                 }
                 dv {
-                    y = container.value.wasteY
-                    z = container.value.wasteZ
+                    this.y = y
+                    this.z = z
                 }
-            }
-        }
-    }
-
-
-    /**
-     * 测试 移动到洗液槽
-     */
-    fun toWashY() {
-        viewModelScope.launch {
-            execute {
-                dv {
-                    y = container.value.washY
-                }
-            }
-        }
-    }
-
-    /**
-     * 测试 洗液槽针头下降
-     */
-    fun toWashZ() {
-        viewModelScope.launch {
-            execute {
-                dv {
-                    y = container.value.washY
-                }
-                dv {
-                    y = container.value.washY
-                    z = container.value.washZ
-                }
-            }
-        }
-    }
-
-    /**
-     * 测试 移动到阻断液槽
-     */
-    fun toBlockY() {
-        viewModelScope.launch {
-            execute {
-                dv {
-                    y = container.value.blockY
-                }
-            }
-        }
-    }
-
-    /**
-     * 测试 阻断液槽针头下降
-     */
-    fun toBlockZ() {
-        viewModelScope.launch {
-            execute {
-                dv {
-                    y = container.value.blockY
-                }
-                dv {
-                    y = container.value.blockY
-                    z = container.value.blockZ
-                }
-            }
-        }
-    }
-
-    /**
-     * 测试 移动到抗体一槽
-     */
-    fun toOneY() {
-        viewModelScope.launch {
-            execute {
-                dv {
-                    y = container.value.oneY
-                }
-            }
-        }
-    }
-
-    /**
-     * 测试 抗体一槽针头下降
-     */
-    fun toOneZ() {
-        viewModelScope.launch {
-            execute {
-                dv {
-                    y = container.value.oneY
-                }
-                dv {
-                    y = container.value.oneY
-                    z = container.value.oneZ
-                }
-            }
-        }
-    }
-
-    /**
-     * 测试 抗体一槽针头下降
-     */
-    fun toRecycleOneZ() {
-        viewModelScope.launch {
-            execute {
-                dv {
-                    y = container.value.oneY
-                }
-                dv {
-                    y = container.value.oneY
-                    z = container.value.recycleOneZ
-                }
-            }
-        }
-    }
-
-    /**
-     * 测试 移动到抗体二槽
-     */
-    fun toTwoY() {
-        viewModelScope.launch {
-            execute {
-                dv {
-                    y = container.value.twoY
-                }
-            }
-        }
-    }
-
-    /**
-     * 测试 抗体二槽针头下降
-     */
-    fun toTwoZ() {
-        viewModelScope.launch {
-            execute {
-                dv {
-                    y = container.value.twoY
-                }
-                dv {
-                    y = container.value.twoY
-                    z = container.value.twoZ
-                }
-            }
-        }
-    }
-
-    /**
-     * 测试 回到原点
-     */
-    fun toZero() {
-        viewModelScope.launch {
-            execute {
-                dv {}
             }
         }
     }

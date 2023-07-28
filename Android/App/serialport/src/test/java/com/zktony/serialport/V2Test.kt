@@ -2,6 +2,8 @@ package com.zktony.serialport
 
 import com.zktony.serialport.ext.crc16
 import com.zktony.serialport.ext.byteArrayToHexString
+import com.zktony.serialport.protocol.V0
+import com.zktony.serialport.protocol.toHex
 import com.zktony.serialport.protocol.toV2
 import org.junit.Assert.assertEquals
 import org.junit.Test

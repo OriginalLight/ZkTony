@@ -2,18 +2,21 @@ package com.zktony.android.ext.dsl
 
 import com.zktony.android.ext.ScheduleTask
 import com.zktony.android.ext.SerialPort
-import com.zktony.android.ext.utils.Constants
 import com.zktony.android.ext.utils.ControlType
 import com.zktony.android.ext.utils.ExceptionPolicy
 import com.zktony.android.ext.utils.ExecuteType
+import com.zktony.android.ext.utils.MoveType
 import com.zktony.serialport.command.Protocol
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
-import org.koin.java.KoinJavaComponent.inject
 import java.util.concurrent.atomic.AtomicLong
 
-val serialPort: SerialPort by inject(SerialPort::class.java)
-val scheduleTask: ScheduleTask by inject(ScheduleTask::class.java)
+val serialPort: SerialPort = SerialPort.instance
+val scheduleTask: ScheduleTask = ScheduleTask.instance
 
 
 private var y: AtomicLong = AtomicLong(0L)
@@ -172,9 +175,9 @@ fun getGpio(vararg ids: Int): Boolean {
  *
  * @param block [TxDsl.() -> Unit] 命令构建器
  */
-suspend fun tx(block: TxDsl.() -> Unit) {
+suspend fun tx(block: TxScope.() -> Unit) {
     // 构建命令
-    val tx = TxDsl().apply(block)
+    val tx = TxScope().apply(block)
 
     // 根据控制类型执行相应的操作
     when (tx.controlType) {
@@ -276,89 +279,81 @@ suspend fun tx(block: TxDsl.() -> Unit) {
 }
 
 /**
- * 电机初始化
- *
- * @param ids IntArray 电机ID列表
- * @return Unit
+ * 初始化
  */
-suspend fun axisInitializer(vararg ids: Int): Unit {
-    // 查询GPIO状态
-    tx {
-        delay = 300L
-        queryGpio(ids.toList())
-    }
+fun initializer() {
 
-    // 针对每个电机进行初始化
-    ids.forEach {
-        // 如果电机未初始化，则进行初始化
-        if (!getGpio(it)) {
-            // 进行电机初始化
+    val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    scope.launch {
+        launch {
+            val ids = listOf(0, 1)
+            // 查询GPIO状态
             tx {
-                timeout = 1000L * 60
-                mpm {
-                    index = it
-                    pulse = 3200L * -30
-                    acc = 100f
-                    dec = 150f
-                    speed = 200f
+                delay = 300L
+                queryGpio(ids)
+            }
+            // 针对每个电机进行初始化
+            ids.forEach {
+                // 如果电机未初始化，则进行初始化
+                if (!getGpio(it)) {
+                    // 进行电机初始化
+                    tx {
+                        timeout = 1000L * 60
+                        move(MoveType.MOVE_PULSE) {
+                            index = it
+                            pulse = 3200L * -30
+                        }
+                    }
+                }
+
+                // 进行正向运动
+                tx {
+                    timeout = 1000L * 10
+                    move(MoveType.MOVE_PULSE) {
+                        index = it
+                        pulse = 3200L * 2
+                        acc = 50
+                        dec = 80
+                        speed = 100
+                    }
+                }
+
+                // 进行反向运动
+                tx {
+                    timeout = 1000L * 15
+                    move(MoveType.MOVE_PULSE) {
+                        index = it
+                        pulse = 3200L * -3
+                        acc = 50
+                        dec = 80
+                        speed = 100
+                    }
                 }
             }
         }
 
-        // 进行正向运动
-        tx {
-            timeout = 1000L * 10
-            mpm {
-                index = it
-                pulse = 3200L * 2
-                acc = 50f
-                dec = 80f
-                speed = 100f
-            }
-        }
-
-        // 进行反向运动
-        tx {
-            timeout = 1000L * 15
-            mpm {
-                index = it
-                pulse = 3200L * -3
-                acc = 50f
-                dec = 80f
-                speed = 100f
-            }
-        }
+//        launch {
+//            delay(150L)
+//            val ids = listOf(2)
+//            // 查询GPIO状态
+//            tx { queryGpio(ids) }
+//            // 延迟
+//            delay(100L)
+//            // 关闭所有气阀
+//            tx { valve(ids.toList().map { it to 0 }) }
+//            // 对每个注射泵进行初始化
+//            tx {
+//                timeout = 1000L * 30
+//                ids.forEach {
+//                    // 进行注射泵初始化
+//                    move(MoveType.MOVE_PULSE) {
+//                        index = it
+//                        pulse = Constants.MAX_SYRINGE * -1
+//                    }
+//                }
+//            }
+//        }
     }
-}
 
-/**
- * 注射泵初始化
- *
- * @param ids List<Int> 注射泵ID列表
- * @return Unit
- */
-suspend fun syringeInitializer(vararg ids: Int) {
-    // 查询GPIO状态
-    tx { queryGpio(ids.toList()) }
-
-    // 延迟
-    delay(100L)
-
-    // 关闭所有气阀
-    tx { valve(ids.toList().map { it to 0 }) }
-
-    // 对每个注射泵进行初始化
-    tx {
-        timeout = 1000L * 60
-        ids.forEach {
-            // 进行注射泵初始化
-            mpm {
-                index = it
-                pulse = Constants.MAX_SYRINGE * -1
-                acc = 300f
-                dec = 400f
-                speed = 600f
-            }
-        }
-    }
 }

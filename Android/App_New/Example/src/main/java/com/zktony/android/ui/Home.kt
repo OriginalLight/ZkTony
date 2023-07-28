@@ -71,7 +71,7 @@ import com.zktony.android.R
 import com.zktony.android.ext.dateFormat
 import com.zktony.android.ext.format
 import com.zktony.android.ext.timeFormat
-import com.zktony.android.data.entities.ProgramEntity
+import com.zktony.android.data.model.Program
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
@@ -1015,8 +1015,8 @@ fun HomeListContentPreview() {
 fun HomeStartContentPreview() {
     // Create a list of program entities for the preview
     val entities = listOf(
-        ProgramEntity(),
-        ProgramEntity(),
+        Program(),
+        Program(),
     )
 
     // Display the start content with the preview entities
@@ -1031,8 +1031,8 @@ fun HomeStartContentPreview() {
 fun HomeRuntimeContentPreview() {
     // Create a list of program entities for the preview
     val entities = listOf(
-        ProgramEntity(id = 1),
-        ProgramEntity(),
+        Program(id = 1),
+        Program(),
     )
 
     // Display the runtime content with the preview entities and a selected entity

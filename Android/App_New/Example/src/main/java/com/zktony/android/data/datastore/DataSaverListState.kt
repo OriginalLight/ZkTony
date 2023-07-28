@@ -176,7 +176,7 @@ inline fun <reified T : Any> rememberDataSaverListState(
                         if (v is String) {
                             val restore = findRestorer<T>()
                             restore ?: throw e
-                            DataSaverConverter.convertStringToList<T>(v, restore)
+                            DataSaverConverter.convertStringToList(v, restore)
                         } else {
                             throw e
                         }
@@ -235,7 +235,7 @@ inline fun <reified T> mutableDataSaverListStateOf(
     } catch (e: Exception) {
         val restore = findRestorer<T>()
         restore ?: throw e
-        DataSaverConverter.convertStringToList<T>(dataSaverInterface.readData(key, "[]"), restore)
+        DataSaverConverter.convertStringToList(dataSaverInterface.readData(key, "[]"), restore)
     }
     return DataSaverMutableListState(dataSaverInterface, key, data, savePolicy, async)
 }

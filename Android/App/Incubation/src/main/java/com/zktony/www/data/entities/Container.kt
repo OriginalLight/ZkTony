@@ -12,7 +12,7 @@ import com.zktony.core.ext.nextId
 @Entity(tableName = "container")
 data class Container(
     @PrimaryKey
-    val id: Long = nextId(),
+    val id: Long = 1L,
     // 废液槽位置
     val wasteY: Float = 0f,
     val wasteZ: Float = 80f,

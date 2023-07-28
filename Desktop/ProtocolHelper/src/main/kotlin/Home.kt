@@ -223,9 +223,9 @@ fun Run(
                                         run {
                                             index = id
                                             steps = runState.steps.toLong()
-                                            acc = runState.acceleration.toFloatOrNull() ?: 0f
-                                            dec = runState.deceleration.toFloatOrNull() ?: 0f
-                                            speed = runState.speed.toFloatOrNull() ?: 0f
+                                            acc = runState.acceleration.toLongOrNull() ?: 0L
+                                            dec = runState.deceleration.toLongOrNull() ?: 0L
+                                            speed = runState.speed.toLongOrNull() ?: 0L
                                         }
                                     }
                                 }.toHexString()

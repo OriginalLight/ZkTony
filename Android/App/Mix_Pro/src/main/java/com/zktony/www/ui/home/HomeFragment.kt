@@ -196,7 +196,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                     val v4 = preCoagulant.text.toString().toFloatOrNull() ?: 0f
                                     val a1 = yAxis.text.toString().toFloatOrNull() ?: 0f
                                     val a2 = zAxis.text.toString().toFloatOrNull() ?: 0f
-                                    if (a1 > 80f || a2 > 30f) {
+                                    if (a1 > 80f || a2 > 38f) {
                                         PopTip.show("超出范围-> Y轴最大80，Z轴最大30")
                                         return@launch
                                     } else {

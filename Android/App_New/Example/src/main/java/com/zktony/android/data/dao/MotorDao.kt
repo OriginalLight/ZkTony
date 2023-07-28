@@ -1,7 +1,7 @@
 package com.zktony.android.data.dao
 
 import androidx.room.*
-import com.zktony.android.data.entities.MotorEntity
+import com.zktony.android.data.model.Motor
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.Flow
  * @date: 2022-10-13 11:49
  */
 @Dao
-abstract class MotorDao : BaseDao<MotorEntity> {
+abstract class MotorDao : BaseDao<Motor> {
     @Query(
         """
         SELECT * FROM motors
         """
     )
-    abstract fun getAll(): Flow<List<MotorEntity>>
+    abstract fun getAll(): Flow<List<Motor>>
 }

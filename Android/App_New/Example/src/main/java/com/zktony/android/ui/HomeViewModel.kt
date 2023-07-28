@@ -2,13 +2,13 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.zktony.android.ext.dsl.axisInitializer
-import com.zktony.android.ext.dsl.syringeInitializer
+import com.zktony.android.data.dao.ProgramDao
+import com.zktony.android.data.model.Program
+import com.zktony.android.ext.dsl.initializer
 import com.zktony.android.ext.dsl.tx
 import com.zktony.android.ext.utils.Constants
 import com.zktony.android.ext.utils.ExecuteType
-import com.zktony.android.data.dao.ProgramDao
-import com.zktony.android.data.entities.ProgramEntity
+import com.zktony.android.ext.utils.MoveType
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -89,8 +89,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             try {
                 // Initialize the axes and syringe within a timeout of 60 seconds
                 withTimeout(60 * 1000L) {
-                    axisInitializer(1, 0) // Step 1: Initialize the X axis to 1 and the Y axis to 0
-                    syringeInitializer(2) // Step 2: Initialize the syringe
+                    initializer()
                 }
             } catch (ex: Exception) {
                 _loading.value = 0
@@ -112,14 +111,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 // Move to the starting position
                 // Step 1: Move the Z axis to 0
                 tx {
-                    mdm {
+                    move {
                         index = 1
                         dv = 0f
                     }
                 }
                 // Step 2: Move the Y axis to 0
                 tx {
-                    mdm {
+                    move {
                         index = 0
                         dv = 0f
                     }
@@ -136,12 +135,12 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 // Step 4: Perform the pre-dispense operation
                 tx {
                     timeout = 1000L * 60 * 1
-                    mdm {
+                    move {
                         index = 2
                         dv = selected.volume[3]
                     }
                     repeat(6) {
-                        mdm {
+                        move {
                             index = it + 3
                             dv = selected.volume[2]
                         }
@@ -151,14 +150,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 // Move to the dispensing position
                 // Step 5: Move the Z axis to 1
                 tx {
-                    mdm {
+                    move {
                         index = 0
                         dv = selected.axis[0]
                     }
                 }
                 // Step 6: Move the Y axis to 1
                 tx {
-                    mdm {
+                    move {
                         index = 1
                         dv = selected.axis[1]
                     }
@@ -168,12 +167,12 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 // Step 7: Perform the dispensing operation
                 tx {
                     timeout = 1000L * 60 * 3
-                    mdm {
+                    move {
                         index = 2
                         dv = selected.volume[1]
                     }
                     repeat(6) {
-                        mdm {
+                        move {
                             index = it + 3
                             dv = selected.volume[0] / 2
                         }
@@ -188,13 +187,13 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     _job.value = null
                     _loading.value = 1
                     tx {
-                        mdm {
+                        move {
                             index = 1
                             dv = 0f
                         }
                     }
                     tx {
-                        mdm {
+                        move {
                             index = 0
                             dv = 0f
                         }
@@ -209,12 +208,9 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     // Perform a syringe operation to clear the system
                     tx {
                         timeout = 1000L * 60
-                        mpm {
+                        move(MoveType.MOVE_PULSE) {
                             index = 2
                             pulse = Constants.MAX_SYRINGE * -1
-                            acc = 300f
-                            dec = 400f
-                            speed = 600f
                         }
                     }
 
@@ -241,13 +237,13 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 reset()
             }
             tx {
-                mdm {
+                move {
                     index = 1
                     dv = 0f
                 }
             }
             tx {
-                mdm {
+                move {
                     index = 0
                     dv = 0f
                 }
@@ -262,12 +258,9 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             // Perform a syringe operation to clear the system
             tx {
                 timeout = 1000L * 60
-                mpm {
+                move(MoveType.MOVE_PULSE) {
                     index = 2
                     pulse = Constants.MAX_SYRINGE * -1
-                    acc = 300f
-                    dec = 400f
-                    speed = 600f
                 }
             }
 
@@ -292,7 +285,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 _loading.value = 2
                 tx {
                     executeType = ExecuteType.ASYNC
-                    mpm {
+                    move(MoveType.MOVE_PULSE) {
                         this.index = 9
                         pulse = 3200L * 10000L
                     }
@@ -315,7 +308,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 syringeJob = null
                 tx {
                     timeout = 1000L * 60
-                    mpm {
+                    move(MoveType.MOVE_PULSE) {
                         this.index = 2
                         pulse = Constants.MAX_SYRINGE * -1
                     }
@@ -331,7 +324,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         }
                         tx {
                             timeout = 1000L * 60
-                            mpm {
+                            move(MoveType.MOVE_PULSE) {
                                 this.index = 2
                                 pulse = Constants.MAX_SYRINGE
                             }
@@ -342,7 +335,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         }
                         tx {
                             timeout = 1000L * 60
-                            mpm {
+                            move(MoveType.MOVE_PULSE) {
                                 this.index = 2
                                 pulse = Constants.MAX_SYRINGE * -1
                             }
@@ -370,7 +363,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 tx {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {
-                        mpm {
+                        move(MoveType.MOVE_PULSE) {
                             this.index = it + 3
                             pulse = 3200L * 10000L * if (index == 1) 1 else -1
                         }
@@ -391,7 +384,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
  * @param job The current execution job.
  */
 data class HomeUiState(
-    val entities: List<ProgramEntity> = emptyList(),
+    val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.LIST,
     /*

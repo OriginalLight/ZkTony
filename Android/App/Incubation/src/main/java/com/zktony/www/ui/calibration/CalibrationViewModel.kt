@@ -15,7 +15,7 @@ class CalibrationViewModel constructor(
     private val CD: CalibrationDao,
 ) : BaseViewModel() {
 
-    private val _uiState = MutableStateFlow<List<Calibration>?>(emptyList())
+    private val _uiState = MutableStateFlow<List<Calibration>>(emptyList())
     val uiState = _uiState.asStateFlow()
 
     init {

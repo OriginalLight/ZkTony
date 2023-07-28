@@ -38,20 +38,20 @@ class TX {
     fun glue(block: DV.() -> Unit) {
         val dv = DV().apply(block)
         controlType = ControlType.GLUE
-        val avg1 = (pulse(dv.v2, 3) + pulse(dv.v3, 4)) / 2
-        val avg2 = (pulse(dv.v2, 5) + pulse(dv.v3, 6)) / 2
-        val avg3 = (pulse(dv.v2, 7) + pulse(dv.v3, 8)) / 2
-        hex1 = "$avg1,$avg1,${pulse(dv.v1, 2)},"
-        hex2 = "$avg2,$avg2,${pulse(dv.v1, 2)},"
-        hex3 = "$avg3,$avg3,${pulse(dv.v1, 2)},"
+        val avg1 = (pulse(dv.v1, 3) + pulse(dv.v2, 4)) / 2
+        val avg2 = (pulse(dv.v1, 5) + pulse(dv.v2, 6)) / 2
+        val avg3 = (pulse(dv.v1, 7) + pulse(dv.v2, 8)) / 2
+        hex1 = "$avg1,$avg1,${pulse(dv.v3, 2)},"
+        hex2 = "$avg2,$avg2,${pulse(dv.v3, 2)},"
+        hex3 = "$avg3,$avg3,${pulse(dv.v3, 2)},"
     }
 
     fun pre(block: DV.() -> Unit) {
         val dv = DV().apply(block)
         controlType = ControlType.PRE
-        hex1 = "${pulse(dv.v2, 3)},${pulse(dv.v3, 4)},${pulse(dv.v1, 2)},"
-        hex2 = "${pulse(dv.v2, 5)},${pulse(dv.v3, 6)},${pulse(dv.v1, 2)},"
-        hex3 = "${pulse(dv.v2, 7)},${pulse(dv.v3, 8)},${pulse(dv.v1, 2)},"
+        hex1 = "${pulse(dv.v1, 3)},${pulse(dv.v2, 4)},${pulse(dv.v3, 2)},"
+        hex2 = "${pulse(dv.v1, 5)},${pulse(dv.v2, 6)},${pulse(dv.v3, 2)},"
+        hex3 = "${pulse(dv.v1, 7)},${pulse(dv.v2, 8)},${pulse(dv.v3, 2)},"
     }
 }
 
