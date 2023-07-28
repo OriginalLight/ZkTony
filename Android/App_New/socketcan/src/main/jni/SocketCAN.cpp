@@ -1,8 +1,8 @@
 #include <jni.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cstdint>
 #include <unistd.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
