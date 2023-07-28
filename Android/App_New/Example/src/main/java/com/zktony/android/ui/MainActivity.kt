@@ -1,6 +1,5 @@
 package com.zktony.android.ui
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -21,7 +20,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore("dataStore
  * The main activity of the application.
  */
 class MainActivity : ComponentActivity() {
-    @SuppressLint("MissingPermission")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

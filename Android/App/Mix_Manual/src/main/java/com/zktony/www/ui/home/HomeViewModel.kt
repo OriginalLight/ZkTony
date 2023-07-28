@@ -149,14 +149,14 @@ class HomeViewModel constructor(
                             pa = "0B"
                             data = "0301"
                         }
-                        delay(10000L)
+                        delay(1000L * 22)
                     } else {
                         _uiState.value = _uiState.value.copy(upOrDown = true)
                         asyncHex {
                             pa = "0B"
                             data = "0302"
                         }
-                        delay(10000L)
+                        delay(1000L * 23)
                     }
                 }
             }
@@ -217,14 +217,14 @@ class HomeViewModel constructor(
                             pa = "0B"
                             data = "0303"
                         }
-                        delay(10000L)
+                        delay(1000L * 22)
                     } else {
                         _uiState.value = _uiState.value.copy(upOrDown = true)
                         asyncHex {
                             pa = "0B"
                             data = "0304"
                         }
-                        delay(10000L)
+                        delay(1000L * 23)
                     }
                 }
             }

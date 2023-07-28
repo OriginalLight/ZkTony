@@ -16,6 +16,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "App"
 include(":serialport")
+include(":socketcan")
 include(":Example")
 include(":Test")
-
