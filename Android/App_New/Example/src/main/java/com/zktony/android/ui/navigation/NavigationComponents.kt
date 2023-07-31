@@ -1,6 +1,7 @@
 package com.zktony.android.ui.navigation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -160,6 +161,90 @@ fun PermanentNavigationDrawerContent(
                                 )
                             },
                             onClick = { navigateToTopLevelDestination(destination) })
+                    }
+                }
+            },
+            measurePolicy = navigationMeasurePolicy(navigationContentPosition)
+        )
+    }
+}
+
+/**
+ * Navigation drawer content for modal drawer
+ *
+ * @param selectedDestination String
+ * @param navigationContentPosition NavigationContentPosition
+ * @param navigateToTopLevelDestination Function1<TopLevelDestination, Unit>
+ * @param onDrawerClicked Function0<Unit>
+ * @return Unit
+ */
+@Composable
+fun ModalNavigationDrawerContent(
+    selectedDestination: String,
+    navigationContentPosition: NavigationContentPosition,
+    navigateToTopLevelDestination: (TopLevelDestination) -> Unit,
+    onDrawerClicked: () -> Unit = {}
+) {
+    ModalDrawerSheet {
+        Layout(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.inverseOnSurface)
+                .padding(16.dp),
+            content = {
+                Column(
+                    modifier = Modifier.layoutId(LayoutType.HEADER),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.app_name).uppercase(),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        IconButton(onClick = onDrawerClicked) {
+                            Icon(
+                                modifier = Modifier.size(32.dp),
+                                imageVector = Icons.Default.MenuOpen,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .layoutId(LayoutType.CONTENT)
+                        .verticalScroll(rememberScrollState()),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    TOP_LEVEL_DESTINATIONS.forEach { destination ->
+                        NavigationDrawerItem(
+                            selected = selectedDestination == destination.route,
+                            label = {
+                                Text(
+                                    text = stringResource(id = destination.iconTextId),
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                )
+                            },
+                            icon = {
+                                Image(
+                                    modifier = Modifier.size(32.dp),
+                                    painter = painterResource(id = destination.imageId),
+                                    contentDescription = stringResource(id = destination.iconTextId),
+                                )
+                            },
+                            colors = NavigationDrawerItemDefaults.colors(
+                                unselectedContainerColor = Color.Transparent
+                            ),
+                            onClick = { navigateToTopLevelDestination(destination) }
+                        )
                     }
                 }
             },
