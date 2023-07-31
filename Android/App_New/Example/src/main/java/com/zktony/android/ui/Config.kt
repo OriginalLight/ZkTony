@@ -2,39 +2,15 @@ package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imeAnimationSource
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -49,8 +25,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverListState
-import com.zktony.android.ext.format
-import com.zktony.android.ext.utils.Constants
+import com.zktony.android.utils.Constants
+import com.zktony.android.utils.ext.format
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -103,7 +79,7 @@ fun Config(
         }
 
         // Display the screen content wrapper
-        ContentWrapper(
+        ConfigList(
             modifier = Modifier,
             uiState = uiState,
             event = viewModel::event
@@ -120,7 +96,7 @@ fun Config(
  */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
-fun ContentWrapper(
+fun ConfigList(
     modifier: Modifier = Modifier,
     uiState: ConfigUiState,
     event: (ConfigEvent) -> Unit = { },
@@ -406,12 +382,12 @@ fun ContentWrapper(
 }
 
 /**
- * Preview function for the [ContentWrapper] composable.
+ * Preview function for the [ConfigList] composable.
  */
 @Composable
 @Preview(showBackground = true, widthDp = 960)
-fun ConfigContentWrapperPreview() {
-    ContentWrapper(
+fun ConfigListPreview() {
+    ConfigList(
         uiState = ConfigUiState()
     )
 }

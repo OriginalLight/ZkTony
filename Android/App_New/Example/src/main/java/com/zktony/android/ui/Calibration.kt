@@ -44,11 +44,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.model.Calibration
-import com.zktony.android.ext.dateFormat
-import com.zktony.android.ext.format
-import com.zktony.android.ext.showShortToast
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.ext.dateFormat
+import com.zktony.android.utils.ext.format
+import com.zktony.android.utils.ext.showShortToast
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -74,47 +74,28 @@ fun Calibration(
         }
     }
 
-    ContentWrapper(
-        modifier = modifier,
-        uiState = uiState,
-        event = viewModel::event,
-    )
-}
-
-/**
- * Composable function that wraps the content of the calibration screen.
- *
- * @param modifier Modifier
- * @param uiState The current UI state of the calibration screen.
- * @param event The event handler for the calibration screen.
- */
-@Composable
-fun ContentWrapper(
-    modifier: Modifier = Modifier,
-    uiState: CalibrationUiState,
-    event: (CalibrationEvent) -> Unit = {},
-) {
     // List page
     AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-        ListContent(
+        CalibrationList(
             modifier = modifier,
             uiState = uiState,
-            event = event,
+            event = viewModel::event,
         )
     }
     // Edit page
     AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-        EditContent(
+        CalibrationDetail(
             modifier = modifier,
             uiState = uiState,
-            event = event,
+            event = viewModel::event,
         )
     }
 }
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListContent(
+fun CalibrationList(
     modifier: Modifier = Modifier,
     uiState: CalibrationUiState = CalibrationUiState(),
     event: (CalibrationEvent) -> Unit = {},
@@ -203,7 +184,7 @@ fun ListContent(
             Spacer(modifier = Modifier.weight(1f))
             // Button for adding a new item
             FloatingActionButton(
-                modifier = Modifier.width(128.dp),
+                modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                 onClick = { showDialog = true })
             {
                 Icon(
@@ -219,7 +200,7 @@ fun ListContent(
                 var count by remember { mutableStateOf(0) }
 
                 FloatingActionButton(
-                    modifier = Modifier.width(128.dp),
+                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                     onClick = {
                         if (count == 1) {
                             event(CalibrationEvent.Delete(uiState.selected))
@@ -241,7 +222,7 @@ fun ListContent(
             // Button for editing the selected item
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
-                    modifier = Modifier.width(128.dp),
+                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                     onClick = { event(CalibrationEvent.NavTo(PageType.EDIT)) }) {
                     Icon(
                         modifier = Modifier.size(32.dp),
@@ -255,7 +236,7 @@ fun ListContent(
             // Button for activating the selected item
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
-                    modifier = Modifier.width(128.dp),
+                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                     onClick = { event(CalibrationEvent.Active(uiState.selected)) }) {
                     Icon(
                         modifier = Modifier.size(32.dp),
@@ -351,7 +332,7 @@ fun ListContent(
  */
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun EditContent(
+fun CalibrationDetail(
     modifier: Modifier = Modifier,
     uiState: CalibrationUiState = CalibrationUiState(),
     event: (CalibrationEvent) -> Unit = {},
@@ -606,7 +587,7 @@ fun EditContent(
  */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun CalibrationListContentPreview() {
+fun CalibrationListPreview() {
     // Create a calibration entity list with a single entity
     val entities = listOf(Calibration())
 
@@ -614,7 +595,7 @@ fun CalibrationListContentPreview() {
     val uiState = CalibrationUiState(entities = entities)
 
     // Show the calibration list content
-    ListContent(uiState = uiState)
+    CalibrationList(uiState = uiState)
 }
 
 /**
@@ -622,7 +603,7 @@ fun CalibrationListContentPreview() {
  */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun CalibrationEditContentPreview() {
+fun CalibrationDetailPreview() {
     // Create a calibration entity list with a single entity
     val entities = listOf(Calibration(id = 1L))
 
@@ -630,5 +611,5 @@ fun CalibrationEditContentPreview() {
     val uiState = CalibrationUiState(entities = entities, selected = 1L)
 
     // Show the calibration edit content
-    EditContent(uiState = uiState)
+    CalibrationDetail(uiState = uiState)
 }

@@ -43,9 +43,9 @@ class ScheduleTask constructor(
                                 Motor(id = 0, name = "托盘", address = 1),
                                 Motor(id = 1, name = "针头", address = 2),
                                 Motor(id = 2, name = "冲洗泵", address = 3),
-                                Motor(id = 3, name = "重液泵", address = 1),
-                                Motor(id = 4, name = "轻液泵", address = 2),
-                                Motor(id = 5, name = "注射泵", address = 3),
+                                Motor(id = 3, name = "预排速度", address = 1),
+                                Motor(id = 4, name = "制胶速度", address = 2),
+                                Motor(id = 5, name = "预留", address = 3),
                             )
                         )
                     }

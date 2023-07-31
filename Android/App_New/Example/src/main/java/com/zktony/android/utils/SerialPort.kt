@@ -1,4 +1,4 @@
-package com.zktony.android.ext
+package com.zktony.android.utils
 
 import com.zktony.serialport.AbstractSerial
 import com.zktony.serialport.command.protocol

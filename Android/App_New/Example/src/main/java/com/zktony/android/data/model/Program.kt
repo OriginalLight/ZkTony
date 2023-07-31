@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.room.*
 import com.zktony.android.data.FloatConverters
 import com.zktony.android.data.IntConverters
-import com.zktony.android.ext.nextId
+import com.zktony.android.utils.ext.nextId
 import java.util.Date
 
 /**

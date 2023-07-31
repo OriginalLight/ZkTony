@@ -1,8 +1,8 @@
-package com.zktony.android.ext
+package com.zktony.android.utils.ext
 
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.zktony.android.ext.utils.Constants
+import com.zktony.android.utils.Constants
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.OkHttpClient

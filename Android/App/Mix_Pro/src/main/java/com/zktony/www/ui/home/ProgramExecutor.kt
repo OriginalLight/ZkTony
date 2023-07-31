@@ -37,7 +37,7 @@ class ProgramExecutor constructor(
                 tx {
                     pre {
                         v1 = params[2] * 2
-                        v3 = params[3] * 2
+                        v3 = params[3] / 3f
                     }
                 }
             }
@@ -59,7 +59,7 @@ class ProgramExecutor constructor(
                     glue {
                         v1 = params[0]
                         v2 = params[0]
-                        v3 = params[1] * 2
+                        v3 = params[1] / 3f
                     }
                 }
             }

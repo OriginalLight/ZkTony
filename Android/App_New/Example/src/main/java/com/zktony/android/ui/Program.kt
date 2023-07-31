@@ -3,21 +3,7 @@ package com.zktony.android.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imeAnimationSource
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -26,27 +12,8 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -78,12 +45,12 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverListState
 import com.zktony.android.data.model.Program
-import com.zktony.android.ext.dateFormat
-import com.zktony.android.ext.format
-import com.zktony.android.ext.showShortToast
-import com.zktony.android.ext.utils.Constants
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.Constants
+import com.zktony.android.utils.ext.dateFormat
+import com.zktony.android.utils.ext.format
+import com.zktony.android.utils.ext.showShortToast
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -112,7 +79,7 @@ fun Program(
     }
 
     // Display the content wrapper
-    ContentWrapper(
+    ConfigList(
         modifier = modifier,
         uiState = uiState,
         event = viewModel::event,
@@ -127,14 +94,14 @@ fun Program(
  * @param event The event handler for the app.
  */
 @Composable
-fun ContentWrapper(
+fun ConfigList(
     modifier: Modifier = Modifier,
     uiState: ProgramUiState,
     event: (ProgramEvent) -> Unit = {},
 ) {
     // Display the list page
     AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-        ListContent(
+        ProgramList(
             modifier = modifier,
             uiState = uiState,
             event = event,
@@ -142,7 +109,7 @@ fun ContentWrapper(
     }
     // Display the edit page
     AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-        EditContent(
+        ProgramDetail(
             modifier = modifier,
             uiState = uiState,
             event = event,
@@ -159,7 +126,7 @@ fun ContentWrapper(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListContent(
+fun ProgramList(
     modifier: Modifier = Modifier,
     uiState: ProgramUiState = ProgramUiState(),
     event: (ProgramEvent) -> Unit = {},
@@ -247,7 +214,7 @@ fun ListContent(
             Spacer(modifier = Modifier.weight(1f))
             // Button for adding a new item
             FloatingActionButton(
-                modifier = Modifier.width(128.dp),
+                modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                 onClick = { showDialog = true })
             {
                 Icon(
@@ -262,7 +229,7 @@ fun ListContent(
                 var count by remember { mutableStateOf(0) }
 
                 FloatingActionButton(
-                    modifier = Modifier.width(128.dp),
+                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                     onClick = {
                         scope.launch {
                             if (count == 1) {
@@ -286,7 +253,7 @@ fun ListContent(
             // Edit button
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
-                    modifier = Modifier.width(128.dp),
+                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                     onClick = { event(ProgramEvent.NavTo(PageType.EDIT)) },
                 ) {
                     Icon(
@@ -301,7 +268,7 @@ fun ListContent(
 
         LazyVerticalGrid(
             modifier = Modifier
-                .fillMaxHeight()
+                .fillMaxSize()
                 .shadow(
                     elevation = 2.dp,
                     shape = MaterialTheme.shapes.medium,
@@ -375,7 +342,7 @@ fun ListContent(
     ExperimentalComposeUiApi::class,
 )
 @Composable
-fun EditContent(
+fun ProgramDetail(
     modifier: Modifier = Modifier,
     uiState: ProgramUiState = ProgramUiState(),
     event: (ProgramEvent) -> Unit = {},
@@ -708,9 +675,9 @@ fun EditContent(
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ProgramListContentPreview() {
+fun ProgramListPreview() {
     // Call the ListContent function and pass in a ProgramUiState object as a parameter
-    ListContent(
+    ProgramList(
         uiState = ProgramUiState(
             entities = listOf(
                 Program(text = "test")
@@ -721,9 +688,9 @@ fun ProgramListContentPreview() {
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ProgramEditContentPreview() {
+fun ProgramDetailPreview() {
     // Call the EditContent function and pass in a ProgramUiState object as a parameter
-    EditContent(
+    ProgramDetail(
         uiState = ProgramUiState(
             entities = listOf(
                 Program(text = "test", id = 1L)

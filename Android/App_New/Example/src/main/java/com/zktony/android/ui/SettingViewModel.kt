@@ -6,15 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
-import com.zktony.android.ext.Application
-import com.zktony.android.ext.DownloadState
-import com.zktony.android.ext.Ext
-import com.zktony.android.ext.download
-import com.zktony.android.ext.httpCall
-import com.zktony.android.ext.installApk
-import com.zktony.android.ext.isNetworkAvailable
-import com.zktony.android.ext.showShortToast
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.ext.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch

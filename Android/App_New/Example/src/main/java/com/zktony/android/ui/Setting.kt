@@ -4,18 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,15 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Security
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -67,9 +48,9 @@ import androidx.navigation.compose.rememberNavController
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
-import com.zktony.android.ext.utils.Constants
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.Constants
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -98,30 +79,6 @@ fun Setting(
         }
     }
 
-    // Display the content wrapper
-    ContentWrapper(
-        modifier = modifier,
-        uiState = uiState,
-        event = viewModel::event,
-        navController = navController,
-    )
-}
-
-/**
- * Composable function that displays the content wrapper for the settings screen.
- *
- * @param modifier The modifier to apply to the composable.
- * @param uiState The UI state for the settings screen.
- * @param event The event handler for the settings screen.
- * @param navController The NavHostController used for navigation.
- */
-@Composable
-fun ContentWrapper(
-    modifier: Modifier = Modifier,
-    uiState: SettingUiState,
-    event: (SettingEvent) -> Unit = {},
-    navController: NavHostController,
-) {
     // Display the main page
     AnimatedVisibility(visible = uiState.page == PageType.LIST) {
         Column(
@@ -135,7 +92,7 @@ fun ContentWrapper(
                 // Display the settings content
                 SettingsContent(
                     modifier = Modifier.weight(1f),
-                    event = event,
+                    event = viewModel::event,
                 )
                 // Display the info content
                 InfoContent(
@@ -145,7 +102,7 @@ fun ContentWrapper(
             // Display the operation content
             OperationContent(
                 uiState = uiState,
-                event = event,
+                event = viewModel::event,
             )
         }
     }
@@ -153,11 +110,12 @@ fun ContentWrapper(
     AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
         Authentication(
             modifier = modifier,
-            event = event,
+            event = viewModel::event,
             navController = navController,
         )
     }
 }
+
 
 /**
  * Composable function that displays the settings content.
@@ -674,14 +632,34 @@ fun SettingsCard(
  */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun SettingListPreview() {
+fun SettingPreview() {
     // Create a new instance of the setting UI state
     val uiState = SettingUiState()
-    // Create a new instance of the navigation controller
-    val navController = rememberNavController()
 
     // Display the content wrapper for the setting list
-    ContentWrapper(uiState = uiState, navController = navController)
+    Column(
+        modifier = Modifier.padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Display the settings content
+            SettingsContent(
+                modifier = Modifier.weight(1f),
+            )
+            // Display the info content
+            InfoContent(
+                modifier = Modifier.weight(1f),
+            )
+        }
+        // Display the operation content
+        OperationContent(
+            uiState = uiState,
+        )
+    }
+
 }
 
 /**

@@ -1,6 +1,6 @@
-package com.zktony.android.ext
+package com.zktony.android.utils.ext
 
-import com.zktony.android.ext.utils.Snowflake
+import com.zktony.android.utils.Snowflake
 
 val snowflake = Snowflake(1)
 

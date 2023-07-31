@@ -385,6 +385,7 @@ class HomeViewModel constructor(
                 stepMotorY = if (xy == 1) state.value.motor else latest.stepMotorY
                 targetVoltageX = if (xy == 0) state.value.voltage else latest.targetVoltageX
                 targetVoltageY = if (xy == 1) state.value.voltage else latest.targetVoltageY
+                motorY = 1
             })
         } else {
             SM.send(latest.apply {
@@ -396,6 +397,7 @@ class HomeViewModel constructor(
                 stepMotorY = if (xy == 1) 0 else latest.stepMotorY
                 targetVoltageX = if (xy == 0) 0f else latest.targetVoltageX
                 targetVoltageY = if (xy == 1) 0f else latest.targetVoltageY
+                motorY = 0
             })
         }
     }
@@ -480,16 +482,10 @@ class HomeViewModel constructor(
                     delay(interval * 60 * 1000L)
                     viewModelScope.launch {
                         // 开启直流泵
-                        SM.send(SM.send.value.apply {
-                            motorX = 1
-                            motorY = 1
-                        })
+                        SM.send(SM.send.value.apply { motorX = 1 })
                         delay(duration * 1000L)
                         // 关闭直流泵
-                        SM.send(SM.send.value.apply {
-                            motorX = 0
-                            motorY = 0
-                        })
+                        SM.send(SM.send.value.apply { motorX = 0 })
                     }
                 }
             }

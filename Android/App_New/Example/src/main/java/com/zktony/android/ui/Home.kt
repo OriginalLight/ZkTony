@@ -5,49 +5,16 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -68,13 +35,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
-import com.zktony.android.ext.dateFormat
-import com.zktony.android.ext.format
-import com.zktony.android.ext.timeFormat
 import com.zktony.android.data.model.Program
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.ext.dateFormat
+import com.zktony.android.utils.ext.format
+import com.zktony.android.utils.ext.timeFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -107,39 +74,12 @@ fun Home(
         }
     }
 
-    // Display the screen content
-    ContentWrapper(
-        modifier = modifier,
-        uiState = uiState,
-        event = viewModel::event,
-        toggleDrawer = toggleDrawer,
-        navController = navController
-    )
-}
-
-/**
- * Composable function for the content wrapper of the Home screen.
- *
- * @param modifier The modifier to apply to the composable.
- * @param uiState The current UI state of the Home screen.
- * @param event The function to handle events on the Home screen.
- * @param toggleDrawer The function to toggle the drawer.
- * @param navController The NavHostController used for navigation.
- */
-@Composable
-fun ContentWrapper(
-    modifier: Modifier = Modifier,
-    uiState: HomeUiState,
-    event: (HomeEvent) -> Unit = {},
-    toggleDrawer: (NavigationType) -> Unit = {},
-    navController: NavHostController,
-) {
     // List content
     AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-        ListContent(
+        MenuContent(
             modifier = modifier,
             uiState = uiState,
-            event = event,
+            event = viewModel::event,
             navController = navController,
         )
     }
@@ -148,7 +88,7 @@ fun ContentWrapper(
         StartContent(
             modifier = modifier,
             uiState = uiState,
-            event = event,
+            event = viewModel::event,
             toggleDrawer = toggleDrawer,
         )
     }
@@ -157,12 +97,11 @@ fun ContentWrapper(
         RuntimeContent(
             modifier = modifier,
             uiState = uiState,
-            event = event,
+            event = viewModel::event,
             toggleDrawer = toggleDrawer,
         )
     }
 }
-
 
 /**
  * Composable function for the list content of the Home screen.
@@ -173,7 +112,7 @@ fun ContentWrapper(
  * @param navController The NavHostController used for navigation.
  */
 @Composable
-fun ListContent(
+fun MenuContent(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
     event: (HomeEvent) -> Unit = {},
@@ -1000,8 +939,8 @@ fun FunctionCard(
  */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun HomeListContentPreview() {
-    ListContent(
+fun MenuContentPreview() {
+    MenuContent(
         uiState = HomeUiState(),
         navController = rememberNavController()
     )
@@ -1012,7 +951,7 @@ fun HomeListContentPreview() {
  */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun HomeStartContentPreview() {
+fun StartContentPreview() {
     // Create a list of program entities for the preview
     val entities = listOf(
         Program(),
@@ -1028,7 +967,7 @@ fun HomeStartContentPreview() {
  */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun HomeRuntimeContentPreview() {
+fun RuntimeContentPreview() {
     // Create a list of program entities for the preview
     val entities = listOf(
         Program(id = 1),

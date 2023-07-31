@@ -1,24 +1,15 @@
-package com.zktony.android.ext.dsl
+package com.zktony.android.utils.tx
 
-import com.zktony.android.ext.ScheduleTask
-import com.zktony.android.ext.SerialPort
-import com.zktony.android.ext.utils.ControlType
-import com.zktony.android.ext.utils.ExceptionPolicy
-import com.zktony.android.ext.utils.ExecuteType
-import com.zktony.android.ext.utils.MoveType
+import com.zktony.android.utils.ScheduleTask
+import com.zktony.android.utils.SerialPort
 import com.zktony.serialport.command.Protocol
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicLong
 
 val serialPort: SerialPort = SerialPort.instance
 val scheduleTask: ScheduleTask = ScheduleTask.instance
 
-
+private var x: AtomicLong = AtomicLong(0L)
 private var y: AtomicLong = AtomicLong(0L)
 private var z: AtomicLong = AtomicLong(0L)
 

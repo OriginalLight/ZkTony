@@ -1,4 +1,4 @@
-package com.zktony.android.ext
+package com.zktony.android.utils.ext
 
 import android.app.Application
 

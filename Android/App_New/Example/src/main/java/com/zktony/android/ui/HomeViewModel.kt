@@ -4,21 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.model.Program
-import com.zktony.android.ext.dsl.initializer
-import com.zktony.android.ext.dsl.tx
-import com.zktony.android.ext.utils.Constants
-import com.zktony.android.ext.utils.ExecuteType
-import com.zktony.android.ext.utils.MoveType
 import com.zktony.android.ui.utils.PageType
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
+import com.zktony.android.utils.Constants
+import com.zktony.android.utils.tx.ExecuteType
+import com.zktony.android.utils.tx.MoveType
+import com.zktony.android.utils.tx.initializer
+import com.zktony.android.utils.tx.tx
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 
 /**
  * @author: 刘贺贺

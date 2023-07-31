@@ -5,7 +5,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.zktony.android.ext.nextId
+import com.zktony.android.utils.ext.nextId
 import com.zktony.serialport.ext.writeInt32LE
 import java.util.Date
 

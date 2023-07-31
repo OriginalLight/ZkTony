@@ -53,7 +53,7 @@ class CalibrationDataViewModel constructor(
                 syncHex(1) {
                     fn = "05"
                     pa = "04"
-                    data = "0101" + "0,0,32000,".asciiToHex()
+                    data = "0101" + "0,0,38400,".asciiToHex()
                 }
                 delay(100L)
                 waitSyncHex(1) {
@@ -78,7 +78,7 @@ class CalibrationDataViewModel constructor(
             list.add(
                 CalibrationData(
                     index = _uiState.value.index,
-                    step = if (_uiState.value.index == 0) 32000 else 32000,
+                    step = if (_uiState.value.index == 0) 38400 else 32000,
                     actual = _uiState.value.actual,
                 )
             )

@@ -54,30 +54,6 @@ fun Motor(
         }
     }
 
-    // Render the content of the screen
-    ContentWrapper(
-        modifier = modifier,
-        uiState = uiState,
-        event = viewModel::event,
-        navController = navController,
-    )
-}
-
-/**
- * The ContentWrapper composable function for the Motor screen.
- *
- * @param modifier The modifier for the composable.
- * @param uiState The MotorUiState for the screen.
- * @param event The event handler for the screen.
- * @param navController The NavHostController for the screen.
- */
-@Composable
-fun ContentWrapper(
-    modifier: Modifier = Modifier,
-    uiState: MotorUiState,
-    event: (MotorEvent) -> Unit = {},
-    navController: NavHostController,
-) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -101,7 +77,7 @@ fun ContentWrapper(
                 onClick = {
                     when (uiState.page) {
                         PageType.LIST -> navController.navigateUp()
-                        else -> event(MotorEvent.NavTo(PageType.LIST))
+                        else -> viewModel.event(MotorEvent.NavTo(PageType.LIST))
                     }
                 }
             ) {
@@ -113,18 +89,18 @@ fun ContentWrapper(
         }
 
         AnimatedVisibility(visible = uiState.page == PageType.LIST) {
-            ListContent(
+            MotorList(
                 modifier = Modifier,
                 uiState = uiState,
-                event = event,
+                event = viewModel::event,
             )
         }
         // Edit content
         AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
-            EditContent(
+            MotorDetail(
                 modifier = Modifier,
                 uiState = uiState,
-                event = event,
+                event = viewModel::event,
             )
         }
     }
@@ -139,7 +115,7 @@ fun ContentWrapper(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListContent(
+fun MotorList(
     modifier: Modifier = Modifier,
     uiState: MotorUiState = MotorUiState(),
     event: (MotorEvent) -> Unit = {},
@@ -208,7 +184,7 @@ fun ListContent(
  * @param event The event handler for the screen.
  */
 @Composable
-fun EditContent(
+fun MotorDetail(
     modifier: Modifier = Modifier,
     uiState: MotorUiState = MotorUiState(),
     event: (MotorEvent) -> Unit = {},
@@ -342,7 +318,7 @@ fun EditContent(
  */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun MotorListContentPreview(
+fun MotorListPreview(
     modifier: Modifier = Modifier,
     uiState: MotorUiState = MotorUiState(
         entities = listOf(
@@ -350,7 +326,7 @@ fun MotorListContentPreview(
         )
     )
 ) {
-    ListContent(
+    MotorList(
         modifier = modifier,
         uiState = uiState,
     )
@@ -362,8 +338,8 @@ fun MotorListContentPreview(
  */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun MotorEditContentPreview() {
-    EditContent(
+fun MotorDetailPreview() {
+    MotorDetail(
         modifier = Modifier,
         uiState = MotorUiState(
             entities = listOf(

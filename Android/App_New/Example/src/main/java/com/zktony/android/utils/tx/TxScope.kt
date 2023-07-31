@@ -1,10 +1,6 @@
-package com.zktony.android.ext.dsl
+package com.zktony.android.utils.tx
 
 import com.zktony.android.data.model.Motor
-import com.zktony.android.ext.utils.ControlType
-import com.zktony.android.ext.utils.ExceptionPolicy
-import com.zktony.android.ext.utils.ExecuteType
-import com.zktony.android.ext.utils.MoveType
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
 

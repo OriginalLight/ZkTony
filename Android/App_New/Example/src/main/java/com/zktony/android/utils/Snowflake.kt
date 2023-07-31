@@ -1,4 +1,4 @@
-package com.zktony.android.ext.utils
+package com.zktony.android.utils
 
 /**
  * 雪花算法
