@@ -83,7 +83,7 @@ fun Calibration(
         )
     }
     // Edit page
-    AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
+    AnimatedVisibility(visible = uiState.page == PageType.DETAIL) {
         CalibrationDetail(
             modifier = modifier,
             uiState = uiState,
@@ -223,7 +223,7 @@ fun CalibrationList(
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = { event(CalibrationEvent.NavTo(PageType.EDIT)) }) {
+                    onClick = { event(CalibrationEvent.NavTo(PageType.DETAIL)) }) {
                     Icon(
                         modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Edit,

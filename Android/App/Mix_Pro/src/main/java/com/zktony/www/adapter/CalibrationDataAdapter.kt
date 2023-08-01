@@ -64,7 +64,7 @@ class CalibrationDataViewHolder(
             cali = item
             order.text = (layoutPosition + 1).toString()
             name.text = when (item.index) {
-                0 -> "注射泵"
+                0 -> "促凝剂泵"
                 1 -> "一号重液泵"
                 2 -> "一号轻液泵"
                 3 -> "二号重液泵"

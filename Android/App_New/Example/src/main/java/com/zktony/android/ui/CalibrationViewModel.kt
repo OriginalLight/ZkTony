@@ -20,34 +20,12 @@ import kotlinx.coroutines.launch
 class CalibrationViewModel constructor(
     private val dao: CalibrationDao,
 ) : ViewModel() {
-    /**
-     * Represents the current active selection in the UI.
-     */
     private val _selected = MutableStateFlow(0L)
-
-    /**
-     * Represents the current active page in the UI.
-     */
     private val _page = MutableStateFlow(PageType.LIST)
-
-    /**
-     * Represents the current loading state of the UI.
-     */
     private val _loading = MutableStateFlow(false)
-
-    /**
-     * Represents the current UI state of the calibration screen.
-     */
     private val _uiState = MutableStateFlow(CalibrationUiState())
-
-    /**
-     * Exposes the current UI state of the calibration screen as a read-only flow.
-     */
     val uiState = _uiState.asStateFlow()
 
-    /**
-     * Initializes the view model by observing changes to the database and updating the UI state accordingly.
-     */
     init {
         viewModelScope.launch {
             combine(

@@ -125,12 +125,17 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                     CustomDialog.build()
                         .setCustomView(object : OnBindView<CustomDialog>(R.layout.layout_wash) {
                             override fun onBind(dialog: CustomDialog, v: View) {
+                                var time = 30
                                 val input = v.findViewById<EditText>(R.id.input)
                                 val btnStart = v.findViewById<MaterialButton>(R.id.start)
                                 val btnStop = v.findViewById<MaterialButton>(R.id.stop)
                                 val btnCancel = v.findViewById<MaterialButton>(R.id.cancel)
-                                val time = input.text.toString().toIntOrNull() ?: 30
+
+                                input.afterTextChange {
+                                    time = it.toIntOrNull() ?: 30
+                                }
                                 val scope = CoroutineScope(Dispatchers.Main)
+
                                 var job: Job? = null
                                 btnStart.setOnClickListener {
                                     viewModel.wash(0)

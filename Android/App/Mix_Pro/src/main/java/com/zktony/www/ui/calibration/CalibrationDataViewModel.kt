@@ -22,8 +22,10 @@ class CalibrationDataViewModel constructor(
     fun init(id: Long) {
         viewModelScope.launch {
             launch {
-                CD.getById(id).distinctUntilChanged().collect {
-                    _uiState.value = _uiState.value.copy(cali = it)
+                CD.getById(id).collect {
+                    if (it != null) {
+                        _uiState.value = _uiState.value.copy(cali = it)
+                    }
                 }
             }
             launch {

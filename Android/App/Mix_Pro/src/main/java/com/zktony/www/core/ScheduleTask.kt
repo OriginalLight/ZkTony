@@ -64,12 +64,7 @@ class ScheduleTask constructor(
                                 hpc[i] = list[i - 2]
                             }
                         } else {
-                            hpc.clear()
-                            hpc[0] = 4.0 / 3200
-                            hpc[1] = 6.35 / 3200
-                            for (i in 2..8) {
-                                hpc[i] = 0.01
-                            }
+                           CD.update(it[0].copy(active = 1))
                         }
                     } else {
                         hpc.clear()

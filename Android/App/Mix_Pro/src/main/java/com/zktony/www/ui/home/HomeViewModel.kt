@@ -162,14 +162,14 @@ class HomeViewModel(
                             pa = "0B"
                             data = "0301"
                         }
-                        delay(13000L)
+                        delay(14000L)
                     } else {
                         _uiState.value = _uiState.value.copy(upOrDown = true)
                         asyncHex(1) {
                             pa = "0B"
                             data = "0302"
                         }
-                        delay(13500L)
+                        delay(14500L)
                     }
                 }
             }
@@ -228,14 +228,14 @@ class HomeViewModel(
                             pa = "0B"
                             data = "0303"
                         }
-                        delay(13000L)
+                        delay(14000L)
                     } else {
                         _uiState.value = _uiState.value.copy(upOrDown = true)
                         asyncHex(1) {
                             pa = "0B"
                             data = "0304"
                         }
-                        delay(13500L)
+                        delay(14500L)
                     }
                 }
             }

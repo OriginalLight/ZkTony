@@ -93,13 +93,13 @@ class HomeViewModel constructor(
             launch {
                 // 设置和定时查询温控
                 for (i in 0..4) {
-                    delay(500L)
                     launch {
                         temp(
                             addr = i,
                             temp = if (i == 0) _uiState.value.temp.format() else "26"
                         )
                     }
+                    delay(500L)
                 }
                 delay(1000L)
                 // 每十秒钟查询一次温度
@@ -452,5 +452,5 @@ data class HomeUiState(
     val container: Container = Container(),
     val shakeBed: Boolean = false,
     val recycle: Boolean = true,
-    val temp: Float = 5f,
+    val temp: Float = 4f,
 )

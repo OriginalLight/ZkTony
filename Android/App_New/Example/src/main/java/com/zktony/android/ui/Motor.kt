@@ -96,7 +96,7 @@ fun Motor(
             )
         }
         // Edit content
-        AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
+        AnimatedVisibility(visible = uiState.page == PageType.DETAIL) {
             MotorDetail(
                 modifier = Modifier,
                 uiState = uiState,
@@ -139,7 +139,7 @@ fun MotorList(
                 onClick = {
                     scope.launch {
                         event(MotorEvent.ToggleSelected(it.id)) // Step 1: Toggle the selected state of the entity
-                        event(MotorEvent.NavTo(PageType.EDIT)) // Step 2: Navigate to the edit page
+                        event(MotorEvent.NavTo(PageType.DETAIL)) // Step 2: Navigate to the edit page
                     }
                 }
             ) {
