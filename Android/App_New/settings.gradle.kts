@@ -15,8 +15,9 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "App"
-include(":serialport")
-include(":socketcan")
-include(":Example")
-include(":Petridish")
-include(":Test")
+include(":App_Example")
+include(":App_Petridish")
+include(":App_Incubation")
+include(":App_Test")
+include(":Lib_SerialPort")
+include(":Lib_SocketCAN")

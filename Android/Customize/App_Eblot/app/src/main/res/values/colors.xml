@@ -67,7 +67,8 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#D50000</color>
     <color name="green">#00FF00</color>
-    <color name="orange">#F2D100</color>
-    <color name="gray">#656362</color>
-    <color name="gray_light">#787776</color>
+    <color name="orange">#E95C1E</color>
+    <color name="gray">#282832</color>
+    <color name="gray_dark">#1E1E28</color>
+    <color name="gray_light">#50505A</color>
 </resources>

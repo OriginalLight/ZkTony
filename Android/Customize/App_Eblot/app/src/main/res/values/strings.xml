@@ -35,7 +35,7 @@
     <string name="no_data">暂无数据</string>
     <string name="no_log">没有相关日志</string>
     <string name="normal_glue">常规胶</string>
-    <string name="notice_content">1. 请确认模块已经完全插入并正确识别后开始实验。\n2. 请确保管路正确安装后开始实验。\n3. 请勿在实验进行中插拔模块。\n4. 请在实验完成后清洗管路。\n5. 请不要长时间连续工作，避免模块过热形变。\n6. 请不要重复回收使用滤纸。\n7. 请在阅读使用说明后使用。</string>
+    <string name="notice_content">1. 请确认模块已经完全插入并正确识别后开始实验。\n2. 请确保管路正确安装后开始实验。\n3. 请勿在实验进行中插拔模块。\n4. 请在实验完成后清洗管路。\n5. 请不要长时间连续染色（大于8分钟），避免模块过热形变。\n6. 请不要重复回收使用滤纸。\n7. 请在阅读使用说明后使用。</string>
     <string name="off">OFF</string>
     <string name="other">其他</string>
     <string name="other_buffer_info">其他缓冲液信息</string>
