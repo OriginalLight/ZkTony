@@ -37,7 +37,7 @@ class ProgramExecutor constructor(
                 tx {
                     pre {
                         v1 = params[2] * 2
-                        v3 = params[3] / 3f
+                        v3 = params[3] * 6f
                     }
                 }
             }
@@ -59,7 +59,7 @@ class ProgramExecutor constructor(
                     glue {
                         v1 = params[0]
                         v2 = params[0]
-                        v3 = params[1] / 3f
+                        v3 = params[1] * 6f
                     }
                 }
             }
@@ -72,7 +72,7 @@ class ProgramExecutor constructor(
                 pa = "0B"
                 data = "0305"
             }
-            delay(100L)
+            delay(3000L)
             waitLock {
                 tx {
                     move {

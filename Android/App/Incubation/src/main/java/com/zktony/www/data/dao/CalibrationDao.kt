@@ -23,5 +23,5 @@ interface CalibrationDao : BaseDao<Calibration> {
         WHERE id = :id
         """
     )
-    fun getById(id: Long): Flow<Calibration>
+    fun getById(id: Long): Flow<Calibration?>
 }

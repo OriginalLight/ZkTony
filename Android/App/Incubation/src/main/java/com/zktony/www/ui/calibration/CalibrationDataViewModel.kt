@@ -44,7 +44,9 @@ class CalibrationDataViewModel constructor(
         viewModelScope.launch {
             launch {
                 CD.getById(id).collect {
-                    _uiState.value = _uiState.value.copy(cali = it)
+                    if (it != null) {
+                        _uiState.value = _uiState.value.copy(cali = it)
+                    }
                 }
             }
         }
@@ -80,10 +82,10 @@ class CalibrationDataViewModel constructor(
                 }
                 pulse {
                     y = pulse(con.washY, 1)
-                    v1 = if (index == 0) 15000 else 0
-                    v2 = if (index == 1) 15000 else 0
-                    v3 = if (index == 2) 15000 else 0
-                    v4 = if (index == 3) 15000 else 0
+                    v1 = if (index == 0) 3200 * 30 else 0
+                    v2 = if (index == 1) 3200 * 30 else 0
+                    v3 = if (index == 2) 3200 * 30 else 0
+                    v4 = if (index == 3) 3200 * 30 else 0
                 }
                 pulse {}
             }

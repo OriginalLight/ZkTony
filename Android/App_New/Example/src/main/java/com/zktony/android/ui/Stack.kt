@@ -77,7 +77,6 @@ fun Stack(
                 onItemClick = { x, y -> "$x,$y".loge() }
             )
         }
-
     }
 }
 

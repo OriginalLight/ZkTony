@@ -108,7 +108,7 @@ fun ConfigList(
         )
     }
     // Display the edit page
-    AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
+    AnimatedVisibility(visible = uiState.page == PageType.DETAIL) {
         ProgramDetail(
             modifier = modifier,
             uiState = uiState,
@@ -254,7 +254,7 @@ fun ProgramList(
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = { event(ProgramEvent.NavTo(PageType.EDIT)) },
+                    onClick = { event(ProgramEvent.NavTo(PageType.DETAIL)) },
                 ) {
                     Icon(
                         modifier = Modifier.size(32.dp),

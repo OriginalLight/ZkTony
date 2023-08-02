@@ -129,16 +129,7 @@ class ScheduleTask(
                                 hpc[index + 3] = fl
                             }
                         } else {
-                            hpc.clear()
-                            hpc[0] = 0f
-                            hpc[1] = 58f / 3200f
-                            hpc[2] = 3.8f / 3200f
-                            hpc[3] = 150f / 3200f
-                            hpc[4] = 150f / 3200f
-                            hpc[5] = 150f / 3200f
-                            hpc[6] = 150f / 3200f
-                            hpc[7] = 150f / 3200f
-                            hpc[8] = 150f / 3200f
+                            calibrationDao.update(it[0].copy(active = 1))
                         }
                     } else {
                         hpc.clear()

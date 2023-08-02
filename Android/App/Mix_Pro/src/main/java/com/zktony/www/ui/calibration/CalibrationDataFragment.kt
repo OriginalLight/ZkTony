@@ -32,7 +32,7 @@ class CalibrationDataFragment :
                 viewModel.uiState.collect {
                     adapter.submitList(it.cali.data)
                     binding.apply {
-                        select.text = listOf("注射泵", "一号重液泵", "一号轻液泵", "二号重液泵", "二号轻液泵", "三号重液泵", "三号轻液泵")[it.index]
+                        select.text = listOf("促凝剂泵", "一号重液泵", "一号轻液泵", "二号重液泵", "二号轻液泵", "三号重液泵", "三号轻液泵")[it.index]
                         if (it.actual > 0f) { actual.setEqualText(it.actual.format()) }
                         save.isEnabled = it.actual > 0f
                     }
@@ -66,7 +66,7 @@ class CalibrationDataFragment :
             }
 
             select.clickNoRepeat {
-                val menuList = listOf("注射泵", "一号重液泵", "一号轻液泵", "二号重液泵", "二号轻液泵", "三号重液泵", "三号轻液泵")
+                val menuList = listOf("促凝剂泵", "一号重液泵", "一号轻液泵", "二号重液泵", "二号轻液泵", "三号重液泵", "三号轻液泵")
                 PopMenu.show(it, menuList).setMenuTextInfo(TextInfo().apply {
                     gravity = Gravity.CENTER
                     fontSize = 16

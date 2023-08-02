@@ -205,7 +205,7 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
     private fun onUiChange(state: HomeUiState) {
         binding.e.apply {
             with(tvInsulating) {
-                text = if (state.insulating) "保温中 ${state.insulatingTemp}" else "抗体保温"
+                text = if (state.insulating) "保温中 ${state.insulatingTemp}" else "未保温 ${state.insulatingTemp}"
                 setTextColor(
                     ContextCompat.getColor(
                         context, if (state.insulating) color.red else color.dark_outline
