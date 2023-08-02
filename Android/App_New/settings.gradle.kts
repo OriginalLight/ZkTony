@@ -18,4 +18,5 @@ rootProject.name = "App"
 include(":serialport")
 include(":socketcan")
 include(":Example")
+include(":Petridish")
 include(":Test")
