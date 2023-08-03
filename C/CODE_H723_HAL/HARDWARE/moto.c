@@ -244,7 +244,7 @@ void TIMControl(uint8_t num, uint8_t operation)
   *           减速至停止，使得整个运动距离为指定的步数。如果加减速阶段很短并且
   *           速度很慢，那还没达到最大速度就要开始减速
   */
-void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t faccel, uint32_t fdecel, uint32_t fspeed)
+void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t accel, uint32_t decel, uint32_t speed)
 {
 	__IO uint16_t tim_count;
 	// 达到最大速度时的步数
@@ -252,10 +252,6 @@ void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t faccel, uint32_t 
 	// 必须要开始减速的步数（如果加速没有达到最大速度）
 	__IO uint32_t accel_lim;
 
-	float accel, decel, speed;
-	memcpy(&accel, &faccel, sizeof(float));
-	memcpy(&decel, &fdecel, sizeof(float));
-	memcpy(&speed, &fspeed, sizeof(float));
 
 	if (Moto[num].MotionStatus != STOP) // 只允许步进电机在停止的时候才继续
 		return;

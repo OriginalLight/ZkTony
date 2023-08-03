@@ -21,7 +21,7 @@ extern uint8_t cmd_buffer[CMD_MAX_SIZE];
 
 extern uint8_t Frame_flag;
 extern AckPack pack[2];
-extern int32_t step_position[MOTONUM];
+
 
 int main(void)
 {

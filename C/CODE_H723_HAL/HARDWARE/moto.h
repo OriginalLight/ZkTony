@@ -74,11 +74,11 @@ typedef struct
 #define SPR                                   (FSPR*MICRO_STEP)   // 旋转一圈需要的脉冲数
 
 // Maths constants
-#define ALPHA 					((float)(2 * 3.14159 / SPR)) // α= 2*pi/spr
-#define A_T_x10 				((float)(10 * ALPHA * T1_FREQ))
+#define ALPHA 					((float)(2 * 3.14159 / SPR)) // α= 2*pi/spr///0.00196
+#define A_T_x10 				((float)(10 * ALPHA * T1_FREQ))//9800000
 #define T1_FREQ_148 			((float)((T1_FREQ * 0.676) / 10)) // 0.676为误差修正值
 #define A_SQ 					((float)(2 * 100000 * ALPHA))
-#define A_x200 					((float)(200 * ALPHA))
+#define A_x200 					((float)(200 * ALPHA))//0.392
 
 #define MOTONUM 16
 
@@ -87,7 +87,7 @@ typedef struct
 
 void TIM_SetCompare(uint8_t num, uint16_t val);
 uint16_t TIM_GetCompare(uint8_t num);
-void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t faccel, uint32_t fdecel, uint32_t fspeed);
+void STEPMOTOR_AxisMoveRel(uint8_t num, int32_t step, uint32_t accel, uint32_t decel, uint32_t speed);
 
 void MotoInitConfig(void);
 
