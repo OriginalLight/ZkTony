@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.data.model.Motor
+import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.components.MyTopAppBar
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch

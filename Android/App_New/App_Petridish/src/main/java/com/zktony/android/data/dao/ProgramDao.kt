@@ -1,7 +1,7 @@
 package com.zktony.android.data.dao
 
 import androidx.room.*
-import com.zktony.android.data.model.Program
+import com.zktony.android.data.entities.Program
 import kotlinx.coroutines.flow.Flow
 
 /**

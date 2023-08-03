@@ -3,7 +3,7 @@ package com.zktony.android.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.CalibrationDao
-import com.zktony.android.data.model.Calibration
+import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.tx.MoveType
 import com.zktony.android.utils.tx.tx

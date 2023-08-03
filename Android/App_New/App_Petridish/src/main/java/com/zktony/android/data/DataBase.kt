@@ -4,9 +4,9 @@ import androidx.room.*
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.dao.ProgramDao
-import com.zktony.android.data.model.Calibration
-import com.zktony.android.data.model.Motor
-import com.zktony.android.data.model.Program
+import com.zktony.android.data.entities.Calibration
+import com.zktony.android.data.entities.Motor
+import com.zktony.android.data.entities.Program
 
 /**
  * @author 刘贺贺

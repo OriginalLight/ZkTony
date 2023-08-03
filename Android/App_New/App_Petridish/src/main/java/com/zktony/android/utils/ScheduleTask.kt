@@ -2,7 +2,7 @@ package com.zktony.android.utils
 
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.MotorDao
-import com.zktony.android.data.model.Motor
+import com.zktony.android.data.entities.Motor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

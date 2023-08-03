@@ -35,7 +35,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
-import com.zktony.android.data.model.Program
+import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.MyTopAppBar
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType

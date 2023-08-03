@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.data.model.Motor
+import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.components.MyTopAppBar
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
@@ -150,11 +150,13 @@ fun MotorList(
                         )
 
                         Text(
-                            text = "A - ${it.acc}", style = MaterialTheme.typography.bodyLarge
+                            text = "A - ${it.acceleration}",
+                            style = MaterialTheme.typography.bodyLarge
                         )
 
                         Text(
-                            text = "D - ${it.dec}", style = MaterialTheme.typography.bodyLarge
+                            text = "D - ${it.deceleration}",
+                            style = MaterialTheme.typography.bodyLarge
                         )
                     }
                 }
@@ -181,8 +183,8 @@ fun MotorDetail(
 
     // Define the state variables for speed, acceleration, and deceleration
     var speed by remember { mutableStateOf(entity.speed) }
-    var acc by remember { mutableStateOf(entity.acc) }
-    var dec by remember { mutableStateOf(entity.dec) }
+    var acc by remember { mutableStateOf(entity.acceleration) }
+    var dec by remember { mutableStateOf(entity.deceleration) }
 
     Column(
         modifier = modifier
@@ -272,7 +274,7 @@ fun MotorDetail(
         }
 
         // Show the update button if any of the values have changed
-        AnimatedVisibility(visible = entity.speed != speed || entity.acc != acc || entity.dec != dec) {
+        AnimatedVisibility(visible = entity.speed != speed || entity.acceleration != acc || entity.deceleration != dec) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -281,7 +283,15 @@ fun MotorDetail(
                     modifier = Modifier.width(192.dp),
                     onClick = {
                         // Update the entity with the new values and navigate back to the list page
-                        event(MotorEvent.Update(entity.copy(speed = speed, acc = acc, dec = dec)))
+                        event(
+                            MotorEvent.Update(
+                                entity.copy(
+                                    speed = speed,
+                                    acceleration = acc,
+                                    deceleration = dec
+                                )
+                            )
+                        )
                         event(MotorEvent.NavTo(PageType.LIST))
                     },
                 ) {

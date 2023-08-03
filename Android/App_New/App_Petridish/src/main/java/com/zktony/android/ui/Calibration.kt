@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.data.model.Calibration
+import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.ext.dateFormat

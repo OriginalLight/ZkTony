@@ -1,6 +1,6 @@
 package com.zktony.android.utils.tx
 
-import com.zktony.android.data.model.Motor
+import com.zktony.android.data.entities.Motor
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
 
@@ -54,7 +54,11 @@ class TxScope {
             MoveType.MOVE_DV -> {
                 val pulse = pulse(moveScope.index, moveScope.dv)
                 val config =
-                    Motor(speed = moveScope.speed, acc = moveScope.acc, dec = moveScope.dec)
+                    Motor(
+                        speed = moveScope.speed,
+                        acceleration = moveScope.acc,
+                        deceleration = moveScope.dec
+                    )
                 if (pulse != 0L) {
                     val ba = ByteArray(5)
                     ba.writeInt8(moveScope.index, 0).writeInt32LE(pulse, 1)
@@ -67,7 +71,11 @@ class TxScope {
             MoveType.MOVE_PULSE -> {
                 val pulse = pulse(moveScope.index, moveScope.pulse)
                 val config =
-                    Motor(speed = moveScope.speed, acc = moveScope.acc, dec = moveScope.dec)
+                    Motor(
+                        speed = moveScope.speed,
+                        acceleration = moveScope.acc,
+                        deceleration = moveScope.dec
+                    )
                 if (pulse != 0L) {
                     val ba = ByteArray(5)
                     ba.writeInt8(moveScope.index, 0).writeInt32LE(pulse, 1)

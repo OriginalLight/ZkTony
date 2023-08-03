@@ -123,7 +123,7 @@ class ActionFragment :
                 }
             }
             btnAction.clickNoRepeat {
-                val menuList = ActionEnum.values().map { it.value }
+                val menuList = ActionEnum.values().filter { it.value != "PBS" }.map { it.value }
                 spannerDialog(
                     view = binding.btnAction,
                     font = 16,

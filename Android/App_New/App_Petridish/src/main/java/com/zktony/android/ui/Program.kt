@@ -44,7 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverListState
-import com.zktony.android.data.model.Program
+import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants

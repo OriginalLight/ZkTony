@@ -3,7 +3,7 @@ package com.zktony.android.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.MotorDao
-import com.zktony.android.data.model.Motor
+import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

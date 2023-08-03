@@ -1,6 +1,6 @@
 package com.zktony.android.utils.tx
 
-import com.zktony.android.data.model.Motor
+import com.zktony.android.data.entities.Motor
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
 
