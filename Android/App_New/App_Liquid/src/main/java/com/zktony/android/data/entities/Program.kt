@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import androidx.room.*
 import com.zktony.android.data.FloatConverters
 import com.zktony.android.data.IntConverters
-import com.zktony.android.utils.ext.nextId
 import java.util.Date
 
 /**
@@ -23,7 +22,7 @@ import java.util.Date
 )
 @Immutable
 data class Program(
-    @PrimaryKey @ColumnInfo(name = "id") val id: Long = nextId(),
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0L,
     @ColumnInfo(name = "text") val text: String = "None",
     @ColumnInfo(name = "active") val active: List<Int> = listOf(0, 1, 2, 3, 4, 5),
     @ColumnInfo(name = "axis") val axis: List<Float> = listOf(0f, 0f),

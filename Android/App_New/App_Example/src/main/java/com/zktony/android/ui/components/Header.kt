@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
  * @date 2023/8/2 9:16
  */
 @Composable
-fun MyTopAppBar(
+fun Header(
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit = {},
     content: @Composable () -> Unit

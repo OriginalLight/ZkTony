@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewModel() {
 
     private val _selected = MutableStateFlow(0L)
-    private val _page = MutableStateFlow(PageType.LIST)
+    private val _page = MutableStateFlow(PageType.CALIBRATION_LIST)
     private val _loading = MutableStateFlow(false)
     private val _uiState = MutableStateFlow(CalibrationUiState())
 
@@ -57,24 +57,13 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
         when (event) {
             is CalibrationEvent.NavTo -> _page.value = event.page
             is CalibrationEvent.ToggleSelected -> _selected.value = event.id
-            is CalibrationEvent.Insert -> async { dao.insert(Calibration(text = event.name)) }
-            is CalibrationEvent.Delete -> async { dao.deleteById(event.id) }
-            is CalibrationEvent.Update -> async { dao.update(event.entity) }
-            is CalibrationEvent.Active -> async { dao.active(event.id) }
+            is CalibrationEvent.Insert -> viewModelScope.launch { dao.insert(Calibration(text = event.name)) }
+            is CalibrationEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
+            is CalibrationEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
+            is CalibrationEvent.Active -> viewModelScope.launch { dao.active(event.id) }
             is CalibrationEvent.AddLiquid -> addLiquid(event.index)
             is CalibrationEvent.DeleteData -> deleteData(event.data)
             is CalibrationEvent.InsertData -> insertData(event.index, event.volume)
-        }
-    }
-
-    /**
-     * Runs the given block of code asynchronously.
-     *
-     * @param block The block of code to run.
-     */
-    private fun async(block: suspend () -> Unit) {
-        viewModelScope.launch {
-            block()
         }
     }
 
@@ -173,7 +162,7 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
 data class CalibrationUiState(
     val entities: List<Calibration> = emptyList(),
     val selected: Long = 0L,
-    val page: PageType = PageType.LIST,
+    val page: PageType = PageType.CALIBRATION_LIST,
     val loading: Boolean = false,
 )
 

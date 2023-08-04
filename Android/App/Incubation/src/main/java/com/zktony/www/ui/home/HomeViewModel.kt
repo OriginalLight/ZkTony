@@ -54,7 +54,7 @@ class HomeViewModel constructor(
             launch {
                 CD.getAll().collect {
                     if (it.isNotEmpty()) {
-                        _uiState.value = _uiState.value.copy(container = it[0])
+                        _uiState.value = _uiState.value.copy(container = it.first())
                     }
                 }
             }
@@ -268,6 +268,7 @@ class HomeViewModel constructor(
                     }
                 }
                 executor.executor()
+
             }
             // 更新状态中的job
             launch {

@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @author: 刘贺贺
  * @date: 2023-01-30 14:27
  */
-class ScheduleTask {
+class AsyncTask {
     private val md: MotorDao by inject(MotorDao::class.java)
     private val cd: CalibrationDao by inject(CalibrationDao::class.java)
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
@@ -96,6 +96,6 @@ class ScheduleTask {
     }
 
     companion object {
-        val instance: ScheduleTask by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { ScheduleTask() }
+        val instance: AsyncTask by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { AsyncTask() }
     }
 }

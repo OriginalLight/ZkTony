@@ -3,7 +3,6 @@ package com.zktony.android.data.entities
 import androidx.compose.runtime.Immutable
 import androidx.room.*
 import com.zktony.android.data.TripleConverters
-import com.zktony.android.utils.ext.nextId
 import java.util.Date
 
 /**
@@ -19,7 +18,7 @@ import java.util.Date
 @Immutable
 @TypeConverters(TripleConverters::class)
 data class Calibration(
-    @PrimaryKey @ColumnInfo(name = "id") val id: Long = nextId(),
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0L,
     @ColumnInfo(name = "text") val text: String = "默认",
     @ColumnInfo(name = "data") val data: List<Triple<Int, Double, Double>> = emptyList(),
     @ColumnInfo(name = "active") val active: Boolean = false,

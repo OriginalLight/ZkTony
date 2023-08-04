@@ -1,13 +1,13 @@
 package com.zktony.android.utils.tx
 
-import com.zktony.android.utils.ScheduleTask
+import com.zktony.android.utils.AsyncTask
 import com.zktony.android.utils.SerialPort
 import com.zktony.serialport.command.Protocol
 import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicLong
 
 val serialPort: SerialPort = SerialPort.instance
-val scheduleTask: ScheduleTask = ScheduleTask.instance
+val asyncTask: AsyncTask = AsyncTask.instance
 
 private var x: AtomicLong = AtomicLong(0L)
 private var y: AtomicLong = AtomicLong(0L)
@@ -24,7 +24,7 @@ fun <T : Number> pulse(index: Int, dvp: T): Long {
 
     val p = when (dvp) {
         is Float -> {
-            (dvp / scheduleTask.hpc[index]!!).toLong()
+            (dvp / asyncTask.hpc[index]!!).toLong()
         }
 
         is Long -> {

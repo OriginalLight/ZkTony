@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -67,13 +68,13 @@ fun Calibration(
 
     BackHandler {
         when (uiState.page) {
-            PageType.LIST -> navController.navigateUp()
-            else -> viewModel.event(CalibrationEvent.NavTo(PageType.LIST))
+            PageType.CALIBRATION_LIST -> navController.navigateUp()
+            else -> viewModel.event(CalibrationEvent.NavTo(PageType.CALIBRATION_LIST))
         }
     }
 
     // List page
-    AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+    AnimatedVisibility(visible = uiState.page == PageType.CALIBRATION_LIST) {
         CalibrationList(
             modifier = modifier,
             uiState = uiState,
@@ -81,7 +82,7 @@ fun Calibration(
         )
     }
     // Edit page
-    AnimatedVisibility(visible = uiState.page == PageType.DETAIL) {
+    AnimatedVisibility(visible = uiState.page == PageType.CALIBRATION_DETAIL) {
         CalibrationDetail(
             modifier = modifier,
             uiState = uiState,
@@ -221,7 +222,7 @@ fun CalibrationList(
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = { event(CalibrationEvent.NavTo(PageType.DETAIL)) }) {
+                    onClick = { event(CalibrationEvent.NavTo(PageType.CALIBRATION_DETAIL)) }) {
                     Icon(
                         modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Edit,
@@ -328,7 +329,7 @@ fun CalibrationList(
  * @param uiState The current state of the calibration UI.
  * @param event The event to be triggered when the UI state changes.
  */
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CalibrationDetail(
     modifier: Modifier = Modifier,
@@ -352,50 +353,52 @@ fun CalibrationDetail(
     ) {
         // Row containing the list of items and the operation column
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            TabRow(
-                modifier = Modifier
-                    .width(400.dp)
-                    .padding(vertical = 4.dp, horizontal = 8.dp)
-                    .clip(CircleShape)
-                    .padding(1.dp),
-                selectedTabIndex = selectedTabIndex,
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                indicator = { Box {} },
-                divider = { },
-            ) {
-                list.forEachIndexed { index, s ->
-                    Tab(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant),
-                        selected = selectedTabIndex == index,
-                        onClick = {
-                            selectedTabIndex = index
-                        }
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(vertical = 8.dp),
-                            text = s,
-                            color = if (selectedTabIndex == index) Color.White else Color.Black,
-                        )
-                    }
-                }
-            }
 
-            OutlinedTextField(
-                modifier = Modifier.width(256.dp),
+            TextField(
+                modifier = Modifier.weight(1f),
                 value = TextFieldValue(volume, TextRange(volume.length)),
                 onValueChange = { volume = it.text },
                 placeholder = {
                     Text(
-                        text = stringResource(id = R.string.volume)
+                        text = stringResource(id = R.string.volume),
+                        fontStyle = FontStyle.Italic,
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily.Serif,
                     )
+                },
+                leadingIcon = {
+                    TabRow(
+                        modifier = Modifier
+                            .width(500.dp)
+                            .padding(vertical = 4.dp, horizontal = 8.dp)
+                            .clip(CircleShape),
+                        selectedTabIndex = selectedTabIndex,
+                        containerColor = MaterialTheme.colorScheme.inversePrimary,
+                        indicator = { Box {} },
+                        divider = { },
+                    ) {
+                        list.forEachIndexed { index, s ->
+                            Tab(
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .background(if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary),
+                                selected = selectedTabIndex == index,
+                                onClick = {
+                                    selectedTabIndex = index
+                                }
+                            ) {
+                                Text(
+                                    modifier = Modifier.padding(vertical = 12.dp),
+                                    text = s,
+                                    color = if (selectedTabIndex == index) Color.White else Color.Black,
+                                )
+                            }
+                        }
+                    }
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal,
@@ -406,36 +409,18 @@ fun CalibrationDetail(
                         softKeyboard?.hide()
                     }
                 ),
-                shape = MaterialTheme.shapes.medium,
+                shape = CircleShape,
+                colors = TextFieldDefaults.colors(
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                ),
+                textStyle = TextStyle(
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Monospace,
+                ),
             )
-
-            Spacer(modifier = Modifier.weight(1f))
-            // Button for adding a new item
-            AnimatedVisibility(visible = volume.isNotEmpty()) {
-                FloatingActionButton(
-                    onClick = {
-                        scope.launch {
-                            softKeyboard?.hide()
-                            if (!uiState.loading) {
-                                event(CalibrationEvent.AddLiquid(selectedTabIndex))
-                            }
-                        }
-                    }
-                ) {
-                    if (uiState.loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(28.dp),
-                            strokeWidth = 4.dp,
-                            color = Color.White,
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = null,
-                        )
-                    }
-                }
-            }
 
             AnimatedVisibility(visible = volume.isNotEmpty()) {
                 FloatingActionButton(
@@ -458,7 +443,32 @@ fun CalibrationDetail(
                 }
             }
 
-            FloatingActionButton(onClick = { event(CalibrationEvent.NavTo(PageType.LIST)) }) {
+            // Button for adding a new item
+            FloatingActionButton(
+                onClick = {
+                    scope.launch {
+                        softKeyboard?.hide()
+                        if (!uiState.loading) {
+                            event(CalibrationEvent.AddLiquid(selectedTabIndex))
+                        }
+                    }
+                }
+            ) {
+                if (uiState.loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.Blue,
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.ArrowForward,
+                        contentDescription = null,
+                    )
+                }
+            }
+
+            FloatingActionButton(onClick = { event(CalibrationEvent.NavTo(PageType.CALIBRATION_LIST)) }) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = null
@@ -482,11 +492,7 @@ fun CalibrationDetail(
                 Row(
                     modifier = Modifier
                         .background(
-                            color = if (index % 2 == 0) {
-                                MaterialTheme.colorScheme.surfaceVariant
-                            } else {
-                                Color.Transparent
-                            },
+                            color = Color.Transparent,
                             shape = MaterialTheme.shapes.medium,
                         )
                         .shadow(
@@ -501,6 +507,11 @@ fun CalibrationDetail(
                         text = "${index + 1}、",
                         style = MaterialTheme.typography.titleLarge,
                         fontStyle = FontStyle.Italic,
+                        color = if (it.first == selectedTabIndex) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            Color.Black
+                        },
                     )
 
                     Column {

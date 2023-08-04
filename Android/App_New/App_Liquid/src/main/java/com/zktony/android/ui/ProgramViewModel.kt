@@ -20,7 +20,7 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProgramUiState())
     private val _selected = MutableStateFlow(0L)
-    private val _page = MutableStateFlow(PageType.LIST)
+    private val _page = MutableStateFlow(PageType.PROGRAM_LIST)
     private val _loading = MutableStateFlow(false)
 
     val uiState = _uiState.asStateFlow()
@@ -99,7 +99,7 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 data class ProgramUiState(
     val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
-    val page: PageType = PageType.LIST,
+    val page: PageType = PageType.PROGRAM_LIST,
     val loading: Boolean = false,
 )
 

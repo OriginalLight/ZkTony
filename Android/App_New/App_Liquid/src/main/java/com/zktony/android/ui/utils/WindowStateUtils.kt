@@ -16,5 +16,8 @@ enum class NavigationContentPosition {
  * Different type of page supported by app depending on each screen.
  */
 enum class PageType {
-    LIST, DETAIL, AUTH, START, RUNTIME, MOTOR_LIST, MOTOR_DETAIL, CONFIG, SETTINGS
+    LIST, START, RUNTIME,
+    CALIBRATION_LIST, CALIBRATION_DETAIL,
+    PROGRAM_LIST, PROGRAM_DETAIL,
+    SETTINGS, AUTH, CONFIG, MOTOR_LIST, MOTOR_DETAIL
 }

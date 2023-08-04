@@ -9,8 +9,6 @@ object Route {
     const val PROGRAM = "PROGRAM"
     const val CALIBRATION = "CALIBRATION"
     const val SETTING = "SETTING"
-    const val MOTOR = "MOTOR"
-    const val CONFIG = "CONFIG"
     const val SPLASH = "SPLASH"
 }
 

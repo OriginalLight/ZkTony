@@ -5,7 +5,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.zktony.android.utils.ext.nextId
 import com.zktony.serialport.ext.writeInt32LE
 import java.util.Date
 
@@ -21,7 +20,7 @@ import java.util.Date
 )
 @Immutable
 data class Motor(
-    @PrimaryKey @ColumnInfo(name = "id") val id: Long = nextId(),
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0L,
     @ColumnInfo(name = "index") val index: Int = 0,
     @ColumnInfo(name = "text") val text: String = "",
     @ColumnInfo(name = "speed") val speed: Long = 600L,

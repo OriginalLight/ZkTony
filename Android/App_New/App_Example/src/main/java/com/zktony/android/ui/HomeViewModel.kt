@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.Constants
 import com.zktony.android.utils.tx.ExecuteType
 import com.zktony.android.utils.tx.MoveType
 import com.zktony.android.utils.tx.initializer
@@ -203,7 +202,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         timeout = 1000L * 60
                         move(MoveType.MOVE_PULSE) {
                             index = 2
-                            pulse = Constants.MAX_SYRINGE * -1
+                            pulse = 0
                         }
                     }
 
@@ -253,7 +252,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 timeout = 1000L * 60
                 move(MoveType.MOVE_PULSE) {
                     index = 2
-                    pulse = Constants.MAX_SYRINGE * -1
+                    pulse = 0
                 }
             }
 
@@ -303,7 +302,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     timeout = 1000L * 60
                     move(MoveType.MOVE_PULSE) {
                         this.index = 2
-                        pulse = Constants.MAX_SYRINGE * -1
+                        pulse = 0
                     }
                 }
             } else {
@@ -319,7 +318,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             timeout = 1000L * 60
                             move(MoveType.MOVE_PULSE) {
                                 this.index = 2
-                                pulse = Constants.MAX_SYRINGE
+                                pulse = 0
                             }
                         }
                         tx {
@@ -330,7 +329,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             timeout = 1000L * 60
                             move(MoveType.MOVE_PULSE) {
                                 this.index = 2
-                                pulse = Constants.MAX_SYRINGE * -1
+                                pulse = 0
                             }
                         }
                     }

@@ -227,14 +227,7 @@ class CommandExecutor constructor(
     private suspend fun waitForFree(block: suspend () -> Unit) {
         event("等待中")
         waitLock {
-            syncHex(0) {
-                pa = "0C"
-            }
-            delay(500L)
-            waitDrawer(
-                timerTask = { event("抽屉未关闭") },
-                block = { block.invoke() }
-            )
+            block.invoke()
         }
     }
 }

@@ -8,7 +8,7 @@ class MoveScope {
     var index: Int = 0
     var dv: Float = 0f
     var pulse: Long = 0L
-    var acc: Long = scheduleTask.hpm[index]!!.acc
-    var dec: Long = scheduleTask.hpm[index]!!.dec
-    var speed: Long = scheduleTask.hpm[index]!!.speed
+    var acc: Long = asyncTask.hpm[index]!!.acc
+    var dec: Long = asyncTask.hpm[index]!!.dec
+    var speed: Long = asyncTask.hpm[index]!!.speed
 }

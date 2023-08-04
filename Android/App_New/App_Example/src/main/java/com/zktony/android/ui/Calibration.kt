@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -20,14 +21,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -39,13 +39,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.components.InputDialog
-import com.zktony.android.ui.components.MyTopAppBar
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.ext.dateFormat
 import com.zktony.android.utils.ext.format
@@ -70,13 +68,13 @@ fun Calibration(
 
     BackHandler {
         when (uiState.page) {
-            PageType.LIST -> navController.navigateUp()
-            else -> viewModel.event(CalibrationEvent.NavTo(PageType.LIST))
+            PageType.CALIBRATION_LIST -> navController.navigateUp()
+            else -> viewModel.event(CalibrationEvent.NavTo(PageType.CALIBRATION_LIST))
         }
     }
 
     // List page
-    AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+    AnimatedVisibility(visible = uiState.page == PageType.CALIBRATION_LIST) {
         CalibrationList(
             modifier = modifier,
             uiState = uiState,
@@ -84,7 +82,7 @@ fun Calibration(
         )
     }
     // Edit page
-    AnimatedVisibility(visible = uiState.page == PageType.DETAIL) {
+    AnimatedVisibility(visible = uiState.page == PageType.CALIBRATION_DETAIL) {
         CalibrationDetail(
             modifier = modifier,
             uiState = uiState,
@@ -224,7 +222,7 @@ fun CalibrationList(
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = { event(CalibrationEvent.NavTo(PageType.DETAIL)) }) {
+                    onClick = { event(CalibrationEvent.NavTo(PageType.CALIBRATION_DETAIL)) }) {
                     Icon(
                         modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Edit,
@@ -331,7 +329,7 @@ fun CalibrationList(
  * @param uiState The current state of the calibration UI.
  * @param event The event to be triggered when the UI state changes.
  */
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CalibrationDetail(
     modifier: Modifier = Modifier,
@@ -341,226 +339,201 @@ fun CalibrationDetail(
     // Get the selected entity or create a new one if none is selected
     val entity = uiState.entities.find { it.id == uiState.selected } ?: Calibration()
 
-    val list = remember {
-        mutableStateListOf(
-            "注射泵",
-            "一号重液泵",
-            "一号轻液泵",
-            "二号重液泵",
-            "二号轻液泵",
-            "三号重液泵",
-            "三号轻液泵"
-        )
-    }
-    var index by remember { mutableStateOf(0) }
-    var textFieldSize by remember { mutableStateOf(Size.Zero) }
-    var volume by remember { mutableStateOf("0") }
+    val list = remember { mutableStateListOf("M0", "M1", "M2", "M3", "M4", "M5") }
+    var selectedTabIndex by remember { mutableStateOf(0) }
+    var volume by remember { mutableStateOf("") }
     val softKeyboard = LocalSoftwareKeyboardController.current
-    var expanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        MyTopAppBar(
-            onBackPressed = {
-                event(CalibrationEvent.NavTo(PageType.LIST))
-            }
+        // Row containing the list of items and the operation column
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Icon(
-                modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.Edit,
-                contentDescription = null,
-            )
-        }
 
-        // Show the edit content UI
-        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            // Show the data grid
-            LazyVerticalGrid(
-                modifier = Modifier
-                    .weight(2f)
-                    .fillMaxHeight()
-                    .shadow(
-                        elevation = 2.dp,
-                        shape = MaterialTheme.shapes.medium,
-                    ),
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                itemsIndexed(items = entity.data) { index, it ->
-                    Row(
-                        modifier = Modifier
-                            .background(
-                                color = if (index % 2 == 0) {
-                                    MaterialTheme.colorScheme.surfaceVariant
-                                } else {
-                                    Color.Transparent
-                                },
-                                shape = MaterialTheme.shapes.medium,
-                            )
-                            .shadow(
-                                elevation = 2.dp,
-                                shape = MaterialTheme.shapes.medium,
-                            )
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "${index + 1}、",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontStyle = FontStyle.Italic,
-                        )
-
-                        Column {
-                            Text(
-                                text = list[it.first],
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontFamily = FontFamily.Serif,
-                            )
-                            Text(
-                                text = it.second.format(2) + " μL",
-                                style = MaterialTheme.typography.bodySmall,
-                                fontFamily = FontFamily.Monospace,
-                                textAlign = TextAlign.Center,
-                            )
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Icon(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clickable { event(CalibrationEvent.DeleteData(it)) },
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = null,
-                            tint = Color.Red,
-                        )
-                    }
-                }
-            }
-
-            // Show the input row
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .shadow(
-                        elevation = 2.dp,
-                        shape = MaterialTheme.shapes.medium,
+            TextField(
+                modifier = Modifier.weight(1f),
+                value = TextFieldValue(volume, TextRange(volume.length)),
+                onValueChange = { volume = it.text },
+                placeholder = {
+                    Text(
+                        text = stringResource(id = R.string.volume),
+                        fontStyle = FontStyle.Italic,
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily.Serif,
                     )
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                // Show the filter chip button
-                Column {
-                    OutlinedCard(
+                },
+                leadingIcon = {
+                    TabRow(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .onGloballyPositioned {
-                                textFieldSize = it.size.toSize()
-                            },
-                        onClick = { expanded = !expanded },
+                            .width(500.dp)
+                            .padding(vertical = 4.dp, horizontal = 8.dp)
+                            .clip(CircleShape),
+                        selectedTabIndex = selectedTabIndex,
+                        containerColor = MaterialTheme.colorScheme.inversePrimary,
+                        indicator = { Box {} },
+                        divider = { },
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Text(
-                                modifier = Modifier.weight(1f),
-                                text = list[index],
-                                style = MaterialTheme.typography.bodyLarge,
-                            )
-                            Icon(
-                                imageVector = if (expanded) Icons.Default.ArrowDropUp else Icons.Default.ArrowDropDown,
-                                contentDescription = null,
-                            )
-                        }
-                    }
-
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        modifier = Modifier
-                            .width(with(LocalDensity.current) { textFieldSize.width.toDp() })
-                    ) {
-                        list.forEachIndexed { ix, label ->
-                            DropdownMenuItem(
-                                text = { Text(text = label) },
+                        list.forEachIndexed { index, s ->
+                            Tab(
+                                modifier = Modifier
+                                    .clip(CircleShape)
+                                    .background(if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary),
+                                selected = selectedTabIndex == index,
                                 onClick = {
-                                    index = ix
-                                    expanded = false
+                                    selectedTabIndex = index
                                 }
-                            )
+                            ) {
+                                Text(
+                                    modifier = Modifier.padding(vertical = 12.dp),
+                                    text = s,
+                                    color = if (selectedTabIndex == index) Color.White else Color.Black,
+                                )
+                            }
                         }
                     }
-                }
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        softKeyboard?.hide()
+                    }
+                ),
+                shape = CircleShape,
+                colors = TextFieldDefaults.colors(
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedIndicatorColor = Color.Transparent,
+                ),
+                textStyle = TextStyle(
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Monospace,
+                ),
+            )
 
-                // Show the volume text field
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = TextFieldValue(volume, TextRange(volume.length)),
-                    onValueChange = { volume = it.text },
-                    label = {
-                        Text(
-                            text = stringResource(id = R.string.volume)
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal,
-                        imeAction = ImeAction.Done,
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = {
-                            softKeyboard?.hide()
-                        }
-                    ),
-                    shape = MaterialTheme.shapes.medium,
-                )
-
-                // Show the add button
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
+            AnimatedVisibility(visible = volume.isNotEmpty()) {
+                FloatingActionButton(
                     onClick = {
                         scope.launch {
                             softKeyboard?.hide()
-                            if (!uiState.loading) {
-                                event(CalibrationEvent.AddLiquid(index))
-                            }
+                            event(
+                                CalibrationEvent.InsertData(
+                                    selectedTabIndex,
+                                    volume.toDoubleOrNull() ?: 0.0
+                                )
+                            )
                         }
-                    }) {
-                    if (uiState.loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(32.dp),
-                            strokeWidth = 4.dp,
-                            color = Color.White,
-                        )
-                    } else {
-                        Icon(
-                            modifier = Modifier.size(32.dp),
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = null,
-                        )
                     }
-                }
-
-                // Show the save button
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = (volume.toDoubleOrNull() ?: 0.0) > 0.0,
-                    onClick = {
-                        softKeyboard?.hide()
-                        event(CalibrationEvent.InsertData(index, volume.toDoubleOrNull() ?: 0.0))
-                    }) {
+                ) {
                     Icon(
-                        modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Save,
                         contentDescription = null,
+                    )
+                }
+            }
+
+            // Button for adding a new item
+            FloatingActionButton(
+                onClick = {
+                    scope.launch {
+                        softKeyboard?.hide()
+                        if (!uiState.loading) {
+                            event(CalibrationEvent.AddLiquid(selectedTabIndex))
+                        }
+                    }
+                }
+            ) {
+                if (uiState.loading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp,
+                        color = Color.Blue,
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.ArrowForward,
+                        contentDescription = null,
+                    )
+                }
+            }
+
+            FloatingActionButton(onClick = { event(CalibrationEvent.NavTo(PageType.CALIBRATION_LIST)) }) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null
+                )
+            }
+        }
+
+        LazyVerticalGrid(
+            modifier = Modifier
+                .fillMaxSize()
+                .shadow(
+                    elevation = 2.dp,
+                    shape = MaterialTheme.shapes.medium,
+                ),
+            columns = GridCells.Fixed(3),
+            contentPadding = PaddingValues(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            itemsIndexed(items = entity.data) { index, it ->
+                Row(
+                    modifier = Modifier
+                        .background(
+                            color = Color.Transparent,
+                            shape = MaterialTheme.shapes.medium,
+                        )
+                        .shadow(
+                            elevation = 2.dp,
+                            shape = MaterialTheme.shapes.medium,
+                        )
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "${index + 1}、",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontStyle = FontStyle.Italic,
+                        color = if (it.first == selectedTabIndex) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            Color.Black
+                        },
+                    )
+
+                    Column {
+                        Text(
+                            text = list[it.first],
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                        Text(
+                            text = it.second.format(2) + " μL",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontFamily = FontFamily.Monospace,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Icon(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clickable { event(CalibrationEvent.DeleteData(it)) },
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = Color.Red,
                     )
                 }
             }

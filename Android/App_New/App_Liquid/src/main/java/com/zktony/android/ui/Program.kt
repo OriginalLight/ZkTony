@@ -45,8 +45,8 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
+import com.zktony.android.ui.components.Header
 import com.zktony.android.ui.components.InputDialog
-import com.zktony.android.ui.components.MyTopAppBar
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.ext.dateFormat
@@ -74,13 +74,13 @@ fun Program(
     // Handle the back button press
     BackHandler {
         when (uiState.page) {
-            PageType.LIST -> navController.navigateUp() // Step 1: Navigate up if on the list page
-            else -> viewModel.event(ProgramEvent.NavTo(PageType.LIST)) // Step 2: Navigate to the list page if on any other page
+            PageType.PROGRAM_LIST -> navController.navigateUp() // Step 1: Navigate up if on the list page
+            else -> viewModel.event(ProgramEvent.NavTo(PageType.PROGRAM_LIST)) // Step 2: Navigate to the list page if on any other page
         }
     }
 
     // Display the list page
-    AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+    AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_LIST) {
         ProgramList(
             modifier = modifier,
             uiState = uiState,
@@ -88,7 +88,7 @@ fun Program(
         )
     }
     // Display the edit page
-    AnimatedVisibility(visible = uiState.page == PageType.DETAIL) {
+    AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_DETAIL) {
         ProgramDetail(
             modifier = modifier,
             uiState = uiState,
@@ -234,7 +234,7 @@ fun ProgramList(
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = { event(ProgramEvent.NavTo(PageType.DETAIL)) },
+                    onClick = { event(ProgramEvent.NavTo(PageType.PROGRAM_DETAIL)) },
                 ) {
                     Icon(
                         modifier = Modifier.size(32.dp),
@@ -340,9 +340,9 @@ fun ProgramDetail(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        MyTopAppBar(
+        Header(
             onBackPressed = {
-                event(ProgramEvent.NavTo(PageType.LIST))
+                event(ProgramEvent.NavTo(PageType.PROGRAM_LIST))
             },
         ) {
             Icon(

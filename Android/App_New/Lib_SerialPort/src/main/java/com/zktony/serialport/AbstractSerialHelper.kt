@@ -19,7 +19,7 @@ abstract class AbstractSerialHelper {
     private var serialPort: SerialPort? = null
     private var outputStream: OutputStream? = null
     private var inputStream: InputStream? = null
-    var isOpen: Boolean = false
+    private var isOpen: Boolean = false
 
     /**
      * Thread for receiving data

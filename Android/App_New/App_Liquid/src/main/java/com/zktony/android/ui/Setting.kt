@@ -45,7 +45,7 @@ import androidx.navigation.NavHostController
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
-import com.zktony.android.ui.components.MyTopAppBar
+import com.zktony.android.ui.components.Header
 import com.zktony.android.ui.components.VerificationCodeField
 import com.zktony.android.ui.components.VerificationCodeItem
 import com.zktony.android.ui.utils.PageType
@@ -80,7 +80,7 @@ fun Setting(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         AnimatedVisibility(visible = uiState.page != PageType.SETTINGS) {
-            MyTopAppBar(
+            Header(
                 onBackPressed = {
                     when (uiState.page) {
                         PageType.MOTOR_DETAIL -> viewModel.event(SettingEvent.NavTo(PageType.MOTOR_LIST))

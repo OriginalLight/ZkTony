@@ -36,7 +36,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
 import com.zktony.android.data.entities.Program
-import com.zktony.android.ui.components.MyTopAppBar
+import com.zktony.android.ui.components.Header
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
@@ -487,7 +487,7 @@ fun StartContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         // Display the operation column
-        MyTopAppBar(
+        Header(
             onBackPressed = { event(HomeEvent.NavTo(PageType.LIST)) },
         ) {
             SearchBar(

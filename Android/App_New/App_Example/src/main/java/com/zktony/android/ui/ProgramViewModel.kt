@@ -20,7 +20,7 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProgramUiState())
     private val _selected = MutableStateFlow(0L)
-    private val _page = MutableStateFlow(PageType.LIST)
+    private val _page = MutableStateFlow(PageType.PROGRAM_LIST)
     private val _loading = MutableStateFlow(false)
 
     val uiState = _uiState.asStateFlow()
@@ -58,22 +58,10 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         when (event) {
             is ProgramEvent.NavTo -> _page.value = event.page
             is ProgramEvent.ToggleSelected -> _selected.value = event.id
-            is ProgramEvent.Insert -> async { dao.insert(Program(text = event.name)) }
-            is ProgramEvent.Update -> async { dao.update(event.entity) }
-            is ProgramEvent.Delete -> async { dao.deleteById(event.id) }
+            is ProgramEvent.Insert -> viewModelScope.launch { dao.insert(Program(text = event.name)) }
+            is ProgramEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
+            is ProgramEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
             is ProgramEvent.MoveTo -> moveTo(event.id, event.distance)
-        }
-    }
-
-    /**
-     * Runs a suspend block of code asynchronously on the view model scope.
-     *
-     * @param block The suspend block of code to run.
-     */
-    private fun async(block: suspend () -> Unit) {
-        viewModelScope.launch {
-            // Execute the suspend block of code
-            block()
         }
     }
 
@@ -111,7 +99,7 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 data class ProgramUiState(
     val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
-    val page: PageType = PageType.LIST,
+    val page: PageType = PageType.PROGRAM_LIST,
     val loading: Boolean = false,
 )
 
