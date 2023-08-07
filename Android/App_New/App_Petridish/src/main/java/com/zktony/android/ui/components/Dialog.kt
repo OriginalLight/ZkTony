@@ -65,6 +65,15 @@ fun InputDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
+                    OutlinedButton(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        onClick = onCancel,
+                    ) {
+                        Text(text = stringResource(id = R.string.cancel))
+                    }
+
                     Button(
                         modifier = Modifier
                             .weight(1f)
@@ -73,15 +82,6 @@ fun InputDialog(
                         enabled = textFieldValue.isNotBlank()
                     ) {
                         Text(text = stringResource(id = R.string.confirm))
-                    }
-
-                    Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 16.dp),
-                        onClick = onCancel,
-                    ) {
-                        Text(text = stringResource(id = R.string.cancel))
                     }
                 }
             }

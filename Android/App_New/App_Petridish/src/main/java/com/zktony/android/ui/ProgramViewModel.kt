@@ -16,18 +16,15 @@ import kotlinx.coroutines.launch
  * @author 刘贺贺
  * @date 2023/5/15 14:51
  */
-class ProgramViewModel constructor(
-    private val dao: ProgramDao,
-) : ViewModel() {
+class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
+
     private val _uiState = MutableStateFlow(ProgramUiState())
     private val _selected = MutableStateFlow(0L)
-    private val _page = MutableStateFlow(PageType.LIST)
+    private val _page = MutableStateFlow(PageType.PROGRAM_LIST)
     private val _loading = MutableStateFlow(false)
+
     val uiState = _uiState.asStateFlow()
 
-    /**
-     * Initializes the program view model and sets up the program UI state.
-     */
     init {
         viewModelScope.launch {
             // Combine the various flows into a single program UI state
@@ -61,22 +58,10 @@ class ProgramViewModel constructor(
         when (event) {
             is ProgramEvent.NavTo -> _page.value = event.page
             is ProgramEvent.ToggleSelected -> _selected.value = event.id
-            is ProgramEvent.Insert -> async { dao.insert(Program(text = event.name)) }
-            is ProgramEvent.Update -> async { dao.update(event.entity) }
-            is ProgramEvent.Delete -> async { dao.deleteById(event.id) }
+            is ProgramEvent.Insert -> viewModelScope.launch { dao.insert(Program(text = event.name)) }
+            is ProgramEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
+            is ProgramEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
             is ProgramEvent.MoveTo -> moveTo(event.id, event.distance)
-        }
-    }
-
-    /**
-     * Runs a suspend block of code asynchronously on the view model scope.
-     *
-     * @param block The suspend block of code to run.
-     */
-    private fun async(block: suspend () -> Unit) {
-        viewModelScope.launch {
-            // Execute the suspend block of code
-            block()
         }
     }
 
@@ -114,7 +99,7 @@ class ProgramViewModel constructor(
 data class ProgramUiState(
     val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
-    val page: PageType = PageType.LIST,
+    val page: PageType = PageType.PROGRAM_LIST,
     val loading: Boolean = false,
 )
 

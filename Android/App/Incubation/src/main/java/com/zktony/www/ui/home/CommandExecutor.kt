@@ -190,7 +190,6 @@ class CommandExecutor constructor(
                 v2 = if (module == 1) 15000f else 0f
                 v3 = if (module == 2) 15000f else 0f
                 v4 = if (module == 3) 15000f else 0f
-                v5 = if (action.mode == 3) 15000f else 0f
             }
         }
     }

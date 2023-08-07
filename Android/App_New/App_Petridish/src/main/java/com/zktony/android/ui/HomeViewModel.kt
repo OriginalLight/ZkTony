@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.Constants
 import com.zktony.android.utils.tx.ExecuteType
 import com.zktony.android.utils.tx.MoveType
 import com.zktony.android.utils.tx.initializer
@@ -21,6 +20,7 @@ import kotlinx.coroutines.flow.combine
  * @date: 2023-02-14 15:37
  */
 class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
+
     private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.LIST)
@@ -28,12 +28,8 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private val _job = MutableStateFlow<Job?>(null)
     private var syringeJob: Job? = null
 
-    // Expose the UI state as a read-only flow
     val uiState = _uiState.asStateFlow()
 
-    /**
-     * Initializes the Home screen by observing changes in the database and updating the UI state accordingly.
-     */
     init {
         viewModelScope.launch {
             combine(
@@ -206,7 +202,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         timeout = 1000L * 60
                         move(MoveType.MOVE_PULSE) {
                             index = 2
-                            pulse = Constants.MAX_SYRINGE * -1
+                            pulse = 0
                         }
                     }
 
@@ -256,7 +252,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 timeout = 1000L * 60
                 move(MoveType.MOVE_PULSE) {
                     index = 2
-                    pulse = Constants.MAX_SYRINGE * -1
+                    pulse = 0
                 }
             }
 
@@ -306,7 +302,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     timeout = 1000L * 60
                     move(MoveType.MOVE_PULSE) {
                         this.index = 2
-                        pulse = Constants.MAX_SYRINGE * -1
+                        pulse = 0
                     }
                 }
             } else {
@@ -322,7 +318,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             timeout = 1000L * 60
                             move(MoveType.MOVE_PULSE) {
                                 this.index = 2
-                                pulse = Constants.MAX_SYRINGE
+                                pulse = 0
                             }
                         }
                         tx {
@@ -333,7 +329,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             timeout = 1000L * 60
                             move(MoveType.MOVE_PULSE) {
                                 this.index = 2
-                                pulse = Constants.MAX_SYRINGE * -1
+                                pulse = 0
                             }
                         }
                     }
@@ -400,9 +396,9 @@ data class HomeUiState(
  * Sealed class for the events of the Home screen.
  */
 sealed class HomeEvent {
-    object Reset : HomeEvent()
-    object Start : HomeEvent()
-    object Stop : HomeEvent()
+    data object Reset : HomeEvent()
+    data object Start : HomeEvent()
+    data object Stop : HomeEvent()
     data class NavTo(val page: PageType) : HomeEvent()
     data class ToggleSelected(val id: Long) : HomeEvent()
     data class Clean(val index: Int) : HomeEvent()

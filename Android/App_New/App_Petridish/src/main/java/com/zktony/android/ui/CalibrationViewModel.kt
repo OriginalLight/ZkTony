@@ -17,37 +17,15 @@ import kotlinx.coroutines.launch
  * @author 刘贺贺
  * @date 2023/5/9 13:19
  */
-class CalibrationViewModel constructor(
-    private val dao: CalibrationDao,
-) : ViewModel() {
-    /**
-     * Represents the current active selection in the UI.
-     */
+class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewModel() {
+
     private val _selected = MutableStateFlow(0L)
-
-    /**
-     * Represents the current active page in the UI.
-     */
-    private val _page = MutableStateFlow(PageType.LIST)
-
-    /**
-     * Represents the current loading state of the UI.
-     */
+    private val _page = MutableStateFlow(PageType.CALIBRATION_LIST)
     private val _loading = MutableStateFlow(false)
-
-    /**
-     * Represents the current UI state of the calibration screen.
-     */
     private val _uiState = MutableStateFlow(CalibrationUiState())
 
-    /**
-     * Exposes the current UI state of the calibration screen as a read-only flow.
-     */
     val uiState = _uiState.asStateFlow()
 
-    /**
-     * Initializes the view model by observing changes to the database and updating the UI state accordingly.
-     */
     init {
         viewModelScope.launch {
             combine(
@@ -79,24 +57,13 @@ class CalibrationViewModel constructor(
         when (event) {
             is CalibrationEvent.NavTo -> _page.value = event.page
             is CalibrationEvent.ToggleSelected -> _selected.value = event.id
-            is CalibrationEvent.Insert -> async { dao.insert(Calibration(text = event.name)) }
-            is CalibrationEvent.Delete -> async { dao.deleteById(event.id) }
-            is CalibrationEvent.Update -> async { dao.update(event.entity) }
-            is CalibrationEvent.Active -> async { dao.active(event.id) }
+            is CalibrationEvent.Insert -> viewModelScope.launch { dao.insert(Calibration(text = event.name)) }
+            is CalibrationEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
+            is CalibrationEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
+            is CalibrationEvent.Active -> viewModelScope.launch { dao.active(event.id) }
             is CalibrationEvent.AddLiquid -> addLiquid(event.index)
             is CalibrationEvent.DeleteData -> deleteData(event.data)
             is CalibrationEvent.InsertData -> insertData(event.index, event.volume)
-        }
-    }
-
-    /**
-     * Runs the given block of code asynchronously.
-     *
-     * @param block The block of code to run.
-     */
-    private fun async(block: suspend () -> Unit) {
-        viewModelScope.launch {
-            block()
         }
     }
 
@@ -195,7 +162,7 @@ class CalibrationViewModel constructor(
 data class CalibrationUiState(
     val entities: List<Calibration> = emptyList(),
     val selected: Long = 0L,
-    val page: PageType = PageType.LIST,
+    val page: PageType = PageType.CALIBRATION_LIST,
     val loading: Boolean = false,
 )
 

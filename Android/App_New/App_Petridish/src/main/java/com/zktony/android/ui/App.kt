@@ -128,17 +128,5 @@ private fun AppNavHost(
                 navController = navController,
             )
         }
-        composable(Route.MOTOR) {
-            Motor(
-                modifier = Modifier,
-                navController = navController,
-            )
-        }
-        composable(Route.CONFIG) {
-            Config(
-                modifier = Modifier,
-                navController = navController,
-            )
-        }
     }
 }

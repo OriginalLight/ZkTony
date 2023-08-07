@@ -36,6 +36,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
 import com.zktony.android.data.entities.Program
+import com.zktony.android.ui.components.Header
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
@@ -46,15 +47,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-
-/**
- * Composable function for the Home screen.
- *
- * @param modifier The modifier to apply to the composable.
- * @param navController The NavHostController used for navigation.
- * @param toggleDrawer The function to toggle the drawer.
- * @param viewModel The HomeViewModel used to manage the UI state.
- */
 @Composable
 fun Home(
     modifier: Modifier = Modifier,
@@ -103,14 +95,6 @@ fun Home(
     }
 }
 
-/**
- * Composable function for the list content of the Home screen.
- *
- * @param modifier The modifier to apply to the composable.
- * @param uiState The HomeUiState used to manage the UI state.
- * @param event The function to handle events.
- * @param navController The NavHostController used for navigation.
- */
 @Composable
 fun MenuContent(
     modifier: Modifier = Modifier,
@@ -459,14 +443,6 @@ fun MenuContent(
     }
 }
 
-/**
- * Composable function for the start content of the Home screen.
- *
- * @param modifier The modifier to apply to the composable.
- * @param uiState The current UI state of the Home screen.
- * @param event The function to handle events on the Home screen.
- * @param toggleDrawer The function to toggle the drawer.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StartContent(
@@ -486,10 +462,8 @@ fun StartContent(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         // Display the operation column
-        Row(
-            modifier = modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        Header(
+            onBackPressed = { event(HomeEvent.NavTo(PageType.LIST)) },
         ) {
             SearchBar(
                 query = query,
@@ -532,18 +506,6 @@ fun StartContent(
                         )
                     }
                 }
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            // Display the close button
-            FloatingActionButton(
-                onClick = {
-                    event(HomeEvent.NavTo(PageType.LIST))
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null
-                )
             }
         }
         // Display the list of entities in a grid
@@ -612,15 +574,6 @@ fun StartContent(
     }
 }
 
-
-/**
- * Composable function for the runtime content of the Home screen.
- *
- * @param modifier The modifier to apply to the composable.
- * @param uiState The current UI state of the Home screen.
- * @param event The function to handle events on the Home screen.
- * @param toggleDrawer The function to toggle the drawer.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RuntimeContent(
@@ -861,17 +814,6 @@ fun RuntimeContent(
     }
 }
 
-
-/**
- * FunctionCard
- *
- * @param modifier Modifier
- * @param title String
- * @param description String
- * @param image [@androidx.compose.runtime.Composable] Function0<Unit>
- * @param button [@androidx.compose.runtime.Composable] Function0<Unit>
- * @return Unit
- */
 @Composable
 fun FunctionCard(
     modifier: Modifier = Modifier,

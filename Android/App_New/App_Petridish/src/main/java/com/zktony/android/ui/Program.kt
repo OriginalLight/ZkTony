@@ -43,8 +43,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
-import com.zktony.android.data.datastore.rememberDataSaverListState
+import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
+import com.zktony.android.ui.components.Header
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
@@ -73,46 +74,25 @@ fun Program(
     // Handle the back button press
     BackHandler {
         when (uiState.page) {
-            PageType.LIST -> navController.navigateUp() // Step 1: Navigate up if on the list page
-            else -> viewModel.event(ProgramEvent.NavTo(PageType.LIST)) // Step 2: Navigate to the list page if on any other page
+            PageType.PROGRAM_LIST -> navController.navigateUp() // Step 1: Navigate up if on the list page
+            else -> viewModel.event(ProgramEvent.NavTo(PageType.PROGRAM_LIST)) // Step 2: Navigate to the list page if on any other page
         }
     }
 
-    // Display the content wrapper
-    ConfigList(
-        modifier = modifier,
-        uiState = uiState,
-        event = viewModel::event,
-    )
-}
-
-/**
- * The ContentWrapper composable function for the app.
- *
- * @param modifier The modifier for the composable.
- * @param uiState The ProgramUiState for the app.
- * @param event The event handler for the app.
- */
-@Composable
-fun ConfigList(
-    modifier: Modifier = Modifier,
-    uiState: ProgramUiState,
-    event: (ProgramEvent) -> Unit = {},
-) {
     // Display the list page
-    AnimatedVisibility(visible = uiState.page == PageType.LIST) {
+    AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_LIST) {
         ProgramList(
             modifier = modifier,
             uiState = uiState,
-            event = event,
+            event = viewModel::event,
         )
     }
     // Display the edit page
-    AnimatedVisibility(visible = uiState.page == PageType.EDIT) {
+    AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_DETAIL) {
         ProgramDetail(
             modifier = modifier,
             uiState = uiState,
-            event = event,
+            event = viewModel::event,
         )
     }
 }
@@ -254,7 +234,7 @@ fun ProgramList(
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = { event(ProgramEvent.NavTo(PageType.EDIT)) },
+                    onClick = { event(ProgramEvent.NavTo(PageType.PROGRAM_DETAIL)) },
                 ) {
                     Icon(
                         modifier = Modifier.size(32.dp),
@@ -350,11 +330,9 @@ fun ProgramDetail(
     val scope = rememberCoroutineScope()
     val keyboard = LocalSoftwareKeyboardController.current
     val entity = uiState.entities.find { it.id == uiState.selected } ?: Program()
-    val stroke by rememberDataSaverListState(
-        key = Constants.MAXIMUM_STROKE,
-        default = listOf(0f, 0f)
-    )
-    var values by rememberSaveable { mutableStateOf((entity.volume + entity.axis).map { it.format(1) }) }
+    val mx = rememberDataSaverState(key = Constants.MAX_X, default = 0f)
+    val my = rememberDataSaverState(key = Constants.MAX_Y, default = 0f)
+    var values by remember { mutableStateOf((entity.volume + entity.axis).map { it.format(1) }) }
 
     Column(
         modifier = modifier
@@ -362,29 +340,16 @@ fun ProgramDetail(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Row(
-            modifier = modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        Header(
+            onBackPressed = {
+                event(ProgramEvent.NavTo(PageType.PROGRAM_LIST))
+            },
         ) {
-            // Display the title
             Icon(
                 modifier = Modifier.size(36.dp),
                 imageVector = Icons.Default.Edit,
                 contentDescription = null,
             )
-            Spacer(modifier = Modifier.weight(1f))
-            // Display the close button
-            FloatingActionButton(
-                onClick = {
-                    event(ProgramEvent.NavTo(PageType.LIST))
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null
-                )
-            }
         }
 
         LazyColumn(
@@ -545,8 +510,8 @@ fun ProgramDetail(
                                 onValueChange = {
                                     scope.launch {
                                         val num = it.text.toFloatOrNull() ?: 0f
-                                        val y = if (num > stroke[0]) {
-                                            stroke[0].format(1)
+                                        val y = if (num > mx.value) {
+                                            mx.value.format(1)
                                         } else if (num < 0) {
                                             "0"
                                         } else {
@@ -558,7 +523,7 @@ fun ProgramDetail(
                                         event(ProgramEvent.Update(entity.copy(axis = axis)))
                                     }
                                 },
-                                label = { Text(text = "坐标(0 ~ ${stroke[0].format(1)})") },
+                                label = { Text(text = "坐标(0 ~ ${mx.value.format(1)})") },
                                 shape = MaterialTheme.shapes.medium,
                                 textStyle = MaterialTheme.typography.bodyLarge,
                                 keyboardOptions = KeyboardOptions(
@@ -613,8 +578,8 @@ fun ProgramDetail(
                                 onValueChange = {
                                     scope.launch {
                                         val num = it.text.toFloatOrNull() ?: 0f
-                                        val z = if (num > stroke[1]) {
-                                            stroke[1].format(1)
+                                        val z = if (num > my.value) {
+                                            my.value.format(1)
                                         } else if (num < 0) {
                                             "0"
                                         } else {
@@ -626,7 +591,7 @@ fun ProgramDetail(
                                         event(ProgramEvent.Update(entity.copy(axis = axis)))
                                     }
                                 },
-                                label = { Text(text = "坐标(0 ~ ${stroke[1].format(1)})") },
+                                label = { Text(text = "坐标(0 ~ ${my.value.format(1)})") },
                                 shape = MaterialTheme.shapes.medium,
                                 textStyle = MaterialTheme.typography.bodyLarge,
                                 keyboardOptions = KeyboardOptions(

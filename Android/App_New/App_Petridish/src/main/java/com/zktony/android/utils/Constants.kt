@@ -7,9 +7,10 @@ package com.zktony.android.utils
 object Constants {
     const val DATABASE_NAME = "zktony-db"
     const val DOMAIN = "https://www.zktony.com"
-    const val MAX_SYRINGE = 3200L * 200
-    const val MAXIMUM_STROKE = "maximum_stroke"
+    const val MAX_X = "max_x"
+    const val MAX_Y = "max_y"
+    const val WASH_TANK_X = "wash_tank_x"
+    const val WASH_TANK_Y = "wash_tank_y"
     const val NAVIGATION = "navigation"
     const val OSS_APP = "https://njzkty.oss-cn-beijing.aliyuncs.com/App.json"
-    const val WASTE_TANK_LOCATION = "waste_tank_location"
 }
