@@ -3,6 +3,7 @@ package com.zktony.android.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -69,7 +69,7 @@ fun Calibration(
     BackHandler {
         when (uiState.page) {
             PageType.CALIBRATION_LIST -> navController.navigateUp()
-            else -> viewModel.event(CalibrationEvent.NavTo(PageType.CALIBRATION_LIST))
+            else -> viewModel.uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_LIST))
         }
     }
 
@@ -78,7 +78,7 @@ fun Calibration(
         CalibrationList(
             modifier = modifier,
             uiState = uiState,
-            event = viewModel::event,
+            uiEvent = viewModel::uiEvent,
         )
     }
     // Edit page
@@ -86,7 +86,7 @@ fun Calibration(
         CalibrationDetail(
             modifier = modifier,
             uiState = uiState,
-            event = viewModel::event,
+            uiEvent = viewModel::uiEvent,
         )
     }
 }
@@ -97,7 +97,7 @@ fun Calibration(
 fun CalibrationList(
     modifier: Modifier = Modifier,
     uiState: CalibrationUiState = CalibrationUiState(),
-    event: (CalibrationEvent) -> Unit = {},
+    uiEvent: (CalibrationUiEvent) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     val gridState = rememberLazyGridState()
@@ -117,7 +117,7 @@ fun CalibrationList(
                         "Name already exists".showShortToast()
                     } else {
                         // Insert the new item
-                        event(CalibrationEvent.Insert(it))
+                        uiEvent(CalibrationUiEvent.Insert(it))
                         showDialog = false
                     }
                 }
@@ -202,8 +202,8 @@ fun CalibrationList(
                     modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                     onClick = {
                         if (count == 1) {
-                            event(CalibrationEvent.Delete(uiState.selected))
-                            event(CalibrationEvent.ToggleSelected(0L))
+                            uiEvent(CalibrationUiEvent.Delete(uiState.selected))
+                            uiEvent(CalibrationUiEvent.ToggleSelected(0L))
                             count = 0
                         } else {
                             count++
@@ -222,7 +222,7 @@ fun CalibrationList(
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = { event(CalibrationEvent.NavTo(PageType.CALIBRATION_DETAIL)) }) {
+                    onClick = { uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_DETAIL)) }) {
                     Icon(
                         modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Edit,
@@ -236,7 +236,7 @@ fun CalibrationList(
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
                     modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = { event(CalibrationEvent.Active(uiState.selected)) }) {
+                    onClick = { uiEvent(CalibrationUiEvent.Active(uiState.selected)) }) {
                     Icon(
                         modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Check,
@@ -250,9 +250,10 @@ fun CalibrationList(
         LazyVerticalGrid(
             modifier = Modifier
                 .fillMaxSize()
-                .shadow(
-                    elevation = 2.dp,
-                    shape = MaterialTheme.shapes.medium,
+                .border(
+                    width = 1.dp,
+                    color = Color.LightGray,
+                    shape = MaterialTheme.shapes.medium
                 ),
             state = gridState,
             columns = GridCells.Fixed(4),
@@ -272,9 +273,9 @@ fun CalibrationList(
                     colors = CardDefaults.cardColors(containerColor = background),
                     onClick = {
                         if (item.id == uiState.selected) {
-                            event(CalibrationEvent.ToggleSelected(0L))
+                            uiEvent(CalibrationUiEvent.ToggleSelected(0L))
                         } else {
-                            event(CalibrationEvent.ToggleSelected(item.id))
+                            uiEvent(CalibrationUiEvent.ToggleSelected(item.id))
                         }
                     },
                 ) {
@@ -327,14 +328,14 @@ fun CalibrationList(
  *
  * @param modifier Modifier to be applied to the content.
  * @param uiState The current state of the calibration UI.
- * @param event The event to be triggered when the UI state changes.
+ * @param uiEvent The event to be triggered when the UI state changes.
  */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CalibrationDetail(
     modifier: Modifier = Modifier,
     uiState: CalibrationUiState = CalibrationUiState(),
-    event: (CalibrationEvent) -> Unit = {},
+    uiEvent: (CalibrationUiEvent) -> Unit = {},
 ) {
     // Get the selected entity or create a new one if none is selected
     val entity = uiState.entities.find { it.id == uiState.selected } ?: Calibration()
@@ -427,8 +428,8 @@ fun CalibrationDetail(
                     onClick = {
                         scope.launch {
                             softKeyboard?.hide()
-                            event(
-                                CalibrationEvent.InsertData(
+                            uiEvent(
+                                CalibrationUiEvent.InsertData(
                                     selectedTabIndex,
                                     volume.toDoubleOrNull() ?: 0.0
                                 )
@@ -449,7 +450,7 @@ fun CalibrationDetail(
                     scope.launch {
                         softKeyboard?.hide()
                         if (!uiState.loading) {
-                            event(CalibrationEvent.AddLiquid(selectedTabIndex))
+                            uiEvent(CalibrationUiEvent.AddLiquid(selectedTabIndex))
                         }
                     }
                 }
@@ -468,7 +469,7 @@ fun CalibrationDetail(
                 }
             }
 
-            FloatingActionButton(onClick = { event(CalibrationEvent.NavTo(PageType.CALIBRATION_LIST)) }) {
+            FloatingActionButton(onClick = { uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_LIST)) }) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = null
@@ -479,9 +480,10 @@ fun CalibrationDetail(
         LazyVerticalGrid(
             modifier = Modifier
                 .fillMaxSize()
-                .shadow(
-                    elevation = 2.dp,
-                    shape = MaterialTheme.shapes.medium,
+                .border(
+                    width = 1.dp,
+                    color = Color.LightGray,
+                    shape = MaterialTheme.shapes.medium
                 ),
             columns = GridCells.Fixed(3),
             contentPadding = PaddingValues(16.dp),
@@ -495,9 +497,10 @@ fun CalibrationDetail(
                             color = Color.Transparent,
                             shape = MaterialTheme.shapes.medium,
                         )
-                        .shadow(
-                            elevation = 2.dp,
-                            shape = MaterialTheme.shapes.medium,
+                        .border(
+                            width = 1.dp,
+                            color = Color.LightGray,
+                            shape = MaterialTheme.shapes.medium
                         )
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -530,7 +533,7 @@ fun CalibrationDetail(
                     Icon(
                         modifier = Modifier
                             .size(32.dp)
-                            .clickable { event(CalibrationEvent.DeleteData(it)) },
+                            .clickable { uiEvent(CalibrationUiEvent.DeleteData(it)) },
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
                         tint = Color.Red,

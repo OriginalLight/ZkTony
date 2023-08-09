@@ -35,7 +35,7 @@ class SerialPort {
     private var lockTime = 0L
 
     // 机构运行小步骤等待时间
-    private val waitTime = 60L
+    private val waitTime = 2 * 60L
 
 
     init {
@@ -89,6 +89,11 @@ class SerialPort {
      */
     fun sendText(text: String) {
         helpers.sendText(3, text)
+    }
+
+    fun setLock() {
+        _lock.value = true
+        lockTime = 0L
     }
 
     /**

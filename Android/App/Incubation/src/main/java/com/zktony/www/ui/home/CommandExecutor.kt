@@ -1,11 +1,6 @@
 package com.zktony.www.ui.home
 
-import com.zktony.www.core.ext.asyncHex
-import com.zktony.www.core.ext.execute
-import com.zktony.www.core.ext.syncHex
-import com.zktony.www.core.ext.temp
-import com.zktony.www.core.ext.waitDrawer
-import com.zktony.www.core.ext.waitLock
+import com.zktony.www.core.ext.*
 import com.zktony.www.data.entities.Action
 import com.zktony.www.data.entities.Container
 import kotlinx.coroutines.CoroutineScope
@@ -35,13 +30,15 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addBlockingLiquid(block: suspend () -> Unit) {
-        waitForFree {
+        event("等待中")
+        waitLock  {
+            serialPort.setLock()
             // 设置温度
             scope.launch { temp(addr = module + 1, temp = action.temp.toString()) }
             addLiquid(yAxis = con.blockY, zAxis = con.blockZ)
             event("加液中")
             delay(100L)
-            waitLock(20L) {
+            waitLock(1) {
                 block.invoke()
             }
         }
@@ -52,13 +49,15 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addAntibodyOne(block: suspend () -> Unit) {
-        waitForFree {
+        event("等待中")
+        waitLock  {
+            serialPort.setLock()
             // 设置温度
             scope.launch { temp(addr = module + 1, temp = action.temp.toString()) }
             addLiquid(yAxis = con.oneY, zAxis = con.oneZ)
             event("加液中")
             delay(100L)
-            waitLock(20L) {
+            waitLock(1) {
                 block.invoke()
             }
         }
@@ -69,7 +68,9 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun recycleAntibodyOne(block: suspend () -> Unit) {
-        waitForFree {
+        event("等待中")
+        waitLock  {
+            serialPort.setLock()
             asyncHex(0) {
                 pa = "0B"
                 data = "0100"
@@ -81,12 +82,12 @@ class CommandExecutor constructor(
             )
             event("回收中")
             delay(100L)
-            waitLock(20L) {
+            waitLock(1) {
                 asyncHex(0) {
                     pa = "0B"
                     data = "0101"
                 }
-                delay(100L)
+                delay(200L)
                 block.invoke()
             }
         }
@@ -97,13 +98,15 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addAntibodyTwo(block: suspend () -> Unit) {
-        waitForFree {
+        event("等待中")
+        waitLock  {
+            serialPort.setLock()
             // 设置温度
             scope.launch { temp(addr = module + 1, temp = action.temp.toString()) }
             addLiquid(yAxis = con.twoY, zAxis = con.twoZ)
             event("加液中")
-            delay(100L)
-            waitLock(20L) {
+            delay(200L)
+            waitLock(1) {
                 block.invoke()
             }
         }
@@ -114,28 +117,32 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun addWashingLiquid(block: suspend () -> Unit) {
-        waitForFree {
+        event("等待中")
+        waitLock  {
+            serialPort.setLock()
             // 设置温度
             scope.launch { temp(addr = module + 1, temp = action.temp.toString()) }
             // 主板运动
             addLiquid(yAxis = con.washY, zAxis = con.washZ)
             event("加液中")
-            delay(100L)
-            waitLock(20L) {
+            delay(200L)
+            waitLock(1) {
                 block.invoke()
             }
         }
     }
 
     suspend fun addPBS(block: suspend () -> Unit) {
-        waitForFree {
+        event("等待中")
+        waitLock  {
+            serialPort.setLock()
             // 设置温度
             scope.launch { temp(addr = module + 1, temp = action.temp.toString()) }
             // 主板运动
             addLiquid(yAxis = con.washY, zAxis = con.washZ)
             event("加液中")
-            delay(100L)
-            waitLock(20L) {
+            delay(200L)
+            waitLock(1) {
                 block.invoke()
             }
         }
@@ -147,7 +154,9 @@ class CommandExecutor constructor(
      * @param block
      */
     suspend fun wasteLiquid(block: suspend () -> Unit) {
-        waitForFree {
+        event("等待中")
+        waitLock  {
+            serialPort.setLock()
             asyncHex(0) {
                 pa = "0B"
                 data = "0100"
@@ -155,8 +164,8 @@ class CommandExecutor constructor(
             delay(100L)
             recycleLiquid(yAxis = con.wasteY, zAxis = con.wasteZ)
             event("清理中")
-            delay(100L)
-            waitLock(20L) {
+            delay(200L)
+            waitLock(1) {
                 asyncHex(0) {
                     pa = "0B"
                     data = "0101"
@@ -219,15 +228,5 @@ class CommandExecutor constructor(
         }
     }
 
-    /**
-     * 等待机构空闲
-     * @param block suspend () -> Unit 代码块
-     */
-    private suspend fun waitForFree(block: suspend () -> Unit) {
-        event("等待中")
-        waitLock {
-            block.invoke()
-        }
-    }
 }
 

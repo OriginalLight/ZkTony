@@ -9,11 +9,14 @@ import com.zktony.android.utils.tx.ExecuteType
 import com.zktony.android.utils.tx.MoveType
 import com.zktony.android.utils.tx.initializer
 import com.zktony.android.utils.tx.tx
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 
 /**
  * @author: 刘贺贺
@@ -59,16 +62,15 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
      *
      * @param event The Home screen event to handle.
      */
-    fun event(event: HomeEvent) {
+    fun event(event: HomeUiEvent) {
         when (event) {
-            is HomeEvent.Reset -> reset()
-            is HomeEvent.Start -> start()
-            is HomeEvent.Stop -> stop()
-            is HomeEvent.NavTo -> _page.value = event.page
-            is HomeEvent.ToggleSelected -> _selected.value = event.id
-            is HomeEvent.Clean -> clean(event.index)
-            is HomeEvent.Syringe -> syringe(event.index)
-            is HomeEvent.Pipeline -> pipeline(event.index)
+            is HomeUiEvent.Reset -> reset()
+            is HomeUiEvent.Start -> start()
+            is HomeUiEvent.Stop -> stop()
+            is HomeUiEvent.NavTo -> _page.value = event.page
+            is HomeUiEvent.ToggleSelected -> _selected.value = event.id
+            is HomeUiEvent.Clean -> clean()
+            is HomeUiEvent.Pipeline -> pipeline(event.index)
         }
     }
 
@@ -91,86 +93,9 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         }
     }
 
-    /**
-     * Starts the execution of the selected program entity.
-     */
     private fun start() {
         viewModelScope.launch {
             val selected = _uiState.value.entities.find { it.id == _selected.value }!!
-
-            // Launch a new job to execute the program entity
-            _job.value = launch(Dispatchers.Default) {
-                // Move to the starting position
-                // Step 1: Move the Z axis to 0
-                tx {
-                    move {
-                        index = 1
-                        dv = 0f
-                    }
-                }
-                // Step 2: Move the Y axis to 0
-                tx {
-                    move {
-                        index = 0
-                        dv = 0f
-                    }
-                }
-
-                // Open the valve to start the process
-                // Step 3: Open the valve
-                tx {
-                    delay = 100L
-                    valve(2 to 1)
-                }
-
-                // Perform the pre-dispense operation
-                // Step 4: Perform the pre-dispense operation
-                tx {
-                    timeout = 1000L * 60 * 1
-                    move {
-                        index = 2
-                        dv = selected.volume[3]
-                    }
-                    repeat(6) {
-                        move {
-                            index = it + 3
-                            dv = selected.volume[2]
-                        }
-                    }
-                }
-
-                // Move to the dispensing position
-                // Step 5: Move the Z axis to 1
-                tx {
-                    move {
-                        index = 0
-                        dv = selected.axis[0]
-                    }
-                }
-                // Step 6: Move the Y axis to 1
-                tx {
-                    move {
-                        index = 1
-                        dv = selected.axis[1]
-                    }
-                }
-
-                // Perform the dispensing operation
-                // Step 7: Perform the dispensing operation
-                tx {
-                    timeout = 1000L * 60 * 3
-                    move {
-                        index = 2
-                        dv = selected.volume[1]
-                    }
-                    repeat(6) {
-                        move {
-                            index = it + 3
-                            dv = selected.volume[0] / 2
-                        }
-                    }
-                }
-            }
 
             // Handle the completion of the job
             _job.value?.invokeOnCompletion {
@@ -178,32 +103,12 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     // Reset the screen and stop the motors
                     _job.value = null
                     _loading.value = 1
-                    tx {
-                        move {
-                            index = 1
-                            dv = 0f
-                        }
-                    }
-                    tx {
-                        move {
-                            index = 0
-                            dv = 0f
-                        }
-                    }
+
 
                     // Close the valve
                     tx {
                         delay = 100L
                         valve(2 to 0)
-                    }
-
-                    // Perform a syringe operation to clear the system
-                    tx {
-                        timeout = 1000L * 60
-                        move(MoveType.MOVE_PULSE) {
-                            index = 2
-                            pulse = 0
-                        }
                     }
 
                     // Set the loading state to 0 to indicate that the execution has stopped
@@ -213,9 +118,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         }
     }
 
-    /**
-     * Stops the execution of the Home screen.
-     */
     private fun stop() {
         viewModelScope.launch {
             // Cancel and join the current job
@@ -227,18 +129,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             tx {
                 delay = 500L
                 reset()
-            }
-            tx {
-                move {
-                    index = 1
-                    dv = 0f
-                }
-            }
-            tx {
-                move {
-                    index = 0
-                    dv = 0f
-                }
             }
 
             // Close the syringe valve
@@ -261,19 +151,12 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         }
     }
 
-    /**
-     * Performs a clean operation on a program entity.
-     *
-     * @param index The index of the program entity to perform the operation on.
-     */
-    private fun clean(index: Int) {
+    private fun clean() {
         viewModelScope.launch {
-            if (index == 0) {
-                // Stop all clean operations
+            if (_loading.value == 2) {
                 _loading.value = 0
                 tx { stop(9) }
             } else {
-                // Start a clean operation on the selected program entity
                 _loading.value = 2
                 tx {
                     executeType = ExecuteType.ASYNC
@@ -286,77 +169,20 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         }
     }
 
-    /**
-     * Performs a syringe operation on a program entity.
-     *
-     * @param index The index of the program entity to perform the operation on.
-     */
-    private fun syringe(index: Int) {
-        viewModelScope.launch {
-            if (index == 0) {
-                // Stop all syringe operations
-                _loading.value = 0
-                syringeJob?.cancelAndJoin()
-                syringeJob = null
-                tx {
-                    timeout = 1000L * 60
-                    move(MoveType.MOVE_PULSE) {
-                        this.index = 2
-                        pulse = 0
-                    }
-                }
-            } else {
-                // Start a syringe operation on the selected program entity
-                _loading.value = 3
-                syringeJob = launch {
-                    while (true) {
-                        tx {
-                            delay = 100L
-                            valve(2 to if (index == 1) 1 else 0)
-                        }
-                        tx {
-                            timeout = 1000L * 60
-                            move(MoveType.MOVE_PULSE) {
-                                this.index = 2
-                                pulse = 0
-                            }
-                        }
-                        tx {
-                            delay = 100L
-                            valve(2 to if (index == 1) 0 else 1)
-                        }
-                        tx {
-                            timeout = 1000L * 60
-                            move(MoveType.MOVE_PULSE) {
-                                this.index = 2
-                                pulse = 0
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Performs a pipeline operation on a program entity.
-     *
-     * @param index The index of the program entity to perform the operation on.
-     */
     private fun pipeline(index: Int) {
         viewModelScope.launch {
             if (index == 0) {
                 // Stop all pipeline operations
                 _loading.value = 0
-                tx { stop(3, 4, 5, 6, 7, 8) }
+                tx { stop(2, 3, 4, 5, 6, 7) }
             } else {
                 // Start a pipeline operation on the selected program entity
-                _loading.value = 4
+                _loading.value = 3
                 tx {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {
                         move(MoveType.MOVE_PULSE) {
-                            this.index = it + 3
+                            this.index = it + 2
                             pulse = 3200L * 10000L * if (index == 1) 1 else -1
                         }
                     }
@@ -366,42 +192,20 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     }
 }
 
-/**
- * Data class for the UI state of the Home screen.
- *
- * @param entities The list of program entities to display.
- * @param selected The ID of the selected program entity.
- * @param page The current page type.
- * @param loading The loading state of the screen.
- * @param job The current execution job.
- */
 data class HomeUiState(
     val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.LIST,
-    /*
-     * 0: loading closed
-     * 1: resting
-     * 2: clean
-     * 3: syringe 1
-     * 4: syringe 2
-     * 5: pipeline 1
-     * 6: pipeline 2
-     */
     val loading: Int = 0,
     val job: Job? = null,
 )
 
-/**
- * Sealed class for the events of the Home screen.
- */
-sealed class HomeEvent {
-    data object Reset : HomeEvent()
-    data object Start : HomeEvent()
-    data object Stop : HomeEvent()
-    data class NavTo(val page: PageType) : HomeEvent()
-    data class ToggleSelected(val id: Long) : HomeEvent()
-    data class Clean(val index: Int) : HomeEvent()
-    data class Syringe(val index: Int) : HomeEvent()
-    data class Pipeline(val index: Int) : HomeEvent()
+sealed class HomeUiEvent {
+    data object Reset : HomeUiEvent()
+    data object Clean : HomeUiEvent()
+    data object Start : HomeUiEvent()
+    data object Stop : HomeUiEvent()
+    data class NavTo(val page: PageType) : HomeUiEvent()
+    data class ToggleSelected(val id: Long) : HomeUiEvent()
+    data class Pipeline(val index: Int) : HomeUiEvent()
 }

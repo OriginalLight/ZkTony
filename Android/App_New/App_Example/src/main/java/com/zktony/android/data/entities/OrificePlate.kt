@@ -12,31 +12,7 @@ data class OrificePlate(
     val coordinate: Array<Array<Double>> = emptyArray(),
     val orifices: Array<Array<Orifice>> = emptyArray(),
 ) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
 
-        other as OrificePlate
-
-        if (id != other.id) return false
-        if (text != other.text) return false
-        if (row != other.row) return false
-        if (column != other.column) return false
-        if (!coordinate.contentEquals(other.coordinate)) return false
-        if (!orifices.contentDeepEquals(other.orifices)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + text.hashCode()
-        result = 31 * result + row
-        result = 31 * result + column
-        result = 31 * result + coordinate.hashCode()
-        result = 31 * result + orifices.contentDeepHashCode()
-        return result
-    }
 
     fun getOrifice(row: Int, column: Int): Orifice {
         return orifices[row][column]
@@ -59,6 +35,32 @@ data class OrificePlate(
         }
         return arrays
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as OrificePlate
+
+        if (id != other.id) return false
+        if (text != other.text) return false
+        if (row != other.row) return false
+        if (column != other.column) return false
+        if (!coordinate.contentDeepEquals(other.coordinate)) return false
+        if (!orifices.contentDeepEquals(other.orifices)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + text.hashCode()
+        result = 31 * result + row
+        result = 31 * result + column
+        result = 31 * result + coordinate.contentDeepHashCode()
+        result = 31 * result + orifices.contentDeepHashCode()
+        return result
+    }
 }
 
 data class Orifice(
@@ -74,7 +76,7 @@ data class Orifice(
 
         if (volume != other.volume) return false
         if (active != other.active) return false
-        if (!coordinate.contentDeepEquals(other.coordinate)) return false
+        if (!coordinate.contentEquals(other.coordinate)) return false
 
         return true
     }
@@ -82,7 +84,8 @@ data class Orifice(
     override fun hashCode(): Int {
         var result = volume.hashCode()
         result = 31 * result + active.hashCode()
-        result = 31 * result + coordinate.contentDeepHashCode()
+        result = 31 * result + coordinate.contentHashCode()
         return result
     }
+
 }

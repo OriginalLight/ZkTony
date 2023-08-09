@@ -6,7 +6,7 @@ package com.zktony.android.utils.tx
  */
 class MoveScope {
     var index: Int = 0
-    var dv: Float = 0f
+    var dv: Double = 0.0
     var pulse: Long = 0L
     var acc: Long = asyncTask.hpm[index]!!.acc
     var dec: Long = asyncTask.hpm[index]!!.dec

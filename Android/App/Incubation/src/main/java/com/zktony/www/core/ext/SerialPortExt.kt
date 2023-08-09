@@ -154,17 +154,9 @@ suspend fun collectLock(block: (Boolean) -> Unit) {
  * 等待解锁
  * @param block () -> Unit
  */
-suspend fun waitLock(interval: Long = 500L, block: suspend () -> Unit) {
+suspend fun waitLock(interval: Long = 100L, block: suspend () -> Unit) {
     while (serialPort.lock.value) {
         delay(interval)
-    }
-    block()
-}
-
-suspend fun waitDrawer(timerTask: () -> Unit, block: suspend () -> Unit) {
-    while (serialPort.drawer.get()) {
-        timerTask()
-        delay(1000L)
     }
     block()
 }

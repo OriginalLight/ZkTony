@@ -3,6 +3,7 @@ package com.zktony.android.data
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.zktony.android.data.entities.OrificePlate
 import java.util.Date
 
 /**
@@ -65,6 +66,21 @@ object FloatConverters {
     @TypeConverter
     @JvmStatic
     fun objectToString(list: List<Float>): String {
+        return Gson().toJson(list)
+    }
+}
+
+object OrificePlateConverters {
+    @TypeConverter
+    @JvmStatic
+    fun stringToObject(value: String): List<OrificePlate?> {
+        val listType = object : TypeToken<List<OrificePlate?>>() {}.type
+        return Gson().fromJson(value, listType)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun objectToString(list: List<OrificePlate?>): String {
         return Gson().toJson(list)
     }
 }

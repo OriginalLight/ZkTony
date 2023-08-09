@@ -205,7 +205,7 @@ class HomeViewModel constructor(
                 AD.getBySubId(state.value.program!!.id).first().forEach {
                     actionQueue.enqueue(it)
                 }
-                actionQueue.enqueue(Action(mode = ActionEnum.PBS.index, volume = 8000f, temp = 4f))
+                actionQueue.enqueue(Action(mode = ActionEnum.PBS.index, volume = 5000f, temp = 4f))
                 // 创建程序执行者
                 val executor = ProgramExecutor(
                     queue = actionQueue,

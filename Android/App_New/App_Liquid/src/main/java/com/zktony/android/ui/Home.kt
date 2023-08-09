@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -17,12 +18,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -41,8 +39,6 @@ import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.ext.dateFormat
-import com.zktony.android.utils.ext.format
-import com.zktony.android.utils.ext.timeFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -55,18 +51,15 @@ fun Home(
     viewModel: HomeViewModel = koinViewModel(),
 ) {
 
-    // Observe the UI state from the view model
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    // Handle the back button press
     BackHandler {
         when (uiState.page) {
-            PageType.START -> viewModel.event(HomeEvent.NavTo(PageType.LIST))
+            PageType.START -> viewModel.event(HomeUiEvent.NavTo(PageType.LIST))
             else -> {}
         }
     }
 
-    // List content
     AnimatedVisibility(visible = uiState.page == PageType.LIST) {
         MenuContent(
             modifier = modifier,
@@ -75,7 +68,7 @@ fun Home(
             navController = navController,
         )
     }
-    // Start content
+
     AnimatedVisibility(visible = uiState.page == PageType.START) {
         StartContent(
             modifier = modifier,
@@ -84,7 +77,7 @@ fun Home(
             toggleDrawer = toggleDrawer,
         )
     }
-    // Runtime content
+
     AnimatedVisibility(visible = uiState.page == PageType.RUNTIME) {
         RuntimeContent(
             modifier = modifier,
@@ -99,14 +92,12 @@ fun Home(
 fun MenuContent(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
-    event: (HomeEvent) -> Unit = {},
+    event: (HomeUiEvent) -> Unit = {},
     navController: NavHostController,
 ) {
     var pipeline by remember { mutableStateOf(0) }
-    var syringe by remember { mutableStateOf(0) }
     var time by remember { mutableStateOf(0) }
 
-    // Start a timer to display the runtime
     LaunchedEffect(key1 = uiState.loading) {
         while (true) {
             if (uiState.loading != 0) {
@@ -125,11 +116,10 @@ fun MenuContent(
         horizontalArrangement = Arrangement.spacedBy(32.dp),
         verticalArrangement = Arrangement.spacedBy(32.dp),
     ) {
-        // Reset item
         item {
             FunctionCard(
                 title = "复位",
-                description = "依次复位Z轴、Y轴、注射泵",
+                description = "依次复位X轴、Y轴",
                 image = {
                     if (uiState.loading == 1) {
                         // Display loading indicator
@@ -163,22 +153,20 @@ fun MenuContent(
                 Button(
                     modifier = Modifier.fillMaxWidth(),
                     enabled = uiState.loading == 0,
-                    onClick = { event(HomeEvent.Reset) }
+                    onClick = { event(HomeUiEvent.Reset) }
                 ) {
                     Text(
                         text = "开始复位",
                         style = MaterialTheme.typography.titleMedium,
-                        fontFamily = FontFamily.Serif,
                         fontWeight = FontWeight.Bold,
                     )
                 }
             }
         }
-        // Clean item
         item {
             FunctionCard(
                 title = "管路清洗",
-                description = "清洗管路残留胶体、促凝剂",
+                description = "清洗管路残留试剂",
                 image = {
                     if (uiState.loading == 2) {
                         // Display loading indicator
@@ -208,125 +196,25 @@ fun MenuContent(
                     }
                 })
             {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = uiState.loading == 0 || uiState.loading == 2,
+                    onClick = { event(HomeUiEvent.Clean) }
                 ) {
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        enabled = uiState.loading == 2,
-                        onClick = { event(HomeEvent.Clean(0)) }
-                    ) {
-                        Text(
-                            text = "取消",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        enabled = uiState.loading == 0,
-                        onClick = { event(HomeEvent.Clean(1)) }
-                    ) {
-                        Text(
-                            text = "开始",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
+                    Text(
+                        text = if (uiState.loading == 2) "停止清洗" else "开始清洗",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                    )
                 }
-
             }
         }
-        // Syringe item
         item {
             FunctionCard(
-                title = "促凝剂 ${if (syringe == 0) "填充" else "回吸"}",
-                description = "填充/回吸促凝剂，点击按钮切换",
+                title = if (pipeline == 0) "填充" else "回吸",
+                description = "填充/回吸，点击按钮切换",
                 image = {
                     if (uiState.loading == 3) {
-                        // Display loading indicator
-                        Box(
-                            modifier = Modifier.size(96.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(72.dp),
-                                strokeWidth = 8.dp,
-                            )
-                            Text(
-                                modifier = Modifier.align(Alignment.BottomEnd),
-                                text = "${time}s",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontFamily = FontFamily.Monospace,
-                                fontStyle = FontStyle.Italic,
-                            )
-                        }
-                    } else {
-                        // Display reset icon
-                        Image(
-                            modifier = Modifier.size(96.dp),
-                            painter = painterResource(id = R.drawable.ic_syringe),
-                            contentDescription = null,
-                        )
-                    }
-                })
-            {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            if (uiState.loading == 3) {
-                                event(HomeEvent.Syringe(0))
-                            } else {
-                                syringe = if (syringe == 0) 1 else 0
-                            }
-                        }
-                    ) {
-                        if (uiState.loading == 3) {
-                            Text(
-                                text = "取消",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.SwapHoriz,
-                                contentDescription = null,
-                            )
-                        }
-                    }
-
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        enabled = uiState.loading == 0,
-                        onClick = { event(HomeEvent.Syringe(syringe + 1)) }
-                    ) {
-                        Text(
-                            text = "开始",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-                }
-
-            }
-        }
-        // Pipeline item
-        item {
-            FunctionCard(
-                title = "胶体 ${if (pipeline == 0) "填充" else "回吸"}",
-                description = "填充/回吸胶体，点击按钮切换",
-                image = {
-                    if (uiState.loading == 4) {
                         // Display loading indicator
                         Box(
                             modifier = Modifier.size(96.dp),
@@ -361,18 +249,17 @@ fun MenuContent(
                     Button(
                         modifier = Modifier.weight(1f),
                         onClick = {
-                            if (uiState.loading == 4) {
-                                event(HomeEvent.Pipeline(0))
+                            if (uiState.loading == 3) {
+                                event(HomeUiEvent.Pipeline(0))
                             } else {
                                 pipeline = if (pipeline == 0) 1 else 0
                             }
                         }
                     ) {
-                        if (uiState.loading == 4) {
+                        if (uiState.loading == 3) {
                             Text(
                                 text = "取消",
                                 style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
                                 fontWeight = FontWeight.Bold,
                             )
                         } else {
@@ -386,24 +273,21 @@ fun MenuContent(
                     Button(
                         modifier = Modifier.weight(1f),
                         enabled = uiState.loading == 0,
-                        onClick = { event(HomeEvent.Pipeline(pipeline + 1)) }
+                        onClick = { event(HomeUiEvent.Pipeline(pipeline + 1)) }
                     ) {
                         Text(
                             text = "开始",
                             style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
                             fontWeight = FontWeight.Bold,
                         )
                     }
                 }
-
             }
         }
-        // Start item
         item {
             FunctionCard(
                 title = "程序运行",
-                description = "选择并执行制胶程序",
+                description = "选择并执行分液程序",
                 image = {
                     Image(
                         modifier = Modifier.size(96.dp),
@@ -424,7 +308,7 @@ fun MenuContent(
                                 if (uiState.entities.isEmpty()) {
                                     navController.navigate(Route.PROGRAM)
                                 } else {
-                                    event(HomeEvent.NavTo(PageType.START))
+                                    event(HomeUiEvent.NavTo(PageType.START))
                                 }
                             }
                         }
@@ -432,7 +316,6 @@ fun MenuContent(
                         Text(
                             text = "开始 ✔",
                             style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
                             fontWeight = FontWeight.Bold,
                         )
                     }
@@ -448,7 +331,7 @@ fun MenuContent(
 fun StartContent(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
-    event: (HomeEvent) -> Unit = {},
+    event: (HomeUiEvent) -> Unit = {},
     toggleDrawer: (NavigationType) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
@@ -461,9 +344,8 @@ fun StartContent(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Display the operation column
         Header(
-            onBackPressed = { event(HomeEvent.NavTo(PageType.LIST)) },
+            onBackPressed = { event(HomeUiEvent.NavTo(PageType.LIST)) },
         ) {
             SearchBar(
                 query = query,
@@ -508,13 +390,14 @@ fun StartContent(
                 }
             }
         }
-        // Display the list of entities in a grid
+
         LazyVerticalGrid(
             modifier = modifier
                 .fillMaxSize()
-                .shadow(
-                    elevation = 2.dp,
-                    shape = MaterialTheme.shapes.medium,
+                .border(
+                    width = 1.dp,
+                    color = Color.LightGray,
+                    shape = MaterialTheme.shapes.medium
                 ),
             columns = GridCells.Fixed(4),
             contentPadding = PaddingValues(16.dp),
@@ -527,9 +410,8 @@ fun StartContent(
                 Card(
                     onClick = {
                         scope.launch {
-                            // Toggle the selected state of the entity and navigate to the runtime page
-                            event(HomeEvent.ToggleSelected(item.id))
-                            event(HomeEvent.NavTo(PageType.RUNTIME))
+                            event(HomeUiEvent.ToggleSelected(item.id))
+                            event(HomeUiEvent.NavTo(PageType.RUNTIME))
                             toggleDrawer(NavigationType.NONE)
                         }
                     },
@@ -579,14 +461,13 @@ fun StartContent(
 fun RuntimeContent(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
-    event: (HomeEvent) -> Unit = {},
+    event: (HomeUiEvent) -> Unit = {},
     toggleDrawer: (NavigationType) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
     var time by remember { mutableStateOf(0L) }
     val item = uiState.entities.find { it.id == uiState.selected }!!
 
-    // Start a timer to display the runtime
     LaunchedEffect(key1 = uiState.job) {
         while (true) {
             if (uiState.job != null) {
@@ -602,7 +483,6 @@ fun RuntimeContent(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
-        // Display the close button
         FloatingActionButton(
             modifier = Modifier
                 .padding(16.dp)
@@ -610,7 +490,7 @@ fun RuntimeContent(
             onClick = {
                 scope.launch {
                     if (uiState.job == null) {
-                        event(HomeEvent.NavTo(PageType.LIST))
+                        event(HomeUiEvent.NavTo(PageType.LIST))
                         toggleDrawer(NavigationType.NAVIGATION_RAIL)
                     }
                 }
@@ -633,125 +513,6 @@ fun RuntimeContent(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(8.dp)
-                    .weight(1f),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                // Display the runtime timer
-                Card {
-                    Box(
-                        modifier = Modifier.padding(8.dp),
-                    ) {
-                        if (uiState.job != null) {
-                            CircularProgressIndicator(
-                                modifier = Modifier
-                                    .size(24.dp)
-                                    .align(Alignment.TopStart),
-                                strokeWidth = 4.dp,
-                            )
-                        }
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = time.timeFormat(),
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(
-                                fontSize = 64.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
-                            )
-                        )
-                    }
-                }
-
-                // Display the volume information
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Card {
-                        Text(
-                            modifier = Modifier
-                                .padding(16.dp),
-                            text = stringResource(id = R.string.glue_making),
-                            style = MaterialTheme.typography.titleLarge,
-                        )
-                    }
-
-                    Card(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            text = item.volume[0].format(1),
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center,
-                            fontFamily = FontFamily.Monospace,
-                        )
-                    }
-
-
-                    Card(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            text = item.volume[1].format(1),
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center,
-                            fontFamily = FontFamily.Monospace,
-                        )
-                    }
-                }
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Card {
-                        Text(
-                            modifier = Modifier
-                                .padding(16.dp),
-                            text = stringResource(id = R.string.pre_drain),
-                            style = MaterialTheme.typography.titleLarge,
-                        )
-                    }
-
-                    Card(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            text = item.volume[2].format(1),
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center,
-                            fontFamily = FontFamily.Monospace,
-                        )
-                    }
-
-
-                    Card(
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            text = item.volume[3].format(1),
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center,
-                            fontFamily = FontFamily.Monospace,
-                        )
-                    }
-                }
-            }
 
             Column(
                 modifier = Modifier
@@ -765,10 +526,10 @@ fun RuntimeContent(
                     onClick = {
                         if (uiState.job == null) {
                             if (uiState.loading == 0) {
-                                event(HomeEvent.Start)
+                                event(HomeUiEvent.Start)
                             }
                         } else {
-                            event(HomeEvent.Stop)
+                            event(HomeUiEvent.Stop)
                         }
                     },
                 ) {
@@ -859,7 +620,6 @@ fun FunctionCard(
                         text = title,
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.SemiBold,
-                        fontFamily = FontFamily.Serif,
                     )
 
                     Text(
@@ -876,9 +636,6 @@ fun FunctionCard(
     }
 }
 
-/**
- * Composable function for the preview of the list content of the Home screen.
- */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun MenuContentPreview() {
@@ -888,34 +645,22 @@ fun MenuContentPreview() {
     )
 }
 
-/**
- * Composable function for the preview of the start content of the Home screen.
- */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun StartContentPreview() {
-    // Create a list of program entities for the preview
     val entities = listOf(
         Program(),
         Program(),
     )
-
-    // Display the start content with the preview entities
     StartContent(uiState = HomeUiState(entities = entities))
 }
 
-/**
- * Composable function for the preview of the runtime content of the Home screen.
- */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun RuntimeContentPreview() {
-    // Create a list of program entities for the preview
     val entities = listOf(
         Program(id = 1),
         Program(),
     )
-
-    // Display the runtime content with the preview entities and a selected entity
     RuntimeContent(uiState = HomeUiState(entities = entities, selected = 1L))
 }

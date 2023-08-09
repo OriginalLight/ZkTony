@@ -53,17 +53,17 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
      *
      * @param event The calibration event to handle.
      */
-    fun event(event: CalibrationEvent) {
+    fun uiEvent(event: CalibrationUiEvent) {
         when (event) {
-            is CalibrationEvent.NavTo -> _page.value = event.page
-            is CalibrationEvent.ToggleSelected -> _selected.value = event.id
-            is CalibrationEvent.Insert -> viewModelScope.launch { dao.insert(Calibration(text = event.name)) }
-            is CalibrationEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
-            is CalibrationEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
-            is CalibrationEvent.Active -> viewModelScope.launch { dao.active(event.id) }
-            is CalibrationEvent.AddLiquid -> addLiquid(event.index)
-            is CalibrationEvent.DeleteData -> deleteData(event.data)
-            is CalibrationEvent.InsertData -> insertData(event.index, event.volume)
+            is CalibrationUiEvent.NavTo -> _page.value = event.page
+            is CalibrationUiEvent.ToggleSelected -> _selected.value = event.id
+            is CalibrationUiEvent.Insert -> viewModelScope.launch { dao.insert(Calibration(text = event.name)) }
+            is CalibrationUiEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
+            is CalibrationUiEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
+            is CalibrationUiEvent.Active -> viewModelScope.launch { dao.active(event.id) }
+            is CalibrationUiEvent.AddLiquid -> addLiquid(event.index)
+            is CalibrationUiEvent.DeleteData -> deleteData(event.data)
+            is CalibrationUiEvent.InsertData -> insertData(event.index, event.volume)
         }
     }
 
@@ -169,14 +169,14 @@ data class CalibrationUiState(
 /**
  * Represents an event that can occur on the calibration screen.
  */
-sealed class CalibrationEvent {
-    data class NavTo(val page: PageType) : CalibrationEvent()
-    data class ToggleSelected(val id: Long) : CalibrationEvent()
-    data class Insert(val name: String) : CalibrationEvent()
-    data class Delete(val id: Long) : CalibrationEvent()
-    data class Update(val entity: Calibration) : CalibrationEvent()
-    data class Active(val id: Long) : CalibrationEvent()
-    data class AddLiquid(val index: Int) : CalibrationEvent()
-    data class DeleteData(val data: Triple<Int, Double, Double>) : CalibrationEvent()
-    data class InsertData(val index: Int, val volume: Double) : CalibrationEvent()
+sealed class CalibrationUiEvent {
+    data class NavTo(val page: PageType) : CalibrationUiEvent()
+    data class ToggleSelected(val id: Long) : CalibrationUiEvent()
+    data class Insert(val name: String) : CalibrationUiEvent()
+    data class Delete(val id: Long) : CalibrationUiEvent()
+    data class Update(val entity: Calibration) : CalibrationUiEvent()
+    data class Active(val id: Long) : CalibrationUiEvent()
+    data class AddLiquid(val index: Int) : CalibrationUiEvent()
+    data class DeleteData(val data: Triple<Int, Double, Double>) : CalibrationUiEvent()
+    data class InsertData(val index: Int, val volume: Double) : CalibrationUiEvent()
 }
