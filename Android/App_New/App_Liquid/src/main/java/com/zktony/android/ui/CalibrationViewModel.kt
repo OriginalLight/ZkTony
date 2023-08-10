@@ -48,11 +48,6 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
         }
     }
 
-    /**
-     * Handles the given calibration event.
-     *
-     * @param event The calibration event to handle.
-     */
     fun uiEvent(event: CalibrationUiEvent) {
         when (event) {
             is CalibrationUiEvent.NavTo -> _page.value = event.page
@@ -67,17 +62,10 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
         }
     }
 
-    /**
-     * Adds a new liquid to the selected calibration entity.
-     *
-     * @param index The index of the calibration entity to add the liquid to.
-     */
     private fun addLiquid(index: Int) {
         viewModelScope.launch {
-            // Set the loading state to true
             _loading.value = true
 
-            // Open the valve if the index is 0
             if (index == 0) {
                 tx {
                     delay = 100L
@@ -85,7 +73,6 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                 }
             }
 
-            // Add the new liquid to the calibration entity
             tx {
                 move(MoveType.MOVE_PULSE) {
                     this.index = index + 2
@@ -106,16 +93,10 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                 }
             }
 
-            // Set the loading state to false
             _loading.value = false
         }
     }
 
-    /**
-     * Deletes the given calibration data point from the selected calibration entity.
-     *
-     * @param data The calibration data point to delete.
-     */
     private fun deleteData(data: Triple<Int, Double, Double>) {
         viewModelScope.launch {
             // Find the selected calibration entity
@@ -129,12 +110,6 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
         }
     }
 
-    /**
-     * Inserts a new calibration data point to the selected calibration entity.
-     *
-     * @param index The index of the calibration entity to insert the data point to.
-     * @param volume The volume of the new calibration data point.
-     */
     private fun insertData(index: Int, volume: Double) {
         viewModelScope.launch {
             // Find the selected calibration entity
@@ -151,14 +126,6 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
     }
 }
 
-/**
- * The UI state for the calibration screen.
- *
- * @param entities The list of calibration entities.
- * @param selected The ID of the selected calibration entity.
- * @param page The current page type.
- * @param loading Whether the screen is currently loading.
- */
 data class CalibrationUiState(
     val entities: List<Calibration> = emptyList(),
     val selected: Long = 0L,
@@ -166,9 +133,6 @@ data class CalibrationUiState(
     val loading: Boolean = false,
 )
 
-/**
- * Represents an event that can occur on the calibration screen.
- */
 sealed class CalibrationUiEvent {
     data class NavTo(val page: PageType) : CalibrationUiEvent()
     data class ToggleSelected(val id: Long) : CalibrationUiEvent()

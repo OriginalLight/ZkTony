@@ -24,7 +24,7 @@ data class Program(
     @ColumnInfo(name = "text")
     val text: String = "None",
     @ColumnInfo(name = "orifice_plates")
-    val orificePlates: List<OrificePlate?> = List(4) { null },
+    val orificePlates: List<OrificePlate> = emptyList(),
     @ColumnInfo(name = "create_time")
     val createTime: Date = Date(System.currentTimeMillis()),
 )

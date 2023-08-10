@@ -91,7 +91,6 @@ fun ProgramList(
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
 
-    // Show the input dialog if showDialog is true
     if (showDialog) {
         InputDialog(
             onConfirm = {
@@ -109,7 +108,6 @@ fun ProgramList(
         )
     }
 
-    // Display the list and operation columns
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -117,7 +115,6 @@ fun ProgramList(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
 
-        // Display the operation column
         Row(
             modifier = modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
@@ -309,13 +306,11 @@ fun ProgramDetail(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Header(onBackPressed = {
-            if (orificePlate.value > -1) {
-                orificePlate.value = -1
-            } else {
-                uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_LIST))
-            }
-        }) {
+        Row(
+            modifier = modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
             Column(
                 modifier = Modifier
                     .background(
@@ -339,6 +334,37 @@ fun ProgramDetail(
                         fontSize = 12.sp,
                     ),
                     color = Color.Gray,
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            AnimatedVisibility(visible = orificePlate.value == -1) {
+                FloatingActionButton(
+                    onClick = {
+                        scope.launch {
+                            val orificePlates = selected.orificePlates.toMutableList()
+                            orificePlates.add(OrificePlate())
+                            uiEvent(ProgramUiEvent.Update(selected.copy(orificePlates = orificePlates)))
+                        }
+                    }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null
+                    )
+                }
+            }
+            FloatingActionButton(
+                onClick = {
+                    if (orificePlate.value > -1) {
+                        orificePlate.value = -1
+                    } else {
+                        uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_LIST))
+                    }
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null
                 )
             }
         }
@@ -376,47 +402,34 @@ fun OrificePlateList(
 ) {
     val scope = rememberCoroutineScope()
 
-    Column(
+    LazyVerticalGrid(
         modifier = modifier
             .fillMaxSize()
             .border(
                 width = 1.dp,
                 color = Color.LightGray,
                 shape = MaterialTheme.shapes.medium
-            )
-            .padding(16.dp),
+            ),
+        contentPadding = PaddingValues(16.dp),
+        columns = GridCells.Fixed(2),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        for (j in 0..1) {
-            Row(
-                modifier = Modifier.weight(0.5f),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                for (i in if (j == 0) 0..1 else 2..3) {
-                    OrificePlateBox(
-                        modifier = Modifier
-                            .weight(0.5f)
-                            .fillMaxHeight(),
-                        orificePlate = selected.orificePlates.getOrNull(i),
-                        insert = {
-                            scope.launch {
-                                val array = selected.orificePlates.toMutableList()
-                                val op = OrificePlate()
-                                array[i] = op.copy(orifices = op.generateOrifices())
-                                uiEvent(ProgramUiEvent.Update(selected.copy(orificePlates = array)))
-                            }
-                        },
-                        delete = {
-                            scope.launch {
-                                val array = selected.orificePlates.toMutableList()
-                                array[i] = null
-                                uiEvent(ProgramUiEvent.Update(selected.copy(orificePlates = array)))
-                            }
-                        },
-                        onClick = { toggleSelected(i) },
-                    )
-                }
-            }
+        itemsIndexed(items = selected.orificePlates) { index, item ->
+            OrificePlateBox(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(296.dp),
+                orificePlate = item,
+                delete = {
+                    scope.launch {
+                        val array = selected.orificePlates.toMutableList()
+                        array.removeAt(index)
+                        uiEvent(ProgramUiEvent.Update(selected.copy(orificePlates = array)))
+                    }
+                },
+                toggleSelected = { toggleSelected(index) },
+            )
         }
     }
 }
@@ -428,12 +441,13 @@ fun OrificePlateDetail(
     toggleSelected: (OrificePlate) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
+    val abscissa by rememberDataSaverState(key = Constants.MAX_ABSCISSA, initialValue = 0.0)
+    val ordinate by rememberDataSaverState(key = Constants.MAX_ORDINATE, initialValue = 0.0)
+
     var selected by remember { mutableStateOf(orificePlate) }
     var volumeIndex by remember { mutableStateOf(0) }
     var volume by remember { mutableStateOf(selected.getVolume()[0].format(1)) }
     var delay by remember { mutableStateOf(selected.delay.toString()) }
-    val abscissa by rememberDataSaverState(key = Constants.MAX_ABSCISSA, initialValue = 0.0)
-    val ordinate by rememberDataSaverState(key = Constants.MAX_ORDINATE, initialValue = 0.0)
 
     Row(
         modifier = modifier
@@ -694,80 +708,66 @@ fun OrificePlateDetail(
 @Composable
 fun OrificePlateBox(
     modifier: Modifier = Modifier,
-    orificePlate: OrificePlate? = null,
-    insert: () -> Unit = {},
+    orificePlate: OrificePlate,
     delete: () -> Unit = {},
-    onClick: () -> Unit = {},
+    toggleSelected: () -> Unit = {},
 ) {
     val deleteCount = remember { mutableStateOf(0) }
 
     Box(
         modifier = modifier
     ) {
-        if (orificePlate != null) {
-            OrificePlate(
-                modifier = Modifier.fillMaxSize(),
-                row = orificePlate.row,
-                column = orificePlate.column,
-                selected = orificePlate.getSelected(),
-            )
+        OrificePlate(
+            modifier = Modifier.fillMaxSize(),
+            row = orificePlate.row,
+            column = orificePlate.column,
+            selected = orificePlate.getSelected(),
+        )
 
-            Row(
-                modifier = Modifier
-                    .offset {
-                        IntOffset(
-                            x = (8).dp.roundToPx(),
-                            y = (-8).dp.roundToPx(),
-                        )
+        Row(
+            modifier = Modifier
+                .offset {
+                    IntOffset(
+                        x = (8).dp.roundToPx(),
+                        y = (-8).dp.roundToPx(),
+                    )
+                }
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = MaterialTheme.shapes.small,
+                )
+                .align(Alignment.TopEnd),
+        ) {
+            IconButton(
+                modifier = Modifier.size(48.dp),
+                onClick = {
+                    if (deleteCount.value > 0) {
+                        delete()
+                        deleteCount.value = 0
+                    } else {
+                        deleteCount.value++
                     }
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.small,
-                    )
-                    .align(Alignment.TopEnd),
-            ) {
-                IconButton(
-                    modifier = Modifier.size(48.dp),
-                    onClick = {
-                        if (deleteCount.value > 0) {
-                            delete()
-                            deleteCount.value = 0
-                        } else {
-                            deleteCount.value++
-                        }
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        tint = if (deleteCount.value > 0) {
-                            Color.Red
-                        } else {
-                            Color.Black
-                        },
-                    )
-                }
-
-                IconButton(
-                    modifier = Modifier.size(48.dp),
-                    onClick = onClick,
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        tint = Color.Black,
-                    )
-                }
-            }
-        } else {
-            FloatingActionButton(
-                modifier = Modifier.align(Alignment.Center),
-                onClick = { insert() },
+                },
             ) {
                 Icon(
-                    modifier = Modifier.size(32.dp),
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    tint = if (deleteCount.value > 0) {
+                        Color.Red
+                    } else {
+                        Color.Black
+                    },
+                )
+            }
+
+            IconButton(
+                modifier = Modifier.size(48.dp),
+                onClick = toggleSelected,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = null,
+                    tint = Color.Black,
                 )
             }
         }

@@ -73,7 +73,6 @@ fun Calibration(
         }
     }
 
-    // List page
     AnimatedVisibility(visible = uiState.page == PageType.CALIBRATION_LIST) {
         CalibrationList(
             modifier = modifier,
@@ -81,7 +80,7 @@ fun Calibration(
             uiEvent = viewModel::uiEvent,
         )
     }
-    // Edit page
+
     AnimatedVisibility(visible = uiState.page == PageType.CALIBRATION_DETAIL) {
         CalibrationDetail(
             modifier = modifier,
@@ -105,18 +104,14 @@ fun CalibrationList(
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
 
-
-    // Show the input dialog if showDialog is true
     if (showDialog) {
         InputDialog(
             onConfirm = {
                 scope.launch {
-                    // Check if the name already exists
                     val nameList = uiState.entities.map { it.text }
                     if (nameList.contains(it)) {
                         "Name already exists".showShortToast()
                     } else {
-                        // Insert the new item
                         uiEvent(CalibrationUiEvent.Insert(it))
                         showDialog = false
                     }
@@ -126,7 +121,6 @@ fun CalibrationList(
         )
     }
 
-    // Row containing the list of items and the operation column
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -323,13 +317,6 @@ fun CalibrationList(
     }
 }
 
-/**
- * Composable function that displays the edit content UI.
- *
- * @param modifier Modifier to be applied to the content.
- * @param uiState The current state of the calibration UI.
- * @param uiEvent The event to be triggered when the UI state changes.
- */
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CalibrationDetail(
@@ -337,9 +324,8 @@ fun CalibrationDetail(
     uiState: CalibrationUiState = CalibrationUiState(),
     uiEvent: (CalibrationUiEvent) -> Unit = {},
 ) {
-    // Get the selected entity or create a new one if none is selected
-    val entity = uiState.entities.find { it.id == uiState.selected } ?: Calibration()
 
+    val entity = uiState.entities.find { it.id == uiState.selected } ?: Calibration()
     val list = remember { mutableStateListOf("M0", "M1", "M2", "M3", "M4", "M5") }
     var selectedTabIndex by remember { mutableStateOf(0) }
     var volume by remember { mutableStateOf("") }
@@ -352,13 +338,11 @@ fun CalibrationDetail(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Row containing the list of items and the operation column
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-
             TextField(
                 modifier = Modifier.weight(1f),
                 value = TextFieldValue(volume, TextRange(volume.length)),
@@ -542,38 +526,20 @@ fun CalibrationDetail(
             }
         }
     }
-
-
 }
 
-/**
- * Composable function that previews the calibration list content.
- */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun CalibrationListPreview() {
-    // Create a calibration entity list with a single entity
     val entities = listOf(Calibration())
-
-    // Create a calibration UI state with the entity list
     val uiState = CalibrationUiState(entities = entities)
-
-    // Show the calibration list content
     CalibrationList(uiState = uiState)
 }
 
-/**
- * Composable function that previews the calibration edit content.
- */
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun CalibrationDetailPreview() {
-    // Create a calibration entity list with a single entity
     val entities = listOf(Calibration(id = 1L))
-
-    // Create a calibration UI state with the entity list and a selected entity ID
     val uiState = CalibrationUiState(entities = entities, selected = 1L)
-
-    // Show the calibration edit content
     CalibrationDetail(uiState = uiState)
 }

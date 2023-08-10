@@ -1,5 +1,6 @@
 package com.zktony.www.ui.home
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Gravity
@@ -129,17 +130,6 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                         viewModel.shakeBed()
                     }
                 }
-                with(insulating) {
-                    clickScale()
-                    clickNoRepeat {
-                        if (viewModel.uiState.value.insulating) {
-                            PopTip.show("已取消保温，再次点击开启")
-                        } else {
-                            PopTip.show("抗体保温中，再次点击取消")
-                        }
-                        viewModel.antibodyWarm()
-                    }
-                }
                 with(lock) {
                     clickScale()
                     clickNoRepeat {
@@ -202,15 +192,11 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
      * 操作按钮的ui状态变化
      * @param state [HomeUiState] 状态
      */
+    @SuppressLint("SetTextI18n")
     private fun onUiChange(state: HomeUiState) {
         binding.e.apply {
             with(tvInsulating) {
-                text = if (state.insulating) "保温中 ${state.insulatingTemp}" else "未保温 ${state.insulatingTemp}"
-                setTextColor(
-                    ContextCompat.getColor(
-                        context, if (state.insulating) color.red else color.dark_outline
-                    )
-                )
+                text = "保温中 ${state.insulatingTemp}"
             }
             with(tvLock) {
                 text = if (state.lock) "已上锁" else "已开锁"

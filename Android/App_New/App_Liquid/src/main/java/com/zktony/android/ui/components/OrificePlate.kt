@@ -5,12 +5,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -20,16 +16,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.zktony.android.data.entities.OrificePlate
-import com.zktony.android.utils.ext.format
 
 /**
  * @author 刘贺贺
@@ -119,120 +109,6 @@ fun OrificePlate(
                         y = size.height - (columnSpace - textSize2.height) / 2 - textSize2.height
                     )
                 )
-            }
-        }
-    }
-}
-
-@Composable
-fun OrificePlateCard(
-    modifier: Modifier = Modifier,
-    orificePlate: OrificePlate,
-) {
-    Card(shape = MaterialTheme.shapes.small) {
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                ElevatedCard(modifier = Modifier.weight(1f)) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = "${orificePlate.column} x ${orificePlate.row}",
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
-                                fontStyle = FontStyle.Italic,
-                            ),
-                        )
-                    }
-
-                }
-                ElevatedCard(modifier = Modifier.weight(1f)) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = "${
-                                orificePlate.orifices.flatten().count { it.selected }
-                            }/${orificePlate.orifices.flatten().size}",
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
-                                fontStyle = FontStyle.Italic,
-                            ),
-                        )
-                    }
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                ElevatedCard(modifier = Modifier.weight(1f)) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = if (orificePlate.type == 0) "分液模式" else "混合模式",
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
-                                fontStyle = FontStyle.Italic,
-                            ),
-                        )
-                    }
-                }
-
-                ElevatedCard(modifier = Modifier.weight(1f)) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = "${orificePlate.delay} ms",
-                            style = TextStyle(
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
-                                fontStyle = FontStyle.Italic,
-                            ),
-                        )
-                    }
-                }
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                ElevatedCard(modifier = Modifier.weight(1f)) {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        Text(
-                            modifier = Modifier.align(Alignment.Center),
-                            text = if (orificePlate.type == 0) orificePlate.getVolume()[0].format(1) else "[${
-                                orificePlate.getVolume().joinToString(", ") { it.format(1) }
-                            }]",
-                            style = TextStyle(
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace,
-                                fontStyle = FontStyle.Italic,
-                            ),
-                        )
-                    }
-                }
             }
         }
     }

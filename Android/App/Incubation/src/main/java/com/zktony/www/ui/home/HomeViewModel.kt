@@ -381,27 +381,6 @@ class HomeViewModel constructor(
         }
     }
 
-    /**
-     * 抗体保温
-     */
-    fun antibodyWarm() {
-        viewModelScope.launch {
-            // insulatingEnable false 未保温状态 true 保温状态
-            // 发送设置温度命令 -> 更改按钮状态
-            // 发送设置温度命令 如果当前是未保温状态发送设置中的温度，否则发送室温26度
-            launch {
-                temp(
-                    addr = 0, temp = if (_uiState.value.insulating) "26"
-                    else _uiState.value.temp.format()
-                )
-            }
-            // 更改按钮状态
-            _uiState.value = _uiState.value.copy(
-                insulating = !_uiState.value.insulating
-            )
-        }
-    }
-
     fun unlock() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
@@ -447,7 +426,6 @@ data class ModuleUiState(
  */
 data class HomeUiState(
     val programList: List<Program> = emptyList(),
-    val insulating: Boolean = true,
     val insulatingTemp: String = "0.0℃",
     val lock: Boolean = true,
     val container: Container = Container(),

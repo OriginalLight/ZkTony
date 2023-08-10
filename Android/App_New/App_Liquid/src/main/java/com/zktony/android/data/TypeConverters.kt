@@ -73,14 +73,14 @@ object FloatConverters {
 object OrificePlateConverters {
     @TypeConverter
     @JvmStatic
-    fun stringToObject(value: String): List<OrificePlate?> {
-        val listType = object : TypeToken<List<OrificePlate?>>() {}.type
+    fun stringToObject(value: String): List<OrificePlate> {
+        val listType = object : TypeToken<List<OrificePlate>>() {}.type
         return Gson().fromJson(value, listType)
     }
 
     @TypeConverter
     @JvmStatic
-    fun objectToString(list: List<OrificePlate?>): String {
+    fun objectToString(list: List<OrificePlate>): String {
         return Gson().toJson(list)
     }
 }

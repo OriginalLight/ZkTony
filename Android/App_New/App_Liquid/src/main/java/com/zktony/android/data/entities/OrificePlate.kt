@@ -10,7 +10,7 @@ data class OrificePlate(
     val row: Int = 12,
     val type: Int = 0,
     val coordinate: List<Coordinate> = List(2) { Coordinate() },
-    val orifices: List<List<Orifice>> = emptyList(),
+    val orifices: List<List<Orifice>> = List(column) { List(row) { Orifice() } },
 ) {
     fun generateOrifices(): List<List<Orifice>> {
         val lists = if (orifices.isNotEmpty()) orifices.toMutableList()
