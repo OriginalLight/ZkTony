@@ -596,7 +596,7 @@ fun OrificePlateDetail(
                     coordinate = selected.coordinate[0],
                     onCoordinateChange = { coordinate ->
                         scope.launch {
-                            if (coordinate.abscissa < abscissa && coordinate.ordinate < ordinate) {
+                            if (coordinate.abscissa <= abscissa && coordinate.ordinate <= ordinate) {
                                 val cd = selected.coordinate.toMutableList()
                                 cd[0] = coordinate
                                 selected = selected.copy(coordinate = cd)
@@ -630,7 +630,7 @@ fun OrificePlateDetail(
                     coordinate = selected.coordinate[1],
                     onCoordinateChange = { coordinate ->
                         scope.launch {
-                            if (coordinate.abscissa < abscissa && coordinate.ordinate < ordinate) {
+                            if (coordinate.abscissa <= abscissa && coordinate.ordinate <= ordinate) {
                                 val cd = selected.coordinate.toMutableList()
                                 cd[1] = coordinate
                                 selected = selected.copy(coordinate = cd)

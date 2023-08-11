@@ -41,8 +41,8 @@ import com.zktony.android.ui.components.RuntimeCard
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.RuntimeState
-import com.zktony.android.utils.RuntimeStatus
+import com.zktony.android.utils.runtime.RuntimeState
+import com.zktony.android.utils.runtime.RuntimeStatus
 import com.zktony.android.utils.ext.dateFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
