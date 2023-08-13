@@ -1,4 +1,4 @@
-package com.zktony.android.utils.tx
+package com.zktony.android.utils.model
 
 /**
  * @author 刘贺贺

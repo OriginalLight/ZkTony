@@ -1,12 +1,12 @@
 package com.zktony.android.utils.tx
 
 import com.zktony.android.utils.AsyncTask
-import com.zktony.android.utils.SerialPort
+import com.zktony.android.utils.SerialPortHelper
 import com.zktony.serialport.command.Protocol
 import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicLong
 
-val serialPort: SerialPort = SerialPort.instance
+val serialPort: SerialPortHelper = SerialPortHelper.instance
 val asyncTask: AsyncTask = AsyncTask.instance
 
 private var x: AtomicLong = AtomicLong(0L)

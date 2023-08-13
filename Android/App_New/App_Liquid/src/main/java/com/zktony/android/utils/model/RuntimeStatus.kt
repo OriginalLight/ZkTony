@@ -1,4 +1,4 @@
-package com.zktony.android.utils.runtime
+package com.zktony.android.utils.model
 
 /**
  * @author 刘贺贺

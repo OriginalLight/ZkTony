@@ -1,27 +1,11 @@
-package com.zktony.android.utils.tx
+package com.zktony.android.utils.model
 
 import com.zktony.android.data.entities.Motor
+import com.zktony.android.utils.ext.pulse
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
 
-/**
- * @author 刘贺贺
- * @date 2023/6/30 9:14
- */
-
-/**
- * TxDsl
- *
- * @property byteList MutableList<Byte>
- * @property indexList MutableList<Int>
- * @property executeType ExecuteType
- * @property exceptionPolicy ExceptionPolicy
- * @property controlType ControlType
- * @property timeout Long
- * @property delay Long
- * @constructor
- */
-class TxScope {
+class SerialParams {
     val byteList: MutableList<Byte> = mutableListOf()
     val indexList: MutableList<Int> = mutableListOf()
     var executeType: ExecuteType = ExecuteType.SYNC
@@ -47,33 +31,33 @@ class TxScope {
      * @param block [@kotlin.ExtensionFunctionType] Function1<MoveScope, Unit>
      * @return Unit
      */
-    fun move(type: MoveType = MoveType.MOVE_DV, block: MoveScope.() -> Unit) {
+    fun move(type: MoveType = MoveType.MOVE_DV, block: MoveParams.() -> Unit) {
         controlType = ControlType.CONTROL_MOVE
-        val moveScope = MoveScope().apply(block)
+        val scope = MoveParams().apply(block)
         when (type) {
             MoveType.MOVE_DV -> {
-                val pulse = pulse(moveScope.index, moveScope.dv)
+                val pulse = pulse(scope.index, scope.dv)
                 val config =
-                    Motor(speed = moveScope.speed, acc = moveScope.acc, dec = moveScope.dec)
+                    Motor(speed = scope.speed, acc = scope.acc, dec = scope.dec)
                 if (pulse != 0L) {
                     val ba = ByteArray(5)
-                    ba.writeInt8(moveScope.index, 0).writeInt32LE(pulse, 1)
+                    ba.writeInt8(scope.index, 0).writeInt32LE(pulse, 1)
                     byteList.addAll(ba.toList())
                     byteList.addAll(config.toByteArray().toList())
-                    indexList.add(moveScope.index)
+                    indexList.add(scope.index)
                 }
             }
 
             MoveType.MOVE_PULSE -> {
-                val pulse = pulse(moveScope.index, moveScope.pulse)
+                val pulse = pulse(scope.index, scope.pulse)
                 val config =
-                    Motor(speed = moveScope.speed, acc = moveScope.acc, dec = moveScope.dec)
+                    Motor(speed = scope.speed, acc = scope.acc, dec = scope.dec)
                 if (pulse != 0L) {
                     val ba = ByteArray(5)
-                    ba.writeInt8(moveScope.index, 0).writeInt32LE(pulse, 1)
+                    ba.writeInt8(scope.index, 0).writeInt32LE(pulse, 1)
                     byteList.addAll(ba.toList())
                     byteList.addAll(config.toByteArray().toList())
-                    indexList.add(moveScope.index)
+                    indexList.add(scope.index)
                 }
             }
         }
@@ -125,42 +109,12 @@ class TxScope {
     }
 
     /**
-     * query axis status
-     *
-     * @param ids IntArray
-     * @return Unit
-     */
-    fun queryAxis(vararg ids: Int) {
-        controlType = ControlType.CONTROL_QUERY_AXIS
-        val byteArray = ByteArray(ids.size)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i, index)
-        }
-        byteList.addAll(byteArray.toList())
-    }
-
-    /**
      * query gpio status
      *
      * @param ids List<Int>
      * @return Unit
      */
     fun queryGpio(ids: List<Int>) {
-        controlType = ControlType.CONTROL_QUERY_GPIO
-        val byteArray = ByteArray(ids.size)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i, index)
-        }
-        byteList.addAll(byteArray.toList())
-    }
-
-    /**
-     * query gpio status
-     *
-     * @param ids IntArray
-     * @return Unit
-     */
-    fun queryGpio(vararg ids: Int) {
         controlType = ControlType.CONTROL_QUERY_GPIO
         val byteArray = ByteArray(ids.size)
         ids.forEachIndexed { index, i ->
@@ -184,21 +138,4 @@ class TxScope {
         }
         byteList.addAll(byteArray.toList())
     }
-
-    /**
-     * set valve status
-     *
-     * @param ids Array<out Pair<Int, Int>>
-     * @return Unit
-     */
-    fun valve(vararg ids: Pair<Int, Int>) {
-        controlType = ControlType.CONTROL_VALVE
-        val byteArray = ByteArray(ids.size * 2)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i.first, index * 2)
-            byteArray.writeInt8(i.second, index * 2 + 1)
-        }
-        byteList.addAll(byteArray.toList())
-    }
 }
-

@@ -1,10 +1,10 @@
 package com.zktony.android.ext.ext
 
-import com.zktony.android.ext.SerialPort
+import com.zktony.android.ext.SerialPortHelper
 import com.zktony.serialport.command.Protocol
 import org.koin.java.KoinJavaComponent.inject
 
-val serialPort: SerialPort by inject(SerialPort::class.java)
+val serialPort: SerialPortHelper by inject(SerialPortHelper::class.java)
 
 /**
  * 发送命令

@@ -44,7 +44,7 @@ import com.zktony.android.ui.components.VerificationCodeField
 import com.zktony.android.ui.components.VerificationCodeItem
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.tx.tx
+import com.zktony.android.utils.ext.serial
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.roundToLong
@@ -714,7 +714,7 @@ fun ConfigList(modifier: Modifier = Modifier) {
                     }
                 ) {
                     scope.launch {
-                        tx {
+                        serial {
                             move { dv = abscissa }
                             move {
                                 index = 1
@@ -735,7 +735,7 @@ fun ConfigList(modifier: Modifier = Modifier) {
                     }
                 ) {
                     scope.launch {
-                        tx {
+                        serial {
                             move { dv = tankAbscissa }
                             move {
                                 index = 1

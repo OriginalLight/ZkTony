@@ -33,7 +33,7 @@ fun OrificePlate(
     row: Int,
     column: Int,
     coordinate: Boolean = false,
-    selected: List<Pair<Int, Int>> = emptyList(),
+    selected: List<Triple<Int, Int, Color>> = emptyList(),
     onItemClick: (IntSize, Offset) -> Unit = { _, _ -> }
 ) {
     check(row > 0) { "row must be greater than 0" }
@@ -69,15 +69,20 @@ fun OrificePlate(
 
             for (i in 0 until column) {
                 for (j in 0 until row) {
-                    val enable = selected.any { it.first == i && it.second == j }
+                    val enable = selected.find { it.first == i && it.second == j }
                     drawCircle(
-                        color = if (enable) Color.Green else Color.Black,
+                        color = enable?.third ?: Color.Black,
                         radius = minOf(columnSpace, rowSpace) / 2.5f,
                         center = Offset(
                             (j + 0.5f) * rowSpace,
                             (i + 0.5f) * columnSpace
                         ),
-                        style = if (enable) Fill else Stroke(minOf(columnSpace, rowSpace) / 18f)
+                        style = if (enable != null) Fill else Stroke(
+                            minOf(
+                                columnSpace,
+                                rowSpace
+                            ) / 18f
+                        )
                     )
                 }
             }
@@ -125,6 +130,5 @@ fun OrificePlatePreview() {
         row = 12,
         column = 8,
         coordinate = true,
-        selected = listOf(0 to 0, 0 to 1, 0 to 2, 0 to 3, 0 to 4, 0 to 5, 0 to 6, 0 to 7)
     )
 }

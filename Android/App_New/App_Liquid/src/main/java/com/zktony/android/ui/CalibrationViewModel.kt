@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.tx.MoveType
-import com.zktony.android.utils.tx.tx
+import com.zktony.android.utils.ext.serial
+import com.zktony.android.utils.model.MoveType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -65,34 +65,12 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
     private fun addLiquid(index: Int) {
         viewModelScope.launch {
             _loading.value = true
-
-            if (index == 0) {
-                tx {
-                    delay = 100L
-                    valve(2 to 1)
-                }
-            }
-
-            tx {
+            serial {
                 move(MoveType.MOVE_PULSE) {
                     this.index = index + 2
                     pulse = 3200L * 20
                 }
             }
-
-            if (index == 0) {
-                tx {
-                    delay = 100L
-                    valve(2 to 0)
-                }
-                tx {
-                    move(MoveType.MOVE_PULSE) {
-                        this.index = 2
-                        pulse = 3200L * 20 * -1
-                    }
-                }
-            }
-
             _loading.value = false
         }
     }

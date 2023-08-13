@@ -1,5 +1,7 @@
 package com.zktony.android.data.entities
 
+import androidx.compose.ui.graphics.Color
+
 /**
  * @author 刘贺贺
  * @date 2023/8/1 15:38
@@ -30,12 +32,12 @@ data class OrificePlate(
         return lists
     }
 
-    fun getSelected(): List<Pair<Int, Int>> {
-        val list = mutableListOf<Pair<Int, Int>>()
+    fun getSelected(): List<Triple<Int, Int, Color>> {
+        val list = mutableListOf<Triple<Int, Int, Color>>()
         for (i in orifices.indices) {
             for (j in orifices[i].indices) {
                 if (orifices[i][j].selected) {
-                    list.add(Pair(i, j))
+                    list.add(Triple(i, j, Color.Green))
                 }
             }
         }

@@ -42,7 +42,7 @@ import com.zktony.android.utils.Constants
 import com.zktony.android.utils.ext.dateFormat
 import com.zktony.android.utils.ext.format
 import com.zktony.android.utils.ext.showShortToast
-import com.zktony.android.utils.tx.tx
+import com.zktony.android.utils.ext.serial
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -607,7 +607,7 @@ fun OrificePlateDetail(
                     },
                     onClick = {
                         scope.launch {
-                            tx {
+                            serial {
                                 move {
                                     index = 0
                                     dv = selected.coordinate[0].abscissa
@@ -641,7 +641,7 @@ fun OrificePlateDetail(
                     },
                     onClick = {
                         scope.launch {
-                            tx {
+                            serial {
                                 move {
                                     index = 0
                                     dv = selected.coordinate[1].abscissa
@@ -661,7 +661,7 @@ fun OrificePlateDetail(
                 item {
                     CircleTabRow(
                         modifier = Modifier.weight(0.5f),
-                        tabItems = listOf("泵1", "泵2", "泵3", "泵4", "泵5", "泵6"),
+                        tabItems = listOf("M0", "M1", "M2", "M3", "M4", "M5"),
                         selected = volumeIndex,
                     ) {
                         scope.launch {
@@ -800,7 +800,6 @@ fun ProgramDetailPreview() {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun OrificePlateDetailPreview() {
-    // Call the EditContent function and pass in a ProgramUiState object as a parameter
     OrificePlateDetail(
         orificePlate = OrificePlate(
             row = 12,

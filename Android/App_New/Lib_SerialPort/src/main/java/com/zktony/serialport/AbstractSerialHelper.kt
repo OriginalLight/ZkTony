@@ -1,146 +1,116 @@
 package com.zktony.serialport
 
-import android.os.Handler
-import android.os.HandlerThread
 import android.os.Message
+import android.util.Log
+import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.config.SerialConfig
-import com.zktony.serialport.core.SerialPort
-import java.io.File
+import com.zktony.serialport.ext.ascii2ByteArray
+import com.zktony.serialport.ext.hex2ByteArray
 import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
 import java.security.InvalidParameterException
 
 /**
- * Serial port helper class (abstract class)
+ * @author: 刘贺贺
+ * @date: 2022-12-08 14:39
  */
-abstract class AbstractSerialHelper {
+abstract class AbstractSerialHelper : AbstractSerial() {
 
-    private var serialPort: SerialPort? = null
-    private var outputStream: OutputStream? = null
-    private var inputStream: InputStream? = null
-    private var isOpen: Boolean = false
-
-    /**
-     * Thread for receiving data
-     */
-    private var readThread: ReadThread? = null
-    private var handler: Handler? = null
-    private var handlerThread: HandlerThread? = null
-
-    private var cache: ByteArray = byteArrayOf()
-    var callback: (ByteArray) -> Unit = { }
-    var exception: (Exception) -> Unit = { }
-
-
-    @Throws(SecurityException::class, IOException::class, InvalidParameterException::class)
-    fun open(config: SerialConfig) {
-        serialPort = SerialPort(
-            device = File(config.device),
-            baudRate = config.baudRate,
-            stopBits = config.stopBits,
-            dataBits = config.dataBits,
-            parity = config.parity,
-            flowCon = config.flowCon,
-            flags = config.flags,
-        )
-        serialPort?.let {
-            outputStream = it.outputStream
-            inputStream = it.inputStream
-        }
-        readThread = ReadThread()
-        readThread?.start()
-
-        handlerThread = HandlerThread("handlerThread")
-        handlerThread?.let {
-            it.start()
-            handler = object : Handler(it.looper) {
-                override fun handleMessage(msg: Message) {
-                    super.handleMessage(msg)
-                    send(msg.obj as ByteArray)
-                    try {
-                        Thread.sleep(config.delay)
-                    } catch (e: InterruptedException) {
-                        e.printStackTrace()
-                    }
-                }
+    init {
+        callback = {
+            callbackVerify(it) { bytes ->
+                callbackProcess(bytes)
             }
         }
-        isOpen = true
+        exception = {
+            it.printStackTrace()
+        }
     }
 
-    fun addWaitMessage(msg: Message) {
-        handler?.sendMessage(msg)
-    }
-
-    open fun close() {
-        try {
-            inputStream?.close()
-            outputStream?.close()
+    /**
+     * Open the serial port
+     */
+    fun openDevice(config: SerialConfig): Int {
+        return try {
+            open(config)
+            Log.i(TAG, "Open the serial port successfully")
+            0
+        } catch (e: SecurityException) {
+            Log.e(TAG, "Failed to open the serial port: no serial port read/write permission!")
+            -1
         } catch (e: IOException) {
-            e.printStackTrace()
-        }
-        serialPort?.close()
-        readThread?.interrupt()
-        handlerThread?.interrupt()
-        isOpen = false
-    }
-
-    private fun send(bOutArray: ByteArray) {
-        if (isOpen) {
-            try {
-                outputStream?.write(bOutArray)
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
+            Log.e(TAG, "Failed to open serial port: unknown error!")
+            -2
+        } catch (e: InvalidParameterException) {
+            Log.e(TAG, "Failed to open the serial port: the parameter is wrong!")
+            -3
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to open the serial port: other error!")
+            -4
         }
     }
 
     /**
-     * data processing
+     * Send byte data
+     *
+     * @param bytes byte data
      */
-    private fun dataProcess(byteArray: ByteArray?) {
-        if (byteArray == null) {
-            if (cache.isNotEmpty()) {
-                try {
-                    callback.invoke(cache)
-                } catch (e: Exception) {
-                    exception.invoke(e)
-                } finally {
-                    cache = byteArrayOf()
-                }
-            }
-        } else {
-            cache += byteArray
-        }
+    fun sendByteArray(bytes: ByteArray) {
+        val msg = Message.obtain()
+        msg.obj = bytes
+        addWaitMessage(msg)
     }
 
     /**
-     * Thread for receiving data
+     * Send hex string
+     *
+     * @param hex String
      */
-    private inner class ReadThread : Thread() {
-        override fun run() {
-            super.run()
-            while (!isInterrupted) {
-                try {
-                    val input = inputStream?.available()
-                    if (input != null && input > 0) {
-                        val buffer = ByteArray(input)
-                        inputStream?.read(buffer)
-                        dataProcess(buffer)
-                    } else {
-                        dataProcess(null)
-                    }
-                    try {
-                        sleep(4L)
-                    } catch (e: InterruptedException) {
-                        e.printStackTrace()
-                    }
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                    return
-                }
-            }
-        }
+    fun sendHexString(hex: String) {
+        val msg = Message.obtain()
+        msg.obj = hex.hex2ByteArray()
+        addWaitMessage(msg)
     }
+
+
+    /**
+     * Send ascii string
+     *
+     * @param ascii String
+     */
+    fun sendAsciiString(ascii: String) {
+        val msg = Message.obtain()
+        msg.obj = ascii.ascii2ByteArray(true)
+        addWaitMessage(msg)
+    }
+
+    /**
+     * Send protocol
+     *
+     * @param protocol Protocol
+     */
+    fun sendProtocol(protocol: Protocol) {
+        val msg = Message.obtain()
+        msg.obj = protocol.toByteArray()
+        addWaitMessage(msg)
+    }
+
+    /**
+     * Callback verify
+     * 包括分包、crc校验等
+     *
+     * @param byteArray ByteArray
+     */
+    abstract fun callbackVerify(byteArray: ByteArray, block: (ByteArray) -> Unit = {})
+
+    /**
+     * Callback process
+     *
+     * @param byteArray ByteArray
+     */
+    abstract fun callbackProcess(byteArray: ByteArray)
+
+    companion object {
+        private const val TAG = "AbstractSerial"
+    }
+
 }

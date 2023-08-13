@@ -7,16 +7,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.koin.java.KoinJavaComponent.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @author: 刘贺贺
  * @date: 2023-01-30 14:27
  */
-class AsyncTask {
-    private val md: MotorDao by inject(MotorDao::class.java)
-    private val cd: CalibrationDao by inject(CalibrationDao::class.java)
+class AsyncHelper : KoinComponent {
+    private val md: MotorDao by inject()
+    private val cd: CalibrationDao by inject()
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     // 电机信息
@@ -96,6 +97,6 @@ class AsyncTask {
     }
 
     companion object {
-        val instance: AsyncTask by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { AsyncTask() }
+        val instance: AsyncHelper by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { AsyncHelper() }
     }
 }

@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.runtime.RuntimeState
-import com.zktony.android.utils.runtime.RuntimeTask
-import com.zktony.android.utils.tx.ExecuteType
-import com.zktony.android.utils.tx.MoveType
-import com.zktony.android.utils.tx.initializer
-import com.zktony.android.utils.tx.tx
+import com.zktony.android.utils.RuntimeHelper
+import com.zktony.android.utils.ext.initializer
+import com.zktony.android.utils.ext.serial
+import com.zktony.android.utils.model.ExecuteType
+import com.zktony.android.utils.model.MoveType
+import com.zktony.android.utils.model.RuntimeState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -28,7 +28,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.LIST)
     private val _loading = MutableStateFlow(0)
-    private val task: RuntimeTask = RuntimeTask.instance
+    private val helper: RuntimeHelper = RuntimeHelper.instance
 
     val uiState = _uiState.asStateFlow()
 
@@ -39,7 +39,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 _selected,
                 _page,
                 _loading,
-                task.state,
+                helper.state,
             ) { entities, selected, page, loading, runtime ->
                 HomeUiState(
                     entities = entities,
@@ -61,17 +61,17 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             is HomeUiEvent.Reset -> reset()
             is HomeUiEvent.Runtime -> {
                 when (event.action) {
-                    RuntimeAction.START -> task.start()
-                    RuntimeAction.PAUSE -> task.pause()
-                    RuntimeAction.RESUME -> task.resume()
-                    RuntimeAction.STOP -> task.stop()
+                    RuntimeAction.START -> helper.start()
+                    RuntimeAction.PAUSE -> helper.pause()
+                    RuntimeAction.RESUME -> helper.resume()
+                    RuntimeAction.STOP -> helper.stop()
                 }
             }
 
             is HomeUiEvent.NavTo -> _page.value = event.page
             is HomeUiEvent.ToggleSelected -> {
                 _selected.value = event.id
-                task.toggleProgram(uiState.value.entities.find { it.id == event.id }!!)
+                helper.toggleProgram(uiState.value.entities.find { it.id == event.id }!!)
             }
 
             is HomeUiEvent.Pipeline -> pipeline(event.index)
@@ -97,10 +97,10 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         viewModelScope.launch {
             if (_loading.value == 2 || _loading.value == 3) {
                 _loading.value = 0
-                tx { stop(2, 3, 4, 5, 6, 7) }
+                serial { stop(2, 3, 4, 5, 6, 7) }
             } else {
                 _loading.value = if (index == 0) 2 else 3
-                tx {
+                serial {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {
                         move(MoveType.MOVE_PULSE) {

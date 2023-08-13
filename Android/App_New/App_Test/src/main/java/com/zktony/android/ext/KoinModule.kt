@@ -13,7 +13,7 @@ import org.koin.dsl.module
 
 val koinModule = module {
     // task
-    singleOf(::SerialPort)
+    singleOf(::SerialPortHelper)
 
     // viewModel
     viewModelOf(::HomeViewModel)

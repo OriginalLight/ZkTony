@@ -1,6 +1,6 @@
 package com.zktony.android.utils
 
-import com.zktony.serialport.AbstractSerial
+import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.crc16LE
@@ -13,7 +13,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SerialPort : AbstractSerial() {
+class SerialPortHelper : AbstractSerialHelper() {
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
@@ -111,6 +111,6 @@ class SerialPort : AbstractSerial() {
     }
 
     companion object {
-        val instance: SerialPort by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { SerialPort() }
+        val instance: SerialPortHelper by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { SerialPortHelper() }
     }
 }

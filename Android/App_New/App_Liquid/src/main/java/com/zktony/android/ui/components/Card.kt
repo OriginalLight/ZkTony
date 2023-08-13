@@ -23,7 +23,7 @@ import com.zktony.android.data.entities.OrificePlate
 import com.zktony.android.ui.RuntimeAction
 import com.zktony.android.utils.ext.format
 import com.zktony.android.utils.ext.timeFormat
-import com.zktony.android.utils.runtime.RuntimeStatus
+import com.zktony.android.utils.model.RuntimeStatus
 import kotlinx.coroutines.delay
 
 /**

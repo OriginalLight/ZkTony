@@ -1,8 +1,11 @@
-package com.zktony.android.utils.runtime
+package com.zktony.android.utils
 
+import androidx.compose.ui.graphics.Color
 import com.zktony.android.data.entities.OrificePlate
 import com.zktony.android.data.entities.Program
-import com.zktony.android.utils.tx.tx
+import com.zktony.android.utils.ext.serial
+import com.zktony.android.utils.model.RuntimeState
+import com.zktony.android.utils.model.RuntimeStatus
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,14 +17,14 @@ import kotlin.math.ceil
  * @author 刘贺贺
  * @date 2023/8/10 14:21
  */
-class RuntimeTask {
+class RuntimeHelper {
 
     val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val _status = MutableStateFlow(RuntimeStatus.STOPPED)
     private val _orificePlate = MutableStateFlow(OrificePlate())
     private val _process = MutableStateFlow(0f)
-    private val _selected = MutableStateFlow(emptyList<Pair<Int, Int>>())
+    private val _selected = MutableStateFlow(emptyList<Triple<Int, Int, Color>>())
     private val _state = MutableStateFlow(RuntimeState())
     private var program: Program? = null
     private var job: Job? = null
@@ -70,6 +73,8 @@ class RuntimeTask {
                     var finished = 0
 
                     orificePlates.forEach { orificePlate ->
+                        _orificePlate.value = orificePlate
+
                         if (orificePlate.type == 0) {
                             separationAlgorithm(orificePlate) {
                                 finished += it
@@ -78,7 +83,7 @@ class RuntimeTask {
                         } else {
                             hybridAlgorithm(orificePlate) {
                                 finished += it
-                                _process.value = finished / total
+                                _process.value = finished / (total * 6)
                             }
                         }
                     }
@@ -127,8 +132,11 @@ class RuntimeTask {
         val column = orificePlate.column
         for (i in 0 until ceil(row / 6.0).toInt()) {
             for (j in if (i % 2 == 0) 0 until column else column - 1 downTo 0) {
+                while (_status.value == RuntimeStatus.PAUSED) {
+                    delay(100)
+                }
                 val coordinate = orificePlate.orifices[j][i * 6].coordinate
-                tx {
+                serial {
                     move {
                         index = 0
                         dv = coordinate.abscissa
@@ -139,9 +147,13 @@ class RuntimeTask {
                     }
                 }
 
-                val list = mutableListOf<Pair<Int, Int>>()
+                while (_status.value == RuntimeStatus.PAUSED) {
+                    delay(100)
+                }
 
-                tx {
+                val list = mutableListOf<Triple<Int, Int, Color>>()
+
+                serial {
                     repeat(6) {
                         if (i * 6 + it < row) {
                             val orifice = orificePlate.orifices[j][i * 6 + it]
@@ -150,7 +162,7 @@ class RuntimeTask {
                                     index = 2 + it
                                     dv = orifice.volume.getOrNull(0) ?: 0.0
                                 }
-                                list += Pair(j, i * 6 + it)
+                                list += Triple(j, i * 6 + it, Color.Green)
                             }
                         }
                     }
@@ -176,13 +188,16 @@ class RuntimeTask {
         val rowSpace = (coordinate[1].abscissa - coordinate[0].abscissa) / (row - 1)
         for (i in 0 until row + 5) {
             for (j in if (i % 2 == 0) 0 until column else column - 1 downTo 0) {
+                while (_status.value == RuntimeStatus.PAUSED) {
+                    delay(100)
+                }
                 val abscissa = if (i < 6) {
                     orificePlate.orifices[j][0].coordinate.abscissa - (5 - i) * rowSpace
                 } else {
                     orificePlate.orifices[j][i - 5].coordinate.abscissa
                 }
 
-                tx {
+                serial {
                     move {
                         index = 0
                         dv = abscissa
@@ -193,9 +208,13 @@ class RuntimeTask {
                     }
                 }
 
-                val list = mutableListOf<Pair<Int, Int>>()
+                while (_status.value == RuntimeStatus.PAUSED) {
+                    delay(100)
+                }
 
-                tx {
+                val list = mutableListOf<Triple<Int, Int, Color>>()
+
+                serial {
                     repeat(6) {
                         if (i - 5 + it in 0 until row) {
                             val orifice = orificePlate.orifices[j][i - 5 + it]
@@ -204,14 +223,25 @@ class RuntimeTask {
                                     index = 2 + it
                                     dv = orifice.volume.getOrNull(it) ?: 0.0
                                 }
-                                if (it == 0) {
-                                    list += Pair(j, i - 5)
-                                }
+                                list += Triple(
+                                    j, i - 5 + it, when (it) {
+                                        0 -> Color.Green
+                                        1 -> Color.Blue
+                                        2 -> Color.Red
+                                        3 -> Color.Yellow
+                                        4 -> Color.Cyan
+                                        5 -> Color.Magenta
+                                        else -> Color.Black
+                                    }
+                                )
                             }
                         }
                     }
                 }
 
+                list.forEach { triple ->
+                    _selected.value -= _selected.value.filter { it.first == triple.first && it.second == triple.second }
+                }
                 _selected.value += list
                 block(list.size)
 
@@ -224,8 +254,8 @@ class RuntimeTask {
     }
 
     companion object {
-        val instance: RuntimeTask by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            RuntimeTask()
+        val instance: RuntimeHelper by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
+            RuntimeHelper()
         }
     }
 }

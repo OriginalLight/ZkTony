@@ -1,6 +1,6 @@
 package com.zktony.android.utils
 
-import com.zktony.serialport.AbstractSerial
+import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.crc16LE
@@ -13,19 +13,19 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SerialPort : AbstractSerial() {
+class SerialHelper : AbstractSerialHelper() {
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    val axis: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>()
-    val gpio: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>()
+    val axis: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>().apply {
+        repeat(16) { add(false) }
+    }
+    val gpio: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>().apply {
+        repeat(16) { add(false) }
+    }
 
     init {
         scope.launch {
-            repeat(16) {
-                axis.add(false)
-                gpio.add(false)
-            }
             openDevice(SerialConfig())
         }
     }
@@ -111,6 +111,7 @@ class SerialPort : AbstractSerial() {
     }
 
     companion object {
-        val instance: SerialPort by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { SerialPort() }
+        val instance: SerialHelper by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { SerialHelper() }
     }
 }
+

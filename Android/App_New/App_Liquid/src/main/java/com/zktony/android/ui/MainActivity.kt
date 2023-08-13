@@ -12,7 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.datastore.LocalDataSaver
 import com.zktony.android.ui.theme.AppTheme
-import com.zktony.android.utils.tx.initializer
+import com.zktony.android.utils.ext.initializer
 import kotlinx.coroutines.launch
 
 
