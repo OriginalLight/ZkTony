@@ -1,0 +1,24 @@
+﻿<Page
+    x:Class="Exposure.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behaviors="using:Exposure.Behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
+    mc:Ignorable="d">
+
+    <Grid x:Name="ContentArea">
+        <TabView>
+            <TabViewItem Header="Tab 1">
+                <TextBlock Text="Tab 1 Content" />
+            </TabViewItem>
+            <TabViewItem Header="Tab 2">
+                <TextBlock Text="Tab 2 Content" />
+            </TabViewItem>
+            <TabViewItem Header="Tab 3">
+                <TextBlock Text="Tab 3 Content" />
+            </TabViewItem>
+        </TabView>
+    </Grid>
+</Page>
