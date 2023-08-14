@@ -9,15 +9,13 @@
     <Platforms>x86;x64;arm64</Platforms>
     <RuntimeIdentifiers>win10-x86;win10-x64;win10-arm64</RuntimeIdentifiers>
     <PublishProfile>Properties\PublishProfiles\win10-$(Platform).pubxml</PublishProfile>
-	<ImplicitUsings>enable</ImplicitUsings>
-	<Nullable>enable</Nullable>
-	<UseWinUI>true</UseWinUI>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-    <PackageCertificateThumbprint>262C8CED3137187EFA41E3F0A187BF31ED1E886C</PackageCertificateThumbprint>
-    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
+
   <ItemGroup>
     <Content Remove="Assets\BadgeLogo.scale-100.png" />
     <Content Remove="Assets\BadgeLogo.scale-125.png" />
@@ -31,17 +29,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.3.230724000" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
-	<PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.16" />
+	  <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.16" />
     <PackageReference Include="WinUIEx" Version="2.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Exposure.Core\Exposure.Core.csproj" />
-  </ItemGroup>
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

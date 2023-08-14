@@ -15,8 +15,6 @@
     Publisher="CN=ZkTony"
     Version="1.0.0.0" />
     
-  <mp:PhoneIdentity PhoneProductId="ff447bb4-92e9-4410-948e-8087b64eaf1c" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
-    
   <Properties>
     <DisplayName>Exposure</DisplayName>
     <PublisherDisplayName>ZkTony</PublisherDisplayName>
@@ -29,8 +27,7 @@
   </Dependencies>
 
   <Resources>
-    <Resource Language="zh-CN"/>
-    <Resource Language="en-US"/>
+    <Resource Language="x-generate" />
   </Resources>
 
   <Applications>

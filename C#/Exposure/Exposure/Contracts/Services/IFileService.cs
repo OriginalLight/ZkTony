@@ -1,4 +1,4 @@
-﻿namespace Exposure.Core.Contracts.Services;
+﻿namespace Exposure.Contracts.Services;
 
 public interface IFileService
 {

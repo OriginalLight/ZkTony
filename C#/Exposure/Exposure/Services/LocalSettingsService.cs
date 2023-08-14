@@ -1,6 +1,4 @@
 ﻿using Exposure.Contracts.Services;
-using Exposure.Core.Contracts.Services;
-using Exposure.Core.Helpers;
 using Exposure.Helpers;
 using Exposure.Models;
 

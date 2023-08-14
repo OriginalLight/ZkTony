@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Exposure.Core.Helpers;
+namespace Exposure.Helpers;
 
 public static class Json
 {

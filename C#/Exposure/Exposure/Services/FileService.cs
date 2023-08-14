@@ -1,10 +1,10 @@
 ﻿using System.Text;
 
-using Exposure.Core.Contracts.Services;
+using Exposure.Contracts.Services;
 
 using Newtonsoft.Json;
 
-namespace Exposure.Core.Services;
+namespace Exposure.Services;
 
 public class FileService : IFileService
 {
