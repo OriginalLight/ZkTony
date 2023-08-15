@@ -1,9 +1,6 @@
 ﻿using System.Collections.Specialized;
 using System.Web;
-
 using Exposure.Contracts.Services;
-using Exposure.ViewModels;
-
 using Microsoft.Windows.AppNotifications;
 
 namespace Exposure.Notifications;
@@ -17,37 +14,11 @@ public class AppNotificationService : IAppNotificationService
         _navigationService = navigationService;
     }
 
-    ~AppNotificationService()
-    {
-        Unregister();
-    }
-
     public void Initialize()
     {
         AppNotificationManager.Default.NotificationInvoked += OnNotificationInvoked;
 
         AppNotificationManager.Default.Register();
-    }
-
-    public void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args)
-    {
-        // TODO: Handle notification invocations when your app is already running.
-
-        //// // Navigate to a specific page based on the notification arguments.
-        //// if (ParseArguments(args.Argument)["action"] == "Settings")
-        //// {
-        ////    App.MainWindow.DispatcherQueue.TryEnqueue(() =>
-        ////    {
-        ////        _navigationService.NavigateTo(typeof(SettingsViewModel).FullName!);
-        ////    });
-        //// }
-
-        App.MainWindow.DispatcherQueue.TryEnqueue(() =>
-        {
-            App.MainWindow.ShowMessageDialogAsync("TODO: Handle notification invocations when your app is already running.", "Notification Invoked");
-
-            App.MainWindow.BringToFront();
-        });
     }
 
     public bool Show(string payload)
@@ -59,13 +30,30 @@ public class AppNotificationService : IAppNotificationService
         return appNotification.Id != 0;
     }
 
-    public NameValueCollection ParseArguments(string arguments)
+    public NameValueCollection ParseArguments(string arguments) => HttpUtility.ParseQueryString(arguments);
+
+    public void Unregister() => AppNotificationManager.Default.Unregister();
+
+    ~AppNotificationService()
     {
-        return HttpUtility.ParseQueryString(arguments);
+        Unregister();
     }
 
-    public void Unregister()
-    {
-        AppNotificationManager.Default.Unregister();
-    }
+    public void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args) =>
+        // TODO: Handle notification invocations when your app is already running.
+        //// // Navigate to a specific page based on the notification arguments.
+        //// if (ParseArguments(args.Argument)["action"] == "Settings")
+        //// {
+        ////    App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+        ////    {
+        ////        _navigationService.NavigateTo(typeof(SettingsViewModel).FullName!);
+        ////    });
+        //// }
+        App.MainWindow.DispatcherQueue.TryEnqueue(() =>
+        {
+            App.MainWindow.ShowMessageDialogAsync(
+                "TODO: Handle notification invocations when your app is already running.", "Notification Invoked");
+
+            App.MainWindow.BringToFront();
+        });
 }

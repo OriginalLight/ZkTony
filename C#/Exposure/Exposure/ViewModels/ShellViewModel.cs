@@ -1,19 +1,22 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-
 using Exposure.Contracts.Services;
 using Exposure.Views;
-
 using Microsoft.UI.Xaml.Navigation;
 
 namespace Exposure.ViewModels;
 
 public partial class ShellViewModel : ObservableRecipient
 {
-    [ObservableProperty]
-    private bool isBackEnabled;
+    [ObservableProperty] private bool isBackEnabled;
 
-    [ObservableProperty]
-    private object? selected;
+    [ObservableProperty] private object? selected;
+
+    public ShellViewModel(INavigationService navigationService, INavigationViewService navigationViewService)
+    {
+        NavigationService = navigationService;
+        NavigationService.Navigated += OnNavigated;
+        NavigationViewService = navigationViewService;
+    }
 
     public INavigationService NavigationService
     {
@@ -23,13 +26,6 @@ public partial class ShellViewModel : ObservableRecipient
     public INavigationViewService NavigationViewService
     {
         get;
-    }
-
-    public ShellViewModel(INavigationService navigationService, INavigationViewService navigationViewService)
-    {
-        NavigationService = navigationService;
-        NavigationService.Navigated += OnNavigated;
-        NavigationViewService = navigationViewService;
     }
 
     private void OnNavigated(object sender, NavigationEventArgs e)

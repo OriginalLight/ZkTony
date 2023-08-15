@@ -1,25 +1,23 @@
 ﻿using System.Reflection;
+using Windows.ApplicationModel;
 using Exposure.Contracts.Services;
 using Exposure.Helpers;
-using Windows.ApplicationModel;
 
 namespace Exposure.Services;
+
 internal class AppInfoService : IAppInfoService
 {
-    public string GetAppNameLocalized()
-    {
-        return "AppDisplayName".GetLocalized();
-    }
+    public string GetAppNameLocalized() => "AppDisplayName".GetLocalized();
+
     public Version GetAppVersion()
     {
         if (RuntimeHelper.IsMSIX)
         {
             var packageVersion = Package.Current.Id.Version;
-            return new(packageVersion.Major, packageVersion.Minor, packageVersion.Build, packageVersion.Revision);
+            return new Version(packageVersion.Major, packageVersion.Minor, packageVersion.Build,
+                packageVersion.Revision);
         }
-        else
-        {
-            return Assembly.GetExecutingAssembly().GetName().Version!;
-        }
+
+        return Assembly.GetExecutingAssembly().GetName().Version!;
     }
 }

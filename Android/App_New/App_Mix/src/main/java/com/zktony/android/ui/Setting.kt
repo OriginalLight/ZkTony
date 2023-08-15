@@ -10,8 +10,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
@@ -24,18 +22,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -45,12 +37,14 @@ import androidx.navigation.NavHostController
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
+import com.zktony.android.data.entities.Coordinate
+import com.zktony.android.ui.components.CoordinateInput
 import com.zktony.android.ui.components.Header
 import com.zktony.android.ui.components.VerificationCodeField
 import com.zktony.android.ui.components.VerificationCodeItem
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.ext.format
+import com.zktony.android.utils.ext.serial
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.roundToLong
@@ -68,8 +62,8 @@ fun Setting(
     BackHandler {
         when (uiState.page) {
             PageType.SETTINGS -> navController.navigateUp()
-            PageType.MOTOR_DETAIL -> viewModel.event(SettingEvent.NavTo(PageType.MOTOR_LIST))
-            else -> viewModel.event(SettingEvent.NavTo(PageType.SETTINGS))
+            PageType.MOTOR_DETAIL -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
+            else -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.SETTINGS))
         }
     }
 
@@ -83,8 +77,8 @@ fun Setting(
             Header(
                 onBackPressed = {
                     when (uiState.page) {
-                        PageType.MOTOR_DETAIL -> viewModel.event(SettingEvent.NavTo(PageType.MOTOR_LIST))
-                        else -> viewModel.event(SettingEvent.NavTo(PageType.SETTINGS))
+                        PageType.MOTOR_DETAIL -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
+                        else -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.SETTINGS))
                     }
                 }
             ) {
@@ -104,7 +98,7 @@ fun Setting(
                     // Display the settings content
                     SettingsContent(
                         modifier = Modifier.weight(1f),
-                        event = viewModel::event,
+                        uiEvent = viewModel::uiEvent,
                     )
                     // Display the info content
                     InfoContent(
@@ -114,29 +108,29 @@ fun Setting(
                 // Display the operation content
                 OperationContent(
                     uiState = uiState,
-                    event = viewModel::event,
+                    uiEvent = viewModel::uiEvent,
                 )
             }
         }
         AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
-            Authentication(modifier = modifier, event = viewModel::event)
+            Authentication(modifier = modifier, event = viewModel::uiEvent)
         }
         AnimatedVisibility(visible = uiState.page == PageType.MOTOR_LIST) {
             MotorList(
                 modifier = modifier,
                 uiState = uiState,
-                event = viewModel::event,
+                uiEvent = viewModel::uiEvent,
             )
         }
         AnimatedVisibility(visible = uiState.page == PageType.MOTOR_DETAIL) {
             MotorDetail(
                 modifier = modifier,
                 uiState = uiState,
-                event = viewModel::event,
+                uiEvent = viewModel::uiEvent,
             )
         }
         AnimatedVisibility(visible = uiState.page == PageType.CONFIG) {
-            ConfigList(modifier = modifier, event = viewModel::event)
+            ConfigList(modifier = modifier)
         }
     }
 }
@@ -144,7 +138,7 @@ fun Setting(
 @Composable
 fun SettingsContent(
     modifier: Modifier = Modifier,
-    event: (SettingEvent) -> Unit = {},
+    uiEvent: (SettingUiEvent) -> Unit = {},
 ) {
     var navigation by rememberDataSaverState(
         key = Constants.NAVIGATION,
@@ -159,9 +153,10 @@ fun SettingsContent(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .shadow(
-                elevation = 2.dp,
-                shape = MaterialTheme.shapes.medium,
+            .border(
+                width = 1.dp,
+                color = Color.LightGray,
+                shape = MaterialTheme.shapes.medium
             ),
         state = lazyColumnState,
         contentPadding = PaddingValues(16.dp),
@@ -179,7 +174,7 @@ fun SettingsContent(
                     onCheckedChange = {
                         scope.launch {
                             navigation = it
-                            event(SettingEvent.Navigation(it))
+                            uiEvent(SettingUiEvent.Navigation(it))
                         }
                     },
                 )
@@ -200,9 +195,10 @@ fun InfoContent(
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .shadow(
-                elevation = 2.dp,
-                shape = MaterialTheme.shapes.medium,
+            .border(
+                width = 1.dp,
+                color = Color.LightGray,
+                shape = MaterialTheme.shapes.medium
             ),
         state = lazyColumnState,
         contentPadding = PaddingValues(16.dp),
@@ -259,21 +255,22 @@ fun InfoContent(
 fun OperationContent(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
-    event: (SettingEvent) -> Unit = {},
+    uiEvent: (SettingUiEvent) -> Unit = {},
 ) {
     // Display the operation content
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(
-                elevation = 2.dp,
-                shape = MaterialTheme.shapes.medium,
+            .border(
+                width = 1.dp,
+                color = Color.LightGray,
+                shape = MaterialTheme.shapes.medium
             )
             .padding(16.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         // Display the parameters card
-        ElevatedCard(onClick = { event(SettingEvent.NavTo(PageType.AUTH)) }) {
+        ElevatedCard(onClick = { uiEvent(SettingUiEvent.NavTo(PageType.AUTH)) }) {
             Column(
                 modifier = Modifier.padding(horizontal = 64.dp, vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -291,7 +288,7 @@ fun OperationContent(
         }
         // Display the network card
         ElevatedCard(
-            onClick = { event(SettingEvent.Network) }
+            onClick = { uiEvent(SettingUiEvent.Network) }
         ) {
             Column(
                 modifier = Modifier.padding(horizontal = 64.dp, vertical = 8.dp),
@@ -310,7 +307,7 @@ fun OperationContent(
         }
         // Display the update card
         ElevatedCard(
-            onClick = { event(SettingEvent.CheckUpdate) }
+            onClick = { uiEvent(SettingUiEvent.CheckUpdate) }
         ) {
             Column(
                 modifier = Modifier.padding(horizontal = 64.dp, vertical = 8.dp),
@@ -369,7 +366,7 @@ fun OperationContent(
 @Composable
 fun Authentication(
     modifier: Modifier = Modifier,
-    event: (SettingEvent) -> Unit = {},
+    event: (SettingUiEvent) -> Unit = {},
 ) {
     var show by remember { mutableStateOf(false) }
 
@@ -397,7 +394,7 @@ fun Authentication(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 // Display the motor configuration button
-                ElevatedCard(onClick = { event(SettingEvent.NavTo(PageType.MOTOR_LIST)) }) {
+                ElevatedCard(onClick = { event(SettingUiEvent.NavTo(PageType.MOTOR_LIST)) }) {
                     Column(
                         modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -416,7 +413,7 @@ fun Authentication(
                     }
                 }
                 // Display the system configuration button
-                ElevatedCard(onClick = { event(SettingEvent.NavTo(PageType.CONFIG)) }) {
+                ElevatedCard(onClick = { event(SettingUiEvent.NavTo(PageType.CONFIG)) }) {
                     Column(
                         modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -482,16 +479,17 @@ fun SettingsCard(
 fun MotorList(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
-    event: (SettingEvent) -> Unit = {},
+    uiEvent: (SettingUiEvent) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
         modifier = modifier
             .fillMaxSize()
-            .shadow(
-                elevation = 2.dp,
-                shape = MaterialTheme.shapes.medium,
+            .border(
+                width = 1.dp,
+                color = Color.LightGray,
+                shape = MaterialTheme.shapes.medium
             ),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -502,8 +500,8 @@ fun MotorList(
             Card(
                 onClick = {
                     scope.launch {
-                        event(SettingEvent.ToggleSelected(it.id)) // Step 1: Toggle the selected state of the entity
-                        event(SettingEvent.NavTo(PageType.MOTOR_DETAIL)) // Step 2: Navigate to the edit page
+                        uiEvent(SettingUiEvent.ToggleSelected(it.id)) // Step 1: Toggle the selected state of the entity
+                        uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL)) // Step 2: Navigate to the edit page
                     }
                 }
             ) {
@@ -544,7 +542,7 @@ fun MotorList(
 fun MotorDetail(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
-    event: (SettingEvent) -> Unit = {},
+    uiEvent: (SettingUiEvent) -> Unit = {},
 ) {
     // Get the selected entity from the UI state
     val entity = uiState.entities.find { it.id == uiState.selected }!!
@@ -557,9 +555,10 @@ fun MotorDetail(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .shadow(
-                elevation = 2.dp,
-                shape = MaterialTheme.shapes.medium,
+            .border(
+                width = 1.dp,
+                color = Color.LightGray,
+                shape = MaterialTheme.shapes.medium
             ),
         verticalArrangement = Arrangement.Center,
     ) {
@@ -651,8 +650,16 @@ fun MotorDetail(
                     modifier = Modifier.width(192.dp),
                     onClick = {
                         // Update the entity with the new values and navigate back to the list page
-                        event(SettingEvent.Update(entity.copy(speed = speed, acc = acc, dec = dec)))
-                        event(SettingEvent.NavTo(PageType.MOTOR_LIST))
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                entity.copy(
+                                    speed = speed,
+                                    acc = acc,
+                                    dec = dec
+                                )
+                            )
+                        )
+                        uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
                     },
                 ) {
                     Icon(
@@ -667,278 +674,80 @@ fun MotorDetail(
 }
 
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ConfigList(
-    modifier: Modifier = Modifier,
-    event: (SettingEvent) -> Unit = { },
-) {
-    val keyboard = LocalSoftwareKeyboardController.current
-    val scope = rememberCoroutineScope()
+fun ConfigList(modifier: Modifier = Modifier) {
 
+    val scope = rememberCoroutineScope()
     LazyColumn(
         modifier = modifier
-            .shadow(
-                elevation = 2.dp,
-                shape = MaterialTheme.shapes.medium,
+            .border(
+                width = 1.dp,
+                color = Color.LightGray,
+                shape = MaterialTheme.shapes.medium
             )
             .windowInsetsPadding(WindowInsets.imeAnimationSource),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
-            val x = rememberDataSaverState(key = Constants.MAX_X, default = 0f)
-            val y = rememberDataSaverState(key = Constants.MAX_Y, default = 0f)
-            var ex by remember { mutableStateOf(x.value.format(1)) }
-            var ey by remember { mutableStateOf(y.value.format(1)) }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        shape = MaterialTheme.shapes.medium,
-                    )
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                Text(
-                    text = "最大行程",
-                    style = TextStyle(
-                        fontSize = 22.sp,
-                        fontFamily = FontFamily.Serif,
-                        fontWeight = FontWeight.Bold,
-                        fontStyle = FontStyle.Italic,
-                    )
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+            var abscissa by rememberDataSaverState(key = Constants.MAX_ABSCISSA, default = 0.0)
+            var ordinate by rememberDataSaverState(key = Constants.MAX_ORDINATE, default = 0.0)
+            var tankAbscissa by rememberDataSaverState(
+                key = Constants.WASH_TANK_ABSCISSA,
+                default = 0.0
+            )
+            var tankOrdinate by rememberDataSaverState(
+                key = Constants.WASH_TANK_ORDINATE,
+                default = 0.0
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                CoordinateInput(
+                    modifier = Modifier.weight(1f),
+                    title = "行程",
+                    coordinate = Coordinate(abscissa = abscissa, ordinate = ordinate),
+                    onCoordinateChange = {
+                        scope.launch {
+                            abscissa = it.abscissa
+                            ordinate = it.ordinate
+                        }
+                    }
                 ) {
-                    OutlinedTextField(
-                        modifier = Modifier.weight(1f),
-                        value = ex,
-                        onValueChange = {
-                            scope.launch {
-                                ex = it
-                                x.value = it.toFloatOrNull() ?: 0f
+                    scope.launch {
+                        serial {
+                            move { dv = abscissa }
+                            move {
+                                index = 1
+                                dv = ordinate
                             }
-                        },
-                        label = { Text(text = "横坐标") },
-                        shape = MaterialTheme.shapes.medium,
-                        textStyle = MaterialTheme.typography.bodyLarge,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
-                    )
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Button(
-                            modifier = Modifier.width(96.dp),
-                            onClick = {
-                                scope.launch {
-                                    keyboard?.hide()
-                                    event(SettingEvent.MoveTo(0, x.value))
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = null
-                            )
                         }
                     }
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                CoordinateInput(
+                    modifier = Modifier.weight(1f),
+                    title = "废液槽",
+                    coordinate = Coordinate(abscissa = tankAbscissa, ordinate = tankOrdinate),
+                    onCoordinateChange = {
+                        scope.launch {
+                            tankAbscissa = it.abscissa
+                            tankOrdinate = it.ordinate
+                        }
+                    }
                 ) {
-                    OutlinedTextField(
-                        modifier = Modifier.weight(1f),
-                        value = ey,
-                        onValueChange = {
-                            scope.launch {
-                                ey = it
-                                y.value = it.toFloatOrNull() ?: 0f
+                    scope.launch {
+                        serial {
+                            move { dv = tankAbscissa }
+                            move {
+                                index = 1
+                                dv = tankOrdinate
                             }
-                        },
-                        label = { Text(text = "纵坐标") },
-                        shape = MaterialTheme.shapes.medium,
-                        textStyle = MaterialTheme.typography.bodyLarge,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
-                    )
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Button(
-                            modifier = Modifier.width(96.dp),
-                            onClick = {
-                                scope.launch {
-                                    keyboard?.hide()
-                                    event(SettingEvent.MoveTo(1, y.value))
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = null
-                            )
                         }
                     }
                 }
             }
-
-        }
-        item {
-            val x = rememberDataSaverState(key = Constants.WASH_TANK_X, default = 0f)
-            val y = rememberDataSaverState(key = Constants.WASH_TANK_Y, default = 0f)
-            var ex by remember { mutableStateOf(x.value.format(1)) }
-            var ey by remember { mutableStateOf(y.value.format(1)) }
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        shape = MaterialTheme.shapes.medium,
-                    )
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                Text(
-                    text = "废液槽坐标",
-                    style = TextStyle(
-                        fontSize = 22.sp,
-                        fontFamily = FontFamily.Serif,
-                        fontWeight = FontWeight.Bold,
-                        fontStyle = FontStyle.Italic,
-                    )
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedTextField(
-                        modifier = Modifier.weight(1f),
-                        value = ex,
-                        onValueChange = {
-                            scope.launch {
-                                ex = it
-                                x.value = it.toFloatOrNull() ?: 0f
-                            }
-                        },
-                        label = { Text(text = "横坐标") },
-                        shape = MaterialTheme.shapes.medium,
-                        textStyle = MaterialTheme.typography.bodyLarge,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
-                    )
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Button(
-                            modifier = Modifier.width(96.dp),
-                            onClick = {
-                                scope.launch {
-                                    keyboard?.hide()
-                                    event(SettingEvent.MoveTo(0, x.value))
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    OutlinedTextField(
-                        modifier = Modifier.weight(1f),
-                        value = ey,
-                        onValueChange = {
-                            scope.launch {
-                                ey = it
-                                y.value = it.toFloatOrNull() ?: 0f
-                            }
-                        },
-                        label = { Text(text = "纵坐标") },
-                        shape = MaterialTheme.shapes.medium,
-                        textStyle = MaterialTheme.typography.bodyLarge,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
-                    )
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Button(
-                            modifier = Modifier.width(96.dp),
-                            onClick = {
-                                scope.launch {
-                                    keyboard?.hide()
-                                    event(SettingEvent.MoveTo(1, y.value))
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                }
-            }
-
         }
     }
 }
-
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)

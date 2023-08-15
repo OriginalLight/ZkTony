@@ -1,4 +1,4 @@
-package com.zktony.android.utils.tx
+package com.zktony.android.utils.model
 
 /**
  * @author 刘贺贺
@@ -34,4 +34,9 @@ enum class ControlType {
      * 切阀 05
      */
     CONTROL_VALVE,
+
+    /**
+     * 制胶 06
+     */
+    CONTROL_GLUE,
 }

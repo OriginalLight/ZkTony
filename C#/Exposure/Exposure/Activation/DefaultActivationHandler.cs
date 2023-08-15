@@ -1,6 +1,5 @@
 ﻿using Exposure.Contracts.Services;
 using Exposure.ViewModels;
-
 using Microsoft.UI.Xaml;
 
 namespace Exposure.Activation;
@@ -14,11 +13,9 @@ public class DefaultActivationHandler : ActivationHandler<LaunchActivatedEventAr
         _navigationService = navigationService;
     }
 
-    protected override bool CanHandleInternal(LaunchActivatedEventArgs args)
-    {
+    protected override bool CanHandleInternal(LaunchActivatedEventArgs args) =>
         // None of the ActivationHandlers has handled the activation.
-        return _navigationService.Frame?.Content == null;
-    }
+        _navigationService.Frame?.Content == null;
 
     protected async override Task HandleInternalAsync(LaunchActivatedEventArgs args)
     {

@@ -168,4 +168,7 @@
   <data name="Shell_Main.Content" xml:space="preserve">
     <value>主页</value>
   </data>
+  <data name="Settings_Storage.Header" xml:space="preserve">
+    <value>存储位置</value>
+  </data>
 </root>

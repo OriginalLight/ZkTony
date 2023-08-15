@@ -1,6 +1,5 @@
-﻿using System;
+﻿namespace Exposure.Contracts.Services;
 
-namespace Exposure.Contracts.Services;
 public interface IAppInfoService
 {
     public string GetAppNameLocalized();

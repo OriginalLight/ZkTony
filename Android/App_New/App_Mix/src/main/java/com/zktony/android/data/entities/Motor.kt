@@ -20,13 +20,21 @@ import java.util.Date
 )
 @Immutable
 data class Motor(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0L,
-    @ColumnInfo(name = "index") val index: Int = 0,
-    @ColumnInfo(name = "text") val text: String = "",
-    @ColumnInfo(name = "speed") val speed: Long = 600L,
-    @ColumnInfo(name = "acc") val acc: Long = 300L,
-    @ColumnInfo(name = "dec") val dec: Long = 400L,
-    @ColumnInfo(name = "create_time") val createTime: Date = Date(System.currentTimeMillis()),
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val id: Long = 0L,
+    @ColumnInfo(name = "index")
+    val index: Int = 0,
+    @ColumnInfo(name = "text")
+    val text: String = "",
+    @ColumnInfo(name = "speed")
+    val speed: Long = 600L,
+    @ColumnInfo(name = "acc")
+    val acc: Long = 300L,
+    @ColumnInfo(name = "dec")
+    val dec: Long = 400L,
+    @ColumnInfo(name = "create_time")
+    val createTime: Date = Date(System.currentTimeMillis()),
 ) {
     fun toByteArray(): ByteArray {
         val ba = ByteArray(12)

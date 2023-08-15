@@ -109,12 +109,42 @@ class SerialParams {
     }
 
     /**
+     * query axis status
+     *
+     * @param ids List<Int>
+     * @return Unit
+     */
+    fun queryAxis(vararg ids: Int) {
+        controlType = ControlType.CONTROL_QUERY_AXIS
+        val byteArray = ByteArray(ids.size)
+        ids.forEachIndexed { index, i ->
+            byteArray.writeInt8(i, index)
+        }
+        byteList.addAll(byteArray.toList())
+    }
+
+    /**
      * query gpio status
      *
      * @param ids List<Int>
      * @return Unit
      */
     fun queryGpio(ids: List<Int>) {
+        controlType = ControlType.CONTROL_QUERY_GPIO
+        val byteArray = ByteArray(ids.size)
+        ids.forEachIndexed { index, i ->
+            byteArray.writeInt8(i, index)
+        }
+        byteList.addAll(byteArray.toList())
+    }
+
+    /**
+     * query gpio status
+     *
+     * @param ids List<Int>
+     * @return Unit
+     */
+    fun queryGpio(vararg ids: Int) {
         controlType = ControlType.CONTROL_QUERY_GPIO
         val byteArray = ByteArray(ids.size)
         ids.forEachIndexed { index, i ->
@@ -137,5 +167,41 @@ class SerialParams {
             byteArray.writeInt8(i.second, index * 2 + 1)
         }
         byteList.addAll(byteArray.toList())
+    }
+
+    /**
+     * set valve status
+     *
+     * @param ids List<Pair<Int, Int>>
+     * @return Unit
+     */
+    fun valve(vararg ids: Pair<Int, Int>) {
+        controlType = ControlType.CONTROL_VALVE
+        val byteArray = ByteArray(ids.size * 2)
+        ids.forEachIndexed { index, i ->
+            byteArray.writeInt8(i.first, index * 2)
+            byteArray.writeInt8(i.second, index * 2 + 1)
+        }
+        byteList.addAll(byteArray.toList())
+    }
+
+    /**
+     * glue
+     *
+     * @param block [@kotlin.ExtensionFunctionType] Function1<MoveScope, Unit>
+     * @return Unit
+     */
+    fun glue(block: MoveParams.() -> Unit) {
+        controlType = ControlType.CONTROL_GLUE
+        val scope = MoveParams().apply(block)
+        val pulse = pulse(scope.index, scope.dv)
+        val config = Motor(speed = scope.speed, acc = scope.acc, dec = scope.dec)
+        if (pulse != 0L) {
+            val ba = ByteArray(5)
+            ba.writeInt8(scope.index, 0).writeInt32LE(pulse, 1)
+            byteList.addAll(ba.toList())
+            byteList.addAll(config.toByteArray().toList())
+            indexList.add(scope.index)
+        }
     }
 }

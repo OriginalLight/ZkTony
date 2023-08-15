@@ -1,7 +1,6 @@
 ﻿using Exposure.Activation;
 using Exposure.Contracts.Services;
 using Exposure.Views;
-
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -9,12 +8,16 @@ namespace Exposure.Services;
 
 public class ActivationService : IActivationService
 {
-    private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
     private readonly IEnumerable<IActivationHandler> _activationHandlers;
+    private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
     private readonly IThemeSelectorService _themeSelectorService;
-    private UIElement? _shell = null;
+    private UIElement? _shell;
 
-    public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, IEnumerable<IActivationHandler> activationHandlers, IThemeSelectorService themeSelectorService)
+    public ActivationService(
+        ActivationHandler<LaunchActivatedEventArgs> defaultHandler,
+        IEnumerable<IActivationHandler> activationHandlers,
+        IThemeSelectorService themeSelectorService
+    )
     {
         _defaultHandler = defaultHandler;
         _activationHandlers = activationHandlers;

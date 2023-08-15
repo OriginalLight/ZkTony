@@ -171,4 +171,7 @@
     <value>https://github.com/OriginalLight/ZkTony</value>
     <comment>URL</comment>
   </data>
+  <data name="Settings_Storage.Header" xml:space="preserve">
+    <value>Storage</value>
+  </data>
 </root>

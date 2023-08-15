@@ -5,11 +5,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:labs="using:CommunityToolkit.Labs.WinUI"
-    xmlns:behaviors="using:Exposure.Behaviors"
     xmlns:xaml="using:Microsoft.UI.Xaml"
     xmlns:ic="using:Microsoft.Xaml.Interactions.Core"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
-    behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
     mc:Ignorable="d"
     Loaded="Page_Loaded">
 
@@ -27,11 +25,17 @@
                     <ComboBoxItem x:Uid="Settings_Theme_Dark" Tag="{x:Bind xaml:ElementTheme.Dark}" />
                     <i:Interaction.Behaviors>
                         <ic:EventTriggerBehavior EventName="SelectionChanged">
-                            <ic:InvokeCommandAction Command="{x:Bind ViewModel.SwitchThemeCommand}" 
-                                            CommandParameter="{x:Bind ((ComboBoxItem)ThemeSelectionComboBox.SelectedItem).Tag, Mode=OneWay}" />
+                            <ic:InvokeCommandAction Command="{x:Bind ViewModel.SwitchThemeCommand}"
+                                                    CommandParameter="{x:Bind ((ComboBoxItem)ThemeSelectionComboBox.SelectedItem).Tag, Mode=OneWay}" />
                         </ic:EventTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </ComboBox>
+            </labs:SettingsCard>
+            <labs:SettingsCard x:Uid="Settings_Storage">
+                <labs:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE8B7;" />
+                </labs:SettingsCard.HeaderIcon>
+                <Button Content="{x:Bind ViewModel.Storage, Mode=OneWay}" Click="PickFolderButton_Click" />
             </labs:SettingsCard>
             <labs:SettingsExpander x:Uid="Settings_About_Card" IsExpanded="True">
                 <labs:SettingsExpander.HeaderIcon>
@@ -44,8 +48,10 @@
                 <labs:SettingsExpander.Items>
                     <labs:SettingsCard HorizontalContentAlignment="Left" ContentAlignment="Left">
                         <StackPanel Orientation="Vertical">
-                            <TextBlock x:Uid="Settings_About_RelatedLinks" Margin="{StaticResource XSmallTopBottomMargin}" />
-                            <HyperlinkButton x:Uid="SettingsPage_SourceCodeLink" Margin="{StaticResource HyperlinkButtonNegativeMargin}" />
+                            <TextBlock x:Uid="Settings_About_RelatedLinks"
+                                       Margin="{StaticResource XSmallTopBottomMargin}" />
+                            <HyperlinkButton x:Uid="SettingsPage_SourceCodeLink"
+                                             Margin="{StaticResource HyperlinkButtonNegativeMargin}" />
                         </StackPanel>
                     </labs:SettingsCard>
                 </labs:SettingsExpander.Items>

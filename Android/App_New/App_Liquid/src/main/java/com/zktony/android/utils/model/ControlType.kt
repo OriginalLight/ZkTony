@@ -34,4 +34,9 @@ enum class ControlType {
      * 切阀 05
      */
     CONTROL_VALVE,
+
+    /**
+     * 制胶 06
+     */
+    CONTROL_GLUE,
 }

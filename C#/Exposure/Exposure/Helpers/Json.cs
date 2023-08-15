@@ -6,17 +6,21 @@ public static class Json
 {
     public static async Task<T> ToObjectAsync<T>(string value)
     {
-        return await Task.Run<T>(() =>
+        if (typeof(T) == typeof(bool))
         {
-            return JsonConvert.DeserializeObject<T>(value);
-        });
+            return (T)(object)bool.Parse(value);
+        }
+
+        return await Task.Run<T>(() => JsonConvert.DeserializeObject<T>(value)!);
     }
 
-    public static async Task<string> StringifyAsync(object value)
+    public static async Task<string> StringifyAsync<T>(T value)
     {
-        return await Task.Run<string>(() =>
+        if (typeof(T) == typeof(bool))
         {
-            return JsonConvert.SerializeObject(value);
-        });
+            return value!.ToString()!.ToLowerInvariant();
+        }
+
+        return await Task.Run(() => JsonConvert.SerializeObject(value));
     }
 }

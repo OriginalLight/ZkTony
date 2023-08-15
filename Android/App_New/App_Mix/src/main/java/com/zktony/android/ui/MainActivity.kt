@@ -11,7 +11,6 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.datastore.LocalDataSaver
 import com.zktony.android.ui.theme.AppTheme
-import com.zktony.android.utils.tx.initializer
 
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore("dataStore")
@@ -25,8 +24,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val dataSaver = DataSaverDataStore(applicationContext.dataStore)
-
-        initializer()
 
         setContent {
             AppTheme {

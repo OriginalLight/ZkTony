@@ -6,11 +6,12 @@ import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.RuntimeHelper
-import com.zktony.android.utils.ext.initializer
 import com.zktony.android.utils.ext.serial
+import com.zktony.android.utils.ext.serialHelper
 import com.zktony.android.utils.model.ExecuteType
 import com.zktony.android.utils.model.MoveType
 import com.zktony.android.utils.model.RuntimeState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -34,31 +35,36 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            combine(
-                dao.getAll(),
-                _selected,
-                _page,
-                _loading,
-                helper.state,
-            ) { entities, selected, page, loading, runtime ->
-                HomeUiState(
-                    entities = entities,
-                    selected = selected,
-                    page = page,
-                    loading = loading,
-                    runtime = runtime
-                )
-            }.catch { ex ->
-                ex.printStackTrace()
-            }.collect {
-                _uiState.value = it
+            launch {
+                combine(
+                    dao.getAll(),
+                    _selected,
+                    _page,
+                    _loading,
+                    helper.state,
+                ) { entities, selected, page, loading, runtime ->
+                    HomeUiState(
+                        entities = entities,
+                        selected = selected,
+                        page = page,
+                        loading = loading,
+                        runtime = runtime
+                    )
+                }.catch { ex ->
+                    ex.printStackTrace()
+                }.collect {
+                    _uiState.value = it
+                }
+            }
+            launch {
+                initializer()
             }
         }
     }
 
     fun uiEvent(event: HomeUiEvent) {
         when (event) {
-            is HomeUiEvent.Reset -> reset()
+            is HomeUiEvent.Reset -> initializer()
             is HomeUiEvent.Runtime -> {
                 when (event.action) {
                     RuntimeAction.START -> helper.start()
@@ -78,12 +84,47 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         }
     }
 
-    private fun reset() {
+    private fun initializer() {
         viewModelScope.launch {
             _loading.value = 1
             try {
                 withTimeout(60 * 1000L) {
-                    initializer()
+                    val ids = listOf(0, 1)
+                    serial { queryGpio(ids) }
+                    delay(300L)
+                    ids.forEach {
+                        if (!serialHelper.gpio[it]) {
+                            serial {
+                                timeout = 1000L * 30
+                                move(MoveType.MOVE_PULSE) {
+                                    index = it
+                                    pulse = 3200L * -30
+                                }
+                            }
+                        }
+
+                        serial {
+                            timeout = 1000L * 15
+                            move(MoveType.MOVE_PULSE) {
+                                index = it
+                                pulse = 3200L * 2
+                                acc = 50
+                                dec = 80
+                                speed = 100
+                            }
+                        }
+
+                        serial {
+                            timeout = 1000L * 15
+                            move(MoveType.MOVE_PULSE) {
+                                index = it
+                                pulse = 3200L * -3
+                                acc = 50
+                                dec = 80
+                                speed = 100
+                            }
+                        }
+                    }
                 }
             } catch (ex: Exception) {
                 _loading.value = 0

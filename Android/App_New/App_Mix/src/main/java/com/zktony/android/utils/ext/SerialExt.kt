@@ -14,8 +14,8 @@ import java.util.concurrent.atomic.AtomicLong
 val serialHelper: SerialHelper = SerialHelper.instance
 val asyncHelper: AsyncHelper = AsyncHelper.instance
 
-private var x: AtomicLong = AtomicLong(0L)
 private var y: AtomicLong = AtomicLong(0L)
+private var z: AtomicLong = AtomicLong(0L)
 
 fun <T : Number> pulse(index: Int, dvp: T): Long {
 
@@ -35,14 +35,14 @@ fun <T : Number> pulse(index: Int, dvp: T): Long {
 
     return when (index) {
         0 -> {
-            val d = p - x.get()
-            x.set(maxOf(p, 0))
+            val d = p - y.get()
+            y.set(maxOf(p, 0))
             d
         }
 
         1 -> {
-            val d = p - y.get()
-            y.set(maxOf(p, 0))
+            val d = p - z.get()
+            z.set(maxOf(p, 0))
             d
         }
 

@@ -8,17 +8,11 @@
     behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
     mc:Ignorable="d">
 
-    <Grid x:Name="ContentArea">
-        <TabView>
-            <TabViewItem Header="Tab 1">
-                <TextBlock Text="Tab 1 Content" />
-            </TabViewItem>
-            <TabViewItem Header="Tab 2">
-                <TextBlock Text="Tab 2 Content" />
-            </TabViewItem>
-            <TabViewItem Header="Tab 3">
-                <TextBlock Text="Tab 3 Content" />
-            </TabViewItem>
-        </TabView>
+    <Grid>
+        <MenuBar>
+            <MenuBarItem Tag="Home" />
+            <MenuBarItem Tag="Search" />
+            <MenuBarItem Tag="Settings" />
+        </MenuBar>
     </Grid>
 </Page>

@@ -13,7 +13,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SerialPortHelper : AbstractSerialHelper() {
+class SerialHelper : AbstractSerialHelper() {
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
@@ -111,6 +111,6 @@ class SerialPortHelper : AbstractSerialHelper() {
     }
 
     companion object {
-        val instance: SerialPortHelper by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { SerialPortHelper() }
+        val instance: SerialHelper by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { SerialHelper() }
     }
 }

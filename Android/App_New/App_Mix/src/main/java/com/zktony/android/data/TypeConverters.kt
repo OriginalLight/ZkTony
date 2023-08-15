@@ -3,6 +3,8 @@ package com.zktony.android.data
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.zktony.android.data.entities.Coordinate
+import com.zktony.android.data.entities.Dosage
 import java.util.Date
 
 /**
@@ -39,32 +41,32 @@ object TripleConverters {
     }
 }
 
-object IntConverters {
+object CoordinateConverters {
     @TypeConverter
     @JvmStatic
-    fun stringToObject(value: String): List<Int> {
-        val listType = object : TypeToken<List<Int>>() {}.type
-        return Gson().fromJson(value, listType)
+    fun stringToObject(value: String): Coordinate {
+        val type = object : TypeToken<Coordinate>() {}.type
+        return Gson().fromJson(value, type)
     }
 
     @TypeConverter
     @JvmStatic
-    fun objectToString(list: List<Int>): String {
-        return Gson().toJson(list)
+    fun objectToString(obj: Coordinate): String {
+        return Gson().toJson(obj)
     }
 }
 
-object FloatConverters {
+object DosageConverters {
     @TypeConverter
     @JvmStatic
-    fun stringToObject(value: String): List<Float> {
-        val listType = object : TypeToken<List<Float>>() {}.type
-        return Gson().fromJson(value, listType)
+    fun stringToObject(value: String): Dosage {
+        val type = object : TypeToken<Dosage>() {}.type
+        return Gson().fromJson(value, type)
     }
 
     @TypeConverter
     @JvmStatic
-    fun objectToString(list: List<Float>): String {
-        return Gson().toJson(list)
+    fun objectToString(obj: Dosage): String {
+        return Gson().toJson(obj)
     }
 }
