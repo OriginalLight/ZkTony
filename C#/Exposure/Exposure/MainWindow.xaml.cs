@@ -1,7 +1,5 @@
-﻿using Windows.UI.ViewManagement;
-using Exposure.Contracts.Services;
+﻿using Exposure.Contracts.Services;
 using Exposure.Helpers;
-using Microsoft.UI.Dispatching;
 
 namespace Exposure;
 

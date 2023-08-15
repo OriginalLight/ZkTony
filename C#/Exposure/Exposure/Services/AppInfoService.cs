@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using Windows.ApplicationModel;
-using Exposure.Contracts.Services;
+﻿using Exposure.Contracts.Services;
 using Exposure.Helpers;
 
 namespace Exposure.Services;

@@ -1,9 +1,4 @@
-﻿using Windows.Storage.AccessCache;
-using Windows.Storage.Pickers;
-using Exposure.ViewModels;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using WinRT.Interop;
+﻿using Exposure.ViewModels;
 
 namespace Exposure.Views;
 
@@ -34,7 +29,7 @@ public sealed partial class SettingsPage : Page
             }
         }
 
-        await ViewModel.InitializeAsync();
+        await ViewModel.GetStorageAsync();
     }
 
     private async void PickFolderButton_Click(object sender, RoutedEventArgs e)

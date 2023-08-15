@@ -5,9 +5,6 @@ using Exposure.Notifications;
 using Exposure.Services;
 using Exposure.ViewModels;
 using Exposure.Views;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.UI.Xaml;
 using UnhandledExceptionEventArgs = Microsoft.UI.Xaml.UnhandledExceptionEventArgs;
 
 namespace Exposure;

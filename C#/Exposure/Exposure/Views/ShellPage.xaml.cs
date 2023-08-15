@@ -1,11 +1,6 @@
-﻿using Windows.System;
-using Exposure.Contracts.Services;
+﻿using Exposure.Contracts.Services;
 using Exposure.Helpers;
 using Exposure.ViewModels;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
 
 namespace Exposure.Views;
 

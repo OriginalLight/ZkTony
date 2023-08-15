@@ -1,7 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using Exposure.Contracts.Services;
+﻿using Exposure.Contracts.Services;
 using Exposure.Views;
-using Microsoft.UI.Xaml.Navigation;
 
 namespace Exposure.ViewModels;
 

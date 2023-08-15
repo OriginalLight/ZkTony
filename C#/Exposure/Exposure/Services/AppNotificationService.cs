@@ -1,7 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.Web;
-using Exposure.Contracts.Services;
-using Microsoft.Windows.AppNotifications;
+﻿using Exposure.Contracts.Services;
 
 namespace Exposure.Notifications;
 

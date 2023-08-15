@@ -1,5 +1,4 @@
 ﻿using Exposure.ViewModels;
-using Microsoft.UI.Xaml.Controls;
 
 namespace Exposure.Views;
 

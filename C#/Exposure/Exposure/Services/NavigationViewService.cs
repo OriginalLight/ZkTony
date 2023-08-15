@@ -1,8 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Exposure.Contracts.Services;
+﻿using Exposure.Contracts.Services;
 using Exposure.Helpers;
 using Exposure.ViewModels;
-using Microsoft.UI.Xaml.Controls;
 
 namespace Exposure.Services;
 

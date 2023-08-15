@@ -1,7 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Exposure.Contracts.Services;
-using Microsoft.UI.Xaml;
+﻿using Exposure.Contracts.Services;
 
 namespace Exposure.ViewModels;
 
@@ -25,10 +22,6 @@ public partial class SettingsViewModel : ObservableRecipient
         _versionDescription = GetVersionDescription();
     }
 
-    public async Task InitializeAsync() => Storage =
-        await _localSettingsService.ReadSettingAsync<string>(nameof(Storage)) ??
-        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
     [RelayCommand]
     private async Task SwitchThemeAsync(ElementTheme elementTheme)
     {
@@ -41,6 +34,13 @@ public partial class SettingsViewModel : ObservableRecipient
         Storage = path;
         await _localSettingsService.SaveSettingAsync(nameof(Storage), path);
     }
+
+    public async Task GetStorageAsync()
+    {
+        Storage = await _localSettingsService.ReadSettingAsync<string>(nameof(Storage)) ??
+        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+    }
+
 
     private static string GetVersionDescription()
     {
