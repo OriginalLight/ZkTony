@@ -34,7 +34,7 @@ public sealed partial class SettingsPage : Page
             }
         }
 
-        await ViewModel.InitializeAsync();
+        await ViewModel.GetStorageAsync();
     }
 
     private async void PickFolderButton_Click(object sender, RoutedEventArgs e)

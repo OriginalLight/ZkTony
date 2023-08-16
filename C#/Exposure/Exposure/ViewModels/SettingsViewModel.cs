@@ -25,15 +25,17 @@ public partial class SettingsViewModel : ObservableRecipient
         _versionDescription = GetVersionDescription();
     }
 
-    public async Task InitializeAsync() => Storage =
-        await _localSettingsService.ReadSettingAsync<string>(nameof(Storage)) ??
-        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
     [RelayCommand]
     private async Task SwitchThemeAsync(ElementTheme elementTheme)
     {
         ElementTheme = elementTheme;
         await _themeSelectorService.SetThemeAsync(elementTheme);
+    }
+    
+    public async Task GetStorageAsync()
+    {
+        Storage = await _localSettingsService.ReadSettingAsync<string>(nameof(Storage)) ??
+                  Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
     }
 
     public async Task SetStorageAsync(string path)

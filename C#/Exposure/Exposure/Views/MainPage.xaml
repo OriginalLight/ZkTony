@@ -9,10 +9,6 @@
     mc:Ignorable="d">
 
     <Grid>
-        <MenuBar>
-            <MenuBarItem Tag="Home" />
-            <MenuBarItem Tag="Search" />
-            <MenuBarItem Tag="Settings" />
-        </MenuBar>
+        <TextBlock Text="Hello, world!" Margin="36,36,36,36"/>
     </Grid>
 </Page>
