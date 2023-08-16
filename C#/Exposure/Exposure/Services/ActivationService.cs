@@ -1,6 +1,8 @@
 ﻿using Exposure.Activation;
 using Exposure.Contracts.Services;
 using Exposure.Views;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 
 namespace Exposure.Services;
 
