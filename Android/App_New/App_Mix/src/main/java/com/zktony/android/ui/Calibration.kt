@@ -22,7 +22,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -43,11 +42,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.data.entities.Calibration
+import com.zktony.android.ui.components.CircleTabRow
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.ext.dateFormat
-import com.zktony.android.utils.ext.format
-import com.zktony.android.utils.ext.showShortToast
+import com.zktony.android.utils.extra.dateFormat
+import com.zktony.android.utils.extra.format
+import com.zktony.android.utils.extra.showShortToast
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -356,32 +356,13 @@ fun CalibrationDetail(
                     )
                 },
                 leadingIcon = {
-                    TabRow(
-                        modifier = Modifier
-                            .width(500.dp)
-                            .padding(vertical = 4.dp, horizontal = 8.dp)
-                            .clip(CircleShape),
-                        selectedTabIndex = selectedTabIndex,
-                        containerColor = MaterialTheme.colorScheme.inversePrimary,
-                        indicator = { Box {} },
-                        divider = { },
+                    CircleTabRow(
+                        modifier = Modifier.width(500.dp),
+                        tabItems = listOf("M0", "M1", "M2", "M3", "M4", "M5", "M6"),
+                        selected = selectedTabIndex,
                     ) {
-                        list.forEachIndexed { index, s ->
-                            Tab(
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .background(if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary),
-                                selected = selectedTabIndex == index,
-                                onClick = {
-                                    selectedTabIndex = index
-                                }
-                            ) {
-                                Text(
-                                    modifier = Modifier.padding(vertical = 12.dp),
-                                    text = s,
-                                    color = if (selectedTabIndex == index) Color.White else Color.Black,
-                                )
-                            }
+                        scope.launch {
+                            selectedTabIndex = it
                         }
                     }
                 },

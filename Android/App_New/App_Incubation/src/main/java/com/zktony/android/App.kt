@@ -2,7 +2,7 @@ package com.zktony.android
 
 import android.app.Application
 import com.zktony.android.di.koinModule
-import com.zktony.android.utils.ext.Ext
+import com.zktony.android.utils.extra.Ext
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin

@@ -18,11 +18,17 @@ import java.util.Date
 @Immutable
 @TypeConverters(TripleConverters::class)
 data class Calibration(
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "id") val id: Long = 0L,
-    @ColumnInfo(name = "text") val text: String = "Default",
-    @ColumnInfo(name = "data") val data: List<Triple<Int, Double, Double>> = emptyList(),
-    @ColumnInfo(name = "active") val active: Boolean = false,
-    @ColumnInfo(name = "create_time") val createTime: Date = Date(System.currentTimeMillis()),
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
+    val id: Long = 0L,
+    @ColumnInfo(name = "text")
+    val text: String = "默认",
+    @ColumnInfo(name = "data")
+    val data: List<Triple<Int, Double, Double>> = emptyList(),
+    @ColumnInfo(name = "active")
+    val active: Boolean = false,
+    @ColumnInfo(name = "create_time")
+    val createTime: Date = Date(System.currentTimeMillis()),
 ) {
     // 计算每个泵每一步的出液量
     fun vps(): List<Double> {

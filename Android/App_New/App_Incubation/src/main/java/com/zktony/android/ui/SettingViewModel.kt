@@ -6,8 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
+import com.zktony.android.data.dao.MotorDao
+import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.ext.*
+import com.zktony.android.utils.extra.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -19,12 +22,13 @@ import java.io.File
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class SettingViewModel : ViewModel() {
+class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
     private val _application = MutableStateFlow<Application?>(null)
+    private val _selected = MutableStateFlow(0L)
     private val _progress = MutableStateFlow(0)
-    private val _page = MutableStateFlow(PageType.LIST)
+    private val _page = MutableStateFlow(PageType.SETTINGS)
 
     val uiState = _uiState.asStateFlow()
 
@@ -34,11 +38,15 @@ class SettingViewModel : ViewModel() {
             launch {
                 combine(
                     _application,
+                    dao.getAll(),
+                    _selected,
                     _progress,
                     _page
-                ) { application, progress, page ->
+                ) { application, entities, selected, progress, page ->
                     SettingUiState(
                         application = application,
+                        entities = entities,
+                        selected = selected,
                         progress = progress,
                         page = page
                     )
@@ -63,12 +71,14 @@ class SettingViewModel : ViewModel() {
      *
      * @param event The setting event to handle.
      */
-    fun event(event: SettingEvent) {
+    fun uiEvent(event: SettingUiEvent) {
         when (event) {
-            is SettingEvent.NavTo -> _page.value = event.page
-            is SettingEvent.Navigation -> navigation(event.navigation)
-            is SettingEvent.Network -> network()
-            is SettingEvent.Update -> update()
+            is SettingUiEvent.NavTo -> _page.value = event.page
+            is SettingUiEvent.Navigation -> navigation(event.navigation)
+            is SettingUiEvent.Network -> network()
+            is SettingUiEvent.CheckUpdate -> checkUpdate()
+            is SettingUiEvent.ToggleSelected -> _selected.value = event.id
+            is SettingUiEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
         }
     }
 
@@ -109,7 +119,7 @@ class SettingViewModel : ViewModel() {
     /**
      * Checks for updates and downloads the latest version of the application if available.
      */
-    private fun update() {
+    private fun checkUpdate() {
         viewModelScope.launch {
             // Check if the network is available
             if (Ext.ctx.isNetworkAvailable()) {
@@ -171,25 +181,20 @@ class SettingViewModel : ViewModel() {
     }
 }
 
-/**
- * Data class that represents the UI state of the setting screen.
- *
- * @param application The application to display in the setting screen.
- * @param progress The progress to display in the setting screen.
- * @param page The page type to display in the setting screen.
- */
 data class SettingUiState(
     val application: Application? = null,
+    val entities: List<Motor> = emptyList(),
+    val selected: Long = 0,
     val progress: Int = 0,
-    val page: PageType = PageType.LIST,
+    val page: PageType = PageType.SETTINGS,
 )
 
-/**
- * Sealed class that defines the possible events that can be triggered in the setting screen.
- */
-sealed class SettingEvent {
-    data object Network : SettingEvent()
-    data object Update : SettingEvent()
-    data class NavTo(val page: PageType) : SettingEvent()
-    data class Navigation(val navigation: Boolean) : SettingEvent()
+
+sealed class SettingUiEvent {
+    data object Network : SettingUiEvent()
+    data object CheckUpdate : SettingUiEvent()
+    data class NavTo(val page: PageType) : SettingUiEvent()
+    data class Navigation(val navigation: Boolean) : SettingUiEvent()
+    data class ToggleSelected(val id: Long) : SettingUiEvent()
+    data class Update(val entity: Motor) : SettingUiEvent()
 }

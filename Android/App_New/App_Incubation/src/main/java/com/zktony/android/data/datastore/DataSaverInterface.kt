@@ -46,10 +46,8 @@ class DataSaverPreferences(
         senseExternalDataChange
     )
 
-    private val logger by lazy { DataSaverLogger("DataSaverPreferences") }
     private val onSharedPreferenceChangeListener by lazy {
         SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-            logger.d("data changed: $key -> ${sharedPreferences.all[key]}, subscriptionCount: ${externalDataChangedFlow?.subscriptionCount?.value}")
             externalDataChangedFlow?.tryEmit(key to sharedPreferences.all[key])
         }
     }
@@ -129,7 +127,6 @@ class DataSaverInMemory(senseExternalDataChange: Boolean = false) :
     private val map = ObservableMap()
 
     override fun <T> saveData(key: String, data: T) {
-        waringUsage()
         if (data == null) {
             remove(key)
             return
@@ -138,21 +135,16 @@ class DataSaverInMemory(senseExternalDataChange: Boolean = false) :
     }
 
     override fun <T> readData(key: String, default: T): T {
-        waringUsage()
         val res = map[key] ?: default
         return res as T
     }
 
     override fun remove(key: String) {
-        waringUsage()
         map.remove(key)
     }
 
     override fun contains(key: String) = map.containsKey(key)
 
-    private fun waringUsage() {
-        DataSaverLogger.w("DataSaverInMemory is used, it's not recommended to use it in production because it saves data in memory, which will be lost when the app is killed. If you are in Preview mode, please ignore this warning.")
-    }
 }
 
 /**

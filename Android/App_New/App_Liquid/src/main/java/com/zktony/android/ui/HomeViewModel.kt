@@ -6,11 +6,11 @@ import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.RuntimeHelper
-import com.zktony.android.utils.ext.serial
-import com.zktony.android.utils.ext.serialHelper
+import com.zktony.android.utils.extra.serial
+import com.zktony.android.utils.extra.serialHelper
 import com.zktony.android.utils.model.ExecuteType
-import com.zktony.android.utils.model.MoveType
 import com.zktony.android.utils.model.RuntimeState
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -89,42 +89,36 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             _loading.value = 1
             try {
                 withTimeout(60 * 1000L) {
-                    val ids = listOf(0, 1)
-                    serial { queryGpio(ids) }
+                    serial { gpio(0, 1) }
                     delay(300L)
-                    ids.forEach {
-                        if (!serialHelper.gpio[it]) {
-                            serial {
-                                timeout = 1000L * 30
-                                move(MoveType.MOVE_PULSE) {
-                                    index = it
-                                    pulse = 3200L * -30
+                    val job: MutableList<Job?> = MutableList(2) { null }
+                    repeat(2) {
+                        job[it] = launch {
+                            if (!serialHelper.gpio[it]) {
+                                serial {
+                                    timeout = 1000L * 30
+                                    start(index = it, pulse = 3200L * -30)
                                 }
                             }
-                        }
 
-                        serial {
-                            timeout = 1000L * 15
-                            move(MoveType.MOVE_PULSE) {
-                                index = it
-                                pulse = 3200L * 2
-                                acc = 50
-                                dec = 80
-                                speed = 100
+                            serial {
+                                start(
+                                    index = it,
+                                    pulse = 3200L * 2,
+                                    ads = Triple(50, 80, 100)
+                                )
                             }
-                        }
 
-                        serial {
-                            timeout = 1000L * 15
-                            move(MoveType.MOVE_PULSE) {
-                                index = it
-                                pulse = 3200L * -3
-                                acc = 50
-                                dec = 80
-                                speed = 100
+                            serial {
+                                start(
+                                    index = it,
+                                    pulse = 3200L * -3,
+                                    ads = Triple(50, 80, 100)
+                                )
                             }
                         }
                     }
+                    job.forEach { it?.join() }
                 }
             } catch (ex: Exception) {
                 _loading.value = 0
@@ -144,10 +138,10 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 serial {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {
-                        move(MoveType.MOVE_PULSE) {
-                            this.index = it + 2
-                            pulse = 3200L * 10000L * if (index <= 1) 1 else -1
-                        }
+                        start(
+                            index = it + 2,
+                            pulse = 3200L * 10000 * if (index <= 1) 1 else -1
+                        )
                     }
                 }
             }

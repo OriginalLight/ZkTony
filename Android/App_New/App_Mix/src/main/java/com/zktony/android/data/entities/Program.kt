@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.room.*
 import com.zktony.android.data.CoordinateConverters
 import com.zktony.android.data.DosageConverters
+import com.zktony.android.data.SpeedConverters
 import java.util.Date
 
 /**
@@ -19,6 +20,7 @@ import java.util.Date
 @TypeConverters(
     CoordinateConverters::class,
     DosageConverters::class,
+    SpeedConverters::class
 )
 @Immutable
 data class Program(
@@ -31,6 +33,8 @@ data class Program(
     val coordinate: Coordinate = Coordinate(),
     @ColumnInfo(name = "dosage")
     val dosage: Dosage = Dosage(),
+    @ColumnInfo(name = "speed")
+    val speed: Speed = Speed(),
     @ColumnInfo(name = "create_time")
     val createTime: Date = Date(System.currentTimeMillis()),
 )
@@ -45,4 +49,9 @@ data class Dosage(
     val coagulant: Double = 0.0,
     val preColloid: Double = 0.0,
     val preCoagulant: Double = 0.0,
+)
+
+data class Speed(
+    val glue: Double = 80.0,
+    val pre: Double = 300.0,
 )

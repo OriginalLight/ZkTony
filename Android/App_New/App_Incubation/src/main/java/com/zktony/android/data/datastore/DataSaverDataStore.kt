@@ -4,14 +4,7 @@ package com.zktony.android.data.datastore
 
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.doublePreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.floatPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -29,14 +22,12 @@ class DataSaverDataStore(
     senseExternalDataChange: Boolean = false
 ) : DataSaverInterface(senseExternalDataChange) {
     private val scope by lazy { CoroutineScope(Dispatchers.IO) }
-    private val logger by lazy { DataSaverLogger("DataStorePreferences") }
 
     init {
         if (senseExternalDataChange) {
             scope.launch {
                 dataStore.data.distinctUntilChanged().collect {
                     it.asMap().forEach { (key, value) ->
-                        logger.d("$key -> $value is emitted")
                         externalDataChangedFlow?.tryEmit(key.name to value)
                     }
                 }

@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.zktony.android.data.entities.Coordinate
 import com.zktony.android.data.entities.Dosage
+import com.zktony.android.data.entities.Speed
 import java.util.Date
 
 /**
@@ -67,6 +68,21 @@ object DosageConverters {
     @TypeConverter
     @JvmStatic
     fun objectToString(obj: Dosage): String {
+        return Gson().toJson(obj)
+    }
+}
+
+object SpeedConverters {
+    @TypeConverter
+    @JvmStatic
+    fun stringToObject(value: String): Speed {
+        val type = object : TypeToken<Speed>() {}.type
+        return Gson().fromJson(value, type)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun objectToString(obj: Speed): String {
         return Gson().toJson(obj)
     }
 }

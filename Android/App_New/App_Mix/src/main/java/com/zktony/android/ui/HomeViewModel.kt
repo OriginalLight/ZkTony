@@ -6,10 +6,11 @@ import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.ext.getGpio
-import com.zktony.android.utils.ext.serial
+import com.zktony.android.utils.extra.dataSaver
+import com.zktony.android.utils.extra.getGpio
+import com.zktony.android.utils.extra.pulse
+import com.zktony.android.utils.extra.serial
 import com.zktony.android.utils.model.ExecuteType
-import com.zktony.android.utils.model.MoveType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -55,6 +56,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 }
             }
             launch {
+                delay(1000L)
                 initializer()
             }
         }
@@ -77,64 +79,39 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         viewModelScope.launch {
             _loading.value = 1
             try {
-                // Initialize the axes and syringe within a timeout of 60 seconds
                 withTimeout(2 * 60 * 1000L) {
-                    val ids = listOf(1, 0)
-                    // 查询GPIO状态
-                    serial {
-                        delay = 300L
-                        queryGpio(ids)
+                    serial { query(0, 1, 2) }
+                    delay(300L)
+                    val job = launch {
+                        if (!getGpio(2)) {
+                            serial { valve(2 to 1) }
+                            delay(30L)
+                            serial {
+                                timeout = 1000L * 60
+                                start(index = 2, pulse = Constants.ZT_0005 * 1)
+                            }
+                        }
                     }
-                    // 针对每个电机进行初始化
-                    ids.forEach {
-                        // 如果电机未初始化，则进行初始化
+
+                    listOf(1, 0).forEach {
                         if (!getGpio(it)) {
-                            // 进行电机初始化
                             serial {
                                 timeout = 1000L * 30
-                                move(MoveType.MOVE_PULSE) {
-                                    index = it
-                                    pulse = 3200L * -30
-                                }
+                                start(index = it, pulse = 3200L * -30)
                             }
                         }
 
-                        // 进行正向运动
                         serial {
                             timeout = 1000L * 10
-                            move(MoveType.MOVE_PULSE) {
-                                index = it
-                                pulse = 3200L * 2
-                                acc = 50
-                                dec = 80
-                                speed = 100
-                            }
+                            start(index = it, pulse = 3200L * 1, ads = Triple(600, 800, 1200))
                         }
 
-                        // 进行反向运动
                         serial {
                             timeout = 1000L * 15
-                            move(MoveType.MOVE_PULSE) {
-                                index = it
-                                pulse = 3200L * -3
-                                acc = 50
-                                dec = 80
-                                speed = 100
-                            }
+                            start(index = it, pulse = 3200L * -2, ads = Triple(600, 800, 1200))
                         }
                     }
-
-                    delay(150L)
-                    serial { queryGpio(listOf(2)) }
-                    delay(100L)
-                    serial { valve(2 to 0) }
-                    serial {
-                        timeout = 1000L * 30
-                        move(MoveType.MOVE_PULSE) {
-                            index = 2
-                            pulse = Constants.MAX_SYRINGE * -1
-                        }
-                    }
+                    job.join()
                 }
             } catch (ex: Exception) {
                 _loading.value = 0
@@ -147,114 +124,161 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private fun start() {
         viewModelScope.launch {
             val selected = _uiState.value.entities.find { it.id == _selected.value }!!
-            _job.value = launch(Dispatchers.Default) {
-                // Step 1: Move the Z axis to 0
+            val abscissa = dataSaver.readData(Constants.ZT_0003, 0.0)
+            val ordinate = dataSaver.readData(Constants.ZT_0004, 0.0)
+            _job.value?.cancel()
+            _job.value = launch {
                 serial {
-                    move {
-                        index = 1
-                        dv = 0.0
-                    }
+                    timeout = 1000L * 60L
+                    start(index = 1, dv = ordinate)
                 }
-                // Step 2: Move the Y axis to 0
                 serial {
-                    move {
-                        index = 0
-                        dv = 0.0
-                    }
+                    timeout = 1000L * 60L
+                    start(index = 0, dv = abscissa)
                 }
-
-                // Step 3: Open the valve
-                serial {
-                    delay = 100L
-                    valve(2 to 1)
-                }
-
-                // Perform the pre-dispense operation
-                // Step 4: Perform the pre-dispense operation
+                serial { valve(2 to 1) }
+                delay(30L)
                 serial {
                     timeout = 1000L * 60 * 1
-                    move {
-                        index = 2
-                        dv = selected.dosage.preCoagulant
-                    }
-                    repeat(6) {
-                        move {
-                            index = it + 3
-                            dv = selected.dosage.preColloid
-                        }
-                    }
+
+                    val s = selected.speed.pre
+                    val p1 = pulse(index = 2, dvp = selected.dosage.preCoagulant * 6)
+                    val p2 = pulse(index = 3, dvp = selected.dosage.preColloid * 2)
+                    val p3 = pulse(index = 4, dvp = selected.dosage.preColloid * 2)
+                    val p4 = pulse(index = 5, dvp = selected.dosage.preColloid * 2)
+
+                    val ad = (2 * s * 100).toLong()
+                    val s1 = (p1 / (maxOf(p2, p3, p4) / s) * 100).toLong()
+                    val s2 = (s * 100).toLong()
+
+                    glue(index = 2, pulse = p1, ads = Triple(ad, ad, s1))
+                    glue(index = 3, pulse = p2, ads = Triple(ad, ad, s2))
+                    glue(index = 4, pulse = p3, ads = Triple(ad, ad, s2))
+                    glue(index = 5, pulse = p4, ads = Triple(ad, ad, s2))
                 }
 
-                // Move to the dispensing position
-                // Step 5: Move the Z axis to 1
                 serial {
-                    move {
-                        index = 0
-                        dv = selected.coordinate.abscissa
-                    }
+                    timeout = 1000L * 60L
+                    start(index = 0, dv = selected.coordinate.abscissa)
                 }
-                // Step 6: Move the Y axis to 1
                 serial {
-                    move {
-                        index = 1
-                        dv = selected.coordinate.ordinate
-                    }
+                    timeout = 1000L * 60L
+                    start(index = 1, dv = selected.coordinate.ordinate)
                 }
 
-                // Perform the dispensing operation
-                // Step 7: Perform the dispensing operation
                 serial {
-                    timeout = 1000L * 60 * 3
-                    move {
-                        index = 2
-                        dv = selected.dosage.coagulant
-                    }
-                    repeat(6) {
-                        move {
-                            index = it + 3
-                            dv = selected.dosage.colloid / 2
-                        }
-                    }
+                    timeout = 1000L * 60 * 10
+                    val s = selected.speed.glue
+                    val p1 = pulse(index = 2, dvp = selected.dosage.coagulant * 6)
+                    val p2 = pulse(index = 3, dvp = selected.dosage.colloid)
+                    val p3 = pulse(index = 4, dvp = selected.dosage.colloid)
+                    val p4 = pulse(index = 5, dvp = selected.dosage.colloid)
+                    val p5 = pulse(index = 6, dvp = selected.dosage.colloid)
+                    val p6 = pulse(index = 7, dvp = selected.dosage.colloid)
+                    val p7 = pulse(index = 8, dvp = selected.dosage.colloid)
+
+                    val pv1 = (p2 + p5) / 2
+                    val pv2 = (p3 + p6) / 2
+                    val pv3 = (p4 + p7) / 2
+
+                    glue(
+                        index = 2,
+                        pulse = p1,
+                        ads = Triple(
+                            (2.5 * s * 100).toLong(),
+                            (2.5 * s * 100).toLong(),
+                            (p1 / (maxOf(pv1, pv2, pv3) * 2 / s) * 100).toLong()
+                        )
+                    )
+
+                    glue(
+                        index = 3,
+                        pulse = pv1,
+                        ads = Triple(
+                            (s * s / 2 / pv1 * 100).toLong(),
+                            (s * 100).toLong(),
+                            (s * 100).toLong()
+                        )
+                    )
+
+                    glue(
+                        index = 4,
+                        pulse = pv2,
+                        ads = Triple(
+                            (s * s / 2 / pv2 * 100).toLong(),
+                            (s * 100).toLong(),
+                            (s * 100).toLong()
+                        )
+                    )
+
+                    glue(
+                        index = 5,
+                        pulse = pv3,
+                        ads = Triple(
+                            (s * s / 2 / pv3 * 100).toLong(),
+                            (s * 100).toLong(),
+                            (s * 100).toLong()
+                        )
+                    )
+
+                    glue(
+                        index = 6,
+                        pulse = p5,
+                        ads = Triple(
+                            (s * 100).toLong(),
+                            (s * s / 2 / pv1 * 100).toLong(),
+                            (s * 100).toLong()
+                        )
+                    )
+
+                    glue(
+                        index = 7,
+                        pulse = p6,
+                        ads = Triple(
+                            (s * 100).toLong(),
+                            (s * s / 2 / pv2 * 100).toLong(),
+                            (s * 100).toLong()
+                        )
+                    )
+
+                    glue(
+                        index = 8,
+                        pulse = p7,
+                        ads = Triple(
+                            (s * 100).toLong(),
+                            (s * s / 2 / pv3 * 100).toLong(),
+                            (s * 100).toLong()
+                        )
+                    )
                 }
-            }
 
-            // Handle the completion of the job
-            _job.value?.invokeOnCompletion {
-                launch {
-                    // Reset the screen and stop the motors
-                    _job.value = null
-                    _loading.value = 1
-                    serial {
-                        move {
-                            index = 1
-                            dv = 0.0
-                        }
-                    }
-                    serial {
-                        move {
-                            index = 0
-                            dv = 0.0
-                        }
-                    }
+                _loading.value = 1
+                serial {
+                    timeout = 1000L * 60L
+                    start(index = 1, dv = ordinate)
+                }
 
-                    // Close the valve
-                    serial {
-                        delay = 100L
-                        valve(2 to 0)
-                    }
+                serial {
+                    timeout = 1000L * 60L
+                    start(index = 0, dv = abscissa)
+                }
 
-                    // Perform a syringe operation to clear the system
+                serial { query(2) }
+                delay(300L)
+                if (!getGpio(2)) {
+                    serial { valve(2 to 0) }
+                    delay(30L)
                     serial {
                         timeout = 1000L * 60
-                        move(MoveType.MOVE_PULSE) {
-                            index = 2
-                            pulse = 0
-                        }
+                        start(index = 2, pulse = Constants.ZT_0005 * -1)
                     }
-
-                    // Set the loading state to 0 to indicate that the execution has stopped
-                    _loading.value = 0
                 }
+
+                // Set the loading state to 0 to indicate that the execution has stopped
+                _loading.value = 0
+            }
+            _job.value?.invokeOnCompletion {
+                _job.value = null
             }
         }
     }
@@ -262,44 +286,39 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private fun stop() {
         viewModelScope.launch {
             // Cancel and join the current job
-            _job.value?.cancelAndJoin()
+            _job.value?.cancel()
             _job.value = null
 
             // Reset the screen and stop the motors
             _loading.value = 1
+
+            val abscissa = dataSaver.readData(Constants.ZT_0003, 0.0)
+            val ordinate = dataSaver.readData(Constants.ZT_0004, 0.0)
+
+            serial { stop(0, 1, 2, 3, 4, 5, 6, 7, 8, 9) }
+            delay(200L)
+
             serial {
-                delay = 500L
-                reset()
-            }
-            serial {
-                move {
-                    index = 1
-                    dv = 0.0
-                }
-            }
-            serial {
-                move {
-                    index = 0
-                    dv = 0.0
-                }
+                timeout = 1000L * 60L
+                start(index = 1, dv = ordinate)
             }
 
-            // Close the syringe valve
             serial {
-                delay = 100L
-                valve(2 to 0)
+                timeout = 1000L * 60L
+                start(index = 0, dv = abscissa)
             }
 
-            // Perform a syringe operation to clear the system
-            serial {
-                timeout = 1000L * 60
-                move(MoveType.MOVE_PULSE) {
-                    index = 2
-                    pulse = 0
+            serial { query(2) }
+            delay(300L)
+            if (!getGpio(2)) {
+                serial { valve(2 to 0) }
+                delay(30L)
+                serial {
+                    timeout = 1000L * 60
+                    start(index = 2, pulse = Constants.ZT_0005 * -1)
                 }
             }
 
-            // Set the loading state to 0 to indicate that the execution has stopped
             _loading.value = 0
         }
     }
@@ -313,10 +332,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 _loading.value = 2
                 serial {
                     executeType = ExecuteType.ASYNC
-                    move(MoveType.MOVE_PULSE) {
-                        this.index = 9
-                        pulse = 3200L * 10000L
-                    }
+                    start(index = 9, pulse = 3200L * 10000L)
                 }
             }
         }
@@ -328,38 +344,27 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 _loading.value = 0
                 syringeJob?.cancelAndJoin()
                 syringeJob = null
+                serial { stop(2) }
+                delay(100L)
                 serial {
                     timeout = 1000L * 60
-                    move(MoveType.MOVE_PULSE) {
-                        this.index = 2
-                        pulse = 0
-                    }
+                    start(index = 2, pulse = Constants.ZT_0005 * -1)
                 }
             } else {
                 _loading.value = 3
                 syringeJob = launch {
                     while (true) {
-                        serial {
-                            delay = 100L
-                            valve(2 to if (index == 1) 1 else 0)
-                        }
+                        serial { valve(2 to if (index == 1) 0 else 1) }
+                        delay(30L)
                         serial {
                             timeout = 1000L * 60
-                            move(MoveType.MOVE_PULSE) {
-                                this.index = 2
-                                pulse = 0
-                            }
+                            start(index = 2, pulse = Constants.ZT_0005)
                         }
-                        serial {
-                            delay = 100L
-                            valve(2 to if (index == 1) 0 else 1)
-                        }
+                        serial { valve(2 to if (index == 1) 1 else 0) }
+                        delay(30L)
                         serial {
                             timeout = 1000L * 60
-                            move(MoveType.MOVE_PULSE) {
-                                this.index = 2
-                                pulse = 0
-                            }
+                            start(index = 2, pulse = Constants.ZT_0005 * -1)
                         }
                     }
                 }
@@ -377,10 +382,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 serial {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {
-                        move(MoveType.MOVE_PULSE) {
-                            this.index = it + 3
-                            pulse = 3200L * 10000L * if (index == 1) 1 else -1
-                        }
+                        start(index = it + 3, pulse = 3200L * 10000L * if (index == 1) 1 else -1)
                     }
                 }
             }

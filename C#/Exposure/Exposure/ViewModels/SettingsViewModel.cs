@@ -31,12 +31,13 @@ public partial class SettingsViewModel : ObservableRecipient
         ElementTheme = elementTheme;
         await _themeSelectorService.SetThemeAsync(elementTheme);
     }
-    
+
     public async Task GetStorageAsync()
     {
-        Storage = await _localSettingsService.ReadSettingAsync<string>(nameof(Storage)) ??
-                  Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        var Default = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        Storage = await _localSettingsService.ReadSettingAsync<string>(nameof(Storage)) ?? Default;
     }
+
 
     public async Task SetStorageAsync(string path)
     {

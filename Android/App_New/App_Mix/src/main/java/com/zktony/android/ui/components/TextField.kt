@@ -27,7 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.data.entities.Coordinate
-import com.zktony.android.utils.ext.format
+import com.zktony.android.utils.extra.format
 
 /**
  * @author 刘贺贺
@@ -108,6 +108,7 @@ fun CoordinateInput(
                                     color = Color.Gray
                                 )
                                 innerTextField()
+                                Spacer(modifier = Modifier.weight(1f))
                                 if (limit != null) {
                                     Text(
                                         text = "<= ${limit.abscissa}",
@@ -165,6 +166,7 @@ fun CoordinateInput(
                                     color = Color.Gray
                                 )
                                 innerTextField()
+                                Spacer(modifier = Modifier.weight(1f))
                                 if (limit != null) {
                                     Text(
                                         text = "<= ${limit.ordinate}",

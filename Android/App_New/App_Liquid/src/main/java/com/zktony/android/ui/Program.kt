@@ -39,10 +39,10 @@ import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.*
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.ext.dateFormat
-import com.zktony.android.utils.ext.format
-import com.zktony.android.utils.ext.showShortToast
-import com.zktony.android.utils.ext.serial
+import com.zktony.android.utils.extra.dateFormat
+import com.zktony.android.utils.extra.format
+import com.zktony.android.utils.extra.serial
+import com.zktony.android.utils.extra.showShortToast
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -441,8 +441,8 @@ fun OrificePlateDetail(
     toggleSelected: (OrificePlate) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
-    val abscissa by rememberDataSaverState(key = Constants.MAX_ABSCISSA, initialValue = 0.0)
-    val ordinate by rememberDataSaverState(key = Constants.MAX_ORDINATE, initialValue = 0.0)
+    val abscissa by rememberDataSaverState(key = Constants.ZT_0001, initialValue = 0.0)
+    val ordinate by rememberDataSaverState(key = Constants.ZT_0002, initialValue = 0.0)
 
     var selected by remember { mutableStateOf(orificePlate) }
     var volumeIndex by remember { mutableStateOf(0) }
@@ -608,14 +608,8 @@ fun OrificePlateDetail(
                     onClick = {
                         scope.launch {
                             serial {
-                                move {
-                                    index = 0
-                                    dv = selected.coordinate[0].abscissa
-                                }
-                                move {
-                                    index = 1
-                                    dv = selected.coordinate[0].abscissa
-                                }
+                                start(index = 0, dv = selected.coordinate[0].abscissa)
+                                start(index = 1, dv = selected.coordinate[0].ordinate)
                             }
                         }
                     }
@@ -642,14 +636,8 @@ fun OrificePlateDetail(
                     onClick = {
                         scope.launch {
                             serial {
-                                move {
-                                    index = 0
-                                    dv = selected.coordinate[1].abscissa
-                                }
-                                move {
-                                    index = 1
-                                    dv = selected.coordinate[1].ordinate
-                                }
+                                start(index = 0, dv = selected.coordinate[1].abscissa)
+                                start(index = 1, dv = selected.coordinate[1].ordinate)
                             }
                         }
                     }

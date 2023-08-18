@@ -7,11 +7,35 @@ package com.zktony.android.utils
 object Constants {
     const val DATABASE_NAME = "zktony-db"
     const val DOMAIN = "https://www.zktony.com"
-    const val MAX_ABSCISSA = "max_abscissa"
-    const val MAX_ORDINATE = "max_ordinate"
-    const val WASH_TANK_ABSCISSA = "wash_tank_abscissa"
-    const val WASH_TANK_ORDINATE = "wash_tank_ordinate"
-    const val NAVIGATION = "navigation"
     const val OSS_APP = "https://njzkty.oss-cn-beijing.aliyuncs.com/App.json"
-    const val MAX_SYRINGE = 3200L * 30
+
+    /**
+     * Navigation
+     */
+    const val NAVIGATION = "NAVIGATION"
+
+    /**
+     * 最大横坐标
+     */
+    const val ZT_0001 = "ZT_0001"
+
+    /**
+     * 最大纵坐标
+     */
+    const val ZT_0002 = "ZT_0002"
+
+    /**
+     * 废液槽横坐标
+     */
+    const val ZT_0003 = "ZT_0003"
+
+    /**
+     * 废液槽纵坐标
+     */
+    const val ZT_0004 = "ZT_0004"
+
+    /**
+     * 最大注射器高度
+     */
+    const val ZT_0005 = 3200L * 47
 }

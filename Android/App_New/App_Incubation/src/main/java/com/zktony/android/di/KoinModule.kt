@@ -2,8 +2,11 @@ package com.zktony.android.di
 
 import androidx.room.Room
 import com.zktony.android.data.AppDatabase
+import com.zktony.android.ui.CalibrationViewModel
+import com.zktony.android.ui.HomeViewModel
+import com.zktony.android.ui.ProgramViewModel
+import com.zktony.android.ui.SettingViewModel
 import com.zktony.android.utils.Constants.DATABASE_NAME
-import com.zktony.android.ui.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
@@ -26,9 +29,7 @@ val koinModule = module {
 
     // viewModel
     viewModelOf(::CalibrationViewModel)
-    viewModelOf(::ConfigViewModel)
     viewModelOf(::HomeViewModel)
-    viewModelOf(::MotorViewModel)
     viewModelOf(::ProgramViewModel)
     viewModelOf(::SettingViewModel)
 }

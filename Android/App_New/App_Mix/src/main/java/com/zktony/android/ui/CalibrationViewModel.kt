@@ -6,8 +6,7 @@ import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.ext.serial
-import com.zktony.android.utils.model.MoveType
+import com.zktony.android.utils.extra.serial
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -68,22 +67,19 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
         viewModelScope.launch {
             _loading.value = true
             if (index == 0) {
-                serial { valve(0 to 0) }
+                serial { valve(2 to 1) }
                 delay(100L)
             }
             serial {
-                move(MoveType.MOVE_PULSE) {
-                    this.index = index + 2
-                    pulse = 3200L * 20
-                }
+                timeout = 1000L * 40L
+                start(index = index + 2, pulse = 3200L * 20)
             }
             if (index == 0) {
-                serial { valve(2 to 1) }
+                serial { valve(2 to 0) }
+                delay(30L)
                 serial {
-                    move(MoveType.MOVE_PULSE) {
-                        this.index = 2
-                        pulse = Constants.MAX_SYRINGE * -1
-                    }
+                    timeout = 1000L * 60L
+                    start(index = 2, pulse = Constants.ZT_0005 * -1)
                 }
             }
             _loading.value = false

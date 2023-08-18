@@ -40,9 +40,9 @@ import com.zktony.android.ui.components.Header
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.ext.dateFormat
-import com.zktony.android.utils.ext.format
-import com.zktony.android.utils.ext.timeFormat
+import com.zktony.android.utils.extra.dateFormat
+import com.zktony.android.utils.extra.format
+import com.zktony.android.utils.extra.timeFormat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -210,7 +210,7 @@ fun MenuContent(
                         modifier = Modifier.weight(1f),
                         onClick = {
                             if (uiState.loading == 2) {
-                                uiEvent(HomeUiEvent.Pipeline(0))
+                                uiEvent(HomeUiEvent.Clean)
                             } else {
                                 cleanTime += 10
                             }

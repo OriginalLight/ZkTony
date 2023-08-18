@@ -40,7 +40,6 @@ fun App() {
     val navigationType = remember { mutableStateOf(NavigationType.NONE) }
 
     Surface(color = MaterialTheme.colorScheme.surface) {
-
         ModalNavigationDrawer(
             drawerState = drawerState,
             gesturesEnabled = false,
@@ -49,57 +48,51 @@ fun App() {
                     selectedDestination = selectedDestination,
                     navigationContentPosition = NavigationContentPosition.CENTER,
                     navigateToTopLevelDestination = navigationActions::navigateTo,
-                    onDrawerClicked = { scope.launch { drawerState.close() } },
+                    onDrawerClicked = { scope.launch { drawerState.close() } }
                 )
-            },
+            }
         ) {
             Row(modifier = Modifier.fillMaxSize()) {
                 AnimatedVisibility(
                     visible = navigationType.value == NavigationType.NAVIGATION_RAIL,
                     enter = expandHorizontally(),
-                    exit = shrinkHorizontally(),
+                    exit = shrinkHorizontally()
                 ) {
                     AppNavigationRail(
                         selectedDestination = selectedDestination,
                         navigationContentPosition = NavigationContentPosition.CENTER,
                         navigateToTopLevelDestination = navigationActions::navigateTo,
-                        onDrawerClicked = { scope.launch { drawerState.open() } },
+                        onDrawerClicked = { scope.launch { drawerState.open() } }
                     )
                 }
                 AppNavHost(
                     modifier = Modifier.fillMaxSize(),
                     navController = navController,
-                    toggleDrawer = { navigationType.value = it },
+                    toggleDrawer = { navigationType.value = it }
                 )
             }
         }
     }
 }
 
-/**
- * NavHost for the app
- *
- * @param navController NavHostController
- * @param modifier Modifier
- */
 @Composable
 private fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    toggleDrawer: (NavigationType) -> Unit = {},
+    toggleDrawer: (NavigationType) -> Unit = {}
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
 
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = Route.SPLASH,
+        startDestination = Route.SPLASH
     ) {
         composable(Route.SPLASH) {
             Splash(
                 modifier = Modifier,
                 navController = navController,
-                toggleDrawer = toggleDrawer,
+                toggleDrawer = toggleDrawer
             )
         }
         composable(Route.HOME) {
@@ -107,37 +100,25 @@ private fun AppNavHost(
                 modifier = Modifier,
                 navController = navController,
                 toggleDrawer = toggleDrawer,
-                viewModel = homeViewModel,
+                viewModel = homeViewModel
             )
         }
         composable(Route.PROGRAM) {
             Program(
                 modifier = Modifier,
-                navController = navController,
+                navController = navController
             )
         }
         composable(Route.CALIBRATION) {
             Calibration(
                 modifier = Modifier,
-                navController = navController,
+                navController = navController
             )
         }
         composable(Route.SETTING) {
             Setting(
                 modifier = Modifier,
-                navController = navController,
-            )
-        }
-        composable(Route.MOTOR) {
-            Motor(
-                modifier = Modifier,
-                navController = navController,
-            )
-        }
-        composable(Route.CONFIG) {
-            Config(
-                modifier = Modifier,
-                navController = navController,
+                navController = navController
             )
         }
     }

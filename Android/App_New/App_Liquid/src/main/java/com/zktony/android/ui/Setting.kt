@@ -44,7 +44,7 @@ import com.zktony.android.ui.components.VerificationCodeField
 import com.zktony.android.ui.components.VerificationCodeItem
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.ext.serial
+import com.zktony.android.utils.extra.serial
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import kotlin.math.roundToLong
@@ -691,14 +691,14 @@ fun ConfigList(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
-            var abscissa by rememberDataSaverState(key = Constants.MAX_ABSCISSA, default = 0.0)
-            var ordinate by rememberDataSaverState(key = Constants.MAX_ORDINATE, default = 0.0)
+            var abscissa by rememberDataSaverState(key = Constants.ZT_0001, default = 0.0)
+            var ordinate by rememberDataSaverState(key = Constants.ZT_0002, default = 0.0)
             var tankAbscissa by rememberDataSaverState(
-                key = Constants.WASH_TANK_ABSCISSA,
+                key = Constants.ZT_0003,
                 default = 0.0
             )
             var tankOrdinate by rememberDataSaverState(
-                key = Constants.WASH_TANK_ORDINATE,
+                key = Constants.ZT_0004,
                 default = 0.0
             )
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -715,11 +715,8 @@ fun ConfigList(modifier: Modifier = Modifier) {
                 ) {
                     scope.launch {
                         serial {
-                            move { dv = abscissa }
-                            move {
-                                index = 1
-                                dv = ordinate
-                            }
+                            start(index = 0, dv = abscissa)
+                            start(index = 1, dv = ordinate)
                         }
                     }
                 }
@@ -736,11 +733,8 @@ fun ConfigList(modifier: Modifier = Modifier) {
                 ) {
                     scope.launch {
                         serial {
-                            move { dv = tankAbscissa }
-                            move {
-                                index = 1
-                                dv = tankOrdinate
-                            }
+                            start(index = 0, dv = tankAbscissa)
+                            start(index = 1, dv = tankOrdinate)
                         }
                     }
                 }

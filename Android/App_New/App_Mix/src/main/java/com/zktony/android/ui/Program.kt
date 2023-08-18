@@ -2,9 +2,7 @@ package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -22,7 +20,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -45,10 +42,10 @@ import com.zktony.android.ui.components.Header
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.ext.dateFormat
-import com.zktony.android.utils.ext.format
-import com.zktony.android.utils.ext.serial
-import com.zktony.android.utils.ext.showShortToast
+import com.zktony.android.utils.extra.dateFormat
+import com.zktony.android.utils.extra.format
+import com.zktony.android.utils.extra.serial
+import com.zktony.android.utils.extra.showShortToast
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -302,10 +299,7 @@ fun ProgramList(
     }
 }
 
-@OptIn(
-    ExperimentalLayoutApi::class,
-    ExperimentalComposeUiApi::class,
-)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProgramDetail(
     modifier: Modifier = Modifier,
@@ -314,12 +308,14 @@ fun ProgramDetail(
 ) {
     val scope = rememberCoroutineScope()
     val selected = uiState.entities.find { it.id == uiState.selected } ?: Program()
-    val maxAbscissa by rememberDataSaverState(key = Constants.MAX_ABSCISSA, initialValue = 0.0)
-    val maxOrdinate by rememberDataSaverState(key = Constants.MAX_ORDINATE, initialValue = 0.0)
+    val maxAbscissa by rememberDataSaverState(key = Constants.ZT_0001, initialValue = 0.0)
+    val maxOrdinate by rememberDataSaverState(key = Constants.ZT_0002, initialValue = 0.0)
     var colloid by remember { mutableStateOf(selected.dosage.colloid.format(1)) }
     var coagulant by remember { mutableStateOf(selected.dosage.coagulant.format(1)) }
     var preColloid by remember { mutableStateOf(selected.dosage.preColloid.format(1)) }
     var preCoagulant by remember { mutableStateOf(selected.dosage.preCoagulant.format(1)) }
+    var glueSpeed by remember { mutableStateOf(selected.speed.glue.format(1)) }
+    var preSpeed by remember { mutableStateOf(selected.speed.pre.format(1)) }
 
     Column(
         modifier = modifier
@@ -374,7 +370,7 @@ fun ProgramDetail(
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     CircleTextField(
                         modifier = Modifier.weight(1f),
-                        title = "制胶/促凝剂",
+                        title = "制胶/促凝剂 μL",
                         value = coagulant,
                         onValueChange = {
                             scope.launch {
@@ -387,7 +383,7 @@ fun ProgramDetail(
                     )
                     CircleTextField(
                         modifier = Modifier.weight(1f),
-                        title = "制胶/胶体",
+                        title = "制胶/胶体 μL",
                         value = colloid,
                         onValueChange = {
                             scope.launch {
@@ -401,10 +397,24 @@ fun ProgramDetail(
                 }
             }
             item {
+                CircleTextField(
+                    title = "制胶/速度",
+                    value = glueSpeed,
+                    onValueChange = {
+                        scope.launch {
+                            glueSpeed = it
+                            val speed =
+                                selected.speed.copy(glue = it.toDoubleOrNull() ?: 0.0)
+                            event(ProgramUiEvent.Update(selected.copy(speed = speed)))
+                        }
+                    }
+                )
+            }
+            item {
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     CircleTextField(
                         modifier = Modifier.weight(1f),
-                        title = "预排/促凝剂",
+                        title = "预排/促凝剂 μL",
                         value = preCoagulant,
                         onValueChange = {
                             scope.launch {
@@ -417,7 +427,7 @@ fun ProgramDetail(
                     )
                     CircleTextField(
                         modifier = Modifier.weight(1f),
-                        title = "预排/胶体",
+                        title = "预排/胶体 μL",
                         value = preColloid,
                         onValueChange = {
                             scope.launch {
@@ -431,8 +441,22 @@ fun ProgramDetail(
                 }
             }
             item {
+                CircleTextField(
+                    title = "预排/速度",
+                    value = preSpeed,
+                    onValueChange = {
+                        scope.launch {
+                            preSpeed = it
+                            val speed =
+                                selected.speed.copy(pre = it.toDoubleOrNull() ?: 0.0)
+                            event(ProgramUiEvent.Update(selected.copy(speed = speed)))
+                        }
+                    }
+                )
+            }
+            item {
                 CoordinateInput(
-                    modifier = Modifier.fillMaxWidth(0.5f),
+                    modifier = Modifier.fillMaxWidth(),
                     title = "位置",
                     coordinate = selected.coordinate,
                     limit = Coordinate(maxAbscissa, maxOrdinate),
@@ -444,18 +468,16 @@ fun ProgramDetail(
                 ) {
                     scope.launch {
                         serial {
-                            move {
-                                index = 1
-                                dv = 0.0
-                            }
-                            move {
-                                index = 0
-                                dv = selected.coordinate.abscissa
-                            }
-                            move {
-                                index = 1
-                                dv = selected.coordinate.ordinate
-                            }
+                            timeout = 1000L * 60L
+                            start(index = 1, dv = 0.0)
+                        }
+                        serial {
+                            timeout = 1000L * 60L
+                            start(index = 0, dv = selected.coordinate.abscissa)
+                        }
+                        serial {
+                            timeout = 1000L * 60L
+                            start(index = 1, dv = selected.coordinate.ordinate)
                         }
                     }
                 }
@@ -479,7 +501,6 @@ fun ProgramListPreview() {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun ProgramDetailPreview() {
-    // Call the EditContent function and pass in a ProgramUiState object as a parameter
     ProgramDetail(
         uiState = ProgramUiState(
             entities = listOf(
