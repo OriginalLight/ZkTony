@@ -1,6 +1,7 @@
 package com.zktony.android.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -10,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,7 +29,7 @@ fun InputDialog(
     onConfirm: (String) -> Unit,
     onCancel: () -> Unit,
 ) {
-    var textFieldValue by remember { mutableStateOf("") }
+    var value by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
 
     Dialog(onDismissRequest = onCancel) {
@@ -46,18 +48,19 @@ fun InputDialog(
 
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = textFieldValue,
-                    onValueChange = { textFieldValue = it },
+                    value = value,
+                    onValueChange = { value = it },
                     textStyle = TextStyle(
                         textAlign = TextAlign.Center,
-                        fontSize = 20.sp
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp,
                     ),
                     singleLine = true,
-                    shape = MaterialTheme.shapes.medium,
+                    shape = CircleShape,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
                         focusManager.clearFocus()
-                        onConfirm(textFieldValue)
+                        onConfirm(value)
                     }),
                 )
 
@@ -65,23 +68,23 @@ fun InputDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Button(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 16.dp),
-                        onClick = { onConfirm(textFieldValue) },
-                        enabled = textFieldValue.isNotBlank()
-                    ) {
-                        Text(text = stringResource(id = R.string.confirm))
-                    }
-
-                    Button(
+                    OutlinedButton(
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 16.dp),
                         onClick = onCancel,
                     ) {
                         Text(text = stringResource(id = R.string.cancel))
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 16.dp),
+                        onClick = { onConfirm(value) },
+                        enabled = value.isNotBlank()
+                    ) {
+                        Text(text = stringResource(id = R.string.confirm))
                     }
                 }
             }

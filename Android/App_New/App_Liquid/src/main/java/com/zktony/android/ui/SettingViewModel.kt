@@ -10,7 +10,7 @@ import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.ext.*
-import com.zktony.android.utils.tx.tx
+import com.zktony.android.utils.extra.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -71,15 +71,14 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
      *
      * @param event The setting event to handle.
      */
-    fun event(event: SettingEvent) {
+    fun uiEvent(event: SettingUiEvent) {
         when (event) {
-            is SettingEvent.NavTo -> _page.value = event.page
-            is SettingEvent.Navigation -> navigation(event.navigation)
-            is SettingEvent.Network -> network()
-            is SettingEvent.CheckUpdate -> checkUpdate()
-            is SettingEvent.ToggleSelected -> _selected.value = event.id
-            is SettingEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
-            is SettingEvent.MoveTo -> moveTo(event.index, event.distance)
+            is SettingUiEvent.NavTo -> _page.value = event.page
+            is SettingUiEvent.Navigation -> navigation(event.navigation)
+            is SettingUiEvent.Network -> network()
+            is SettingUiEvent.CheckUpdate -> checkUpdate()
+            is SettingUiEvent.ToggleSelected -> _selected.value = event.id
+            is SettingUiEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
         }
     }
 
@@ -180,17 +179,6 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
                 }
         }
     }
-
-    private fun moveTo(index: Int, distance: Float) {
-        viewModelScope.launch {
-            tx {
-                move {
-                    this.index = index
-                    dv = distance
-                }
-            }
-        }
-    }
 }
 
 data class SettingUiState(
@@ -202,12 +190,11 @@ data class SettingUiState(
 )
 
 
-sealed class SettingEvent {
-    data object Network : SettingEvent()
-    data object CheckUpdate : SettingEvent()
-    data class NavTo(val page: PageType) : SettingEvent()
-    data class Navigation(val navigation: Boolean) : SettingEvent()
-    data class ToggleSelected(val id: Long) : SettingEvent()
-    data class Update(val entity: Motor) : SettingEvent()
-    data class MoveTo(val index: Int, val distance: Float) : SettingEvent()
+sealed class SettingUiEvent {
+    data object Network : SettingUiEvent()
+    data object CheckUpdate : SettingUiEvent()
+    data class NavTo(val page: PageType) : SettingUiEvent()
+    data class Navigation(val navigation: Boolean) : SettingUiEvent()
+    data class ToggleSelected(val id: Long) : SettingUiEvent()
+    data class Update(val entity: Motor) : SettingUiEvent()
 }

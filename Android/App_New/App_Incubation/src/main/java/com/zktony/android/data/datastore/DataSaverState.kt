@@ -1,7 +1,6 @@
 package com.zktony.android.data.datastore
 
 import androidx.compose.runtime.*
-import com.zktony.android.data.datastore.DataSaverConverter.findSaver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -79,26 +78,10 @@ class DataSaverMutableState<T>(
         if (async) {
             job?.cancel()
             job = scope.launch {
-                val typeConverter = findSaver(value)
-                if (typeConverter != null) {
-                    val convertedData = typeConverter(value)
-                    log("saveConvertedData(async: $async): $key -> $value(as $convertedData)")
-                    dataSaverInterface.saveDataAsync(key, convertedData)
-                } else {
-                    log("saveData(async: $async): $key -> $value")
-                    dataSaverInterface.saveDataAsync(key, value)
-                }
+                dataSaverInterface.saveDataAsync(key, value)
             }
         } else {
-            val typeConverter = findSaver(value)
-            if (typeConverter != null) {
-                val convertedData = typeConverter(value)
-                log("saveConvertedData(async: $async): $key -> $value(as $convertedData)")
-                dataSaverInterface.saveData(key, convertedData)
-            } else {
-                log("saveData(async: $async): $key -> $value")
-                dataSaverInterface.saveData(key, value)
-            }
+            dataSaverInterface.saveData(key, value)
         }
     }
 
@@ -109,7 +92,6 @@ class DataSaverMutableState<T>(
     fun remove(replacement: T = initialValue) {
         dataSaverInterface.remove(key)
         state.value = replacement
-        log("remove: key: $key, replace the value to $replacement")
     }
 
     fun valueChangedSinceInit() = state.value != initialValue
@@ -130,18 +112,6 @@ class DataSaverMutableState<T>(
             saveData()
     }
 
-
-    companion object {
-        const val TAG = "DataSaverState"
-
-        private val logger by lazy(LazyThreadSafetyMode.PUBLICATION) {
-            DataSaverLogger(TAG)
-        }
-
-        private fun log(msg: String) {
-            logger.d(msg)
-        }
-    }
 
     override operator fun component1() = state.value
 
@@ -169,7 +139,6 @@ inline fun <reified T> rememberDataSaverState(
     initialValue = default,
     savePolicy = if (autoSave) SavePolicy.IMMEDIATELY else SavePolicy.NEVER
 )
-
 
 /**
  * This function READ AND CONVERT the saved data and return a remembered [DataSaverMutableState].
@@ -200,24 +169,16 @@ inline fun <reified T> rememberDataSaverState(
     LaunchedEffect(key1 = senseExternalDataChange) {
         if (!senseExternalDataChange || state == null) return@LaunchedEffect
         if (!saverInterface.senseExternalDataChange) {
-            DataSaverLogger.e("to enable senseExternalDataChange, you should set `senseExternalDataChange` to true in DataSaverInterface")
             return@LaunchedEffect
         }
         saverInterface.externalDataChangedFlow?.collect { pair ->
             val (k, v) = pair
-            DataSaverLogger.log("externalDataChangedFlow: $key -> $v")
             if (k == key && v != state?.value) {
                 val d = if (v != null) {
                     try {
                         v as T
                     } catch (e: Exception) {
-                        if (v is String) {
-                            val restore = DataSaverConverter.findRestorer<T>()
-                            restore ?: throw e
-                            restore(v) as T
-                        } else {
-                            throw e
-                        }
+                        throw e
                     }
                 } else {
                     // if the value is null
@@ -232,7 +193,6 @@ inline fun <reified T> rememberDataSaverState(
 
     DisposableEffect(key, savePolicy) {
         onDispose {
-            DataSaverLogger.log("rememberDataSaverState: state of key=\"$key\" onDisposed!")
             if (savePolicy == SavePolicy.DISPOSED && state != null && state!!.valueChangedSinceInit()) {
                 state!!.saveData()
             }
@@ -271,9 +231,7 @@ inline fun <reified T> mutableDataSaverStateOf(
         if (!dataSaverInterface.contains(key)) initialValue
         else dataSaverInterface.readData(key, initialValue)
     } catch (e: Exception) {
-        val restore = DataSaverConverter.findRestorer<T>()
-        restore ?: throw e
-        restore(dataSaverInterface.readData(key, "")) as T
+        dataSaverInterface.readData(key, initialValue)
     }
     return DataSaverMutableState(dataSaverInterface, key, data, savePolicy, async)
 }

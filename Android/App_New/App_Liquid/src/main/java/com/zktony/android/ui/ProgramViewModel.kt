@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.tx.tx
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -49,53 +48,19 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         }
     }
 
-    /**
-     * Processes a program event and updates the program UI state accordingly.
-     *
-     * @param event The program event to process.
-     */
-    fun event(event: ProgramEvent) {
+
+    fun uiEvent(event: ProgramUiEvent) {
         when (event) {
-            is ProgramEvent.NavTo -> _page.value = event.page
-            is ProgramEvent.ToggleSelected -> _selected.value = event.id
-            is ProgramEvent.Insert -> viewModelScope.launch { dao.insert(Program(text = event.name)) }
-            is ProgramEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
-            is ProgramEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
-            is ProgramEvent.MoveTo -> moveTo(event.id, event.distance)
+            is ProgramUiEvent.NavTo -> _page.value = event.page
+            is ProgramUiEvent.ToggleSelected -> _selected.value = event.id
+            is ProgramUiEvent.Insert -> viewModelScope.launch { dao.insert(Program(text = event.name)) }
+            is ProgramUiEvent.Update -> viewModelScope.launch { dao.update(event.program) }
+            is ProgramUiEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
         }
     }
 
-    /**
-     * Moves a program to a new position in the list.
-     *
-     * @param id The ID of the program to move.
-     * @param distance The distance to move the program.
-     */
-    private fun moveTo(id: Int, distance: Float) {
-        viewModelScope.launch {
-            // Set the loading state to true
-            _loading.value = true
-            // Execute the transaction to move the program
-            tx {
-                move {
-                    index = id
-                    dv = distance
-                }
-            }
-            // Set the loading state to false
-            _loading.value = false
-        }
-    }
 }
 
-/**
- * Data class that represents the state of the program UI.
- *
- * @param entities The list of program entities to display.
- * @param selected The ID of the currently selected program.
- * @param page The current page being displayed.
- * @param loading Whether or not the UI is currently loading data.
- */
 data class ProgramUiState(
     val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
@@ -103,14 +68,10 @@ data class ProgramUiState(
     val loading: Boolean = false,
 )
 
-/**
- * Sealed class that represents events that can occur in the program UI.
- */
-sealed class ProgramEvent {
-    data class NavTo(val page: PageType) : ProgramEvent()
-    data class ToggleSelected(val id: Long) : ProgramEvent()
-    data class Insert(val name: String) : ProgramEvent()
-    data class Update(val entity: Program) : ProgramEvent()
-    data class Delete(val id: Long) : ProgramEvent()
-    data class MoveTo(val id: Int, val distance: Float) : ProgramEvent()
+sealed class ProgramUiEvent {
+    data class NavTo(val page: PageType) : ProgramUiEvent()
+    data class ToggleSelected(val id: Long) : ProgramUiEvent()
+    data class Insert(val name: String) : ProgramUiEvent()
+    data class Update(val program: Program) : ProgramUiEvent()
+    data class Delete(val id: Long) : ProgramUiEvent()
 }

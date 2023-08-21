@@ -15,7 +15,7 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "App"
-include(":App_Example")
+include(":App_Mix")
 include(":App_Incubation")
 include(":App_Liquid")
 include(":App_Petridish")

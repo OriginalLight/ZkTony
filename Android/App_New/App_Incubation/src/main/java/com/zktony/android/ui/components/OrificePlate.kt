@@ -13,7 +13,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
 /**
@@ -21,21 +26,25 @@ import androidx.compose.ui.unit.dp
  * @date 2023/7/25 13:35
  */
 
+@OptIn(ExperimentalTextApi::class)
 @Composable
 fun OrificePlate(
     modifier: Modifier = Modifier,
     row: Int,
     column: Int,
-    selected: List<Pair<Int, Int>> = emptyList(),
-    onItemClick: (Int, Int) -> Unit = { _, _ -> }
+    coordinate: Boolean = false,
+    selected: List<Triple<Int, Int, Color>> = emptyList(),
+    onItemClick: (IntSize, Offset) -> Unit = { _, _ -> }
 ) {
     check(row > 0) { "row must be greater than 0" }
     check(column > 0) { "column must be greater than 0" }
 
+    val textMeasure = rememberTextMeasurer()
+
     Box(
         modifier = modifier
             .background(
-                color = Color.White,
+                color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.small
             )
             .border(
@@ -51,12 +60,7 @@ fun OrificePlate(
                 .fillMaxSize()
                 .pointerInput(Unit) {
                     detectTapGestures {
-                        val rowSpace = size.width / row
-                        val columnSpace = size.height / column
-
-                        val x = (it.x / rowSpace).toInt()
-                        val y = (it.y / columnSpace).toInt()
-                        onItemClick(x, y)
+                        onItemClick(size, it)
                     }
                 }) {
 
@@ -65,17 +69,51 @@ fun OrificePlate(
 
             for (i in 0 until column) {
                 for (j in 0 until row) {
-                    val enable = selected.any { it.first == i && it.second == j }
+                    val enable = selected.find { it.first == i && it.second == j }
                     drawCircle(
-                        color = if (enable) Color.Green else Color.Black,
+                        color = enable?.third ?: Color.Black,
                         radius = minOf(columnSpace, rowSpace) / 2.5f,
                         center = Offset(
                             (j + 0.5f) * rowSpace,
                             (i + 0.5f) * columnSpace
                         ),
-                        style = if (enable) Fill else Stroke(minOf(columnSpace, rowSpace) / 18f)
+                        style = if (enable != null) Fill else Stroke(
+                            minOf(
+                                columnSpace,
+                                rowSpace
+                            ) / 18f
+                        )
                     )
                 }
+            }
+
+            if (coordinate) {
+                val textStyle = TextStyle(
+                    color = Color.DarkGray,
+                    fontSize = (minOf(columnSpace, rowSpace) / 3f).toSp()
+                )
+                val text1 = "A1"
+                val text2 = "${'A' + column - 1}${row}"
+                val textSize1 = textMeasure.measure(text1, textStyle).size
+                val textSize2 = textMeasure.measure(text2, textStyle).size
+                drawText(
+                    textMeasurer = textMeasure,
+                    text = text1,
+                    style = textStyle,
+                    topLeft = Offset(
+                        x = (rowSpace - textSize1.width) / 2,
+                        y = (columnSpace - textSize1.height) / 2
+                    )
+                )
+                drawText(
+                    textMeasurer = textMeasure,
+                    text = text2,
+                    style = textStyle,
+                    topLeft = Offset(
+                        x = size.width - (rowSpace - textSize2.width) / 2 - textSize2.width,
+                        y = size.height - (columnSpace - textSize2.height) / 2 - textSize2.height
+                    )
+                )
             }
         }
     }
@@ -91,6 +129,6 @@ fun OrificePlatePreview() {
             .height(250.dp),
         row = 12,
         column = 8,
-        selected = listOf(0 to 0, 0 to 1, 0 to 2, 0 to 3, 0 to 4, 0 to 5, 0 to 6, 0 to 7)
+        coordinate = true,
     )
 }
