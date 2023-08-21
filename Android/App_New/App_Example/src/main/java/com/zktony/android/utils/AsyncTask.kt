@@ -1,11 +1,18 @@
 package com.zktony.android.utils
 
+import androidx.datastore.preferences.core.floatPreferencesKey
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.entities.Motor
+import com.zktony.android.utils.ext.dataSaver
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
 import java.util.concurrent.ConcurrentHashMap
@@ -71,27 +78,23 @@ class AsyncTask {
      * @return Unit
      */
     private suspend fun asyncTaskTwo() {
-        cd.getAll().collect {
-            if (it.isNotEmpty()) {
-                val active = it.find { c -> c.active }
-                if (active == null) {
-                    cd.update(it[0].copy(active = true))
-                } else {
-                    hpc.clear()
-                    hpc[0] = 4.0 / 3200
-                    hpc[1] = 6.35 / 3200
-                    active.vps().forEachIndexed { index, vps ->
-                        hpc[index + 2] = vps
-                    }
-                }
-            } else {
-                hpc.clear()
-                hpc[0] = 4.0 / 3200
-                hpc[1] = 6.35 / 3200
-                repeat(14) { index ->
-                    hpc[index + 2] = 0.01
-                }
-            }
+        val flow1 = dataSaver.getDataStore().data.map { setting ->
+            setting[floatPreferencesKey("jyq")] ?: 1f
+        }
+
+        val flow2 = dataSaver.getDataStore().data.map { setting ->
+            setting[floatPreferencesKey("jyh")] ?: 1f
+        }
+        flow1.zip(flow2) { jyq, jyh ->
+            jyq to jyh
+        }.collect {
+            hpc.clear()
+            hpc[0] = 4.0 / 3200
+            hpc[1] = 6.35 / 3200
+            hpc[2] = 4.0 / 3200
+            hpc[3] = 6.35 / 3200
+            hpc[4] = 4.0 / 3200
+            hpc[5] = (it.first / it.second).toDouble()
         }
     }
 

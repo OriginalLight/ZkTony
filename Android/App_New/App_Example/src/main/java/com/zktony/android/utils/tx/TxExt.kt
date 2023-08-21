@@ -12,6 +12,8 @@ val asyncTask: AsyncTask = AsyncTask.instance
 private var x: AtomicLong = AtomicLong(0L)
 private var y: AtomicLong = AtomicLong(0L)
 private var z: AtomicLong = AtomicLong(0L)
+private var z1: AtomicLong = AtomicLong(0L)
+private var z2: AtomicLong = AtomicLong(0L)
 
 /**
  * 脉冲
@@ -38,14 +40,35 @@ fun <T : Number> pulse(index: Int, dvp: T): Long {
 
     return when (index) {
         0 -> {
+            val d = p - x.get()
+            x.set(maxOf(p, 0))
+            d
+        }
+
+        1 -> {
             val d = p - y.get()
             y.set(maxOf(p, 0))
             d
         }
 
-        1 -> {
+
+        2 -> {
             val d = p - z.get()
             z.set(maxOf(p, 0))
+            d
+        }
+
+
+        3 -> {
+            val d = p - z1.get()
+            z1.set(maxOf(p, 0))
+            d
+        }
+
+
+        4 -> {
+            val d = p - z2.get()
+            z2.set(maxOf(p, 0))
             d
         }
 
@@ -269,82 +292,3 @@ suspend fun tx(block: TxScope.() -> Unit) {
     delay(tx.delay)
 }
 
-/**
- * 初始化
- */
-fun initializer() {
-
-    val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
-    scope.launch {
-        launch {
-            val ids = listOf(0, 1)
-            // 查询GPIO状态
-            tx {
-                delay = 300L
-                queryGpio(ids)
-            }
-            // 针对每个电机进行初始化
-            ids.forEach {
-                // 如果电机未初始化，则进行初始化
-                if (!getGpio(it)) {
-                    // 进行电机初始化
-                    tx {
-                        timeout = 1000L * 60
-                        move(MoveType.MOVE_PULSE) {
-                            index = it
-                            pulse = 3200L * -30
-                        }
-                    }
-                }
-
-                // 进行正向运动
-                tx {
-                    timeout = 1000L * 10
-                    move(MoveType.MOVE_PULSE) {
-                        index = it
-                        pulse = 3200L * 2
-                        acc = 50
-                        dec = 80
-                        speed = 100
-                    }
-                }
-
-                // 进行反向运动
-                tx {
-                    timeout = 1000L * 15
-                    move(MoveType.MOVE_PULSE) {
-                        index = it
-                        pulse = 3200L * -3
-                        acc = 50
-                        dec = 80
-                        speed = 100
-                    }
-                }
-            }
-        }
-
-//        launch {
-//            delay(150L)
-//            val ids = listOf(2)
-//            // 查询GPIO状态
-//            tx { queryGpio(ids) }
-//            // 延迟
-//            delay(100L)
-//            // 关闭所有气阀
-//            tx { valve(ids.toList().map { it to 0 }) }
-//            // 对每个注射泵进行初始化
-//            tx {
-//                timeout = 1000L * 30
-//                ids.forEach {
-//                    // 进行注射泵初始化
-//                    move(MoveType.MOVE_PULSE) {
-//                        index = it
-//                        pulse = Constants.MAX_SYRINGE * -1
-//                    }
-//                }
-//            }
-//        }
-    }
-
-}

@@ -1,0 +1,2 @@
+ninja: Entering directory `C:\Users\admin\Documents\GitHub\ZkTony\Android\App_New\serialport\.cxx\Debug\3t501b6s\x86_64'
+ninja: no work to do.
