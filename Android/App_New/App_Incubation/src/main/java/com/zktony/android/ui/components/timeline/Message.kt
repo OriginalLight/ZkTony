@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.W400
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.zktony.android.data.entities.IncubationFlow
 import com.zktony.android.ui.theme.AppTheme
 import java.util.Date
 
@@ -86,10 +87,7 @@ private fun MessagePreview() {
         Message(
             hiringStage = IncubationStage(
                 date = Date(System.currentTimeMillis()),
-                flows = MessageSender.Candidate(
-                    initials = "JD",
-                    message = "Hi! I will be glad to join DreamCompany team. I've sent you my CV."
-                ),
+                flows = IncubationFlow.Blocking(),
                 status = IncubationStageStatus.CURRENT
             ),
             modifier = Modifier
@@ -104,10 +102,7 @@ private fun UpcomingStageMessagePreview() {
         Message(
             hiringStage = IncubationStage(
                 date = Date(System.currentTimeMillis()),
-                flows = MessageSender.Candidate(
-                    initials = "JD",
-                    message = "Coming soon"
-                ),
+                flows = IncubationFlow.Blocking(),
                 status = IncubationStageStatus.UPCOMING
             ),
             modifier = Modifier
@@ -123,10 +118,7 @@ private fun FinishedMessagePreview() {
             modifier = Modifier,
             hiringStage = IncubationStage(
                 date = Date(System.currentTimeMillis()),
-                flows = MessageSender.Candidate(
-                    initials = "JD",
-                    message = "Hi! I will be glad to join DreamCompany team. I've sent you my CV."
-                ),
+                flows = IncubationFlow.Blocking(),
                 status = IncubationStageStatus.FINISHED
             )
         )
