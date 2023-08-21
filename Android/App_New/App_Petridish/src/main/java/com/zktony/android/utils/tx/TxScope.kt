@@ -51,6 +51,7 @@ class TxScope {
         controlType = ControlType.CONTROL_MOVE
         val moveScope = MoveScope().apply(block)
         when (type) {
+            //按照校准数据运动
             MoveType.MOVE_DV -> {
                 val pulse = pulse(moveScope.index, moveScope.dv)
                 val config =
@@ -63,7 +64,7 @@ class TxScope {
                     indexList.add(moveScope.index)
                 }
             }
-
+            //按照步数运动/3200
             MoveType.MOVE_PULSE -> {
                 val pulse = pulse(moveScope.index, moveScope.pulse)
                 val config =

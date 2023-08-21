@@ -26,7 +26,9 @@ class SerialPort : AbstractSerial() {
                 axis.add(false)
                 gpio.add(false)
             }
-            openDevice(SerialConfig())
+            openDevice(SerialConfig(
+                device = "/dev/ttyS4"
+            ))
         }
     }
 

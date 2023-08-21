@@ -9,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -104,19 +105,42 @@ fun Splash(
                     ),
                     fontFamily = FontFamily.Serif,
                 )
-                FloatingActionButton(
-                    modifier = Modifier.width(192.dp),
-                    onClick = {
-                        toggleDrawer(NavigationType.NAVIGATION_RAIL)
-                        navController.popBackStack()
-                        navController.navigate(Route.HOME)
-                    },
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Default.Done,
-                        contentDescription = null
-                    )
+                    Button(
+                        modifier = Modifier.width(300.dp),
+                        onClick = {
+                            //TODO 复位命令
+                            toggleDrawer(NavigationType.NAVIGATION_RAIL)
+                            navController.popBackStack()
+                            navController.navigate(Route.HOME)
+                        }
+                    ) {
+                        Text(
+                            text = "复位",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    Button(
+                        modifier = Modifier.width(300.dp),
+                        onClick = {
+                            toggleDrawer(NavigationType.NAVIGATION_RAIL)
+                            navController.popBackStack()
+                            navController.navigate(Route.CALIBRATION)
+                        }
+                    ) {
+                        Text(
+                            text = "进入校准管理",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
                 }
             }
         }

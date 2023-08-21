@@ -129,7 +129,7 @@ fun MenuContent(
         item {
             FunctionCard(
                 title = "复位",
-                description = "依次复位Z轴、Y轴、注射泵",
+                description = "依次复位举升，下盘，上盘",
                 image = {
                     if (uiState.loading == 1) {
                         // Display loading indicator
@@ -177,8 +177,8 @@ fun MenuContent(
         // Clean item
         item {
             FunctionCard(
-                title = "管路清洗",
-                description = "清洗管路残留胶体、促凝剂",
+                title = "紫外",
+                description = "",
                 image = {
                     if (uiState.loading == 2) {
                         // Display loading indicator
@@ -202,7 +202,7 @@ fun MenuContent(
                         // Display reset icon
                         Image(
                             modifier = Modifier.size(96.dp),
-                            painter = painterResource(id = R.drawable.ic_water),
+                            painter = painterResource(id = R.drawable.ic_uv),
                             contentDescription = null,
                         )
                     }
@@ -244,8 +244,8 @@ fun MenuContent(
         // Syringe item
         item {
             FunctionCard(
-                title = "促凝剂 ${if (syringe == 0) "填充" else "回吸"}",
-                description = "填充/回吸促凝剂，点击按钮切换",
+                title = "${if (syringe == 0) "排液" else "回吸"}",
+                description = "排液/回吸，点击按钮切换",
                 image = {
                     if (uiState.loading == 3) {
                         // Display loading indicator
@@ -269,7 +269,7 @@ fun MenuContent(
                         // Display reset icon
                         Image(
                             modifier = Modifier.size(96.dp),
-                            painter = painterResource(id = R.drawable.ic_syringe),
+                            painter = painterResource(id = R.drawable.ic_pipeline),
                             contentDescription = null,
                         )
                     }
@@ -320,90 +320,11 @@ fun MenuContent(
 
             }
         }
-        // Pipeline item
-        item {
-            FunctionCard(
-                title = "胶体 ${if (pipeline == 0) "填充" else "回吸"}",
-                description = "填充/回吸胶体，点击按钮切换",
-                image = {
-                    if (uiState.loading == 4) {
-                        // Display loading indicator
-                        Box(
-                            modifier = Modifier.size(96.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(72.dp),
-                                strokeWidth = 8.dp,
-                            )
-                            Text(
-                                modifier = Modifier.align(Alignment.BottomEnd),
-                                text = "${time}s",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontFamily = FontFamily.Monospace,
-                                fontStyle = FontStyle.Italic,
-                            )
-                        }
-                    } else {
-                        // Display reset icon
-                        Image(
-                            modifier = Modifier.size(96.dp),
-                            painter = painterResource(id = R.drawable.ic_pipeline),
-                            contentDescription = null,
-                        )
-                    }
-                })
-            {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            if (uiState.loading == 4) {
-                                event(HomeEvent.Pipeline(0))
-                            } else {
-                                pipeline = if (pipeline == 0) 1 else 0
-                            }
-                        }
-                    ) {
-                        if (uiState.loading == 4) {
-                            Text(
-                                text = "取消",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.SwapHoriz,
-                                contentDescription = null,
-                            )
-                        }
-                    }
-
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        enabled = uiState.loading == 0,
-                        onClick = { event(HomeEvent.Pipeline(pipeline + 1)) }
-                    ) {
-                        Text(
-                            text = "开始",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-                }
-
-            }
-        }
         // Start item
         item {
             FunctionCard(
                 title = "程序运行",
-                description = "选择并执行制胶程序",
+                description = "执行分液程序",
                 image = {
                     Image(
                         modifier = Modifier.size(96.dp),
@@ -420,10 +341,15 @@ fun MenuContent(
                         modifier = Modifier.weight(1f),
                         enabled = uiState.loading == 0,
                         onClick = {
+                            println("uiState.loading==="+uiState.loading)
+                            println("uiState.entities.isEmpty()==="+uiState.entities.isEmpty())
                             if (uiState.loading == 0) {
                                 if (uiState.entities.isEmpty()) {
+
+                                    println(111111)
                                     navController.navigate(Route.PROGRAM)
                                 } else {
+                                    println(222222)
                                     event(HomeEvent.NavTo(PageType.START))
                                 }
                             }

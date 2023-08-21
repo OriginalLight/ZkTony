@@ -1,8 +1,11 @@
 package com.zktony.android.ui
 
+import android.text.style.BackgroundColorSpan
+import android.widget.Button
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,6 +14,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -42,12 +48,16 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.R
+import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.Constants
 import com.zktony.android.utils.ext.dateFormat
 import com.zktony.android.utils.ext.format
 import com.zktony.android.utils.ext.showShortToast
+import com.zktony.android.utils.tx.MoveType
+import com.zktony.android.utils.tx.tx
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -81,18 +91,10 @@ fun Calibration(
             event = viewModel::event,
         )
     }
-    // Edit page
-    AnimatedVisibility(visible = uiState.page == PageType.CALIBRATION_DETAIL) {
-        CalibrationDetail(
-            modifier = modifier,
-            uiState = uiState,
-            event = viewModel::event,
-        )
-    }
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun CalibrationList(
     modifier: Modifier = Modifier,
@@ -105,6 +107,93 @@ fun CalibrationList(
     var query by rememberSaveable { mutableStateOf("") }
     var active by rememberSaveable { mutableStateOf(false) }
 
+    val keyboard = LocalSoftwareKeyboardController.current
+
+    /**
+     * 复位高度
+     */
+    val fwgd = rememberDataSaverState(key = "fwgd", default = 0f)
+    var fwgd_ex by remember { mutableStateOf(fwgd.value.format(1)) }
+
+
+    /**
+     * 盘子距离
+     */
+    val pzjl = rememberDataSaverState(key = "pzjl", default = 0f)
+    var pzjl_ex by remember { mutableStateOf(pzjl.value.format(1)) }
+
+
+    /**
+     * 夹爪高度
+     */
+    val jzgd = rememberDataSaverState(key = "jzgd", default = 0f)
+    var jzgd_ex by remember { mutableStateOf(jzgd.value.format(1)) }
+
+    /**
+     * 分离距离
+     */
+    val fljl = rememberDataSaverState(key = "fljl", default = 0f)
+    var fljl_ex by remember { mutableStateOf(fljl.value.format(1)) }
+
+    /**
+     * 矫正高度
+     */
+    val jiaozgd = rememberDataSaverState(key = "jiaozgd", default = 0f)
+    var jiaozgd_ex by remember { mutableStateOf(jiaozgd.value.format(1)) }
+
+    /**
+     * 复位高度
+     */
+    val fwgd2 = rememberDataSaverState(key = "fwgd2", default = 0f)
+    var fwgd2_ex by remember { mutableStateOf(fwgd2.value.format(1)) }
+
+    /**
+     * 盘子距离
+     */
+    val pzjl2 = rememberDataSaverState(key = "pzjl2", default = 0f)
+    var pzjl2_ex by remember { mutableStateOf(pzjl2.value.format(1)) }
+
+    /**
+     * 夹紧距离
+     */
+    val jjjl = rememberDataSaverState(key = "jjjl", default = 0f)
+    var jjjl_ex by remember { mutableStateOf(jjjl.value.format(1)) }
+
+    /**
+     * 松开距离
+     */
+    val skjl = rememberDataSaverState(key = "skjl", default = 0f)
+    var skjl_ex by remember { mutableStateOf(skjl.value.format(1)) }
+
+    /**
+     * 上盘距离
+     */
+    val spjl = rememberDataSaverState(key = "spjl", default = 0f)
+    var spjl_ex by remember { mutableStateOf(spjl.value.format(1)) }
+
+    /**
+     * 下盘距离
+     */
+    val xpjl = rememberDataSaverState(key = "xpjl", default = 0f)
+    var xpjl_ex by remember { mutableStateOf(xpjl.value.format(1)) }
+
+    /**
+     * 原点距离
+     */
+    val ydjl = rememberDataSaverState(key = "ydjl", default = 0f)
+    var ydjl_ex by remember { mutableStateOf(ydjl.value.format(1)) }
+
+    /**
+     * 加液前
+     */
+    val jyq = rememberDataSaverState(key = "jyq", default = 0f)
+    var jyq_ex by remember { mutableStateOf(jyq.value.format(1)) }
+
+    /**
+     * 加液后
+     */
+    val jyh = rememberDataSaverState(key = "jyh", default = 0f)
+    var jyh_ex by remember { mutableStateOf(jyh.value.format(1)) }
 
     // Show the input dialog if showDialog is true
     if (showDialog) {
@@ -125,423 +214,740 @@ fun CalibrationList(
             onCancel = { showDialog = false },
         )
     }
+    Row {
+        Text(
+            text = "举升1",
+            fontSize = 30.sp
+        )
+        Button(
+            onClick = {
 
-    // Row containing the list of items and the operation column
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        // Column containing the operation buttons
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            },
+            modifier = Modifier.padding(start = 20.dp),
+            shape = RoundedCornerShape(10.dp),
         ) {
-            SearchBar(
-                query = query,
-                onQueryChange = { query = it },
-                onSearch = { active = false },
-                active = active,
-                onActiveChange = { active = it },
-                placeholder = { Text("搜索") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                trailingIcon = {
-                    if (query.isNotEmpty()) {
-                        IconButton(onClick = { query = "" }) {
-                            Icon(Icons.Default.Clear, contentDescription = null)
-                        }
-                    }
-                },
-            ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    val items =
-                        uiState.entities.filter { query.isNotEmpty() && it.text.contains(query) }
-                    items(items.size) {
-                        val item = items[it]
-                        ListItem(
-                            headlineContent = { Text(item.text) },
-                            supportingContent = { Text(item.createTime.dateFormat("yyyy/MM/dd")) },
-                            leadingContent = {
-                                if (item.text == query) Icon(
-                                    Icons.Filled.Star,
-                                    contentDescription = null
-                                )
-                            },
-                            modifier = Modifier.clickable {
-                                query = item.text
-                                active = false
-                            }
-                        )
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            // Button for adding a new item
-            FloatingActionButton(
-                modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                onClick = { showDialog = true })
-            {
-                Icon(
-                    modifier = Modifier.size(32.dp),
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null,
-                    tint = Color.Black,
-                )
-            }
-
-            // Button for deleting the selected item
-            AnimatedVisibility(visible = uiState.selected != 0L) {
-                var count by remember { mutableStateOf(0) }
-
-                FloatingActionButton(
-                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = {
-                        if (count == 1) {
-                            event(CalibrationEvent.Delete(uiState.selected))
-                            event(CalibrationEvent.ToggleSelected(0L))
-                            count = 0
-                        } else {
-                            count++
-                        }
-                    }) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        tint = if (count == 1) Color.Red else Color.Black,
-                    )
-                }
-            }
-
-            // Button for editing the selected item
-            AnimatedVisibility(visible = uiState.selected != 0L) {
-                FloatingActionButton(
-                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = { event(CalibrationEvent.NavTo(PageType.CALIBRATION_DETAIL)) }) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        tint = Color.Black,
-                    )
-                }
-            }
-
-            // Button for activating the selected item
-            AnimatedVisibility(visible = uiState.selected != 0L) {
-                FloatingActionButton(
-                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = { event(CalibrationEvent.Active(uiState.selected)) }) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        tint = Color.Black,
-                    )
-                }
-            }
+            Text("复    位")
         }
 
-        LazyVerticalGrid(
-            modifier = Modifier
-                .fillMaxSize()
-                .shadow(
-                    elevation = 2.dp,
-                    shape = MaterialTheme.shapes.medium,
-                ),
-            state = gridState,
-            columns = GridCells.Fixed(4),
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+        Button(
+            onClick = {
+
+            },
+            modifier = Modifier.padding(start = 500.dp),
+            shape = RoundedCornerShape(10.dp),
         ) {
-            val items = uiState.entities.filter { it.text.contains(query) }
-
-            itemsIndexed(items = items) { index, item ->
-                val background = if (item.id == uiState.selected) {
-                    Color.Blue.copy(alpha = 0.3f)
-                } else {
-                    MaterialTheme.colorScheme.surfaceVariant
-                }
-                ElevatedCard(
-                    colors = CardDefaults.cardColors(containerColor = background),
-                    onClick = {
-                        if (item.id == uiState.selected) {
-                            event(CalibrationEvent.ToggleSelected(0L))
-                        } else {
-                            event(CalibrationEvent.ToggleSelected(item.id))
-                        }
-                    },
-                ) {
-                    Column(
-                        modifier = Modifier.padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        // Display the entity image and title
-                        Row(
-                            modifier = Modifier.height(24.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Text(
-                                text = "${index + 1}、",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Monospace,
-                                fontStyle = FontStyle.Italic,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-                            Spacer(modifier = Modifier.weight(1f))
-                            AnimatedVisibility(visible = item.active) {
-                                Text(text = "✔")
-                            }
-                        }
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = item.text,
-                            fontSize = 20.sp,
-                            overflow = TextOverflow.Ellipsis,
-                            textAlign = TextAlign.Center,
-                            maxLines = 1,
-                        )
-                        Text(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = item.createTime.dateFormat("yyyy/MM/dd"),
-                            style = MaterialTheme.typography.bodySmall,
-                            fontFamily = FontFamily.Monospace,
-                            textAlign = TextAlign.End,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-/**
- * Composable function that displays the edit content UI.
- *
- * @param modifier Modifier to be applied to the content.
- * @param uiState The current state of the calibration UI.
- * @param event The event to be triggered when the UI state changes.
- */
-@OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun CalibrationDetail(
-    modifier: Modifier = Modifier,
-    uiState: CalibrationUiState = CalibrationUiState(),
-    event: (CalibrationEvent) -> Unit = {},
-) {
-    // Get the selected entity or create a new one if none is selected
-    val entity = uiState.entities.find { it.id == uiState.selected } ?: Calibration()
-
-    val list = remember { mutableStateListOf("M0", "M1", "M2", "M3", "M4", "M5") }
-    var selectedTabIndex by remember { mutableStateOf(0) }
-    var volume by remember { mutableStateOf("") }
-    val softKeyboard = LocalSoftwareKeyboardController.current
-    val scope = rememberCoroutineScope()
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        // Row containing the list of items and the operation column
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-
-            TextField(
-                modifier = Modifier.weight(1f),
-                value = TextFieldValue(volume, TextRange(volume.length)),
-                onValueChange = { volume = it.text },
-                placeholder = {
-                    Text(
-                        text = stringResource(id = R.string.volume),
-                        fontStyle = FontStyle.Italic,
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily.Serif,
-                    )
-                },
-                leadingIcon = {
-                    TabRow(
-                        modifier = Modifier
-                            .width(500.dp)
-                            .padding(vertical = 4.dp, horizontal = 8.dp)
-                            .clip(CircleShape),
-                        selectedTabIndex = selectedTabIndex,
-                        containerColor = MaterialTheme.colorScheme.inversePrimary,
-                        indicator = { Box {} },
-                        divider = { },
-                    ) {
-                        list.forEachIndexed { index, s ->
-                            Tab(
-                                modifier = Modifier
-                                    .clip(CircleShape)
-                                    .background(if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.inversePrimary),
-                                selected = selectedTabIndex == index,
-                                onClick = {
-                                    selectedTabIndex = index
-                                }
-                            ) {
-                                Text(
-                                    modifier = Modifier.padding(vertical = 12.dp),
-                                    text = s,
-                                    color = if (selectedTabIndex == index) Color.White else Color.Black,
-                                )
-                            }
-                        }
-                    }
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Decimal,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        softKeyboard?.hide()
-                    }
-                ),
-                shape = CircleShape,
-                colors = TextFieldDefaults.colors(
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                ),
-                textStyle = TextStyle(
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily.Monospace,
-                ),
-            )
-
-            AnimatedVisibility(visible = volume.isNotEmpty()) {
-                FloatingActionButton(
-                    onClick = {
-                        scope.launch {
-                            softKeyboard?.hide()
-                            event(
-                                CalibrationEvent.InsertData(
-                                    selectedTabIndex,
-                                    volume.toDoubleOrNull() ?: 0.0
-                                )
-                            )
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Save,
-                        contentDescription = null,
-                    )
-                }
-            }
-
-            // Button for adding a new item
-            FloatingActionButton(
-                onClick = {
-                    scope.launch {
-                        softKeyboard?.hide()
-                        if (!uiState.loading) {
-                            event(CalibrationEvent.AddLiquid(selectedTabIndex))
-                        }
-                    }
-                }
-            ) {
-                if (uiState.loading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.dp,
-                        color = Color.Blue,
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.ArrowForward,
-                        contentDescription = null,
-                    )
-                }
-            }
-
-            FloatingActionButton(onClick = { event(CalibrationEvent.NavTo(PageType.CALIBRATION_LIST)) }) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null
-                )
-            }
+            Text("全部复位")
         }
 
-        LazyVerticalGrid(
-            modifier = Modifier
-                .fillMaxSize()
-                .shadow(
-                    elevation = 2.dp,
-                    shape = MaterialTheme.shapes.medium,
-                ),
-            columns = GridCells.Fixed(3),
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+        Button(
+            onClick = {
+//                event(CalibrationEvent.AddLiquid())
+            },
+            modifier = Modifier.padding(start = 20.dp),
+            shape = RoundedCornerShape(10.dp),
         ) {
-            itemsIndexed(items = entity.data) { index, it ->
-                Row(
-                    modifier = Modifier
-                        .background(
-                            color = Color.Transparent,
-                            shape = MaterialTheme.shapes.medium,
-                        )
-                        .shadow(
-                            elevation = 2.dp,
-                            shape = MaterialTheme.shapes.medium,
-                        )
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "${index + 1}、",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontStyle = FontStyle.Italic,
-                        color = if (it.first == selectedTabIndex) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            Color.Black
-                        },
-                    )
-
-                    Column {
-                        Text(
-                            text = list[it.first],
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        Text(
-                            text = it.second.format(2) + " μL",
-                            style = MaterialTheme.typography.bodySmall,
-                            fontFamily = FontFamily.Monospace,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Icon(
-                        modifier = Modifier
-                            .size(32.dp)
-                            .clickable { event(CalibrationEvent.DeleteData(it)) },
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = null,
-                        tint = Color.Red,
-                    )
-                }
-            }
+            Text("全部保存")
         }
     }
 
 
+
+    Row(
+        modifier = Modifier.padding(top = 40.dp),
+    ) {
+
+        OutlinedTextField(
+            modifier = Modifier.width(100.dp),
+            value = fwgd_ex,
+            onValueChange = {
+                scope.launch {
+                    fwgd_ex = it
+                    fwgd.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "复位高度") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+
+        Button(
+            onClick = {
+                scope.launch {
+                    tx {
+                        move{
+                            index = 0
+                            pulse = 3200L;
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+
+
+
+        OutlinedTextField(
+            modifier = Modifier
+                .width(100.dp)
+                .padding(start = 20.dp),
+            value = pzjl_ex,
+            onValueChange = {
+                scope.launch {
+                    pzjl_ex = it
+                    pzjl.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "盘子距离") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+
+        Button(
+            onClick = {
+                scope.launch {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 0
+                            pulse = 3200L * pzjl.value.toLong();
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+
+        OutlinedTextField(
+            modifier = Modifier
+                .width(100.dp)
+                .padding(start = 20.dp),
+            value = jzgd_ex,
+            onValueChange = {
+                scope.launch {
+                    jzgd_ex = it
+                    jzgd.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "夹爪高度") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+
+        Button(
+            onClick = {
+                scope.launch {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 0
+                            pulse = 3200L * jzgd.value.toLong();
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+    }
+
+    Row(
+        modifier = Modifier.padding(top = 120.dp),
+    ) {
+
+        OutlinedTextField(
+            modifier = Modifier.width(100.dp),
+            value = fljl_ex,
+            onValueChange = {
+                scope.launch {
+                    fljl_ex = it
+                    fljl.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "分离距离") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+
+        Button(
+            onClick = {
+                scope.launch {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 0
+                            pulse = 3200L * fljl.value.toLong();
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+        OutlinedTextField(
+            modifier = Modifier
+                .width(100.dp)
+                .padding(start = 20.dp),
+            value = jiaozgd_ex,
+            onValueChange = {
+                scope.launch {
+                    jiaozgd_ex = it
+                    jiaozgd.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "矫正高度") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+
+        Button(
+            onClick = {
+                scope.launch {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 0
+                            pulse = 3200L * jzgd.value.toLong();
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+    }
+
+    Row(
+        modifier = Modifier.padding(top = 190.dp),
+    ) {
+        Text(
+            text = "举升2",
+            fontSize = 30.sp
+        )
+        Button(
+            onClick = {
+
+            },
+            modifier = Modifier.padding(start = 20.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("复    位")
+        }
+
+    }
+
+    Row(
+        modifier = Modifier.padding(top = 230.dp),
+    ) {
+
+
+        OutlinedTextField(
+            modifier = Modifier.width(100.dp),
+            value = fwgd2_ex,
+            onValueChange = {
+                scope.launch {
+                    fwgd2_ex = it
+                    fwgd2.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "复位距离") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+
+        Button(
+            onClick = {
+                scope.launch {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 0
+                            pulse = 3200L * fwgd2.value.toLong();
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+
+        OutlinedTextField(
+            modifier = Modifier
+                .width(100.dp)
+                .padding(start = 20.dp),
+            value = pzjl2_ex,
+            onValueChange = {
+                scope.launch {
+                    pzjl2_ex = it
+                    pzjl2.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "盘子距离") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+        Button(
+            onClick = {
+                scope.launch {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 0
+                            pulse = 3200L * pzjl2.value.toLong();
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+    }
+
+    Row(
+        modifier = Modifier.padding(top = 300.dp),
+    ) {
+        Text(
+            text = "夹爪",
+            fontSize = 30.sp
+        )
+        Button(
+            onClick = {
+
+            },
+            modifier = Modifier.padding(start = 20.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("复    位")
+        }
+
+    }
+
+    Row(
+        modifier = Modifier.padding(top = 340.dp),
+    ) {
+
+        OutlinedTextField(
+            modifier = Modifier.width(100.dp),
+            value = jjjl_ex,
+            onValueChange = {
+                scope.launch {
+                    jjjl_ex = it
+                    jjjl.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "夹紧距离") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+        Button(
+            onClick = {
+                scope.launch {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 0
+                            pulse = 3200L * jjjl.value.toLong();
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+
+        OutlinedTextField(
+            modifier = Modifier
+                .width(100.dp)
+                .padding(start = 20.dp),
+            value = skjl_ex,
+            onValueChange = {
+                scope.launch {
+                    skjl_ex = it
+                    skjl.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "松开距离") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+        Button(
+            onClick = {
+                scope.launch {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 0
+                            pulse = 3200L * skjl.value.toLong();
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+    }
+
+
+    Row(
+        modifier = Modifier.padding(top = 410.dp),
+    ) {
+        Text(
+            text = "上盘",
+            fontSize = 30.sp
+        )
+        Button(
+            onClick = {
+
+            },
+            modifier = Modifier.padding(start = 20.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("复    位")
+        }
+
+    }
+
+    Row(
+        modifier = Modifier.padding(top = 450.dp),
+    ) {
+
+        OutlinedTextField(
+            modifier = Modifier.width(100.dp),
+            value = spjl_ex,
+            onValueChange = {
+                scope.launch {
+                    spjl_ex = it
+                    spjl.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "上盘距离") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+        Button(
+            onClick = {
+                scope.launch {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 0
+                            pulse = 3200L * spjl.value.toLong();
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+
+        OutlinedTextField(
+            modifier = Modifier
+                .width(100.dp)
+                .padding(start = 20.dp),
+            value = xpjl_ex,
+            onValueChange = {
+                scope.launch {
+                    xpjl_ex = it
+                    xpjl.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "下盘距离") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+        Button(
+            onClick = {
+                scope.launch {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 0
+                            pulse = 3200L * xpjl.value.toLong();
+                        }
+                    }
+                }
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+    }
+
+
+    Row(
+        modifier = Modifier.padding(top = 520.dp),
+    ) {
+        Text(
+            text = "下盘",
+            fontSize = 30.sp
+        )
+        Button(
+            onClick = {
+
+            },
+            modifier = Modifier.padding(start = 20.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("复    位")
+        }
+
+        Text(
+            text = "蠕动泵",
+            fontSize = 30.sp,
+            modifier = Modifier.padding(start = 60.dp),
+        )
+        Button(
+            onClick = {
+
+            },
+            modifier = Modifier.padding(start = 20.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("加    液")
+        }
+
+    }
+
+    Row(
+        modifier = Modifier.padding(top = 570.dp),
+    ) {
+
+        OutlinedTextField(
+            modifier = Modifier.width(100.dp),
+            value = ydjl_ex,
+            onValueChange = {
+                scope.launch {
+                    ydjl_ex = it
+                    ydjl.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "原点距离") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+        Button(
+            onClick = {
+
+            },
+            modifier = Modifier
+                .padding(start = 10.dp, top = 10.dp)
+                .height(50.dp),
+            shape = RoundedCornerShape(10.dp),
+        ) {
+            Text("移    动")
+        }
+
+
+        OutlinedTextField(
+            modifier = Modifier
+                .width(100.dp)
+                .padding(start = 30.dp),
+            value = jyq_ex,
+            onValueChange = {
+                scope.launch {
+                    jyq_ex = it
+                    jyq.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "加液前") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+
+
+        OutlinedTextField(
+            modifier = Modifier
+                .width(100.dp)
+                .padding(start = 20.dp),
+            value = jyh_ex,
+            onValueChange = {
+                scope.launch {
+                    jyh_ex = it
+                    jyh.value = it.toFloatOrNull() ?: 0f
+                }
+            },
+            label = { Text(text = "加液后") },
+            shape = MaterialTheme.shapes.medium,
+            textStyle = MaterialTheme.typography.bodyLarge,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done,
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = {
+                    keyboard?.hide()
+                }
+            ),
+        )
+
+
+    }
+
+
 }
+
 
 /**
  * Composable function that previews the calibration list content.
@@ -562,15 +968,15 @@ fun CalibrationListPreview() {
 /**
  * Composable function that previews the calibration edit content.
  */
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun CalibrationDetailPreview() {
-    // Create a calibration entity list with a single entity
-    val entities = listOf(Calibration(id = 1L))
-
-    // Create a calibration UI state with the entity list and a selected entity ID
-    val uiState = CalibrationUiState(entities = entities, selected = 1L)
-
-    // Show the calibration edit content
-    CalibrationDetail(uiState = uiState)
-}
+//@Composable
+//@Preview(showBackground = true, widthDp = 960, heightDp = 640)
+//fun CalibrationDetailPreview() {
+//    // Create a calibration entity list with a single entity
+//    val entities = listOf(Calibration(id = 1L))
+//
+//    // Create a calibration UI state with the entity list and a selected entity ID
+//    val uiState = CalibrationUiState(entities = entities, selected = 1L)
+//
+//    // Show the calibration edit content
+//    CalibrationDetail(uiState = uiState)
+//}
