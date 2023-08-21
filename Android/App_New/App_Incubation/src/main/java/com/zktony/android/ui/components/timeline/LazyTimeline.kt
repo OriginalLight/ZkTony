@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.NextPlan
 import androidx.compose.material.icons.filled.RunCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,7 +20,7 @@ import com.zktony.android.ui.components.timeline.defaults.CircleParametersDefaul
 import com.zktony.android.ui.components.timeline.defaults.LineParametersDefaults
 
 @Composable
-fun LazyTimeline(stages: Array<HiringStage>) {
+fun LazyTimeline(stages: Array<IncubationStage>) {
     LazyColumn(
         modifier = Modifier
             .wrapContentHeight()
@@ -50,10 +51,14 @@ fun LazyTimeline(stages: Array<HiringStage>) {
 }
 
 @Composable
-private fun getLineBrush(circleRadius: Dp, index: Int, items: Array<HiringStage>): LineParameters? {
+private fun getLineBrush(
+    circleRadius: Dp,
+    index: Int,
+    items: Array<IncubationStage>
+): LineParameters? {
     return if (index != items.lastIndex) {
-        val currentStage: HiringStage = items[index]
-        val nextStage: HiringStage = items[index + 1]
+        val currentStage: IncubationStage = items[index]
+        val nextStage: IncubationStage = items[index + 1]
         val circleRadiusInPx = with(LocalDensity.current) { circleRadius.toPx() }
         LineParametersDefaults.linearGradient(
             strokeWidth = 3.dp,
@@ -66,16 +71,16 @@ private fun getLineBrush(circleRadius: Dp, index: Int, items: Array<HiringStage>
     }
 }
 
-private fun getIconColor(stage: HiringStage): Color {
+private fun getIconColor(stage: IncubationStage): Color {
     return when (stage.status) {
-        HiringStageStatus.FINISHED -> Color.Green
-        HiringStageStatus.CURRENT -> Color.Blue
-        HiringStageStatus.UPCOMING -> Color.Gray
+        IncubationStageStatus.FINISHED -> Color.Green
+        IncubationStageStatus.CURRENT -> Color.Blue
+        IncubationStageStatus.UPCOMING -> Color.Gray
     }
 }
 
-private fun getIconStrokeColor(stage: HiringStage): StrokeParameters? {
-    return if (stage.status == HiringStageStatus.UPCOMING) {
+private fun getIconStrokeColor(stage: IncubationStage): StrokeParameters? {
+    return if (stage.status == IncubationStageStatus.UPCOMING) {
         StrokeParameters(color = Color.Gray, width = 2.dp)
     } else {
         null
@@ -83,11 +88,11 @@ private fun getIconStrokeColor(stage: HiringStage): StrokeParameters? {
 }
 
 @Composable
-private fun getIcon(stage: HiringStage): ImageVector? {
+private fun getIcon(stage: IncubationStage): ImageVector {
     return when (stage.status) {
-        HiringStageStatus.FINISHED -> Icons.Default.Done
-        HiringStageStatus.CURRENT -> Icons.Default.RunCircle
-        HiringStageStatus.UPCOMING -> null
+        IncubationStageStatus.FINISHED -> Icons.Default.Done
+        IncubationStageStatus.CURRENT -> Icons.Default.RunCircle
+        IncubationStageStatus.UPCOMING -> Icons.Default.NextPlan
     }
 }
 

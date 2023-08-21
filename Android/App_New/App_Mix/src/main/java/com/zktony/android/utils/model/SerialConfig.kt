@@ -31,7 +31,7 @@ class SerialConfig {
         controlType = 0x01
         val step = pulse(index, pulse)
         if (step != 0L) {
-            val config = Motor(acc = ads.first, dec = ads.second, speed = ads.third)
+            val config = Motor(acc = ads.first * 10, dec = ads.second * 10, speed = ads.third * 10)
             val ba = ByteArray(5)
             ba.writeInt8(index, 0).writeInt32LE(step, 1)
             byteList.addAll(ba.toList())
@@ -52,7 +52,7 @@ class SerialConfig {
         controlType = 0x01
         val step = pulse(index, dv)
         if (step != 0L) {
-            val config = Motor(acc = ads.first, dec = ads.second, speed = ads.third)
+            val config = Motor(acc = ads.first * 10, dec = ads.second * 10, speed = ads.third * 10)
             val ba = ByteArray(5)
             ba.writeInt8(index, 0).writeInt32LE(step, 1)
             byteList.addAll(ba.toList())

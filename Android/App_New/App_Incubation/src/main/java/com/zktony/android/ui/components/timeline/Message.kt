@@ -20,7 +20,7 @@ import java.util.Date
 
 @Composable
 internal fun Message(
-    hiringStage: HiringStage,
+    hiringStage: IncubationStage,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -39,7 +39,7 @@ internal fun Message(
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(12.dp),
-                text = hiringStage.initiator.message,
+                text = hiringStage.flows.displayText,
                 style = getTextStyle(hiringStage),
                 fontWeight = getFontWeight(hiringStage),
                 color = getTextColor(hiringStage)
@@ -49,31 +49,31 @@ internal fun Message(
 }
 
 @Composable
-private fun getBackgroundColor(hiringStage: HiringStage) = when (hiringStage.status) {
-    HiringStageStatus.UPCOMING -> MaterialTheme.colorScheme.surface.copy(alpha = 0.3f)
-    HiringStageStatus.CURRENT -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
+private fun getBackgroundColor(hiringStage: IncubationStage) = when (hiringStage.status) {
+    IncubationStageStatus.UPCOMING -> MaterialTheme.colorScheme.surface.copy(alpha = 0.3f)
+    IncubationStageStatus.CURRENT -> MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f)
     else -> MaterialTheme.colorScheme.surfaceVariant
 }
 
 @Composable
-private fun getTextColor(hiringStage: HiringStage) =
-    if (hiringStage.status == HiringStageStatus.UPCOMING) {
+private fun getTextColor(hiringStage: IncubationStage) =
+    if (hiringStage.status == IncubationStageStatus.UPCOMING) {
         MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.63f)
     } else {
         MaterialTheme.colorScheme.onSurfaceVariant
     }
 
 @Composable
-private fun getFontWeight(hiringStage: HiringStage) =
-    if (hiringStage.status == HiringStageStatus.CURRENT) {
+private fun getFontWeight(hiringStage: IncubationStage) =
+    if (hiringStage.status == IncubationStageStatus.CURRENT) {
         W500
     } else {
         W400
     }
 
 @Composable
-private fun getTextStyle(hiringStage: HiringStage) =
-    if (hiringStage.status == HiringStageStatus.CURRENT) {
+private fun getTextStyle(hiringStage: IncubationStage) =
+    if (hiringStage.status == IncubationStageStatus.CURRENT) {
         MaterialTheme.typography.bodyLarge
     } else {
         MaterialTheme.typography.bodyMedium
@@ -84,13 +84,13 @@ private fun getTextStyle(hiringStage: HiringStage) =
 private fun MessagePreview() {
     AppTheme {
         Message(
-            hiringStage = HiringStage(
+            hiringStage = IncubationStage(
                 date = Date(System.currentTimeMillis()),
-                initiator = MessageSender.Candidate(
+                flows = MessageSender.Candidate(
                     initials = "JD",
                     message = "Hi! I will be glad to join DreamCompany team. I've sent you my CV."
                 ),
-                status = HiringStageStatus.CURRENT
+                status = IncubationStageStatus.CURRENT
             ),
             modifier = Modifier
         )
@@ -102,13 +102,13 @@ private fun MessagePreview() {
 private fun UpcomingStageMessagePreview() {
     AppTheme {
         Message(
-            hiringStage = HiringStage(
+            hiringStage = IncubationStage(
                 date = Date(System.currentTimeMillis()),
-                initiator = MessageSender.Candidate(
+                flows = MessageSender.Candidate(
                     initials = "JD",
                     message = "Coming soon"
                 ),
-                status = HiringStageStatus.UPCOMING
+                status = IncubationStageStatus.UPCOMING
             ),
             modifier = Modifier
         )
@@ -121,13 +121,13 @@ private fun FinishedMessagePreview() {
     AppTheme {
         Message(
             modifier = Modifier,
-            hiringStage = HiringStage(
+            hiringStage = IncubationStage(
                 date = Date(System.currentTimeMillis()),
-                initiator = MessageSender.Candidate(
+                flows = MessageSender.Candidate(
                     initials = "JD",
                     message = "Hi! I will be glad to join DreamCompany team. I've sent you my CV."
                 ),
-                status = HiringStageStatus.FINISHED
+                status = IncubationStageStatus.FINISHED
             )
         )
     }
