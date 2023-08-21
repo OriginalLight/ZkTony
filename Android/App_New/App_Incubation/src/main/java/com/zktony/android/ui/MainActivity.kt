@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppTheme {
                 CompositionLocalProvider(LocalDataSaver provides dataSaver) {
-                    App()
+                    Test()
                 }
             }
         }

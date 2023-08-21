@@ -559,7 +559,6 @@ fun OrificePlateDetail(
                                     }
                                 },
                                 valueRange = 2f..16f,
-                                steps = 13,
                             )
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -582,7 +581,6 @@ fun OrificePlateDetail(
                                     }
                                 },
                                 valueRange = 2f..24f,
-                                steps = 21,
                             )
                         }
                     }

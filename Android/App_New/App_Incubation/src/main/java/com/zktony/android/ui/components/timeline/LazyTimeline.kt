@@ -1,8 +1,6 @@
 package com.zktony.android.ui.components.timeline
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -14,17 +12,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.zktony.android.data.entities.IncubationFlow
 import com.zktony.android.ui.components.timeline.defaults.CircleParametersDefaults
 import com.zktony.android.ui.components.timeline.defaults.LineParametersDefaults
+import com.zktony.android.ui.theme.AppTheme
+import java.util.Date
 
 @Composable
-fun LazyTimeline(stages: Array<IncubationStage>) {
+fun LazyTimeline(
+    modifier: Modifier = Modifier,
+    stages: Array<IncubationStage>
+) {
     LazyColumn(
-        modifier = Modifier
-            .wrapContentHeight()
-            .fillMaxWidth(),
+        modifier = modifier,
         content = {
             itemsIndexed(stages) { index, stage ->
                 TimelineNode(
@@ -42,7 +45,7 @@ fun LazyTimeline(stages: Array<IncubationStage>) {
                     contentStartOffset = 16.dp,
                     spacer = 24.dp
                 ) { modifier ->
-                    Message(stage, modifier)
+                    StageCard(stage, modifier)
                 }
             }
         },
@@ -100,4 +103,31 @@ private fun mapToTimelineNodePosition(index: Int, collectionSize: Int) = when (i
     0 -> TimelineNodePosition.FIRST
     collectionSize - 1 -> TimelineNodePosition.LAST
     else -> TimelineNodePosition.MIDDLE
+}
+
+
+@Composable
+@Preview(showBackground = true)
+fun LazyTimelinePreview() {
+    AppTheme {
+        LazyTimeline(
+            stages = arrayOf(
+                IncubationStage(
+                    date = Date(),
+                    status = IncubationStageStatus.FINISHED,
+                    flows = IncubationFlow.PrimaryAntibody()
+                ),
+                IncubationStage(
+                    date = Date(),
+                    status = IncubationStageStatus.CURRENT,
+                    flows = IncubationFlow.Washing()
+                ),
+                IncubationStage(
+                    date = Date(),
+                    status = IncubationStageStatus.UPCOMING,
+                    flows = IncubationFlow.SecondaryAntibody()
+                )
+            )
+        )
+    }
 }
