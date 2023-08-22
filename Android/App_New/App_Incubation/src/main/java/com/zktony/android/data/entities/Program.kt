@@ -2,7 +2,7 @@ package com.zktony.android.data.entities
 
 import androidx.compose.runtime.Immutable
 import androidx.room.*
-import com.zktony.android.data.OrificePlateConverters
+import com.zktony.android.data.IncubationStageConverters
 import java.util.Date
 
 /**
@@ -15,7 +15,7 @@ import java.util.Date
         Index(value = ["text"], unique = true)
     ]
 )
-@TypeConverters(OrificePlateConverters::class)
+@TypeConverters(IncubationStageConverters::class)
 @Immutable
 data class Program(
     @PrimaryKey(autoGenerate = true)
@@ -23,8 +23,8 @@ data class Program(
     val id: Long = 0L,
     @ColumnInfo(name = "text")
     val text: String = "None",
-    @ColumnInfo(name = "orifice_plates")
-    val orificePlates: List<OrificePlate> = emptyList(),
+    @ColumnInfo(name = "stages")
+    val stages: List<IncubationStage> = emptyList(),
     @ColumnInfo(name = "create_time")
     val createTime: Date = Date(System.currentTimeMillis()),
 )

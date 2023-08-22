@@ -30,27 +30,16 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.ui.navigation.Route
-import com.zktony.android.ui.utils.NavigationType
 
-/**
- * Displays a splash screen with an animation and a message, and navigates to the home screen when the user clicks the "Done" button.
- *
- * @param modifier The modifier to apply to the splash screen.
- * @param navController The navigation controller to use for navigating to the home screen.
- * @param toggleDrawer The function to call to toggle the navigation drawer.
- */
 @Composable
 fun Splash(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
-    toggleDrawer: (NavigationType) -> Unit = {},
+    navController: NavHostController
 ) {
 
-    // Define the animation scale and splash state
     val scale = remember { Animatable(0f) }
     val splash = remember { mutableStateOf(true) }
 
-    // Animate the splash screen and hide it when the animation is complete
     LaunchedEffect(key1 = true) {
         scale.animateTo(
             targetValue = 0.7f,
@@ -63,7 +52,6 @@ fun Splash(
         splash.value = false
     }
 
-    // Display the splash screen with the logo and message
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -107,7 +95,6 @@ fun Splash(
                 FloatingActionButton(
                     modifier = Modifier.width(192.dp),
                     onClick = {
-                        toggleDrawer(NavigationType.NAVIGATION_RAIL)
                         navController.popBackStack()
                         navController.navigate(Route.HOME)
                     },

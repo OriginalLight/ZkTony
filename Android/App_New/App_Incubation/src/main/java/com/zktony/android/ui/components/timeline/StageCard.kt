@@ -1,13 +1,16 @@
 package com.zktony.android.ui.components.timeline
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -15,72 +18,94 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zktony.android.data.entities.IncubationFlow
+import com.zktony.android.R
+import com.zktony.android.data.entities.IncubationStage
+import com.zktony.android.data.entities.IncubationStageStatus
 import com.zktony.android.data.entities.IncubationTag
 import com.zktony.android.ui.theme.AppTheme
-import java.util.Date
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun StageCard(
     stage: IncubationStage,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
             .wrapContentHeight()
             .fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier
-                .background(
-                    color = getBackgroundColor(stage = stage),
-                    shape = MaterialTheme.shapes.small
-                )
-                .padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = getBackgroundColor(stage = stage),
+            ),
+            shape = MaterialTheme.shapes.small,
+            onClick = onClick
         ) {
-            ElevatedCard(shape = MaterialTheme.shapes.small) {
-                Text(
-                    modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
-                    text = stage.flows.displayText,
-                    textAlign = TextAlign.Center,
-                    fontSize = 16.sp,
-                    fontStyle = FontStyle.Italic,
-                    fontFamily = FontFamily.Serif,
-                    fontWeight = FontWeight.Bold,
-                    color = getTextColor(stage = stage),
-                )
-            }
-
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                maxItemsInEachRow = 3
+            Column(
+                modifier = Modifier.padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                getParameter(stage = stage).forEach {
-                    AssistChip(
-                        onClick = { },
-                        label = {
-                            Text(
-                                text = it.second,
-                                color = getTextColor(stage = stage)
-                            )
-                        },
-                        leadingIcon = {
+                ElevatedCard(shape = MaterialTheme.shapes.small) {
+                    Text(
+                        modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
+                        text = getDisplayText(stage = stage),
+                        textAlign = TextAlign.Center,
+                        fontSize = 16.sp,
+                        fontStyle = FontStyle.Italic,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
+                        color = getTextColor(stage = stage),
+                    )
+                }
+
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    maxItemsInEachRow = 3
+                ) {
+                    getParameter(stage = stage).forEach {
+                        Row(
+                            modifier = Modifier
+                                .padding(vertical = 4.dp)
+                                .border(
+                                    width = 1.dp,
+                                    color = Color.Gray,
+                                    shape = MaterialTheme.shapes.small
+                                )
+                                .padding(horizontal = 12.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Icon(
                                 imageVector = it.first,
                                 contentDescription = null,
                                 modifier = Modifier.size(AssistChipDefaults.IconSize),
                                 tint = getTextColor(stage = stage)
                             )
-                        })
-
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = it.second,
+                                color = getTextColor(stage = stage)
+                            )
+                        }
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun getDisplayText(stage: IncubationStage): String {
+    return when (stage.tag) {
+        IncubationTag.BLOCKING -> stringResource(id = R.string.blocking)
+        IncubationTag.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
+        IncubationTag.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
+        IncubationTag.WASHING -> stringResource(id = R.string.washing)
+        IncubationTag.PHOSPHATE_BUFFERED_SALINE -> stringResource(id = R.string.phosphate_buffered_saline)
     }
 }
 
@@ -101,23 +126,27 @@ private fun getTextColor(stage: IncubationStage) =
 
 private fun getParameter(stage: IncubationStage): List<Pair<ImageVector, String>> {
     val list = mutableListOf<Pair<ImageVector, String>>()
-    list.add(Icons.Default.LocalFireDepartment to "${stage.flows.temperature} ℃")
+    list.add(Icons.Default.LocalFireDepartment to "${stage.temperature} ℃")
     list.add(
         Icons.Default.LockClock to
-                "${stage.flows.duration} ${
-                    if (stage.flows.tag == IncubationTag.WASHING) {
+                "${stage.duration} ${
+                    if (stage.tag == IncubationTag.WASHING) {
                         "Min"
                     } else {
                         "Hour"
                     }
                 }"
     )
-    list.add(Icons.Default.WaterDrop to "${stage.flows.dosage} μL")
-    if (stage.flows is IncubationFlow.PrimaryAntibody) {
-        list.add(Icons.Default.Recycling to if (stage.flows.recycle) "Recycle" else "No Recycle")
+    list.add(Icons.Default.WaterDrop to "${stage.dosage} μL")
+    if (stage.tag == IncubationTag.PRIMARY_ANTIBODY) {
+        list.add(Icons.Default.Recycling to if (stage.recycle) "Recycle" else "No Recycle")
+        list.add(Icons.Default.TripOrigin to "${'A' + stage.origin}")
     }
-    if (stage.flows is IncubationFlow.Washing) {
-        list.add(Icons.Default.Numbers to "${stage.flows.times} Times")
+    if (stage.tag == IncubationTag.SECONDARY_ANTIBODY) {
+        list.add(Icons.Default.TripOrigin to "${'A' + stage.origin}")
+    }
+    if (stage.tag == IncubationTag.WASHING) {
+        list.add(Icons.Default.Numbers to "${stage.times} Times")
     }
     return list
 }
@@ -129,8 +158,7 @@ private fun MessagePreview() {
     AppTheme {
         StageCard(
             stage = IncubationStage(
-                date = Date(System.currentTimeMillis()),
-                flows = IncubationFlow.Blocking(),
+                tag = IncubationTag.BLOCKING,
                 status = IncubationStageStatus.CURRENT
             ),
             modifier = Modifier
@@ -144,8 +172,7 @@ private fun UpcomingStageMessagePreview() {
     AppTheme {
         StageCard(
             stage = IncubationStage(
-                date = Date(System.currentTimeMillis()),
-                flows = IncubationFlow.Blocking(),
+                tag = IncubationTag.PRIMARY_ANTIBODY,
                 status = IncubationStageStatus.UPCOMING
             ),
             modifier = Modifier
@@ -160,8 +187,7 @@ private fun FinishedMessagePreview() {
         StageCard(
             modifier = Modifier,
             stage = IncubationStage(
-                date = Date(System.currentTimeMillis()),
-                flows = IncubationFlow.PrimaryAntibody(),
+                tag = IncubationTag.BLOCKING,
                 status = IncubationStageStatus.FINISHED
             )
         )

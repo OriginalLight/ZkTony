@@ -1,31 +1,25 @@
 package com.zktony.android.ui.navigation
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MenuOpen
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationRail
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
-import androidx.compose.ui.unit.sp
-import com.zktony.android.R
 import com.zktony.android.ui.utils.NavigationContentPosition
 
 /**
@@ -34,52 +28,78 @@ import com.zktony.android.ui.utils.NavigationContentPosition
  * @param selectedDestination String
  * @param navigationContentPosition NavigationContentPosition
  * @param navigateToTopLevelDestination Function1<TopLevelDestination, Unit>
- * @param onDrawerClicked Function0<Unit>
  */
 @Composable
-fun AppNavigationRail(
+fun AppNavigation(
     selectedDestination: String,
     navigationContentPosition: NavigationContentPosition,
     navigateToTopLevelDestination: (TopLevelDestination) -> Unit,
-    onDrawerClicked: () -> Unit = {},
+    onBackPressed: () -> Unit = {},
 ) {
     NavigationRail(
-        modifier = Modifier.fillMaxHeight(),
+        modifier = Modifier
+            .fillMaxHeight()
+            .padding(vertical = 16.dp, horizontal = 8.dp),
         containerColor = Color.Transparent,
     ) {
         Layout(
             modifier = Modifier.widthIn(max = 80.dp),
             content = {
                 Column(
-                    modifier = Modifier.layoutId(LayoutType.HEADER),
+                    modifier = Modifier
+                        .layoutId(LayoutType.HEADER)
+                        .padding(8.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = MaterialTheme.shapes.small
+                        ),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Spacer(Modifier.height(16.dp))
-
-                    NavigationRailItem(
-                        selected = false, onClick = onDrawerClicked, icon = {
-                            Icon(
-                                modifier = Modifier.size(32.dp),
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = null
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                MaterialTheme.colorScheme.surfaceVariant,
+                                MaterialTheme.shapes.small
                             )
-                        })
+                            .clip(MaterialTheme.shapes.small)
+                            .size(48.dp)
+                            .clickable { onBackPressed() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(32.dp),
+                            imageVector = Icons.Filled.Undo,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
 
                 Column(
-                    modifier = Modifier.layoutId(LayoutType.CONTENT),
+                    modifier = Modifier
+                        .layoutId(LayoutType.CONTENT)
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .padding(8.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     TOP_LEVEL_DESTINATIONS.forEach { destination ->
-                        NavigationRailItem(
+                        NavigationItem(
                             selected = selectedDestination == destination.route,
                             onClick = { navigateToTopLevelDestination(destination) },
                             icon = {
-                                Image(
+                                Icon(
                                     modifier = Modifier.size(32.dp),
-                                    painter = painterResource(id = destination.imageId),
+                                    imageVector = destination.icon,
                                     contentDescription = stringResource(id = destination.iconTextId),
+                                    tint = if (selectedDestination == destination.route) {
+                                        MaterialTheme.colorScheme.surface
+                                    } else {
+                                        MaterialTheme.colorScheme.primary
+                                    }
                                 )
                             }
                         )
@@ -92,166 +112,38 @@ fun AppNavigationRail(
 }
 
 /**
- * Navigation drawer content for permanent drawer
+ * NavigationItem
  *
- * @param selectedDestination String
- * @param navigationContentPosition NavigationContentPosition
- * @param navigateToTopLevelDestination Function1<TopLevelDestination, Unit>
- * @param onDrawerClicked Function0<Unit>
- */
-@Composable
-fun PermanentNavigationDrawerContent(
-    selectedDestination: String,
-    navigationContentPosition: NavigationContentPosition,
-    navigateToTopLevelDestination: (TopLevelDestination) -> Unit,
-    onDrawerClicked: () -> Unit = {},
-) {
-    PermanentDrawerSheet(
-        modifier = Modifier.sizeIn(minWidth = 200.dp, maxWidth = 200.dp),
-        drawerContainerColor = Color.Transparent
-    ) {
-        Layout(
-            modifier = Modifier.padding(16.dp),
-            content = {
-                Column(
-                    modifier = Modifier.layoutId(LayoutType.HEADER),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    ExtendedFloatingActionButton(
-                        onClick = { onDrawerClicked() },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.app_name),
-                            modifier = Modifier.weight(1f),
-                            textAlign = TextAlign.Center
-                        )
-                        Icon(
-                            modifier = Modifier.size(32.dp),
-                            imageVector = Icons.Default.MenuOpen,
-                            contentDescription = null
-                        )
-                    }
-                }
-
-                Column(
-                    modifier = Modifier
-                        .layoutId(LayoutType.CONTENT)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center,
-                ) {
-                    TOP_LEVEL_DESTINATIONS.forEach { destination ->
-                        NavigationDrawerItem(
-                            selected = selectedDestination == destination.route,
-                            label = {
-                                Text(
-                                    text = stringResource(id = destination.iconTextId),
-                                    style = TextStyle(
-                                        fontWeight = FontWeight.Bold,
-                                        fontSize = 16.sp
-                                    )
-                                )
-                            },
-                            icon = {
-                                Image(
-                                    modifier = Modifier.size(32.dp),
-                                    painter = painterResource(id = destination.imageId),
-                                    contentDescription = stringResource(id = destination.iconTextId),
-                                )
-                            },
-                            onClick = { navigateToTopLevelDestination(destination) })
-                    }
-                }
-            },
-            measurePolicy = navigationMeasurePolicy(navigationContentPosition)
-        )
-    }
-}
-
-/**
- * Navigation drawer content for modal drawer
- *
- * @param selectedDestination String
- * @param navigationContentPosition NavigationContentPosition
- * @param navigateToTopLevelDestination Function1<TopLevelDestination, Unit>
- * @param onDrawerClicked Function0<Unit>
+ * @param selected Boolean
+ * @param onClick Function0<Unit>
+ * @param icon [@androidx.compose.runtime.Composable] Function0<Unit>
+ * @param modifier Modifier
  * @return Unit
  */
 @Composable
-fun ModalNavigationDrawerContent(
-    selectedDestination: String,
-    navigationContentPosition: NavigationContentPosition,
-    navigateToTopLevelDestination: (TopLevelDestination) -> Unit,
-    onDrawerClicked: () -> Unit = {}
+internal fun NavigationItem(
+    selected: Boolean,
+    onClick: () -> Unit,
+    icon: @Composable () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    ModalDrawerSheet {
-        Layout(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.inverseOnSurface)
-                .padding(16.dp),
-            content = {
-                Column(
-                    modifier = Modifier.layoutId(LayoutType.HEADER),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(id = R.string.app_name).uppercase(),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        IconButton(onClick = onDrawerClicked) {
-                            Icon(
-                                modifier = Modifier.size(32.dp),
-                                imageVector = Icons.Default.MenuOpen,
-                                contentDescription = null
-                            )
-                        }
-                    }
-                }
-
-                Column(
-                    modifier = Modifier
-                        .layoutId(LayoutType.CONTENT)
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    TOP_LEVEL_DESTINATIONS.forEach { destination ->
-                        NavigationDrawerItem(
-                            selected = selectedDestination == destination.route,
-                            label = {
-                                Text(
-                                    text = stringResource(id = destination.iconTextId),
-                                    modifier = Modifier.padding(horizontal = 16.dp)
-                                )
-                            },
-                            icon = {
-                                Image(
-                                    modifier = Modifier.size(32.dp),
-                                    painter = painterResource(id = destination.imageId),
-                                    contentDescription = stringResource(id = destination.iconTextId),
-                                )
-                            },
-                            colors = NavigationDrawerItemDefaults.colors(
-                                unselectedContainerColor = Color.Transparent
-                            ),
-                            onClick = { navigateToTopLevelDestination(destination) }
-                        )
-                    }
-                }
-            },
-            measurePolicy = navigationMeasurePolicy(navigationContentPosition)
-        )
+    val backgroundColor = if (selected) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+    Box(
+        modifier = modifier
+            .background(backgroundColor, MaterialTheme.shapes.small)
+            .clip(MaterialTheme.shapes.small)
+            .size(48.dp)
+            .clickable { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        icon()
     }
 }
+
 
 /**
  * Different position of navigation content inside Navigation Rail, Navigation Drawer depending on device size and state.

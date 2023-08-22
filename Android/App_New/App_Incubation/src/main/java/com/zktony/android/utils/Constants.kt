@@ -34,4 +34,9 @@ object Constants {
      */
     const val ZT_0004 = "ZT_0004"
 
+    /**
+     * 模块数量
+     */
+    const val ZT_0005 = 4
+
 }
