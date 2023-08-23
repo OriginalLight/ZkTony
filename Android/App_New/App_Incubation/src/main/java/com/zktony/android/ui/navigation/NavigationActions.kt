@@ -1,5 +1,11 @@
 package com.zktony.android.ui.navigation
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Apps
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Terminal
+import androidx.compose.material.icons.filled.Token
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.zktony.android.R
@@ -14,7 +20,7 @@ object Route {
 
 data class TopLevelDestination(
     val route: String,
-    val imageId: Int,
+    val icon: ImageVector,
     val iconTextId: Int
 )
 
@@ -40,22 +46,22 @@ class NavigationActions(private val navController: NavHostController) {
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
         route = Route.HOME,
-        imageId = R.drawable.ic_home,
+        icon = Icons.Default.Apps,
         iconTextId = R.string.tab_home
     ),
     TopLevelDestination(
         route = Route.PROGRAM,
-        imageId = R.drawable.ic_program,
+        icon = Icons.Default.Terminal,
         iconTextId = R.string.tab_program
     ),
     TopLevelDestination(
         route = Route.CALIBRATION,
-        imageId = R.drawable.ic_module,
+        icon = Icons.Default.Token,
         iconTextId = R.string.tab_calibration
     ),
     TopLevelDestination(
         route = Route.SETTING,
-        imageId = R.drawable.ic_settings,
+        icon = Icons.Default.Settings,
         iconTextId = R.string.tab_setting
     )
 )

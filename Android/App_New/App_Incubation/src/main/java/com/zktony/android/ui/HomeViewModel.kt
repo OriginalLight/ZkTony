@@ -5,11 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.RuntimeHelper
 import com.zktony.android.utils.extra.serial
 import com.zktony.android.utils.extra.serialHelper
 import com.zktony.android.utils.model.ExecuteType
-import com.zktony.android.utils.model.RuntimeState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +27,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.LIST)
     private val _loading = MutableStateFlow(0)
-    private val helper: RuntimeHelper = RuntimeHelper.instance
 
     val uiState = _uiState.asStateFlow()
 
@@ -41,14 +38,12 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     _selected,
                     _page,
                     _loading,
-                    helper.state,
-                ) { entities, selected, page, loading, runtime ->
+                ) { entities, selected, page, loading ->
                     HomeUiState(
                         entities = entities,
                         selected = selected,
                         page = page,
                         loading = loading,
-                        runtime = runtime
                     )
                 }.catch { ex ->
                     ex.printStackTrace()
@@ -65,21 +60,9 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     fun uiEvent(event: HomeUiEvent) {
         when (event) {
             is HomeUiEvent.Reset -> initializer()
-            is HomeUiEvent.Runtime -> {
-                when (event.action) {
-                    RuntimeAction.START -> helper.start()
-                    RuntimeAction.PAUSE -> helper.pause()
-                    RuntimeAction.RESUME -> helper.resume()
-                    RuntimeAction.STOP -> helper.stop()
-                }
-            }
-
+            is HomeUiEvent.Runtime -> {}
             is HomeUiEvent.NavTo -> _page.value = event.page
-            is HomeUiEvent.ToggleSelected -> {
-                _selected.value = event.id
-                helper.toggleProgram(uiState.value.entities.find { it.id == event.id }!!)
-            }
-
+            is HomeUiEvent.ToggleSelected -> _selected.value = event.id
             is HomeUiEvent.Pipeline -> pipeline(event.index)
         }
     }
@@ -154,7 +137,6 @@ data class HomeUiState(
     val selected: Long = 0L,
     val page: PageType = PageType.LIST,
     val loading: Int = 0,
-    val runtime: RuntimeState = RuntimeState(),
 )
 
 sealed class HomeUiEvent {

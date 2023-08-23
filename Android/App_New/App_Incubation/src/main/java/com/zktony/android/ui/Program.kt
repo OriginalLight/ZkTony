@@ -26,22 +26,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.zktony.android.data.datastore.rememberDataSaverState
-import com.zktony.android.data.entities.Coordinate
-import com.zktony.android.data.entities.Orifice
-import com.zktony.android.data.entities.OrificePlate
+import com.zktony.android.data.entities.IncubationStage
+import com.zktony.android.data.entities.IncubationStageStatus
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.*
+import com.zktony.android.ui.components.timeline.LazyTimeline
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.dateFormat
-import com.zktony.android.utils.extra.format
-import com.zktony.android.utils.extra.serial
 import com.zktony.android.utils.extra.showShortToast
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -163,24 +158,19 @@ fun ProgramList(
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
-            // Button for adding a new item
-            FloatingActionButton(
-                modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                onClick = { showDialog = true })
-            {
+
+            FloatingActionButton(onClick = { showDialog = true }) {
                 Icon(
-                    modifier = Modifier.size(32.dp),
                     imageVector = Icons.Default.Add,
                     contentDescription = null,
                     tint = Color.Black,
                 )
             }
-            // Delete button
+
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 var count by remember { mutableStateOf(0) }
 
                 FloatingActionButton(
-                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                     onClick = {
                         scope.launch {
                             if (count == 1) {
@@ -194,21 +184,16 @@ fun ProgramList(
                     }
                 ) {
                     Icon(
-                        modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
                         tint = if (count == 1) Color.Red else Color.Black,
                     )
                 }
             }
-            // Edit button
+
             AnimatedVisibility(visible = uiState.selected != 0L) {
-                FloatingActionButton(
-                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                    onClick = { uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL)) },
-                ) {
+                FloatingActionButton(onClick = { uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL)) }) {
                     Icon(
-                        modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Edit,
                         contentDescription = null,
                         tint = Color.Black,
@@ -298,7 +283,7 @@ fun ProgramDetail(
 
     val scope = rememberCoroutineScope()
     val selected = uiState.entities.find { it.id == uiState.selected } ?: Program()
-    val orificePlate = remember { mutableStateOf(-1) }
+    var stages by remember { mutableStateOf(selected.stages) }
 
     Column(
         modifier = modifier
@@ -337,29 +322,56 @@ fun ProgramDetail(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            AnimatedVisibility(visible = orificePlate.value == -1) {
+
+
+
+            FloatingActionButton(
+                onClick = {
+                    scope.launch {
+                        stages = stages.toMutableList().apply {
+                            add(IncubationStage())
+                        }
+                        uiEvent(ProgramUiEvent.Update(selected.copy(stages = stages)))
+                    }
+                })
+            {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = Color.Black,
+                )
+            }
+
+            AnimatedVisibility(visible = stages.any { it.status == IncubationStageStatus.CURRENT }) {
+                var count by remember { mutableStateOf(0) }
+
                 FloatingActionButton(
                     onClick = {
                         scope.launch {
-                            val orificePlates = selected.orificePlates.toMutableList()
-                            orificePlates.add(OrificePlate())
-                            uiEvent(ProgramUiEvent.Update(selected.copy(orificePlates = orificePlates)))
+                            if (count == 1) {
+                                stages = stages.toMutableList().apply {
+                                    removeAt(stages.indexOfFirst { it.status == IncubationStageStatus.CURRENT })
+                                }
+                                uiEvent(ProgramUiEvent.Update(selected.copy(stages = stages)))
+                                count = 0
+                            } else {
+                                count++
+                            }
                         }
                     }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null
+                        modifier = Modifier.size(32.dp),
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = if (count == 1) Color.Red else Color.Black,
                     )
                 }
             }
+
             FloatingActionButton(
                 onClick = {
-                    if (orificePlate.value > -1) {
-                        orificePlate.value = -1
-                    } else {
-                        uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_LIST))
-                    }
+                    uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_LIST))
                 }
             ) {
                 Icon(
@@ -369,396 +381,35 @@ fun ProgramDetail(
             }
         }
 
-        AnimatedVisibility(visible = orificePlate.value == -1) {
-            OrificePlateList(
-                selected = selected,
-                uiEvent = uiEvent,
-                toggleSelected = { orificePlate.value = it },
-            )
-        }
-
-        AnimatedVisibility(visible = orificePlate.value > -1) {
-            OrificePlateDetail(
-                orificePlate = selected.orificePlates.getOrNull(orificePlate.value)
-                    ?: OrificePlate(),
-                toggleSelected = {
-                    scope.launch {
-                        val array = selected.orificePlates.toMutableList()
-                        array[orificePlate.value] = it
-                        uiEvent(ProgramUiEvent.Update(selected.copy(orificePlates = array)))
-                    }
-                },
-            )
-        }
-    }
-}
-
-@Composable
-fun OrificePlateList(
-    modifier: Modifier = Modifier,
-    selected: Program,
-    uiEvent: (ProgramUiEvent) -> Unit = {},
-    toggleSelected: (Int) -> Unit = {},
-) {
-    val scope = rememberCoroutineScope()
-
-    LazyVerticalGrid(
-        modifier = modifier
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
-            ),
-        contentPadding = PaddingValues(16.dp),
-        columns = GridCells.Fixed(2),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        itemsIndexed(items = selected.orificePlates) { index, item ->
-            OrificePlateBox(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(296.dp),
-                orificePlate = item,
-                delete = {
-                    scope.launch {
-                        val array = selected.orificePlates.toMutableList()
-                        array.removeAt(index)
-                        uiEvent(ProgramUiEvent.Update(selected.copy(orificePlates = array)))
-                    }
-                },
-                toggleSelected = { toggleSelected(index) },
-            )
-        }
-    }
-}
-
-@Composable
-fun OrificePlateDetail(
-    modifier: Modifier = Modifier,
-    orificePlate: OrificePlate,
-    toggleSelected: (OrificePlate) -> Unit = {},
-) {
-    val scope = rememberCoroutineScope()
-    val abscissa by rememberDataSaverState(key = Constants.ZT_0001, initialValue = 0.0)
-    val ordinate by rememberDataSaverState(key = Constants.ZT_0002, initialValue = 0.0)
-
-    var selected by remember { mutableStateOf(orificePlate) }
-    var volumeIndex by remember { mutableStateOf(0) }
-    var volume by remember { mutableStateOf(selected.getVolume()[0].format(1)) }
-    var delay by remember { mutableStateOf(selected.delay.toString()) }
-
-    Row(
-        modifier = modifier
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
-            )
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        Column(
+        Row(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            OrificePlate(
-                modifier = Modifier.fillMaxHeight(0.5f),
-                row = selected.row,
-                column = selected.column,
-                selected = selected.getSelected(),
-                coordinate = true,
-                onItemClick = { size, office ->
-                    scope.launch {
-                        val rowSpace = size.width / selected.row
-                        val columnSpace = size.height / selected.column
-                        val list = selected.orifices.toMutableList().map { it.toMutableList() }
-                        val x = minOf((office.x / rowSpace).toInt(), selected.row - 1)
-                        val y = minOf((office.y / columnSpace).toInt(), selected.column - 1)
-                        list[y][x] = list[y][x].copy(selected = !list[y][x].selected)
-                        selected = selected.copy(orifices = list)
-                        toggleSelected(selected)
-                    }
-                },
-            )
-
-            OrificePlateCard(orificePlate = selected)
-        }
-
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
+                .fillMaxSize()
                 .border(
                     width = 1.dp,
                     color = Color.LightGray,
-                    shape = MaterialTheme.shapes.small
+                    shape = MaterialTheme.shapes.medium
                 )
-                .imePadding(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            item {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    CircleTabRow(
-                        modifier = Modifier.weight(0.5f),
-                        tabItems = listOf("分液模式", "混合模式"),
-                        selected = selected.type,
-                    ) {
-                        scope.launch {
-                            selected = selected.copy(type = it)
-                            toggleSelected(selected)
-                            volumeIndex = 0
-                            volume = selected.getVolume()[0].format(1)
+            LazyTimeline(
+                modifier = Modifier.fillMaxWidth(0.5f),
+                stages = stages,
+            ) {
+                scope.launch {
+                    val list = stages.toMutableList()
+                    list.forEachIndexed { index, item ->
+                        if (index == it) {
+                            list[index] = item.copy(status = IncubationStageStatus.CURRENT)
+                        } else {
+                            list[index] = item.copy(status = IncubationStageStatus.FINISHED)
                         }
                     }
-
-                    CircleTabRow(
-                        modifier = Modifier.weight(0.5f),
-                        tabItems = listOf("/", "全选"),
-                        selected = if (selected.isSelectAll()) 1 else 0,
-                    ) {
-                        scope.launch {
-                            selected = selected.copy(orifices = selected.selectAll(it == 1))
-                            toggleSelected(selected)
-                        }
-                    }
-                }
-            }
-
-            item {
-                ElevatedCard {
-                    Column(modifier = Modifier.padding(8.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                modifier = Modifier.width(48.dp),
-                                text = "C/${selected.column}",
-                                textAlign = TextAlign.Center
-                            )
-                            Slider(
-                                value = selected.column.toFloat(),
-                                onValueChange = {
-                                    scope.launch {
-                                        selected =
-                                            selected.copy(
-                                                column = it.toInt(),
-                                                orifices = emptyList()
-                                            )
-                                        selected =
-                                            selected.copy(orifices = selected.generateOrifices())
-                                        toggleSelected(selected)
-                                        volumeIndex = 0
-                                        volume = "0"
-                                    }
-                                },
-                                valueRange = 2f..16f,
-                            )
-                        }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                modifier = Modifier.width(48.dp),
-                                text = "R/${selected.row}",
-                                textAlign = TextAlign.Center
-                            )
-                            Slider(
-                                value = selected.row.toFloat(),
-                                onValueChange = {
-                                    scope.launch {
-                                        selected =
-                                            selected.copy(row = it.toInt(), orifices = emptyList())
-                                        selected =
-                                            selected.copy(orifices = selected.generateOrifices())
-                                        toggleSelected(selected)
-                                        volumeIndex = 0
-                                        volume = "0"
-                                    }
-                                },
-                                valueRange = 2f..24f,
-                            )
-                        }
-                    }
-                }
-            }
-
-            item {
-                CoordinateInput(
-                    title = "A1",
-                    limit = Coordinate(abscissa, ordinate),
-                    coordinate = selected.coordinate[0],
-                    onCoordinateChange = { coordinate ->
-                        scope.launch {
-                            if (coordinate.abscissa <= abscissa && coordinate.ordinate <= ordinate) {
-                                val cd = selected.coordinate.toMutableList()
-                                cd[0] = coordinate
-                                selected = selected.copy(coordinate = cd)
-                                selected = selected.copy(orifices = selected.generateOrifices())
-                                toggleSelected(selected)
-                            }
-                        }
-                    },
-                    onClick = {
-                        scope.launch {
-                            serial {
-                                start(index = 0, dv = selected.coordinate[0].abscissa)
-                                start(index = 1, dv = selected.coordinate[0].ordinate)
-                            }
-                        }
-                    }
-                )
-            }
-
-
-            item {
-                CoordinateInput(
-                    title = "${'A' + selected.column - 1}${selected.row}",
-                    limit = Coordinate(abscissa, ordinate),
-                    coordinate = selected.coordinate[1],
-                    onCoordinateChange = { coordinate ->
-                        scope.launch {
-                            if (coordinate.abscissa <= abscissa && coordinate.ordinate <= ordinate) {
-                                val cd = selected.coordinate.toMutableList()
-                                cd[1] = coordinate
-                                selected = selected.copy(coordinate = cd)
-                                selected = selected.copy(orifices = selected.generateOrifices())
-                                toggleSelected(selected)
-                            }
-                        }
-                    },
-                    onClick = {
-                        scope.launch {
-                            serial {
-                                start(index = 0, dv = selected.coordinate[1].abscissa)
-                                start(index = 1, dv = selected.coordinate[1].ordinate)
-                            }
-                        }
-                    }
-                )
-            }
-
-
-            if (selected.type == 1) {
-                item {
-                    CircleTabRow(
-                        modifier = Modifier.weight(0.5f),
-                        tabItems = listOf("M0", "M1", "M2", "M3", "M4", "M5"),
-                        selected = volumeIndex,
-                    ) {
-                        scope.launch {
-                            volumeIndex = it
-                            volume = selected.getVolume()[it].format(1)
-                        }
-                    }
-                }
-            }
-
-            item {
-                CircleTextField(
-                    title = "液量 μL",
-                    value = volume
-                ) {
-                    scope.launch {
-                        volume = it
-                        val v = it.toDoubleOrNull() ?: 0.0
-                        val list = selected.getVolume().toMutableList()
-                        list[if (selected.type == 0) 0 else volumeIndex] = v
-                        val orifices = selected.setVolume(list)
-                        selected = selected.copy(orifices = orifices)
-                        toggleSelected(selected)
-                    }
-                }
-            }
-
-            item {
-                CircleTextField(
-                    title = "延时 ms",
-                    value = delay
-                ) {
-                    scope.launch {
-                        delay = it
-                        selected = selected.copy(delay = it.toLongOrNull() ?: 0L)
-                        toggleSelected(selected)
-                    }
+                    stages = list
                 }
             }
         }
     }
 }
 
-@Composable
-fun OrificePlateBox(
-    modifier: Modifier = Modifier,
-    orificePlate: OrificePlate,
-    delete: () -> Unit = {},
-    toggleSelected: () -> Unit = {},
-) {
-    val deleteCount = remember { mutableStateOf(0) }
-
-    Box(
-        modifier = modifier
-    ) {
-        OrificePlate(
-            modifier = Modifier.fillMaxSize(),
-            row = orificePlate.row,
-            column = orificePlate.column,
-            selected = orificePlate.getSelected(),
-        )
-
-        Row(
-            modifier = Modifier
-                .offset {
-                    IntOffset(
-                        x = (8).dp.roundToPx(),
-                        y = (-8).dp.roundToPx(),
-                    )
-                }
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceVariant,
-                    shape = MaterialTheme.shapes.small,
-                )
-                .align(Alignment.TopEnd),
-        ) {
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                onClick = {
-                    if (deleteCount.value > 0) {
-                        delete()
-                        deleteCount.value = 0
-                    } else {
-                        deleteCount.value++
-                    }
-                },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = null,
-                    tint = if (deleteCount.value > 0) {
-                        Color.Red
-                    } else {
-                        Color.Black
-                    },
-                )
-            }
-
-            IconButton(
-                modifier = Modifier.size(48.dp),
-                onClick = toggleSelected,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = null,
-                    tint = Color.Black,
-                )
-            }
-        }
-    }
-}
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
@@ -779,34 +430,6 @@ fun ProgramDetailPreview() {
         uiState = ProgramUiState(
             entities = listOf(Program(text = "test", id = 1L)),
             selected = 1L
-        )
-    )
-}
-
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun OrificePlateDetailPreview() {
-    OrificePlateDetail(
-        orificePlate = OrificePlate(
-            row = 12,
-            column = 8,
-            orifices = listOf(
-                listOf(
-                    Orifice(),
-                    Orifice(),
-                    Orifice(),
-                ),
-                listOf(
-                    Orifice(),
-                    Orifice(),
-                    Orifice(),
-                ),
-                listOf(
-                    Orifice(),
-                    Orifice(),
-                    Orifice(),
-                ),
-            )
         )
     )
 }

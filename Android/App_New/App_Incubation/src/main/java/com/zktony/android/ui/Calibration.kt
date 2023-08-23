@@ -175,25 +175,19 @@ fun CalibrationList(
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
-            // Button for adding a new item
-            FloatingActionButton(
-                modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
-                onClick = { showDialog = true })
-            {
+
+            FloatingActionButton(onClick = { showDialog = true }) {
                 Icon(
-                    modifier = Modifier.size(32.dp),
                     imageVector = Icons.Default.Add,
                     contentDescription = null,
                     tint = Color.Black,
                 )
             }
 
-            // Button for deleting the selected item
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 var count by remember { mutableStateOf(0) }
 
                 FloatingActionButton(
-                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                     onClick = {
                         if (count == 1) {
                             uiEvent(CalibrationUiEvent.Delete(uiState.selected))
@@ -204,7 +198,6 @@ fun CalibrationList(
                         }
                     }) {
                     Icon(
-                        modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
                         tint = if (count == 1) Color.Red else Color.Black,
@@ -215,10 +208,8 @@ fun CalibrationList(
             // Button for editing the selected item
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
-                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                     onClick = { uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_DETAIL)) }) {
                     Icon(
-                        modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Edit,
                         contentDescription = null,
                         tint = Color.Black,
@@ -229,10 +220,8 @@ fun CalibrationList(
             // Button for activating the selected item
             AnimatedVisibility(visible = uiState.selected != 0L) {
                 FloatingActionButton(
-                    modifier = Modifier.sizeIn(minWidth = 64.dp, maxWidth = 128.dp),
                     onClick = { uiEvent(CalibrationUiEvent.Active(uiState.selected)) }) {
                     Icon(
-                        modifier = Modifier.size(32.dp),
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
                         tint = Color.Black,
@@ -349,7 +338,7 @@ fun CalibrationDetail(
                 onValueChange = { volume = it.text },
                 placeholder = {
                     Text(
-                        text = stringResource(id = R.string.volume),
+                        text = stringResource(id = R.string.dosage),
                         fontStyle = FontStyle.Italic,
                         fontSize = 20.sp,
                         fontFamily = FontFamily.Serif,

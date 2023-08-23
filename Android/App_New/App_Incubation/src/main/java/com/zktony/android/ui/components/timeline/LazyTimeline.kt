@@ -15,16 +15,18 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.zktony.android.data.entities.IncubationFlow
+import com.zktony.android.data.entities.IncubationStage
+import com.zktony.android.data.entities.IncubationStageStatus
+import com.zktony.android.data.entities.IncubationTag
 import com.zktony.android.ui.components.timeline.defaults.CircleParametersDefaults
 import com.zktony.android.ui.components.timeline.defaults.LineParametersDefaults
 import com.zktony.android.ui.theme.AppTheme
-import java.util.Date
 
 @Composable
 fun LazyTimeline(
     modifier: Modifier = Modifier,
-    stages: Array<IncubationStage>
+    stages: List<IncubationStage>,
+    onItemClick: (Int) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier,
@@ -45,7 +47,7 @@ fun LazyTimeline(
                     contentStartOffset = 16.dp,
                     spacer = 24.dp
                 ) { modifier ->
-                    StageCard(stage, modifier)
+                    StageCard(stage, modifier) { onItemClick(index) }
                 }
             }
         },
@@ -57,7 +59,7 @@ fun LazyTimeline(
 private fun getLineBrush(
     circleRadius: Dp,
     index: Int,
-    items: Array<IncubationStage>
+    items: List<IncubationStage>
 ): LineParameters? {
     return if (index != items.lastIndex) {
         val currentStage: IncubationStage = items[index]
@@ -111,21 +113,18 @@ private fun mapToTimelineNodePosition(index: Int, collectionSize: Int) = when (i
 fun LazyTimelinePreview() {
     AppTheme {
         LazyTimeline(
-            stages = arrayOf(
+            stages = listOf(
                 IncubationStage(
-                    date = Date(),
+                    tag = IncubationTag.BLOCKING,
                     status = IncubationStageStatus.FINISHED,
-                    flows = IncubationFlow.PrimaryAntibody()
                 ),
                 IncubationStage(
-                    date = Date(),
+                    tag = IncubationTag.PRIMARY_ANTIBODY,
                     status = IncubationStageStatus.CURRENT,
-                    flows = IncubationFlow.Washing()
                 ),
                 IncubationStage(
-                    date = Date(),
+                    tag = IncubationTag.SECONDARY_ANTIBODY,
                     status = IncubationStageStatus.UPCOMING,
-                    flows = IncubationFlow.SecondaryAntibody()
                 )
             )
         )
