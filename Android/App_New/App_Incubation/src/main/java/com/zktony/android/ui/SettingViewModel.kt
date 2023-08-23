@@ -167,7 +167,7 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
                         is DownloadState.Err -> {
                             // Reset the progress state and display an error message
                             _progress.value = 0
-                            Ext.ctx.getString(R.string.download_failed).showShortToast()
+                            Ext.ctx.getString(R.string.downloading).showShortToast()
                         }
 
                         is DownloadState.Progress -> {

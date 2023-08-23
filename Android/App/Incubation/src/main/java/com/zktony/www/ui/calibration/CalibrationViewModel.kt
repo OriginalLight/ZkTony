@@ -32,7 +32,7 @@ class CalibrationViewModel constructor(
                 PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.not_empty))
                 return@launch
             }
-            val cali = _uiState.value?.find { it.name == name }
+            val cali = _uiState.value.find { it.name == name }
             if (cali != null) {
                 PopTip.show(Ext.ctx.getString(com.zktony.core.R.string.already_exists))
             } else {
@@ -51,7 +51,7 @@ class CalibrationViewModel constructor(
 
     fun enable(calibration: Calibration) {
         viewModelScope.launch {
-            val cali = _uiState.value?.find { it.active == 1 }
+            val cali = _uiState.value.find { it.active == 1 }
             if (cali == null) {
                 CD.update(calibration.copy(active = 1))
             } else {

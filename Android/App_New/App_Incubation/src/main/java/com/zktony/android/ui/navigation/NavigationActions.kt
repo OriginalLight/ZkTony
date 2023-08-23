@@ -1,10 +1,9 @@
 package com.zktony.android.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Apps
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Terminal
-import androidx.compose.material.icons.filled.Token
+import androidx.compose.material.icons.outlined.Analytics
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -14,7 +13,7 @@ object Route {
     const val HOME = "HOME"
     const val PROGRAM = "PROGRAM"
     const val CALIBRATION = "CALIBRATION"
-    const val SETTING = "SETTING"
+    const val SETTINGS = "SETTINGS"
     const val SPLASH = "SPLASH"
 }
 
@@ -25,7 +24,6 @@ data class TopLevelDestination(
 )
 
 class NavigationActions(private val navController: NavHostController) {
-
     fun navigateTo(destination: TopLevelDestination) {
         navController.navigate(destination.route) {
             // Pop up to the start destination of the graph to
@@ -41,27 +39,26 @@ class NavigationActions(private val navController: NavHostController) {
             restoreState = true
         }
     }
+
+    fun navigateUp() {
+        navController.navigateUp()
+    }
 }
 
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
-        route = Route.HOME,
-        icon = Icons.Default.Apps,
-        iconTextId = R.string.tab_home
-    ),
-    TopLevelDestination(
         route = Route.PROGRAM,
-        icon = Icons.Default.Terminal,
+        icon = Icons.Outlined.Terminal,
         iconTextId = R.string.tab_program
     ),
     TopLevelDestination(
         route = Route.CALIBRATION,
-        icon = Icons.Default.Token,
+        icon = Icons.Outlined.Analytics,
         iconTextId = R.string.tab_calibration
     ),
     TopLevelDestination(
-        route = Route.SETTING,
-        icon = Icons.Default.Settings,
+        route = Route.SETTINGS,
+        icon = Icons.Outlined.Settings,
         iconTextId = R.string.tab_setting
     )
 )

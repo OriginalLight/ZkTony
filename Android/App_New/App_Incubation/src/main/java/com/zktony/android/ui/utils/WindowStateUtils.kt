@@ -1,13 +1,5 @@
 package com.zktony.android.ui.utils
 
-/**
- * Different type of navigation supported by app depending on device size and state.
- */
-enum class NavigationType {
-    NONE, ONLY_RAIL, ONLY_TOP, RAIL_AND_TOP
-}
-
-
 enum class NavigationContentPosition {
     TOP, CENTER
 }

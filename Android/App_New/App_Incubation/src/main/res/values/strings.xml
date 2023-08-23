@@ -15,12 +15,12 @@
     <string name="tab_calibration">校准管理</string>
     <string name="tab_container">容器</string>
     <string name="tab_home">主页面</string>
-    <string name="tab_program">制胶程序</string>
+    <string name="tab_program">孵育程序</string>
     <string name="update">检测更新</string>
     <string name="update_available">有新版本</string>
     <string name="version">版本</string>
-    <string name="wifi">WIFI设置</string>
-    <string name="download_failed">下载失败</string>
+    <string name="network">网络设置</string>
+    <string name="downloading">下载中</string>
     <string name="network_unavailable">网络不可用</string>
     <string name="interface_exception">接口异常</string>
     <string name="speed">速度</string>
@@ -43,4 +43,5 @@
     <string name="primary_antibody">一抗</string>
     <string name="secondary_antibody">二抗</string>
     <string name="phosphate_buffered_saline">缓冲液</string>
+    <string name="search">搜索</string>
 </resources>

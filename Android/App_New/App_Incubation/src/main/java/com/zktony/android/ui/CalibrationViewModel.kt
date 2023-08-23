@@ -20,7 +20,7 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
 
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.CALIBRATION_LIST)
-    private val _loading = MutableStateFlow(false)
+    private val _loading = MutableStateFlow(0)
     private val _uiState = MutableStateFlow(CalibrationUiState())
 
     val uiState = _uiState.asStateFlow()
@@ -63,12 +63,12 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
 
     private fun addLiquid(index: Int) {
         viewModelScope.launch {
-            _loading.value = true
+            _loading.value = 1
             serial {
                 timeout = 1000L * 30
                 start(index = index + 2, pulse = 3200L * 20)
             }
-            _loading.value = false
+            _loading.value = 0
         }
     }
 
@@ -105,7 +105,7 @@ data class CalibrationUiState(
     val entities: List<Calibration> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.CALIBRATION_LIST,
-    val loading: Boolean = false,
+    val loading: Int = 0,
 )
 
 sealed class CalibrationUiEvent {

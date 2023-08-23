@@ -49,7 +49,7 @@ class DynamicPlate : View {
 
 
     @SuppressLint("DrawAllocation")
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         spacex = width.toFloat() / column
         spacey = height.toFloat() / row
@@ -60,7 +60,7 @@ class DynamicPlate : View {
         paint.color = Color.BLACK
         paint.strokeWidth = 4f
         paint.isAntiAlias = true
-        canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
 
         // 画横线和竖线
         paint.style = Paint.Style.STROKE
@@ -68,10 +68,10 @@ class DynamicPlate : View {
         paint.strokeWidth = 0.5f
         paint.isAntiAlias = true
         for (i in 1 until column) {
-            canvas?.drawLine(i * spacex, 0f, i * spacex, height.toFloat(), paint)
+            canvas.drawLine(i * spacex, 0f, i * spacex, height.toFloat(), paint)
         }
         for (i in 1 until row) {
-            canvas?.drawLine(0f, i * spacey, width.toFloat(), i * spacey, paint)
+            canvas.drawLine(0f, i * spacey, width.toFloat(), i * spacey, paint)
         }
 
 
@@ -83,7 +83,7 @@ class DynamicPlate : View {
 
         for (i in 0 until column) {
             for (j in 0 until row) {
-                canvas?.drawCircle(
+                canvas.drawCircle(
                     (i + 0.5f) * spacex,
                     (j + 0.5f) * spacey,
                     minOf(spacex, spacey) / 3f,
@@ -101,7 +101,7 @@ class DynamicPlate : View {
             for (j in 0 until row) {
                 val point = data.find { it.first == j && it.second == i && it.third }
                 if (point != null) {
-                    canvas?.drawCircle(
+                    canvas.drawCircle(
                         (i + 0.5f) * spacex,
                         (j + 0.5f) * spacey,
                         minOf(spacex, spacey) / 3f,
@@ -121,12 +121,12 @@ class DynamicPlate : View {
             val textLeft = "A1"
             val x = spacex / 2 - paint.measureText(textLeft) / 2
             val y = spacey / 2 + (paint.fontMetrics.bottom - paint.fontMetrics.top) / 2 - paint.fontMetrics.bottom
-            canvas?.drawText(textLeft, x, y, paint)
+            canvas.drawText(textLeft, x, y, paint)
             if (row * column >= 2) {
                 val textRight = "${'A' + row - 1}$column"
                 val x1 = spacex * (column - 0.5f) - paint.measureText(textRight) / 2
                 val y1 = spacey * (row - 0.5f) + (paint.fontMetrics.bottom - paint.fontMetrics.top) / 2 - paint.fontMetrics.bottom
-                canvas?.drawText(textRight, x1, y1, paint)
+                canvas.drawText(textRight, x1, y1, paint)
             }
         }
     }

@@ -42,7 +42,7 @@ class GradientPlate : View {
     private var space: Float = 0f
 
     @SuppressLint("DrawAllocation")
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         space = width.toFloat() / size
 
@@ -52,7 +52,7 @@ class GradientPlate : View {
         paint.color = Color.BLACK
         paint.strokeWidth = 4f
         paint.isAntiAlias = true
-        canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
+        canvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paint)
 
         // 画size个矩形
         for (i in 0 until size) {
@@ -64,7 +64,7 @@ class GradientPlate : View {
             paint.color = Color.BLACK
             paint.strokeWidth = 2f
             paint.isAntiAlias = true
-            canvas?.drawRect(left, top, right, bottom, paint)
+            canvas.drawRect(left, top, right, bottom, paint)
         }
 
         for (i in 0 until size) {
@@ -77,7 +77,7 @@ class GradientPlate : View {
                 paint.style = Paint.Style.FILL
                 paint.color = Color.GREEN
                 paint.isAntiAlias = true
-                canvas?.drawRect(left, top, right, bottom, paint)
+                canvas.drawRect(left, top, right, bottom, paint)
             }
         }
 
@@ -92,7 +92,7 @@ class GradientPlate : View {
             paint.textSize = space * 0.6f
             val text = ('A' + i).toString()
             val textWidth = paint.measureText(text)
-            canvas?.drawText(
+            canvas.drawText(
                 text,
                 left + (right - left - textWidth) / 2,
                 height.toFloat() - 16,
@@ -113,7 +113,7 @@ class GradientPlate : View {
                 paint.textSize = space * 0.5f
                 val text = "√"
                 val textWidth = paint.measureText(text)
-                canvas?.drawText(
+                canvas.drawText(
                     text,
                     left + (right - left - textWidth) / 2,
                     32f,
@@ -137,12 +137,12 @@ class GradientPlate : View {
                 val text = String.format("%.2f", axis.second).format()
                 val x = left + (right - left - paint.measureText(text)) / 2
                 val y = top + (bottom - top - paint.textSize) / 2 - paint.textSize
-                canvas?.drawText(text, x, y, paint)
+                canvas.drawText(text, x, y, paint)
 
                 val text2 = String.format("%.2f", axis.third).format()
                 val x2 = left + (right - left - paint.measureText(text2)) / 2
                 val y2 = top + (bottom - top - paint.textSize) / 2 + paint.textSize * 2
-                canvas?.drawText(text2, x2, y2, paint)
+                canvas.drawText(text2, x2, y2, paint)
             }
         }
     }

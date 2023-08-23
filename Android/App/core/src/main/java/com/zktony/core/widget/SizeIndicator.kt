@@ -25,7 +25,7 @@ class SizeIndicator : View {
         }
 
     @SuppressLint("DrawAllocation")
-    override fun onDraw(canvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
         // 左右两边画一个竖杠
@@ -39,23 +39,23 @@ class SizeIndicator : View {
         paint.isAntiAlias = true
 
         if (type == 0) {
-            canvas?.drawLine(0f, 0f, 0f, height.toFloat(), paint)
-            canvas?.drawLine(width.toFloat(), 0f, width.toFloat(), height.toFloat(), paint)
+            canvas.drawLine(0f, 0f, 0f, height.toFloat(), paint)
+            canvas.drawLine(width.toFloat(), 0f, width.toFloat(), height.toFloat(), paint)
         } else {
-            canvas?.drawLine(0f, 0f, width.toFloat(), 0f, paint)
-            canvas?.drawLine(0f, height.toFloat(), width.toFloat(), height.toFloat(), paint)
+            canvas.drawLine(0f, 0f, width.toFloat(), 0f, paint)
+            canvas.drawLine(0f, height.toFloat(), width.toFloat(), height.toFloat(), paint)
         }
 
         paint.strokeWidth = 2f
         if (type == 0) {
-            canvas?.drawLine(
+            canvas.drawLine(
                 width.toFloat() / 20,
                 height.toFloat() / 2,
                 width.toFloat() / 10 * 4,
                 height.toFloat() / 2,
                 paint
             )
-            canvas?.drawLine(
+            canvas.drawLine(
                 width.toFloat() / 10 * 6,
                 height.toFloat() / 2,
                 width.toFloat() / 20 * 19,
@@ -63,14 +63,14 @@ class SizeIndicator : View {
                 paint
             )
         } else {
-            canvas?.drawLine(
+            canvas.drawLine(
                 width.toFloat() / 2,
                 height.toFloat() / 20,
                 width.toFloat() / 2,
                 height.toFloat() / 10 * 4,
                 paint
             )
-            canvas?.drawLine(
+            canvas.drawLine(
                 width.toFloat() / 2,
                 height.toFloat() / 10 * 6,
                 width.toFloat() / 2,
@@ -85,7 +85,7 @@ class SizeIndicator : View {
         val x = (width - paint.measureText(text)) / 2
         val y =
             height / 2 + (paint.fontMetrics.bottom - paint.fontMetrics.top) / 2 - paint.fontMetrics.bottom
-        canvas?.drawText(text, x, y, paint)
+        canvas.drawText(text, x, y, paint)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

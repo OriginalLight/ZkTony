@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -30,7 +29,6 @@ fun InputDialog(
     onCancel: () -> Unit,
 ) {
     var value by remember { mutableStateOf("") }
-    val focusManager = LocalFocusManager.current
 
     Dialog(onDismissRequest = onCancel) {
         ElevatedCard {
@@ -59,7 +57,6 @@ fun InputDialog(
                     shape = CircleShape,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
-                        focusManager.clearFocus()
                         onConfirm(value)
                     }),
                 )
@@ -72,7 +69,9 @@ fun InputDialog(
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 16.dp),
-                        onClick = onCancel,
+                        onClick = {
+                            onCancel()
+                        },
                     ) {
                         Text(text = stringResource(id = R.string.cancel))
                     }
@@ -81,7 +80,9 @@ fun InputDialog(
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 16.dp),
-                        onClick = { onConfirm(value) },
+                        onClick = {
+                            onConfirm(value)
+                        },
                         enabled = value.isNotBlank()
                     ) {
                         Text(text = stringResource(id = R.string.confirm))
