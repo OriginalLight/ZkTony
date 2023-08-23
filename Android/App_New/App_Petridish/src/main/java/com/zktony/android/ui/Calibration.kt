@@ -1,59 +1,44 @@
 package com.zktony.android.ui
 
-import android.text.style.BackgroundColorSpan
-import android.widget.Button
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.Constants
-import com.zktony.android.utils.ext.dateFormat
 import com.zktony.android.utils.ext.format
 import com.zktony.android.utils.ext.showShortToast
 import com.zktony.android.utils.tx.MoveType
@@ -105,7 +90,6 @@ fun CalibrationList(
     val gridState = rememberLazyGridState()
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var query by rememberSaveable { mutableStateOf("") }
-    var active by rememberSaveable { mutableStateOf(false) }
 
     val keyboard = LocalSoftwareKeyboardController.current
 
@@ -142,6 +126,13 @@ fun CalibrationList(
     var jiaozgd_ex by remember { mutableStateOf(jiaozgd.value.format(1)) }
 
     /**
+     * 下盘高度
+     */
+    val xpgd = rememberDataSaverState(key = "xpgd", default = 0f)
+    var xpgd_ex by remember { mutableStateOf(xpgd.value.format(1)) }
+
+
+    /**
      * 复位高度
      */
     val fwgd2 = rememberDataSaverState(key = "fwgd2", default = 0f)
@@ -166,22 +157,84 @@ fun CalibrationList(
     var skjl_ex by remember { mutableStateOf(skjl.value.format(1)) }
 
     /**
-     * 上盘距离
+     * 上盘原点距离
      */
-    val spjl = rememberDataSaverState(key = "spjl", default = 0f)
-    var spjl_ex by remember { mutableStateOf(spjl.value.format(1)) }
+    val spydjl = rememberDataSaverState(key = "spydjl", default = 0f)
+    var spydjl_ex by remember { mutableStateOf(spydjl.value.format(1)) }
 
     /**
-     * 下盘距离
+     * 上盘孔位距离1
      */
-    val xpjl = rememberDataSaverState(key = "xpjl", default = 0f)
-    var xpjl_ex by remember { mutableStateOf(xpjl.value.format(1)) }
+    val spkwjl1 = rememberDataSaverState(key = "spkwjl1", default = 0f)
+    var spkwjl1_ex by remember { mutableStateOf(spkwjl1.value.format(1)) }
+
+    /**
+     * 上盘孔位距离2
+     */
+    val spkwjl2 = rememberDataSaverState(key = "spkwjl2", default = 0f)
+    var spkwjl2_ex by remember { mutableStateOf(spkwjl2.value.format(1)) }
+
+    /**
+     * 上盘孔位距离3
+     */
+    val spkwjl3 = rememberDataSaverState(key = "spkwjl3", default = 0f)
+    var spkwjl3_ex by remember { mutableStateOf(spkwjl3.value.format(1)) }
+
+    /**
+     * 上盘孔位距离4
+     */
+    val spkwjl4 = rememberDataSaverState(key = "spkwjl4", default = 0f)
+    var spkwjl4_ex by remember { mutableStateOf(spkwjl4.value.format(1)) }
+
+    /**
+     * 上盘孔位距离5
+     */
+    val spkwjl5 = rememberDataSaverState(key = "spkwjl5", default = 0f)
+    var spkwjl5_ex by remember { mutableStateOf(spkwjl5.value.format(1)) }
+
+    /**
+     * 上盘孔位距离6
+     */
+    val spkwjl6 = rememberDataSaverState(key = "spkwjl6", default = 0f)
+    var spkwjl6_ex by remember { mutableStateOf(spkwjl6.value.format(1)) }
+
+    /**
+     * 上盘孔位距离7
+     */
+    val spkwjl7 = rememberDataSaverState(key = "spkwjl7", default = 0f)
+    var spkwjl7_ex by remember { mutableStateOf(spkwjl7.value.format(1)) }
+
+    /**
+     * 上盘孔位距离8
+     */
+    val spkwjl8 = rememberDataSaverState(key = "spkwjl8", default = 0f)
+    var spkwjl8_ex by remember { mutableStateOf(spkwjl8.value.format(1)) }
+
 
     /**
      * 原点距离
      */
-    val ydjl = rememberDataSaverState(key = "ydjl", default = 0f)
-    var ydjl_ex by remember { mutableStateOf(ydjl.value.format(1)) }
+    val xpydjl = rememberDataSaverState(key = "xpydjl", default = 0f)
+    var xpydjl_ex by remember { mutableStateOf(xpydjl.value.format(1)) }
+
+    /**
+     * 下盘孔位距离1
+     */
+    val xpkwjl1 = rememberDataSaverState(key = "xpkwjl1", default = 0f)
+    var xpkwjl1_ex by remember { mutableStateOf(xpkwjl1.value.format(1)) }
+
+    /**
+     * 下盘孔位距离2
+     */
+    val xpkwjl2 = rememberDataSaverState(key = "xpkwjl2", default = 0f)
+    var xpkwjl2_ex by remember { mutableStateOf(xpkwjl2.value.format(1)) }
+
+    /**
+     * 下盘孔位距离3
+     */
+    val xpkwjl3 = rememberDataSaverState(key = "xpkwjl3", default = 0f)
+    var xpkwjl3_ex by remember { mutableStateOf(xpkwjl3.value.format(1)) }
+
 
     /**
      * 加液前
@@ -194,6 +247,8 @@ fun CalibrationList(
      */
     val jyh = rememberDataSaverState(key = "jyh", default = 0f)
     var jyh_ex by remember { mutableStateOf(jyh.value.format(1)) }
+
+    val context = LocalContext.current;
 
     // Show the input dialog if showDialog is true
     if (showDialog) {
@@ -214,735 +269,1434 @@ fun CalibrationList(
             onCancel = { showDialog = false },
         )
     }
-    Row {
-        Text(
-            text = "举升1",
-            fontSize = 30.sp
-        )
-        Button(
-            onClick = {
 
-            },
-            modifier = Modifier.padding(start = 20.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("复    位")
-        }
-
-        Button(
-            onClick = {
-
-            },
-            modifier = Modifier.padding(start = 500.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("全部复位")
-        }
-
-        Button(
-            onClick = {
-//                event(CalibrationEvent.AddLiquid())
-            },
-            modifier = Modifier.padding(start = 20.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("全部保存")
-        }
-    }
-
-
-
-    Row(
-        modifier = Modifier.padding(top = 40.dp),
-    ) {
-
-        OutlinedTextField(
-            modifier = Modifier.width(100.dp),
-            value = fwgd_ex,
-            onValueChange = {
-                scope.launch {
-                    fwgd_ex = it
-                    fwgd.value = it.toFloatOrNull() ?: 0f
+    LazyColumn {
+        item {
+            Row {
+                Text(
+                    text = "举升1",
+                    fontSize = 30.sp
+                )
+                Button(
+                    onClick = {
+                        event(
+                            CalibrationEvent.Reset(
+                                listOf(1),
+                                spydjl.value.toLong(),
+                                xpydjl.value.toLong()
+                            )
+                        )
+                    },
+                    modifier = Modifier.padding(start = 20.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("复    位")
                 }
-            },
-            label = { Text(text = "复位高度") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
 
-        Button(
-            onClick = {
-                scope.launch {
-                    tx {
-                        move{
-                            index = 0
-                            pulse = 3200L;
+                Button(
+                    onClick = {
+                        event(
+                            CalibrationEvent.Reset(
+                                listOf(1, 0, 2, 4, 5),
+                                spydjl.value.toLong(),
+                                xpydjl.value.toLong()
+                            )
+                        )
+                    },
+                    modifier = Modifier.padding(start = 500.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("全部复位")
+                }
+            }
+
+            Row {
+
+                OutlinedTextField(
+                    modifier = Modifier.width(100.dp),
+                    value = fwgd_ex,
+                    onValueChange = {
+                        scope.launch {
+                            fwgd_ex = it
+                            fwgd.value = it.toFloatOrNull() ?: 0f
                         }
-                    }
-                }
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
-        }
-
-
-
-
-        OutlinedTextField(
-            modifier = Modifier
-                .width(100.dp)
-                .padding(start = 20.dp),
-            value = pzjl_ex,
-            onValueChange = {
-                scope.launch {
-                    pzjl_ex = it
-                    pzjl.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "盘子距离") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-
-        Button(
-            onClick = {
-                scope.launch {
-                    tx {
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = 3200L * pzjl.value.toLong();
+                    },
+                    label = { Text(text = "复位高度") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
                         }
-                    }
-                }
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
-        }
+                    ),
+                )
 
-
-        OutlinedTextField(
-            modifier = Modifier
-                .width(100.dp)
-                .padding(start = 20.dp),
-            value = jzgd_ex,
-            onValueChange = {
-                scope.launch {
-                    jzgd_ex = it
-                    jzgd.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "夹爪高度") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-
-        Button(
-            onClick = {
-                scope.launch {
-                    tx {
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = 3200L * jzgd.value.toLong();
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 1
+                                        pulse = (3200L * fwgd.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
                         }
-                    }
+
+
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
                 }
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
-        }
 
-    }
 
-    Row(
-        modifier = Modifier.padding(top = 120.dp),
-    ) {
 
-        OutlinedTextField(
-            modifier = Modifier.width(100.dp),
-            value = fljl_ex,
-            onValueChange = {
-                scope.launch {
-                    fljl_ex = it
-                    fljl.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "分离距离") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
 
-        Button(
-            onClick = {
-                scope.launch {
-                    tx {
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = 3200L * fljl.value.toLong();
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = pzjl_ex,
+                    onValueChange = {
+                        scope.launch {
+                            pzjl_ex = it
+                            pzjl.value = it.toFloatOrNull() ?: 0f
                         }
-                    }
-                }
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
-        }
-
-        OutlinedTextField(
-            modifier = Modifier
-                .width(100.dp)
-                .padding(start = 20.dp),
-            value = jiaozgd_ex,
-            onValueChange = {
-                scope.launch {
-                    jiaozgd_ex = it
-                    jiaozgd.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "矫正高度") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-
-        Button(
-            onClick = {
-                scope.launch {
-                    tx {
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = 3200L * jzgd.value.toLong();
+                    },
+                    label = { Text(text = "盘子距离") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
                         }
-                    }
-                }
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
-        }
+                    ),
+                )
 
-    }
-
-    Row(
-        modifier = Modifier.padding(top = 190.dp),
-    ) {
-        Text(
-            text = "举升2",
-            fontSize = 30.sp
-        )
-        Button(
-            onClick = {
-
-            },
-            modifier = Modifier.padding(start = 20.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("复    位")
-        }
-
-    }
-
-    Row(
-        modifier = Modifier.padding(top = 230.dp),
-    ) {
-
-
-        OutlinedTextField(
-            modifier = Modifier.width(100.dp),
-            value = fwgd2_ex,
-            onValueChange = {
-                scope.launch {
-                    fwgd2_ex = it
-                    fwgd2.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "复位距离") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-
-        Button(
-            onClick = {
-                scope.launch {
-                    tx {
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = 3200L * fwgd2.value.toLong();
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 1
+                                        pulse = (3200L * pzjl.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
                         }
-                    }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
                 }
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
-        }
 
 
-        OutlinedTextField(
-            modifier = Modifier
-                .width(100.dp)
-                .padding(start = 20.dp),
-            value = pzjl2_ex,
-            onValueChange = {
-                scope.launch {
-                    pzjl2_ex = it
-                    pzjl2.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "盘子距离") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-        Button(
-            onClick = {
-                scope.launch {
-                    tx {
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = 3200L * pzjl2.value.toLong();
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = jzgd_ex,
+                    onValueChange = {
+                        scope.launch {
+                            jzgd_ex = it
+                            jzgd.value = it.toFloatOrNull() ?: 0f
                         }
-                    }
-                }
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
-        }
-
-    }
-
-    Row(
-        modifier = Modifier.padding(top = 300.dp),
-    ) {
-        Text(
-            text = "夹爪",
-            fontSize = 30.sp
-        )
-        Button(
-            onClick = {
-
-            },
-            modifier = Modifier.padding(start = 20.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("复    位")
-        }
-
-    }
-
-    Row(
-        modifier = Modifier.padding(top = 340.dp),
-    ) {
-
-        OutlinedTextField(
-            modifier = Modifier.width(100.dp),
-            value = jjjl_ex,
-            onValueChange = {
-                scope.launch {
-                    jjjl_ex = it
-                    jjjl.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "夹紧距离") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-        Button(
-            onClick = {
-                scope.launch {
-                    tx {
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = 3200L * jjjl.value.toLong();
+                    },
+                    label = { Text(text = "夹爪高度") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
                         }
-                    }
-                }
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
-        }
+                    ),
+                )
 
-
-        OutlinedTextField(
-            modifier = Modifier
-                .width(100.dp)
-                .padding(start = 20.dp),
-            value = skjl_ex,
-            onValueChange = {
-                scope.launch {
-                    skjl_ex = it
-                    skjl.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "松开距离") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-        Button(
-            onClick = {
-                scope.launch {
-                    tx {
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = 3200L * skjl.value.toLong();
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 1
+                                        pulse = (3200L * jzgd.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
                         }
-                    }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
                 }
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
-        }
 
-    }
+            }
 
+            Row {
 
-    Row(
-        modifier = Modifier.padding(top = 410.dp),
-    ) {
-        Text(
-            text = "上盘",
-            fontSize = 30.sp
-        )
-        Button(
-            onClick = {
-
-            },
-            modifier = Modifier.padding(start = 20.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("复    位")
-        }
-
-    }
-
-    Row(
-        modifier = Modifier.padding(top = 450.dp),
-    ) {
-
-        OutlinedTextField(
-            modifier = Modifier.width(100.dp),
-            value = spjl_ex,
-            onValueChange = {
-                scope.launch {
-                    spjl_ex = it
-                    spjl.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "上盘距离") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-        Button(
-            onClick = {
-                scope.launch {
-                    tx {
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = 3200L * spjl.value.toLong();
+                OutlinedTextField(
+                    modifier = Modifier.width(100.dp),
+                    value = fljl_ex,
+                    onValueChange = {
+                        scope.launch {
+                            fljl_ex = it
+                            fljl.value = it.toFloatOrNull() ?: 0f
                         }
-                    }
-                }
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
-        }
-
-
-        OutlinedTextField(
-            modifier = Modifier
-                .width(100.dp)
-                .padding(start = 20.dp),
-            value = xpjl_ex,
-            onValueChange = {
-                scope.launch {
-                    xpjl_ex = it
-                    xpjl.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "下盘距离") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-        Button(
-            onClick = {
-                scope.launch {
-                    tx {
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = 3200L * xpjl.value.toLong();
+                    },
+                    label = { Text(text = "分离距离") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
                         }
-                    }
+                    ),
+                )
+
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 1
+                                        pulse = (3200L * fljl.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
                 }
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = jiaozgd_ex,
+                    onValueChange = {
+                        scope.launch {
+                            jiaozgd_ex = it
+                            jiaozgd.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "矫正高度") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 1
+                                        pulse = (3200L * jzgd.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = xpgd_ex,
+                    onValueChange = {
+                        scope.launch {
+                            xpgd_ex = it
+                            xpgd.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "下盘高度") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 1
+                                        pulse = (3200L * xpgd.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+            }
+
+            Row {
+                Text(
+                    text = "举升2",
+                    fontSize = 30.sp
+                )
+                Button(
+                    onClick = {
+                        event(
+                            CalibrationEvent.Reset(
+                                listOf(0),
+                                spydjl.value.toLong(),
+                                xpydjl.value.toLong()
+                            )
+                        )
+                    },
+                    modifier = Modifier.padding(start = 20.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("复    位")
+                }
+
+            }
+
+            Row {
+
+
+                OutlinedTextField(
+                    modifier = Modifier.width(100.dp),
+                    value = fwgd2_ex,
+                    onValueChange = {
+                        scope.launch {
+                            fwgd2_ex = it
+                            fwgd2.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "复位距离") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 0
+                                        pulse = (3200L * fwgd2.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = pzjl2_ex,
+                    onValueChange = {
+                        scope.launch {
+                            pzjl2_ex = it
+                            pzjl2.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "盘子距离") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 0
+                                        pulse = (3200L * pzjl2.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+            }
+
+            Row {
+                Text(
+                    text = "夹爪",
+                    fontSize = 30.sp
+                )
+                Button(
+                    onClick = {
+                        event(
+                            CalibrationEvent.Reset(
+                                listOf(2),
+                                spydjl.value.toLong(),
+                                xpydjl.value.toLong()
+                            )
+                        )
+                    },
+                    modifier = Modifier.padding(start = 20.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("复    位")
+                }
+
+            }
+
+            Row {
+
+                OutlinedTextField(
+                    modifier = Modifier.width(100.dp),
+                    value = jjjl_ex,
+                    onValueChange = {
+                        scope.launch {
+                            jjjl_ex = it
+                            jjjl.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "夹紧距离") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 2
+                                        pulse = (3200L * jjjl.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = skjl_ex,
+                    onValueChange = {
+                        scope.launch {
+                            skjl_ex = it
+                            skjl.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "松开距离") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 2
+                                        pulse = (3200L * skjl.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+            }
+
+            Row {
+                Text(
+                    text = "上盘",
+                    fontSize = 30.sp
+                )
+                Button(
+                    onClick = {
+                        event(
+                            CalibrationEvent.Reset(
+                                listOf(5),
+                                spydjl.value.toLong(),
+                                xpydjl.value.toLong()
+                            )
+                        )
+                    },
+                    modifier = Modifier.padding(start = 20.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("复    位")
+                }
+
+            }
+
+            Row {
+
+                OutlinedTextField(
+                    modifier = Modifier.width(100.dp),
+                    value = spydjl_ex,
+                    onValueChange = {
+                        scope.launch {
+                            spydjl_ex = it
+                            spydjl.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "原点距离") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse = (3200L * spydjl.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = spkwjl1_ex,
+                    onValueChange = {
+                        scope.launch {
+                            spkwjl1_ex = it
+                            spkwjl1.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "孔位距离1") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse = (3200L * spkwjl1.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = spkwjl2_ex,
+                    onValueChange = {
+                        scope.launch {
+                            spkwjl2_ex = it
+                            spkwjl2.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "孔位距离2") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse = (3200L * spkwjl2.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+            }
+
+            Row {
+
+                OutlinedTextField(
+                    modifier = Modifier.width(100.dp),
+                    value = spkwjl3_ex,
+                    onValueChange = {
+                        scope.launch {
+                            spkwjl3_ex = it
+                            spkwjl3.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "孔位距离3") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse = (3200L * spkwjl3.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = spkwjl4_ex,
+                    onValueChange = {
+                        scope.launch {
+                            spkwjl4_ex = it
+                            spkwjl4.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "孔位距离4") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse = (3200L * spkwjl4.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = spkwjl5_ex,
+                    onValueChange = {
+                        scope.launch {
+                            spkwjl5_ex = it
+                            spkwjl5.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "孔位距离5") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse = (3200L * spkwjl5.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+            }
+
+            Row {
+
+                OutlinedTextField(
+                    modifier = Modifier.width(100.dp),
+                    value = spkwjl6_ex,
+                    onValueChange = {
+                        scope.launch {
+                            spkwjl6_ex = it
+                            spkwjl6.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "孔位距离6") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse = (3200L * spkwjl6.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = spkwjl7_ex,
+                    onValueChange = {
+                        scope.launch {
+                            spkwjl7_ex = it
+                            spkwjl7.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "孔位距离7") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse = (3200L * spkwjl7.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = spkwjl8_ex,
+                    onValueChange = {
+                        scope.launch {
+                            spkwjl8_ex = it
+                            spkwjl8.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "孔位距离8") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse = (3200L * spkwjl8.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+            }
+
+            Row {
+                Text(
+                    text = "下盘",
+                    fontSize = 30.sp
+                )
+                Button(
+                    onClick = {
+                        event(
+                            CalibrationEvent.Reset(
+                                listOf(4),
+                                spydjl.value.toLong(),
+                                xpydjl.value.toLong()
+                            )
+                        )
+                    },
+                    modifier = Modifier.padding(start = 20.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("复    位")
+                }
+
+            }
+
+            Row {
+
+                OutlinedTextField(
+                    modifier = Modifier.width(100.dp),
+                    value = xpydjl_ex,
+                    onValueChange = {
+                        scope.launch {
+                            xpydjl_ex = it
+                            xpydjl.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "原点距离") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 4
+                                        pulse = (3200L * xpydjl.value.toDouble()).toLong();
+                                        speed = 100
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = xpkwjl1_ex,
+                    onValueChange = {
+                        scope.launch {
+                            xpkwjl1_ex = it
+                            xpkwjl1.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "孔位距离1") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 4
+                                        pulse = (3200L * xpkwjl1.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = xpkwjl2_ex,
+                    onValueChange = {
+                        scope.launch {
+                            xpkwjl2_ex = it
+                            xpkwjl2.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "孔位距离2") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 4
+                                        pulse = (3200L * xpkwjl2.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+            }
+
+            Row {
+
+                OutlinedTextField(
+                    modifier = Modifier.width(100.dp),
+                    value = xpkwjl3_ex,
+                    onValueChange = {
+                        scope.launch {
+                            xpkwjl3_ex = it
+                            xpkwjl3.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "孔位距离3") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 4
+                                        pulse = (3200L * xpkwjl3.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+
+            }
+
+
+
+            Row {
+                Text(
+                    text = "蠕动泵",
+                    fontSize = 30.sp
+                )
+                Button(
+                    onClick = {
+                    },
+                    modifier = Modifier.padding(start = 20.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("加    液")
+                }
+
+            }
+
+            Row {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(100.dp),
+                    value = jyq_ex,
+                    onValueChange = {
+                        scope.launch {
+                            jyq_ex = it
+                            jyq.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "加液前") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = jyh_ex,
+                    onValueChange = {
+                        scope.launch {
+                            jyh_ex = it
+                            jyh.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "加液后") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+            }
+
+
         }
-
-    }
-
-
-    Row(
-        modifier = Modifier.padding(top = 520.dp),
-    ) {
-        Text(
-            text = "下盘",
-            fontSize = 30.sp
-        )
-        Button(
-            onClick = {
-
-            },
-            modifier = Modifier.padding(start = 20.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("复    位")
-        }
-
-        Text(
-            text = "蠕动泵",
-            fontSize = 30.sp,
-            modifier = Modifier.padding(start = 60.dp),
-        )
-        Button(
-            onClick = {
-
-            },
-            modifier = Modifier.padding(start = 20.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("加    液")
-        }
-
-    }
-
-    Row(
-        modifier = Modifier.padding(top = 570.dp),
-    ) {
-
-        OutlinedTextField(
-            modifier = Modifier.width(100.dp),
-            value = ydjl_ex,
-            onValueChange = {
-                scope.launch {
-                    ydjl_ex = it
-                    ydjl.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "原点距离") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-        Button(
-            onClick = {
-
-            },
-            modifier = Modifier
-                .padding(start = 10.dp, top = 10.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(10.dp),
-        ) {
-            Text("移    动")
-        }
-
-
-        OutlinedTextField(
-            modifier = Modifier
-                .width(100.dp)
-                .padding(start = 30.dp),
-            value = jyq_ex,
-            onValueChange = {
-                scope.launch {
-                    jyq_ex = it
-                    jyq.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "加液前") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-
-
-        OutlinedTextField(
-            modifier = Modifier
-                .width(100.dp)
-                .padding(start = 20.dp),
-            value = jyh_ex,
-            onValueChange = {
-                scope.launch {
-                    jyh_ex = it
-                    jyh.value = it.toFloatOrNull() ?: 0f
-                }
-            },
-            label = { Text(text = "加液后") },
-            shape = MaterialTheme.shapes.medium,
-            textStyle = MaterialTheme.typography.bodyLarge,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done,
-            ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    keyboard?.hide()
-                }
-            ),
-        )
-
-
     }
 
 

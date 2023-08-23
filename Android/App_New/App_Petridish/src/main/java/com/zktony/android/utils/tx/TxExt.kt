@@ -2,8 +2,11 @@ package com.zktony.android.utils.tx
 
 import com.zktony.android.utils.AsyncTask
 import com.zktony.android.utils.SerialPortHelper
+import com.zktony.android.utils.ext.loge
 import com.zktony.serialport.command.Protocol
-import kotlinx.coroutines.*
+import com.zktony.serialport.ext.toHexString
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
 import java.util.concurrent.atomic.AtomicLong
 
 val serialPort: SerialPortHelper = SerialPortHelper.instance
@@ -94,6 +97,7 @@ fun sendByteArray(byteArray: ByteArray) {
  */
 fun sendProtocol(block: Protocol.() -> Unit) {
     serialPort.sendProtocol(Protocol().apply(block))
+    Protocol().apply(block).toByteArray().toHexString().loge()
 }
 
 /**

@@ -6,18 +6,20 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -32,6 +34,11 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
+import com.zktony.android.utils.tx.MoveType
+import com.zktony.android.utils.tx.getGpio
+import com.zktony.android.utils.tx.tx
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Displays a splash screen with an animation and a message, and navigates to the home screen when the user clicks the "Done" button.
@@ -45,11 +52,13 @@ fun Splash(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     toggleDrawer: (NavigationType) -> Unit = {},
+    viewModel: SplashViewModel = koinViewModel(),
 ) {
 
     // Define the animation scale and splash state
     val scale = remember { Animatable(0f) }
     val splash = remember { mutableStateOf(true) }
+    val scope = rememberCoroutineScope()
 
     // Animate the splash screen and hide it when the animation is complete
     LaunchedEffect(key1 = true) {
@@ -112,10 +121,59 @@ fun Splash(
                     Button(
                         modifier = Modifier.width(300.dp),
                         onClick = {
-                            //TODO 复位命令
-                            toggleDrawer(NavigationType.NAVIGATION_RAIL)
-                            navController.popBackStack()
-                            navController.navigate(Route.HOME)
+                            scope.launch {
+                                val ids = listOf(1, 0, 2, 4, 5)
+                                // 查询GPIO状态
+                                tx {
+                                    queryGpio(ids)
+                                    delay = 300L
+                                }
+                                // 针对每个电机进行初始化
+                                ids.forEach {
+                                    // 如果电机未初始化，则进行初始化
+                                    if (!getGpio(it)) {
+                                        // 进行电机初始化
+                                        tx {
+                                            timeout = 1000L * 60
+                                            move(MoveType.MOVE_PULSE) {
+                                                index = it
+                                                pulse = 3200L * -30
+                                                acc = 50
+                                                dec = 80
+                                                speed = 100
+                                            }
+
+                                        }
+                                    }
+
+                                    // 进行正向运动
+                                    tx {
+                                        timeout = 1000L * 10
+                                        move(MoveType.MOVE_PULSE) {
+                                            index = it
+                                            pulse = 3200L * 2
+                                            acc = 50
+                                            dec = 80
+                                            speed = 100
+                                        }
+                                    }
+
+                                    // 进行反向运动
+                                    tx {
+                                        timeout = 1000L * 15
+                                        move(MoveType.MOVE_PULSE) {
+                                            index = it
+                                            pulse = 3200L * -3
+                                            acc = 50
+                                            dec = 80
+                                            speed = 100
+                                        }
+                                    }
+                                }
+                                toggleDrawer(NavigationType.NAVIGATION_RAIL)
+                                navController.popBackStack()
+                                navController.navigate(Route.HOME)
+                            }
                         }
                     ) {
                         Text(

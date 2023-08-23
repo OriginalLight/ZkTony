@@ -47,7 +47,7 @@ class TxScope {
      * @param block [@kotlin.ExtensionFunctionType] Function1<MoveScope, Unit>
      * @return Unit
      */
-    fun move(type: MoveType = MoveType.MOVE_DV, block: MoveScope.() -> Unit) {
+    fun move(type: MoveType = MoveType.MOVE_DV, block: MoveScope.() -> Unit){
         controlType = ControlType.CONTROL_MOVE
         val moveScope = MoveScope().apply(block)
         when (type) {

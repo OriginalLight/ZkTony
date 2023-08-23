@@ -9,11 +9,15 @@ import com.zktony.android.utils.tx.ExecuteType
 import com.zktony.android.utils.tx.MoveType
 import com.zktony.android.utils.tx.getGpio
 import com.zktony.android.utils.tx.tx
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 
 /**
  * @author: 刘贺贺
@@ -84,11 +88,11 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 withTimeout(60 * 1000L) {
 
 
-                    val ids = listOf(0, 1)
+                    val ids = listOf(1, 0, 2, 4, 5)
                     // 查询GPIO状态
                     tx {
-                        delay = 300L
                         queryGpio(ids)
+                        delay = 300L
                     }
                     // 针对每个电机进行初始化
                     ids.forEach {
@@ -100,6 +104,9 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 move(MoveType.MOVE_PULSE) {
                                     index = it
                                     pulse = 3200L * -30
+                                    acc = 50
+                                    dec = 80
+                                    speed = 100
                                 }
 
                             }

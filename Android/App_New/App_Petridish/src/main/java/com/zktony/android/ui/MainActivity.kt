@@ -18,6 +18,16 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore("dataStore
 /**
  * The main activity of the application.
  */
+/**
+ * 培养皿
+ * 1.举升1是电机1
+ * 2.举升2是电机0
+ * 3.夹爪是电机2
+ * 4.上盘是电机5
+ * 5.下盘是电机4
+ * 紫外线灯是6
+ * 检测是7和8
+ */
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

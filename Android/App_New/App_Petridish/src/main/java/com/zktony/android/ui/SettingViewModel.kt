@@ -10,12 +10,17 @@ import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.ext.*
+import com.zktony.android.utils.tx.MoveType
+import com.zktony.android.utils.tx.getGpio
 import com.zktony.android.utils.tx.tx
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import java.io.File
 
 /**
@@ -28,6 +33,7 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
     private val _application = MutableStateFlow<Application?>(null)
     private val _selected = MutableStateFlow(0L)
     private val _progress = MutableStateFlow(0)
+    private val _loading = MutableStateFlow(0)
     private val _page = MutableStateFlow(PageType.SETTINGS)
 
     val uiState = _uiState.asStateFlow()
@@ -65,6 +71,7 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
             }
         }
     }
+
 
     /**
      * Handles the specified setting event and updates the UI state accordingly.
