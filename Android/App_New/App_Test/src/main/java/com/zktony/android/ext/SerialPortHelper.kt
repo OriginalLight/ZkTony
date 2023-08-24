@@ -75,8 +75,8 @@ class SerialPortHelper : AbstractSerialHelper() {
     override fun callbackProcess(byteArray: ByteArray) {
         _byteArrayFlow.value = byteArray
         val rec = byteArray.protocol()
-        if (rec.address == 0x02.toByte()) {
-            when (rec.control) {
+        if (rec.addr == 0x02.toByte()) {
+            when (rec.func) {
                 0x01.toByte() -> {
                     for (i in 0 until rec.data.size / 2) {
                         val index = rec.data.readInt8(offset = i * 2)

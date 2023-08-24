@@ -1,6 +1,7 @@
 package com.zktony.android.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -53,7 +54,7 @@ fun InputDialog(
                         fontSize = 20.sp
                     ),
                     singleLine = true,
-                    shape = MaterialTheme.shapes.medium,
+                    shape = CircleShape,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
                         focusManager.clearFocus()

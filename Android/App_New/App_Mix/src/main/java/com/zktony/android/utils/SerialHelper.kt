@@ -1,30 +1,31 @@
 package com.zktony.android.utils
 
-import com.zktony.android.utils.extra.loge
 import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.config.SerialConfig
-import com.zktony.serialport.ext.*
+import com.zktony.serialport.ext.crc16LE
+import com.zktony.serialport.ext.readInt16LE
+import com.zktony.serialport.ext.readInt8
+import com.zktony.serialport.ext.splitByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.text.toHexString
 
 class SerialHelper : AbstractSerialHelper() {
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    val axis: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>()
-    val gpio: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>()
+    val axis: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>().apply {
+        repeat(16) { add(false) }
+    }
+    val gpio: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>().apply {
+        repeat(16) { add(false) }
+    }
 
     init {
         scope.launch {
-            repeat(16) {
-                axis.add(false)
-                gpio.add(false)
-            }
             openDevice(SerialConfig())
         }
     }
@@ -36,9 +37,7 @@ class SerialHelper : AbstractSerialHelper() {
      * @param byteArray ByteArray
      * @param block Function1<ByteArray, Unit>
      */
-    @OptIn(ExperimentalStdlibApi::class)
     override fun callbackVerify(byteArray: ByteArray, block: (ByteArray) -> Unit) {
-        byteArray.toHexString().loge()
         // 验证包长 >= 12
         if (byteArray.size < 12) {
             throw Exception("RX Length Error")
@@ -80,8 +79,8 @@ class SerialHelper : AbstractSerialHelper() {
         val rec = byteArray.protocol()
 
         // 处理地址为 0x02 的数据包
-        if (rec.address == 0x02.toByte()) {
-            when (rec.control) {
+        if (rec.addr == 0x02.toByte()) {
+            when (rec.func) {
                 // 处理轴状态数据
                 0x01.toByte() -> {
                     for (i in 0 until rec.data.size / 2) {

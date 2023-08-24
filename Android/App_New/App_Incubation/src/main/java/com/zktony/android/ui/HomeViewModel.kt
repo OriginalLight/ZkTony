@@ -60,7 +60,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     fun uiEvent(event: HomeUiEvent) {
         when (event) {
             is HomeUiEvent.Reset -> initializer()
-            is HomeUiEvent.Runtime -> {}
             is HomeUiEvent.NavTo -> _page.value = event.page
             is HomeUiEvent.ToggleSelected -> _selected.value = event.id
             is HomeUiEvent.Pipeline -> pipeline(event.index)
@@ -141,13 +140,8 @@ data class HomeUiState(
 
 sealed class HomeUiEvent {
     data object Reset : HomeUiEvent()
-    data class Runtime(val action: RuntimeAction) : HomeUiEvent()
     data class NavTo(val page: PageType) : HomeUiEvent()
     data class ToggleSelected(val id: Long) : HomeUiEvent()
     data class Pipeline(val index: Int) : HomeUiEvent()
-}
-
-enum class RuntimeAction {
-    START, STOP, PAUSE, RESUME
 }
 

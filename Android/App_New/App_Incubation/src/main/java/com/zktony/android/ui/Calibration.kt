@@ -2,9 +2,7 @@ package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -91,7 +90,7 @@ fun CalibrationScreen(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun CalibrationList(
     modifier: Modifier = Modifier,
@@ -121,16 +120,26 @@ fun CalibrationList(
                 MaterialTheme.colorScheme.surfaceVariant
             }
             ElevatedCard(
-                colors = CardDefaults.cardColors(containerColor = background),
-                onClick = {
-                    scope.launch {
-                        if (item.id == uiState.selected) {
-                            uiEvent(CalibrationUiEvent.ToggleSelected(0L))
-                        } else {
-                            uiEvent(CalibrationUiEvent.ToggleSelected(item.id))
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.medium)
+                    .combinedClickable(
+                        onClick = {
+                            scope.launch {
+                                if (item.id == uiState.selected) {
+                                    uiEvent(CalibrationUiEvent.ToggleSelected(0L))
+                                } else {
+                                    uiEvent(CalibrationUiEvent.ToggleSelected(item.id))
+                                }
+                            }
+                        },
+                        onDoubleClick = {
+                            scope.launch {
+                                uiEvent(CalibrationUiEvent.ToggleSelected(item.id))
+                                uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_DETAIL))
+                            }
                         }
-                    }
-                },
+                    ),
+                colors = CardDefaults.cardColors(containerColor = background)
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp),

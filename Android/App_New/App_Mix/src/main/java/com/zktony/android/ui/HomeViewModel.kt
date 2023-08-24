@@ -25,7 +25,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0L)
-    private val _page = MutableStateFlow(PageType.LIST)
+    private val _page = MutableStateFlow(PageType.HOME)
     private val _loading = MutableStateFlow(0)
     private val _job = MutableStateFlow<Job?>(null)
     private var syringeJob: Job? = null
@@ -80,15 +80,19 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             _loading.value = 1
             try {
                 withTimeout(2 * 60 * 1000L) {
-                    serial { query(0, 1, 2) }
-                    delay(300L)
+                    serial { gpio(0, 1, 2) }
+                    delay(500L)
                     val job = launch {
                         if (!getGpio(2)) {
                             serial { valve(2 to 1) }
                             delay(30L)
                             serial {
                                 timeout = 1000L * 60
-                                start(index = 2, pulse = Constants.ZT_0005 * 1)
+                                start(
+                                    index = 2,
+                                    pulse = Constants.ZT_0005 * -1,
+                                    ads = Triple(300, 400, 600)
+                                )
                             }
                         }
                     }
@@ -97,18 +101,18 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         if (!getGpio(it)) {
                             serial {
                                 timeout = 1000L * 30
-                                start(index = it, pulse = 3200L * -30)
+                                start(index = it, pulse = 3200L * -30, ads = Triple(300, 400, 600))
                             }
                         }
 
                         serial {
                             timeout = 1000L * 10
-                            start(index = it, pulse = 3200L * 1, ads = Triple(600, 800, 1200))
+                            start(index = it, pulse = 3200L * 2, ads = Triple(300, 400, 600))
                         }
 
                         serial {
                             timeout = 1000L * 15
-                            start(index = it, pulse = 3200L * -2, ads = Triple(600, 800, 1200))
+                            start(index = it, pulse = 3200L * -3, ads = Triple(300, 400, 600))
                         }
                     }
                     job.join()
@@ -263,7 +267,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     start(index = 0, dv = abscissa)
                 }
 
-                serial { query(2) }
+                serial { gpio(2) }
                 delay(300L)
                 if (!getGpio(2)) {
                     serial { valve(2 to 0) }
@@ -308,7 +312,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 start(index = 0, dv = abscissa)
             }
 
-            serial { query(2) }
+            serial { gpio(2) }
             delay(300L)
             if (!getGpio(2)) {
                 serial { valve(2 to 0) }
@@ -351,7 +355,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     start(index = 2, pulse = Constants.ZT_0005 * -1)
                 }
             } else {
-                _loading.value = 3
+                _loading.value = 2 + index
                 syringeJob = launch {
                     while (true) {
                         serial { valve(2 to if (index == 1) 0 else 1) }
@@ -378,7 +382,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 _loading.value = 0
                 serial { stop(3, 4, 5, 6, 7, 8) }
             } else {
-                _loading.value = 4
+                _loading.value = 4 + index
                 serial {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {
@@ -393,7 +397,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 data class HomeUiState(
     val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
-    val page: PageType = PageType.LIST,
+    val page: PageType = PageType.HOME,
     val loading: Int = 0,
     val job: Job? = null,
 )

@@ -202,7 +202,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
         // 复位
         ControlType.CONTROL_RESET -> {
             sendProtocol {
-                control = 0x00
+                func = 0x00
                 data = tx.byteList.toByteArray()
             }
         }
@@ -219,7 +219,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
                             if (tx.byteList.isNotEmpty()) {
                                 setLock(tx.indexList)
                                 sendProtocol {
-                                    control = 0x01
+                                    func = 0x01
                                     data = tx.byteList.toByteArray()
                                 }
                                 delay(10L)
@@ -251,7 +251,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
                     if (tx.byteList.isNotEmpty()) {
                         setLock(tx.indexList)
                         sendProtocol {
-                            control = 0x01
+                            func = 0x01
                             data = tx.byteList.toByteArray()
                         }
                     }
@@ -262,7 +262,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
         // 停止
         ControlType.CONTROL_STOP -> {
             sendProtocol {
-                control = 0x02
+                func = 0x02
                 data = tx.byteList.toByteArray()
             }
         }
@@ -270,7 +270,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
         // 查询轴状态
         ControlType.CONTROL_QUERY_AXIS -> {
             sendProtocol {
-                control = 0x03
+                func = 0x03
                 data = tx.byteList.toByteArray()
             }
         }
@@ -278,7 +278,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
         // 查询GPIO状态
         ControlType.CONTROL_QUERY_GPIO -> {
             sendProtocol {
-                control = 0x04
+                func = 0x04
                 data = tx.byteList.toByteArray()
             }
         }
@@ -286,7 +286,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
         // 控制气阀
         ControlType.CONTROL_VALVE -> {
             sendProtocol {
-                control = 0x05
+                func = 0x05
                 data = tx.byteList.toByteArray()
             }
         }

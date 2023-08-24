@@ -21,8 +21,8 @@
     <string name="update">检测更新</string>
     <string name="update_available">有新版本</string>
     <string name="version">版本</string>
-    <string name="wifi">WIFI设置</string>
-    <string name="download_failed">下载失败</string>
+    <string name="network">网络设置</string>
+    <string name="downloading">下载中</string>
     <string name="network_unavailable">网络不可用</string>
     <string name="interface_exception">接口异常</string>
     <string name="speed">速度</string>
@@ -43,7 +43,7 @@
     <string name="x_axis">X 轴</string>
     <string name="y_axis">Y 轴</string>
     <string name="z_axis">Z 轴</string>
-    <string name="volume">出液量 μL</string>
+    <string name="dosage">出液量 μL</string>
     <string name="colloid">胶体 μL</string>
     <string name="coagulant">促凝剂 μL</string>
     <string name="glue_making">制胶</string>

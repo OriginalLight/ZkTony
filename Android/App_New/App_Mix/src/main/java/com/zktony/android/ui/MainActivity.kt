@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.CompositionLocalProvider
 import com.zktony.android.data.datastore.LocalDataSaver
 import com.zktony.android.ui.theme.AppTheme
-import com.zktony.android.utils.ext.dataSaver
+import com.zktony.android.utils.extra.dataSaver
 
 /**
  * The main activity of the application.
@@ -15,8 +15,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
 
         setContent {
             AppTheme {

@@ -8,8 +8,8 @@ import com.zktony.serialport.ext.writeInt16LE
  * Protocol
  *
  * @property head Byte
- * @property address Byte
- * @property control Byte
+ * @property addr Byte
+ * @property func Byte
  * @property length ByteArray
  * @property data ByteArray
  * @property crc ByteArray
@@ -20,7 +20,7 @@ class Protocol {
     var head: Byte = 0xEE.toByte()
 
     // Addr 1byte 0x01 0x02
-    var address: Byte = 0x01.toByte()
+    var addr: Byte = 0x01.toByte()
 
     /**
      * control
@@ -36,7 +36,7 @@ class Protocol {
      *     0x02 gpio status
      *     0xFF error
      */
-    var control: Byte = 0x01.toByte()
+    var func: Byte = 0x01.toByte()
 
     // Length of data 2byte 0x0000 ~ 0xFFFF
     var length: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
@@ -51,7 +51,7 @@ class Protocol {
     var end: ByteArray = byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
 
     fun toByteArray(): ByteArray {
-        val byteArray = byteArrayOf(head, address, control)
+        val byteArray = byteArrayOf(head, addr, func)
             .plus(length.writeInt16LE(data.size, 0))
             .plus(data)
             .plus(crc)
@@ -86,8 +86,8 @@ fun ByteArray.protocol(): Protocol {
     val bytes = this
     return protocol {
         head = bytes[0]
-        address = bytes[1]
-        control = bytes[2]
+        addr = bytes[1]
+        func = bytes[2]
         length = bytes.copyOfRange(3, 5)
         data = bytes.copyOfRange(5, bytes.size - 6)
         crc = bytes.copyOfRange(bytes.size - 6, bytes.size - 4)

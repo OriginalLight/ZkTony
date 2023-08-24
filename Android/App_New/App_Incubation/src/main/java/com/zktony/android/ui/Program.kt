@@ -2,16 +2,20 @@ package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -25,7 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.zktony.android.data.entities.IncubationStageStatus
 import com.zktony.android.data.entities.Program
-import com.zktony.android.ui.components.*
+import com.zktony.android.ui.components.ProgramAppBar
 import com.zktony.android.ui.components.timeline.LazyTimeline
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.extra.dateFormat
@@ -36,7 +40,7 @@ fun ProgramRoute(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: ProgramViewModel,
-    snackbarHostState: SnackbarHostState,
+    snackbarHostState: SnackbarHostState
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
@@ -77,7 +81,7 @@ fun ProgramRoute(
 fun ProgramScreen(
     modifier: Modifier = Modifier,
     uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit,
+    uiEvent: (ProgramUiEvent) -> Unit
 ) {
     AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_LIST) {
         ProgramList(modifier, uiState, uiEvent)
@@ -88,7 +92,7 @@ fun ProgramScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun ProgramList(
     modifier: Modifier = Modifier,
@@ -118,16 +122,26 @@ fun ProgramList(
                 MaterialTheme.colorScheme.surfaceVariant
             }
             ElevatedCard(
-                colors = CardDefaults.cardColors(containerColor = background),
-                onClick = {
-                    scope.launch {
-                        if (item.id == uiState.selected) {
-                            uiEvent(ProgramUiEvent.ToggleSelected(0L))
-                        } else {
-                            uiEvent(ProgramUiEvent.ToggleSelected(item.id))
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.medium)
+                    .combinedClickable(
+                        onClick = {
+                            scope.launch {
+                                if (item.id == uiState.selected) {
+                                    uiEvent(ProgramUiEvent.ToggleSelected(0L))
+                                } else {
+                                    uiEvent(ProgramUiEvent.ToggleSelected(item.id))
+                                }
+                            }
+                        },
+                        onDoubleClick = {
+                            scope.launch {
+                                uiEvent(ProgramUiEvent.ToggleSelected(item.id))
+                                uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
+                            }
                         }
-                    }
-                },
+                    ),
+                colors = CardDefaults.cardColors(containerColor = background)
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp),

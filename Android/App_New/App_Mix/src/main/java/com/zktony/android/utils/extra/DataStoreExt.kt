@@ -1,4 +1,4 @@
-package com.zktony.android.utils.ext
+package com.zktony.android.utils.extra
 
 import android.content.Context
 import androidx.datastore.core.DataStore

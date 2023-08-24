@@ -4,11 +4,7 @@ import com.zktony.android.utils.ext.loge
 import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.config.SerialConfig
-import com.zktony.serialport.ext.crc16LE
-import com.zktony.serialport.ext.readInt16LE
-import com.zktony.serialport.ext.readInt8
-import com.zktony.serialport.ext.splitByteArray
-import com.zktony.serialport.ext.toHexString
+import com.zktony.serialport.ext.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -28,9 +24,11 @@ class SerialPortHelper : AbstractSerialHelper() {
                 axis.add(false)
                 gpio.add(false)
             }
-            openDevice(SerialConfig(
-                device = "/dev/ttyS4"
-            ))
+            openDevice(
+                SerialConfig(
+                    device = "/dev/ttyS4"
+                )
+            )
         }
     }
 
@@ -84,8 +82,8 @@ class SerialPortHelper : AbstractSerialHelper() {
         val rec = byteArray.protocol()
 
         // 处理地址为 0x02 的数据包
-        if (rec.address == 0x02.toByte()) {
-            when (rec.control) {
+        if (rec.addr == 0x02.toByte()) {
+            when (rec.func) {
                 // 处理轴状态数据
                 0x01.toByte() -> {
                     for (i in 0 until rec.data.size / 2) {

@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -37,6 +38,7 @@ import com.zktony.android.data.entities.Coordinate
 import com.zktony.android.ui.components.*
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
+import com.zktony.android.utils.extra.isNetworkAvailable
 import com.zktony.android.utils.extra.serial
 import kotlinx.coroutines.launch
 import kotlin.math.roundToLong
@@ -80,7 +82,8 @@ fun SettingsRoute(
         SettingsScreen(
             modifier = modifier.padding(paddingValues),
             uiState = uiState,
-            uiEvent = viewModel::uiEvent
+            uiEvent = viewModel::uiEvent,
+            snackbarHostState = snackbarHostState
         )
     }
 }
@@ -90,9 +93,10 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
     uiEvent: (SettingUiEvent) -> Unit = {},
+    snackbarHostState: SnackbarHostState
 ) {
     AnimatedVisibility(visible = uiState.page == PageType.SETTINGS) {
-        SettingsContent(modifier, uiState, uiEvent)
+        SettingsContent(modifier, uiState, uiEvent, snackbarHostState)
     }
     AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
         Authentication(modifier, uiEvent)
@@ -113,8 +117,10 @@ fun SettingsContent(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
     uiEvent: (SettingUiEvent) -> Unit = {},
+    snackbarHostState: SnackbarHostState
 ) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
     var helpInfo by remember { mutableStateOf(false) }
 
@@ -160,7 +166,7 @@ fun SettingsContent(
                     onClick = { uiEvent(SettingUiEvent.Network) }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowForwardIos,
+                        imageVector = Icons.Default.ArrowRight,
                         contentDescription = null
                     )
                 }
@@ -173,7 +179,7 @@ fun SettingsContent(
                     onClick = { uiEvent(SettingUiEvent.NavTo(PageType.AUTH)) }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowForwardIos,
+                        imageVector = Icons.Default.ArrowRight,
                         contentDescription = null
                     )
                 }
@@ -212,7 +218,7 @@ fun SettingsContent(
                     onClick = { helpInfo = !helpInfo },
                 ) {
                     Icon(
-                        imageVector = if (helpInfo) Icons.Default.Close else Icons.Default.ArrowForwardIos,
+                        imageVector = if (helpInfo) Icons.Default.Close else Icons.Default.ArrowRight,
                         contentDescription = null
                     )
                 }
@@ -246,7 +252,15 @@ fun SettingsContent(
                 SettingsCard(
                     icon = image,
                     text = text,
-                    onClick = { uiEvent(SettingUiEvent.CheckUpdate) }
+                    onClick = {
+                        scope.launch {
+                            if (context.isNetworkAvailable()) {
+                                uiEvent(SettingUiEvent.CheckUpdate)
+                            } else {
+                                snackbarHostState.showSnackbar(message = "网络不可用")
+                            }
+                        }
+                    }
                 ) {
 
                     if (uiState.application == null) {
@@ -325,7 +339,7 @@ fun Authentication(
                     ) {
                         Icon(
                             modifier = Modifier.size(96.dp),
-                            imageVector = Icons.Default.Widgets,
+                            imageVector = Icons.Default.Cyclone,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.primary
                         )
@@ -671,5 +685,5 @@ fun ConfigList(modifier: Modifier = Modifier) {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun SettingsPreview() {
-    SettingsContent(uiState = SettingUiState())
+    SettingsContent(uiState = SettingUiState(), snackbarHostState = SnackbarHostState())
 }

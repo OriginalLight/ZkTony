@@ -33,7 +33,6 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            // Combine the application, settings, progress, and page values into a single UI state
             launch {
                 combine(
                     _application,
@@ -55,7 +54,6 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
                     _uiState.value = it
                 }
             }
-            // Load the latest application instance from the server if the network is available
             launch {
                 httpCall {
                     _application.value =
@@ -65,11 +63,6 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
         }
     }
 
-    /**
-     * Handles the specified setting event and updates the UI state accordingly.
-     *
-     * @param event The setting event to handle.
-     */
     fun uiEvent(event: SettingUiEvent) {
         when (event) {
             is SettingUiEvent.NavTo -> _page.value = event.page
@@ -81,27 +74,16 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
         }
     }
 
-    /**
-     * Toggles the navigation bar on or off.
-     *
-     * @param nav Whether to show or hide the navigation bar.
-     */
     private fun navigation(nav: Boolean) {
         viewModelScope.launch {
-            // Create an intent to show or hide the navigation bar
             val intent = Intent().apply {
                 action = "ACTION_SHOW_NAVBAR"
                 putExtra("cmd", if (nav) "show" else "hide")
             }
-
-            // Send the broadcast to show or hide the navigation bar
             Ext.ctx.sendBroadcast(intent)
         }
     }
 
-    /**
-     * Launches the Wi-Fi settings screen to allow the user to configure their network settings.
-     */
     private fun network() {
         // Create a new intent to launch the Wi-Fi settings screen
         val intent = Intent(Settings.ACTION_WIFI_SETTINGS).apply {
@@ -115,63 +97,41 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
         Ext.ctx.startActivity(intent)
     }
 
-    /**
-     * Checks for updates and downloads the latest version of the application if available.
-     */
     private fun checkUpdate() {
         viewModelScope.launch {
-            // Check if the network is available
-            if (Ext.ctx.isNetworkAvailable()) {
-                // Get the current application instance
-                val application = _application.value
-                if (application != null) {
-                    // Check if a new version of the application is available for download
-                    if (application.version_code > BuildConfig.VERSION_CODE
-                        && application.download_url.isNotEmpty()
-                        && _progress.value == 0
-                    ) {
-                        // Download the latest version of the application
-                        download(application.download_url)
-                        _progress.value = 1
-                    }
-                } else {
-                    // Get the latest application instance from the server
-                    httpCall {
-                        it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
-                    }
+            val application = _application.value
+            if (application != null) {
+                if (application.version_code > BuildConfig.VERSION_CODE
+                    && application.download_url.isNotEmpty()
+                    && _progress.value == 0
+                ) {
+                    download(application.download_url)
+                    _progress.value = 1
                 }
             } else {
-                // Display a message if the network is unavailable
-                Ext.ctx.getString(R.string.network_unavailable).showShortToast()
+                httpCall {
+                    it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                }
             }
         }
     }
 
-    /**
-     * Downloads an APK file from the specified URL and installs it on the device.
-     *
-     * @param url The URL of the APK file to download.
-     */
     private fun download(url: String) {
         viewModelScope.launch {
-            // Download the APK file and update the progress state
             url.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
                 .collect {
                     when (it) {
                         is DownloadState.Success -> {
-                            // Install the APK file and reset the progress state
                             _progress.value = 0
                             Ext.ctx.installApk(it.file)
                         }
 
                         is DownloadState.Err -> {
-                            // Reset the progress state and display an error message
                             _progress.value = 0
                             Ext.ctx.getString(R.string.downloading).showShortToast()
                         }
 
                         is DownloadState.Progress -> {
-                            // Update the progress state
                             _progress.value = maxOf(it.progress, 1)
                         }
                     }

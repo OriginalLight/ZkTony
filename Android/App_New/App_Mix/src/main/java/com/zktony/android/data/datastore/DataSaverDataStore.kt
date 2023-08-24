@@ -7,10 +7,8 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -117,8 +115,6 @@ class DataSaverDataStore(
             }
         }
     }
-
-    fun getDataStore() = dataStore
 
     override fun contains(key: String): Boolean {
         return runBlocking {

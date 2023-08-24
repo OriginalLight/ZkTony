@@ -79,8 +79,8 @@ class SerialHelper : AbstractSerialHelper() {
         val rec = byteArray.protocol()
 
         // 处理地址为 0x02 的数据包
-        if (rec.address == 0x02.toByte()) {
-            when (rec.control) {
+        if (rec.addr == 0x02.toByte()) {
+            when (rec.func) {
                 // 处理轴状态数据
                 0x01.toByte() -> {
                     for (i in 0 until rec.data.size / 2) {

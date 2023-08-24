@@ -84,6 +84,7 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 }
             }
             // Set the loading state to false
+
             _loading.value = false
         }
     }

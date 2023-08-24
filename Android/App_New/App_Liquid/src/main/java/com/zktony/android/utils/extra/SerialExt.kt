@@ -50,10 +50,20 @@ fun setLock(ids: List<Int>, isLock: Boolean = true) =
 fun setLock(vararg ids: Int, isLock: Boolean = true) =
     ids.forEach { serialHelper.axis[it] = isLock }
 
-fun getLock(ids: List<Int>) = ids.any { serialHelper.axis[it] }
-fun getLock(vararg ids: Int) = ids.any { serialHelper.axis[it] }
-fun getGpio(ids: List<Int>) = ids.any { serialHelper.gpio[it] }
-fun getGpio(vararg ids: Int) = ids.any { serialHelper.gpio[it] }
+fun getLock(ids: List<Int>): Boolean {
+    var bool = true
+    ids.forEach { bool = bool && serialHelper.axis[it] }
+    return bool
+}
+
+fun getLock(vararg ids: Int) = getLock(ids.toList())
+fun getGpio(ids: List<Int>): Boolean {
+    var bool = true
+    ids.forEach { bool = bool && serialHelper.gpio[it] }
+    return bool
+}
+
+fun getGpio(vararg ids: Int) = getGpio(ids.toList())
 suspend fun serial(block: SerialConfig.() -> Unit) {
     // 构建命令
     val tx = SerialConfig().apply(block)
@@ -70,7 +80,7 @@ suspend fun serial(block: SerialConfig.() -> Unit) {
                             if (tx.byteList.isNotEmpty()) {
                                 setLock(tx.indexList)
                                 sendProtocol {
-                                    control = tx.controlType
+                                    func = tx.controlType
                                     data = tx.byteList.toByteArray()
                                 }
                                 delay(10L)
@@ -102,7 +112,7 @@ suspend fun serial(block: SerialConfig.() -> Unit) {
                     if (tx.byteList.isNotEmpty()) {
                         setLock(tx.indexList)
                         sendProtocol {
-                            control = tx.controlType
+                            func = tx.controlType
                             data = tx.byteList.toByteArray()
                         }
                     }
@@ -113,7 +123,7 @@ suspend fun serial(block: SerialConfig.() -> Unit) {
         else -> {
             if (tx.byteList.isNotEmpty()) {
                 sendProtocol {
-                    control = tx.controlType
+                    func = tx.controlType
                     data = tx.byteList.toByteArray()
                 }
             }

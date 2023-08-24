@@ -9,23 +9,20 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,291 +35,206 @@ import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Coordinate
-import com.zktony.android.ui.components.CoordinateInput
-import com.zktony.android.ui.components.Header
-import com.zktony.android.ui.components.VerificationCodeField
-import com.zktony.android.ui.components.VerificationCodeItem
+import com.zktony.android.ui.components.*
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
+import com.zktony.android.utils.extra.isNetworkAvailable
 import com.zktony.android.utils.extra.serial
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 import kotlin.math.roundToLong
 
 @Composable
-fun Setting(
+fun SettingsRoute(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    viewModel: SettingViewModel = koinViewModel(),
+    viewModel: SettingViewModel,
+    snackbarHostState: SnackbarHostState,
 ) {
-    // Collect the UI state from the view model
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val scope = rememberCoroutineScope()
 
-    // Handle the back button press
-    BackHandler {
-        when (uiState.page) {
-            PageType.SETTINGS -> navController.navigateUp()
-            PageType.MOTOR_DETAIL -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
-            else -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.SETTINGS))
+    val navigation: () -> Unit = {
+        scope.launch {
+            when (uiState.page) {
+                PageType.SETTINGS -> navController.navigateUp()
+                PageType.MOTOR_DETAIL -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
+                else -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.SETTINGS))
+            }
         }
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        AnimatedVisibility(visible = uiState.page != PageType.SETTINGS) {
-            Header(
-                onBackPressed = {
-                    when (uiState.page) {
-                        PageType.MOTOR_DETAIL -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
-                        else -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.SETTINGS))
-                    }
-                }
-            ) {
-                Image(
-                    modifier = Modifier.size(36.dp),
-                    painter = painterResource(id = R.drawable.ic_setting),
-                    contentDescription = null,
-                )
-            }
-        }
-        AnimatedVisibility(visible = uiState.page == PageType.SETTINGS) {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Row(
-                    modifier = Modifier.weight(1f),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Display the settings content
-                    SettingsContent(
-                        modifier = Modifier.weight(1f),
-                        uiEvent = viewModel::uiEvent,
-                    )
-                    // Display the info content
-                    InfoContent(
-                        modifier = Modifier.weight(1f),
+    BackHandler { navigation() }
+
+    Scaffold(
+        topBar = {
+            SettingsAppBar {
+                ElevatedButton(onClick = navigation) {
+                    Icon(
+                        imageVector = Icons.Default.Reply,
+                        contentDescription = null
                     )
                 }
-                // Display the operation content
-                OperationContent(
-                    uiState = uiState,
-                    uiEvent = viewModel::uiEvent,
-                )
             }
-        }
-        AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
-            Authentication(modifier = modifier, event = viewModel::uiEvent)
-        }
-        AnimatedVisibility(visible = uiState.page == PageType.MOTOR_LIST) {
-            MotorList(
-                modifier = modifier,
-                uiState = uiState,
-                uiEvent = viewModel::uiEvent,
-            )
-        }
-        AnimatedVisibility(visible = uiState.page == PageType.MOTOR_DETAIL) {
-            MotorDetail(
-                modifier = modifier,
-                uiState = uiState,
-                uiEvent = viewModel::uiEvent,
-            )
-        }
-        AnimatedVisibility(visible = uiState.page == PageType.CONFIG) {
-            ConfigList(modifier = modifier)
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
+    ) { paddingValues ->
+        SettingsScreen(
+            modifier = modifier.padding(paddingValues),
+            uiState = uiState,
+            uiEvent = viewModel::uiEvent,
+            snackbarHostState = snackbarHostState
+        )
+    }
+}
+
+@Composable
+fun SettingsScreen(
+    modifier: Modifier = Modifier,
+    uiState: SettingUiState,
+    uiEvent: (SettingUiEvent) -> Unit = {},
+    snackbarHostState: SnackbarHostState
+) {
+    AnimatedVisibility(visible = uiState.page == PageType.SETTINGS) {
+        SettingsContent(modifier, uiState, uiEvent, snackbarHostState)
+    }
+    AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
+        Authentication(modifier, uiEvent)
+    }
+    AnimatedVisibility(visible = uiState.page == PageType.MOTOR_LIST) {
+        MotorList(modifier, uiState, uiEvent)
+    }
+    AnimatedVisibility(visible = uiState.page == PageType.MOTOR_DETAIL) {
+        MotorDetail(modifier, uiState, uiEvent)
+    }
+    AnimatedVisibility(visible = uiState.page == PageType.CONFIG) {
+        ConfigList(modifier)
     }
 }
 
 @Composable
 fun SettingsContent(
     modifier: Modifier = Modifier,
+    uiState: SettingUiState,
     uiEvent: (SettingUiEvent) -> Unit = {},
+    snackbarHostState: SnackbarHostState
 ) {
-    var navigation by rememberDataSaverState(
-        key = Constants.NAVIGATION,
-        default = false
-    )
-
-    // Define the lazy column state and coroutine scope
-    val lazyColumnState = rememberLazyListState()
     val scope = rememberCoroutineScope()
-
-    // Display the settings content
-    LazyColumn(
-        modifier = modifier
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
-            ),
-        state = lazyColumnState,
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        // Display the navigation setting
-        item {
-            SettingsCard(
-                image = R.drawable.ic_navigation,
-                text = stringResource(id = R.string.navigation),
-            ) {
-                Switch(
-                    modifier = Modifier.height(32.dp),
-                    checked = navigation,
-                    onCheckedChange = {
-                        scope.launch {
-                            navigation = it
-                            uiEvent(SettingUiEvent.Navigation(it))
-                        }
-                    },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun InfoContent(
-    modifier: Modifier = Modifier,
-) {
-    // Define the lazy column state and expanded state for the help info
-    val lazyColumnState = rememberLazyListState()
+    val context = LocalContext.current
+    var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
     var helpInfo by remember { mutableStateOf(false) }
 
-    // Display the info content
-    LazyColumn(
+    Row(
         modifier = modifier
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
-            ),
-        state = lazyColumnState,
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .fillMaxWidth()
+            .padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Display the version info
-        item {
-            SettingsCard(
-                image = R.drawable.ic_version,
-                text = stringResource(id = R.string.version),
-            ) {
-                Text(
-                    text = BuildConfig.VERSION_NAME,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontStyle = FontStyle.Italic,
-                )
-            }
-        }
-        // Display the help info toggle
-        item {
-            SettingsCard(
-                image = R.drawable.ic_help,
-                text = if (helpInfo) stringResource(id = R.string.qrcode) else stringResource(id = R.string.help),
-                onClick = { helpInfo = !helpInfo },
-            ) {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    imageVector = if (helpInfo) Icons.Default.Close else Icons.Default.ArrowForward,
-                    contentDescription = null,
-                )
-            }
-        }
-
-        if (helpInfo) {
-            // Display the help info
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .border(
+                    width = 1.dp,
+                    color = Color.LightGray,
+                    shape = MaterialTheme.shapes.small
+                ),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
             item {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    Image(
-                        modifier = Modifier
-                            .size(200.dp)
-                            .align(Alignment.Center),
-                        painter = painterResource(id = R.mipmap.qrcode),
+                SettingsCard(
+                    icon = Icons.Outlined.Navigation,
+                    text = stringResource(id = R.string.navigation)
+                ) {
+                    Switch(
+                        modifier = Modifier.height(32.dp),
+                        checked = navigation,
+                        onCheckedChange = {
+                            scope.launch {
+                                navigation = it
+                                uiEvent(SettingUiEvent.Navigation(it))
+                            }
+                        }
+                    )
+                }
+            }
+
+            item {
+                SettingsCard(
+                    icon = Icons.Outlined.Wifi,
+                    text = stringResource(id = R.string.network),
+                    onClick = { uiEvent(SettingUiEvent.Network) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowRight,
+                        contentDescription = null
+                    )
+                }
+            }
+
+            item {
+                SettingsCard(
+                    icon = Icons.Outlined.Security,
+                    text = stringResource(id = R.string.parameters),
+                    onClick = { uiEvent(SettingUiEvent.NavTo(PageType.AUTH)) }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowRight,
                         contentDescription = null
                     )
                 }
             }
         }
-    }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun OperationContent(
-    modifier: Modifier = Modifier,
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit = {},
-) {
-    // Display the operation content
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
-            )
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        // Display the parameters card
-        ElevatedCard(onClick = { uiEvent(SettingUiEvent.NavTo(PageType.AUTH)) }) {
-            Column(
-                modifier = Modifier.padding(horizontal = 64.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Image(
-                    modifier = Modifier.size(96.dp),
-                    painter = painterResource(id = R.drawable.ic_setting),
-                    contentDescription = null,
-                )
-                Text(
-                    text = stringResource(id = R.string.parameters),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
-            }
-        }
-        // Display the network card
-        ElevatedCard(
-            onClick = { uiEvent(SettingUiEvent.Network) }
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .border(
+                    width = 1.dp,
+                    color = Color.LightGray,
+                    shape = MaterialTheme.shapes.small
+                ),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 64.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Image(
-                    modifier = Modifier.size(96.dp),
-                    painter = painterResource(id = R.drawable.ic_wifi),
-                    contentDescription = null,
-                )
-                Text(
-                    text = stringResource(id = R.string.wifi),
-                    style = MaterialTheme.typography.bodyLarge,
-                )
+            item {
+                SettingsCard(
+                    icon = Icons.Outlined.Info,
+                    text = stringResource(id = R.string.version)
+                ) {
+                    Text(
+                        text = BuildConfig.VERSION_NAME,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontStyle = FontStyle.Italic
+                    )
+                }
             }
-        }
-        // Display the update card
-        ElevatedCard(
-            onClick = { uiEvent(SettingUiEvent.CheckUpdate) }
-        ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 64.dp, vertical = 8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                // Determine the icon and text to display based on the UI state
-                val painter = if (uiState.application == null) {
-                    painterResource(id = R.drawable.ic_sync)
+
+            item {
+                SettingsCard(
+                    icon = Icons.Outlined.HelpOutline,
+                    text = if (helpInfo) stringResource(id = R.string.qrcode) else stringResource(id = R.string.help),
+                    onClick = { helpInfo = !helpInfo },
+                ) {
+                    Icon(
+                        imageVector = if (helpInfo) Icons.Default.Close else Icons.Default.ArrowRight,
+                        contentDescription = null
+                    )
+                }
+            }
+
+            item {
+                val image = if (uiState.application == null) {
+                    Icons.Outlined.Sync
                 } else {
                     if (uiState.application.version_code > BuildConfig.VERSION_CODE) {
-                        painterResource(id = R.drawable.ic_new)
+                        Icons.Outlined.Grade
                     } else {
-                        painterResource(id = R.drawable.ic_happy_cloud)
+                        Icons.Outlined.Verified
                     }
                 }
+
                 val text = if (uiState.application == null) {
                     stringResource(id = R.string.update)
                 } else {
@@ -333,30 +245,60 @@ fun OperationContent(
                             stringResource(id = R.string.already_latest)
                         }
                     } else {
-                        "${uiState.progress} %"
+                        stringResource(id = R.string.downloading)
                     }
                 }
-                // Display the progress indicator or the icon and text
-                AnimatedVisibility(visible = uiState.progress > 0) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .size(96.dp)
-                            .padding(8.dp),
-                        progress = uiState.progress / 100f,
-                        strokeWidth = 16.dp,
-                    )
-                }
-                AnimatedVisibility(visible = uiState.progress == 0) {
-                    Image(
-                        modifier = Modifier.size(96.dp),
-                        painter = painter,
-                        contentDescription = text,
-                    )
-                }
-                Text(
+
+                SettingsCard(
+                    icon = image,
                     text = text,
-                    style = MaterialTheme.typography.bodyLarge,
-                )
+                    onClick = {
+                        scope.launch {
+                            if (context.isNetworkAvailable()) {
+                                uiEvent(SettingUiEvent.CheckUpdate)
+                            } else {
+                                snackbarHostState.showSnackbar(message = "网络不可用")
+                            }
+                        }
+                    }
+                ) {
+
+                    if (uiState.application == null) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null
+                        )
+                    } else {
+                        if (uiState.progress == 0) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowCircleUp,
+                                contentDescription = null
+                            )
+                        } else {
+                            Text(
+                                text = "${uiState.progress}%",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontStyle = FontStyle.Italic
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (helpInfo) {
+                // Display the help info
+                item {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        Image(
+                            modifier = Modifier
+                                .size(200.dp)
+                                .align(Alignment.Center),
+                            painter = painterResource(id = R.mipmap.qrcode),
+                            contentDescription = null
+                        )
+                    }
+                }
             }
         }
     }
@@ -366,7 +308,7 @@ fun OperationContent(
 @Composable
 fun Authentication(
     modifier: Modifier = Modifier,
-    event: (SettingUiEvent) -> Unit = {},
+    uiEvent: (SettingUiEvent) -> Unit = {}
 ) {
     var show by remember { mutableStateOf(false) }
 
@@ -377,9 +319,7 @@ fun Authentication(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        // Display the authentication header
-        Spacer(modifier = Modifier.height(128.dp))
-        // Display the verification code field
+        Spacer(modifier = Modifier.height(64.dp))
         AnimatedVisibility(visible = !show) {
             VerificationCodeField(digits = 6, inputCallback = {
                 show = true
@@ -387,47 +327,48 @@ fun Authentication(
                 VerificationCodeItem(text, focused)
             }
         }
-        // Display the navigation buttons
         AnimatedVisibility(visible = show) {
             Row(
                 modifier = Modifier.padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                // Display the motor configuration button
-                ElevatedCard(onClick = { event(SettingUiEvent.NavTo(PageType.MOTOR_LIST)) }) {
+                ElevatedCard(onClick = { uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST)) }) {
                     Column(
                         modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Image(
+                        Icon(
                             modifier = Modifier.size(96.dp),
-                            painter = painterResource(id = R.drawable.ic_engine),
+                            imageVector = Icons.Default.Cyclone,
                             contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
                         )
                         Text(
                             modifier = Modifier.padding(bottom = 8.dp),
                             text = stringResource(id = R.string.motor_config),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Serif
                         )
                     }
                 }
-                // Display the system configuration button
-                ElevatedCard(onClick = { event(SettingUiEvent.NavTo(PageType.CONFIG)) }) {
+                ElevatedCard(onClick = { uiEvent(SettingUiEvent.NavTo(PageType.CONFIG)) }) {
                     Column(
                         modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Image(
+                        Icon(
                             modifier = Modifier.size(96.dp),
-                            painter = painterResource(id = R.drawable.ic_config),
+                            imageVector = Icons.Default.Tune,
                             contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
                         )
                         Text(
                             modifier = Modifier.padding(bottom = 8.dp),
                             text = stringResource(id = R.string.system_config),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Serif
                         )
                     }
                 }
@@ -441,9 +382,9 @@ fun Authentication(
 fun SettingsCard(
     paddingStart: Dp = 0.dp,
     onClick: () -> Unit = { },
-    image: Int,
+    icon: ImageVector,
     text: String? = null,
-    content: @Composable () -> Unit,
+    content: @Composable () -> Unit
 ) {
     Card(
         modifier = Modifier.padding(start = paddingStart),
@@ -454,20 +395,24 @@ fun SettingsCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Display the image in the settings card
-            Image(
+            Icon(
                 modifier = Modifier.size(32.dp),
-                painter = painterResource(id = image),
-                contentDescription = null,
+                imageVector = icon,
+                contentDescription = text,
+                tint = MaterialTheme.colorScheme.primary
             )
-            // Display the text in the settings card
             text?.let {
                 Text(
                     text = text,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Serif,
+                        fontSize = 16.sp,
+                        lineHeight = 24.sp,
+                        letterSpacing = 0.15.sp
+                    )
                 )
             }
-            // Display the content of the settings card
             Spacer(modifier = Modifier.weight(1f))
             content.invoke()
         }
@@ -479,17 +424,18 @@ fun SettingsCard(
 fun MotorList(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit = {},
+    uiEvent: (SettingUiEvent) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
         modifier = modifier
+            .padding(16.dp)
             .fillMaxSize()
             .border(
                 width = 1.dp,
                 color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.small
             ),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -500,8 +446,8 @@ fun MotorList(
             Card(
                 onClick = {
                     scope.launch {
-                        uiEvent(SettingUiEvent.ToggleSelected(it.id)) // Step 1: Toggle the selected state of the entity
-                        uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL)) // Step 2: Navigate to the edit page
+                        uiEvent(SettingUiEvent.ToggleSelected(it.id))
+                        uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL))
                     }
                 }
             ) {
@@ -542,38 +488,34 @@ fun MotorList(
 fun MotorDetail(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit = {},
+    uiEvent: (SettingUiEvent) -> Unit = {}
 ) {
-    // Get the selected entity from the UI state
+    val scope = rememberCoroutineScope()
     val entity = uiState.entities.find { it.id == uiState.selected }!!
-
-    // Define the state variables for speed, acceleration, and deceleration
-    var speed by remember { mutableStateOf(entity.speed) }
-    var acc by remember { mutableStateOf(entity.acc) }
-    var dec by remember { mutableStateOf(entity.dec) }
+    var speed by remember { mutableLongStateOf(entity.speed) }
+    var acc by remember { mutableLongStateOf(entity.acc) }
+    var dec by remember { mutableLongStateOf(entity.dec) }
 
     Column(
         modifier = modifier
-            .fillMaxSize()
+            .padding(16.dp)
             .border(
                 width = 1.dp,
                 color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
-            ),
-        verticalArrangement = Arrangement.Center,
+                shape = MaterialTheme.shapes.small
+            )
+            .padding(32.dp)
     ) {
-        // Speed slider
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
+            Icon(
                 modifier = Modifier.size(36.dp),
-                painter = painterResource(id = R.drawable.ic_speed),
-                contentDescription = stringResource(id = R.string.speed)
+                imageVector = Icons.Default.Speed,
+                contentDescription = stringResource(id = R.string.speed),
+                tint = MaterialTheme.colorScheme.primary
             )
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -588,18 +530,16 @@ fun MotorDetail(
             )
         }
 
-        // Acceleration slider
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
+            Icon(
                 modifier = Modifier.size(36.dp),
-                painter = painterResource(id = R.drawable.ic_rocket),
-                contentDescription = stringResource(id = R.string.acceleration)
+                imageVector = Icons.Default.TrendingUp,
+                contentDescription = stringResource(id = R.string.acceleration),
+                tint = MaterialTheme.colorScheme.primary
             )
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -614,18 +554,16 @@ fun MotorDetail(
             )
         }
 
-        // Deceleration slider
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
+            Icon(
                 modifier = Modifier.size(36.dp),
-                painter = painterResource(id = R.drawable.ic_turtle),
-                contentDescription = stringResource(id = R.string.deceleration)
+                imageVector = Icons.Default.TrendingDown,
+                contentDescription = stringResource(id = R.string.deceleration),
+                tint = MaterialTheme.colorScheme.primary
             )
             Text(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -640,7 +578,6 @@ fun MotorDetail(
             )
         }
 
-        // Show the update button if any of the values have changed
         AnimatedVisibility(visible = entity.speed != speed || entity.acc != acc || entity.dec != dec) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -649,17 +586,18 @@ fun MotorDetail(
                 FloatingActionButton(
                     modifier = Modifier.width(192.dp),
                     onClick = {
-                        // Update the entity with the new values and navigate back to the list page
-                        uiEvent(
-                            SettingUiEvent.Update(
-                                entity.copy(
-                                    speed = speed,
-                                    acc = acc,
-                                    dec = dec
+                        scope.launch {
+                            uiEvent(
+                                SettingUiEvent.Update(
+                                    entity.copy(
+                                        speed = speed,
+                                        acc = acc,
+                                        dec = dec
+                                    )
                                 )
                             )
-                        )
-                        uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
+                            uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
+                        }
                     },
                 ) {
                     Icon(
@@ -677,10 +615,11 @@ fun MotorDetail(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ConfigList(modifier: Modifier = Modifier) {
-
     val scope = rememberCoroutineScope()
+
     LazyColumn(
         modifier = modifier
+            .padding(16.dp)
             .border(
                 width = 1.dp,
                 color = Color.LightGray,
@@ -715,15 +654,7 @@ fun ConfigList(modifier: Modifier = Modifier) {
                 ) {
                     scope.launch {
                         serial {
-                            timeout = 1000L * 60L
-                            start(index = 1, dv = 0.0)
-                        }
-                        serial {
-                            timeout = 1000L * 60L
                             start(index = 0, dv = abscissa)
-                        }
-                        serial {
-                            timeout = 1000L * 60L
                             start(index = 1, dv = ordinate)
                         }
                     }
@@ -741,15 +672,7 @@ fun ConfigList(modifier: Modifier = Modifier) {
                 ) {
                     scope.launch {
                         serial {
-                            timeout = 1000L * 60L
-                            start(index = 1, dv = 0.0)
-                        }
-                        serial {
-                            timeout = 1000L * 60L
                             start(index = 0, dv = tankAbscissa)
-                        }
-                        serial {
-                            timeout = 1000L * 60L
                             start(index = 1, dv = tankOrdinate)
                         }
                     }
@@ -761,38 +684,6 @@ fun ConfigList(modifier: Modifier = Modifier) {
 
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun SettingPreview() {
-    // Create a new instance of the setting UI state
-    val uiState = SettingUiState()
-
-    // Display the content wrapper for the setting list
-    Column(
-        modifier = Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Row(
-            modifier = Modifier.weight(1f),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Display the settings content
-            SettingsContent(
-                modifier = Modifier.weight(1f),
-            )
-            // Display the info content
-            InfoContent(
-                modifier = Modifier.weight(1f),
-            )
-        }
-        // Display the operation content
-        OperationContent(
-            uiState = uiState,
-        )
-    }
-
-}
-
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun AuthenticationPreview() {
-    Authentication()
+fun SettingsPreview() {
+    SettingsContent(uiState = SettingUiState(), snackbarHostState = SnackbarHostState())
 }
