@@ -71,7 +71,6 @@ abstract class AbstractSerialHelper : AbstractSerial() {
         addWaitMessage(msg)
     }
 
-
     /**
      * Send ascii string
      *
@@ -80,17 +79,6 @@ abstract class AbstractSerialHelper : AbstractSerial() {
     fun sendAsciiString(ascii: String) {
         val msg = Message.obtain()
         msg.obj = ascii.ascii2ByteArray(true)
-        addWaitMessage(msg)
-    }
-
-    /**
-     * Send protocol
-     *
-     * @param protocol Protocol
-     */
-    fun sendProtocol(protocol: Protocol) {
-        val msg = Message.obtain()
-        msg.obj = protocol.toByteArray()
         addWaitMessage(msg)
     }
 

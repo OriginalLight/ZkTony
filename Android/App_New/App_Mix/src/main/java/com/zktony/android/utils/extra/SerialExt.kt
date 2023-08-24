@@ -42,7 +42,7 @@ fun <T : Number> pulse(index: Int, dvp: T): Long {
 }
 
 inline fun sendProtocol(block: Protocol.() -> Unit) =
-    serialHelper.sendProtocol(Protocol().apply(block))
+    serialHelper.sendByteArray(Protocol().apply(block).toByteArray())
 
 fun setLock(ids: List<Int>, isLock: Boolean = true) =
     ids.forEach { serialHelper.axis[it] = isLock }

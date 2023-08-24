@@ -11,6 +11,7 @@ import com.zktony.android.utils.extra.getGpio
 import com.zktony.android.utils.extra.pulse
 import com.zktony.android.utils.extra.serial
 import com.zktony.android.utils.model.ExecuteType
+import com.zktony.serialport.AbstractSerialHelper
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

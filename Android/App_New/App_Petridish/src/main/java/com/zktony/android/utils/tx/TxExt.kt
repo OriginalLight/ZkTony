@@ -96,7 +96,7 @@ fun sendByteArray(byteArray: ByteArray) {
  * @return Unit
  */
 fun sendProtocol(block: Protocol.() -> Unit) {
-    serialPort.sendProtocol(Protocol().apply(block))
+    serialPort.sendByteArray(Protocol().apply(block).toByteArray())
     Protocol().apply(block).toByteArray().toHexString().loge()
 }
 
@@ -172,21 +172,7 @@ fun getLock(vararg ids: Int): Boolean {
  * @param ids List<Int>
  * @return Boolean
  */
-fun getGpio(ids: List<Int>): Boolean {
-    return ids.any {
-        serialPort.gpio[it] == true
-    }
-}
-
-/**
- * 获取光电状态
- *
- * @param ids List<Int>
- * @return Boolean
- */
-fun getGpio(vararg ids: Int): Boolean {
-    return ids.any { serialPort.gpio[it] }
-}
+fun getGpio(id: Int): Boolean = serialPort.gpio[id]
 
 /**
  * 发送命令
