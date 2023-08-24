@@ -92,7 +92,7 @@ fun ProgramScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProgramList(
     modifier: Modifier = Modifier,

@@ -50,20 +50,9 @@ fun setLock(ids: List<Int>, isLock: Boolean = true) =
 fun setLock(vararg ids: Int, isLock: Boolean = true) =
     ids.forEach { serialHelper.axis[it] = isLock }
 
-fun getLock(ids: List<Int>): Boolean {
-    var bool = true
-    ids.forEach { bool = bool && serialHelper.axis[it] }
-    return bool
-}
-
-fun getLock(vararg ids: Int) = getLock(ids.toList())
-fun getGpio(ids: List<Int>): Boolean {
-    var bool = true
-    ids.forEach { bool = bool && serialHelper.gpio[it] }
-    return bool
-}
-
-fun getGpio(vararg ids: Int) = getGpio(ids.toList())
+fun getLock(ids: List<Int>) = ids.any { serialHelper.axis[it] }
+fun getLock(vararg ids: Int) = ids.any { serialHelper.axis[it] }
+fun getGpio(id: Int): Boolean = serialHelper.gpio[id]
 suspend fun serial(block: SerialConfig.() -> Unit) {
     // 构建命令
     val tx = SerialConfig().apply(block)
