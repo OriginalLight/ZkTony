@@ -37,7 +37,6 @@ import androidx.navigation.compose.rememberNavController
 import com.zktony.android.R
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.Header
-import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.ext.dateFormat
@@ -57,7 +56,7 @@ fun Home(
 
     // Observe the UI state from the view model
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
+    val count by viewModel.count.collectAsStateWithLifecycle()
     // Handle the back button press
     BackHandler {
         when (uiState.page) {
@@ -72,7 +71,9 @@ fun Home(
             modifier = modifier,
             uiState = uiState,
             event = viewModel::event,
+            count = count,
             navController = navController,
+            toggleDrawer=toggleDrawer,
         )
     }
     // Start content
@@ -100,14 +101,22 @@ fun MenuContent(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
     event: (HomeEvent) -> Unit = {},
+    count: Int = 0,
+    toggleDrawer: (NavigationType) -> Unit = {},
     navController: NavHostController,
 ) {
     var pipeline by remember { mutableStateOf(0) }
     var syringe by remember { mutableStateOf(0) }
     var time by remember { mutableStateOf(0) }
 
+
     // Start a timer to display the runtime
     LaunchedEffect(key1 = uiState.loading) {
+        if (uiState.loading == 0) {
+            toggleDrawer(NavigationType.NAVIGATION_RAIL)
+        } else {
+            toggleDrawer(NavigationType.NONE)
+        }
         while (true) {
             if (uiState.loading != 0) {
                 time += 1
@@ -323,8 +332,10 @@ fun MenuContent(
         // Start item
         item {
             FunctionCard(
-                title = "程序运行",
-                description = "执行分液程序",
+                title = "程序运行(" + count +
+                        ")",
+                description =
+                "当前停止不是即停,需要等当前举升1上方所有培养血清空后停止，如需即停，请关闭电源",
                 image = {
                     Image(
                         modifier = Modifier.size(96.dp),
@@ -337,30 +348,50 @@ fun MenuContent(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
+
                     Button(
                         modifier = Modifier.weight(1f),
                         enabled = uiState.loading == 0,
-                        onClick = {
-                            println("uiState.loading==="+uiState.loading)
-                            println("uiState.entities.isEmpty()==="+uiState.entities.isEmpty())
-                            if (uiState.loading == 0) {
-                                if (uiState.entities.isEmpty()) {
-
-                                    println(111111)
-                                    navController.navigate(Route.PROGRAM)
-                                } else {
-                                    println(222222)
-                                    event(HomeEvent.NavTo(PageType.START))
-                                }
-                            }
-                        }
+                        onClick = { event(HomeEvent.Clean(0)) }
                     ) {
                         Text(
-                            text = "开始 ✔",
+                            text = "上盘",
                             style = MaterialTheme.typography.titleMedium,
                             fontFamily = FontFamily.Serif,
                             fontWeight = FontWeight.Bold,
                         )
+                    }
+
+                    Button(
+                        modifier = Modifier.weight(1f),
+                        enabled = uiState.loading == 0 || uiState.loading == 7,
+                        onClick = {
+
+                            println("uiState.loading===" + uiState.loading)
+                            println("uiState.entities.isEmpty()===" + uiState.entities.isEmpty())
+                            if (uiState.loading == 0) {
+                                event(HomeEvent.Start(7))
+                            } else {
+                                event(HomeEvent.Start(8))
+                            }
+                        }
+                    ) {
+                        if (uiState.loading == 7) {
+                            Text(
+                                text = "停止",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        } else {
+                            Text(
+                                text = "运行",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+
                     }
                 }
 
@@ -691,7 +722,7 @@ fun RuntimeContent(
                     onClick = {
                         if (uiState.job == null) {
                             if (uiState.loading == 0) {
-                                event(HomeEvent.Start)
+//                                event(HomeEvent.Start)
                             }
                         } else {
                             event(HomeEvent.Stop)

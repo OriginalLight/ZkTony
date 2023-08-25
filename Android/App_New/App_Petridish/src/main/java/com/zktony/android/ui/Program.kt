@@ -2,20 +2,23 @@ package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,17 +29,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,14 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
-import com.zktony.android.ui.components.Header
 import com.zktony.android.ui.components.InputDialog
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.Constants
-import com.zktony.android.utils.ext.dateFormat
 import com.zktony.android.utils.ext.format
 import com.zktony.android.utils.ext.showShortToast
 import kotlinx.coroutines.launch
@@ -141,12 +133,14 @@ fun ProgramList(
             modifier
                 .height(700.dp)
                 .width(800.dp)
-                .background(Color.Red)
+                //设置边框的宽度为10dp,颜色为Yellow,设置圆角为20dp
+                .border(1.dp, Color.Black)
+
         ) {
             Box(modifier = Modifier.height(700.dp), contentAlignment = Alignment.Center) {
                 Text(
                     modifier = Modifier.fillMaxWidth(),
-                    fontSize = 20.sp,
+                    fontSize = 120.sp,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
                     text = "0"
@@ -167,7 +161,33 @@ fun ProgramList(
                         tj.value = it.toFloatOrNull() ?: 0f
                     }
                 },
-                label = { Text(text = "下盘距离") },
+                label = { Text(text = "体积") },
+                shape = MaterialTheme.shapes.medium,
+                textStyle = MaterialTheme.typography.bodyLarge,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboard?.hide()
+                    }
+                ),
+            )
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .width(100.dp)
+                    .padding(start = 20.dp, top = 20.dp),
+                enabled = false,
+                value = tj_ex,
+                onValueChange = {
+                    scope.launch {
+                        tj_ex = it
+                        tj.value = it.toFloatOrNull() ?: 0f
+                    }
+                },
+                label = { Text(text = "计数") },
                 shape = MaterialTheme.shapes.medium,
                 textStyle = MaterialTheme.typography.bodyLarge,
                 keyboardOptions = KeyboardOptions(
@@ -183,7 +203,7 @@ fun ProgramList(
 
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                fontSize = 20.sp,
+                fontSize = 10.sp,
                 overflow = TextOverflow.Ellipsis,
                 textAlign = TextAlign.Center,
                 text = "当前停止不是即停,需要等当前举升1上方所有培养血清空后停止，如需即停，请关闭电源"
@@ -198,7 +218,7 @@ fun ProgramList(
                     .height(50.dp),
                 shape = RoundedCornerShape(10.dp),
             ) {
-                Text("移    动")
+                Text("运    动")
             }
 
 

@@ -212,7 +212,7 @@ fun CalibrationList(
 
 
     /**
-     * 原点距离
+     * 下盘原点距离
      */
     val xpydjl = rememberDataSaverState(key = "xpydjl", default = 0f)
     var xpydjl_ex by remember { mutableStateOf(xpydjl.value.format(1)) }

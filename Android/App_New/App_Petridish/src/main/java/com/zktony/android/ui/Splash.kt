@@ -32,13 +32,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.zktony.android.R
+import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.utils.tx.MoveType
 import com.zktony.android.utils.tx.getGpio
 import com.zktony.android.utils.tx.tx
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.koinViewModel
 
 /**
  * Displays a splash screen with an animation and a message, and navigates to the home screen when the user clicks the "Done" button.
@@ -52,13 +52,16 @@ fun Splash(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     toggleDrawer: (NavigationType) -> Unit = {},
-    viewModel: SplashViewModel = koinViewModel(),
 ) {
 
     // Define the animation scale and splash state
     val scale = remember { Animatable(0f) }
     val splash = remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
+
+
+    var spydjl by rememberDataSaverState(key = "spydjl", default = 0f);
+    var xpydjl by rememberDataSaverState(key = "xpydjl", default = 0f);
 
     // Animate the splash screen and hide it when the animation is complete
     LaunchedEffect(key1 = true) {
@@ -122,12 +125,13 @@ fun Splash(
                         modifier = Modifier.width(300.dp),
                         onClick = {
                             scope.launch {
+
                                 val ids = listOf(1, 0, 2, 4, 5)
-                                // 查询GPIO状态
                                 tx {
                                     queryGpio(ids)
                                     delay = 300L
                                 }
+
                                 // 针对每个电机进行初始化
                                 ids.forEach {
                                     // 如果电机未初始化，则进行初始化
@@ -170,10 +174,32 @@ fun Splash(
                                         }
                                     }
                                 }
+
+                                //移动上盘到原点距离
+                                tx {
+                                    timeout = 1000L * 60
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse =  (3200L * spydjl).toLong();
+                                        speed = 100
+                                    }
+
+                                }
+                                //移动下盘到原点距离
+                                tx {
+                                    timeout = 1000L * 60
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 4
+                                        pulse = (3200L * xpydjl).toLong();
+                                        speed = 100
+                                    }
+
+                                }
                                 toggleDrawer(NavigationType.NAVIGATION_RAIL)
                                 navController.popBackStack()
                                 navController.navigate(Route.HOME)
                             }
+
                         }
                     ) {
                         Text(

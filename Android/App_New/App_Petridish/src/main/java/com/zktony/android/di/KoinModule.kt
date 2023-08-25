@@ -6,7 +6,6 @@ import com.zktony.android.ui.CalibrationViewModel
 import com.zktony.android.ui.HomeViewModel
 import com.zktony.android.ui.ProgramViewModel
 import com.zktony.android.ui.SettingViewModel
-import com.zktony.android.ui.SplashViewModel
 import com.zktony.android.utils.Constants.DATABASE_NAME
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModelOf
@@ -33,6 +32,5 @@ val koinModule = module {
     viewModelOf(::HomeViewModel)
     viewModelOf(::ProgramViewModel)
     viewModelOf(::SettingViewModel)
-    viewModelOf(::SplashViewModel)
 }
 

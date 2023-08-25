@@ -4,7 +4,11 @@ import com.zktony.android.utils.ext.loge
 import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.config.SerialConfig
-import com.zktony.serialport.ext.*
+import com.zktony.serialport.ext.crc16LE
+import com.zktony.serialport.ext.readInt16LE
+import com.zktony.serialport.ext.readInt8
+import com.zktony.serialport.ext.splitByteArray
+import com.zktony.serialport.ext.toHexString
 import java.util.concurrent.CopyOnWriteArrayList
 
 class SerialPortHelper : AbstractSerialHelper(
@@ -68,6 +72,7 @@ class SerialPortHelper : AbstractSerialHelper(
     override fun callbackProcess(byteArray: ByteArray) {
         // 解析协议
         val rec = byteArray.protocol()
+        println("rec====="+rec)
 
         // 处理地址为 0x02 的数据包
         if (rec.addr == 0x02.toByte()) {

@@ -25,8 +25,9 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore("dataStore
  * 3.夹爪是电机2
  * 4.上盘是电机5
  * 5.下盘是电机4
- * 紫外线灯是6
- * 检测是7和8
+ * 紫外线灯是3
+ * 检测是否有培养皿6
+ * 检测培养皿是否摆放正确7
  */
 class MainActivity : ComponentActivity() {
 
