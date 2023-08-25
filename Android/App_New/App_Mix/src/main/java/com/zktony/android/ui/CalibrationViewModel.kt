@@ -72,14 +72,14 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
             }
             serial {
                 timeout = 1000L * 40L
-                start(index = index + 2, pulse = 3200L * 20)
+                start(index = index + 2, pdv = 3200L * 20)
             }
             if (index == 0) {
                 serial { valve(2 to 0) }
                 delay(30L)
                 serial {
                     timeout = 1000L * 60L
-                    start(index = 2, pulse = Constants.ZT_0005 * -1)
+                    start(index = 2, pdv = Constants.ZT_0005 * -1)
                 }
             }
             _loading.value = 0

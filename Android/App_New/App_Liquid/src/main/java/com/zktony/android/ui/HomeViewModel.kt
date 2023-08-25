@@ -6,9 +6,8 @@ import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.RuntimeHelper
+import com.zktony.android.utils.extra.getGpio
 import com.zktony.android.utils.extra.serial
-import com.zktony.android.utils.extra.serialHelper
-import com.zktony.android.utils.model.ExecuteType
 import com.zktony.android.utils.model.RuntimeState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -94,17 +93,17 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     val job: MutableList<Job?> = MutableList(2) { null }
                     repeat(2) {
                         job[it] = launch {
-                            if (!serialHelper.gpio[it]) {
+                            if (!getGpio(it)) {
                                 serial {
                                     timeout = 1000L * 30
-                                    start(index = it, pulse = 3200L * -30)
+                                    start(index = it, pdv = 3200L * -30)
                                 }
                             }
 
                             serial {
                                 start(
                                     index = it,
-                                    pulse = 3200L * 2,
+                                    pdv = 3200L * 2,
                                     ads = Triple(50, 80, 100)
                                 )
                             }
@@ -112,7 +111,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             serial {
                                 start(
                                     index = it,
-                                    pulse = 3200L * -3,
+                                    pdv = 3200L * -3,
                                     ads = Triple(50, 80, 100)
                                 )
                             }
@@ -136,11 +135,11 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             } else {
                 _loading.value = if (index == 0) 2 else 3
                 serial {
-                    executeType = ExecuteType.ASYNC
+                    executeType = com.zktony.android.utils.extra.internal.ExecuteType.ASYNC
                     repeat(6) {
                         start(
                             index = it + 2,
-                            pulse = 3200L * 10000 * if (index <= 1) 1 else -1
+                            pdv = 3200L * 10000 * if (index <= 1) 1 else -1
                         )
                     }
                 }

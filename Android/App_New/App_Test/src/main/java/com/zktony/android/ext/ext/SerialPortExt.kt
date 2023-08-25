@@ -14,7 +14,7 @@ fun sendByteArray(byteArray: ByteArray) {
 }
 
 fun sendProtocol(block: Protocol.() -> Unit) {
-    serialPort.sendProtocol(Protocol().apply(block))
+    serialPort.sendByteArray(Protocol().apply(block).toByteArray())
 }
 
 fun sendHexString(hex: String) {

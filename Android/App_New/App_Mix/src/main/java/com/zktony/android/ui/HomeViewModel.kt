@@ -8,10 +8,9 @@ import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.dataSaver
 import com.zktony.android.utils.extra.getGpio
+import com.zktony.android.utils.extra.internal.ExecuteType
 import com.zktony.android.utils.extra.pulse
 import com.zktony.android.utils.extra.serial
-import com.zktony.android.utils.model.ExecuteType
-import com.zktony.serialport.AbstractSerialHelper
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -91,7 +90,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 timeout = 1000L * 60
                                 start(
                                     index = 2,
-                                    pulse = Constants.ZT_0005 * -1,
+                                    pdv = Constants.ZT_0005 * -1,
                                     ads = Triple(300, 400, 600)
                                 )
                             }
@@ -102,18 +101,18 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         if (!getGpio(it)) {
                             serial {
                                 timeout = 1000L * 30
-                                start(index = it, pulse = 3200L * -30, ads = Triple(300, 400, 600))
+                                start(index = it, pdv = 3200L * -30, ads = Triple(300, 400, 600))
                             }
                         }
 
                         serial {
                             timeout = 1000L * 10
-                            start(index = it, pulse = 3200L * 2, ads = Triple(300, 400, 600))
+                            start(index = it, pdv = 3200L * 2, ads = Triple(300, 400, 600))
                         }
 
                         serial {
                             timeout = 1000L * 15
-                            start(index = it, pulse = 3200L * -3, ads = Triple(300, 400, 600))
+                            start(index = it, pdv = 3200L * -3, ads = Triple(300, 400, 600))
                         }
                     }
                     job.join()
@@ -135,11 +134,11 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             _job.value = launch {
                 serial {
                     timeout = 1000L * 60L
-                    start(index = 1, dv = ordinate)
+                    start(index = 1, pdv = ordinate)
                 }
                 serial {
                     timeout = 1000L * 60L
-                    start(index = 0, dv = abscissa)
+                    start(index = 0, pdv = abscissa)
                 }
                 serial { valve(2 to 1) }
                 delay(30L)
@@ -164,11 +163,11 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
                 serial {
                     timeout = 1000L * 60L
-                    start(index = 0, dv = selected.coordinate.abscissa)
+                    start(index = 0, pdv = selected.coordinate.abscissa)
                 }
                 serial {
                     timeout = 1000L * 60L
-                    start(index = 1, dv = selected.coordinate.ordinate)
+                    start(index = 1, pdv = selected.coordinate.ordinate)
                 }
 
                 serial {
@@ -260,12 +259,12 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 _loading.value = 1
                 serial {
                     timeout = 1000L * 60L
-                    start(index = 1, dv = ordinate)
+                    start(index = 1, pdv = ordinate)
                 }
 
                 serial {
                     timeout = 1000L * 60L
-                    start(index = 0, dv = abscissa)
+                    start(index = 0, pdv = abscissa)
                 }
 
                 serial { gpio(2) }
@@ -275,7 +274,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     delay(30L)
                     serial {
                         timeout = 1000L * 60
-                        start(index = 2, pulse = Constants.ZT_0005 * -1)
+                        start(index = 2, pdv = Constants.ZT_0005 * -1)
                     }
                 }
 
@@ -305,12 +304,12 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
             serial {
                 timeout = 1000L * 60L
-                start(index = 1, dv = ordinate)
+                start(index = 1, pdv = ordinate)
             }
 
             serial {
                 timeout = 1000L * 60L
-                start(index = 0, dv = abscissa)
+                start(index = 0, pdv = abscissa)
             }
 
             serial { gpio(2) }
@@ -320,7 +319,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 delay(30L)
                 serial {
                     timeout = 1000L * 60
-                    start(index = 2, pulse = Constants.ZT_0005 * -1)
+                    start(index = 2, pdv = Constants.ZT_0005 * -1)
                 }
             }
 
@@ -337,7 +336,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 _loading.value = 2
                 serial {
                     executeType = ExecuteType.ASYNC
-                    start(index = 9, pulse = 3200L * 10000L)
+                    start(index = 9, pdv = 3200L * 10000L)
                 }
             }
         }
@@ -353,7 +352,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 delay(100L)
                 serial {
                     timeout = 1000L * 60
-                    start(index = 2, pulse = Constants.ZT_0005 * -1)
+                    start(index = 2, pdv = Constants.ZT_0005 * -1)
                 }
             } else {
                 _loading.value = 2 + index
@@ -363,13 +362,13 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         delay(30L)
                         serial {
                             timeout = 1000L * 60
-                            start(index = 2, pulse = Constants.ZT_0005)
+                            start(index = 2, pdv = Constants.ZT_0005)
                         }
                         serial { valve(2 to if (index == 1) 1 else 0) }
                         delay(30L)
                         serial {
                             timeout = 1000L * 60
-                            start(index = 2, pulse = Constants.ZT_0005 * -1)
+                            start(index = 2, pdv = Constants.ZT_0005 * -1)
                         }
                     }
                 }
@@ -387,7 +386,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 serial {
                     executeType = ExecuteType.ASYNC
                     repeat(6) {
-                        start(index = it + 3, pulse = 3200L * 10000L * if (index == 1) 1 else -1)
+                        start(index = it + 3, pdv = 3200L * 10000L * if (index == 1) 1 else -1)
                     }
                 }
             }

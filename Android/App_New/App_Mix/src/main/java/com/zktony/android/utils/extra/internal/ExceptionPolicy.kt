@@ -1,4 +1,4 @@
-package com.zktony.android.utils.model
+package com.zktony.android.utils.extra.internal
 
 /**
  * 异常处理策略

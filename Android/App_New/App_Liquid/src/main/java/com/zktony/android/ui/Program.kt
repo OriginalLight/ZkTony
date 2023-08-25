@@ -606,8 +606,8 @@ fun OrificePlateDetail(
                     onClick = {
                         scope.launch {
                             serial {
-                                start(index = 0, dv = selected.coordinate[0].abscissa)
-                                start(index = 1, dv = selected.coordinate[0].ordinate)
+                                start(index = 0, pdv = selected.coordinate[0].abscissa)
+                                start(index = 1, pdv = selected.coordinate[0].ordinate)
                             }
                         }
                     }
@@ -634,8 +634,8 @@ fun OrificePlateDetail(
                     onClick = {
                         scope.launch {
                             serial {
-                                start(index = 0, dv = selected.coordinate[1].abscissa)
-                                start(index = 1, dv = selected.coordinate[1].ordinate)
+                                start(index = 0, pdv = selected.coordinate[1].abscissa)
+                                start(index = 1, pdv = selected.coordinate[1].ordinate)
                             }
                         }
                     }

@@ -5,31 +5,19 @@ import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.protocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SerialPortHelper : AbstractSerialHelper() {
+class SerialPortHelper : AbstractSerialHelper(
+    SerialConfig(
+        device = "/dev/ttyS4"
+    )
+) {
 
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
-    val axis: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>()
-    val gpio: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>()
-
-    init {
-        scope.launch {
-            repeat(16) {
-                axis.add(false)
-                gpio.add(false)
-            }
-            openDevice(
-                SerialConfig(
-                    device = "/dev/ttyS4"
-                )
-            )
-        }
+    val axis: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>().apply {
+        repeat(16) { add(false) }
+    }
+    val gpio: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>().apply {
+        repeat(16) { add(false) }
     }
 
     /**

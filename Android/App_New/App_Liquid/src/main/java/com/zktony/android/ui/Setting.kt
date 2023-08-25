@@ -715,8 +715,8 @@ fun ConfigList(modifier: Modifier = Modifier) {
                 ) {
                     scope.launch {
                         serial {
-                            start(index = 0, dv = abscissa)
-                            start(index = 1, dv = ordinate)
+                            start(index = 0, pdv = abscissa)
+                            start(index = 1, pdv = ordinate)
                         }
                     }
                 }
@@ -733,8 +733,8 @@ fun ConfigList(modifier: Modifier = Modifier) {
                 ) {
                     scope.launch {
                         serial {
-                            start(index = 0, dv = tankAbscissa)
-                            start(index = 1, dv = tankOrdinate)
+                            start(index = 0, pdv = tankAbscissa)
+                            start(index = 1, pdv = tankOrdinate)
                         }
                     }
                 }

@@ -616,22 +616,12 @@ fun RuntimeContent(
                             }
                         }
                     } else {
-                        Box(
+                        Icon(
                             modifier = Modifier.size(196.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(156.dp),
-                                strokeWidth = 8.dp,
-                                color = Color.Red,
-                            )
-                            Icon(
-                                modifier = Modifier.size(196.dp),
-                                imageVector = Icons.Default.Close,
-                                contentDescription = null,
-                                tint = Color.Red
-                            )
-                        }
+                            imageVector = Icons.Default.Close,
+                            contentDescription = null,
+                            tint = Color.Red
+                        )
                     }
                 }
             }

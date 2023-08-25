@@ -1,9 +1,5 @@
 package com.zktony.android.ui.utils
 
-enum class NavigationContentPosition {
-    TOP, CENTER
-}
-
 /**
  * Different type of page supported by app depending on each screen.
  */

@@ -1,12 +1,12 @@
-package com.zktony.android.utils.model
+package com.zktony.android.utils.extra.internal
 
 import com.zktony.android.data.entities.Motor
-import com.zktony.android.utils.extra.asyncHelper
+import com.zktony.android.utils.extra.hpm
 import com.zktony.android.utils.extra.pulse
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
 
-class SerialConfig {
+class SerialExtension {
 
     var controlType: Byte = 0x00
     val byteList: MutableList<Byte> = mutableListOf()
@@ -19,38 +19,17 @@ class SerialConfig {
         byteList.add(0x00)
     }
 
-    fun start(
+    fun <T : Number> start(
         index: Int = 0,
-        pulse: Long = 0L,
+        pdv: T,
         ads: Triple<Long, Long, Long> = Triple(
-            asyncHelper.hpm[index]!!.acc,
-            asyncHelper.hpm[index]!!.dec,
-            asyncHelper.hpm[index]!!.speed
+            hpm[index]!!.acc,
+            hpm[index]!!.dec,
+            hpm[index]!!.speed
         ),
     ) {
         controlType = 0x01
-        val step = pulse(index, pulse)
-        if (step != 0L) {
-            val config = Motor(acc = ads.first * 20, dec = ads.second * 20, speed = ads.third * 20)
-            val ba = ByteArray(5)
-            ba.writeInt8(index, 0).writeInt32LE(step, 1)
-            byteList.addAll(ba.toList())
-            byteList.addAll(config.toByteArray().toList())
-            indexList.add(index)
-        }
-    }
-
-    fun start(
-        index: Int = 0,
-        dv: Double = 0.0,
-        ads: Triple<Long, Long, Long> = Triple(
-            asyncHelper.hpm[index]!!.acc,
-            asyncHelper.hpm[index]!!.dec,
-            asyncHelper.hpm[index]!!.speed
-        ),
-    ) {
-        controlType = 0x01
-        val step = pulse(index, dv)
+        val step = pulse(index, pdv)
         if (step != 0L) {
             val config = Motor(acc = ads.first * 20, dec = ads.second * 20, speed = ads.third * 20)
             val ba = ByteArray(5)

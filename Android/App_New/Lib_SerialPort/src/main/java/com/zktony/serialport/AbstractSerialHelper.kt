@@ -2,7 +2,6 @@ package com.zktony.serialport
 
 import android.os.Message
 import android.util.Log
-import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.ascii2ByteArray
 import com.zktony.serialport.ext.hex2ByteArray
@@ -13,14 +12,18 @@ import java.security.InvalidParameterException
  * @author: 刘贺贺
  * @date: 2022-12-08 14:39
  */
-abstract class AbstractSerialHelper : AbstractSerial() {
+abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
 
     init {
+        // Open the serial port
+        openDevice(config)
+        // register callback
         callback = {
             callbackVerify(it) { bytes ->
                 callbackProcess(bytes)
             }
         }
+        // exception callback
         exception = {
             it.printStackTrace()
         }

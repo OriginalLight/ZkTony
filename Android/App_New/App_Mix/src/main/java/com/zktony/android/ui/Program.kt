@@ -332,15 +332,15 @@ fun ProgramDetail(
                 scope.launch {
                     serial {
                         timeout = 1000L * 60L
-                        start(index = 1, dv = 0.0)
+                        start(index = 1, pdv = 0.0)
                     }
                     serial {
                         timeout = 1000L * 60L
-                        start(index = 0, dv = selected.coordinate.abscissa)
+                        start(index = 0, pdv = selected.coordinate.abscissa)
                     }
                     serial {
                         timeout = 1000L * 60L
-                        start(index = 1, dv = selected.coordinate.ordinate)
+                        start(index = 1, pdv = selected.coordinate.ordinate)
                     }
                 }
             }

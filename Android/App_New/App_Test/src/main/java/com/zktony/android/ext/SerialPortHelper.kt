@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.concurrent.CopyOnWriteArrayList
 
-class SerialPortHelper : AbstractSerialHelper() {
+class SerialPortHelper : AbstractSerialHelper(SerialConfig()) {
 
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val _byteArrayFlow = MutableStateFlow(byteArrayOf())
@@ -27,7 +27,6 @@ class SerialPortHelper : AbstractSerialHelper() {
     init {
         scope.launch {
             repeat(16) { array.add(0) }
-            openDevice(SerialConfig())
         }
     }
 
