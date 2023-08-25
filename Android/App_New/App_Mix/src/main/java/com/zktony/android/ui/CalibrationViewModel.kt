@@ -67,7 +67,7 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
         viewModelScope.launch {
             _loading.value = 1
             if (index == 0) {
-                serial { valve(2 to 1) }
+                serial { valve(2 to 0) }
                 delay(100L)
             }
             serial {
@@ -75,7 +75,7 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                 start(index = index + 2, pdv = 3200L * 20)
             }
             if (index == 0) {
-                serial { valve(2 to 0) }
+                serial { valve(2 to 1) }
                 delay(30L)
                 serial {
                     timeout = 1000L * 60L

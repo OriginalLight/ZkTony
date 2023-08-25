@@ -26,7 +26,6 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            // Combine the various flows into a single program UI state
             combine(
                 dao.getAll(),
                 _selected,
@@ -42,7 +41,6 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             }.catch { ex ->
                 ex.printStackTrace()
             }.collect {
-                // Set the program UI state
                 _uiState.value = it
             }
         }

@@ -1,26 +1,26 @@
-package com.zktony.android.utils
+package com.zktony.android.ui
 
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.entities.OrificePlate
 import com.zktony.android.data.entities.Program
 import com.zktony.android.utils.extra.serial
-import com.zktony.android.utils.model.RuntimeState
-import com.zktony.android.utils.model.RuntimeStatus
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import kotlin.math.ceil
 
 /**
  * @author 刘贺贺
- * @date 2023/8/10 14:21
+ * @date 2023/8/25 13:04
  */
-class RuntimeHelper {
-
-    val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
+class RuntimeViewModel : ViewModel() {
     private val _status = MutableStateFlow(RuntimeStatus.STOPPED)
     private val _orificePlate = MutableStateFlow(OrificePlate())
     private val _process = MutableStateFlow(0f)
@@ -32,7 +32,7 @@ class RuntimeHelper {
     val state = _state.asStateFlow()
 
     init {
-        scope.launch {
+        viewModelScope.launch {
             combine(
                 _status,
                 _orificePlate,
@@ -59,9 +59,9 @@ class RuntimeHelper {
     }
 
     fun start() {
-        scope.launch {
+        viewModelScope.launch {
             _status.value = RuntimeStatus.RUNNING
-            job = scope.launch {
+            job = viewModelScope.launch {
                 try {
                     if (program == null) throw Exception("Program is null")
                     if (program?.orificePlates.isNullOrEmpty()) throw Exception("OrificePlate is null")
@@ -106,19 +106,19 @@ class RuntimeHelper {
     }
 
     fun pause() {
-        scope.launch {
+        viewModelScope.launch {
             _status.value = RuntimeStatus.PAUSED
         }
     }
 
     fun resume() {
-        scope.launch {
+        viewModelScope.launch {
             _status.value = RuntimeStatus.RUNNING
         }
     }
 
     fun stop() {
-        scope.launch {
+        viewModelScope.launch {
             _status.value = RuntimeStatus.STOPPED
             job?.cancel()
         }
@@ -233,9 +233,15 @@ class RuntimeHelper {
         _selected.value = emptyList()
     }
 
-    companion object {
-        val instance: RuntimeHelper by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            RuntimeHelper()
-        }
-    }
+}
+
+data class RuntimeState(
+    val status: RuntimeStatus = RuntimeStatus.STOPPED,
+    val orificePlate: OrificePlate = OrificePlate(),
+    val process: Float = 0f,
+    val selected: List<Triple<Int, Int, Color>> = emptyList(),
+)
+
+enum class RuntimeStatus {
+    RUNNING, STOPPED, PAUSED, ERROR
 }

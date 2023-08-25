@@ -7,17 +7,12 @@ enum class NavigationType {
     NONE, NAVIGATION_RAIL, PERMANENT_NAVIGATION_DRAWER
 }
 
-
-enum class NavigationContentPosition {
-    TOP, CENTER
-}
-
 /**
  * Different type of page supported by app depending on each screen.
  */
 enum class PageType {
-    LIST, START, RUNTIME,
+    HOME, START, RUNTIME,
     CALIBRATION_LIST, CALIBRATION_DETAIL,
-    PROGRAM_LIST, PROGRAM_DETAIL,
+    PROGRAM_LIST, PROGRAM_DETAIL, PROGRAM_EDIT,
     SETTINGS, AUTH, CONFIG, MOTOR_LIST, MOTOR_DETAIL
 }

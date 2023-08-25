@@ -21,9 +21,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.data.entities.OrificePlate
 import com.zktony.android.ui.RuntimeAction
+import com.zktony.android.ui.RuntimeStatus
 import com.zktony.android.utils.extra.format
 import com.zktony.android.utils.extra.timeFormat
-import com.zktony.android.utils.model.RuntimeStatus
 import kotlinx.coroutines.delay
 
 /**
@@ -155,7 +155,7 @@ fun RuntimeCard(
     process: Float = 0f,
     uiEvent: (RuntimeAction) -> Unit = {},
 ) {
-    var time by remember { mutableStateOf(0L) }
+    var time by remember { mutableLongStateOf(0L) }
 
     LaunchedEffect(key1 = status) {
         while (true) {

@@ -120,29 +120,23 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
      */
     private fun checkUpdate() {
         viewModelScope.launch {
-            // Check if the network is available
-            if (Ext.ctx.isNetworkAvailable()) {
-                // Get the current application instance
-                val application = _application.value
-                if (application != null) {
-                    // Check if a new version of the application is available for download
-                    if (application.version_code > BuildConfig.VERSION_CODE
-                        && application.download_url.isNotEmpty()
-                        && _progress.value == 0
-                    ) {
-                        // Download the latest version of the application
-                        download(application.download_url)
-                        _progress.value = 1
-                    }
-                } else {
-                    // Get the latest application instance from the server
-                    httpCall {
-                        it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
-                    }
+            // Get the current application instance
+            val application = _application.value
+            if (application != null) {
+                // Check if a new version of the application is available for download
+                if (application.version_code > BuildConfig.VERSION_CODE
+                    && application.download_url.isNotEmpty()
+                    && _progress.value == 0
+                ) {
+                    // Download the latest version of the application
+                    download(application.download_url)
+                    _progress.value = 1
                 }
             } else {
-                // Display a message if the network is unavailable
-                Ext.ctx.getString(R.string.network_unavailable).showShortToast()
+                // Get the latest application instance from the server
+                httpCall {
+                    it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                }
             }
         }
     }

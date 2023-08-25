@@ -140,8 +140,10 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     timeout = 1000L * 60L
                     start(index = 0, pdv = abscissa)
                 }
-                serial { valve(2 to 1) }
+                serial { valve(2 to 0) }
+
                 delay(30L)
+
                 serial {
                     timeout = 1000L * 60 * 1
 
@@ -199,8 +201,8 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         index = 3,
                         pulse = pv1,
                         ads = Triple(
-                            (s * s / 2 / pv1 * 100).toLong(),
                             (s * 100).toLong(),
+                            (s * s / 2 / pv1 * 100).toLong(),
                             (s * 100).toLong()
                         )
                     )
@@ -209,8 +211,8 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         index = 4,
                         pulse = pv2,
                         ads = Triple(
-                            (s * s / 2 / pv2 * 100).toLong(),
                             (s * 100).toLong(),
+                            (s * s / 2 / pv2 * 100).toLong(),
                             (s * 100).toLong()
                         )
                     )
@@ -219,8 +221,8 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         index = 5,
                         pulse = pv3,
                         ads = Triple(
-                            (s * s / 2 / pv3 * 100).toLong(),
                             (s * 100).toLong(),
+                            (s * s / 2 / pv2 * 100).toLong(),
                             (s * 100).toLong()
                         )
                     )
@@ -229,8 +231,8 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         index = 6,
                         pulse = p5,
                         ads = Triple(
-                            (s * 100).toLong(),
                             (s * s / 2 / pv1 * 100).toLong(),
+                            (s * 100).toLong(),
                             (s * 100).toLong()
                         )
                     )
@@ -239,8 +241,8 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         index = 7,
                         pulse = p6,
                         ads = Triple(
-                            (s * 100).toLong(),
                             (s * s / 2 / pv2 * 100).toLong(),
+                            (s * 100).toLong(),
                             (s * 100).toLong()
                         )
                     )
@@ -249,8 +251,8 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         index = 8,
                         pulse = p7,
                         ads = Triple(
-                            (s * 100).toLong(),
                             (s * s / 2 / pv3 * 100).toLong(),
+                            (s * 100).toLong(),
                             (s * 100).toLong()
                         )
                     )
@@ -270,7 +272,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 serial { gpio(2) }
                 delay(300L)
                 if (!getGpio(2)) {
-                    serial { valve(2 to 0) }
+                    serial { valve(2 to 1) }
                     delay(30L)
                     serial {
                         timeout = 1000L * 60
@@ -289,41 +291,13 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     private fun stop() {
         viewModelScope.launch {
-            // Cancel and join the current job
             _job.value?.cancel()
             _job.value = null
-
-            // Reset the screen and stop the motors
-            _loading.value = 1
-
-            val abscissa = dataSaver.readData(Constants.ZT_0003, 0.0)
-            val ordinate = dataSaver.readData(Constants.ZT_0004, 0.0)
 
             serial { stop(0, 1, 2, 3, 4, 5, 6, 7, 8, 9) }
             delay(200L)
 
-            serial {
-                timeout = 1000L * 60L
-                start(index = 1, pdv = ordinate)
-            }
-
-            serial {
-                timeout = 1000L * 60L
-                start(index = 0, pdv = abscissa)
-            }
-
-            serial { gpio(2) }
-            delay(300L)
-            if (!getGpio(2)) {
-                serial { valve(2 to 0) }
-                delay(30L)
-                serial {
-                    timeout = 1000L * 60
-                    start(index = 2, pdv = Constants.ZT_0005 * -1)
-                }
-            }
-
-            _loading.value = 0
+            initializer()
         }
     }
 
@@ -345,15 +319,17 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private fun syringe(index: Int) {
         viewModelScope.launch {
             if (index == 0) {
-                _loading.value = 0
                 syringeJob?.cancelAndJoin()
                 syringeJob = null
                 serial { stop(2) }
                 delay(100L)
+                serial { valve(2 to if (_loading.value == 3) 1 else 0) }
+                delay(30L)
                 serial {
                     timeout = 1000L * 60
                     start(index = 2, pdv = Constants.ZT_0005 * -1)
                 }
+                _loading.value = 0
             } else {
                 _loading.value = 2 + index
                 syringeJob = launch {

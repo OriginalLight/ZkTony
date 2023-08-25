@@ -20,7 +20,7 @@
     <string name="update">Update</string>
     <string name="update_available">Update available</string>
     <string name="version">Version</string>
-    <string name="wifi">WIFI</string>
+    <string name="network">Network</string>
     <string name="download_failed">Download failed</string>
     <string name="network_unavailable">Network Unavailable</string>
     <string name="interface_exception">Interface Exception</string>
@@ -42,13 +42,12 @@
     <string name="x_axis">X Axis</string>
     <string name="y_axis">Y Axis</string>
     <string name="z_axis">Z Axis</string>
-    <string name="volume">Volume μL</string>
-    <string name="colloid">Colloid μL</string>
-    <string name="coagulant">Coagulant μL</string>
+    <string name="dosage">Volume μL</string>
     <string name="glue_making">Glue making</string>
     <string name="pre_drain">Pre-drain</string>
     <string name="confirm">Confirm</string>
     <string name="moving_distance">Moving distance</string>
     <string name="actions">Actions</string>
     <string name="motor">Motor</string>
+    <string name="downloading">Downloading</string>
 </resources>

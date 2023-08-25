@@ -5,10 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.RuntimeHelper
 import com.zktony.android.utils.extra.getGpio
+import com.zktony.android.utils.extra.internal.ExecuteType
 import com.zktony.android.utils.extra.serial
-import com.zktony.android.utils.model.RuntimeState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,9 +25,9 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0L)
-    private val _page = MutableStateFlow(PageType.LIST)
+    private val _page = MutableStateFlow(PageType.HOME)
     private val _loading = MutableStateFlow(0)
-    private val helper: RuntimeHelper = RuntimeHelper.instance
+    private val helper: RuntimeViewModel = RuntimeViewModel()
 
     val uiState = _uiState.asStateFlow()
 
@@ -129,17 +128,17 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     private fun pipeline(index: Int) {
         viewModelScope.launch {
-            if (_loading.value == 2 || _loading.value == 3) {
+            if (index == 0) {
                 _loading.value = 0
                 serial { stop(2, 3, 4, 5, 6, 7) }
             } else {
-                _loading.value = if (index == 0) 2 else 3
+                _loading.value = index + 1
                 serial {
-                    executeType = com.zktony.android.utils.extra.internal.ExecuteType.ASYNC
+                    executeType = ExecuteType.ASYNC
                     repeat(6) {
                         start(
                             index = it + 2,
-                            pdv = 3200L * 10000 * if (index <= 1) 1 else -1
+                            pdv = 3200L * 10000 * if (index < 3) 1 else -1
                         )
                     }
                 }
@@ -151,7 +150,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 data class HomeUiState(
     val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
-    val page: PageType = PageType.LIST,
+    val page: PageType = PageType.HOME,
     val loading: Int = 0,
     val runtime: RuntimeState = RuntimeState(),
 )
