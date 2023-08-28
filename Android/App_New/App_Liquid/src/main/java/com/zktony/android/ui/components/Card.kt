@@ -178,7 +178,7 @@ fun JobActionCard(
         contentAlignment = Alignment.Center
     ) {
         if (uiState.jobState.status == JobStatus.STOPPED) {
-            ElevatedCard(
+            Card(
                 enabled = uiState.loading == 0 && uiState.selected != 0L,
                 onClick = { uiEvent(HomeUiEvent.Start) }
             ) {
@@ -191,35 +191,26 @@ fun JobActionCard(
             }
         } else {
             Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                Text(
+                    text = time.timeFormat(),
+                    style = TextStyle(
+                        fontSize = 48.sp,
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Monospace
+                    ),
+                )
 
-                Box {
-                    LinearProgressIndicator(
-                        progress = uiState.jobState.process,
-                        modifier = Modifier
-                            .width(296.dp)
-                            .height(20.dp)
-                            .align(Alignment.Center),
-                        color = Color.Blue,
-                        strokeCap = StrokeCap.Round
-                    )
-                    Text(
-                        modifier = Modifier
-                            .align(Alignment.CenterEnd)
-                            .padding(end = 8.dp),
-                        text = time.timeFormat(),
-                        style = TextStyle(
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace,
-                            fontStyle = FontStyle.Italic,
-                        ),
-                    )
-                }
+                LinearProgressIndicator(
+                    progress = uiState.jobState.process,
+                    modifier = Modifier.width(296.dp),
+                    color = Color.Blue
+                )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    ElevatedCard(onClick = {
+                Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+                    Card(onClick = {
                         if (uiState.jobState.status == JobStatus.RUNNING) {
                             uiEvent(HomeUiEvent.Pause)
                         } else {
@@ -243,7 +234,7 @@ fun JobActionCard(
                         }
                     }
 
-                    ElevatedCard(onClick = { uiEvent(HomeUiEvent.Stop) }) {
+                    Card(onClick = { uiEvent(HomeUiEvent.Stop) }) {
                         Icon(
                             modifier = Modifier.size(128.dp),
                             imageVector = Icons.Default.Close,

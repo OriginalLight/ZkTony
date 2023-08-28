@@ -98,10 +98,16 @@ fun SettingsAppBar(
     TopAppBar(
         title = {
             Text(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.small,
+                    )
+                    .padding(horizontal = 32.dp, vertical = 4.dp),
                 text = stringResource(id = R.string.tab_setting),
                 style = TextStyle(
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 28.sp
+                    fontSize = 24.sp
                 )
             )
         },
@@ -155,10 +161,16 @@ fun ProgramAppBar(
         title = {
             if (uiState.page == PageType.PROGRAM_LIST) {
                 Text(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = MaterialTheme.shapes.small,
+                        )
+                        .padding(horizontal = 32.dp, vertical = 4.dp),
                     text = stringResource(id = R.string.tab_program),
                     style = TextStyle(
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 28.sp
+                        fontSize = 24.sp
                     )
                 )
             } else {
@@ -306,10 +318,16 @@ fun CalibrationAppBar(
     ) {
         if (uiState.page == PageType.CALIBRATION_LIST) {
             Text(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.small,
+                    )
+                    .padding(horizontal = 32.dp, vertical = 4.dp),
                 text = stringResource(id = R.string.tab_calibration),
                 style = TextStyle(
                     fontWeight = FontWeight.SemiBold,
-                    fontSize = 28.sp
+                    fontSize = 24.sp
                 )
             )
             Spacer(modifier = Modifier.weight(1f))

@@ -4,6 +4,7 @@ import com.zktony.serialport.ext.checkSumLE
 
 /**
  *
+ * 普通命令
  * 帧头 地址码 功能码 参数区 帧尾 和校验
  * B0 B1 B2 B3 B4 B5 B6 B7
  * STX ADDR FUNC 1-8 位 9-16 位 ETX 低字节 高字节
@@ -41,23 +42,7 @@ import com.zktony.serialport.ext.checkSumLE
  * 0xA4           按需求方向切换孔位                   根据切换阀实际通道数而定，参数值不可超过当前阀的最大通道数，且 B3,B4 必须为相邻的两个孔位
  * 0xB4           按需求方向切换到孔位之间              根据切换阀实际通道数而定，参数值不可超过当前阀的最大通道数，且 B3,B4 必须为相邻的两个孔位
  * 0x49           强停                               B3=0x00 B4=0x0
- */
-class RunzeProtocol {
-    var head: Byte = 0xCC.toByte()
-    var addr: Byte = 0x00.toByte()
-    var func: Byte = 0x00.toByte()
-    var params: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
-    var end: Byte = 0xDD.toByte()
-
-    fun toByteArray(): ByteArray {
-        val byteArray = byteArrayOf(head, addr, func)
-            .plus(params)
-            .plus(end)
-        return byteArray.plus(byteArray.checkSumLE())
-    }
-}
-
-/**
+ *
  * 工厂指令
  * 帧头 地址码 功能码 密码 参数区 帧尾 和校验
  * B0 B1 B2 B3,B4,B5,B6 B7 B8 B9 B10 B11 B12 B13
@@ -81,25 +66,7 @@ class RunzeProtocol {
  * 0xFC     参数锁定            参数均为 0x00
  * 0xFF     恢复出厂设置         参数均为 0x00
  *
- */
-class RunzeSuperProtocol {
-    var head: Byte = 0xCC.toByte()
-    var addr: Byte = 0x00.toByte()
-    var func: Byte = 0x00.toByte()
-    var pwd: ByteArray = byteArrayOf(0xFF.toByte(), 0xEE.toByte(), 0xBB.toByte(), 0xAA.toByte())
-    var params: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte())
-    var end: Byte = 0xDD.toByte()
-
-    fun toByteArray(): ByteArray {
-        val byteArray = byteArrayOf(head, addr, func)
-            .plus(pwd)
-            .plus(params)
-            .plus(end)
-        return byteArray.plus(byteArray.checkSumLE())
-    }
-}
-
-/**
+ * 返回指令
  *
  * 帧头 地址码 状态码 参数区 帧尾 和校验
  * B0 B1 B2 B3 B4 B5 B6 B7
@@ -119,23 +86,30 @@ class RunzeSuperProtocol {
  * 0xFF      未知错误       参数=0x00 0x00
  *
  */
-class RunzeResponseProtocol {
+class RunzeProtocol {
     var head: Byte = 0xCC.toByte()
     var addr: Byte = 0x00.toByte()
-    var status: Byte = 0x00.toByte()
-    var params: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
+    var funcCode: Byte = 0x00.toByte()
+    var data: ByteArray = byteArrayOf()
     var end: Byte = 0xDD.toByte()
-    var checkSum: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
+    var checksum: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
+
+    fun toByteArray(): ByteArray {
+        val byteArray = byteArrayOf(head, addr, funcCode)
+            .plus(data)
+            .plus(end)
+        return byteArray.plus(byteArray.checkSumLE())
+    }
 }
 
-fun ByteArray.toRunzeResponseProtocol(): RunzeResponseProtocol {
+fun ByteArray.toRunzeProtocol(): RunzeProtocol {
     val byteArray = this
-    return RunzeResponseProtocol().apply {
+    return RunzeProtocol().apply {
         head = byteArray[0]
         addr = byteArray[1]
-        status = byteArray[2]
-        params = byteArray.copyOfRange(3, 5)
-        end = byteArray[5]
-        checkSum = byteArray.copyOfRange(6, 8)
+        funcCode = byteArray[2]
+        data = byteArray.copyOfRange(3, byteArray.size - 3)
+        end = byteArray[byteArray.size - 3]
+        checksum = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
     }
 }

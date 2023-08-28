@@ -4,7 +4,7 @@ import com.zktony.android.data.entities.Motor
 import com.zktony.android.utils.extra.internal.AppStateObserver
 import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.modbus.toRtuProtocol
-import com.zktony.serialport.command.runze.toRunzeResponseProtocol
+import com.zktony.serialport.command.runze.toRunzeProtocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.checkSumLE
 import com.zktony.serialport.ext.crc16LE
@@ -80,7 +80,7 @@ val runze = object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS9")) {
 
     override fun callbackProcess(byteArray: ByteArray) {
         // 解析协议
-        val rx = byteArray.toRunzeResponseProtocol()
+        val rx = byteArray.toRunzeProtocol()
 
         when (rx.status) {
             0xFE.toByte() -> {
