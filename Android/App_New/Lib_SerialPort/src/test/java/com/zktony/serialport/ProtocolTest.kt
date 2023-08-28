@@ -1,6 +1,7 @@
 package com.zktony.serialport
 
-import com.zktony.serialport.command.protocol
+import com.zktony.serialport.command.Protocol
+import com.zktony.serialport.command.toProtocol
 import com.zktony.serialport.ext.toHexString
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -9,7 +10,7 @@ class ProtocolTest {
 
     @Test
     fun test1() {
-        val p = protocol {
+        val p = Protocol().apply {
             data = byteArrayOf(0x01, 0x06, 0x0A, 0x00, 0x00, 0x00)
         }
         assertEquals(
@@ -38,7 +39,7 @@ class ProtocolTest {
             0xFC.toByte(),
             0xFF.toByte(),
             0xFF.toByte()
-        ).protocol()
+        ).toProtocol()
         assertEquals("01 06 0A 00 00 00", p.data.toHexString())
         assertEquals("93 D5", p.crc.toHexString())
     }

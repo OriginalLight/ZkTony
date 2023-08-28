@@ -101,8 +101,7 @@ fun SettingsAppBar(
                 text = stringResource(id = R.string.tab_setting),
                 style = TextStyle(
                     fontWeight = FontWeight.SemiBold,
-                    fontFamily = FontFamily.Serif,
-                    fontSize = 24.sp
+                    fontSize = 28.sp
                 )
             )
         },
@@ -159,8 +158,7 @@ fun ProgramAppBar(
                     text = stringResource(id = R.string.tab_program),
                     style = TextStyle(
                         fontWeight = FontWeight.SemiBold,
-                        fontFamily = FontFamily.Serif,
-                        fontSize = 24.sp
+                        fontSize = 28.sp
                     )
                 )
             } else {
@@ -311,8 +309,7 @@ fun CalibrationAppBar(
                 text = stringResource(id = R.string.tab_calibration),
                 style = TextStyle(
                     fontWeight = FontWeight.SemiBold,
-                    fontFamily = FontFamily.Serif,
-                    fontSize = 22.sp
+                    fontSize = 28.sp
                 )
             )
             Spacer(modifier = Modifier.weight(1f))

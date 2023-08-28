@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.extra.serial
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -64,10 +63,6 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
     private fun addLiquid(index: Int) {
         viewModelScope.launch {
             _loading.value = 1
-            serial {
-                timeout = 1000L * 30
-                start(index = index + 2, pdv = 3200L * 20)
-            }
             _loading.value = 0
         }
     }

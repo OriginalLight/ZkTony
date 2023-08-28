@@ -2,7 +2,7 @@ package com.zktony.android.ext
 
 import android.util.Log
 import com.zktony.serialport.AbstractSerialHelper
-import com.zktony.serialport.command.protocol
+import com.zktony.serialport.command.toProtocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.crc16LE
 import com.zktony.serialport.ext.readInt16LE
@@ -73,7 +73,7 @@ class SerialPortHelper : AbstractSerialHelper(SerialConfig()) {
      */
     override fun callbackProcess(byteArray: ByteArray) {
         _byteArrayFlow.value = byteArray
-        val rec = byteArray.protocol()
+        val rec = byteArray.toProtocol()
         if (rec.addr == 0x02.toByte()) {
             when (rec.func) {
                 0x01.toByte() -> {

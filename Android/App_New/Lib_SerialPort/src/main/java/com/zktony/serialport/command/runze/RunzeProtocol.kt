@@ -127,3 +127,15 @@ class RunzeResponseProtocol {
     var end: Byte = 0xDD.toByte()
     var checkSum: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
 }
+
+fun ByteArray.toRunzeResponseProtocol(): RunzeResponseProtocol {
+    val byteArray = this
+    return RunzeResponseProtocol().apply {
+        head = byteArray[0]
+        addr = byteArray[1]
+        status = byteArray[2]
+        params = byteArray.copyOfRange(3, 5)
+        end = byteArray[5]
+        checkSum = byteArray.copyOfRange(6, 8)
+    }
+}

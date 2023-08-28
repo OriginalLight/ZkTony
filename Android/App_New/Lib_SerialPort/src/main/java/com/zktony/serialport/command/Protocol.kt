@@ -69,22 +69,12 @@ class Protocol {
 /**
  * protocol
  *
- * @param block [@kotlin.ExtensionFunctionType] Function1<Protocol, Unit>
- * @return Protocol
- */
-fun protocol(block: Protocol.() -> Unit): Protocol {
-    return Protocol().apply(block)
-}
-
-/**
- * protocol
- *
  * @receiver ByteArray
  * @return Protocol
  */
-fun ByteArray.protocol(): Protocol {
+fun ByteArray.toProtocol(): Protocol {
     val bytes = this
-    return protocol {
+    return Protocol().apply {
         head = bytes[0]
         addr = bytes[1]
         func = bytes[2]

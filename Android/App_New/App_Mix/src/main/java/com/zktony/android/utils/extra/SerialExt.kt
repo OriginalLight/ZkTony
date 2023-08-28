@@ -7,7 +7,7 @@ import com.zktony.android.utils.extra.internal.ExecuteType
 import com.zktony.android.utils.extra.internal.SerialExtension
 import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.Protocol
-import com.zktony.serialport.command.protocol
+import com.zktony.serialport.command.toProtocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.crc16LE
 import com.zktony.serialport.ext.readInt16LE
@@ -89,7 +89,7 @@ val serialport = object : AbstractSerialHelper(SerialConfig()) {
 
     override fun callbackProcess(byteArray: ByteArray) {
         // 解析协议
-        val rec = byteArray.protocol()
+        val rec = byteArray.toProtocol()
 
         // 处理地址为 0x02 的数据包
         if (rec.addr == 0x02.toByte()) {

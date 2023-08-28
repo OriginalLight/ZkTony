@@ -39,7 +39,6 @@ import com.zktony.android.ui.components.*
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.isNetworkAvailable
-import com.zktony.android.utils.extra.serial
 import kotlinx.coroutines.launch
 import kotlin.math.roundToLong
 
@@ -652,12 +651,6 @@ fun ConfigList(modifier: Modifier = Modifier) {
                         }
                     }
                 ) {
-                    scope.launch {
-                        serial {
-                            start(index = 0, pdv = abscissa)
-                            start(index = 1, pdv = ordinate)
-                        }
-                    }
                 }
                 CoordinateInput(
                     modifier = Modifier.weight(1f),
@@ -670,12 +663,7 @@ fun ConfigList(modifier: Modifier = Modifier) {
                         }
                     }
                 ) {
-                    scope.launch {
-                        serial {
-                            start(index = 0, pdv = tankAbscissa)
-                            start(index = 1, pdv = tankOrdinate)
-                        }
-                    }
+
                 }
             }
         }
