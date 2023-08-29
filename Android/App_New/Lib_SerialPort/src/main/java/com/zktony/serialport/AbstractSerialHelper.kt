@@ -19,20 +19,20 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
         openDevice(config)
         // register callback
         callback = {
-            callbackVerify(it) { bytes ->
-                callbackProcess(bytes)
+            try {
+                callbackVerify(it) { bytes ->
+                    callbackProcess(bytes)
+                }
+            } catch (ex: Exception) {
+                Log.e(TAG, "Callback Exception: ${ex.message}")
             }
-        }
-        // exception callback
-        exception = {
-            it.printStackTrace()
         }
     }
 
     /**
      * Open the serial port
      */
-    fun openDevice(config: SerialConfig): Int {
+    private fun openDevice(config: SerialConfig): Int {
         return try {
             open(config)
             Log.i(TAG, "Open the serial port successfully")

@@ -15,28 +15,12 @@ object Constants {
     const val NAVIGATION = "NAVIGATION"
 
     /**
-     * 最大横坐标
-     */
-    const val ZT_0001 = "ZT_0001"
-
-    /**
-     * 最大纵坐标
-     */
-    const val ZT_0002 = "ZT_0002"
-
-    /**
-     * 废液槽横坐标
-     */
-    const val ZT_0003 = "ZT_0003"
-
-    /**
-     * 废液槽纵坐标
-     */
-    const val ZT_0004 = "ZT_0004"
-
-    /**
      * 模块数量
      */
-    const val ZT_0005 = 4
+    const val ZT_0000 = "ZT_0000"
 
+    /**
+     * 保温温度
+     */
+    const val ZT_0001 = "ZT_0001"
 }

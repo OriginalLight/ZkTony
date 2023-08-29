@@ -40,54 +40,45 @@ val hpc: MutableMap<Int, Double> = ConcurrentHashMap<Int, Double>().apply {
 /**
  * 串口通信
  */
-val rtu = object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS3")) {
+val serialHelper = object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS3")) {
     override fun callbackVerify(byteArray: ByteArray, block: (ByteArray) -> Unit) {
 
-        // crc 校验
-        val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-        val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
-        if (!bytes.crc16LE().contentEquals(crc)) {
-            throw Exception("RX Crc Error")
-        }
-
-        // 校验通过
-        block(byteArray)
-    }
-
-    override fun callbackProcess(byteArray: ByteArray) {
-        // 解析协议
-        val rx = byteArray.toRtuProtocol()
-
-        when (rx.funcCode) {
-            // TODO
-        }
-    }
-}
-
-val runze = object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS9")) {
-    override fun callbackVerify(byteArray: ByteArray, block: (ByteArray) -> Unit) {
-
-        // checksum 校验
-        val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-        val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
-        if (!bytes.checkSumLE().contentEquals(crc)) {
-            throw Exception("RX Crc Error")
-        }
-
-        // 校验通过
-        block(byteArray)
-    }
-
-    override fun callbackProcess(byteArray: ByteArray) {
-        // 解析协议
-        val rx = byteArray.toRunzeProtocol()
-
-        when (rx.status) {
-            0xFE.toByte() -> {
-                // 任务挂起
+        if (byteArray[0] == 0xCC.toByte()) {
+            // checksum 校验
+            val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
+            val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
+            if (!bytes.checkSumLE().contentEquals(crc)) {
+                throw Exception("RX Crc Error")
             }
+        } else {
+            // crc 校验
+            val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
+            val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
+            if (!bytes.crc16LE().contentEquals(crc)) {
+                throw Exception("RX Crc Error")
+            }
+        }
 
-            else -> {}
+        // 校验通过
+        block(byteArray)
+    }
+
+    override fun callbackProcess(byteArray: ByteArray) {
+        // 解析协议
+        if (byteArray[0] == 0xCC.toByte()) {
+            val rx = byteArray.toRunzeProtocol()
+            when (rx.funcCode) {
+                0xFE.toByte() -> {
+                    // 任务挂起
+                }
+
+                else -> {}
+            }
+        } else {
+            val rx = byteArray.toRtuProtocol()
+            when (rx.funcCode) {
+                // TODO
+            }
         }
     }
 }
@@ -117,26 +108,9 @@ val observer = object : AppStateObserver() {
  * @return Long
  */
 fun <T : Number> pulse(index: Int, dvp: T): Long {
-
-    val p = when (dvp) {
+    return when (dvp) {
         is Double -> (dvp / hpc[index]!!).toLong()
         is Long -> dvp
         else -> dvp.toLong()
-    }
-
-    return when (index) {
-        0 -> {
-            val d = p - x.get()
-            x.set(maxOf(p, 0))
-            d
-        }
-
-        1 -> {
-            val d = p - y.get()
-            y.set(maxOf(p, 0))
-            d
-        }
-
-        else -> p
     }
 }

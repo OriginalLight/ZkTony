@@ -9,22 +9,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -34,13 +41,11 @@ import androidx.navigation.NavHostController
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
-import com.zktony.android.data.entities.Coordinate
 import com.zktony.android.ui.components.*
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.isNetworkAvailable
 import kotlinx.coroutines.launch
-import kotlin.math.roundToLong
 
 @Composable
 fun SettingsRoute(
@@ -49,8 +54,9 @@ fun SettingsRoute(
     viewModel: SettingViewModel,
     snackbarHostState: SnackbarHostState,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val message by viewModel.message.collectAsStateWithLifecycle()
 
     val navigation: () -> Unit = {
         scope.launch {
@@ -63,6 +69,16 @@ fun SettingsRoute(
     }
 
     BackHandler { navigation() }
+
+    LaunchedEffect(key1 = message) {
+        if (message != null) {
+            snackbarHostState.showSnackbar(
+                message = message ?: "未知错误",
+                actionLabel = "关闭",
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -466,15 +482,15 @@ fun MotorList(
                         modifier = Modifier.padding(start = 16.dp),
                     ) {
                         Text(
-                            text = "S - ${it.speed}", style = MaterialTheme.typography.bodyLarge
-                        )
-
-                        Text(
                             text = "A - ${it.acc}", style = MaterialTheme.typography.bodyLarge
                         )
 
                         Text(
                             text = "D - ${it.dec}", style = MaterialTheme.typography.bodyLarge
+                        )
+
+                        Text(
+                            text = "S - ${it.speed}", style = MaterialTheme.typography.bodyLarge
                         )
                     }
                 }
@@ -483,6 +499,7 @@ fun MotorList(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MotorDetail(
     modifier: Modifier = Modifier,
@@ -490,10 +507,9 @@ fun MotorDetail(
     uiEvent: (SettingUiEvent) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
-    val entity = uiState.entities.find { it.id == uiState.selected }!!
-    var speed by remember { mutableLongStateOf(entity.speed) }
-    var acc by remember { mutableLongStateOf(entity.acc) }
-    var dec by remember { mutableLongStateOf(entity.dec) }
+    val softKeyboard = LocalSoftwareKeyboardController.current
+    val selected = uiState.entities.find { it.id == uiState.selected }!!
+    var ads by remember { mutableStateOf(selected.toAdsString()) }
 
     Column(
         modifier = modifier
@@ -503,110 +519,140 @@ fun MotorDetail(
                 color = Color.LightGray,
                 shape = MaterialTheme.shapes.small
             )
-            .padding(32.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.Speed,
-                contentDescription = stringResource(id = R.string.speed),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = "S - $speed",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Slider(
-                value = speed.toFloat(),
-                onValueChange = { speed = it.roundToLong() },
-                valueRange = 0f..800f,
-                steps = 79,
-            )
-        }
+        val keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done,
+        )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.TrendingUp,
-                contentDescription = stringResource(id = R.string.acceleration),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = "A - $acc",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Slider(
-                value = acc.toFloat(),
-                onValueChange = { acc = it.roundToLong() },
-                valueRange = 0f..800f,
-                steps = 79,
-            )
-        }
+        val keyboardActions = KeyboardActions(
+            onDone = {
+                softKeyboard?.hide()
+            }
+        )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.TrendingDown,
-                contentDescription = stringResource(id = R.string.deceleration),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = "D - $dec",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Slider(
-                value = dec.toFloat(),
-                onValueChange = { dec = it.roundToLong() },
-                valueRange = 0f..800f,
-                steps = 79,
-            )
-        }
+        val colors = TextFieldDefaults.colors(
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+        )
 
-        AnimatedVisibility(visible = entity.speed != speed || entity.acc != acc || entity.dec != dec) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                FloatingActionButton(
-                    modifier = Modifier.width(192.dp),
-                    onClick = {
-                        scope.launch {
-                            uiEvent(
-                                SettingUiEvent.Update(
-                                    entity.copy(
-                                        speed = speed,
-                                        acc = acc,
-                                        dec = dec
-                                    )
-                                )
-                            )
-                            uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
-                        }
-                    },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Default.Done,
-                        contentDescription = null
+        val textStyle = TextStyle(
+            fontStyle = FontStyle.Italic,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+            fontFamily = FontFamily.Monospace,
+        )
+
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = ads.first,
+            onValueChange = {
+                scope.launch {
+                    ads = Triple(it, ads.second, ads.third)
+                    uiEvent(
+                        SettingUiEvent.Update(
+                            selected.copy(acc = it.toLongOrNull() ?: 0L)
+                        )
                     )
                 }
-            }
-        }
+            },
+            leadingIcon = {
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.TrendingUp,
+                        contentDescription = stringResource(id = R.string.acceleration)
+                    )
+                }
+            },
+            trailingIcon = {
+                ElevatedButton(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    onClick = { /*TODO*/ }) {
+                    Icon(imageVector = Icons.Default.Download, contentDescription = null)
+                }
+            },
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            shape = CircleShape,
+            colors = colors,
+            textStyle = textStyle,
+        )
+
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = ads.second,
+            onValueChange = {
+                scope.launch {
+                    ads = Triple(ads.first, it, ads.third)
+                    uiEvent(
+                        SettingUiEvent.Update(
+                            selected.copy(
+                                dec = it.toLongOrNull() ?: 0L
+                            )
+                        )
+                    )
+                }
+            },
+            leadingIcon = {
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.TrendingDown,
+                        contentDescription = stringResource(id = R.string.deceleration)
+                    )
+                }
+            },
+            trailingIcon = {
+                ElevatedButton(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    onClick = { /*TODO*/ }) {
+                    Icon(imageVector = Icons.Default.Download, contentDescription = null)
+                }
+            },
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            shape = CircleShape,
+            colors = colors,
+            textStyle = textStyle,
+        )
+
+        TextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = ads.third,
+            onValueChange = {
+                scope.launch {
+                    ads = Triple(ads.first, ads.second, it)
+                    uiEvent(
+                        SettingUiEvent.Update(
+                            selected.copy(
+                                speed = it.toLongOrNull() ?: 0L
+                            )
+                        )
+                    )
+                }
+            },
+            leadingIcon = {
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Speed,
+                        contentDescription = stringResource(id = R.string.speed)
+                    )
+                }
+            },
+            trailingIcon = {
+                ElevatedButton(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    onClick = { /*TODO*/ }) {
+                    Icon(imageVector = Icons.Default.Download, contentDescription = null)
+                }
+            },
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            shape = CircleShape,
+            colors = colors,
+            textStyle = textStyle,
+        )
     }
 }
 
@@ -614,6 +660,7 @@ fun MotorDetail(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ConfigList(modifier: Modifier = Modifier) {
+
     val scope = rememberCoroutineScope()
 
     LazyColumn(
@@ -629,43 +676,32 @@ fun ConfigList(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
-            var abscissa by rememberDataSaverState(key = Constants.ZT_0001, default = 0.0)
-            var ordinate by rememberDataSaverState(key = Constants.ZT_0002, default = 0.0)
-            var tankAbscissa by rememberDataSaverState(
-                key = Constants.ZT_0003,
-                default = 0.0
-            )
-            var tankOrdinate by rememberDataSaverState(
-                key = Constants.ZT_0004,
-                default = 0.0
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                CoordinateInput(
-                    modifier = Modifier.weight(1f),
-                    title = "行程",
-                    coordinate = Coordinate(abscissa = abscissa, ordinate = ordinate),
-                    onCoordinateChange = {
-                        scope.launch {
-                            abscissa = it.abscissa
-                            ordinate = it.ordinate
-                        }
-                    }
-                ) {
-                }
-                CoordinateInput(
-                    modifier = Modifier.weight(1f),
-                    title = "废液槽",
-                    coordinate = Coordinate(abscissa = tankAbscissa, ordinate = tankOrdinate),
-                    onCoordinateChange = {
-                        scope.launch {
-                            tankAbscissa = it.abscissa
-                            tankOrdinate = it.ordinate
-                        }
-                    }
-                ) {
+            var value by rememberDataSaverState(key = Constants.ZT_0000, default = 4)
+            var string by remember { mutableStateOf(value.toString()) }
 
+            CircleTextField(
+                title = "模块数量",
+                value = string,
+                keyboardType = KeyboardType.Number,
+                onValueChange = {
+                    string = it
+                    scope.launch { value = it.toIntOrNull() ?: 4 }
                 }
-            }
+            )
+        }
+
+        item {
+            var value by rememberDataSaverState(key = Constants.ZT_0001, default = 4.0)
+            var string by remember { mutableStateOf(value.toString()) }
+
+            CircleTextField(
+                title = "保温温度",
+                value = string,
+                onValueChange = {
+                    string = it
+                    scope.launch { value = it.toDoubleOrNull() ?: 0.0 }
+                }
+            )
         }
     }
 }

@@ -45,8 +45,9 @@ fun HomeRoute(
     navigationActions: NavigationActions,
     snackbarHostState: SnackbarHostState,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val message by viewModel.message.collectAsStateWithLifecycle()
 
     val navigation: () -> Unit = {
         scope.launch {
@@ -58,6 +59,16 @@ fun HomeRoute(
     }
 
     BackHandler { navigation() }
+
+    LaunchedEffect(key1 = message) {
+        if (message != null) {
+            snackbarHostState.showSnackbar(
+                message = message ?: "未知错误",
+                actionLabel = "关闭",
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
 
     Scaffold(
         topBar = {

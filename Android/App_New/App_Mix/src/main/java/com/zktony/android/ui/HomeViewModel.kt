@@ -30,7 +30,10 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private val _job = MutableStateFlow<Job?>(null)
     private var syringeJob: Job? = null
 
+    private val _message: MutableStateFlow<String?> = MutableStateFlow(null)
+
     val uiState = _uiState.asStateFlow()
+    val message = _message.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -51,20 +54,20 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     )
                 }.catch { ex ->
                     ex.printStackTrace()
+                    _message.value = ex.message
                 }.collect {
                     _uiState.value = it
                 }
             }
             launch {
-                delay(1000L)
-                initializer()
+                init()
             }
         }
     }
 
     fun uiEvent(event: HomeUiEvent) {
         when (event) {
-            is HomeUiEvent.Reset -> initializer()
+            is HomeUiEvent.Reset -> init()
             is HomeUiEvent.Start -> start()
             is HomeUiEvent.Stop -> stop()
             is HomeUiEvent.NavTo -> _page.value = event.page
@@ -75,7 +78,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         }
     }
 
-    private fun initializer() {
+    private fun init() {
         viewModelScope.launch {
             _loading.value = 1
             try {
@@ -119,6 +122,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 }
             } catch (ex: Exception) {
                 _loading.value = 0
+                _message.value = ex.message
             } finally {
                 _loading.value = 0
             }
@@ -127,164 +131,171 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     private fun start() {
         viewModelScope.launch {
-            val selected = _uiState.value.entities.find { it.id == _selected.value }!!
-            val abscissa = dataSaver.readData(Constants.ZT_0003, 0.0)
-            val ordinate = dataSaver.readData(Constants.ZT_0004, 0.0)
-            _job.value?.cancel()
-            _job.value = launch {
-                serial {
-                    timeout = 1000L * 60L
-                    start(index = 1, pdv = ordinate)
-                }
-                serial {
-                    timeout = 1000L * 60L
-                    start(index = 0, pdv = abscissa)
-                }
-                serial { valve(2 to 0) }
-
-                delay(30L)
-
-                serial {
-                    timeout = 1000L * 60 * 1
-
-                    val s = selected.speed.pre
-                    val p1 = pulse(index = 2, dvp = selected.dosage.preCoagulant * 6)
-                    val p2 = pulse(index = 3, dvp = selected.dosage.preColloid * 2)
-                    val p3 = pulse(index = 4, dvp = selected.dosage.preColloid * 2)
-                    val p4 = pulse(index = 5, dvp = selected.dosage.preColloid * 2)
-
-                    val ad = (2 * s * 100).toLong()
-                    val s1 = (p1 / (maxOf(p2, p3, p4) / s) * 100).toLong()
-                    val s2 = (s * 100).toLong()
-
-                    glue(index = 2, pulse = p1, ads = Triple(ad, ad, s1))
-                    glue(index = 3, pulse = p2, ads = Triple(ad, ad, s2))
-                    glue(index = 4, pulse = p3, ads = Triple(ad, ad, s2))
-                    glue(index = 5, pulse = p4, ads = Triple(ad, ad, s2))
-                }
-
-                serial {
-                    timeout = 1000L * 60L
-                    start(index = 0, pdv = selected.coordinate.abscissa)
-                }
-                serial {
-                    timeout = 1000L * 60L
-                    start(index = 1, pdv = selected.coordinate.ordinate)
-                }
-
-                serial {
-                    timeout = 1000L * 60 * 10
-                    val s = selected.speed.glue
-                    val p1 = pulse(index = 2, dvp = selected.dosage.coagulant * 6)
-                    val p2 = pulse(index = 3, dvp = selected.dosage.colloid)
-                    val p3 = pulse(index = 4, dvp = selected.dosage.colloid)
-                    val p4 = pulse(index = 5, dvp = selected.dosage.colloid)
-                    val p5 = pulse(index = 6, dvp = selected.dosage.colloid)
-                    val p6 = pulse(index = 7, dvp = selected.dosage.colloid)
-                    val p7 = pulse(index = 8, dvp = selected.dosage.colloid)
-
-                    val pv1 = (p2 + p5) / 2
-                    val pv2 = (p3 + p6) / 2
-                    val pv3 = (p4 + p7) / 2
-
-                    glue(
-                        index = 2,
-                        pulse = p1,
-                        ads = Triple(
-                            (2.5 * s * 100).toLong(),
-                            (2.5 * s * 100).toLong(),
-                            (p1 / (maxOf(pv1, pv2, pv3) * 2 / s) * 100).toLong()
-                        )
-                    )
-
-                    glue(
-                        index = 3,
-                        pulse = pv1,
-                        ads = Triple(
-                            (s * 100).toLong(),
-                            (s * s / 2 / pv1 * 100).toLong(),
-                            (s * 100).toLong()
-                        )
-                    )
-
-                    glue(
-                        index = 4,
-                        pulse = pv2,
-                        ads = Triple(
-                            (s * 100).toLong(),
-                            (s * s / 2 / pv2 * 100).toLong(),
-                            (s * 100).toLong()
-                        )
-                    )
-
-                    glue(
-                        index = 5,
-                        pulse = pv3,
-                        ads = Triple(
-                            (s * 100).toLong(),
-                            (s * s / 2 / pv2 * 100).toLong(),
-                            (s * 100).toLong()
-                        )
-                    )
-
-                    glue(
-                        index = 6,
-                        pulse = p5,
-                        ads = Triple(
-                            (s * s / 2 / pv1 * 100).toLong(),
-                            (s * 100).toLong(),
-                            (s * 100).toLong()
-                        )
-                    )
-
-                    glue(
-                        index = 7,
-                        pulse = p6,
-                        ads = Triple(
-                            (s * s / 2 / pv2 * 100).toLong(),
-                            (s * 100).toLong(),
-                            (s * 100).toLong()
-                        )
-                    )
-
-                    glue(
-                        index = 8,
-                        pulse = p7,
-                        ads = Triple(
-                            (s * s / 2 / pv3 * 100).toLong(),
-                            (s * 100).toLong(),
-                            (s * 100).toLong()
-                        )
-                    )
-                }
-
-                _loading.value = 1
-                serial {
-                    timeout = 1000L * 60L
-                    start(index = 1, pdv = ordinate)
-                }
-
-                serial {
-                    timeout = 1000L * 60L
-                    start(index = 0, pdv = abscissa)
-                }
-
-                serial { gpio(2) }
-                delay(300L)
-                if (!getGpio(2)) {
-                    serial { valve(2 to 1) }
-                    delay(30L)
+            try {
+                val selected = _uiState.value.entities.find { it.id == _selected.value }
+                    ?: throw Exception("程序为空")
+                val abscissa = dataSaver.readData(Constants.ZT_0003, 0.0)
+                val ordinate = dataSaver.readData(Constants.ZT_0004, 0.0)
+                _job.value?.cancel()
+                _job.value = launch {
                     serial {
-                        timeout = 1000L * 60
-                        start(index = 2, pdv = Constants.ZT_0005 * -1)
+                        timeout = 1000L * 60L
+                        start(index = 1, pdv = ordinate)
                     }
-                }
+                    serial {
+                        timeout = 1000L * 60L
+                        start(index = 0, pdv = abscissa)
+                    }
+                    serial { valve(2 to 0) }
 
-                // Set the loading state to 0 to indicate that the execution has stopped
-                _loading.value = 0
-            }
-            _job.value?.invokeOnCompletion {
+                    delay(30L)
+
+                    serial {
+                        timeout = 1000L * 60 * 1
+
+                        val s = selected.speed.pre
+                        val p1 = pulse(index = 2, dvp = selected.dosage.preCoagulant * 6)
+                        val p2 = pulse(index = 3, dvp = selected.dosage.preColloid * 2)
+                        val p3 = pulse(index = 4, dvp = selected.dosage.preColloid * 2)
+                        val p4 = pulse(index = 5, dvp = selected.dosage.preColloid * 2)
+
+                        val ad = (2 * s * 100).toLong()
+                        val s1 = (p1 / (maxOf(p2, p3, p4) / s) * 100).toLong()
+                        val s2 = (s * 100).toLong()
+
+                        glue(index = 2, pulse = p1, ads = Triple(ad, ad, s1))
+                        glue(index = 3, pulse = p2, ads = Triple(ad, ad, s2))
+                        glue(index = 4, pulse = p3, ads = Triple(ad, ad, s2))
+                        glue(index = 5, pulse = p4, ads = Triple(ad, ad, s2))
+                    }
+
+                    serial {
+                        timeout = 1000L * 60L
+                        start(index = 0, pdv = selected.coordinate.abscissa)
+                    }
+                    serial {
+                        timeout = 1000L * 60L
+                        start(index = 1, pdv = selected.coordinate.ordinate)
+                    }
+
+                    serial {
+                        timeout = 1000L * 60 * 10
+                        val s = selected.speed.glue
+                        val p1 = pulse(index = 2, dvp = selected.dosage.coagulant * 6)
+                        val p2 = pulse(index = 3, dvp = selected.dosage.colloid)
+                        val p3 = pulse(index = 4, dvp = selected.dosage.colloid)
+                        val p4 = pulse(index = 5, dvp = selected.dosage.colloid)
+                        val p5 = pulse(index = 6, dvp = selected.dosage.colloid)
+                        val p6 = pulse(index = 7, dvp = selected.dosage.colloid)
+                        val p7 = pulse(index = 8, dvp = selected.dosage.colloid)
+
+                        val pv1 = (p2 + p5) / 2
+                        val pv2 = (p3 + p6) / 2
+                        val pv3 = (p4 + p7) / 2
+
+                        glue(
+                            index = 2,
+                            pulse = p1,
+                            ads = Triple(
+                                (2.5 * s * 100).toLong(),
+                                (2.5 * s * 100).toLong(),
+                                (p1 / (maxOf(pv1, pv2, pv3) * 2 / s) * 100).toLong()
+                            )
+                        )
+
+                        glue(
+                            index = 3,
+                            pulse = pv1,
+                            ads = Triple(
+                                (s * 100).toLong(),
+                                (s * s / 2 / pv1 * 100).toLong(),
+                                (s * 100).toLong()
+                            )
+                        )
+
+                        glue(
+                            index = 4,
+                            pulse = pv2,
+                            ads = Triple(
+                                (s * 100).toLong(),
+                                (s * s / 2 / pv2 * 100).toLong(),
+                                (s * 100).toLong()
+                            )
+                        )
+
+                        glue(
+                            index = 5,
+                            pulse = pv3,
+                            ads = Triple(
+                                (s * 100).toLong(),
+                                (s * s / 2 / pv2 * 100).toLong(),
+                                (s * 100).toLong()
+                            )
+                        )
+
+                        glue(
+                            index = 6,
+                            pulse = p5,
+                            ads = Triple(
+                                (s * s / 2 / pv1 * 100).toLong(),
+                                (s * 100).toLong(),
+                                (s * 100).toLong()
+                            )
+                        )
+
+                        glue(
+                            index = 7,
+                            pulse = p6,
+                            ads = Triple(
+                                (s * s / 2 / pv2 * 100).toLong(),
+                                (s * 100).toLong(),
+                                (s * 100).toLong()
+                            )
+                        )
+
+                        glue(
+                            index = 8,
+                            pulse = p7,
+                            ads = Triple(
+                                (s * s / 2 / pv3 * 100).toLong(),
+                                (s * 100).toLong(),
+                                (s * 100).toLong()
+                            )
+                        )
+                    }
+
+                    _loading.value = 1
+                    serial {
+                        timeout = 1000L * 60L
+                        start(index = 1, pdv = ordinate)
+                    }
+
+                    serial {
+                        timeout = 1000L * 60L
+                        start(index = 0, pdv = abscissa)
+                    }
+
+                    serial { gpio(2) }
+                    delay(300L)
+                    if (!getGpio(2)) {
+                        serial { valve(2 to 1) }
+                        delay(30L)
+                        serial {
+                            timeout = 1000L * 60
+                            start(index = 2, pdv = Constants.ZT_0005 * -1)
+                        }
+                    }
+
+                    // Set the loading state to 0 to indicate that the execution has stopped
+                    _loading.value = 0
+                }
+                _job.value?.invokeOnCompletion {
+                    _job.value = null
+                }
+            } catch (ex: Exception) {
+                _job.value?.cancel()
                 _job.value = null
+                _message.value = ex.message
             }
         }
     }
@@ -297,7 +308,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             serial { stop(0, 1, 2, 3, 4, 5, 6, 7, 8, 9) }
             delay(200L)
 
-            initializer()
+            init()
         }
     }
 

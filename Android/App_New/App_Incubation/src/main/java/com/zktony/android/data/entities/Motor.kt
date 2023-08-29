@@ -5,7 +5,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.zktony.serialport.ext.writeInt32LE
 import java.util.Date
 
 /**
@@ -30,14 +29,13 @@ data class Motor(
     @ColumnInfo(name = "speed")
     val speed: Long = 600L,
     @ColumnInfo(name = "acc")
-    val acc: Long = 300L,
+    val acc: Long = 120L,
     @ColumnInfo(name = "dec")
-    val dec: Long = 400L,
+    val dec: Long = 120L,
     @ColumnInfo(name = "create_time")
     val createTime: Date = Date(System.currentTimeMillis()),
 ) {
-    fun toByteArray(): ByteArray {
-        val ba = ByteArray(12)
-        return ba.writeInt32LE(acc, 0).writeInt32LE(dec, 4).writeInt32LE(speed, 8)
+    fun toAdsString(): Triple<String, String, String> {
+        return Triple(acc.toString(), dec.toString(), speed.toString())
     }
 }

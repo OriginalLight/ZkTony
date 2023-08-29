@@ -191,23 +191,28 @@ fun JobActionCard(
             }
         } else {
             Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(
-                    text = time.timeFormat(),
-                    style = TextStyle(
-                        fontSize = 48.sp,
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Monospace
-                    ),
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .width(296.dp)
+                            .height(64.dp),
+                        progress = uiState.jobState.process,
+                        color = Color.Blue,
+                        strokeCap = StrokeCap.Round,
+                    )
 
-                LinearProgressIndicator(
-                    progress = uiState.jobState.process,
-                    modifier = Modifier.width(296.dp),
-                    color = Color.Blue
-                )
+                    Text(
+                        text = time.timeFormat(),
+                        style = TextStyle(
+                            fontSize = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = FontFamily.Monospace
+                        ),
+                    )
+                }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
                     Card(onClick = {

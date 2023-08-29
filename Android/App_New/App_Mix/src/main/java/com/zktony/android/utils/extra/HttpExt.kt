@@ -3,11 +3,7 @@ package com.zktony.android.utils.extra
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.zktony.android.utils.Constants
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.*
 import java.io.IOException
 
 /**
@@ -15,7 +11,11 @@ import java.io.IOException
  * @date 2023/7/24 9:05
  */
 
-fun httpCall(url: String = Constants.OSS_APP, callback: (List<Application>) -> Unit) {
+fun httpCall(
+    url: String = Constants.OSS_APP,
+    exception: (Exception) -> Unit = {},
+    callback: (List<Application>) -> Unit
+) {
     val request = Request.Builder().url(url).get().build()
     val call = OkHttpClient.Builder().build().newCall(request)
 
@@ -31,11 +31,12 @@ fun httpCall(url: String = Constants.OSS_APP, callback: (List<Application>) -> U
                     val type = object : TypeToken<List<Application>>() {}.type
                     val list = Gson().fromJson<List<Application>>(resp, type)
                     callback(list)
-                } catch (e: Exception) {
-                    e.printStackTrace()
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                    exception(ex)
                 }
             } else {
-                throw Exception(response.toString())
+                exception(Exception("请求失败"))
             }
         }
     })

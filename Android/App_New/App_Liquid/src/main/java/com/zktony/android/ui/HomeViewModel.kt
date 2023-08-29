@@ -38,7 +38,10 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private val _finished = MutableStateFlow(emptyList<Triple<Int, Int, Color>>())
     private val _job = MutableStateFlow<Job?>(null)
 
+    private val _message: MutableStateFlow<String?> = MutableStateFlow(null)
+
     val uiState = _uiState.asStateFlow()
+    val message = _message.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -59,6 +62,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     )
                 }.catch { ex ->
                     ex.printStackTrace()
+                    _message.value = ex.message
                 }.collect {
                     _uiState.value = it
                 }
@@ -80,13 +84,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     )
                 }.catch { ex ->
                     ex.printStackTrace()
+                    _message.value = ex.message
                 }.collect {
                     _jobState.value = it
                 }
             }
-//            launch {
-//                init()
-//            }
+            launch {
+                init()
+            }
         }
     }
 
@@ -141,6 +146,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 }
             } catch (ex: Exception) {
                 _loading.value = 0
+                _message.value = ex.message
             } finally {
                 _loading.value = 0
             }
@@ -152,8 +158,8 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         _job.value = viewModelScope.launch {
             try {
                 val selected = _uiState.value.entities.find { it.id == _uiState.value.selected }
-                    ?: throw Exception("Program is null")
-                if (selected.orificePlates.isEmpty()) throw Exception("OrificePlate is empty")
+                    ?: throw Exception("程序为空")
+                if (selected.orificePlates.isEmpty()) throw Exception("加液孔板为空")
 
                 val orificePlates = selected.orificePlates
 
@@ -179,6 +185,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
+                _message.value = ex.message
             } finally {
                 _finished.value = emptyList()
                 _status.value = JobStatus.STOPPED

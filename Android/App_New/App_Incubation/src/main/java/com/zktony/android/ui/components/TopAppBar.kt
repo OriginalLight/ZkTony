@@ -30,6 +30,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.R
+import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.IncubationStage
 import com.zktony.android.data.entities.IncubationStageStatus
 import com.zktony.android.data.entities.Program
@@ -40,6 +41,7 @@ import com.zktony.android.ui.ProgramUiState
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
 
@@ -300,11 +302,18 @@ fun CalibrationAppBar(
     snackbarHostState: SnackbarHostState,
 ) {
     val scope = rememberCoroutineScope()
+    val softKeyboard = LocalSoftwareKeyboardController.current
+    val number by rememberDataSaverState(key = Constants.ZT_0000, default = 4)
     var showDialog by rememberSaveable { mutableStateOf(false) }
     var deleteCount by remember { mutableIntStateOf(0) }
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     var volume by remember { mutableStateOf("") }
-    val softKeyboard = LocalSoftwareKeyboardController.current
+
+    val list = remember {
+        mutableStateListOf<String>().apply {
+            repeat(number / 4) { add("M$it") }
+        }
+    }
 
     if (showDialog) {
         InputDialog(
@@ -363,8 +372,8 @@ fun CalibrationAppBar(
 
                 leadingIcon = {
                     CircleTabRow(
-                        modifier = Modifier.width(500.dp),
-                        tabItems = listOf("M0", "M1", "M2", "M3", "M4", "M5"),
+                        modifier = Modifier.width((100 * number / 4).dp),
+                        tabItems = list,
                         selected = selectedTabIndex,
                     ) {
                         scope.launch {

@@ -12,7 +12,6 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -26,9 +25,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.components.CalibrationAppBar
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.format
 import kotlinx.coroutines.launch
@@ -90,7 +91,7 @@ fun CalibrationScreen(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CalibrationList(
     modifier: Modifier = Modifier,
@@ -184,7 +185,6 @@ fun CalibrationList(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CalibrationDetail(
     modifier: Modifier = Modifier,
@@ -193,7 +193,12 @@ fun CalibrationDetail(
 ) {
 
     val entity = uiState.entities.find { it.id == uiState.selected } ?: Calibration()
-    val list = remember { mutableStateListOf("M0", "M1", "M2", "M3", "M4", "M5") }
+    val number by rememberDataSaverState(key = Constants.ZT_0000, default = 4)
+    val list = remember {
+        mutableStateListOf<String>().apply {
+            repeat(number / 4) { add("M$it") }
+        }
+    }
 
     LazyVerticalGrid(
         modifier = modifier

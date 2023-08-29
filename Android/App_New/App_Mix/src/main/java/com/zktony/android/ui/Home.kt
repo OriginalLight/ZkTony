@@ -49,8 +49,9 @@ fun HomeRoute(
     navigationActions: NavigationActions,
     snackbarHostState: SnackbarHostState,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val message by viewModel.message.collectAsStateWithLifecycle()
 
     val navigation: () -> Unit = {
         scope.launch {
@@ -62,6 +63,16 @@ fun HomeRoute(
     }
 
     BackHandler { navigation() }
+
+    LaunchedEffect(key1 = message) {
+        if (message != null) {
+            snackbarHostState.showSnackbar(
+                message = message ?: "未知错误",
+                actionLabel = "关闭",
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -113,7 +124,7 @@ fun HomeScreen(
         }
 
         AnimatedVisibility(visible = uiState.page == PageType.HOME) {
-            RuntimeContent(uiState = uiState, uiEvent = uiEvent, navController = navController)
+            JobContent(uiState = uiState, uiEvent = uiEvent, navController = navController)
         }
     }
 }
@@ -379,7 +390,7 @@ fun ProgramList(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RuntimeContent(
+fun JobContent(
     modifier: Modifier = Modifier,
     uiState: HomeUiState,
     uiEvent: (HomeUiEvent) -> Unit = {},
@@ -636,7 +647,7 @@ fun RuntimeContentPreview() {
         Program(id = 1),
         Program(),
     )
-    RuntimeContent(
+    JobContent(
         uiState = HomeUiState(entities = entities, selected = 1L),
         uiEvent = {},
         navController = rememberNavController()

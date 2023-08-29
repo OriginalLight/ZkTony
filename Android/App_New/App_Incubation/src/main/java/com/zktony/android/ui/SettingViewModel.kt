@@ -28,8 +28,10 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
     private val _selected = MutableStateFlow(0L)
     private val _progress = MutableStateFlow(0)
     private val _page = MutableStateFlow(PageType.SETTINGS)
+    private val _message = MutableStateFlow<String?>(null)
 
     val uiState = _uiState.asStateFlow()
+    val message = _message.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -50,14 +52,17 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
                     )
                 }.catch { ex ->
                     ex.printStackTrace()
+                    _message.value = ex.message
                 }.collect {
                     _uiState.value = it
                 }
             }
             launch {
-                httpCall {
-                    _application.value =
-                        it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                if (Ext.ctx.isNetworkAvailable()) {
+                    httpCall {
+                        _application.value =
+                            it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                    }
                 }
             }
         }
@@ -105,37 +110,43 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
                     && application.download_url.isNotEmpty()
                     && _progress.value == 0
                 ) {
-                    download(application.download_url)
+                    application.download_url.download(
+                        File(
+                            Ext.ctx.getExternalFilesDir(null),
+                            "update.apk"
+                        )
+                    )
+                        .collect {
+                            when (it) {
+                                is DownloadState.Success -> {
+                                    _progress.value = 0
+                                    Ext.ctx.installApk(it.file)
+                                }
+
+                                is DownloadState.Err -> {
+                                    _progress.value = 0
+                                    _message.value = "下载失败: ${it.t.message}"
+                                }
+
+                                is DownloadState.Progress -> {
+                                    _progress.value = maxOf(it.progress, 1)
+                                }
+                            }
+                        }
                     _progress.value = 1
                 }
             } else {
-                httpCall {
-                    it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
-                }
-            }
-        }
-    }
-
-    private fun download(url: String) {
-        viewModelScope.launch {
-            url.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
-                .collect {
-                    when (it) {
-                        is DownloadState.Success -> {
-                            _progress.value = 0
-                            Ext.ctx.installApk(it.file)
-                        }
-
-                        is DownloadState.Err -> {
-                            _progress.value = 0
-                            Ext.ctx.getString(R.string.downloading).showShortToast()
-                        }
-
-                        is DownloadState.Progress -> {
-                            _progress.value = maxOf(it.progress, 1)
-                        }
+                httpCall(
+                    exception = { _message.value = it.message }
+                ) {
+                    val app = it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                    if (app != null) {
+                        _application.value = app
+                    } else {
+                        _message.value = "未找到升级信息"
                     }
                 }
+            }
         }
     }
 }
@@ -147,7 +158,6 @@ data class SettingUiState(
     val progress: Int = 0,
     val page: PageType = PageType.SETTINGS,
 )
-
 
 sealed class SettingUiEvent {
     data object Network : SettingUiEvent()

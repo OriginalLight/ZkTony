@@ -30,7 +30,6 @@ abstract class AbstractSerial {
 
     private var cache: ByteArray = byteArrayOf()
     var callback: (ByteArray) -> Unit = { }
-    var exception: (Exception) -> Unit = { }
 
 
     @Throws(SecurityException::class, IOException::class, InvalidParameterException::class)
@@ -105,7 +104,7 @@ abstract class AbstractSerial {
                 try {
                     callback.invoke(cache)
                 } catch (e: Exception) {
-                    exception.invoke(e)
+                    e.printStackTrace()
                 } finally {
                     cache = byteArrayOf()
                 }
