@@ -197,6 +197,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         when (event) {
             is HomeEvent.Reset -> reset()
             is HomeEvent.Start -> start(event.index)
+            is HomeEvent.spStart -> spStart(event.index)
             is HomeEvent.Stop -> stop()
             is HomeEvent.NavTo -> _page.value = event.page
             is HomeEvent.ToggleSelected -> _selected.value = event.id
@@ -298,6 +299,22 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         }
     }
 
+    /**
+     * 上盘运动
+     */
+    private fun spStart(runIndex:Int){
+        viewModelScope.launch {
+            val spkwjl = dataSaver.readData("spkwjl" + runIndex, 0f);
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 5
+                    pulse = (3200L * spkwjl).toLong();
+                }
+            }
+        }
+
+    }
+
 
 //    private fun start(index: Int) {
 //        viewModelScope.launch {
@@ -315,112 +332,123 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
      */
     private fun start(int: Int) {
         viewModelScope.launch {
-            _loading.value = 7
-            /**
-             * 是否有培养皿运动过
-             */
-            var isStart = false
+            _loading.value = int
+            if (_loading.value != 8) {
+                /**
+                 * 是否有培养皿运动过
+                 */
+                var isStart = false
 
-            /**
-             * 上盘运动次数
-             */
-            var spStartNum = 0
+                /**
+                 * 上盘运动次数
+                 */
+                var spStartNum = 0
 
-            /**
-             * 下盘移动坐标
-             * 从1开始
-             */
-            var xpStartCoordinates = 1;
+                /**
+                 * 下盘移动坐标
+                 * 从1开始
+                 */
+                var xpStartCoordinates = 1;
 
-            /**
-             * 上盘移动坐标
-             * 从1开始
-             */
-            var spStartCoordinates = 1;
+                /**
+                 * 上盘移动坐标
+                 * 从1开始
+                 */
+                var spStartCoordinates = 1;
 
-            /**
-             * 运动状态
-             * 0=运动的准备工作
-             * 1=有培养皿的运动
-             * 2=没有培养皿的运动
-             * 3=培养皿摆放正确
-             * 4=培养皿摆放错误
-             * 5=结束运动的最后几个动作
-             */
-            var startState = 0;
+                /**
+                 * 运动状态
+                 * 0=运动的准备工作
+                 * 1=有培养皿的运动
+                 * 2=没有培养皿的运动
+                 * 3=培养皿摆放正确
+                 * 4=培养皿摆放错误
+                 * 5=结束运动的最后几个动作
+                 */
+                var startState = 0;
+
+                /**
+                 * 下盘孔位间距0.8mm,初始是0
+                 */
+                var xpkwjj = 0f
 
 
-            /**
-             *  举升2移动到举升盘子高度，防止开机前有培养皿
-             */
-            tx {
-                move(MoveType.MOVE_PULSE) {
-                    index = 0
-                    pulse = (3200L * pzgd2).toLong();
-                }
-            }
-
-            /**
-             * 1.判断是否是第一次运动
-             * 2.检测是否有培养皿
-             * 3.检测培养皿摆放状态
-             */
-            while (true) {
-                if (startState == 0) {
-
-                    /**
-                     *  1.举升1移动到举升夹爪高度
-                     *  2.举升2移动到0
-                     *  3.夹爪松开
-                     */
-                    tx {
-                        //1.举升1移动到举升夹爪高度
-                        move(MoveType.MOVE_PULSE) {
-                            index = 1
-                            pulse = (3200L * jzgd).toLong()
-                        }
-                        //2.举升2移动到0
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = 0
-                        }
-                        //3.夹爪松开
-                        move(MoveType.MOVE_PULSE) {
-                            index = 2
-                            pulse = (3200L * skjl).toLong();
-                        }
-
-                        queryGpio(6)
-                        delay = 300L
+                /**
+                 *  举升2移动到举升盘子高度，防止开机前有培养皿
+                 */
+                tx {
+                    move(MoveType.MOVE_PULSE) {
+                        index = 0
+                        pulse = (3200L * pzgd2).toLong();
                     }
+                    move(MoveType.MOVE_PULSE) {
+                        index = 1
+                        pulse = (3200L * fwgd).toLong();
+                    }
+                }
 
-                    /**
-                     * 获取是否有培养皿
-                     * false=有
-                     * true=没有
-                     */
-                    val jiance1 = getGpio(6)
-                    if (!jiance1) {
+
+                /**
+                 * 1.判断是否是第一次运动
+                 * 2.检测是否有培养皿
+                 * 3.检测培养皿摆放状态
+                 */
+                while (true) {
+                    if (startState == 0) {
+
+                        /**
+                         *  1.举升1移动到举升夹爪高度
+                         *  2.举升2移动到0
+                         *  3.夹爪松开
+                         */
+                        tx {
+                            //1.举升1移动到举升夹爪高度
+                            move(MoveType.MOVE_PULSE) {
+                                index = 1
+                                pulse = (3200L * jzgd).toLong()
+                            }
+                            //2.举升2移动到0
+                            move(MoveType.MOVE_PULSE) {
+                                index = 0
+                                pulse = 0
+                            }
+                            //3.夹爪松开
+                            move(MoveType.MOVE_PULSE) {
+                                index = 2
+                                pulse = (3200L * skjl).toLong();
+                            }
+
+
+                        }
+                        tx {
+                            queryGpio(6)
+                            delay = 300L
+                        }
+
+                        /**
+                         * 获取是否有培养皿
+                         * false=有
+                         * true=没有
+                         */
+//                        val jiance1 = getGpio(6)
+                        val jiance1 = false
+                        if (!jiance1) {
+                            /**
+                             * 有培养皿的运动
+                             */
+                            startState = 1;
+                            continue;
+                        } else {
+                            /**
+                             * 没有有培养皿的运动
+                             */
+                            startState = 2;
+                            continue;
+                        }
+                    } else if (startState == 1) {
                         /**
                          * 有培养皿的运动
                          */
-                        startState = 1;
-                        continue;
-                    } else {
-                        /**
-                         * 没有有培养皿的运动
-                         */
-                        startState = 2;
-                        continue;
-                    }
-                } else if (startState == 1) {
-                    /**
-                     * 有培养皿的运动
-                     */
-                    /**
-                     * 第一次有培养皿的运动
-                     */
-                    if (!isStart) {
                         tx {
                             //1.举升1移动到分离距离
                             move(MoveType.MOVE_PULSE) {
@@ -432,6 +460,10 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 index = 2
                                 pulse = (3200L * jjjl).toLong()
                             }
+
+                        }
+
+                        tx {
                             //3.举升1移动到0
                             move(MoveType.MOVE_PULSE) {
                                 index = 1
@@ -442,7 +474,8 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 index = 0
                                 pulse = 0
                             }
-
+                        }
+                        tx {
                             /**
                              * 检测培养皿是否摆放正确
                              */
@@ -453,11 +486,11 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
                         /**
                          * 获取检测培养皿是否摆放正确
-                         * false=没有
-                         * true=有
+                         * false=摆放错误
+                         * true=摆放正确
                          */
-                        val jiance2 = getGpio(7)
-
+//                            val jiance2 = getGpio(7)
+                        val jiance2 = true
                         if (jiance2) {
                             startState = 3;
                             continue;
@@ -465,117 +498,31 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             startState = 4;
                             continue;
                         }
-                    }
 
 
-                } else if (startState == 2) {
-                    /**
-                     * 检测没有有培养皿的运动
-                     */
-
-                    //第一次运动
-                    if (!isStart) {
+                    } else if (startState == 2) {
                         /**
-                         * 打开夹爪（1号顶升机构顶升至上料台面齐平位置，培养皿上料机构旋转至第二培养皿放置位置。开始执行第二步骤。）
+                         * 检测没有有培养皿的运动
                          */
-                        tx {
-                            //举升1运动到复位高度
-                            move(MoveType.MOVE_PULSE) {
-                                index = 1
-                                pulse = (3200L * fwgd).toLong();
-                            }
 
-                            //夹爪松开
-                            move(MoveType.MOVE_PULSE) {
-                                index = 2
-                                pulse = (3200L * skjl).toLong();
-                            }
-
-                            //1.上盘移动1格
+                        //第一次运动
+                        if (!isStart) {
                             /**
-                             * 上盘孔位距离
+                             * 打开夹爪（1号顶升机构顶升至上料台面齐平位置，培养皿上料机构旋转至第二培养皿放置位置。开始执行第二步骤。）
                              */
-                            val spkwjl = dataSaver.readData("spkwjl" + spStartCoordinates, 0f);
-
-                            move(MoveType.MOVE_PULSE) {
-                                index = 5
-                                pulse = (3200L * spkwjl).toLong();
-                            }
-                        }
-                        if (spStartCoordinates < 8) {
-                            spStartCoordinates += 1;
-                        } else {
-                            spStartCoordinates = 1;
-                        }
-                        startState = 0;
-                        continue;
-
-
-                    } else {
-                        //不是第一次运动
-
-                        tx {
-                            //1.举升1移动到0
-                            move(MoveType.MOVE_PULSE) {
-                                index = 1
-                                pulse = 0
-                            }
-                            //2.举升2移动到0
-                            move(MoveType.MOVE_PULSE) {
-                                index = 0
-                                pulse = (3200L * fwgd2).toLong();
-                            }
-
-                            //3.夹爪松开
-                            move(MoveType.MOVE_PULSE) {
-                                index = 2
-                                pulse = (3200L * skjl).toLong();
-                            }
-
-                            //2.举升2移动到0
-                            move(MoveType.MOVE_PULSE) {
-                                index = 0
-                                pulse = 0
-                            }
-                            var i = 0;
-                            while (i < 3) {
-                                /**
-                                 * 下盘孔位距离
-                                 */
-                                val xpkwjl = dataSaver.readData("xpkwjl" + xpStartCoordinates, 0f);
-                                /**
-                                 * 下盘移动一格
-                                 */
+                            tx {
+                                //举升1运动到复位高度
                                 move(MoveType.MOVE_PULSE) {
-                                    index = 4
-                                    pulse = (3200L * xpkwjl).toLong();
+                                    index = 1
+                                    pulse = (3200L * fwgd).toLong();
                                 }
 
-                                /**
-                                 * 举升2举升到复位高度
-                                 */
+                                //夹爪松开
                                 move(MoveType.MOVE_PULSE) {
-                                    index = 0
-                                    pulse = (3200L * fwgd2).toLong();
+                                    index = 2
+                                    pulse = (3200L * skjl).toLong();
                                 }
 
-                                if (xpStartCoordinates < 3) {
-                                    xpStartCoordinates += 1;
-                                } else {
-                                    xpStartCoordinates = 1;
-
-                                    /**
-                                     * 下盘回到原点距离
-                                     */
-                                    move(MoveType.MOVE_PULSE) {
-                                        index = 4
-                                        pulse = (3200L * xpydjl).toLong();
-                                    }
-                                }
-                            }
-
-                            if (spStartCoordinates < 8) {
-                                spStartCoordinates += 1;
                                 //1.上盘移动1格
                                 /**
                                  * 上盘孔位距离
@@ -587,150 +534,290 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                     pulse = (3200L * spkwjl).toLong();
                                 }
                             }
+                            if (spStartCoordinates == 8) {
+                                _loading.value = 0
+                                break;
+                            } else {
+                                spStartCoordinates += 1;
+                            }
+                            startState = 0;
+                            continue;
 
 
-                        }
-
-                        if (spStartCoordinates == 8) {
-                            _loading.value = 0
-                            //TODO 运动结束
-                            break;
-                        }
-                        startState = 0;
-
-                        if (int == 8) {
-                            _loading.value = 0
-                            break;
-                        }
-
-                        continue;
-                    }
-
-
-                } else if (startState == 3) {
-                    /**
-                     * 培养皿摆放正确的运动
-                     */
-
-                    //1.下盘移动1格
-                    /**
-                     * 下盘孔位距离
-                     */
-                    val xpkwjl = dataSaver.readData("xpkwjl" + xpStartCoordinates, 0f);
-                    tx {
-                        /**
-                         * 下盘移动一格
-                         */
-                        move(MoveType.MOVE_PULSE) {
-                            index = 4
-                            pulse = (3200L * xpkwjl).toLong();
-                        }
-
-                        /**
-                         * 加液
-                         */
-                        //TODO 暂时加液
-                        move(MoveType.MOVE_PULSE) {
-                            index = 8
-                            pulse = 3200L * 10;
-                        }
-
-                        /**
-                         * 举升1举升到夹爪高度
-                         */
-                        move(MoveType.MOVE_PULSE) {
-                            index = 1
-                            pulse = (3200L * jzgd).toLong();
-                        }
-
-                        /**
-                         * 举升2举升到复位高度
-                         */
-                        move(MoveType.MOVE_PULSE) {
-                            index = 0
-                            pulse = (3200L * fwgd2).toLong();
-                        }
-
-                        if (xpStartCoordinates < 3) {
-                            xpStartCoordinates += 1;
                         } else {
-                            xpStartCoordinates = 1;
+                            //不是第一次运动,一罐培养皿已经运行完成，做下一灌培养皿的运动准备
 
-                            /**
-                             * 下盘回到原点距离
-                             */
-                            move(MoveType.MOVE_PULSE) {
-                                index = 4
-                                pulse = (3200L * xpydjl).toLong();
-                            }
-                        }
+                            tx {
+                                //1.举升1移动到0
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 1
+                                    pulse = 0
+                                }
+                                //2.举升2移动到0
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 0
+                                    pulse = (3200L * fwgd2).toLong();
+                                }
 
-                    }
+                                //3.夹爪松开
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 2
+                                    pulse = (3200L * skjl).toLong();
+                                }
 
-                    _count.value += 1;
-                    startState = 0;
-                    continue;
+                                //2.举升2移动到0
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 0
+                                    pulse = 0
+                                }
 
-
-                } else if (startState == 4) {
-                    /**
-                     * 培养皿摆放错误的运动
-                     */
-
-                    var jiance2 = false;
-                    /**
-                     * 培养皿摆放不正确的次数，3次就停止运动
-                     */
-                    var displayError = 0;
-                    while (displayError < 3) {
-                        tx {
-                            /**
-                             * 举升1举升到矫正高度
-                             */
-                            move(MoveType.MOVE_PULSE) {
-                                index = 1
-                                pulse = (3200L * jiaozgd).toLong();
                             }
 
-                            /**
-                             * 举升1举升到0
-                             */
-                            move(MoveType.MOVE_PULSE) {
-                                index = 1
-                                pulse = 0;
+                            while (0 < 3) {
+                                /**
+                                 * 下盘孔位距离
+                                 */
+                                val xpkwjl =
+                                    dataSaver.readData("xpkwjl" + xpStartCoordinates, 0f);
+                                tx {
+                                    /**
+                                     * 下盘移动一格
+                                     */
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 4
+                                        pulse = (3200L * xpkwjl).toLong();
+                                    }
+
+                                    /**
+                                     * 举升2举升到复位高度
+                                     */
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 0
+                                        pulse = (3200L * fwgd2).toLong();
+                                    }
+                                }
+
+
+                                if (xpStartCoordinates < 3) {
+                                    xpStartCoordinates += 1;
+                                } else {
+                                    xpStartCoordinates = 1;
+                                    tx {
+                                        /**
+                                         * 下盘回到原点距离
+                                         */
+                                        move(MoveType.MOVE_PULSE) {
+                                            index = 4
+                                            pulse = (3200L * xpydjl).toLong();
+                                        }
+                                    }
+                                }
                             }
 
-                            /**
-                             * 举升2举升到0
-                             */
-                            move(MoveType.MOVE_PULSE) {
-                                index = 0
-                                pulse = 0;
+
+                            if (spStartCoordinates <= 8) {
+                                spStartCoordinates += 1;
+                                //1.上盘移动1格
+                                /**
+                                 * 上盘孔位距离
+                                 */
+                                val spkwjl =
+                                    dataSaver.readData("spkwjl" + spStartCoordinates, 0f);
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse = (3200L * spkwjl).toLong();
+                                    }
+                                }
+
                             }
 
-                            /**
-                             * 检测培养皿是否摆放正确
-                             */
-                            queryGpio(7)
-                            delay = 300L
-                            /**
-                             * 获取检测培养皿是否摆放正确
-                             * false=没有
-                             * true=有
-                             */
-                            jiance2 = getGpio(7)
-                        }
+                            if (_loading.value == 8) {
+                                _loading.value = 0
+                                //TODO 运动结束
+                                break;
+                            }
 
-                        if (jiance2) {
-                            startState = 3;
+                            if (spStartCoordinates == 8) {
+                                _loading.value = 0
+                                //TODO 运动结束
+                                break;
+                            }
+                            startState = 0;
+
+                            if (int == 8) {
+                                _loading.value = 0
+                                break;
+                            }
+
                             continue;
                         }
 
+
+                    } else if (startState == 3) {
+                        /**
+                         * 培养皿摆放正确的运动
+                         */
+
+                        /**
+                         * 下盘运动3次
+                         */
+                        /**
+                         * 第一次的运动
+                         */
+                        isStart = true;
+                        var xpkwjl = dataSaver.readData("xpkwjl" + xpStartCoordinates, 0f);
+                        tx {
+                            /**
+                             * 下盘移动一格
+                             */
+                            move(MoveType.MOVE_PULSE) {
+                                index = 4
+                                pulse = (3200L * (xpkwjl + xpkwjj)).toLong();
+                            }
+                        }
+
+//                        if (xpStartCoordinates < 4) {
+//                            /**
+//                             * 下盘孔位距离
+//                             */
+//                            val xpkwjl = dataSaver.readData("xpkwjl" + xpStartCoordinates, 0f);
+//                            tx {
+//                                /**
+//                                 * 下盘移动一格
+//                                 */
+//                                move(MoveType.MOVE_PULSE) {
+//                                    index = 4
+//                                    pulse = (3200L * xpkwjl).toLong();
+//                                }
+//                            }
+//                        } else {
+//                            xpStartCoordinates = 1;
+//                            tx {
+//                                /**
+//                                 * 下盘回到原点距离
+//                                 */
+//                                move(MoveType.MOVE_PULSE) {
+//                                    index = 4
+//                                    pulse = (3200L * xpydjl).toLong();
+//                                }
+//                            }
+//                        }
+
+
+                        tx {
+
+                            /**
+                             * 加液
+                             */
+                            //TODO 暂时加液
+                            move(MoveType.MOVE_DV) {
+                                index = 3
+                                dv = 0.5f
+                            }
+
+                            /**
+                             * 举升1举升到夹爪高度
+                             */
+                            move(MoveType.MOVE_PULSE) {
+                                index = 1
+                                pulse = (3200L * jzgd).toLong();
+                            }
+
+                            /**
+                             * 举升2举升到复位高度
+                             */
+                            move(MoveType.MOVE_PULSE) {
+                                index = 0
+                                pulse = (3200L * fwgd2).toLong();
+                            }
+
+//                            if (xpStartCoordinates < 4) {
+//                                xpStartCoordinates += 1;
+//                            }
+                        }
+                        xpkwjj += 0.8f
+                        _count.value += 1;
+                        startState = 0;
+                        continue;
+
+
+                    } else if (startState == 4) {
+                        /**
+                         * 培养皿摆放错误的运动
+                         */
+
+                        var jiance2 = false;
+                        /**
+                         * 培养皿摆放不正确的次数，3次就停止运动
+                         */
+                        var displayError = 0;
+                        while (displayError < 3) {
+                            tx {
+
+                                //夹爪松开
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 2
+                                    pulse = (3200L * skjl).toLong()
+                                }
+
+                                /**
+                                 * 举升1举升到矫正高度
+                                 */
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 1
+                                    pulse = (3200L * jiaozgd).toLong();
+                                }
+
+
+                            }
+
+                            tx {
+                                /**
+                                 * 举升1举升到0
+                                 */
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 1
+                                    pulse = 0;
+                                }
+
+                                /**
+                                 * 举升2举升到0
+                                 */
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 0
+                                    pulse = 0;
+                                }
+                            }
+
+                            tx {
+                                /**
+                                 * 检测培养皿是否摆放正确
+                                 */
+                                queryGpio(7)
+                                delay = 300L
+                                /**
+                                 * 获取检测培养皿是否摆放正确
+                                 * false=没有
+                                 * true=有
+                                 */
+                                jiance2 = getGpio(7)
+                            }
+
+                            if (jiance2) {
+                                startState = 3;
+                                continue;
+                            }
+                            displayError += 1
+
+                        }
+                        _loading.value = 0
+                        //TODO 运动结束
+                        break;
                     }
-                    _loading.value = 0
-                    //TODO 运动结束
-                    break;
                 }
+
+
             }
         }
     }
@@ -926,6 +1013,7 @@ data class HomeUiState(
 sealed class HomeEvent {
     data object Reset : HomeEvent()
     data class Start(val index: Int) : HomeEvent()
+    data class spStart(val index: Int) : HomeEvent()
     data object Stop : HomeEvent()
     data class NavTo(val page: PageType) : HomeEvent()
     data class ToggleSelected(val id: Long) : HomeEvent()

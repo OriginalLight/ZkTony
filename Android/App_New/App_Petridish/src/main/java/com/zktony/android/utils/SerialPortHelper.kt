@@ -72,7 +72,6 @@ class SerialPortHelper : AbstractSerialHelper(
     override fun callbackProcess(byteArray: ByteArray) {
         // 解析协议
         val rec = byteArray.toProtocol()
-        println("rec=====" + rec)
 
         // 处理地址为 0x02 的数据包
         if (rec.addr == 0x02.toByte()) {

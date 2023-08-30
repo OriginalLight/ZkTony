@@ -558,7 +558,7 @@ fun CalibrationList(
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
                                         index = 1
-                                        pulse = (3200L * jzgd.value.toDouble()).toLong();
+                                        pulse = (3200L * jiaozgd.value.toDouble()).toLong();
                                     }
                                 }
                             } catch (e: Exception) {
@@ -1634,6 +1634,14 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
+                        scope.launch {
+                            tx {
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 3
+                                    pulse = 32000L
+                                }
+                            }
+                        }
                     },
                     modifier = Modifier.padding(start = 20.dp),
                     shape = RoundedCornerShape(10.dp),

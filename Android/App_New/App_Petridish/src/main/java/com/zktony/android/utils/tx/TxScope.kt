@@ -1,6 +1,7 @@
 package com.zktony.android.utils.tx
 
 import com.zktony.android.data.entities.Motor
+import com.zktony.android.utils.ext.dataSaver
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
 
@@ -53,7 +54,9 @@ class TxScope {
         when (type) {
             //按照校准数据运动
             MoveType.MOVE_DV -> {
-                val pulse = pulse(moveScope.index, moveScope.dv)
+                val jyh = dataSaver.readData("jyh", 0.0)
+                val jyq = dataSaver.readData("jyq", 0.0)
+                val pulse = (moveScope.dv / ((jyh - jyq) / 3200 * 10L)).toLong()
                 val config =
                     Motor(speed = moveScope.speed, acc = moveScope.acc, dec = moveScope.dec)
                 if (pulse != 0L) {
