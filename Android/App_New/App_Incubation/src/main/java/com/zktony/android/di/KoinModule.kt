@@ -2,6 +2,7 @@ package com.zktony.android.di
 
 import androidx.room.Room
 import com.zktony.android.data.AppDatabase
+import com.zktony.android.ui.CurveViewModel
 import com.zktony.android.ui.CalibrationViewModel
 import com.zktony.android.ui.HomeViewModel
 import com.zktony.android.ui.ProgramViewModel
@@ -23,11 +24,13 @@ val koinModule = module {
             androidContext(), AppDatabase::class.java, DATABASE_NAME
         ).build()
     }
+    single { get<AppDatabase>().CurveDao() }
     single { get<AppDatabase>().CalibrationDao() }
     single { get<AppDatabase>().MotorDao() }
     single { get<AppDatabase>().ProgramDao() }
 
     // viewModel
+    viewModelOf(::CurveViewModel)
     viewModelOf(::CalibrationViewModel)
     viewModelOf(::HomeViewModel)
     viewModelOf(::ProgramViewModel)

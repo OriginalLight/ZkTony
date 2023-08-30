@@ -7,35 +7,15 @@ import com.zktony.serialport.ext.crc16LE
  */
 
 class RtuProtocol {
-
-    /**
-     * 从机地址
-     */
     var slaveAddr: Byte = 0x01
-
-    /**
-     * 功能码
-     */
     var funcCode: Byte = 0x03
-
-    /**
-     * 数据域
-     */
     var data: ByteArray = byteArrayOf()
-
-    /**
-     * CRC 校验
-     */
     var crc: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
 
-    /**
-     * 转换为字节数组
-     */
     fun toByteArray(): ByteArray {
         val byteArray = byteArrayOf(slaveAddr, funcCode).plus(data)
         return byteArray.plus(byteArray.crc16LE())
     }
-
 }
 
 fun rtuProtocol(block: RtuProtocol.() -> Unit): RtuProtocol {

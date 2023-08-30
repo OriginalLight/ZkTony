@@ -9,12 +9,7 @@ import java.util.Date
  * @author: 刘贺贺
  * @date: 2022-10-25 10:42
  */
-@Entity(
-    tableName = "calibrations",
-    indices = [
-        Index(value = ["text"], unique = true)
-    ]
-)
+@Entity(tableName = "calibrations")
 @Immutable
 @TypeConverters(TripleConverters::class)
 data class Calibration(

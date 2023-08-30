@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.zktony.android.data.entities.IncubationStage
 import com.zktony.android.data.entities.OrificePlate
+import com.zktony.android.utils.extra.Point
 import java.util.Date
 
 /**
@@ -97,6 +98,21 @@ object IncubationStageConverters {
     @TypeConverter
     @JvmStatic
     fun toString(list: List<IncubationStage>): String {
+        return Gson().toJson(list)
+    }
+}
+
+object PointConverters {
+    @TypeConverter
+    @JvmStatic
+    fun toObject(value: String): List<Point> {
+        val listType = object : TypeToken<List<Point>>() {}.type
+        return Gson().fromJson(value, listType)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toString(list: List<Point>): String {
         return Gson().toJson(list)
     }
 }

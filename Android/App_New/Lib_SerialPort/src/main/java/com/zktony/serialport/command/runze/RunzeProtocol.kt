@@ -88,14 +88,14 @@ import com.zktony.serialport.ext.checkSumLE
  */
 class RunzeProtocol {
     var head: Byte = 0xCC.toByte()
-    var addr: Byte = 0x00.toByte()
+    var slaveAddr: Byte = 0x00.toByte()
     var funcCode: Byte = 0x00.toByte()
     var data: ByteArray = byteArrayOf()
     var end: Byte = 0xDD.toByte()
     var checksum: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
 
     fun toByteArray(): ByteArray {
-        val byteArray = byteArrayOf(head, addr, funcCode)
+        val byteArray = byteArrayOf(head, slaveAddr, funcCode)
             .plus(data)
             .plus(end)
         return byteArray.plus(byteArray.checkSumLE())
@@ -106,7 +106,7 @@ fun ByteArray.toRunzeProtocol(): RunzeProtocol {
     val byteArray = this
     return RunzeProtocol().apply {
         head = byteArray[0]
-        addr = byteArray[1]
+        slaveAddr = byteArray[1]
         funcCode = byteArray[2]
         data = byteArray.copyOfRange(3, byteArray.size - 3)
         end = byteArray[byteArray.size - 3]

@@ -34,10 +34,7 @@ import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.IncubationStage
 import com.zktony.android.data.entities.IncubationStageStatus
 import com.zktony.android.data.entities.Program
-import com.zktony.android.ui.CalibrationUiEvent
-import com.zktony.android.ui.CalibrationUiState
-import com.zktony.android.ui.ProgramUiEvent
-import com.zktony.android.ui.ProgramUiState
+import com.zktony.android.ui.*
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.zktony.android.ui.utils.PageType
@@ -95,7 +92,9 @@ fun HomeAppBar(
 @Composable
 fun SettingsAppBar(
     modifier: Modifier = Modifier,
-    actions: @Composable () -> Unit = {},
+    uiState: SettingUiState,
+    uiEvent: (SettingUiEvent) -> Unit,
+    navigation: () -> Unit,
 ) {
     TopAppBar(
         title = {
@@ -124,7 +123,20 @@ fun SettingsAppBar(
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                actions()
+                AnimatedVisibility(visible = uiState.page == PageType.MOTOR_LIST) {
+                    ElevatedButton(onClick = { uiEvent(SettingUiEvent.Insert) }) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = null
+                        )
+                    }
+                }
+                ElevatedButton(onClick = navigation) {
+                    Icon(
+                        imageVector = Icons.Default.Reply,
+                        contentDescription = null
+                    )
+                }
             }
         },
     )

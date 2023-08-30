@@ -75,6 +75,7 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
             is SettingUiEvent.Network -> network()
             is SettingUiEvent.CheckUpdate -> checkUpdate()
             is SettingUiEvent.ToggleSelected -> _selected.value = event.id
+            is SettingUiEvent.Insert -> viewModelScope.launch { dao.insert(Motor()) }
             is SettingUiEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
         }
     }
@@ -162,6 +163,7 @@ data class SettingUiState(
 sealed class SettingUiEvent {
     data object Network : SettingUiEvent()
     data object CheckUpdate : SettingUiEvent()
+    data object Insert : SettingUiEvent()
     data class NavTo(val page: PageType) : SettingUiEvent()
     data class Navigation(val navigation: Boolean) : SettingUiEvent()
     data class ToggleSelected(val id: Long) : SettingUiEvent()

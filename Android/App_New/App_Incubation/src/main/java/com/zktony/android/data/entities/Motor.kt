@@ -3,7 +3,6 @@ package com.zktony.android.data.entities
 import androidx.compose.runtime.Immutable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.util.Date
 
@@ -11,12 +10,7 @@ import java.util.Date
  * @author: 刘贺贺
  * @date: 2022-10-13 11:27
  */
-@Entity(
-    tableName = "motors",
-    indices = [
-        Index(value = ["text"], unique = true)
-    ]
-)
+@Entity(tableName = "motors")
 @Immutable
 data class Motor(
     @PrimaryKey(autoGenerate = true)

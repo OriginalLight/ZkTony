@@ -44,7 +44,8 @@ import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.ui.components.*
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.extra.isNetworkAvailable
+import com.zktony.android.utils.extra.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -82,14 +83,11 @@ fun SettingsRoute(
 
     Scaffold(
         topBar = {
-            SettingsAppBar {
-                ElevatedButton(onClick = navigation) {
-                    Icon(
-                        imageVector = Icons.Default.Reply,
-                        contentDescription = null
-                    )
-                }
-            }
+            SettingsAppBar(
+                uiState = uiState,
+                uiEvent = viewModel::uiEvent,
+                navigation = navigation
+            )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets
@@ -474,7 +472,7 @@ fun MotorList(
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = it.text,
+                        text = "M ${it.index}",
                         fontSize = 50.sp,
                         fontWeight = FontWeight.SemiBold,
                     )
@@ -499,7 +497,7 @@ fun MotorList(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun MotorDetail(
     modifier: Modifier = Modifier,
@@ -510,149 +508,206 @@ fun MotorDetail(
     val softKeyboard = LocalSoftwareKeyboardController.current
     val selected = uiState.entities.find { it.id == uiState.selected }!!
     var ads by remember { mutableStateOf(selected.toAdsString()) }
+    var index by remember { mutableStateOf(selected.index.toString()) }
 
-    Column(
+    val keyboardOptions = KeyboardOptions(
+        keyboardType = KeyboardType.Number,
+        imeAction = ImeAction.Done,
+    )
+
+    val keyboardActions = KeyboardActions(
+        onDone = {
+            softKeyboard?.hide()
+        }
+    )
+
+    val colors = TextFieldDefaults.colors(
+        unfocusedIndicatorColor = Color.Transparent,
+        focusedIndicatorColor = Color.Transparent,
+    )
+
+    val textStyle = TextStyle(
+        fontStyle = FontStyle.Italic,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        fontFamily = FontFamily.Monospace,
+    )
+
+    LazyColumn(
         modifier = modifier
             .padding(16.dp)
             .border(
                 width = 1.dp,
                 color = Color.LightGray,
-                shape = MaterialTheme.shapes.small
+                shape = MaterialTheme.shapes.medium
             )
-            .padding(16.dp),
+            .windowInsetsPadding(WindowInsets.imeAnimationSource),
+        contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done,
-        )
-
-        val keyboardActions = KeyboardActions(
-            onDone = {
-                softKeyboard?.hide()
-            }
-        )
-
-        val colors = TextFieldDefaults.colors(
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-        )
-
-        val textStyle = TextStyle(
-            fontStyle = FontStyle.Italic,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
-            fontFamily = FontFamily.Monospace,
-        )
-
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = ads.first,
-            onValueChange = {
-                scope.launch {
-                    ads = Triple(it, ads.second, ads.third)
-                    uiEvent(
-                        SettingUiEvent.Update(
-                            selected.copy(acc = it.toLongOrNull() ?: 0L)
-                        )
-                    )
-                }
-            },
-            leadingIcon = {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Icon(
-                        imageVector = Icons.Default.TrendingUp,
-                        contentDescription = stringResource(id = R.string.acceleration)
-                    )
-                }
-            },
-            trailingIcon = {
-                ElevatedButton(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.Default.Download, contentDescription = null)
-                }
-            },
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            shape = CircleShape,
-            colors = colors,
-            textStyle = textStyle,
-        )
-
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = ads.second,
-            onValueChange = {
-                scope.launch {
-                    ads = Triple(ads.first, it, ads.third)
-                    uiEvent(
-                        SettingUiEvent.Update(
-                            selected.copy(
-                                dec = it.toLongOrNull() ?: 0L
+        item {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = index,
+                onValueChange = {
+                    scope.launch {
+                        index = it
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                selected.copy(index = it.toIntOrNull() ?: 0)
                             )
                         )
-                    )
-                }
-            },
-            leadingIcon = {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Icon(
-                        imageVector = Icons.Default.TrendingDown,
-                        contentDescription = stringResource(id = R.string.deceleration)
-                    )
-                }
-            },
-            trailingIcon = {
-                ElevatedButton(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.Default.Download, contentDescription = null)
-                }
-            },
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            shape = CircleShape,
-            colors = colors,
-            textStyle = textStyle,
-        )
-
-        TextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = ads.third,
-            onValueChange = {
-                scope.launch {
-                    ads = Triple(ads.first, ads.second, it)
-                    uiEvent(
-                        SettingUiEvent.Update(
-                            selected.copy(
-                                speed = it.toLongOrNull() ?: 0L
+                    }
+                },
+                leadingIcon = {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.Numbers,
+                            contentDescription = null
+                        )
+                    }
+                },
+                suffix = {
+                    Text(text = "电机编号", style = textStyle)
+                },
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                shape = CircleShape,
+                colors = colors,
+                textStyle = textStyle,
+            )
+        }
+        item {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = ads.first,
+                onValueChange = {
+                    scope.launch {
+                        ads = Triple(it, ads.second, ads.third)
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                selected.copy(acc = it.toLongOrNull() ?: 0L)
                             )
                         )
-                    )
-                }
-            },
-            leadingIcon = {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    Icon(
-                        imageVector = Icons.Default.Speed,
-                        contentDescription = stringResource(id = R.string.speed)
-                    )
-                }
-            },
-            trailingIcon = {
-                ElevatedButton(
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    onClick = { /*TODO*/ }) {
-                    Icon(imageVector = Icons.Default.Download, contentDescription = null)
-                }
-            },
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            shape = CircleShape,
-            colors = colors,
-            textStyle = textStyle,
-        )
+                    }
+                },
+                leadingIcon = {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.TrendingUp,
+                            contentDescription = stringResource(id = R.string.acceleration)
+                        )
+                    }
+                },
+                trailingIcon = {
+                    ElevatedButton(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        onClick = {
+                            scope.launch {
+                                writeRegisterInt16(selected.index, 152, selected.acc.toInt())
+                                delay(500L)
+                                writeRegisterInt16(selected.index, 220, 1)
+                            }
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Default.Download, contentDescription = null)
+                    }
+                },
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                shape = CircleShape,
+                colors = colors,
+                textStyle = textStyle,
+            )
+        }
+        item {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = ads.second,
+                onValueChange = {
+                    scope.launch {
+                        ads = Triple(ads.first, it, ads.third)
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                selected.copy(
+                                    dec = it.toLongOrNull() ?: 0L
+                                )
+                            )
+                        )
+                    }
+                },
+                leadingIcon = {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.TrendingDown,
+                            contentDescription = stringResource(id = R.string.deceleration)
+                        )
+                    }
+                },
+                trailingIcon = {
+                    ElevatedButton(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        onClick = {
+                            scope.launch {
+                                writeRegisterInt16(selected.index, 153, selected.dec.toInt())
+                                delay(500L)
+                                writeRegisterInt16(selected.index, 220, 1)
+                            }
+                        }) {
+                        Icon(imageVector = Icons.Default.Download, contentDescription = null)
+                    }
+                },
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                shape = CircleShape,
+                colors = colors,
+                textStyle = textStyle,
+            )
+        }
+        item {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = ads.third,
+                onValueChange = {
+                    scope.launch {
+                        ads = Triple(ads.first, ads.second, it)
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                selected.copy(
+                                    speed = it.toLongOrNull() ?: 0L
+                                )
+                            )
+                        )
+                    }
+                },
+                leadingIcon = {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.Speed,
+                            contentDescription = stringResource(id = R.string.speed)
+                        )
+                    }
+                },
+                trailingIcon = {
+                    ElevatedButton(
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                        onClick = {
+                            scope.launch {
+                                writeRegisterInt16(selected.index, 154, selected.speed.toInt())
+                                delay(500L)
+                                writeRegisterInt16(selected.index, 220, 1)
+                            }
+                        }) {
+                        Icon(imageVector = Icons.Default.Download, contentDescription = null)
+                    }
+                },
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                shape = CircleShape,
+                colors = colors,
+                textStyle = textStyle,
+            )
+        }
     }
 }
 
