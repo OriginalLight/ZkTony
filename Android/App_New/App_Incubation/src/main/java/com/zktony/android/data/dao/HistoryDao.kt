@@ -2,7 +2,7 @@ package com.zktony.android.data.dao
 
 import androidx.paging.PagingSource
 import androidx.room.*
-import com.zktony.android.data.entities.Curve
+import com.zktony.android.data.entities.History
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -10,26 +10,26 @@ import kotlinx.coroutines.flow.Flow
  * @date 2023/8/30 10:56
  */
 @Dao
-abstract class CurveDao : BaseDao<Curve> {
+abstract class HistoryDao : BaseDao<History> {
     @Query(
         """
-        SELECT * FROM curve
-        ORDER BY `index` ASC
+        SELECT * FROM history
+        ORDER BY createTime ASC
         """
     )
-    abstract fun getAll(): Flow<List<Curve>>
+    abstract fun getAll(): Flow<List<History>>
 
     @Query(
         """
-        SELECT * FROM curve
-        ORDER BY `index` ASC
+        SELECT * FROM history
+        ORDER BY createTime ASC
         """
     )
-    abstract fun getByPage(): PagingSource<Int, Curve>
+    abstract fun getByPage(): PagingSource<Int, History>
 
     @Query(
         """
-        DELETE FROM curve
+        DELETE FROM history
         WHERE id = :id
         """
     )

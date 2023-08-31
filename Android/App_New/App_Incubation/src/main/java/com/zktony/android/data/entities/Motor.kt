@@ -1,7 +1,6 @@
 package com.zktony.android.data.entities
 
 import androidx.compose.runtime.Immutable
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.Date
@@ -10,26 +9,18 @@ import java.util.Date
  * @author: 刘贺贺
  * @date: 2022-10-13 11:27
  */
-@Entity(tableName = "motors")
+@Entity(tableName = "motor")
 @Immutable
 data class Motor(
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
     val id: Long = 0L,
-    @ColumnInfo(name = "index")
     val index: Int = 0,
-    @ColumnInfo(name = "text")
-    val text: String = "",
-    @ColumnInfo(name = "speed")
     val speed: Long = 600L,
-    @ColumnInfo(name = "acc")
-    val acc: Long = 120L,
-    @ColumnInfo(name = "dec")
-    val dec: Long = 120L,
-    @ColumnInfo(name = "create_time")
+    val acceleration: Long = 120L,
+    val deceleration: Long = 120L,
     val createTime: Date = Date(System.currentTimeMillis()),
 ) {
     fun toAdsString(): Triple<String, String, String> {
-        return Triple(acc.toString(), dec.toString(), speed.toString())
+        return Triple(acceleration.toString(), deceleration.toString(), speed.toString())
     }
 }

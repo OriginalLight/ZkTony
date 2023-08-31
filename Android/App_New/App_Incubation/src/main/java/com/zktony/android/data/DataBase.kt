@@ -1,26 +1,15 @@
 package com.zktony.android.data
 
 import androidx.room.*
-import com.zktony.android.data.dao.CalibrationDao
-import com.zktony.android.data.dao.CurveDao
-import com.zktony.android.data.dao.MotorDao
-import com.zktony.android.data.dao.ProgramDao
-import com.zktony.android.data.entities.Calibration
-import com.zktony.android.data.entities.Curve
-import com.zktony.android.data.entities.Motor
-import com.zktony.android.data.entities.Program
+import com.zktony.android.data.dao.*
+import com.zktony.android.data.entities.*
 
 /**
  * @author 刘贺贺
  */
 @Database(
     entities =
-    [
-        Curve::class,
-        Motor::class,
-        Calibration::class,
-        Program::class,
-    ],
+    [Curve::class, Motor::class, History::class, Program::class],
     version = 1,
     exportSchema = false
 )
@@ -28,6 +17,6 @@ import com.zktony.android.data.entities.Program
 abstract class AppDatabase : RoomDatabase() {
     abstract fun CurveDao(): CurveDao
     abstract fun MotorDao(): MotorDao
-    abstract fun CalibrationDao(): CalibrationDao
+    abstract fun HistoryDao(): HistoryDao
     abstract fun ProgramDao(): ProgramDao
 }

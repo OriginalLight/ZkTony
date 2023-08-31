@@ -19,9 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.R
-import com.zktony.android.data.entities.IncubationStage
-import com.zktony.android.data.entities.IncubationStageStatus
-import com.zktony.android.data.entities.IncubationTag
+import com.zktony.android.data.entities.internal.IncubationStage
+import com.zktony.android.data.entities.internal.IncubationStageStatus
+import com.zktony.android.data.entities.internal.IncubationTag
 import com.zktony.android.ui.theme.AppTheme
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)

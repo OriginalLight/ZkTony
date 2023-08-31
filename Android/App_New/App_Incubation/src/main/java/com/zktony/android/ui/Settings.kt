@@ -480,11 +480,13 @@ fun MotorList(
                         modifier = Modifier.padding(start = 16.dp),
                     ) {
                         Text(
-                            text = "A - ${it.acc}", style = MaterialTheme.typography.bodyLarge
+                            text = "A - ${it.acceleration}",
+                            style = MaterialTheme.typography.bodyLarge
                         )
 
                         Text(
-                            text = "D - ${it.dec}", style = MaterialTheme.typography.bodyLarge
+                            text = "D - ${it.deceleration}",
+                            style = MaterialTheme.typography.bodyLarge
                         )
 
                         Text(
@@ -586,7 +588,7 @@ fun MotorDetail(
                         ads = Triple(it, ads.second, ads.third)
                         uiEvent(
                             SettingUiEvent.Update(
-                                selected.copy(acc = it.toLongOrNull() ?: 0L)
+                                selected.copy(acceleration = it.toLongOrNull() ?: 0L)
                             )
                         )
                     }
@@ -604,9 +606,9 @@ fun MotorDetail(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         onClick = {
                             scope.launch {
-                                writeRegisterInt16(selected.index, 152, selected.acc.toInt())
+                                writeRegister(selected.index, 152, selected.acceleration.toInt())
                                 delay(500L)
-                                writeRegisterInt16(selected.index, 220, 1)
+                                writeRegister(selected.index, 220, 1)
                             }
                         }
                     ) {
@@ -630,7 +632,7 @@ fun MotorDetail(
                         uiEvent(
                             SettingUiEvent.Update(
                                 selected.copy(
-                                    dec = it.toLongOrNull() ?: 0L
+                                    deceleration = it.toLongOrNull() ?: 0L
                                 )
                             )
                         )
@@ -649,9 +651,9 @@ fun MotorDetail(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         onClick = {
                             scope.launch {
-                                writeRegisterInt16(selected.index, 153, selected.dec.toInt())
+                                writeRegister(selected.index, 153, selected.deceleration.toInt())
                                 delay(500L)
-                                writeRegisterInt16(selected.index, 220, 1)
+                                writeRegister(selected.index, 220, 1)
                             }
                         }) {
                         Icon(imageVector = Icons.Default.Download, contentDescription = null)
@@ -693,9 +695,9 @@ fun MotorDetail(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         onClick = {
                             scope.launch {
-                                writeRegisterInt16(selected.index, 154, selected.speed.toInt())
+                                writeRegister(selected.index, 154, selected.speed.toInt())
                                 delay(500L)
-                                writeRegisterInt16(selected.index, 220, 1)
+                                writeRegister(selected.index, 220, 1)
                             }
                         }) {
                         Icon(imageVector = Icons.Default.Download, contentDescription = null)

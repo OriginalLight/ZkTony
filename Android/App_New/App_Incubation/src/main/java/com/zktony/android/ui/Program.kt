@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
-import com.zktony.android.data.entities.IncubationStageStatus
 import com.zktony.android.data.entities.Program
+import com.zktony.android.data.entities.internal.IncubationStageStatus
 import com.zktony.android.ui.components.ProgramAppBar
 import com.zktony.android.ui.components.timeline.LazyTimeline
 import com.zktony.android.ui.utils.PageType
@@ -42,8 +42,8 @@ fun ProgramRoute(
     viewModel: ProgramViewModel,
     snackbarHostState: SnackbarHostState
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val navigation: () -> Unit = {
         scope.launch {
@@ -163,7 +163,7 @@ fun ProgramList(
                     }
                     Text(
                         modifier = Modifier.fillMaxWidth(),
-                        text = item.text,
+                        text = item.displayText,
                         fontSize = 20.sp,
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.Center,
@@ -228,7 +228,7 @@ fun ProgramListPreview() {
     ProgramList(
         uiState = ProgramUiState(
             entities = listOf(
-                Program(text = "test")
+                Program(displayText = "test")
             )
         )
     )
@@ -239,7 +239,7 @@ fun ProgramListPreview() {
 fun ProgramDetailPreview() {
     ProgramDetail(
         uiState = ProgramUiState(
-            entities = listOf(Program(text = "test", id = 1L)),
+            entities = listOf(Program(displayText = "test", id = 1L)),
             selected = 1L
         )
     )

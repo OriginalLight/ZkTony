@@ -1,4 +1,4 @@
-package com.zktony.android.data.entities
+package com.zktony.android.data.entities.internal
 
 /**
  * @author 刘贺贺
@@ -16,17 +16,3 @@ data class IncubationStage(
     val times: Int = 1,
     val status: IncubationStageStatus = IncubationStageStatus.FINISHED
 )
-
-enum class IncubationTag {
-    BLOCKING,
-    PRIMARY_ANTIBODY,
-    SECONDARY_ANTIBODY,
-    WASHING,
-    PHOSPHATE_BUFFERED_SALINE
-}
-
-enum class IncubationStageStatus {
-    FINISHED,
-    CURRENT,
-    UPCOMING
-}

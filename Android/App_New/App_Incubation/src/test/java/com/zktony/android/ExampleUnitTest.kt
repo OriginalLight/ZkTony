@@ -34,19 +34,20 @@ class ExampleUnitTest {
     @Test
     fun test() {
         val points = listOf(
-            Point(64000.0, 99.0),
-            Point(128000.0, 205.0),
-            Point(640000.0, 1100.0)
+            Point(0.0, 0.0),
+            Point(1.0, 640.0),
+            Point(99.0, 64000.0),
+            Point(203.0, 128000.0),
+            Point(986.0, 640000.0)
         )
 
         val quadraticCurve = fitQuadraticCurve(points)
 
-        val x = 600000.0
+        val x = 986.0
         val y = quadraticCurve(x)
 
         if (y != null) {
-            assertEquals(1027.0692274305566, y, 1.0)
+            assertEquals(639982.8994101394, y, 1.0)
         }
-
     }
 }

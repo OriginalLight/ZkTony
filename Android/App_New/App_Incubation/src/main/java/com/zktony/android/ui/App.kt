@@ -75,6 +75,13 @@ private fun AppNavHost(
                 snackbarHostState = snackbarHostState
             )
         }
+        composable(Route.History) {
+            HistoryRoute(
+                navController = navController,
+                viewModel = koinViewModel(),
+                snackbarHostState = snackbarHostState
+            )
+        }
         composable(Route.Settings) {
             SettingsRoute(
                 navController = navController,

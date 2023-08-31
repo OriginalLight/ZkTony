@@ -12,15 +12,15 @@ import kotlinx.coroutines.flow.Flow
 abstract class ProgramDao : BaseDao<Program> {
     @Query(
         """
-        SELECT * FROM programs
-        ORDER BY create_time DESC
+        SELECT * FROM program
+        ORDER BY createTime DESC
         """
     )
     abstract fun getAll(): Flow<List<Program>>
 
     @Query(
         """
-        DELETE FROM programs
+        DELETE FROM program
         WHERE id = :id
         """
     )

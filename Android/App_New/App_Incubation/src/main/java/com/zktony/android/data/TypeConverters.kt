@@ -3,8 +3,8 @@ package com.zktony.android.data
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.zktony.android.data.entities.IncubationStage
-import com.zktony.android.data.entities.OrificePlate
+import com.zktony.android.data.entities.internal.IncubationStage
+import com.zktony.android.data.entities.internal.Log
 import com.zktony.android.utils.extra.Point
 import java.util.Date
 
@@ -24,66 +24,6 @@ object DateConverters {
     @JvmStatic
     fun dateToTimestamp(date: Date?): Long? {
         return date?.time
-    }
-}
-
-object TripleConverters {
-    @TypeConverter
-    @JvmStatic
-    fun stringToObject(value: String): List<Triple<Int, Double, Double>> {
-        val listType = object : TypeToken<List<Triple<Int, Double, Double>>>() {}.type
-        return Gson().fromJson(value, listType)
-    }
-
-    @TypeConverter
-    @JvmStatic
-    fun objectToString(list: List<Triple<Int, Double, Double>>): String {
-        return Gson().toJson(list)
-    }
-}
-
-object IntConverters {
-    @TypeConverter
-    @JvmStatic
-    fun stringToObject(value: String): List<Int> {
-        val listType = object : TypeToken<List<Int>>() {}.type
-        return Gson().fromJson(value, listType)
-    }
-
-    @TypeConverter
-    @JvmStatic
-    fun objectToString(list: List<Int>): String {
-        return Gson().toJson(list)
-    }
-}
-
-object FloatConverters {
-    @TypeConverter
-    @JvmStatic
-    fun stringToObject(value: String): List<Float> {
-        val listType = object : TypeToken<List<Float>>() {}.type
-        return Gson().fromJson(value, listType)
-    }
-
-    @TypeConverter
-    @JvmStatic
-    fun objectToString(list: List<Float>): String {
-        return Gson().toJson(list)
-    }
-}
-
-object OrificePlateConverters {
-    @TypeConverter
-    @JvmStatic
-    fun stringToObject(value: String): List<OrificePlate> {
-        val listType = object : TypeToken<List<OrificePlate>>() {}.type
-        return Gson().fromJson(value, listType)
-    }
-
-    @TypeConverter
-    @JvmStatic
-    fun objectToString(list: List<OrificePlate>): String {
-        return Gson().toJson(list)
     }
 }
 
@@ -113,6 +53,21 @@ object PointConverters {
     @TypeConverter
     @JvmStatic
     fun toString(list: List<Point>): String {
+        return Gson().toJson(list)
+    }
+}
+
+object LogConverters {
+    @TypeConverter
+    @JvmStatic
+    fun toObject(value: String): List<Log> {
+        val listType = object : TypeToken<List<Log>>() {}.type
+        return Gson().fromJson(value, listType)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toString(list: List<Log>): String {
         return Gson().toJson(list)
     }
 }

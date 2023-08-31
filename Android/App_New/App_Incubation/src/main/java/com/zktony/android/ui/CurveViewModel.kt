@@ -2,6 +2,9 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.zktony.android.data.dao.CurveDao
 import com.zktony.android.data.entities.Curve
 import com.zktony.android.ui.utils.PageType
@@ -15,22 +18,24 @@ import kotlinx.coroutines.launch
  * @author 刘贺贺
  * @date 2023/5/9 13:19
  */
-class CurveViewModel constructor(private val dao: CurveDao) : ViewModel() {
+class CurveViewModel(private val dao: CurveDao) : ViewModel() {
 
-    private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.CURVE_LIST)
+    private val _selected = MutableStateFlow(0L)
     private val _uiFlags = MutableStateFlow(0)
     private val _uiState = MutableStateFlow(CurveUiState())
-
     private val _message = MutableStateFlow<String?>(null)
 
     val uiState = _uiState.asStateFlow()
     val message = _message.asStateFlow()
+    val entities = Pager(
+        config = PagingConfig(pageSize = 20, initialLoadSize = 40),
+    ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     init {
         viewModelScope.launch {
-            combine(dao.getAll(), _selected, _page, _uiFlags) { entities, selected, page, uiFlags ->
-                CurveUiState(entities, selected, page, uiFlags)
+            combine(_selected, _page, _uiFlags) { selected, page, uiFlags ->
+                CurveUiState(selected, page, uiFlags)
             }.catch { ex ->
                 _message.value = ex.message
             }.collect {
@@ -48,11 +53,9 @@ class CurveViewModel constructor(private val dao: CurveDao) : ViewModel() {
             is CurveUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.curve) }
         }
     }
-
 }
 
 data class CurveUiState(
-    val entities: List<Curve> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.CURVE_LIST,
     val uiFlags: Int = 0,

@@ -53,7 +53,7 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         when (event) {
             is ProgramUiEvent.NavTo -> _page.value = event.page
             is ProgramUiEvent.ToggleSelected -> _selected.value = event.id
-            is ProgramUiEvent.Insert -> viewModelScope.launch { dao.insert(Program(text = event.name)) }
+            is ProgramUiEvent.Insert -> viewModelScope.launch { dao.insert(Program(displayText = event.name)) }
             is ProgramUiEvent.Update -> viewModelScope.launch { dao.update(event.program) }
             is ProgramUiEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
         }

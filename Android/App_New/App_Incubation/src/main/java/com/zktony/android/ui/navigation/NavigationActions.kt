@@ -2,6 +2,7 @@ package com.zktony.android.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Analytics
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -13,6 +14,7 @@ object Route {
     const val Home = "Home"
     const val Program = "Program"
     const val Curve = "Curve"
+    const val History = "History"
     const val Settings = "Settings"
     const val Splash = "Splash"
 }
@@ -49,16 +51,21 @@ val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
         route = Route.Program,
         icon = Icons.Outlined.Terminal,
-        iconTextId = R.string.tab_program
+        iconTextId = R.string.program
     ),
     TopLevelDestination(
         route = Route.Curve,
         icon = Icons.Outlined.Analytics,
-        iconTextId = R.string.tab_calibration
+        iconTextId = R.string.calibration
+    ),
+    TopLevelDestination(
+        route = Route.History,
+        icon = Icons.Outlined.History,
+        iconTextId = R.string.history
     ),
     TopLevelDestination(
         route = Route.Settings,
         icon = Icons.Outlined.Settings,
-        iconTextId = R.string.tab_setting
+        iconTextId = R.string.settings
     )
 )

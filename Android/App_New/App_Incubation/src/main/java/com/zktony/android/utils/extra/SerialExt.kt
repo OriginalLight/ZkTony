@@ -94,14 +94,14 @@ fun readRegister(slaveAddr: Int, startAddr: Int, quantity: Int) =
         data = ByteArray(4).writeInt16BE(startAddr).writeInt16BE(quantity, 2)
     }
 
-fun writeRegisterInt16(slaveAddr: Int, startAddr: Int, value: Int) =
+fun writeRegister(slaveAddr: Int, startAddr: Int, value: Int) =
     sendRtuProtocol {
         this.slaveAddr = (slaveAddr + 1).toByte()
         funcCode = 0x06
         data = ByteArray(4).writeInt16BE(startAddr).writeInt16BE(value, 2)
     }
 
-fun writeRegisterInt32(slaveAddr: Int, startAddr: Int, value: Long) =
+fun writeRegister(slaveAddr: Int, startAddr: Int, value: Long) =
     sendRtuProtocol {
         val byteArray = ByteArray(4).writeInt32BE(value)
         this.slaveAddr = (slaveAddr + 1).toByte()

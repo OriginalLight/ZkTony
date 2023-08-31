@@ -11,10 +11,11 @@
     <string name="parameters">Parameters</string>
     <string name="qrcode">Scan this QR code</string>
     <string name="system_config">System config</string>
-    <string name="tab_calibration">Calibration</string>
-    <string name="tab_container">Container</string>
-    <string name="tab_home">Home</string>
-    <string name="tab_program">Program</string>
+    <string name="calibration">Calibration</string>
+    <string name="container">Container</string>
+    <string name="home">Home</string>
+    <string name="history">History</string>
+    <string name="program">Program</string>
     <string name="update">Update</string>
     <string name="update_available">Update available</string>
     <string name="version">Version</string>
@@ -28,7 +29,7 @@
     <string name="save">Save</string>
     <string name="edit">edit</string>
     <string name="delete">Delete</string>
-    <string name="tab_setting">Setting</string>
+    <string name="settings">Setting</string>
     <string name="add">Add</string>
     <string name="authentication">Authentication</string>
     <string name="time_out">Time out</string>
