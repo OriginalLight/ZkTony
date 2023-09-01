@@ -158,7 +158,7 @@ fun CurveList(
                     curve = item,
                     onClick = {
                         scope.launch {
-                            if (uiState.selected == 0L) {
+                            if (uiState.selected != item.id) {
                                 uiEvent(CurveUiEvent.ToggleSelected(it.id))
                             } else {
                                 uiEvent(CurveUiEvent.ToggleSelected(0L))

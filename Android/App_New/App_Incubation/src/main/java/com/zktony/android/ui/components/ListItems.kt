@@ -81,7 +81,7 @@ fun CurveItem(
                         shape = MaterialTheme.shapes.small
                     )
                     .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = "泵${curve.index}",
+                text = "M${curve.index}",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
@@ -91,7 +91,7 @@ fun CurveItem(
                         shape = MaterialTheme.shapes.small
                     )
                     .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = if (curve.enable) "启用" else "未启用",
+                text = if (curve.enable) "启用中" else "未启用",
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (curve.enable) MaterialTheme.colorScheme.onSurface else Color.Red
             )

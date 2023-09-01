@@ -123,7 +123,7 @@ fun ProgramList(
                     program = item,
                     onClick = {
                         scope.launch {
-                            if (uiState.selected == 0L) {
+                            if (uiState.selected != item.id) {
                                 uiEvent(ProgramUiEvent.ToggleSelected(it.id))
                             } else {
                                 uiEvent(ProgramUiEvent.ToggleSelected(0L))
