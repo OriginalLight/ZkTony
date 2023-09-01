@@ -47,4 +47,6 @@
     <string name="finished">Finished</string>
     <string name="running">Running</string>
     <string name="upcoming">Upcoming</string>
+    <string name="up">Up</string>
+    <string name="down">Down</string>
 </resources>

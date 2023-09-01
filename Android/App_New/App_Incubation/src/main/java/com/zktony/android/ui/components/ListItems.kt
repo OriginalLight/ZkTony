@@ -91,7 +91,7 @@ fun CurveItem(
                         shape = MaterialTheme.shapes.small
                     )
                     .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = if (curve.enable) "启用中" else "未启用",
+                text = if (curve.enable) "生效中" else "未生效",
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (curve.enable) MaterialTheme.colorScheme.onSurface else Color.Red
             )
@@ -153,8 +153,7 @@ fun PointItem(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.medium
             )
-            .padding(vertical = 8.dp, horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+            .padding(vertical = 8.dp, horizontal = 16.dp)
     ) {
         Row(
             verticalAlignment = Alignment.Top,
@@ -175,7 +174,7 @@ fun PointItem(
                     .clip(MaterialTheme.shapes.small)
                     .clickable { onClickOne() }
                     .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = "测试",
+                text = "加液测试",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
@@ -192,67 +191,69 @@ fun PointItem(
                 color = Color.Red
             )
         }
-        BasicTextField(
-            value = TextFieldValue(x, TextRange(x.length)),
-            onValueChange = {
-                scope.launch {
-                    x = it.text
-                    onPointChange(point.copy(x = it.text.toDoubleOrNull() ?: 0.0))
-                }
-            },
-            textStyle = textStyle,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            decorationBox = @Composable { innerTextField ->
-                Column {
-                    Row(
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "出液",
-                            fontStyle = FontStyle.Italic,
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily.Serif,
-                            color = Color.Gray
-                        )
-                        innerTextField()
+        Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
+            BasicTextField(
+                value = TextFieldValue(x, TextRange(x.length)),
+                onValueChange = {
+                    scope.launch {
+                        x = it.text
+                        onPointChange(point.copy(x = it.text.toDoubleOrNull() ?: 0.0))
                     }
-                    Divider()
+                },
+                textStyle = textStyle,
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                decorationBox = @Composable { innerTextField ->
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "出液",
+                                fontStyle = FontStyle.Italic,
+                                fontSize = 14.sp,
+                                fontFamily = FontFamily.Serif,
+                                color = Color.Gray
+                            )
+                            innerTextField()
+                        }
+                        Divider()
+                    }
                 }
-            }
-        )
+            )
 
-        BasicTextField(
-            value = TextFieldValue(y, TextRange(y.length)),
-            onValueChange = {
-                scope.launch {
-                    y = it.text
-                    onPointChange(point.copy(y = it.text.toDoubleOrNull() ?: 0.0))
-                }
-            },
-            textStyle = textStyle,
-            keyboardOptions = keyboardOptions,
-            keyboardActions = keyboardActions,
-            decorationBox = @Composable { innerTextField ->
-                Column {
-                    Row(
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "步数",
-                            fontStyle = FontStyle.Italic,
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily.Serif,
-                            color = Color.Gray
-                        )
-                        innerTextField()
+            BasicTextField(
+                value = TextFieldValue(y, TextRange(y.length)),
+                onValueChange = {
+                    scope.launch {
+                        y = it.text
+                        onPointChange(point.copy(y = it.text.toDoubleOrNull() ?: 0.0))
                     }
-                    Divider()
+                },
+                textStyle = textStyle,
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                decorationBox = @Composable { innerTextField ->
+                    Column {
+                        Row(
+                            verticalAlignment = Alignment.Bottom,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "步数",
+                                fontStyle = FontStyle.Italic,
+                                fontSize = 14.sp,
+                                fontFamily = FontFamily.Serif,
+                                color = Color.Gray
+                            )
+                            innerTextField()
+                        }
+                        Divider()
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 }
 
@@ -279,7 +280,6 @@ fun HistoryItem(
             style = MaterialTheme.typography.titleLarge,
             fontStyle = FontStyle.Italic,
         )
-
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = history.createTime.dateFormat("yyyy/MM/dd"),
@@ -300,14 +300,27 @@ fun LogItem(log: Log) {
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = MaterialTheme.shapes.medium
             )
-            .padding(vertical = 8.dp, horizontal = 16.dp),
+            .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    .padding(vertical = 4.dp, horizontal = 8.dp),
+                text = log.createTime.dateFormat("HH:mm:ss"),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    .padding(vertical = 4.dp, horizontal = 8.dp),
                 text = log.level,
                 style = MaterialTheme.typography.bodyMedium,
                 color = when (log.level) {
@@ -319,14 +332,6 @@ fun LogItem(log: Log) {
                 }
             )
 
-            Spacer(modifier = Modifier.weight(1f))
-
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = log.createTime.dateFormat("HH:mm:ss"),
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.End
-            )
         }
 
         Text(
@@ -334,7 +339,7 @@ fun LogItem(log: Log) {
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             text = log.message,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyLarge
         )
 
     }
@@ -388,7 +393,8 @@ fun ProcessItem(
     modifier: Modifier = Modifier,
     process: Process,
     onClick: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onUpOrDown: (Boolean) -> Unit
 ) {
 
     val displayText = when (process.type) {
@@ -441,9 +447,9 @@ fun ProcessItem(
                         shape = MaterialTheme.shapes.small
                     )
                     .clip(MaterialTheme.shapes.small)
-                    .clickable { onDelete() }
+                    .clickable { onUpOrDown(true) }
                     .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = " 上 ",
+                text = " ${stringResource(id = R.string.up)} ",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
@@ -453,9 +459,9 @@ fun ProcessItem(
                         shape = MaterialTheme.shapes.small
                     )
                     .clip(MaterialTheme.shapes.small)
-                    .clickable { onDelete() }
+                    .clickable { onUpOrDown(false) }
                     .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = " 下 ",
+                text = " ${stringResource(id = R.string.down)} ",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(

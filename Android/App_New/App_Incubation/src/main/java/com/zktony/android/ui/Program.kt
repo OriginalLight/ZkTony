@@ -174,14 +174,35 @@ fun ProgramDetail(
                         shape = MaterialTheme.shapes.medium
                     ),
                     process = process,
-                    onClick = { selectedIndex = index }
-                ) {
-                    scope.launch {
-                        val processes = selected.processes.toMutableList()
-                        processes.removeAt(index)
-                        uiEvent(ProgramUiEvent.Update(selected.copy(processes = processes)))
+                    onClick = { selectedIndex = index },
+                    onDelete = {
+                        scope.launch {
+                            val processes = selected.processes.toMutableList()
+                            processes.removeAt(index)
+                            uiEvent(ProgramUiEvent.Update(selected.copy(processes = processes)))
+                        }
+                    },
+                    onUpOrDown = {
+                        scope.launch {
+                            val processes = selected.processes.toMutableList()
+                            val temp = processes[index]
+                            if (it) {
+                                if (index == 0) {
+                                    return@launch
+                                }
+                                processes[index] = processes[index - 1]
+                                processes[index - 1] = temp
+                            } else {
+                                if (index == processes.size - 1) {
+                                    return@launch
+                                }
+                                processes[index] = processes[index + 1]
+                                processes[index + 1] = temp
+                            }
+                            uiEvent(ProgramUiEvent.Update(selected.copy(processes = processes)))
+                        }
                     }
-                }
+                )
             }
         }
     }

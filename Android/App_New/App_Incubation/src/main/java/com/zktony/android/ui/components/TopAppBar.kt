@@ -227,7 +227,7 @@ fun ProgramAppBar(
                                 entities.itemSnapshotList.items.find { it.id == uiState.selected }
                                     ?: Program()
                             val processes = selected.processes.toMutableList()
-                            processes.add(ProcessDefaults.defaultBlocking())
+                            processes.add(ProcessDefaults.defaultPrimaryAntibody())
                             uiEvent(ProgramUiEvent.Update(selected.copy(processes = processes)))
                         }
                     }

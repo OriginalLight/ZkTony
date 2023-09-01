@@ -214,7 +214,7 @@ fun CurveDetail(
                     Text(text = "泵编号", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.weight(1f))
                     BasicTextField(
-                        modifier = Modifier.width(128.dp),
+                        modifier = Modifier.width(64.dp),
                         value = TextFieldValue(
                             selected.index.toString(),
                             TextRange(selected.index.toString().length)
@@ -276,7 +276,7 @@ fun CurveDetail(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(text = "是否启用", style = MaterialTheme.typography.titleMedium)
+                    Text(text = "是否生效", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.weight(1f))
                     Switch(
                         modifier = Modifier.height(32.dp),

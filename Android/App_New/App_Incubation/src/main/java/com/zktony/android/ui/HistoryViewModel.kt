@@ -6,6 +6,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.zktony.android.data.dao.HistoryDao
+import com.zktony.android.data.entities.History
+import com.zktony.android.data.entities.internal.Log
 import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,6 +34,30 @@ class HistoryViewModel(private val dao: HistoryDao) : ViewModel() {
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     init {
+        viewModelScope.launch {
+            dao.insert(
+                History(
+                    logs = listOf(
+                        Log(
+                            level = "INFO",
+                            message = "Hello World!Hello World!Hello World!Hello \nWorld!Hello World!Hello World!Hello World!Hello World!Hello World!",
+                        ),
+                        Log(
+                            level = "INFO",
+                            message = "Hello World!\nHello World!\nHello World!",
+                        ),
+                        Log(
+                            level = "ERROR",
+                            message = "Hello World!",
+                        ),
+                        Log(
+                            level = "WARN",
+                            message = "Hello World!",
+                        ),
+                    )
+                )
+            )
+        }
         viewModelScope.launch {
             combine(_selected, _page, _uiFlags) { selected, page, loading ->
                 HistoryUiState(selected, page, loading)
