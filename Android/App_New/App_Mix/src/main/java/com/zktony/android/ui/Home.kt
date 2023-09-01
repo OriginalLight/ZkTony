@@ -596,7 +596,7 @@ fun JobContent(
                         if (uiState.job == null) {
                             if (uiState.loading == 0) {
                                 if (uiState.selected == 0L) {
-                                    navController.navigate(Route.PROGRAM)
+                                    navController.navigate(Route.Program)
                                 } else {
                                     uiEvent(HomeUiEvent.Start)
                                 }

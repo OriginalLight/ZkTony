@@ -2,37 +2,27 @@ package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.border
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.zktony.android.data.entities.Program
-import com.zktony.android.data.entities.internal.IncubationStageStatus
+import com.zktony.android.ui.components.ProcessItem
 import com.zktony.android.ui.components.ProgramAppBar
-import com.zktony.android.ui.components.timeline.LazyTimeline
+import com.zktony.android.ui.components.ProgramItem
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
 
 @Composable
@@ -44,7 +34,7 @@ fun ProgramRoute(
 ) {
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
+    val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
         scope.launch {
             when (uiState.page) {
@@ -59,17 +49,18 @@ fun ProgramRoute(
     Scaffold(
         topBar = {
             ProgramAppBar(
+                entities = entities,
                 uiState = uiState,
                 uiEvent = viewModel::uiEvent,
-                navigation = navigation,
                 snackbarHostState = snackbarHostState
-            )
+            ) { navigation() }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets
     ) { paddingValues ->
         ProgramScreen(
             modifier = modifier.padding(paddingValues),
+            entities = entities,
             uiState = uiState,
             uiEvent = viewModel::uiEvent
         )
@@ -80,103 +71,72 @@ fun ProgramRoute(
 @Composable
 fun ProgramScreen(
     modifier: Modifier = Modifier,
+    entities: LazyPagingItems<Program>,
     uiState: ProgramUiState,
     uiEvent: (ProgramUiEvent) -> Unit
 ) {
     AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_LIST) {
-        ProgramList(modifier, uiState, uiEvent)
+        ProgramList(modifier, entities, uiState, uiEvent)
     }
 
     AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_DETAIL) {
-        ProgramDetail(modifier, uiState, uiEvent)
+        ProgramDetail(modifier, entities, uiState, uiEvent)
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProgramList(
     modifier: Modifier = Modifier,
-    uiState: ProgramUiState = ProgramUiState(),
-    uiEvent: (ProgramUiEvent) -> Unit = {},
+    entities: LazyPagingItems<Program>,
+    uiState: ProgramUiState,
+    uiEvent: (ProgramUiEvent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.small
-            ),
+        modifier = modifier,
         contentPadding = PaddingValues(16.dp),
         columns = GridCells.Fixed(4),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        itemsIndexed(items = uiState.entities) { index, item ->
-            val background = if (item.id == uiState.selected) {
-                Color.Blue.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            }
-            ElevatedCard(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.medium)
-                    .combinedClickable(
-                        onClick = {
-                            scope.launch {
-                                if (item.id == uiState.selected) {
-                                    uiEvent(ProgramUiEvent.ToggleSelected(0L))
-                                } else {
-                                    uiEvent(ProgramUiEvent.ToggleSelected(item.id))
-                                }
-                            }
-                        },
-                        onDoubleClick = {
-                            scope.launch {
-                                uiEvent(ProgramUiEvent.ToggleSelected(item.id))
-                                uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
+        items(
+            count = entities.itemCount,
+            key = entities.itemKey(),
+            contentType = entities.itemContentType()
+        ) { index ->
+            val item = entities[index]
+            if (item != null) {
+                val color =
+                    if (uiState.selected == item.id) {
+                        MaterialTheme.colorScheme.secondaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    }
+
+                ProgramItem(
+                    modifier = Modifier.background(
+                        color = color,
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                    index = index,
+                    program = item,
+                    onClick = {
+                        scope.launch {
+                            if (uiState.selected == 0L) {
+                                uiEvent(ProgramUiEvent.ToggleSelected(it.id))
+                            } else {
+                                uiEvent(ProgramUiEvent.ToggleSelected(0L))
                             }
                         }
-                    ),
-                colors = CardDefaults.cardColors(containerColor = background)
-            ) {
-                Column(
-                    modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Display the entity image and title
-                    Row(
-                        modifier = Modifier.height(24.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Text(
-                            text = "${index + 1}、",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Monospace,
-                            fontStyle = FontStyle.Italic,
-                            fontWeight = FontWeight.SemiBold,
-                        )
+                    },
+                    onDoubleClick = {
+                        scope.launch {
+                            uiEvent(ProgramUiEvent.ToggleSelected(it.id))
+                            uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
+                        }
                     }
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = item.displayText,
-                        fontSize = 20.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                    )
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = item.createTime.dateFormat("yyyy/MM/dd"),
-                        style = MaterialTheme.typography.bodySmall,
-                        fontFamily = FontFamily.Monospace,
-                        textAlign = TextAlign.End,
-                    )
-                }
+                )
             }
         }
     }
@@ -185,62 +145,44 @@ fun ProgramList(
 @Composable
 fun ProgramDetail(
     modifier: Modifier = Modifier,
-    uiState: ProgramUiState = ProgramUiState(),
-    uiEvent: (ProgramUiEvent) -> Unit = {},
+    entities: LazyPagingItems<Program>,
+    uiState: ProgramUiState,
+    uiEvent: (ProgramUiEvent) -> Unit,
 ) {
-
     val scope = rememberCoroutineScope()
-    val selected = uiState.entities.find { it.id == uiState.selected } ?: Program()
+    val selected = entities.itemSnapshotList.items.find { it.id == uiState.selected } ?: Program()
+    var selectedIndex by remember { mutableIntStateOf(0) }
 
     Row(
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
-            )
+        modifier = modifier.padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        LazyTimeline(
+        LazyColumn(
             modifier = Modifier.fillMaxWidth(0.5f),
-            stages = selected.stages,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            scope.launch {
-                val list = selected.stages.toMutableList()
-                list.forEachIndexed { index, item ->
-                    if (index == it) {
-                        list[index] = item.copy(status = IncubationStageStatus.CURRENT)
-                    } else {
-                        list[index] = item.copy(status = IncubationStageStatus.FINISHED)
+            itemsIndexed(selected.processes) { index, process ->
+                val color = if (index == selectedIndex) {
+                    MaterialTheme.colorScheme.secondaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant
+                }
+
+                ProcessItem(
+                    modifier = Modifier.background(
+                        color = color,
+                        shape = MaterialTheme.shapes.medium
+                    ),
+                    process = process,
+                    onClick = { selectedIndex = index }
+                ) {
+                    scope.launch {
+                        val processes = selected.processes.toMutableList()
+                        processes.removeAt(index)
+                        uiEvent(ProgramUiEvent.Update(selected.copy(processes = processes)))
                     }
                 }
-                uiEvent(ProgramUiEvent.Update(selected.copy(stages = list)))
             }
         }
     }
-}
-
-
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ProgramListPreview() {
-    ProgramList(
-        uiState = ProgramUiState(
-            entities = listOf(
-                Program(displayText = "test")
-            )
-        )
-    )
-}
-
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun ProgramDetailPreview() {
-    ProgramDetail(
-        uiState = ProgramUiState(
-            entities = listOf(Program(displayText = "test", id = 1L)),
-            selected = 1L
-        )
-    )
 }

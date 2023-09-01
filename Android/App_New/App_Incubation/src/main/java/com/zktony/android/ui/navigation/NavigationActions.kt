@@ -15,7 +15,7 @@ object Route {
     const val Program = "Program"
     const val Curve = "Curve"
     const val History = "History"
-    const val Settings = "Settings"
+    const val Setting = "Setting"
     const val Splash = "Splash"
 }
 
@@ -64,7 +64,7 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         iconTextId = R.string.history
     ),
     TopLevelDestination(
-        route = Route.Settings,
+        route = Route.Setting,
         icon = Icons.Outlined.Settings,
         iconTextId = R.string.settings
     )

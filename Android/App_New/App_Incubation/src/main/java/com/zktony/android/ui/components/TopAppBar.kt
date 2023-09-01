@@ -20,14 +20,17 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.paging.compose.LazyPagingItems
 import com.zktony.android.R
+import com.zktony.android.data.entities.Curve
+import com.zktony.android.data.entities.History
 import com.zktony.android.data.entities.Program
-import com.zktony.android.data.entities.internal.IncubationStage
-import com.zktony.android.data.entities.internal.IncubationStageStatus
+import com.zktony.android.data.entities.internal.defaults.ProcessDefaults
 import com.zktony.android.ui.*
 import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.extra.Point
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
 
@@ -83,7 +86,7 @@ fun SettingsAppBar(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
     uiEvent: (SettingUiEvent) -> Unit,
-    navigation: () -> Unit,
+    navigation: () -> Unit
 ) {
     TopAppBar(
         title = {
@@ -135,29 +138,26 @@ fun SettingsAppBar(
 @Composable
 fun ProgramAppBar(
     modifier: Modifier = Modifier,
+    entities: LazyPagingItems<Program>,
     uiState: ProgramUiState,
     uiEvent: (ProgramUiEvent) -> Unit,
-    navigation: () -> Unit,
     snackbarHostState: SnackbarHostState,
+    navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var showDialog by rememberSaveable { mutableStateOf(false) }
-    var deleteCount by remember { mutableIntStateOf(0) }
+    var dialog by rememberSaveable { mutableStateOf(false) }
+    var count by remember { mutableIntStateOf(0) }
 
-    if (showDialog) {
+    if (dialog) {
         InputDialog(
             onConfirm = {
                 scope.launch {
-                    showDialog = false
-                    val nameList = uiState.entities.map { it.displayText }
-                    if (nameList.contains(it)) {
-                        snackbarHostState.showSnackbar("已存在 $it")
-                    } else {
-                        uiEvent(ProgramUiEvent.Insert(it))
-                    }
+                    uiEvent(ProgramUiEvent.Insert(it))
+                    dialog = false
                 }
-            }
-        ) { showDialog = false }
+            },
+            onCancel = { dialog = false }
+        )
     }
 
     TopAppBar(
@@ -185,7 +185,9 @@ fun ProgramAppBar(
                         )
                         .padding(horizontal = 32.dp, vertical = 4.dp)
                 ) {
-                    val selected = uiState.entities.find { it.id == uiState.selected } ?: Program()
+                    val selected =
+                        entities.itemSnapshotList.items.find { it.id == uiState.selected }
+                            ?: Program()
                     Text(
                         text = selected.displayText,
                         style = TextStyle(
@@ -219,13 +221,14 @@ fun ProgramAppBar(
                 ElevatedButton(onClick = {
                     scope.launch {
                         if (uiState.page == PageType.PROGRAM_LIST) {
-                            showDialog = true
+                            dialog = true
                         } else {
                             val selected =
-                                uiState.entities.find { it.id == uiState.selected } ?: Program()
-                            val stages = selected.stages.toMutableList()
-                            stages.add(IncubationStage())
-                            uiEvent(ProgramUiEvent.Update(selected.copy(stages = stages)))
+                                entities.itemSnapshotList.items.find { it.id == uiState.selected }
+                                    ?: Program()
+                            val processes = selected.processes.toMutableList()
+                            processes.add(ProcessDefaults.defaultBlocking())
+                            uiEvent(ProgramUiEvent.Update(selected.copy(processes = processes)))
                         }
                     }
                 }) {
@@ -247,36 +250,22 @@ fun ProgramAppBar(
                     }
                 }
 
-                val delete = (uiState.selected != 0L && uiState.page == PageType.PROGRAM_LIST)
-                        || (uiState.page == PageType.PROGRAM_DETAIL
-                        && uiState.selected != 0L
-                        && uiState.entities.find { it.id == uiState.selected }?.stages?.find { it.status == IncubationStageStatus.CURRENT } != null)
-
-                AnimatedVisibility(visible = delete) {
+                AnimatedVisibility(visible = uiState.selected != 0L && uiState.page == PageType.PROGRAM_LIST) {
                     ElevatedButton(onClick = {
                         scope.launch {
-                            if (deleteCount == 0) {
-                                deleteCount++
+                            if (count == 0) {
+                                count++
                                 snackbarHostState.showSnackbar("再次点击删除")
                             } else {
-                                deleteCount = 0
-                                if (uiState.page == PageType.PROGRAM_LIST) {
-                                    uiEvent(ProgramUiEvent.Delete(uiState.selected))
-                                } else {
-                                    val selected =
-                                        uiState.entities.find { it.id == uiState.selected }
-                                            ?: Program()
-                                    val stages = selected.stages.toMutableList()
-                                    stages.removeAt(stages.indexOf(stages.find { it.status == IncubationStageStatus.CURRENT }))
-                                    uiEvent(ProgramUiEvent.Update(selected.copy(stages = stages)))
-                                }
+                                count = 0
+                                uiEvent(ProgramUiEvent.Delete(uiState.selected))
                             }
                         }
                     }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = null,
-                            tint = if (deleteCount == 0) MaterialTheme.colorScheme.primary else Color.Red
+                            tint = if (count == 0) MaterialTheme.colorScheme.primary else Color.Red
                         )
                     }
                 }
@@ -296,10 +285,171 @@ fun ProgramAppBar(
 @Composable
 fun CurveAppBar(
     modifier: Modifier = Modifier,
+    entities: LazyPagingItems<Curve>,
+    uiState: CurveUiState,
+    uiEvent: (CurveUiEvent) -> Unit,
+    snackbarHostState: SnackbarHostState,
     navigation: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+    var count by remember { mutableIntStateOf(0) }
+    var dialog by remember { mutableStateOf(false) }
+
+    if (dialog) {
+        InputDialog(
+            onConfirm = {
+                uiEvent(CurveUiEvent.Insert(it))
+                dialog = false
+            },
+            onCancel = { dialog = false }
+        )
+    }
+
     TopAppBar(
         title = {
+            if (uiState.page == PageType.CURVE_LIST) {
+                Text(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = MaterialTheme.shapes.small,
+                        )
+                        .padding(horizontal = 32.dp, vertical = 4.dp),
+                    text = stringResource(id = R.string.calibration),
+                    style = TextStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 24.sp
+                    )
+                )
+            } else {
+                Column(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = MaterialTheme.shapes.small,
+                        )
+                        .padding(horizontal = 32.dp, vertical = 4.dp)
+                ) {
+                    val selected =
+                        entities.itemSnapshotList.items.find { it.id == uiState.selected }
+                            ?: Curve(displayText = "None")
+                    Text(
+                        text = selected.displayText,
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            fontStyle = FontStyle.Italic,
+                        )
+                    )
+                    Text(
+                        text = selected.createTime.dateFormat("yyyy/MM/dd"),
+                        style = TextStyle(
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 12.sp,
+                        ),
+                        color = Color.Gray,
+                    )
+                }
+            }
+        },
+        actions = {
+            Row(
+                modifier = modifier
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = CircleShape
+                    )
+                    .padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ElevatedButton(onClick = {
+                    scope.launch {
+                        if (uiState.page == PageType.CURVE_LIST) {
+                            dialog = true
+                        } else {
+                            val selected =
+                                entities.itemSnapshotList.items.find { it.id == uiState.selected }
+                                    ?: Curve(displayText = "None")
+                            val points = selected.points.toMutableList()
+                            points.add(Point(0.0, 0.0))
+                            uiEvent(CurveUiEvent.Update(selected.copy(points = points)))
+                        }
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null
+                    )
+                }
+
+                AnimatedVisibility(
+                    visible = uiState.page == PageType.CURVE_LIST
+                            && uiState.selected != 0L
+                ) {
+                    ElevatedButton(onClick = { uiEvent(CurveUiEvent.NavTo(PageType.CURVE_DETAIL)) }) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null
+                        )
+                    }
+                }
+
+                AnimatedVisibility(
+                    visible = uiState.page == PageType.CURVE_LIST
+                            && uiState.selected != 0L
+                ) {
+                    ElevatedButton(onClick = {
+                        scope.launch {
+                            if (count == 0) {
+                                count++
+                                snackbarHostState.showSnackbar("再次点击删除")
+                            } else {
+                                count = 0
+                                uiEvent(CurveUiEvent.Delete(uiState.selected))
+                            }
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = if (count == 0) MaterialTheme.colorScheme.primary else Color.Red
+                        )
+                    }
+                }
+
+                ElevatedButton(onClick = navigation) {
+                    Icon(
+                        imageVector = Icons.Default.Reply,
+                        contentDescription = null
+                    )
+                }
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HistoryAppBar(
+    modifier: Modifier = Modifier,
+    entities: LazyPagingItems<History>,
+    uiState: HistoryUiState,
+    uiEvent: (HistoryUiEvent) -> Unit,
+    navigation: () -> Unit
+) {
+    val scope = rememberCoroutineScope()
+
+    TopAppBar(
+        title = {
+            val selected =
+                entities.itemSnapshotList.items.find { it.id == uiState.selected } ?: History()
+            val text = if (uiState.page == PageType.HISTORY_LIST) {
+                stringResource(id = R.string.history)
+            } else {
+                selected.createTime.dateFormat("yyyy/MM/dd")
+            }
+
             Text(
                 modifier = Modifier
                     .background(
@@ -307,7 +457,7 @@ fun CurveAppBar(
                         shape = MaterialTheme.shapes.small,
                     )
                     .padding(horizontal = 32.dp, vertical = 4.dp),
-                text = stringResource(id = R.string.calibration),
+                text = text,
                 style = TextStyle(
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 24.sp
@@ -325,6 +475,20 @@ fun CurveAppBar(
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                AnimatedVisibility(visible = uiState.page == PageType.HISTORY_DETAIL && uiState.selected != 0L) {
+                    ElevatedButton(onClick = {
+                        scope.launch {
+                            uiEvent(HistoryUiEvent.NavTo(PageType.HISTORY_LIST))
+                            uiEvent(HistoryUiEvent.Delete(uiState.selected))
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null
+                        )
+                    }
+                }
+
                 ElevatedButton(onClick = navigation) {
                     Icon(
                         imageVector = Icons.Default.Reply,

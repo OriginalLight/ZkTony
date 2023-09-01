@@ -14,7 +14,7 @@ abstract class HistoryDao : BaseDao<History> {
     @Query(
         """
         SELECT * FROM history
-        ORDER BY createTime ASC
+        ORDER BY createTime DESC
         """
     )
     abstract fun getAll(): Flow<List<History>>
@@ -22,7 +22,7 @@ abstract class HistoryDao : BaseDao<History> {
     @Query(
         """
         SELECT * FROM history
-        ORDER BY createTime ASC
+        ORDER BY createTime DESC
         """
     )
     abstract fun getByPage(): PagingSource<Int, History>

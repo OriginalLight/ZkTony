@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToLong
 
 @Composable
-fun SettingsRoute(
+fun SettingRoute(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: SettingViewModel,
@@ -90,7 +90,7 @@ fun SettingsRoute(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets
     ) { paddingValues ->
-        SettingsScreen(
+        SettingScreen(
             modifier = modifier.padding(paddingValues),
             uiState = uiState,
             uiEvent = viewModel::uiEvent,
@@ -100,14 +100,14 @@ fun SettingsRoute(
 }
 
 @Composable
-fun SettingsScreen(
+fun SettingScreen(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
     uiEvent: (SettingUiEvent) -> Unit = {},
     snackbarHostState: SnackbarHostState
 ) {
     AnimatedVisibility(visible = uiState.page == PageType.SETTINGS) {
-        SettingsContent(modifier, uiState, uiEvent, snackbarHostState)
+        SettingContent(modifier, uiState, uiEvent, snackbarHostState)
     }
     AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
         Authentication(modifier, uiEvent)
@@ -124,7 +124,7 @@ fun SettingsScreen(
 }
 
 @Composable
-fun SettingsContent(
+fun SettingContent(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
     uiEvent: (SettingUiEvent) -> Unit = {},
@@ -228,10 +228,19 @@ fun SettingsContent(
                     text = if (helpInfo) stringResource(id = R.string.qrcode) else stringResource(id = R.string.help),
                     onClick = { helpInfo = !helpInfo },
                 ) {
-                    Icon(
-                        imageVector = if (helpInfo) Icons.Default.Close else Icons.Default.ArrowRight,
-                        contentDescription = null
-                    )
+                    if (helpInfo) {
+                        Text(
+                            text = "025-68790636",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontStyle = FontStyle.Italic
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.ArrowRight,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
 
@@ -317,6 +326,48 @@ fun SettingsContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+fun SettingsCard(
+    paddingStart: Dp = 0.dp,
+    onClick: () -> Unit = { },
+    icon: ImageVector,
+    text: String? = null,
+    content: @Composable () -> Unit
+) {
+    Card(
+        modifier = Modifier.padding(start = paddingStart),
+        onClick = onClick,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                modifier = Modifier.size(32.dp),
+                imageVector = icon,
+                contentDescription = text,
+                tint = MaterialTheme.colorScheme.primary
+            )
+            text?.let {
+                Text(
+                    text = text,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold,
+                        fontFamily = FontFamily.Serif,
+                        fontSize = 16.sp,
+                        lineHeight = 24.sp,
+                        letterSpacing = 0.15.sp
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            content.invoke()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun Authentication(
     modifier: Modifier = Modifier,
     uiEvent: (SettingUiEvent) -> Unit = {}
@@ -384,48 +435,6 @@ fun Authentication(
                     }
                 }
             }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SettingsCard(
-    paddingStart: Dp = 0.dp,
-    onClick: () -> Unit = { },
-    icon: ImageVector,
-    text: String? = null,
-    content: @Composable () -> Unit
-) {
-    Card(
-        modifier = Modifier.padding(start = paddingStart),
-        onClick = onClick,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                modifier = Modifier.size(32.dp),
-                imageVector = icon,
-                contentDescription = text,
-                tint = MaterialTheme.colorScheme.primary
-            )
-            text?.let {
-                Text(
-                    text = text,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Serif,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                        letterSpacing = 0.15.sp
-                    )
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            content.invoke()
         }
     }
 }
@@ -696,5 +705,5 @@ fun ConfigList(modifier: Modifier = Modifier) {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun SettingsPreview() {
-    SettingsContent(uiState = SettingUiState(), snackbarHostState = SnackbarHostState())
+    SettingContent(uiState = SettingUiState(), snackbarHostState = SnackbarHostState())
 }

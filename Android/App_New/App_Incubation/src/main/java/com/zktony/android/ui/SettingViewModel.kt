@@ -43,15 +43,8 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
                     _progress,
                     _page
                 ) { application, entities, selected, progress, page ->
-                    SettingUiState(
-                        application = application,
-                        entities = entities,
-                        selected = selected,
-                        progress = progress,
-                        page = page
-                    )
+                    SettingUiState(application, entities, selected, progress, page)
                 }.catch { ex ->
-                    ex.printStackTrace()
                     _message.value = ex.message
                 }.collect {
                     _uiState.value = it
@@ -59,10 +52,7 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
             }
             launch {
                 if (Ext.ctx.isNetworkAvailable()) {
-                    httpCall {
-                        _application.value =
-                            it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
-                    }
+                    httpCall { _application.value = it }
                 }
             }
         }
@@ -111,36 +101,32 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
                     && application.download_url.isNotEmpty()
                     && _progress.value == 0
                 ) {
+                    _progress.value = 1
                     application.download_url.download(
                         File(
                             Ext.ctx.getExternalFilesDir(null),
                             "update.apk"
                         )
-                    )
-                        .collect {
-                            when (it) {
-                                is DownloadState.Success -> {
-                                    _progress.value = 0
-                                    Ext.ctx.installApk(it.file)
-                                }
+                    ).collect {
+                        when (it) {
+                            is DownloadState.Success -> {
+                                _progress.value = 0
+                                Ext.ctx.installApk(it.file)
+                            }
 
-                                is DownloadState.Err -> {
-                                    _progress.value = 0
-                                    _message.value = "下载失败: ${it.t.message}"
-                                }
+                            is DownloadState.Err -> {
+                                _progress.value = 0
+                                _message.value = "下载失败: ${it.t.message}"
+                            }
 
-                                is DownloadState.Progress -> {
-                                    _progress.value = maxOf(it.progress, 1)
-                                }
+                            is DownloadState.Progress -> {
+                                _progress.value = maxOf(it.progress, 1)
                             }
                         }
-                    _progress.value = 1
+                    }
                 }
             } else {
-                httpCall(
-                    exception = { _message.value = it.message }
-                ) {
-                    val app = it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                httpCall(exception = { _message.value = it.message }) { app ->
                     if (app != null) {
                         _application.value = app
                     } else {

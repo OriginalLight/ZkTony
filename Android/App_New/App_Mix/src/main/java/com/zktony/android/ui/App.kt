@@ -45,15 +45,15 @@ private fun AppNavHost(
     NavHost(
         modifier = modifier,
         navController = navController,
-        startDestination = Route.SPLASH
+        startDestination = Route.Splash
     ) {
-        composable(Route.SPLASH) {
+        composable(Route.Splash) {
             Splash(
                 modifier = Modifier,
                 navController = navController
             )
         }
-        composable(Route.HOME) {
+        composable(Route.Home) {
             HomeRoute(
                 navController = navController,
                 viewModel = homeViewModel,
@@ -61,22 +61,22 @@ private fun AppNavHost(
                 snackbarHostState = snackbarHostState,
             )
         }
-        composable(Route.PROGRAM) {
+        composable(Route.Program) {
             ProgramRoute(
                 navController = navController,
                 viewModel = koinViewModel(),
                 snackbarHostState = snackbarHostState
             )
         }
-        composable(Route.CALIBRATION) {
+        composable(Route.Calibration) {
             CalibrationRoute(
                 navController = navController,
                 viewModel = koinViewModel(),
                 snackbarHostState = snackbarHostState
             )
         }
-        composable(Route.SETTINGS) {
-            SettingsRoute(
+        composable(Route.Setting) {
+            SettingRoute(
                 navController = navController,
                 viewModel = koinViewModel(),
                 snackbarHostState = snackbarHostState

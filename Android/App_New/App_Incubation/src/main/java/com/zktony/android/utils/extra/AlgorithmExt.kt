@@ -6,6 +6,27 @@ package com.zktony.android.utils.extra
  */
 data class Point(val x: Double, val y: Double)
 
+fun calculateLinearRelation(point: Point): (Double) -> Double? {
+    // 计算斜率
+    val slope = point.y / point.x
+
+    return { x ->
+        slope * x
+    }
+}
+
+fun calculateLinearRelation(point1: Point, point2: Point): (Double) -> Double? {
+    // 计算斜率
+    val slope = (point2.y - point1.y) / (point2.x - point1.x)
+
+    // 计算截距
+    val intercept = point1.y - slope * point1.x
+
+    return { x ->
+        slope * x + intercept
+    }
+}
+
 fun fitQuadraticCurve(points: List<Point>): (Double) -> Double? {
     val n = points.size
 

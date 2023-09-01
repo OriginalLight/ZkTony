@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.extra.writeRegister
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -25,6 +26,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     val uiState = _uiState.asStateFlow()
 
     init {
+        writeRegister(0, 204, 1000L)
         viewModelScope.launch {
             combine(
                 dao.getAll(),

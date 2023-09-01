@@ -82,8 +82,8 @@ private fun AppNavHost(
                 snackbarHostState = snackbarHostState
             )
         }
-        composable(Route.Settings) {
-            SettingsRoute(
+        composable(Route.Setting) {
+            SettingRoute(
                 navController = navController,
                 viewModel = koinViewModel(),
                 snackbarHostState = snackbarHostState

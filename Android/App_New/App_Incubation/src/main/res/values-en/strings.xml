@@ -44,4 +44,7 @@
     <string name="secondary_antibody">Secondary Antibody</string>
     <string name="phosphate_buffered_saline">Phosphate Buffered Saline</string>
     <string name="search">Search</string>
+    <string name="finished">Finished</string>
+    <string name="running">Running</string>
+    <string name="upcoming">Upcoming</string>
 </resources>

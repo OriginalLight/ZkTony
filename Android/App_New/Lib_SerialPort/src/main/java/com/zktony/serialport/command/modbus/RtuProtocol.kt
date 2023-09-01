@@ -18,13 +18,9 @@ class RtuProtocol {
     }
 }
 
-fun rtuProtocol(block: RtuProtocol.() -> Unit): RtuProtocol {
-    return RtuProtocol().apply(block)
-}
-
 fun ByteArray.toRtuProtocol(): RtuProtocol {
     val byteArray = this
-    return rtuProtocol {
+    return RtuProtocol().apply {
         slaveAddr = byteArray[0]
         funcCode = byteArray[1]
         data = byteArray.copyOfRange(2, byteArray.size - 2)

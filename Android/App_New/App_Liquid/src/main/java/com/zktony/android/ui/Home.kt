@@ -426,7 +426,7 @@ fun JobContent(
                                 if (uiState.entities.isNotEmpty()) {
                                     uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
                                 } else {
-                                    navController.navigate(Route.PROGRAM)
+                                    navController.navigate(Route.Program)
                                 }
                             }
                         }

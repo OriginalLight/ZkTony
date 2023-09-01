@@ -2,6 +2,9 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
@@ -15,34 +18,26 @@ import kotlinx.coroutines.launch
  * @author 刘贺贺
  * @date 2023/5/15 14:51
  */
-class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
-
+class ProgramViewModel(private val dao: ProgramDao) : ViewModel() {
     private val _uiState = MutableStateFlow(ProgramUiState())
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.PROGRAM_LIST)
-    private val _loading = MutableStateFlow(false)
+    private val _uiFlags = MutableStateFlow(0)
+    private val _message = MutableStateFlow<String?>(null)
 
     val uiState = _uiState.asStateFlow()
+    val message = _message.asStateFlow()
+    val entities = Pager(
+        config = PagingConfig(pageSize = 20, initialLoadSize = 40)
+    ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     init {
         viewModelScope.launch {
-            // Combine the various flows into a single program UI state
-            combine(
-                dao.getAll(),
-                _selected,
-                _page,
-                _loading,
-            ) { entities, selected, page, loading ->
-                ProgramUiState(
-                    entities = entities,
-                    selected = selected,
-                    page = page,
-                    loading = loading
-                )
+            combine(_selected, _page, _uiFlags) { selected, page, uiFlags ->
+                ProgramUiState(selected, page, uiFlags)
             }.catch { ex ->
-                ex.printStackTrace()
+                _message.value = ex.message
             }.collect {
-                // Set the program UI state
                 _uiState.value = it
             }
         }
@@ -62,10 +57,9 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 }
 
 data class ProgramUiState(
-    val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.PROGRAM_LIST,
-    val loading: Boolean = false,
+    val uiFlags: Int = 0
 )
 
 sealed class ProgramUiEvent {

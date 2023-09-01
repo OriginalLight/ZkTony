@@ -1,5 +1,6 @@
 package com.zktony.android.data.entities
 
+import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
@@ -13,6 +14,7 @@ import java.util.Date
  */
 @Entity(tableName = "curve")
 @TypeConverters(PointConverters::class)
+@Immutable
 data class Curve(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0L,

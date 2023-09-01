@@ -43,10 +43,11 @@ class HistoryViewModel(private val dao: HistoryDao) : ViewModel() {
         }
     }
 
-    fun uiEvent(event: HistoryUiEvent) {
-        when (event) {
-            is HistoryUiEvent.NavTo -> _page.value = event.page
-            is HistoryUiEvent.ToggleSelected -> _selected.value = event.id
+    fun uiEvent(uiEvent: HistoryUiEvent) {
+        when (uiEvent) {
+            is HistoryUiEvent.NavTo -> _page.value = uiEvent.page
+            is HistoryUiEvent.ToggleSelected -> _selected.value = uiEvent.id
+            is HistoryUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
         }
     }
 
@@ -61,5 +62,6 @@ data class HistoryUiState(
 sealed class HistoryUiEvent {
     data class NavTo(val page: PageType) : HistoryUiEvent()
     data class ToggleSelected(val id: Long) : HistoryUiEvent()
+    data class Delete(val id: Long) : HistoryUiEvent()
 }
 
