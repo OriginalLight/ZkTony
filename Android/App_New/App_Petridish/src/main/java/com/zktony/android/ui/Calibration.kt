@@ -97,156 +97,156 @@ fun CalibrationList(
      * 复位高度
      */
     val fwgd = rememberDataSaverState(key = "fwgd", default = 0f)
-    var fwgd_ex by remember { mutableStateOf(fwgd.value.format(1)) }
+    var fwgd_ex by remember { mutableStateOf(fwgd.value.format(4)) }
 
 
     /**
      * 盘子距离
      */
     val pzjl = rememberDataSaverState(key = "pzjl", default = 0f)
-    var pzjl_ex by remember { mutableStateOf(pzjl.value.format(1)) }
+    var pzjl_ex by remember { mutableStateOf(pzjl.value.format(4)) }
 
 
     /**
      * 夹爪高度
      */
     val jzgd = rememberDataSaverState(key = "jzgd", default = 0f)
-    var jzgd_ex by remember { mutableStateOf(jzgd.value.format(1)) }
+    var jzgd_ex by remember { mutableStateOf(jzgd.value.format(4)) }
 
     /**
      * 分离距离
      */
     val fljl = rememberDataSaverState(key = "fljl", default = 0f)
-    var fljl_ex by remember { mutableStateOf(fljl.value.format(1)) }
+    var fljl_ex by remember { mutableStateOf(fljl.value.format(4)) }
 
     /**
      * 矫正高度
      */
     val jiaozgd = rememberDataSaverState(key = "jiaozgd", default = 0f)
-    var jiaozgd_ex by remember { mutableStateOf(jiaozgd.value.format(1)) }
+    var jiaozgd_ex by remember { mutableStateOf(jiaozgd.value.format(4)) }
 
     /**
      * 下盘高度
      */
     val xpgd = rememberDataSaverState(key = "xpgd", default = 0f)
-    var xpgd_ex by remember { mutableStateOf(xpgd.value.format(1)) }
+    var xpgd_ex by remember { mutableStateOf(xpgd.value.format(4)) }
 
 
     /**
      * 复位高度
      */
     val fwgd2 = rememberDataSaverState(key = "fwgd2", default = 0f)
-    var fwgd2_ex by remember { mutableStateOf(fwgd2.value.format(1)) }
+    var fwgd2_ex by remember { mutableStateOf(fwgd2.value.format(4)) }
 
     /**
      * 盘子距离
      */
     val pzjl2 = rememberDataSaverState(key = "pzjl2", default = 0f)
-    var pzjl2_ex by remember { mutableStateOf(pzjl2.value.format(1)) }
+    var pzjl2_ex by remember { mutableStateOf(pzjl2.value.format(4)) }
 
     /**
      * 夹紧距离
      */
     val jjjl = rememberDataSaverState(key = "jjjl", default = 0f)
-    var jjjl_ex by remember { mutableStateOf(jjjl.value.format(1)) }
+    var jjjl_ex by remember { mutableStateOf(jjjl.value.format(4)) }
 
     /**
      * 松开距离
      */
     val skjl = rememberDataSaverState(key = "skjl", default = 0f)
-    var skjl_ex by remember { mutableStateOf(skjl.value.format(1)) }
+    var skjl_ex by remember { mutableStateOf(skjl.value.format(4)) }
 
     /**
      * 上盘原点距离
      */
     val spydjl = rememberDataSaverState(key = "spydjl", default = 0f)
-    var spydjl_ex by remember { mutableStateOf(spydjl.value.format(1)) }
+    var spydjl_ex by remember { mutableStateOf(spydjl.value.format(4)) }
 
     /**
      * 上盘孔位距离1
      */
     val spkwjl1 = rememberDataSaverState(key = "spkwjl1", default = 0f)
-    var spkwjl1_ex by remember { mutableStateOf(spkwjl1.value.format(1)) }
+    var spkwjl1_ex by remember { mutableStateOf(spkwjl1.value.format(4)) }
 
     /**
      * 上盘孔位距离2
      */
     val spkwjl2 = rememberDataSaverState(key = "spkwjl2", default = 0f)
-    var spkwjl2_ex by remember { mutableStateOf(spkwjl2.value.format(1)) }
+    var spkwjl2_ex by remember { mutableStateOf(spkwjl2.value.format(4)) }
 
     /**
      * 上盘孔位距离3
      */
     val spkwjl3 = rememberDataSaverState(key = "spkwjl3", default = 0f)
-    var spkwjl3_ex by remember { mutableStateOf(spkwjl3.value.format(1)) }
+    var spkwjl3_ex by remember { mutableStateOf(spkwjl3.value.format(4)) }
 
     /**
      * 上盘孔位距离4
      */
     val spkwjl4 = rememberDataSaverState(key = "spkwjl4", default = 0f)
-    var spkwjl4_ex by remember { mutableStateOf(spkwjl4.value.format(1)) }
+    var spkwjl4_ex by remember { mutableStateOf(spkwjl4.value.format(4)) }
 
     /**
      * 上盘孔位距离5
      */
     val spkwjl5 = rememberDataSaverState(key = "spkwjl5", default = 0f)
-    var spkwjl5_ex by remember { mutableStateOf(spkwjl5.value.format(1)) }
+    var spkwjl5_ex by remember { mutableStateOf(spkwjl5.value.format(4)) }
 
     /**
      * 上盘孔位距离6
      */
     val spkwjl6 = rememberDataSaverState(key = "spkwjl6", default = 0f)
-    var spkwjl6_ex by remember { mutableStateOf(spkwjl6.value.format(1)) }
+    var spkwjl6_ex by remember { mutableStateOf(spkwjl6.value.format(4)) }
 
     /**
      * 上盘孔位距离7
      */
     val spkwjl7 = rememberDataSaverState(key = "spkwjl7", default = 0f)
-    var spkwjl7_ex by remember { mutableStateOf(spkwjl7.value.format(1)) }
+    var spkwjl7_ex by remember { mutableStateOf(spkwjl7.value.format(4)) }
 
     /**
      * 上盘孔位距离8
      */
     val spkwjl8 = rememberDataSaverState(key = "spkwjl8", default = 0f)
-    var spkwjl8_ex by remember { mutableStateOf(spkwjl8.value.format(1)) }
+    var spkwjl8_ex by remember { mutableStateOf(spkwjl8.value.format(4)) }
 
 
     /**
      * 下盘原点距离
      */
     val xpydjl = rememberDataSaverState(key = "xpydjl", default = 0f)
-    var xpydjl_ex by remember { mutableStateOf(xpydjl.value.format(1)) }
+    var xpydjl_ex by remember { mutableStateOf(xpydjl.value.format(4)) }
 
     /**
      * 下盘孔位距离1
      */
     val xpkwjl1 = rememberDataSaverState(key = "xpkwjl1", default = 0f)
-    var xpkwjl1_ex by remember { mutableStateOf(xpkwjl1.value.format(1)) }
+    var xpkwjl1_ex by remember { mutableStateOf(xpkwjl1.value.format(4)) }
 
     /**
      * 下盘孔位距离2
      */
     val xpkwjl2 = rememberDataSaverState(key = "xpkwjl2", default = 0f)
-    var xpkwjl2_ex by remember { mutableStateOf(xpkwjl2.value.format(1)) }
+    var xpkwjl2_ex by remember { mutableStateOf(xpkwjl2.value.format(4)) }
 
     /**
      * 下盘孔位距离3
      */
     val xpkwjl3 = rememberDataSaverState(key = "xpkwjl3", default = 0f)
-    var xpkwjl3_ex by remember { mutableStateOf(xpkwjl3.value.format(1)) }
+    var xpkwjl3_ex by remember { mutableStateOf(xpkwjl3.value.format(4)) }
 
 
     /**
      * 加液前
      */
     val jyq = rememberDataSaverState(key = "jyq", default = 0f)
-    var jyq_ex by remember { mutableStateOf(jyq.value.format(1)) }
+    var jyq_ex by remember { mutableStateOf(jyq.value.format(4)) }
 
     /**
      * 加液后
      */
     val jyh = rememberDataSaverState(key = "jyh", default = 0f)
-    var jyh_ex by remember { mutableStateOf(jyh.value.format(1)) }
+    var jyh_ex by remember { mutableStateOf(jyh.value.format(4)) }
 
     val context = LocalContext.current;
 
@@ -282,8 +282,10 @@ fun CalibrationList(
                         event(
                             CalibrationEvent.Reset(
                                 listOf(1),
-                                spydjl.value.toLong(),
-                                xpydjl.value.toLong()
+                                spydjl.value.toDouble(),
+                                xpydjl.value.toDouble(),
+                                fwgd.value.toDouble(),
+                                fwgd2.value.toDouble()
                             )
                         )
                     },
@@ -298,8 +300,10 @@ fun CalibrationList(
                         event(
                             CalibrationEvent.Reset(
                                 listOf(1, 0, 2, 4, 5),
-                                spydjl.value.toLong(),
-                                xpydjl.value.toLong()
+                                spydjl.value.toDouble(),
+                                xpydjl.value.toDouble(),
+                                fwgd.value.toDouble(),
+                                fwgd2.value.toDouble()
                             )
                         )
                     },
@@ -644,8 +648,10 @@ fun CalibrationList(
                         event(
                             CalibrationEvent.Reset(
                                 listOf(0),
-                                spydjl.value.toLong(),
-                                xpydjl.value.toLong()
+                                spydjl.value.toDouble(),
+                                xpydjl.value.toDouble(),
+                                fwgd.value.toDouble(),
+                                fwgd2.value.toDouble()
                             )
                         )
                     },
@@ -774,8 +780,10 @@ fun CalibrationList(
                         event(
                             CalibrationEvent.Reset(
                                 listOf(2),
-                                spydjl.value.toLong(),
-                                xpydjl.value.toLong()
+                                spydjl.value.toDouble(),
+                                xpydjl.value.toDouble(),
+                                fwgd.value.toDouble(),
+                                fwgd2.value.toDouble()
                             )
                         )
                     },
@@ -902,8 +910,10 @@ fun CalibrationList(
                         event(
                             CalibrationEvent.Reset(
                                 listOf(5),
-                                spydjl.value.toLong(),
-                                xpydjl.value.toLong()
+                                spydjl.value.toDouble(),
+                                xpydjl.value.toDouble(),
+                                fwgd.value.toDouble(),
+                                fwgd2.value.toDouble()
                             )
                         )
                     },
@@ -942,11 +952,13 @@ fun CalibrationList(
                 Button(
                     onClick = {
                         scope.launch {
+
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
                                         index = 5
                                         pulse = (3200L * spydjl.value.toDouble()).toLong();
+                                        speed = 100
                                     }
                                 }
                             } catch (e: Exception) {
@@ -1399,8 +1411,10 @@ fun CalibrationList(
                         event(
                             CalibrationEvent.Reset(
                                 listOf(4),
-                                spydjl.value.toLong(),
-                                xpydjl.value.toLong()
+                                spydjl.value.toDouble(),
+                                xpydjl.value.toDouble(),
+                                fwgd.value.toDouble(),
+                                fwgd2.value.toDouble()
                             )
                         )
                     },
@@ -1438,12 +1452,14 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
+                        println("下盘移动数据===" + xpydjl.value.toDouble())
+                        println("下盘步数===" + (2599L * xpydjl.value.toDouble()).toLong())
                         scope.launch {
                             try {
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
                                         index = 4
-                                        pulse = (3200L * xpydjl.value.toDouble()).toLong();
+                                        pulse = (2599L * xpydjl.value.toDouble()).toLong()
                                         speed = 100
                                     }
                                 }
@@ -1496,7 +1512,7 @@ fun CalibrationList(
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
                                         index = 4
-                                        pulse = (3200L * xpkwjl1.value.toDouble()).toLong();
+                                        pulse = (3255L * xpkwjl1.value.toDouble()).toLong();
                                     }
                                 }
                             } catch (e: Exception) {
@@ -1548,7 +1564,7 @@ fun CalibrationList(
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
                                         index = 4
-                                        pulse = (3200L * xpkwjl2.value.toDouble()).toLong();
+                                        pulse = (3255L * xpkwjl2.value.toDouble()).toLong();
                                     }
                                 }
                             } catch (e: Exception) {
@@ -1602,7 +1618,7 @@ fun CalibrationList(
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
                                         index = 4
-                                        pulse = (3200L * xpkwjl3.value.toDouble()).toLong();
+                                        pulse = (3255L * xpkwjl3.value.toDouble()).toLong();
                                     }
                                 }
                             } catch (e: Exception) {

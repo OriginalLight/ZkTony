@@ -12,11 +12,31 @@ import java.util.concurrent.atomic.AtomicLong
 val serialPort: SerialPortHelper = SerialPortHelper.instance
 val asyncTask: AsyncTask = AsyncTask.instance
 
-private var x: AtomicLong = AtomicLong(0L)
-private var y: AtomicLong = AtomicLong(0L)
-private var z: AtomicLong = AtomicLong(0L)
-private var z1: AtomicLong = AtomicLong(0L)
-private var z2: AtomicLong = AtomicLong(0L)
+/**
+ * 控制类型
+ * 举升2是电机0
+ */
+private var js2: AtomicLong = AtomicLong(0L)
+
+/**
+ * 举升1是电机1
+ */
+private var js1: AtomicLong = AtomicLong(0L)
+
+/**
+ * 夹爪是电机2
+ */
+private var jiazhua: AtomicLong = AtomicLong(0L)
+
+/**
+ * 下盘是电机4
+ */
+private var xp: AtomicLong = AtomicLong(0L)
+
+/**
+ * 上盘是电机5
+ */
+private var sp: AtomicLong = AtomicLong(0L)
 
 /**
  * 脉冲
@@ -41,37 +61,40 @@ fun <T : Number> pulse(index: Int, dvp: T): Long {
         }
     }
 
+    /**
+     * 记录坐标
+     */
     return when (index) {
         0 -> {
-            val d = p - x.get()
-            x.set(maxOf(p, 0))
+            val d = p - js2.get()
+            js2.set(maxOf(p, 0))
             d
         }
 
         1 -> {
-            val d = p - y.get()
-            y.set(maxOf(p, 0))
+            val d = p - js1.get()
+            js1.set(maxOf(p, 0))
             d
         }
 
 
         2 -> {
-            val d = p - z.get()
-            z.set(maxOf(p, 0))
-            d
-        }
-
-
-        3 -> {
-            val d = p - z1.get()
-            z1.set(maxOf(p, 0))
+            val d = p - jiazhua.get()
+            jiazhua.set(maxOf(p, 0))
             d
         }
 
 
         4 -> {
-            val d = p - z2.get()
-            z2.set(maxOf(p, 0))
+            val d = p - xp.get()
+            xp.set(maxOf(p, 0))
+            d
+        }
+
+
+        5 -> {
+            val d = p - sp.get()
+            sp.set(maxOf(p, 0))
             d
         }
 

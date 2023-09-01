@@ -70,8 +70,8 @@ class TxScope {
             //按照步数运动/3200
             MoveType.MOVE_PULSE -> {
                 val pulse = pulse(moveScope.index, moveScope.pulse)
-                val config =
-                    Motor(speed = moveScope.speed, acc = moveScope.acc, dec = moveScope.dec)
+                println("pulse:$pulse")
+                val config =Motor(speed = moveScope.speed, acc = moveScope.acc, dec = moveScope.dec)
                 if (pulse != 0L) {
                     val ba = ByteArray(5)
                     ba.writeInt8(moveScope.index, 0).writeInt32LE(pulse, 1)

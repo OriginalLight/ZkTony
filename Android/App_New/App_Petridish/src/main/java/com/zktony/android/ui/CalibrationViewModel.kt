@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 
 /**
  * @author 刘贺贺
@@ -69,20 +68,25 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
             is CalibrationEvent.AddLiquid -> addLiquid(event.index)
             is CalibrationEvent.DeleteData -> deleteData(event.data)
             is CalibrationEvent.InsertData -> insertData(event.index, event.volume)
-            is CalibrationEvent.Reset -> reset(event.ids, event.spydjl, event.xpydjl)
+            is CalibrationEvent.Reset -> reset(
+                event.ids,
+                event.spydjl,
+                event.xpydjl,
+                event.fwgd,
+                event.fwgd2
+            )
         }
     }
 
     /**
      * Resets the axes and syringe.
      */
-    private fun reset(ids: List<Int>, spydjl: Long, xpydjl: Long) {
+    private fun reset(ids: List<Int>, spydjl: Double, xpydjl: Double, fwgd: Double, fwgd2: Double) {
         viewModelScope.launch {
             _loadingNum.value = 1
             try {
-                // Initialize the axes and syringe within a timeout of 60 seconds
-                withTimeout(60 * 1000L * ids.size) {
-
+                if (!_loading.value) {
+                    _loading.value = true
                     // 查询GPIO状态
                     tx { queryGpio(ids) }
                     delay(300L)
@@ -108,7 +112,7 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                             timeout = 1000L * 10
                             move(MoveType.MOVE_PULSE) {
                                 index = it
-                                pulse = 3200L * 2
+                                pulse = 800L
                                 acc = 50
                                 dec = 80
                                 speed = 100
@@ -131,26 +135,42 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                     if (ids.size > 1) {
                         //移动上盘到原点距离
                         tx {
-                            timeout = 1000L * 60
                             move(MoveType.MOVE_PULSE) {
                                 index = 5
-                                pulse = 3200L * xpydjl
+                                pulse = (3200L * spydjl).toLong();
                                 speed = 100
                             }
 
-                        }
-                        //移动下盘到原点距离
-                        tx {
-                            timeout = 1000L * 60
+                            //移动下盘到原点距离
                             move(MoveType.MOVE_PULSE) {
                                 index = 4
-                                pulse = 3200L * spydjl
+                                pulse = (2599L * xpydjl).toLong();
                                 speed = 100
                             }
 
                         }
+
+                        tx {
+                            //移动到复位高度
+                            move(MoveType.MOVE_PULSE) {
+                                index = 1
+                                pulse = (3200L * fwgd).toLong();
+                                speed = 100
+                            }
+                            //移动到复位高度
+                            move(MoveType.MOVE_PULSE) {
+                                index = 0
+                                pulse = (3200L * fwgd2).toLong();
+                                speed = 100
+                            }
+                        }
+
                     }
+
+                    _loading.value = false
                 }
+
+
             } catch (ex: Exception) {
                 _loadingNum.value = 0
             } finally {
@@ -272,5 +292,11 @@ sealed class CalibrationEvent {
     data class AddLiquid(val index: Int) : CalibrationEvent()
     data class DeleteData(val data: Triple<Int, Double, Double>) : CalibrationEvent()
     data class InsertData(val index: Int, val volume: Double) : CalibrationEvent()
-    data class Reset(val ids: List<Int>, val spydjl: Long, val xpydjl: Long) : CalibrationEvent()
+    data class Reset(
+        val ids: List<Int>,
+        val spydjl: Double,
+        val xpydjl: Double,
+        val fwgd: Double,
+        val fwgd2: Double
+    ) : CalibrationEvent()
 }

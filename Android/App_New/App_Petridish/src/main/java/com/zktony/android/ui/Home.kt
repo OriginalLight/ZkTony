@@ -395,7 +395,7 @@ fun MenuContent(
 
                     OutlinedTextField(
                         modifier = Modifier
-                            .width(120.dp),
+                            .width(70.dp),
                         value = tiji_ex,
                         onValueChange = {
                             scope.launch {

@@ -63,6 +63,11 @@ fun Splash(
     var spydjl by rememberDataSaverState(key = "spydjl", default = 0f);
     var xpydjl by rememberDataSaverState(key = "xpydjl", default = 0f);
 
+    var fwgd by rememberDataSaverState(key = "fwgd", default = 0f);
+    var fwgd2 by rememberDataSaverState(key = "fwgd2", default = 0f);
+
+    var clickNum = 0;
+
     // Animate the splash screen and hide it when the animation is complete
     LaunchedEffect(key1 = true) {
         scale.animateTo(
@@ -124,82 +129,95 @@ fun Splash(
                     Button(
                         modifier = Modifier.width(300.dp),
                         onClick = {
-                            scope.launch {
+                            if (clickNum == 0) {
+                                clickNum = 1;
+                                scope.launch {
 
-                                val ids = listOf(1, 0, 2, 4, 5)
-                                tx {
-                                    queryGpio(ids)
-                                    delay = 300L
-                                }
+                                    val ids = listOf(1, 0, 2, 4, 5)
+                                    tx {
+                                        queryGpio(ids)
+                                        delay = 300L
+                                    }
 
-                                // 针对每个电机进行初始化
-                                ids.forEach {
-                                    // 如果电机未初始化，则进行初始化
-                                    if (!getGpio(it)) {
-                                        // 进行电机初始化
+                                    // 针对每个电机进行初始化
+                                    ids.forEach {
+                                        // 如果电机未初始化，则进行初始化
+                                        if (!getGpio(it)) {
+                                            // 进行电机初始化
+                                            tx {
+                                                timeout = 1000L * 60
+                                                move(MoveType.MOVE_PULSE) {
+                                                    index = it
+                                                    pulse = 3200L * -30
+                                                    acc = 50
+                                                    dec = 80
+                                                    speed = 100
+                                                }
+
+                                            }
+                                        }
+
+                                        // 进行正向运动
                                         tx {
-                                            timeout = 1000L * 60
+                                            timeout = 1000L * 10
                                             move(MoveType.MOVE_PULSE) {
                                                 index = it
-                                                pulse = 3200L * -30
+                                                pulse = 800L
                                                 acc = 50
                                                 dec = 80
                                                 speed = 100
                                             }
+                                        }
 
+                                        // 进行反向运动
+                                        tx {
+                                            timeout = 1000L * 15
+                                            move(MoveType.MOVE_PULSE) {
+                                                index = it
+                                                pulse = 3200L * -3
+                                                acc = 50
+                                                dec = 80
+                                                speed = 100
+                                            }
                                         }
                                     }
 
-                                    // 进行正向运动
+                                    //移动上盘到原点距离
                                     tx {
-                                        timeout = 1000L * 10
                                         move(MoveType.MOVE_PULSE) {
-                                            index = it
-                                            pulse = 3200L * 2
-                                            acc = 50
-                                            dec = 80
+                                            index = 5
+                                            pulse = (3200L * spydjl).toLong();
+                                            speed = 100
+                                        }
+
+                                        //移动下盘到原点距离
+                                        move(MoveType.MOVE_PULSE) {
+                                            index = 4
+                                            pulse = (2599L * xpydjl).toLong();
+                                            speed = 100
+                                        }
+
+                                    }
+
+                                    tx {
+                                        //移动到复位高度
+                                        move(MoveType.MOVE_PULSE) {
+                                            index = 1
+                                            pulse = (3200L * fwgd).toLong();
+                                            speed = 100
+                                        }
+                                        //移动到复位高度
+                                        move(MoveType.MOVE_PULSE) {
+                                            index = 0
+                                            pulse = (3200L * fwgd2).toLong();
                                             speed = 100
                                         }
                                     }
-
-                                    // 进行反向运动
-                                    tx {
-                                        timeout = 1000L * 15
-                                        move(MoveType.MOVE_PULSE) {
-                                            index = it
-                                            pulse = 3200L * -3
-                                            acc = 50
-                                            dec = 80
-                                            speed = 100
-                                        }
-                                    }
+                                    toggleDrawer(NavigationType.NAVIGATION_RAIL)
+                                    navController.popBackStack()
+                                    navController.navigate(Route.HOME)
                                 }
-
-                                //移动上盘到原点距离
-                                tx {
-                                    timeout = 1000L * 60
-                                    move(MoveType.MOVE_PULSE) {
-                                        index = 5
-                                        pulse =  (3200L * spydjl).toLong();
-                                        speed = 100
-                                    }
-
-                                }
-                                //移动下盘到原点距离
-                                tx {
-                                    timeout = 1000L * 60
-                                    move(MoveType.MOVE_PULSE) {
-                                        index = 4
-                                        pulse = (3200L * xpydjl).toLong();
-                                        speed = 100
-                                    }
-
-                                }
-                                toggleDrawer(NavigationType.NAVIGATION_RAIL)
-                                navController.popBackStack()
-                                navController.navigate(Route.HOME)
                             }
-
                         }
                     ) {
                         Text(

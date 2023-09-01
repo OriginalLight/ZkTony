@@ -248,7 +248,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             timeout = 1000L * 10
                             move(MoveType.MOVE_PULSE) {
                                 index = it
-                                pulse = 3200L * 2
+                                pulse = 800L
                                 acc = 50
                                 dec = 80
                                 speed = 100
@@ -270,23 +270,34 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
                     //移动上盘到原点距离
                     tx {
-                        timeout = 1000L * 60
                         move(MoveType.MOVE_PULSE) {
                             index = 5
                             pulse = (3200L * spydjl).toLong();
                             speed = 100
                         }
 
-                    }
-                    //移动下盘到原点距离
-                    tx {
-                        timeout = 1000L * 60
+                        //移动下盘到原点距离
                         move(MoveType.MOVE_PULSE) {
                             index = 4
-                            pulse = (3200L * xpydjl).toLong();
+                            pulse = (2599L * xpydjl).toLong();
                             speed = 100
                         }
 
+                    }
+
+                    tx {
+                        //移动到复位高度
+                        move(MoveType.MOVE_PULSE) {
+                            index = 1
+                            pulse = (3200L * fwgd).toLong();
+                            speed = 100
+                        }
+                        //移动到复位高度
+                        move(MoveType.MOVE_PULSE) {
+                            index = 0
+                            pulse = (3200L * fwgd2).toLong();
+                            speed = 100
+                        }
                     }
 
 
@@ -302,7 +313,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     /**
      * 上盘运动
      */
-    private fun spStart(runIndex:Int){
+    private fun spStart(runIndex: Int) {
         viewModelScope.launch {
             val spkwjl = dataSaver.readData("spkwjl" + runIndex, 0f);
             tx {
@@ -352,9 +363,9 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
                 /**
                  * 上盘移动坐标
-                 * 从1开始
+                 * 从0开始
                  */
-                var spStartCoordinates = 1;
+                var spStartCoordinates = 0;
 
                 /**
                  * 运动状态
@@ -368,9 +379,15 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 var startState = 0;
 
                 /**
-                 * 下盘孔位间距0.8mm,初始是0
+                 * 下盘原点距离
                  */
-                var xpkwjj = 0f
+                var xpydjl = dataSaver.readData("xpydjl", 0f);
+                xpydjl = xpydjl * 2599
+
+                /**
+                 * 下盘孔位间距3255步
+                 */
+                var xpkwjj = 2599
 
 
                 /**
@@ -380,10 +397,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                     move(MoveType.MOVE_PULSE) {
                         index = 0
                         pulse = (3200L * pzgd2).toLong();
-                    }
-                    move(MoveType.MOVE_PULSE) {
-                        index = 1
-                        pulse = (3200L * fwgd).toLong();
                     }
                 }
 
@@ -412,27 +425,29 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 index = 0
                                 pulse = 0
                             }
-                            //3.夹爪松开
-                            move(MoveType.MOVE_PULSE) {
-                                index = 2
-                                pulse = (3200L * skjl).toLong();
-                            }
-
 
                         }
                         tx {
-                            queryGpio(6)
+                            //3.夹爪夹紧
+                            move(MoveType.MOVE_PULSE) {
+                                index = 2
+                                pulse = (3200L * jjjl).toLong();
+                            }
+                        }
+
+                        tx {
+                            queryGpio(7)
                             delay = 300L
                         }
 
                         /**
                          * 获取是否有培养皿
-                         * false=有
-                         * true=没有
+                         * true=有
+                         * false=没有
                          */
-//                        val jiance1 = getGpio(6)
-                        val jiance1 = false
-                        if (!jiance1) {
+                        val jiance1 = getGpio(7)
+//                        val jiance1 = false
+                        if (jiance1) {
                             /**
                              * 有培养皿的运动
                              */
@@ -450,12 +465,23 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                          * 有培养皿的运动
                          */
                         tx {
-                            //1.举升1移动到分离距离
+                            //1.夹爪松开
+                            move(MoveType.MOVE_PULSE) {
+                                index = 2
+                                pulse = (3200L * skjl).toLong()
+                            }
+
+                            //2.举升1移动到分离距离
                             move(MoveType.MOVE_PULSE) {
                                 index = 1
                                 pulse = (3200L * fljl).toLong()
                             }
-                            //2.夹爪夹紧
+
+
+                        }
+
+                        tx {
+                            //13.夹爪夹紧
                             move(MoveType.MOVE_PULSE) {
                                 index = 2
                                 pulse = (3200L * jjjl).toLong()
@@ -464,14 +490,9 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         }
 
                         tx {
-                            //3.举升1移动到0
+                            //4.举升1移动到0
                             move(MoveType.MOVE_PULSE) {
                                 index = 1
-                                pulse = 0
-                            }
-                            //4.举升2移动到0
-                            move(MoveType.MOVE_PULSE) {
-                                index = 0
                                 pulse = 0
                             }
                         }
@@ -479,19 +500,19 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             /**
                              * 检测培养皿是否摆放正确
                              */
-                            queryGpio(7)
+                            queryGpio(6)
                             delay = 300L
                         }
 
 
                         /**
                          * 获取检测培养皿是否摆放正确
-                         * false=摆放错误
-                         * true=摆放正确
+                         * false=摆放正确
+                         * true=摆放错误
                          */
-//                            val jiance2 = getGpio(7)
-                        val jiance2 = true
-                        if (jiance2) {
+                        val jiance2 = getGpio(6)
+//                        val jiance2 = true
+                        if (!jiance2) {
                             startState = 3;
                             continue;
                         } else {
@@ -511,22 +532,34 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                              * 打开夹爪（1号顶升机构顶升至上料台面齐平位置，培养皿上料机构旋转至第二培养皿放置位置。开始执行第二步骤。）
                              */
                             tx {
-                                //举升1运动到复位高度
-                                move(MoveType.MOVE_PULSE) {
-                                    index = 1
-                                    pulse = (3200L * fwgd).toLong();
-                                }
-
                                 //夹爪松开
                                 move(MoveType.MOVE_PULSE) {
                                     index = 2
                                     pulse = (3200L * skjl).toLong();
                                 }
+                            }
 
-                                //1.上盘移动1格
+                            tx {
+                                //举升1运动到复位高度
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 1
+                                    pulse = (3200L * fwgd).toLong();
+                                }
+                            }
+                            tx {
+                                //举升2运动到复位高度
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 0
+                                    pulse = (3200L * fwgd2).toLong();
+                                }
+                            }
+
+                            tx {
+                                //上盘移动1格
                                 /**
                                  * 上盘孔位距离
                                  */
+                                spStartCoordinates += 1;
                                 val spkwjl = dataSaver.readData("spkwjl" + spStartCoordinates, 0f);
 
                                 move(MoveType.MOVE_PULSE) {
@@ -548,69 +581,125 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             //不是第一次运动,一罐培养皿已经运行完成，做下一灌培养皿的运动准备
 
                             tx {
-                                //1.举升1移动到0
-                                move(MoveType.MOVE_PULSE) {
-                                    index = 1
-                                    pulse = 0
-                                }
-                                //2.举升2移动到0
-                                move(MoveType.MOVE_PULSE) {
-                                    index = 0
-                                    pulse = (3200L * fwgd2).toLong();
-                                }
 
-                                //3.夹爪松开
+                                //夹爪松开
                                 move(MoveType.MOVE_PULSE) {
                                     index = 2
                                     pulse = (3200L * skjl).toLong();
                                 }
-
-                                //2.举升2移动到0
-                                move(MoveType.MOVE_PULSE) {
-                                    index = 0
-                                    pulse = 0
-                                }
-
                             }
 
-                            while (0 < 3) {
-                                /**
-                                 * 下盘孔位距离
-                                 */
-                                val xpkwjl =
-                                    dataSaver.readData("xpkwjl" + xpStartCoordinates, 0f);
+                            tx {
+                                //举升1移动到0
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 1
+                                    pulse = 0
+                                }
+                            }
+
+                            var i = 0;
+                            while (i < 3) {
                                 tx {
                                     /**
                                      * 下盘移动一格
                                      */
                                     move(MoveType.MOVE_PULSE) {
                                         index = 4
-                                        pulse = (3200L * xpkwjl).toLong();
-                                    }
-
-                                    /**
-                                     * 举升2举升到复位高度
-                                     */
-                                    move(MoveType.MOVE_PULSE) {
-                                        index = 0
-                                        pulse = (3200L * fwgd2).toLong();
+                                        pulse = (xpydjl + xpkwjj).toLong();
                                     }
                                 }
 
-
-                                if (xpStartCoordinates < 3) {
-                                    xpStartCoordinates += 1;
-                                } else {
-                                    xpStartCoordinates = 1;
-                                    tx {
-                                        /**
-                                         * 下盘回到原点距离
-                                         */
-                                        move(MoveType.MOVE_PULSE) {
-                                            index = 4
-                                            pulse = (3200L * xpydjl).toLong();
-                                        }
+                                tx {
+                                    /**
+                                     * 举升2举升到盘子高度
+                                     */
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 0
+                                        pulse = (3200L * pzgd2).toLong();
                                     }
+                                }
+
+                                tx {
+                                    /**
+                                     * 举升2举升到0
+                                     */
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 0
+                                        pulse = 0
+                                    }
+                                }
+
+                                xpkwjj += 2599
+                                i++
+                            }
+
+                            /**
+                             * 下盘复位
+                             */
+                            tx {
+                                timeout = 1000L * 60
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 4
+                                    pulse = 3200L * -30
+                                    acc = 50
+                                    dec = 80
+                                    speed = 100
+                                }
+
+                            }
+                            // 进行正向运动
+                            tx {
+                                timeout = 1000L * 10
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 4
+                                    pulse = 800L
+                                    acc = 50
+                                    dec = 80
+                                    speed = 100
+                                }
+                            }
+
+                            // 进行反向运动
+                            tx {
+                                timeout = 1000L * 15
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 4
+                                    pulse = 3200L * -3
+                                    acc = 50
+                                    dec = 80
+                                    speed = 100
+                                }
+                            }
+
+                            tx {
+                                //移动下盘到原点距离
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 4
+                                    pulse = xpydjl.toLong();
+                                    speed = 100
+                                }
+                            }
+                            xpkwjj = 2599
+                            /**
+                             * 下盘复位
+                             */
+
+
+                            tx {
+                                /**
+                                 * 举升2举升到复位高度，让上盘运动
+                                 */
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 0
+                                    pulse = (3200L * fwgd2).toLong();
+                                }
+
+                                /**
+                                 * 举升1举升到复位高度，让上盘运动
+                                 */
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 1
+                                    pulse = (3200L * fwgd).toLong();
                                 }
                             }
 
@@ -643,12 +732,8 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 //TODO 运动结束
                                 break;
                             }
+                            isStart = false
                             startState = 0;
-
-                            if (int == 8) {
-                                _loading.value = 0
-                                break;
-                            }
 
                             continue;
                         }
@@ -660,20 +745,17 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                          */
 
                         /**
-                         * 下盘运动3次
-                         */
-                        /**
                          * 第一次的运动
                          */
                         isStart = true;
-                        var xpkwjl = dataSaver.readData("xpkwjl" + xpStartCoordinates, 0f);
+
                         tx {
                             /**
                              * 下盘移动一格
                              */
                             move(MoveType.MOVE_PULSE) {
                                 index = 4
-                                pulse = (3200L * (xpkwjl + xpkwjj)).toLong();
+                                pulse = (xpydjl + xpkwjj).toLong();
                             }
                         }
 
@@ -725,18 +807,18 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             }
 
                             /**
-                             * 举升2举升到复位高度
+                             * 举升2举升到盘子高度
                              */
                             move(MoveType.MOVE_PULSE) {
                                 index = 0
-                                pulse = (3200L * fwgd2).toLong();
+                                pulse = (3200L * pzgd2).toLong();
                             }
 
 //                            if (xpStartCoordinates < 4) {
 //                                xpStartCoordinates += 1;
 //                            }
                         }
-                        xpkwjj += 0.8f
+                        xpkwjj += 2599
                         _count.value += 1;
                         startState = 0;
                         continue;
