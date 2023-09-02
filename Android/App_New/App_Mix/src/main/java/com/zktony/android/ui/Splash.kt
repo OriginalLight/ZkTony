@@ -59,7 +59,7 @@ fun Splash(
                 color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.medium
             ),
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(visible = splash.value) {
             Image(
@@ -81,7 +81,7 @@ fun Splash(
                         fontWeight = FontWeight.SemiBold,
                         lineHeight = 50.sp,
                     ),
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = FontFamily.Serif
                 )
                 Text(
                     text = stringResource(id = R.string.notice_content),
@@ -90,14 +90,14 @@ fun Splash(
                         lineHeight = 32.sp,
                         fontWeight = FontWeight.Medium,
                     ),
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = FontFamily.Serif
                 )
                 FloatingActionButton(
                     modifier = Modifier.width(192.dp),
                     onClick = {
                         navController.popBackStack()
                         navController.navigate(Route.Home)
-                    },
+                    }
                 ) {
                     Icon(
                         modifier = Modifier.size(32.dp),

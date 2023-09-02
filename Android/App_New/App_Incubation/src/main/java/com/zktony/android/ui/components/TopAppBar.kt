@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -76,7 +75,7 @@ fun HomeAppBar(
                     }
                 }
             }
-        },
+        }
     )
 }
 
@@ -86,8 +85,12 @@ fun SettingsAppBar(
     modifier: Modifier = Modifier,
     uiState: SettingUiState,
     uiEvent: (SettingUiEvent) -> Unit,
+    snackbarHostState: SnackbarHostState,
     navigation: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+    var count by remember { mutableIntStateOf(0) }
+
     TopAppBar(
         title = {
             Text(
@@ -116,10 +119,37 @@ fun SettingsAppBar(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 AnimatedVisibility(visible = uiState.page == PageType.MOTOR_LIST) {
-                    ElevatedButton(onClick = { uiEvent(SettingUiEvent.Insert) }) {
+                    ElevatedButton(onClick = { scope.launch { uiEvent(SettingUiEvent.Insert) } }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = null
+                        )
+                    }
+                }
+                AnimatedVisibility(visible = uiState.selected != 0L && uiState.page == PageType.MOTOR_LIST) {
+                    ElevatedButton(onClick = { scope.launch { uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL)) } }) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null
+                        )
+                    }
+                }
+                AnimatedVisibility(visible = uiState.selected != 0L && uiState.page == PageType.MOTOR_LIST) {
+                    ElevatedButton(onClick = {
+                        scope.launch {
+                            if (count == 0) {
+                                count++
+                                snackbarHostState.showSnackbar("再次点击删除")
+                            } else {
+                                count = 0
+                                uiEvent(SettingUiEvent.Delete(uiState.selected))
+                            }
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = if (count == 0) MaterialTheme.colorScheme.primary else Color.Red
                         )
                     }
                 }
@@ -130,7 +160,7 @@ fun SettingsAppBar(
                     )
                 }
             }
-        },
+        }
     )
 }
 
@@ -145,7 +175,7 @@ fun ProgramAppBar(
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    var dialog by rememberSaveable { mutableStateOf(false) }
+    var dialog by remember { mutableStateOf(false) }
     var count by remember { mutableIntStateOf(0) }
 
     if (dialog) {
@@ -277,7 +307,7 @@ fun ProgramAppBar(
                     )
                 }
             }
-        },
+        }
     )
 }
 

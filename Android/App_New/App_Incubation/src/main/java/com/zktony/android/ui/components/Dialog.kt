@@ -26,7 +26,7 @@ import com.zktony.android.R
 @Composable
 fun InputDialog(
     onConfirm: (String) -> Unit,
-    onCancel: () -> Unit,
+    onCancel: () -> Unit
 ) {
     var value by remember { mutableStateOf("") }
 
@@ -37,11 +37,11 @@ fun InputDialog(
                     .fillMaxWidth()
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = stringResource(id = R.string.add),
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleMedium
                 )
 
                 OutlinedTextField(
@@ -51,14 +51,14 @@ fun InputDialog(
                     textStyle = TextStyle(
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
+                        fontSize = 20.sp
                     ),
                     singleLine = true,
                     shape = CircleShape,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
                         onConfirm(value)
-                    }),
+                    })
                 )
 
                 Row(
@@ -69,9 +69,7 @@ fun InputDialog(
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 16.dp),
-                        onClick = {
-                            onCancel()
-                        },
+                        onClick = { onCancel() }
                     ) {
                         Text(text = stringResource(id = R.string.cancel))
                     }
@@ -80,9 +78,7 @@ fun InputDialog(
                         modifier = Modifier
                             .weight(1f)
                             .padding(horizontal = 16.dp),
-                        onClick = {
-                            onConfirm(value)
-                        },
+                        onClick = { onConfirm(value) },
                         enabled = value.isNotBlank()
                     ) {
                         Text(text = stringResource(id = R.string.confirm))

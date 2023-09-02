@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -150,7 +149,7 @@ fun HistoryDetail(
     ) {
         val item = entities.itemSnapshotList.items.find { it.id == uiState.selected }
         if (item != null) {
-            items(item.logs) { LogItem(log = it) }
+            items(item.logs) { LogItem(item = it) }
         }
     }
 }

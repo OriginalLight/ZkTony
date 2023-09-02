@@ -16,4 +16,13 @@ abstract class MotorDao : BaseDao<Motor> {
         """
     )
     abstract fun getAll(): Flow<List<Motor>>
+
+
+    @Query(
+        """
+        DELETE FROM motor
+        WHERE id = :id
+        """
+    )
+    abstract suspend fun deleteById(id: Long)
 }

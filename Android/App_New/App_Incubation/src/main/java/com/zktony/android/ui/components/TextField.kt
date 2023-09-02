@@ -8,7 +8,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
@@ -33,9 +35,10 @@ fun CircleTextField(
     title: String,
     value: String,
     keyboardType: KeyboardType = KeyboardType.Decimal,
-    onValueChange: (String) -> Unit = {},
+    onValueChange: (String) -> Unit = {}
 ) {
     val softKeyboard = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
 
     TextField(
         modifier = modifier.fillMaxWidth(),
@@ -59,6 +62,7 @@ fun CircleTextField(
         keyboardActions = KeyboardActions(
             onDone = {
                 softKeyboard?.hide()
+                focusManager.clearFocus()
             }
         ),
         shape = CircleShape,

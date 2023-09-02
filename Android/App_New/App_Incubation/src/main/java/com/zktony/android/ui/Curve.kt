@@ -155,7 +155,7 @@ fun CurveList(
                         shape = MaterialTheme.shapes.medium
                     ),
                     index = index,
-                    curve = item,
+                    item = item,
                     onClick = {
                         scope.launch {
                             if (uiState.selected != item.id) {
@@ -292,7 +292,7 @@ fun CurveDetail(
             itemsIndexed(items = selected.points) { index, item ->
                 PointItem(
                     index = index,
-                    point = item,
+                    item = item,
                     onClickOne = { },
                     onClickTwo = {
                         scope.launch {
@@ -304,8 +304,7 @@ fun CurveDetail(
                     onPointChange = { point ->
                         scope.launch {
                             val points = selected.points.toMutableList()
-                            val index = points.indexOf(item)
-                            points[index] = point
+                            points[points.indexOf(item)] = point
                             uiEvent(CurveUiEvent.Update(selected.copy(points = points)))
                         }
                     }

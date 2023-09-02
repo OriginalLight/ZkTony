@@ -96,7 +96,7 @@ fun ProgramList(
     LazyVerticalGrid(
         modifier = modifier,
         contentPadding = PaddingValues(16.dp),
-        columns = GridCells.Fixed(4),
+        columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -120,7 +120,7 @@ fun ProgramList(
                         shape = MaterialTheme.shapes.medium
                     ),
                     index = index,
-                    program = item,
+                    item = item,
                     onClick = {
                         scope.launch {
                             if (uiState.selected != item.id) {
@@ -173,7 +173,7 @@ fun ProgramDetail(
                         color = color,
                         shape = MaterialTheme.shapes.medium
                     ),
-                    process = process,
+                    item = process,
                     onClick = { selectedIndex = index },
                     onDelete = {
                         scope.launch {

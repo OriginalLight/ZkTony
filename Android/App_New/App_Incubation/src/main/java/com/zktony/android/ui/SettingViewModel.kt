@@ -21,7 +21,7 @@ import java.io.File
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
+class SettingViewModel(private val dao: MotorDao) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
     private val _application = MutableStateFlow<Application?>(null)
@@ -58,15 +58,16 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
         }
     }
 
-    fun uiEvent(event: SettingUiEvent) {
-        when (event) {
-            is SettingUiEvent.NavTo -> _page.value = event.page
-            is SettingUiEvent.Navigation -> navigation(event.navigation)
+    fun uiEvent(uiEvent: SettingUiEvent) {
+        when (uiEvent) {
+            is SettingUiEvent.NavTo -> _page.value = uiEvent.page
+            is SettingUiEvent.Navigation -> navigation(uiEvent.navigation)
             is SettingUiEvent.Network -> network()
             is SettingUiEvent.CheckUpdate -> checkUpdate()
-            is SettingUiEvent.ToggleSelected -> _selected.value = event.id
+            is SettingUiEvent.ToggleSelected -> _selected.value = uiEvent.id
             is SettingUiEvent.Insert -> viewModelScope.launch { dao.insert(Motor()) }
-            is SettingUiEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
+            is SettingUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.entity) }
+            is SettingUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
         }
     }
 
@@ -143,7 +144,7 @@ data class SettingUiState(
     val entities: List<Motor> = emptyList(),
     val selected: Long = 0,
     val progress: Int = 0,
-    val page: PageType = PageType.SETTINGS,
+    val page: PageType = PageType.SETTINGS
 )
 
 sealed class SettingUiEvent {
@@ -154,4 +155,5 @@ sealed class SettingUiEvent {
     data class Navigation(val navigation: Boolean) : SettingUiEvent()
     data class ToggleSelected(val id: Long) : SettingUiEvent()
     data class Update(val entity: Motor) : SettingUiEvent()
+    data class Delete(val id: Long) : SettingUiEvent()
 }

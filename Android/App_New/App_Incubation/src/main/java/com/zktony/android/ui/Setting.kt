@@ -3,6 +3,7 @@ package com.zktony.android.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -41,6 +42,7 @@ import androidx.navigation.NavHostController
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
+import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.components.*
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
@@ -86,8 +88,8 @@ fun SettingRoute(
             SettingsAppBar(
                 uiState = uiState,
                 uiEvent = viewModel::uiEvent,
-                navigation = navigation
-            )
+                snackbarHostState = snackbarHostState
+            ) { navigation() }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         contentWindowInsets = ScaffoldDefaults.contentWindowInsets
@@ -441,7 +443,6 @@ fun Authentication(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MotorList(
     modifier: Modifier = Modifier,
@@ -451,59 +452,41 @@ fun MotorList(
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.small
-            ),
+        modifier = modifier,
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         columns = GridCells.Fixed(3)
     ) {
-        items(items = uiState.entities) {
-            Card(
+        items(items = uiState.entities) { item ->
+            val color =
+                if (uiState.selected == item.id) {
+                    MaterialTheme.colorScheme.secondaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant
+                }
+            MotorItem(
+                modifier = Modifier.background(
+                    color = color,
+                    shape = MaterialTheme.shapes.medium
+                ),
+                item = item,
                 onClick = {
                     scope.launch {
-                        uiEvent(SettingUiEvent.ToggleSelected(it.id))
+                        if (uiState.selected != item.id) {
+                            uiEvent(SettingUiEvent.ToggleSelected(item.id))
+                        } else {
+                            uiEvent(SettingUiEvent.ToggleSelected(0L))
+                        }
+                    }
+                },
+                onDoubleClick = {
+                    scope.launch {
+                        uiEvent(SettingUiEvent.ToggleSelected(item.id))
                         uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL))
                     }
                 }
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "M ${it.index}",
-                        fontSize = 50.sp,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Column(
-                        modifier = Modifier.padding(start = 16.dp),
-                    ) {
-                        Text(
-                            text = "A - ${it.acceleration}",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-
-                        Text(
-                            text = "D - ${it.deceleration}",
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-
-                        Text(
-                            text = "S - ${it.speed}", style = MaterialTheme.typography.bodyLarge
-                        )
-                    }
-                }
-            }
+            )
         }
     }
 }
@@ -517,7 +500,7 @@ fun MotorDetail(
 ) {
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
-    val selected = uiState.entities.find { it.id == uiState.selected }!!
+    val selected = uiState.entities.find { it.id == uiState.selected } ?: Motor()
     var ads by remember { mutableStateOf(selected.toAdsString()) }
     var index by remember { mutableStateOf(selected.index.toString()) }
 
@@ -547,11 +530,6 @@ fun MotorDetail(
     LazyColumn(
         modifier = modifier
             .padding(16.dp)
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
-            )
             .windowInsetsPadding(WindowInsets.imeAnimationSource),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -732,11 +710,6 @@ fun ConfigList(modifier: Modifier = Modifier) {
     LazyColumn(
         modifier = modifier
             .padding(16.dp)
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
-            )
             .windowInsetsPadding(WindowInsets.imeAnimationSource),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),

@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import com.zktony.android.R
 import com.zktony.android.data.entities.Curve
 import com.zktony.android.data.entities.History
+import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Log
 import com.zktony.android.data.entities.internal.Process
@@ -50,7 +51,7 @@ import kotlinx.coroutines.launch
 fun CurveItem(
     modifier: Modifier = Modifier,
     index: Int,
-    curve: Curve,
+    item: Curve,
     onClick: (Curve) -> Unit,
     onDoubleClick: (Curve) -> Unit
 ) {
@@ -58,8 +59,8 @@ fun CurveItem(
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
             .combinedClickable(
-                onClick = { onClick(curve) },
-                onDoubleClick = { onDoubleClick(curve) }
+                onClick = { onClick(item) },
+                onDoubleClick = { onDoubleClick(item) }
             )
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -81,7 +82,7 @@ fun CurveItem(
                         shape = MaterialTheme.shapes.small
                     )
                     .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = "M${curve.index}",
+                text = "M${item.index}",
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
@@ -91,14 +92,14 @@ fun CurveItem(
                         shape = MaterialTheme.shapes.small
                     )
                     .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = if (curve.enable) "生效中" else "未生效",
+                text = if (item.enable) "生效中" else "未生效",
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (curve.enable) MaterialTheme.colorScheme.onSurface else Color.Red
+                color = if (item.enable) MaterialTheme.colorScheme.onSurface else Color.Red
             )
         }
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = curve.displayText,
+            text = item.displayText,
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             maxLines = 1,
@@ -106,7 +107,7 @@ fun CurveItem(
         )
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = curve.createTime.dateFormat("yyyy/MM/dd"),
+            text = item.createTime.dateFormat("yyyy/MM/dd"),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.End,
             color = Color.Gray
@@ -117,7 +118,7 @@ fun CurveItem(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PointItem(
-    point: Point,
+    item: Point,
     index: Int,
     onClickOne: () -> Unit,
     onClickTwo: () -> Unit,
@@ -126,8 +127,8 @@ fun PointItem(
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
     val forceManager = LocalFocusManager.current
-    var x by remember { mutableStateOf(point.x.toString()) }
-    var y by remember { mutableStateOf(point.y.toString()) }
+    var x by remember { mutableStateOf(item.x.toString()) }
+    var y by remember { mutableStateOf(item.y.toString()) }
 
     val textStyle = TextStyle(
         fontStyle = FontStyle.Italic,
@@ -197,7 +198,7 @@ fun PointItem(
                 onValueChange = {
                     scope.launch {
                         x = it.text
-                        onPointChange(point.copy(x = it.text.toDoubleOrNull() ?: 0.0))
+                        onPointChange(item.copy(x = it.text.toDoubleOrNull() ?: 0.0))
                     }
                 },
                 textStyle = textStyle,
@@ -228,7 +229,7 @@ fun PointItem(
                 onValueChange = {
                     scope.launch {
                         y = it.text
-                        onPointChange(point.copy(y = it.text.toDoubleOrNull() ?: 0.0))
+                        onPointChange(item.copy(y = it.text.toDoubleOrNull() ?: 0.0))
                     }
                 },
                 textStyle = textStyle,
@@ -261,7 +262,7 @@ fun PointItem(
 @Composable
 fun HistoryItem(
     index: Int,
-    history: History,
+    item: History,
     onClick: (History) -> Unit,
 ) {
     Column(
@@ -271,7 +272,7 @@ fun HistoryItem(
                 shape = MaterialTheme.shapes.medium
             )
             .clip(MaterialTheme.shapes.medium)
-            .clickable { onClick(history) }
+            .clickable { onClick(item) }
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -282,7 +283,7 @@ fun HistoryItem(
         )
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = history.createTime.dateFormat("yyyy/MM/dd"),
+            text = item.createTime.dateFormat("yyyy/MM/dd"),
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             maxLines = 1,
@@ -293,7 +294,7 @@ fun HistoryItem(
 
 
 @Composable
-fun LogItem(log: Log) {
+fun LogItem(item: Log) {
     Column(
         modifier = Modifier
             .background(
@@ -311,7 +312,7 @@ fun LogItem(log: Log) {
                         shape = MaterialTheme.shapes.small
                     )
                     .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = log.createTime.dateFormat("HH:mm:ss"),
+                text = item.createTime.dateFormat("HH:mm:ss"),
                 style = MaterialTheme.typography.bodyMedium
             )
             Text(
@@ -321,9 +322,9 @@ fun LogItem(log: Log) {
                         shape = MaterialTheme.shapes.small
                     )
                     .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = log.level,
+                text = item.level,
                 style = MaterialTheme.typography.bodyMedium,
-                color = when (log.level) {
+                color = when (item.level) {
                     "DEBUG" -> Color.Blue
                     "INFO" -> Color.Green
                     "WARN" -> Color.Yellow
@@ -338,7 +339,7 @@ fun LogItem(log: Log) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            text = log.message,
+            text = item.message,
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -350,7 +351,7 @@ fun LogItem(log: Log) {
 fun ProgramItem(
     modifier: Modifier = Modifier,
     index: Int,
-    program: Program,
+    item: Program,
     onClick: (Program) -> Unit,
     onDoubleClick: (Program) -> Unit
 ) {
@@ -358,8 +359,8 @@ fun ProgramItem(
         modifier = modifier
             .clip(MaterialTheme.shapes.medium)
             .combinedClickable(
-                onClick = { onClick(program) },
-                onDoubleClick = { onDoubleClick(program) }
+                onClick = { onClick(item) },
+                onDoubleClick = { onDoubleClick(item) }
             )
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -371,7 +372,7 @@ fun ProgramItem(
         )
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = program.displayText,
+            text = item.displayText,
             style = MaterialTheme.typography.titleLarge,
             textAlign = TextAlign.Center,
             maxLines = 1,
@@ -379,7 +380,7 @@ fun ProgramItem(
         )
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = program.createTime.dateFormat("yyyy/MM/dd"),
+            text = item.createTime.dateFormat("yyyy/MM/dd"),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.End,
             color = Color.Gray
@@ -391,13 +392,13 @@ fun ProgramItem(
 @Composable
 fun ProcessItem(
     modifier: Modifier = Modifier,
-    process: Process,
+    item: Process,
     onClick: () -> Unit,
     onDelete: () -> Unit,
     onUpOrDown: (Boolean) -> Unit
 ) {
 
-    val displayText = when (process.type) {
+    val displayText = when (item.type) {
         ProcessType.BLOCKING -> stringResource(id = R.string.blocking)
         ProcessType.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
         ProcessType.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
@@ -406,21 +407,21 @@ fun ProcessItem(
     }
 
     val info: List<String> = mutableListOf<String>().apply {
-        add("${process.temperature} ℃")
-        add("${process.dosage} μL")
-        add("${process.duration} ${if (process.type == ProcessType.WASHING) "Min" else "Hour"}")
+        add("${item.temperature} ℃")
+        add("${item.dosage} μL")
+        add("${item.duration} ${if (item.type == ProcessType.WASHING) "Min" else "Hour"}")
 
-        if (process.type == ProcessType.PRIMARY_ANTIBODY) {
-            add("${'A' + process.origin}")
-            add(if (process.recycle) "Recycle" else "No Recycle")
+        if (item.type == ProcessType.PRIMARY_ANTIBODY) {
+            add("${'A' + item.origin}")
+            add(if (item.recycle) "Recycle" else "No Recycle")
         }
 
-        if (process.type == ProcessType.SECONDARY_ANTIBODY) {
-            add("${'A' + process.origin}")
+        if (item.type == ProcessType.SECONDARY_ANTIBODY) {
+            add("${'A' + item.origin}")
         }
 
-        if (process.type == ProcessType.WASHING) {
-            add("${process.times} Cycle")
+        if (item.type == ProcessType.WASHING) {
+            add("${item.times} Cycle")
         }
     }
 
@@ -498,6 +499,50 @@ fun ProcessItem(
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun MotorItem(
+    modifier: Modifier = Modifier,
+    item: Motor,
+    onClick: () -> Unit,
+    onDoubleClick: () -> Unit
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .combinedClickable(
+                onClick = { onClick() },
+                onDoubleClick = { onDoubleClick() }
+            )
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "M ${item.index}",
+            fontSize = 50.sp,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Column(modifier = Modifier.padding(start = 16.dp)) {
+            Text(
+                text = "A - ${item.acceleration}",
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Text(
+                text = "D - ${item.deceleration}",
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Text(
+                text = "S - ${item.speed}",
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }
