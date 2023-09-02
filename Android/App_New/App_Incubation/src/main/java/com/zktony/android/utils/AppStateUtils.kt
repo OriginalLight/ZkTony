@@ -1,4 +1,4 @@
-package com.zktony.android.utils.extra.internal
+package com.zktony.android.utils
 
 import java.util.concurrent.ConcurrentHashMap
 

@@ -3,17 +3,27 @@ package com.zktony.android.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -26,19 +36,17 @@ import com.zktony.android.ui.utils.PageType
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProgramRoute(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    viewModel: ProgramViewModel,
-    snackbarHostState: SnackbarHostState
-) {
+fun ProgramRoute(viewModel: ProgramViewModel) {
+
     val scope = rememberCoroutineScope()
+    val navigationActions = LocalNavigationActions.current
+    val snackbarHostState = LocalSnackbarHostState.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
         scope.launch {
             when (uiState.page) {
-                PageType.PROGRAM_LIST -> navController.navigateUp()
+                PageType.PROGRAM_LIST -> navigationActions.navigateUp()
                 else -> viewModel.uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_LIST))
             }
         }
@@ -46,47 +54,45 @@ fun ProgramRoute(
 
     BackHandler { navigation() }
 
-    Scaffold(
-        topBar = {
-            ProgramAppBar(
-                entities = entities,
-                uiState = uiState,
-                uiEvent = viewModel::uiEvent,
-                snackbarHostState = snackbarHostState
-            ) { navigation() }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
-    ) { paddingValues ->
-        ProgramScreen(
-            modifier = modifier.padding(paddingValues),
-            entities = entities,
-            uiState = uiState,
-            uiEvent = viewModel::uiEvent
-        )
-    }
+    ProgramScreen(
+        entities = entities,
+        uiState = uiState,
+        uiEvent = viewModel::uiEvent,
+        snackbarHostState = snackbarHostState,
+        navigation = navigation
+    )
 }
 
 
 @Composable
 fun ProgramScreen(
-    modifier: Modifier = Modifier,
     entities: LazyPagingItems<Program>,
     uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit
+    uiEvent: (ProgramUiEvent) -> Unit,
+    snackbarHostState: SnackbarHostState,
+    navigation: () -> Unit
 ) {
-    AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_LIST) {
-        ProgramList(modifier, entities, uiState, uiEvent)
+    Column {
+        ProgramAppBar(
+            entities = entities,
+            uiState = uiState,
+            uiEvent = uiEvent,
+            snackbarHostState = snackbarHostState
+        ) { navigation() }
+
+        AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_LIST) {
+            ProgramList(entities, uiState, uiEvent)
+        }
+
+        AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_DETAIL) {
+            ProgramDetail(entities, uiState, uiEvent)
+        }
     }
 
-    AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_DETAIL) {
-        ProgramDetail(modifier, entities, uiState, uiEvent)
-    }
 }
 
 @Composable
 fun ProgramList(
-    modifier: Modifier = Modifier,
     entities: LazyPagingItems<Program>,
     uiState: ProgramUiState,
     uiEvent: (ProgramUiEvent) -> Unit,
@@ -94,7 +100,7 @@ fun ProgramList(
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = modifier,
+        modifier = Modifier,
         contentPadding = PaddingValues(16.dp),
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -144,7 +150,6 @@ fun ProgramList(
 
 @Composable
 fun ProgramDetail(
-    modifier: Modifier = Modifier,
     entities: LazyPagingItems<Program>,
     uiState: ProgramUiState,
     uiEvent: (ProgramUiEvent) -> Unit,
@@ -154,7 +159,7 @@ fun ProgramDetail(
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     Row(
-        modifier = modifier.padding(16.dp),
+        modifier = Modifier.padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         LazyColumn(

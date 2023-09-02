@@ -33,7 +33,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -51,20 +50,18 @@ import kotlinx.coroutines.launch
  */
 
 @Composable
-fun CurveRoute(
-    navController: NavHostController,
-    viewModel: CurveViewModel,
-    snackbarHostState: SnackbarHostState
-) {
+fun CurveRoute(viewModel: CurveViewModel) {
 
     val scope = rememberCoroutineScope()
+    val navigationActions = LocalNavigationActions.current
+    val snackbarHostState = LocalSnackbarHostState.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
         scope.launch {
             when (uiState.page) {
-                PageType.CURVE_LIST -> navController.navigateUp()
+                PageType.CURVE_LIST -> navigationActions.navigateUp()
                 else -> viewModel.uiEvent(CurveUiEvent.NavTo(PageType.CURVE_LIST))
             }
         }
@@ -82,46 +79,43 @@ fun CurveRoute(
         }
     }
 
-    Scaffold(
-        topBar = {
-            CurveAppBar(
-                entities = entities,
-                uiState = uiState,
-                uiEvent = viewModel::uiEvent,
-                snackbarHostState = snackbarHostState
-            ) { navigation() }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
-    ) { paddingValues ->
-        CurveScreen(
-            modifier = Modifier.padding(paddingValues),
-            entities = entities,
-            uiState = uiState,
-            uiEvent = viewModel::uiEvent
-        )
-    }
+    CurveScreen(
+        entities = entities,
+        uiState = uiState,
+        uiEvent = viewModel::uiEvent,
+        snackbarHostState = snackbarHostState,
+        navigation = navigation
+    )
 }
 
 @Composable
 fun CurveScreen(
-    modifier: Modifier = Modifier,
     entities: LazyPagingItems<Curve>,
     uiState: CurveUiState,
     uiEvent: (CurveUiEvent) -> Unit,
+    snackbarHostState: SnackbarHostState,
+    navigation: () -> Unit
 ) {
-    AnimatedVisibility(visible = uiState.page == PageType.CURVE_LIST) {
-        CurveList(modifier, entities, uiState, uiEvent)
-    }
+    Column {
+        CurveAppBar(
+            entities = entities,
+            uiState = uiState,
+            uiEvent = uiEvent,
+            snackbarHostState = snackbarHostState
+        ) { navigation() }
 
-    AnimatedVisibility(visible = uiState.page == PageType.CURVE_DETAIL) {
-        CurveDetail(modifier, entities, uiState, uiEvent)
+        AnimatedVisibility(visible = uiState.page == PageType.CURVE_LIST) {
+            CurveList(entities, uiState, uiEvent)
+        }
+
+        AnimatedVisibility(visible = uiState.page == PageType.CURVE_DETAIL) {
+            CurveDetail(entities, uiState, uiEvent)
+        }
     }
 }
 
 @Composable
 fun CurveList(
-    modifier: Modifier = Modifier,
     entities: LazyPagingItems<Curve>,
     uiState: CurveUiState,
     uiEvent: (CurveUiEvent) -> Unit,
@@ -129,7 +123,7 @@ fun CurveList(
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = modifier,
+        modifier = Modifier,
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -180,7 +174,6 @@ fun CurveList(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CurveDetail(
-    modifier: Modifier = Modifier,
     entities: LazyPagingItems<Curve>,
     uiState: CurveUiState,
     uiEvent: (CurveUiEvent) -> Unit,
@@ -190,7 +183,7 @@ fun CurveDetail(
     val forceManager = LocalFocusManager.current
 
     LazyVerticalGrid(
-        modifier = modifier,
+        modifier = Modifier,
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),

@@ -3,13 +3,13 @@ package com.zktony.android.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,7 +17,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -34,20 +33,18 @@ import kotlinx.coroutines.launch
  * @date 2023/8/31 9:57
  */
 @Composable
-fun HistoryRoute(
-    navController: NavHostController,
-    viewModel: HistoryViewModel,
-    snackbarHostState: SnackbarHostState
-) {
+fun HistoryRoute(viewModel: HistoryViewModel) {
 
     val scope = rememberCoroutineScope()
+    val navigationActions = LocalNavigationActions.current
+    val snackbarHostState = LocalSnackbarHostState.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
     val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
         scope.launch {
             when (uiState.page) {
-                PageType.HISTORY_LIST -> navController.navigateUp()
+                PageType.HISTORY_LIST -> navigationActions.navigateUp()
                 else -> viewModel.uiEvent(HistoryUiEvent.NavTo(PageType.HISTORY_LIST))
             }
         }
@@ -65,53 +62,48 @@ fun HistoryRoute(
         }
     }
 
-    Scaffold(
-        topBar = {
-            HistoryAppBar(
-                entities = entities,
-                uiState = uiState,
-                uiEvent = viewModel::uiEvent
-            ) { navigation() }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
-    ) { paddingValues ->
-        HistoryScreen(
-            modifier = Modifier.padding(paddingValues),
-            entities = entities,
-            uiState = uiState,
-            uiEvent = viewModel::uiEvent
-        )
-    }
+    HistoryScreen(
+        entities = entities,
+        uiState = uiState,
+        uiEvent = viewModel::uiEvent,
+        navigation = navigation
+    )
 }
 
 @Composable
 fun HistoryScreen(
-    modifier: Modifier = Modifier,
     entities: LazyPagingItems<History>,
     uiState: HistoryUiState,
-    uiEvent: (HistoryUiEvent) -> Unit
+    uiEvent: (HistoryUiEvent) -> Unit,
+    navigation: () -> Unit
 ) {
-    AnimatedVisibility(visible = uiState.page == PageType.HISTORY_LIST) {
-        HistoryList(modifier, entities, uiEvent)
-    }
+    Column {
+        HistoryAppBar(
+            entities = entities,
+            uiState = uiState,
+            uiEvent = uiEvent
+        ) { navigation() }
 
-    AnimatedVisibility(visible = uiState.page == PageType.HISTORY_DETAIL) {
-        HistoryDetail(modifier, entities, uiState)
+        AnimatedVisibility(visible = uiState.page == PageType.HISTORY_LIST) {
+            HistoryList(entities, uiEvent)
+        }
+
+        AnimatedVisibility(visible = uiState.page == PageType.HISTORY_DETAIL) {
+            HistoryDetail(entities, uiState)
+        }
     }
 
 }
 
 @Composable
 fun HistoryList(
-    modifier: Modifier = Modifier,
     entities: LazyPagingItems<History>,
     uiEvent: (HistoryUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = modifier,
+        modifier = Modifier,
         columns = GridCells.Fixed(4),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -137,13 +129,12 @@ fun HistoryList(
 
 @Composable
 fun HistoryDetail(
-    modifier: Modifier,
     entities: LazyPagingItems<History>,
     uiState: HistoryUiState
 ) {
 
     LazyColumn(
-        modifier = modifier,
+        modifier = Modifier,
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {

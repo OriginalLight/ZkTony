@@ -6,7 +6,12 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.FloatingActionButton
@@ -27,16 +32,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.ui.navigation.Route
 
 @Composable
-fun Splash(
-    modifier: Modifier = Modifier,
-    navController: NavHostController
-) {
+fun Splash() {
 
+    val navigationActions = LocalNavigationActions.current
     val scale = remember { Animatable(0f) }
     val splash = remember { mutableStateOf(true) }
 
@@ -53,7 +55,7 @@ fun Splash(
     }
 
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(
                 color = MaterialTheme.colorScheme.surface,
@@ -95,8 +97,8 @@ fun Splash(
                 FloatingActionButton(
                     modifier = Modifier.width(192.dp),
                     onClick = {
-                        navController.popBackStack()
-                        navController.navigate(Route.Home)
+                        navigationActions.popBackStack()
+                        navigationActions.navigate(Route.Home)
                     }
                 ) {
                     Icon(

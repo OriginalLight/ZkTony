@@ -1,4 +1,4 @@
-package com.zktony.android.utils.extra.internal
+package com.zktony.android.utils.service
 
 import com.zktony.android.data.dao.CurveDao
 import com.zktony.android.data.entities.Curve
@@ -16,16 +16,27 @@ import org.koin.core.component.inject
  * @author 刘贺贺
  * @date 2023/9/1 10:29
  */
-class CurveFactory : KoinComponent {
-    private val dao: CurveDao by inject()
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+class CurveService(private val dao: CurveDao) : AbstractService() {
 
-    fun setup() {
-        scope.launch {
-            dao.getAll().collect { calculate(it) }
-        }
+    /**
+     * 初始化曲线
+     * 1. 从数据库中获取所有曲线
+     * 2. 计算曲线函数
+     * 3. 将曲线函数保存到appState中
+     */
+    override fun setup() {
+        scope.launch { dao.getAll().collect { calculate(it) } }
     }
 
+    /**
+     * 计算曲线函数
+     * 1. 如果曲线未启用，则曲线函数为y=x*100
+     * 2. 如果曲线启用，则根据曲线点计算曲线函数
+     * 3. 如果曲线点不满足要求，则曲线函数为y=x*100
+     * 4. 如果曲线点满足要求，则根据曲线点计算曲线函数
+     *
+     * @param curves List<Curve>
+     */
     private fun calculate(curves: List<Curve>) {
         curves.forEach { curve ->
             try {

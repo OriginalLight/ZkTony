@@ -1,6 +1,6 @@
 package com.zktony.android.utils.extra
 
-import com.zktony.android.utils.extra.internal.AppState
+import com.zktony.android.utils.AppState
 
 /**
  * @author 刘贺贺

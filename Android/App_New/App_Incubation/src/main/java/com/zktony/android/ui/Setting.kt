@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
@@ -51,20 +50,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
-fun SettingRoute(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    viewModel: SettingViewModel,
-    snackbarHostState: SnackbarHostState,
-) {
+fun SettingRoute(viewModel: SettingViewModel) {
+
     val scope = rememberCoroutineScope()
+    val navigationActions = LocalNavigationActions.current
+    val snackbarHostState = LocalSnackbarHostState.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
 
     val navigation: () -> Unit = {
         scope.launch {
             when (uiState.page) {
-                PageType.SETTINGS -> navController.navigateUp()
+                PageType.SETTINGS -> navigationActions.navigateUp()
                 PageType.MOTOR_DETAIL -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
                 else -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.SETTINGS))
             }
@@ -83,53 +80,48 @@ fun SettingRoute(
         }
     }
 
-    Scaffold(
-        topBar = {
-            SettingsAppBar(
-                uiState = uiState,
-                uiEvent = viewModel::uiEvent,
-                snackbarHostState = snackbarHostState
-            ) { navigation() }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
-    ) { paddingValues ->
-        SettingScreen(
-            modifier = modifier.padding(paddingValues),
-            uiState = uiState,
-            uiEvent = viewModel::uiEvent,
-            snackbarHostState = snackbarHostState
-        )
-    }
+    SettingScreen(
+        uiState = uiState,
+        uiEvent = viewModel::uiEvent,
+        snackbarHostState = snackbarHostState,
+        navigation = navigation
+    )
 }
 
 @Composable
 fun SettingScreen(
-    modifier: Modifier = Modifier,
     uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit = {},
-    snackbarHostState: SnackbarHostState
+    uiEvent: (SettingUiEvent) -> Unit,
+    snackbarHostState: SnackbarHostState,
+    navigation: () -> Unit
 ) {
-    AnimatedVisibility(visible = uiState.page == PageType.SETTINGS) {
-        SettingContent(modifier, uiState, uiEvent, snackbarHostState)
-    }
-    AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
-        Authentication(modifier, uiEvent)
-    }
-    AnimatedVisibility(visible = uiState.page == PageType.MOTOR_LIST) {
-        MotorList(modifier, uiState, uiEvent)
-    }
-    AnimatedVisibility(visible = uiState.page == PageType.MOTOR_DETAIL) {
-        MotorDetail(modifier, uiState, uiEvent)
-    }
-    AnimatedVisibility(visible = uiState.page == PageType.CONFIG) {
-        ConfigList(modifier)
+    Column {
+        SettingsAppBar(
+            uiState = uiState,
+            uiEvent = uiEvent,
+            snackbarHostState = snackbarHostState
+        ) { navigation() }
+
+        AnimatedVisibility(visible = uiState.page == PageType.SETTINGS) {
+            SettingContent(uiState, uiEvent, snackbarHostState)
+        }
+        AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
+            Authentication(uiEvent)
+        }
+        AnimatedVisibility(visible = uiState.page == PageType.MOTOR_LIST) {
+            MotorList(uiState, uiEvent)
+        }
+        AnimatedVisibility(visible = uiState.page == PageType.MOTOR_DETAIL) {
+            MotorDetail(uiState, uiEvent)
+        }
+        AnimatedVisibility(visible = uiState.page == PageType.CONFIG) {
+            ConfigList()
+        }
     }
 }
 
 @Composable
 fun SettingContent(
-    modifier: Modifier = Modifier,
     uiState: SettingUiState,
     uiEvent: (SettingUiEvent) -> Unit = {},
     snackbarHostState: SnackbarHostState
@@ -140,7 +132,7 @@ fun SettingContent(
     var helpInfo by remember { mutableStateOf(false) }
 
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -372,14 +364,12 @@ fun SettingsCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Authentication(
-    modifier: Modifier = Modifier,
-    uiEvent: (SettingUiEvent) -> Unit = {}
-) {
+fun Authentication(uiEvent: (SettingUiEvent) -> Unit) {
+
     var show by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -445,14 +435,13 @@ fun Authentication(
 
 @Composable
 fun MotorList(
-    modifier: Modifier = Modifier,
     uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit = {}
+    uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = modifier,
+        modifier = Modifier,
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -494,10 +483,10 @@ fun MotorList(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun MotorDetail(
-    modifier: Modifier = Modifier,
     uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit = {}
+    uiEvent: (SettingUiEvent) -> Unit
 ) {
+
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
     val selected = uiState.entities.find { it.id == uiState.selected } ?: Motor()
@@ -528,7 +517,7 @@ fun MotorDetail(
     )
 
     LazyColumn(
-        modifier = modifier
+        modifier = Modifier
             .padding(16.dp)
             .windowInsetsPadding(WindowInsets.imeAnimationSource),
         contentPadding = PaddingValues(16.dp),
@@ -703,12 +692,12 @@ fun MotorDetail(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ConfigList(modifier: Modifier = Modifier) {
+fun ConfigList() {
 
     val scope = rememberCoroutineScope()
 
     LazyColumn(
-        modifier = modifier
+        modifier = Modifier
             .padding(16.dp)
             .windowInsetsPadding(WindowInsets.imeAnimationSource),
         contentPadding = PaddingValues(16.dp),

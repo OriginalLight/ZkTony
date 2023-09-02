@@ -26,8 +26,10 @@ data class TopLevelDestination(
 )
 
 class NavigationActions(private val navController: NavHostController) {
-    fun navigateTo(destination: TopLevelDestination) {
-        navController.navigate(destination.route) {
+    fun navigateTo(destination: TopLevelDestination) = navigate(destination.route)
+
+    fun navigate(route: String) {
+        navController.navigate(route) {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations
             // on the back stack as users select items
@@ -44,6 +46,10 @@ class NavigationActions(private val navController: NavHostController) {
 
     fun navigateUp() {
         navController.navigateUp()
+    }
+
+    fun popBackStack() {
+        navController.popBackStack()
     }
 }
 
