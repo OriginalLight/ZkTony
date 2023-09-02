@@ -19,7 +19,7 @@ class CurveService(private val dao: CurveDao) : AbstractService() {
      * 2. 计算曲线函数
      * 3. 将曲线函数保存到appState中
      */
-    override fun setup() {
+    override fun start() {
         scope.launch { dao.getAll().collect { calculate(it) } }
     }
 

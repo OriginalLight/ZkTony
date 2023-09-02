@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.R
 import com.zktony.android.ui.navigation.Route
+import com.zktony.android.ui.utils.LocalNavigationActions
 
 @Composable
 fun Splash() {

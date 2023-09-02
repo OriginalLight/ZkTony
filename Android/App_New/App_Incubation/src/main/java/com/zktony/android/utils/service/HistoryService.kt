@@ -11,7 +11,7 @@ class HistoryService(private val dao: HistoryDao) : AbstractService() {
      * 1. 从数据库中获取所有历史记录
      * 2. 清理180天前的数据
      */
-    override fun setup() {
+    override fun start() {
         scope.launch { dao.getAll().collect { cleanup(it) } }
     }
 

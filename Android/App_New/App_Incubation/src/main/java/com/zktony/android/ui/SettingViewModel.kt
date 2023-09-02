@@ -16,18 +16,21 @@ import com.zktony.android.utils.extra.download
 import com.zktony.android.utils.extra.httpCall
 import com.zktony.android.utils.extra.installApk
 import com.zktony.android.utils.extra.isNetworkAvailable
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.io.File
+import javax.inject.Inject
 
 /**
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class SettingViewModel(private val dao: MotorDao) : ViewModel() {
+@HiltViewModel
+class SettingViewModel @Inject constructor(private val dao: MotorDao) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
     private val _application = MutableStateFlow<Application?>(null)

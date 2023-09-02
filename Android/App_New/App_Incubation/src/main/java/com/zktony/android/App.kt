@@ -1,16 +1,13 @@
 package com.zktony.android
 
 import android.app.Application
-import com.zktony.android.di.koinModule
 import com.zktony.android.utils.extra.Ext
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-import org.koin.core.logger.Level
+import dagger.hilt.android.HiltAndroidApp
 
 /**
  * The main application class that initializes the application and its dependencies.
  */
+@HiltAndroidApp
 class App : Application() {
 
     /**
@@ -19,14 +16,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Initialize the application context and data store factory
+        // Initialize the application context
         Ext.with(this)
-
-        // Initialize the dependency injection framework with the application context and modules
-        startKoin {
-            androidContext(this@App)
-            androidLogger(level = Level.INFO)
-            modules(koinModule)
-        }
     }
 }

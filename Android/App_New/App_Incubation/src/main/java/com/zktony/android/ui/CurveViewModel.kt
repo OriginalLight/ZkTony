@@ -8,17 +8,20 @@ import androidx.paging.cachedIn
 import com.zktony.android.data.dao.CurveDao
 import com.zktony.android.data.entities.Curve
 import com.zktony.android.ui.utils.PageType
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * @author 刘贺贺
  * @date 2023/5/9 13:19
  */
-class CurveViewModel(private val dao: CurveDao) : ViewModel() {
+@HiltViewModel
+class CurveViewModel @Inject constructor(private val dao: CurveDao) : ViewModel() {
 
     private val _page = MutableStateFlow(PageType.CURVE_LIST)
     private val _selected = MutableStateFlow(0L)

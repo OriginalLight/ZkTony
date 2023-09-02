@@ -6,5 +6,5 @@ import kotlinx.coroutines.SupervisorJob
 
 abstract class AbstractService {
     val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    open fun setup() {}
+    open fun start() {}
 }

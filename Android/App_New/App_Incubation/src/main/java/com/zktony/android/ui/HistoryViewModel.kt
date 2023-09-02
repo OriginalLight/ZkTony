@@ -7,17 +7,20 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.zktony.android.data.dao.HistoryDao
 import com.zktony.android.ui.utils.PageType
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class HistoryViewModel(private val dao: HistoryDao) : ViewModel() {
+@HiltViewModel
+class HistoryViewModel @Inject constructor(private val dao: HistoryDao) : ViewModel() {
 
     private val _page = MutableStateFlow(PageType.HISTORY_LIST)
     private val _selected = MutableStateFlow(0L)

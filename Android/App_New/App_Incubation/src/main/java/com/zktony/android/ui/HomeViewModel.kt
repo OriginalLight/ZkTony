@@ -6,17 +6,20 @@ import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.extra.writeRegister
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0L)
