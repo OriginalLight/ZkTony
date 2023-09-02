@@ -26,13 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemContentType
-import androidx.paging.compose.itemKey
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.ProcessItem
 import com.zktony.android.ui.components.ProgramAppBar
 import com.zktony.android.ui.components.ProgramItem
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.itemsIndexed
 import kotlinx.coroutines.launch
 
 @Composable
@@ -106,44 +105,37 @@ fun ProgramList(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(
-            count = entities.itemCount,
-            key = entities.itemKey(),
-            contentType = entities.itemContentType()
-        ) { index ->
-            val item = entities[index]
-            if (item != null) {
-                val color =
-                    if (uiState.selected == item.id) {
-                        MaterialTheme.colorScheme.secondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.surfaceVariant
-                    }
+        itemsIndexed(entities) { index, item ->
+            val color =
+                if (uiState.selected == item.id) {
+                    MaterialTheme.colorScheme.secondaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant
+                }
 
-                ProgramItem(
-                    modifier = Modifier.background(
-                        color = color,
-                        shape = MaterialTheme.shapes.medium
-                    ),
-                    index = index,
-                    item = item,
-                    onClick = {
-                        scope.launch {
-                            if (uiState.selected != item.id) {
-                                uiEvent(ProgramUiEvent.ToggleSelected(it.id))
-                            } else {
-                                uiEvent(ProgramUiEvent.ToggleSelected(0L))
-                            }
-                        }
-                    },
-                    onDoubleClick = {
-                        scope.launch {
+            ProgramItem(
+                modifier = Modifier.background(
+                    color = color,
+                    shape = MaterialTheme.shapes.medium
+                ),
+                index = index,
+                item = item,
+                onClick = {
+                    scope.launch {
+                        if (uiState.selected != item.id) {
                             uiEvent(ProgramUiEvent.ToggleSelected(it.id))
-                            uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
+                        } else {
+                            uiEvent(ProgramUiEvent.ToggleSelected(0L))
                         }
                     }
-                )
-            }
+                },
+                onDoubleClick = {
+                    scope.launch {
+                        uiEvent(ProgramUiEvent.ToggleSelected(it.id))
+                        uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
+                    }
+                }
+            )
         }
     }
 }

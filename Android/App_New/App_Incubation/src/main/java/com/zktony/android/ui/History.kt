@@ -19,13 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemContentType
-import androidx.paging.compose.itemKey
 import com.zktony.android.data.entities.History
 import com.zktony.android.ui.components.HistoryAppBar
 import com.zktony.android.ui.components.HistoryItem
 import com.zktony.android.ui.components.LogItem
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.itemsIndexed
 import kotlinx.coroutines.launch
 
 /**
@@ -109,18 +108,11 @@ fun HistoryList(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(
-            count = entities.itemCount,
-            key = entities.itemKey(),
-            contentType = entities.itemContentType()
-        ) { index ->
-            val item = entities[index]
-            if (item != null) {
-                HistoryItem(index, item) {
-                    scope.launch {
-                        uiEvent(HistoryUiEvent.ToggleSelected(it.id))
-                        uiEvent(HistoryUiEvent.NavTo(PageType.HISTORY_DETAIL))
-                    }
+        itemsIndexed(entities) { index, item ->
+            HistoryItem(index, item) {
+                scope.launch {
+                    uiEvent(HistoryUiEvent.ToggleSelected(it.id))
+                    uiEvent(HistoryUiEvent.NavTo(PageType.HISTORY_DETAIL))
                 }
             }
         }
@@ -132,7 +124,6 @@ fun HistoryDetail(
     entities: LazyPagingItems<History>,
     uiState: HistoryUiState
 ) {
-
     LazyColumn(
         modifier = Modifier,
         contentPadding = PaddingValues(16.dp),

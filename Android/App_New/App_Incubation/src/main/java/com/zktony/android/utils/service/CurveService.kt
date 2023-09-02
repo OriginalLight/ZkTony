@@ -5,12 +5,7 @@ import com.zktony.android.data.entities.Curve
 import com.zktony.android.utils.extra.appState
 import com.zktony.android.utils.extra.calculateLinearRelation
 import com.zktony.android.utils.extra.fitQuadraticCurve
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 
 /**
  * @author 刘贺贺

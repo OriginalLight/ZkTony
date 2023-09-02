@@ -35,13 +35,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemContentType
-import androidx.paging.compose.itemKey
 import com.zktony.android.data.entities.Curve
 import com.zktony.android.ui.components.CurveAppBar
 import com.zktony.android.ui.components.CurveItem
 import com.zktony.android.ui.components.PointItem
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.itemsIndexed
 import kotlinx.coroutines.launch
 
 /**
@@ -129,44 +128,37 @@ fun CurveList(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(
-            count = entities.itemCount,
-            key = entities.itemKey(),
-            contentType = entities.itemContentType()
-        ) { index ->
-            val item = entities[index]
-            if (item != null) {
-                val color =
-                    if (uiState.selected == item.id) {
-                        MaterialTheme.colorScheme.secondaryContainer
-                    } else {
-                        MaterialTheme.colorScheme.surfaceVariant
-                    }
+        itemsIndexed(entities) { index, item ->
+            val color =
+                if (uiState.selected == item.id) {
+                    MaterialTheme.colorScheme.secondaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant
+                }
 
-                CurveItem(
-                    modifier = Modifier.background(
-                        color = color,
-                        shape = MaterialTheme.shapes.medium
-                    ),
-                    index = index,
-                    item = item,
-                    onClick = {
-                        scope.launch {
-                            if (uiState.selected != item.id) {
-                                uiEvent(CurveUiEvent.ToggleSelected(it.id))
-                            } else {
-                                uiEvent(CurveUiEvent.ToggleSelected(0L))
-                            }
-                        }
-                    },
-                    onDoubleClick = {
-                        scope.launch {
+            CurveItem(
+                modifier = Modifier.background(
+                    color = color,
+                    shape = MaterialTheme.shapes.medium
+                ),
+                index = index,
+                item = item,
+                onClick = {
+                    scope.launch {
+                        if (uiState.selected != item.id) {
                             uiEvent(CurveUiEvent.ToggleSelected(it.id))
-                            uiEvent(CurveUiEvent.NavTo(PageType.CURVE_DETAIL))
+                        } else {
+                            uiEvent(CurveUiEvent.ToggleSelected(0L))
                         }
                     }
-                )
-            }
+                },
+                onDoubleClick = {
+                    scope.launch {
+                        uiEvent(CurveUiEvent.ToggleSelected(it.id))
+                        uiEvent(CurveUiEvent.NavTo(PageType.CURVE_DETAIL))
+                    }
+                }
+            )
         }
     }
 }
