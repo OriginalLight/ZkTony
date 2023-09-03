@@ -26,8 +26,9 @@ import com.zktony.android.data.entities.History
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.defaults.ProcessDefaults
 import com.zktony.android.ui.*
-import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.TOP_LEVEL_DESTINATIONS
+import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.extra.Point
 import com.zktony.android.utils.extra.dateFormat
@@ -40,10 +41,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeAppBar(
-    modifier: Modifier = Modifier,
-    navigationActions: NavigationActions,
-    navigation: @Composable () -> Unit = {},
+    uiState: HomeUiState,
+    navigation: () -> Unit
 ) {
+
+    val navigationActions = LocalNavigationActions.current
+
     TopAppBar(
         title = {
             Image(
@@ -54,7 +57,7 @@ fun HomeAppBar(
         },
         actions = {
             Row(
-                modifier = modifier
+                modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 4.dp)
                     .background(
                         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -63,7 +66,14 @@ fun HomeAppBar(
                     .padding(horizontal = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                navigation()
+                AnimatedVisibility(visible = uiState.page != PageType.HOME) {
+                    ElevatedButton(onClick = navigation) {
+                        Icon(
+                            imageVector = Icons.Default.Reply,
+                            contentDescription = null
+                        )
+                    }
+                }
                 TOP_LEVEL_DESTINATIONS.forEach { destination ->
                     ElevatedButton(
                         onClick = { navigationActions.navigateTo(destination) },
@@ -82,13 +92,12 @@ fun HomeAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsAppBar(
-    modifier: Modifier = Modifier,
     uiState: SettingUiState,
     uiEvent: (SettingUiEvent) -> Unit,
-    snackbarHostState: SnackbarHostState,
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
     var count by remember { mutableIntStateOf(0) }
 
     TopAppBar(
@@ -100,16 +109,13 @@ fun SettingsAppBar(
                         shape = MaterialTheme.shapes.small,
                     )
                     .padding(horizontal = 32.dp, vertical = 4.dp),
-                text = stringResource(id = R.string.settings),
-                style = TextStyle(
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 24.sp
-                )
+                text = stringResource(id = R.string.setting),
+                style = MaterialTheme.typography.headlineSmall
             )
         },
         actions = {
             Row(
-                modifier = modifier
+                modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 4.dp)
                     .background(
                         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -167,14 +173,13 @@ fun SettingsAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgramAppBar(
-    modifier: Modifier = Modifier,
     entities: LazyPagingItems<Program>,
     uiState: ProgramUiState,
     uiEvent: (ProgramUiEvent) -> Unit,
-    snackbarHostState: SnackbarHostState,
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
     var dialog by remember { mutableStateOf(false) }
     var count by remember { mutableIntStateOf(0) }
 
@@ -201,10 +206,7 @@ fun ProgramAppBar(
                         )
                         .padding(horizontal = 32.dp, vertical = 4.dp),
                     text = stringResource(id = R.string.program),
-                    style = TextStyle(
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 24.sp
-                    )
+                    style = MaterialTheme.typography.headlineSmall
                 )
             } else {
                 Column(
@@ -239,7 +241,7 @@ fun ProgramAppBar(
         },
         actions = {
             Row(
-                modifier = modifier
+                modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 4.dp)
                     .background(
                         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -314,14 +316,13 @@ fun ProgramAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CurveAppBar(
-    modifier: Modifier = Modifier,
     entities: LazyPagingItems<Curve>,
     uiState: CurveUiState,
     uiEvent: (CurveUiEvent) -> Unit,
-    snackbarHostState: SnackbarHostState,
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
     var count by remember { mutableIntStateOf(0) }
     var dialog by remember { mutableStateOf(false) }
 
@@ -346,10 +347,7 @@ fun CurveAppBar(
                         )
                         .padding(horizontal = 32.dp, vertical = 4.dp),
                     text = stringResource(id = R.string.calibration),
-                    style = TextStyle(
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 24.sp
-                    )
+                    style = MaterialTheme.typography.headlineSmall
                 )
             } else {
                 Column(
@@ -384,7 +382,7 @@ fun CurveAppBar(
         },
         actions = {
             Row(
-                modifier = modifier
+                modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 4.dp)
                     .background(
                         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -462,13 +460,13 @@ fun CurveAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryAppBar(
-    modifier: Modifier = Modifier,
     entities: LazyPagingItems<History>,
     uiState: HistoryUiState,
     uiEvent: (HistoryUiEvent) -> Unit,
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
 
     TopAppBar(
         title = {
@@ -488,15 +486,12 @@ fun HistoryAppBar(
                     )
                     .padding(horizontal = 32.dp, vertical = 4.dp),
                 text = text,
-                style = TextStyle(
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 24.sp
-                )
+                style = MaterialTheme.typography.headlineSmall
             )
         },
         actions = {
             Row(
-                modifier = modifier
+                modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 4.dp)
                     .background(
                         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -510,6 +505,7 @@ fun HistoryAppBar(
                         scope.launch {
                             uiEvent(HistoryUiEvent.NavTo(PageType.HISTORY_LIST))
                             uiEvent(HistoryUiEvent.Delete(uiState.selected))
+                            snackbarHostState.showSnackbar("删除成功")
                         }
                     }) {
                         Icon(

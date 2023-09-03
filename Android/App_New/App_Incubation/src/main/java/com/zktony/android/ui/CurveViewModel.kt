@@ -21,7 +21,9 @@ import javax.inject.Inject
  * @date 2023/5/9 13:19
  */
 @HiltViewModel
-class CurveViewModel @Inject constructor(private val dao: CurveDao) : ViewModel() {
+class CurveViewModel @Inject constructor(
+    private val dao: CurveDao
+) : ViewModel() {
 
     private val _page = MutableStateFlow(PageType.CURVE_LIST)
     private val _selected = MutableStateFlow(0L)

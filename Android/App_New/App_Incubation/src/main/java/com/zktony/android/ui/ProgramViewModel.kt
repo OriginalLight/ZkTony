@@ -21,7 +21,10 @@ import javax.inject.Inject
  * @date 2023/5/15 14:51
  */
 @HiltViewModel
-class ProgramViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel() {
+class ProgramViewModel @Inject constructor(
+    private val dao: ProgramDao
+) : ViewModel() {
+
     private val _uiState = MutableStateFlow(ProgramUiState())
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.PROGRAM_LIST)

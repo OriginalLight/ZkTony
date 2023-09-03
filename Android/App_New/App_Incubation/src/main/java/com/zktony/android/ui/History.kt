@@ -1,7 +1,7 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,6 +23,7 @@ import com.zktony.android.data.entities.History
 import com.zktony.android.ui.components.HistoryAppBar
 import com.zktony.android.ui.components.HistoryItem
 import com.zktony.android.ui.components.LogItem
+import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
@@ -71,6 +72,7 @@ fun HistoryRoute(viewModel: HistoryViewModel) {
     )
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HistoryScreen(
     entities: LazyPagingItems<History>,
@@ -79,21 +81,15 @@ fun HistoryScreen(
     navigation: () -> Unit
 ) {
     Column {
-        HistoryAppBar(
-            entities = entities,
-            uiState = uiState,
-            uiEvent = uiEvent
-        ) { navigation() }
-
-        AnimatedVisibility(visible = uiState.page == PageType.HISTORY_LIST) {
-            HistoryList(entities, uiEvent)
-        }
-
-        AnimatedVisibility(visible = uiState.page == PageType.HISTORY_DETAIL) {
-            HistoryDetail(entities, uiState)
+        HistoryAppBar(entities, uiState, uiEvent) { navigation() }
+        AnimatedContent(targetState = uiState.page) {
+            when (it) {
+                PageType.HISTORY_LIST -> HistoryList(entities, uiEvent)
+                PageType.HISTORY_DETAIL -> HistoryDetail(entities, uiState)
+                else -> {}
+            }
         }
     }
-
 }
 
 @Composable

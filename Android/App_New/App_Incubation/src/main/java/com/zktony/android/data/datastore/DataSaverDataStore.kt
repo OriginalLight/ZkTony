@@ -7,21 +7,23 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
 /**
  * The implementation using [PreferenceDataStore] to save data. And because DataStore supports coroutine,
  * so does this.
  */
-class DataSaverDataStore(
+class DataSaverDataStore @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     senseExternalDataChange: Boolean = false
 ) : DataSaverInterface(senseExternalDataChange) {
-    private val scope by lazy { CoroutineScope(Dispatchers.IO) }
+    private val scope by lazy { CoroutineScope(Dispatchers.IO + SupervisorJob()) }
 
     init {
         if (senseExternalDataChange) {
@@ -53,7 +55,6 @@ class DataSaverDataStore(
         }
     }
 
-    // Reference：https://blog.csdn.net/qq_36707431/article/details/119447093
     private suspend fun <T> get(dataStore: DataStore<Preferences>, key: String, default: T): T {
         return when (default) {
             is Int -> {

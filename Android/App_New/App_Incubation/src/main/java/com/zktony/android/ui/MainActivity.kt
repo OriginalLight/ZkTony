@@ -14,7 +14,7 @@ import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.theme.AppTheme
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
-import com.zktony.android.utils.service.ServiceFactory
+import com.zktony.android.utils.service.ServiceObserver
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -25,15 +25,14 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var serviceFactory: ServiceFactory
+    lateinit var serviceObserver: ServiceObserver
 
     @Inject
     lateinit var dataSaverDataStore: DataSaverDataStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        serviceFactory.create()
+        lifecycle.addObserver(serviceObserver)
 
         setContent {
 
@@ -43,9 +42,9 @@ class MainActivity : ComponentActivity() {
             val homeViewModel: HomeViewModel = hiltViewModel()
 
             CompositionLocalProvider(
+                LocalDataSaver provides dataSaverDataStore,
                 LocalNavigationActions provides navigationActions,
-                LocalSnackbarHostState provides snackbarHostState,
-                LocalDataSaver provides dataSaverDataStore
+                LocalSnackbarHostState provides snackbarHostState
             ) {
                 AppTheme {
                     AppNavigation(

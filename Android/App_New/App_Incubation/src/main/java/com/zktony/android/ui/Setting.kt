@@ -1,10 +1,12 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -21,6 +23,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -34,7 +37,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,6 +45,7 @@ import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.components.*
+import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
@@ -83,53 +86,37 @@ fun SettingRoute(viewModel: SettingViewModel) {
     }
 
     SettingScreen(
-        uiState = uiState,
-        uiEvent = viewModel::uiEvent,
-        snackbarHostState = snackbarHostState,
-        navigation = navigation
+        uiState = uiState, uiEvent = viewModel::uiEvent, navigation = navigation
     )
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SettingScreen(
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit,
-    snackbarHostState: SnackbarHostState,
-    navigation: () -> Unit
+    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit, navigation: () -> Unit
 ) {
     Column {
-        SettingsAppBar(
-            uiState = uiState,
-            uiEvent = uiEvent,
-            snackbarHostState = snackbarHostState
-        ) { navigation() }
-
-        AnimatedVisibility(visible = uiState.page == PageType.SETTINGS) {
-            SettingContent(uiState, uiEvent, snackbarHostState)
-        }
-        AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
-            Authentication(uiEvent)
-        }
-        AnimatedVisibility(visible = uiState.page == PageType.MOTOR_LIST) {
-            MotorList(uiState, uiEvent)
-        }
-        AnimatedVisibility(visible = uiState.page == PageType.MOTOR_DETAIL) {
-            MotorDetail(uiState, uiEvent)
-        }
-        AnimatedVisibility(visible = uiState.page == PageType.CONFIG) {
-            ConfigList()
+        SettingsAppBar(uiState, uiEvent) { navigation() }
+        AnimatedContent(targetState = uiState.page) {
+            when (uiState.page) {
+                PageType.SETTINGS -> SettingContent(uiState, uiEvent)
+                PageType.AUTH -> Authentication(uiEvent)
+                PageType.MOTOR_LIST -> MotorList(uiState, uiEvent)
+                PageType.MOTOR_DETAIL -> MotorDetail(uiState, uiEvent)
+                PageType.CONFIG -> ConfigList()
+                else -> {}
+            }
         }
     }
 }
 
 @Composable
 fun SettingContent(
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit = {},
-    snackbarHostState: SnackbarHostState
+    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val snackbarHostState = LocalSnackbarHostState.current
     var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
     var helpInfo by remember { mutableStateOf(false) }
 
@@ -143,10 +130,9 @@ fun SettingContent(
             modifier = Modifier
                 .weight(1f)
                 .border(
-                    width = 1.dp,
-                    color = Color.LightGray,
-                    shape = MaterialTheme.shapes.small
-                ),
+                    width = 1.dp, color = Color.LightGray, shape = MaterialTheme.shapes.small
+                )
+                .animateContentSize(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -155,41 +141,33 @@ fun SettingContent(
                     icon = Icons.Outlined.Navigation,
                     text = stringResource(id = R.string.navigation)
                 ) {
-                    Switch(
-                        modifier = Modifier.height(32.dp),
+                    Switch(modifier = Modifier.height(32.dp),
                         checked = navigation,
                         onCheckedChange = {
                             scope.launch {
                                 navigation = it
                                 uiEvent(SettingUiEvent.Navigation(it))
                             }
-                        }
-                    )
+                        })
                 }
             }
 
             item {
-                SettingsCard(
-                    icon = Icons.Outlined.Wifi,
+                SettingsCard(icon = Icons.Outlined.Wifi,
                     text = stringResource(id = R.string.network),
-                    onClick = { uiEvent(SettingUiEvent.Network) }
-                ) {
+                    onClick = { uiEvent(SettingUiEvent.Network) }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowRight,
-                        contentDescription = null
+                        imageVector = Icons.Default.ArrowRight, contentDescription = null
                     )
                 }
             }
 
             item {
-                SettingsCard(
-                    icon = Icons.Outlined.Security,
+                SettingsCard(icon = Icons.Outlined.Security,
                     text = stringResource(id = R.string.parameters),
-                    onClick = { uiEvent(SettingUiEvent.NavTo(PageType.AUTH)) }
-                ) {
+                    onClick = { uiEvent(SettingUiEvent.NavTo(PageType.AUTH)) }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowRight,
-                        contentDescription = null
+                        imageVector = Icons.Default.ArrowRight, contentDescription = null
                     )
                 }
             }
@@ -199,17 +177,15 @@ fun SettingContent(
             modifier = Modifier
                 .weight(1f)
                 .border(
-                    width = 1.dp,
-                    color = Color.LightGray,
-                    shape = MaterialTheme.shapes.small
-                ),
+                    width = 1.dp, color = Color.LightGray, shape = MaterialTheme.shapes.small
+                )
+                .animateContentSize(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
                 SettingsCard(
-                    icon = Icons.Outlined.Info,
-                    text = stringResource(id = R.string.version)
+                    icon = Icons.Outlined.Info, text = stringResource(id = R.string.version)
                 ) {
                     Text(
                         text = BuildConfig.VERSION_NAME,
@@ -221,11 +197,9 @@ fun SettingContent(
             }
 
             item {
-                SettingsCard(
-                    icon = Icons.Outlined.HelpOutline,
+                SettingsCard(icon = Icons.Outlined.HelpOutline,
                     text = if (helpInfo) stringResource(id = R.string.qrcode) else stringResource(id = R.string.help),
-                    onClick = { helpInfo = !helpInfo },
-                ) {
+                    onClick = { helpInfo = !helpInfo }) {
                     if (helpInfo) {
                         Text(
                             text = "025-68790636",
@@ -235,8 +209,7 @@ fun SettingContent(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.Default.ArrowRight,
-                            contentDescription = null
+                            imageVector = Icons.Default.ArrowRight, contentDescription = null
                         )
                     }
                 }
@@ -267,30 +240,24 @@ fun SettingContent(
                     }
                 }
 
-                SettingsCard(
-                    icon = image,
-                    text = text,
-                    onClick = {
-                        scope.launch {
-                            if (context.isNetworkAvailable()) {
-                                uiEvent(SettingUiEvent.CheckUpdate)
-                            } else {
-                                snackbarHostState.showSnackbar(message = "网络不可用")
-                            }
+                SettingsCard(icon = image, text = text, onClick = {
+                    scope.launch {
+                        if (context.isNetworkAvailable()) {
+                            uiEvent(SettingUiEvent.CheckUpdate)
+                        } else {
+                            snackbarHostState.showSnackbar(message = "网络不可用")
                         }
                     }
-                ) {
+                }) {
 
                     if (uiState.application == null) {
                         Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null
+                            imageVector = Icons.Default.Check, contentDescription = null
                         )
                     } else {
                         if (uiState.progress == 0) {
                             Icon(
-                                imageVector = Icons.Default.ArrowCircleUp,
-                                contentDescription = null
+                                imageVector = Icons.Default.ArrowCircleUp, contentDescription = null
                             )
                         } else {
                             Text(
@@ -322,114 +289,98 @@ fun SettingContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsCard(
-    paddingStart: Dp = 0.dp,
     onClick: () -> Unit = { },
     icon: ImageVector,
     text: String? = null,
     content: @Composable () -> Unit
 ) {
-    Card(
-        modifier = Modifier.padding(start = paddingStart),
-        onClick = onClick,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                modifier = Modifier.size(32.dp),
-                imageVector = icon,
-                contentDescription = text,
-                tint = MaterialTheme.colorScheme.primary
+    Row(modifier = Modifier
+        .background(
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            shape = MaterialTheme.shapes.medium
+        )
+        .clip(MaterialTheme.shapes.medium)
+        .clickable { onClick() }
+        .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Icon(
+            modifier = Modifier.size(32.dp),
+            imageVector = icon,
+            contentDescription = text,
+            tint = MaterialTheme.colorScheme.primary
+        )
+        text?.let {
+            Text(
+                text = text, style = MaterialTheme.typography.titleMedium
             )
-            text?.let {
-                Text(
-                    text = text,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Serif,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                        letterSpacing = 0.15.sp
-                    )
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            content.invoke()
         }
+        Spacer(modifier = Modifier.weight(1f))
+        content.invoke()
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Authentication(uiEvent: (SettingUiEvent) -> Unit) {
 
+    val scope = rememberCoroutineScope()
     var show by remember { mutableStateOf(false) }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .windowInsetsPadding(WindowInsets.imeAnimationSource),
+        contentAlignment = Alignment.Center
     ) {
-        Spacer(modifier = Modifier.height(64.dp))
-        AnimatedVisibility(visible = !show) {
+        if (show) {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                FloatingActionButton(onClick = {
+                    scope.launch {
+                        uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
+                    }
+                }) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Cyclone, contentDescription = null
+                        )
+                        Text(
+                            text = stringResource(id = R.string.motor_config),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+                FloatingActionButton(onClick = {
+                    scope.launch {
+                        uiEvent(SettingUiEvent.NavTo(PageType.CONFIG))
+                    }
+                }) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Tune, contentDescription = null
+                        )
+                        Text(
+                            text = stringResource(id = R.string.system_config),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+            }
+        } else {
             VerificationCodeField(digits = 6, inputCallback = {
                 show = true
             }) { text, focused ->
                 VerificationCodeItem(text, focused)
-            }
-        }
-        AnimatedVisibility(visible = show) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                ElevatedCard(onClick = { uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST)) }) {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(96.dp),
-                            imageVector = Icons.Default.Cyclone,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            modifier = Modifier.padding(bottom = 8.dp),
-                            text = stringResource(id = R.string.motor_config),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Serif
-                        )
-                    }
-                }
-                ElevatedCard(onClick = { uiEvent(SettingUiEvent.NavTo(PageType.CONFIG)) }) {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(96.dp),
-                            imageVector = Icons.Default.Tune,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            modifier = Modifier.padding(bottom = 8.dp),
-                            text = stringResource(id = R.string.system_config),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Serif
-                        )
-                    }
-                }
             }
         }
     }
@@ -437,8 +388,7 @@ fun Authentication(uiEvent: (SettingUiEvent) -> Unit) {
 
 @Composable
 fun MotorList(
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit
+    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -450,34 +400,27 @@ fun MotorList(
         columns = GridCells.Fixed(3)
     ) {
         items(items = uiState.entities) { item ->
-            val color =
-                if (uiState.selected == item.id) {
-                    MaterialTheme.colorScheme.secondaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surfaceVariant
-                }
-            MotorItem(
-                modifier = Modifier.background(
-                    color = color,
-                    shape = MaterialTheme.shapes.medium
-                ),
-                item = item,
-                onClick = {
-                    scope.launch {
-                        if (uiState.selected != item.id) {
-                            uiEvent(SettingUiEvent.ToggleSelected(item.id))
-                        } else {
-                            uiEvent(SettingUiEvent.ToggleSelected(0L))
-                        }
-                    }
-                },
-                onDoubleClick = {
-                    scope.launch {
+            val color = if (uiState.selected == item.id) {
+                MaterialTheme.colorScheme.secondaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            }
+            MotorItem(modifier = Modifier.background(
+                color = color, shape = MaterialTheme.shapes.medium
+            ), item = item, onClick = {
+                scope.launch {
+                    if (uiState.selected != item.id) {
                         uiEvent(SettingUiEvent.ToggleSelected(item.id))
-                        uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL))
+                    } else {
+                        uiEvent(SettingUiEvent.ToggleSelected(0L))
                     }
                 }
-            )
+            }, onDoubleClick = {
+                scope.launch {
+                    uiEvent(SettingUiEvent.ToggleSelected(item.id))
+                    uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL))
+                }
+            })
         }
     }
 }
@@ -485,8 +428,7 @@ fun MotorList(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun MotorDetail(
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit
+    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
@@ -500,11 +442,9 @@ fun MotorDetail(
         imeAction = ImeAction.Done,
     )
 
-    val keyboardActions = KeyboardActions(
-        onDone = {
-            softKeyboard?.hide()
-        }
-    )
+    val keyboardActions = KeyboardActions(onDone = {
+        softKeyboard?.hide()
+    })
 
     val colors = TextFieldDefaults.colors(
         unfocusedIndicatorColor = Color.Transparent,
@@ -542,8 +482,7 @@ fun MotorDetail(
                 leadingIcon = {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         Icon(
-                            imageVector = Icons.Default.Numbers,
-                            contentDescription = null
+                            imageVector = Icons.Default.Numbers, contentDescription = null
                         )
                     }
                 },
@@ -580,16 +519,13 @@ fun MotorDetail(
                     }
                 },
                 trailingIcon = {
-                    ElevatedButton(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        onClick = {
-                            scope.launch {
-                                writeRegister(selected.index, 152, selected.acceleration.toInt())
-                                delay(500L)
-                                writeRegister(selected.index, 220, 1)
-                            }
+                    ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                        scope.launch {
+                            writeRegister(selected.index, 152, selected.acceleration.toInt())
+                            delay(500L)
+                            writeRegister(selected.index, 220, 1)
                         }
-                    ) {
+                    }) {
                         Icon(imageVector = Icons.Default.Download, contentDescription = null)
                     }
                 },
@@ -625,15 +561,13 @@ fun MotorDetail(
                     }
                 },
                 trailingIcon = {
-                    ElevatedButton(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        onClick = {
-                            scope.launch {
-                                writeRegister(selected.index, 153, selected.deceleration.toInt())
-                                delay(500L)
-                                writeRegister(selected.index, 220, 1)
-                            }
-                        }) {
+                    ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                        scope.launch {
+                            writeRegister(selected.index, 153, selected.deceleration.toInt())
+                            delay(500L)
+                            writeRegister(selected.index, 220, 1)
+                        }
+                    }) {
                         Icon(imageVector = Icons.Default.Download, contentDescription = null)
                     }
                 },
@@ -669,15 +603,13 @@ fun MotorDetail(
                     }
                 },
                 trailingIcon = {
-                    ElevatedButton(
-                        modifier = Modifier.padding(horizontal = 16.dp),
-                        onClick = {
-                            scope.launch {
-                                writeRegister(selected.index, 154, selected.speed.toInt())
-                                delay(500L)
-                                writeRegister(selected.index, 220, 1)
-                            }
-                        }) {
+                    ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                        scope.launch {
+                            writeRegister(selected.index, 154, selected.speed.toInt())
+                            delay(500L)
+                            writeRegister(selected.index, 220, 1)
+                        }
+                    }) {
                         Icon(imageVector = Icons.Default.Download, contentDescription = null)
                     }
                 },
@@ -709,29 +641,23 @@ fun ConfigList() {
             var value by rememberDataSaverState(key = Constants.ZT_0000, default = 4)
             var string by remember { mutableStateOf(value.toString()) }
 
-            CircleTextField(
-                title = "模块数量",
+            CircleTextField(title = "模块数量",
                 value = string,
                 keyboardType = KeyboardType.Number,
                 onValueChange = {
                     string = it
                     scope.launch { value = it.toIntOrNull() ?: 4 }
-                }
-            )
+                })
         }
 
         item {
             var value by rememberDataSaverState(key = Constants.ZT_0001, default = 4.0)
             var string by remember { mutableStateOf(value.toString()) }
 
-            CircleTextField(
-                title = "保温温度",
-                value = string,
-                onValueChange = {
-                    string = it
-                    scope.launch { value = it.toDoubleOrNull() ?: 0.0 }
-                }
-            )
+            CircleTextField(title = "保温温度", value = string, onValueChange = {
+                string = it
+                scope.launch { value = it.toDoubleOrNull() ?: 0.0 }
+            })
         }
     }
 }
@@ -739,5 +665,5 @@ fun ConfigList() {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun SettingsPreview() {
-    SettingContent(uiState = SettingUiState(), snackbarHostState = SnackbarHostState())
+    SettingContent(uiState = SettingUiState()) {}
 }

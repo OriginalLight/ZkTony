@@ -1,7 +1,7 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,8 +14,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -30,6 +31,7 @@ import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.ProcessItem
 import com.zktony.android.ui.components.ProgramAppBar
 import com.zktony.android.ui.components.ProgramItem
+import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
@@ -44,6 +46,7 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
     val snackbarHostState = LocalSnackbarHostState.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val entities = viewModel.entities.collectAsLazyPagingItems()
+    val message by viewModel.message.collectAsStateWithLifecycle()
     val navigation: () -> Unit = {
         scope.launch {
             when (uiState.page) {
@@ -55,41 +58,43 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
 
     BackHandler { navigation() }
 
+    LaunchedEffect(key1 = message) {
+        if (message != null) {
+            snackbarHostState.showSnackbar(
+                message = message ?: "未知错误",
+                actionLabel = "关闭",
+                duration = SnackbarDuration.Short
+            )
+        }
+    }
+
     ProgramScreen(
         entities = entities,
         uiState = uiState,
         uiEvent = viewModel::uiEvent,
-        snackbarHostState = snackbarHostState,
         navigation = navigation
     )
 }
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ProgramScreen(
     entities: LazyPagingItems<Program>,
     uiState: ProgramUiState,
     uiEvent: (ProgramUiEvent) -> Unit,
-    snackbarHostState: SnackbarHostState,
     navigation: () -> Unit
 ) {
     Column {
-        ProgramAppBar(
-            entities = entities,
-            uiState = uiState,
-            uiEvent = uiEvent,
-            snackbarHostState = snackbarHostState
-        ) { navigation() }
-
-        AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_LIST) {
-            ProgramList(entities, uiState, uiEvent)
-        }
-
-        AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_DETAIL) {
-            ProgramDetail(entities, uiState, uiEvent)
+        ProgramAppBar(entities, uiState, uiEvent) { navigation() }
+        AnimatedContent(targetState = uiState.page) {
+            when (it) {
+                PageType.PROGRAM_LIST -> ProgramList(entities, uiState, uiEvent)
+                PageType.PROGRAM_DETAIL -> ProgramDetail(entities, uiState, uiEvent)
+                else -> {}
+            }
         }
     }
-
 }
 
 @Composable
@@ -105,7 +110,7 @@ fun ProgramList(
         contentPadding = PaddingValues(16.dp),
         columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         itemsIndexed(entities) { index, item ->
             val color =

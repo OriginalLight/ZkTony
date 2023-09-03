@@ -2,7 +2,6 @@
     <string name="already_latest">Already latest</string>
     <string name="app_name">ZkTony</string>
     <string name="cancel">Cancel</string>
-    <string name="device_info">Device info</string>
     <string name="finish">Finish</string>
     <string name="help">Help</string>
     <string name="language">Language</string>
@@ -22,17 +21,14 @@
     <string name="network">Network</string>
     <string name="downloading">Downloading</string>
     <string name="network_unavailable">Network Unavailable</string>
-    <string name="interface_exception">Interface Exception</string>
     <string name="speed">Speed</string>
     <string name="acceleration">Acceleration</string>
     <string name="deceleration">Deceleration</string>
     <string name="save">Save</string>
     <string name="edit">edit</string>
     <string name="delete">Delete</string>
-    <string name="settings">Setting</string>
-    <string name="add">Add</string>
+    <string name="setting">Setting</string>
     <string name="authentication">Authentication</string>
-    <string name="time_out">Time out</string>
     <string name="notice_content">1. Please follow the instruction manual\n2. Please fill the coagulant first and then fill the glue\n3. Please stick the needle to the opening of the rubber board during glue filling\n4. During use, please keep the liquid in the pipeline in a flowing state as much as possible\n5. The time interval between filling two gels should not be too long\n6. After the glue filling is completed, rinse the pipeline with clean water to avoid the gel blocking the pipeline</string>
     <string name="notice">Notice</string>
     <string name="dosage">Volume μL</string>
@@ -49,4 +45,5 @@
     <string name="upcoming">Upcoming</string>
     <string name="up">Up</string>
     <string name="down">Down</string>
+    <string name="add">Add</string>
 </resources>

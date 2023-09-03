@@ -20,7 +20,9 @@ import javax.inject.Inject
  * @date: 2023-02-14 15:37
  */
 @HiltViewModel
-class HistoryViewModel @Inject constructor(private val dao: HistoryDao) : ViewModel() {
+class HistoryViewModel @Inject constructor(
+    private val dao: HistoryDao
+) : ViewModel() {
 
     private val _page = MutableStateFlow(PageType.HISTORY_LIST)
     private val _selected = MutableStateFlow(0L)

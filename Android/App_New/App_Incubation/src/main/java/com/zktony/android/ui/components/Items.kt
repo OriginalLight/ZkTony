@@ -70,9 +70,9 @@ fun CurveItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "${index + 1}、",
+                text = "# ${index + 1}",
                 style = MaterialTheme.typography.titleLarge,
-                fontStyle = FontStyle.Italic,
+                fontStyle = FontStyle.Italic
             )
             Spacer(modifier = Modifier.weight(1f))
             Text(
@@ -161,7 +161,7 @@ fun PointItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "${index + 1}、",
+                text = "# ${index + 1}",
                 style = MaterialTheme.typography.titleMedium,
                 fontStyle = FontStyle.Italic
             )
@@ -277,9 +277,9 @@ fun HistoryItem(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "${index + 1}、",
+            text = "# ${index + 1}",
             style = MaterialTheme.typography.titleLarge,
-            fontStyle = FontStyle.Italic,
+            fontStyle = FontStyle.Italic
         )
         Text(
             modifier = Modifier.fillMaxWidth(),
@@ -366,9 +366,9 @@ fun ProgramItem(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "${index + 1}、",
+            text = "# ${index + 1}",
             style = MaterialTheme.typography.titleLarge,
-            fontStyle = FontStyle.Italic,
+            fontStyle = FontStyle.Italic
         )
         Text(
             modifier = Modifier.fillMaxWidth(),

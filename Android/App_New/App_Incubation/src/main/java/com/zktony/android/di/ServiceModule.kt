@@ -4,7 +4,7 @@ import com.zktony.android.data.dao.CurveDao
 import com.zktony.android.data.dao.HistoryDao
 import com.zktony.android.utils.service.CurveService
 import com.zktony.android.utils.service.HistoryService
-import com.zktony.android.utils.service.ServiceFactory
+import com.zktony.android.utils.service.ServiceObserver
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,8 +20,10 @@ object ServiceModule {
     fun historyService(dao: HistoryDao) = HistoryService(dao)
 
     @Provides
-    fun service(
+    fun serviceObserver(
         curveService: CurveService,
         historyService: HistoryService
-    ) = ServiceFactory(curveService, historyService)
+    ): ServiceObserver {
+        return ServiceObserver(curveService, historyService)
+    }
 }

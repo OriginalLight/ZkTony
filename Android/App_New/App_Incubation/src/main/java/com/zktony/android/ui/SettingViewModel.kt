@@ -30,7 +30,9 @@ import javax.inject.Inject
  * @date: 2023-02-14 15:37
  */
 @HiltViewModel
-class SettingViewModel @Inject constructor(private val dao: MotorDao) : ViewModel() {
+class SettingViewModel @Inject constructor(
+    private val dao: MotorDao
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
     private val _application = MutableStateFlow<Application?>(null)

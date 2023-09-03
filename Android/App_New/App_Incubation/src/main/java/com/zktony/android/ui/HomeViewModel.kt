@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.extra.writeRegister
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,30 +18,28 @@ import javax.inject.Inject
  * @date: 2023-02-14 15:37
  */
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val dao: ProgramDao
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0L)
-    private val _page = MutableStateFlow(PageType.LIST)
-    private val _loading = MutableStateFlow(0)
+    private val _page = MutableStateFlow(PageType.HOME)
+    private val _uiFlags = MutableStateFlow(0)
+    private val _message = MutableStateFlow<String?>(null)
 
     val uiState = _uiState.asStateFlow()
+    val message = _message.asStateFlow()
 
     init {
-        writeRegister(0, 204, 1000L)
         viewModelScope.launch {
             combine(
                 dao.getAll(),
                 _selected,
                 _page,
-                _loading,
-            ) { entities, selected, page, loading ->
-                HomeUiState(
-                    entities = entities,
-                    selected = selected,
-                    page = page,
-                    loading = loading,
-                )
+                _uiFlags
+            ) { entities, selected, page, uiFlags ->
+                HomeUiState(entities, selected, page, uiFlags)
             }.catch { ex ->
                 ex.printStackTrace()
             }.collect {
@@ -51,10 +48,10 @@ class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel
         }
     }
 
-    fun uiEvent(event: HomeUiEvent) {
-        when (event) {
-            is HomeUiEvent.NavTo -> _page.value = event.page
-            is HomeUiEvent.ToggleSelected -> _selected.value = event.id
+    fun uiEvent(uiEvent: HomeUiEvent) {
+        when (uiEvent) {
+            is HomeUiEvent.NavTo -> _page.value = uiEvent.page
+            is HomeUiEvent.ToggleSelected -> _selected.value = uiEvent.id
         }
     }
 
@@ -63,8 +60,8 @@ class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel
 data class HomeUiState(
     val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
-    val page: PageType = PageType.LIST,
-    val loading: Int = 0,
+    val page: PageType = PageType.HOME,
+    val uiFlags: Int = 0,
 )
 
 sealed class HomeUiEvent {

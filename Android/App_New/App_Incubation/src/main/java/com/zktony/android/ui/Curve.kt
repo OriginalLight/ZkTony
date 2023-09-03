@@ -1,7 +1,7 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -39,6 +39,7 @@ import com.zktony.android.data.entities.Curve
 import com.zktony.android.ui.components.CurveAppBar
 import com.zktony.android.ui.components.CurveItem
 import com.zktony.android.ui.components.PointItem
+import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
@@ -84,33 +85,26 @@ fun CurveRoute(viewModel: CurveViewModel) {
         entities = entities,
         uiState = uiState,
         uiEvent = viewModel::uiEvent,
-        snackbarHostState = snackbarHostState,
         navigation = navigation
     )
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CurveScreen(
     entities: LazyPagingItems<Curve>,
     uiState: CurveUiState,
     uiEvent: (CurveUiEvent) -> Unit,
-    snackbarHostState: SnackbarHostState,
     navigation: () -> Unit
 ) {
     Column {
-        CurveAppBar(
-            entities = entities,
-            uiState = uiState,
-            uiEvent = uiEvent,
-            snackbarHostState = snackbarHostState
-        ) { navigation() }
-
-        AnimatedVisibility(visible = uiState.page == PageType.CURVE_LIST) {
-            CurveList(entities, uiState, uiEvent)
-        }
-
-        AnimatedVisibility(visible = uiState.page == PageType.CURVE_DETAIL) {
-            CurveDetail(entities, uiState, uiEvent)
+        CurveAppBar(entities, uiState, uiEvent) { navigation() }
+        AnimatedContent(targetState = uiState.page) {
+            when (uiState.page) {
+                PageType.CURVE_LIST -> CurveList(entities, uiState, uiEvent)
+                PageType.CURVE_DETAIL -> CurveDetail(entities, uiState, uiEvent)
+                else -> {}
+            }
         }
     }
 }
