@@ -11,12 +11,12 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 
 object Route {
-    const val Home = "Home"
-    const val Program = "Program"
-    const val Curve = "Curve"
-    const val History = "History"
-    const val Setting = "Setting"
-    const val Splash = "Splash"
+    const val HOME = "Home"
+    const val PROGRAM = "Program"
+    const val CURVE = "Curve"
+    const val HISTORY = "History"
+    const val SETTING = "Setting"
+    const val SPLASH = "Splash"
 }
 
 data class TopLevelDestination(
@@ -55,22 +55,22 @@ class NavigationActions(private val navController: NavHostController) {
 
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
-        route = Route.Program,
+        route = Route.PROGRAM,
         icon = Icons.Outlined.Terminal,
         iconTextId = R.string.program
     ),
     TopLevelDestination(
-        route = Route.Curve,
+        route = Route.CURVE,
         icon = Icons.Outlined.Analytics,
         iconTextId = R.string.calibration
     ),
     TopLevelDestination(
-        route = Route.History,
+        route = Route.HISTORY,
         icon = Icons.Outlined.History,
         iconTextId = R.string.history
     ),
     TopLevelDestination(
-        route = Route.Setting,
+        route = Route.SETTING,
         icon = Icons.Outlined.Settings,
         iconTextId = R.string.setting
     )

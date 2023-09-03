@@ -99,7 +99,7 @@ fun Splash() {
                     modifier = Modifier.width(192.dp),
                     onClick = {
                         navigationActions.popBackStack()
-                        navigationActions.navigate(Route.Home)
+                        navigationActions.navigate(Route.HOME)
                     }
                 ) {
                     Icon(

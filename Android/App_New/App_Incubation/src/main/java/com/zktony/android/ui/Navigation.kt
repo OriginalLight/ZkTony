@@ -26,17 +26,17 @@ fun AppNavigation(
     ) { scaffoldPadding ->
         NavHost(
             navController = navController,
-            startDestination = Route.Splash,
+            startDestination = Route.SPLASH,
             modifier = Modifier
                 .padding(scaffoldPadding)
                 .consumeWindowInsets(scaffoldPadding)
         ) {
-            composable(Route.Splash) { Splash() }
-            composable(Route.Home) { HomeRoute(viewModel = homeViewModel) }
-            composable(Route.Program) { ProgramRoute(viewModel = hiltViewModel()) }
-            composable(Route.Curve) { CurveRoute(viewModel = hiltViewModel()) }
-            composable(Route.History) { HistoryRoute(viewModel = hiltViewModel()) }
-            composable(Route.Setting) { SettingRoute(viewModel = hiltViewModel()) }
+            composable(Route.SPLASH) { Splash() }
+            composable(Route.HOME) { HomeRoute(viewModel = homeViewModel) }
+            composable(Route.PROGRAM) { ProgramRoute(viewModel = hiltViewModel()) }
+            composable(Route.CURVE) { CurveRoute(viewModel = hiltViewModel()) }
+            composable(Route.HISTORY) { HistoryRoute(viewModel = hiltViewModel()) }
+            composable(Route.SETTING) { SettingRoute(viewModel = hiltViewModel()) }
         }
     }
 }
