@@ -29,6 +29,8 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore("dataStore
  * 检测培养皿是否摆放正确7
  * 检测是否有培养皿6
  */
+
+//TODO 1.排液回吸没测；2运行是加液没测；3紫外没写
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

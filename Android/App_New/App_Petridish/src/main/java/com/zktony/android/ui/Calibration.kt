@@ -1452,8 +1452,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        println("下盘移动数据===" + xpydjl.value.toDouble())
-                        println("下盘步数===" + (2599L * xpydjl.value.toDouble()).toLong())
                         scope.launch {
                             try {
                                 tx {

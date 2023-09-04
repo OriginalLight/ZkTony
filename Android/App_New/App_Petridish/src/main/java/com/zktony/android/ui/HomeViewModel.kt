@@ -163,6 +163,8 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
      */
     val xpkwjl3 = dataSaver.readData("xpkwjl1", 0f);
 
+    val tiji = dataSaver.readData("tiji", 0f);
+
 
     init {
         viewModelScope.launch {
@@ -363,9 +365,9 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
                 /**
                  * 上盘移动坐标
-                 * 从0开始
+                 * 从1开始
                  */
-                var spStartCoordinates = 0;
+                var spStartCoordinates = 1;
 
                 /**
                  * 运动状态
@@ -389,16 +391,10 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                  */
                 var xpkwjj = 2599
 
-
                 /**
-                 *  举升2移动到举升盘子高度，防止开机前有培养皿
+                 * 检测正确的培养皿个数,坐标从2到0
                  */
-                tx {
-                    move(MoveType.MOVE_PULSE) {
-                        index = 0
-                        pulse = (3200L * pzgd2).toLong();
-                    }
-                }
+                var jiance2PYM = 0
 
 
                 /**
@@ -471,13 +467,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 pulse = (3200L * skjl).toLong()
                             }
 
+                        }
+
+                        tx {
                             //2.举升1移动到分离距离
                             move(MoveType.MOVE_PULSE) {
                                 index = 1
                                 pulse = (3200L * fljl).toLong()
                             }
-
-
                         }
 
                         tx {
@@ -545,29 +542,31 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                     index = 1
                                     pulse = (3200L * fwgd).toLong();
                                 }
-                            }
-                            tx {
+
                                 //举升2运动到复位高度
                                 move(MoveType.MOVE_PULSE) {
                                     index = 0
                                     pulse = (3200L * fwgd2).toLong();
                                 }
+
                             }
+                            if (spStartCoordinates < 7) {
+                                tx {
+                                    //上盘移动1格
+                                    /**
+                                     * 上盘孔位距离
+                                     */
+                                    val spkwjl =
+                                        dataSaver.readData("spkwjl" + spStartCoordinates, 0f);
 
-                            tx {
-                                //上盘移动1格
-                                /**
-                                 * 上盘孔位距离
-                                 */
-                                spStartCoordinates += 1;
-                                val spkwjl = dataSaver.readData("spkwjl" + spStartCoordinates, 0f);
-
-                                move(MoveType.MOVE_PULSE) {
-                                    index = 5
-                                    pulse = (3200L * spkwjl).toLong();
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 5
+                                        pulse = (3200L * spkwjl).toLong();
+                                    }
                                 }
                             }
-                            if (spStartCoordinates == 8) {
+
+                            if (spStartCoordinates == 7) {
                                 _loading.value = 0
                                 break;
                             } else {
@@ -598,7 +597,10 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             }
 
                             var i = 0;
-                            while (i < 3) {
+                            if (jiance2PYM == 0) {
+                                xpkwjj += 2599
+                            }
+                            while (i <= jiance2PYM) {
                                 tx {
                                     /**
                                      * 下盘移动一格
@@ -629,9 +631,11 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                     }
                                 }
 
+
                                 xpkwjj += 2599
                                 i++
                             }
+
 
                             /**
                              * 下盘复位
@@ -704,8 +708,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             }
 
 
-                            if (spStartCoordinates <= 8) {
-                                spStartCoordinates += 1;
+                            if (spStartCoordinates < 7) {
                                 //1.上盘移动1格
                                 /**
                                  * 上盘孔位距离
@@ -723,15 +726,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
                             if (_loading.value == 8) {
                                 _loading.value = 0
-                                //TODO 运动结束
                                 break;
                             }
 
-                            if (spStartCoordinates == 8) {
+                            if (spStartCoordinates == 7) {
                                 _loading.value = 0
-                                //TODO 运动结束
                                 break;
                             }
+                            spStartCoordinates += 1;
                             isStart = false
                             startState = 0;
 
@@ -743,11 +745,17 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         /**
                          * 培养皿摆放正确的运动
                          */
+                        if (!isStart) {
+                            jiance2PYM = 0
+                        } else {
+                            jiance2PYM = 1
+                        }
+
 
                         /**
                          * 第一次的运动
                          */
-                        isStart = true;
+                        isStart = true
 
                         tx {
                             /**
@@ -759,43 +767,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             }
                         }
 
-//                        if (xpStartCoordinates < 4) {
-//                            /**
-//                             * 下盘孔位距离
-//                             */
-//                            val xpkwjl = dataSaver.readData("xpkwjl" + xpStartCoordinates, 0f);
-//                            tx {
-//                                /**
-//                                 * 下盘移动一格
-//                                 */
-//                                move(MoveType.MOVE_PULSE) {
-//                                    index = 4
-//                                    pulse = (3200L * xpkwjl).toLong();
-//                                }
-//                            }
-//                        } else {
-//                            xpStartCoordinates = 1;
-//                            tx {
-//                                /**
-//                                 * 下盘回到原点距离
-//                                 */
-//                                move(MoveType.MOVE_PULSE) {
-//                                    index = 4
-//                                    pulse = (3200L * xpydjl).toLong();
-//                                }
-//                            }
-//                        }
-
-
                         tx {
 
                             /**
                              * 加液
                              */
-                            //TODO 暂时加液
                             move(MoveType.MOVE_DV) {
                                 index = 3
-                                dv = 0.5f
+                                dv = tiji
                             }
 
                             /**
@@ -814,9 +793,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 pulse = (3200L * pzgd2).toLong();
                             }
 
-//                            if (xpStartCoordinates < 4) {
-//                                xpStartCoordinates += 1;
-//                            }
                         }
                         xpkwjj += 2599
                         _count.value += 1;
@@ -894,7 +870,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
                         }
                         _loading.value = 0
-                        //TODO 运动结束
                         break;
                     }
                 }
