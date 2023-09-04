@@ -202,7 +202,10 @@ fun PointItem(
                 onValueChange = {
                     scope.launch {
                         x = it.text
-                        onPointChange(item.copy(x = it.text.toDoubleOrNull() ?: 0.0))
+                        val value = it.text.toDoubleOrNull() ?: 0.0
+                        if (value != item.x) {
+                            onPointChange(item.copy(x = value))
+                        }
                     }
                 },
                 textStyle = textStyle,
@@ -233,7 +236,10 @@ fun PointItem(
                 onValueChange = {
                     scope.launch {
                         y = it.text
-                        onPointChange(item.copy(y = it.text.toDoubleOrNull() ?: 0.0))
+                        val value = it.text.toDoubleOrNull() ?: 0.0
+                        if (value != item.y) {
+                            onPointChange(item.copy(y = value))
+                        }
                     }
                 },
                 textStyle = textStyle,
