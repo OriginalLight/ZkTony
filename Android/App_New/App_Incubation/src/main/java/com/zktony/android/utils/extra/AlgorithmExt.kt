@@ -1,10 +1,11 @@
 package com.zktony.android.utils.extra
 
+import com.zktony.android.data.entities.internal.Point
+
 /**
  * @author 刘贺贺
  * @date 2023/8/30 10:06
  */
-data class Point(val x: Double, val y: Double)
 
 fun calculateLinearRelation(point: Point): (Double) -> Double? {
     // 计算斜率

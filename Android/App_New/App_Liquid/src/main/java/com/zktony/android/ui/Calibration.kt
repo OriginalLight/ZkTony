@@ -1,51 +1,65 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.*
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.components.CalibrationAppBar
-import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.extra.dateFormat
-import com.zktony.android.utils.extra.format
+import com.zktony.android.ui.components.CalibrationItem
+import com.zktony.android.ui.components.PointItem
+import com.zktony.android.ui.utils.*
 import kotlinx.coroutines.launch
 
-@Composable
-fun CalibrationRoute(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    viewModel: CalibrationViewModel,
-    snackbarHostState: SnackbarHostState
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
+/**
+ * @author 刘贺贺
+ * @date 2023/8/30 11:10
+ */
 
+@Composable
+fun CalibrationRoute(viewModel: CalibrationViewModel) {
+
+    val scope = rememberCoroutineScope()
+    val navigationActions = LocalNavigationActions.current
+    val snackbarHostState = LocalSnackbarHostState.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val message by viewModel.message.collectAsStateWithLifecycle()
+    val entities = viewModel.entities.collectAsLazyPagingItems()
     val navigation: () -> Unit = {
         scope.launch {
             when (uiState.page) {
-                PageType.CALIBRATION_LIST -> navController.navigateUp()
+                PageType.CALIBRATION_LIST -> navigationActions.navigateUp()
                 else -> viewModel.uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_LIST))
             }
         }
@@ -53,220 +67,217 @@ fun CalibrationRoute(
 
     BackHandler { navigation() }
 
-    Scaffold(
-        topBar = {
-            CalibrationAppBar(
-                uiState = uiState,
-                uiEvent = viewModel::uiEvent,
-                navigation = navigation,
-                snackbarHostState = snackbarHostState
+    LaunchedEffect(key1 = message) {
+        if (message != null) {
+            snackbarHostState.showSnackbar(
+                message = message ?: "未知错误",
+                actionLabel = "关闭",
+                duration = SnackbarDuration.Short
             )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
-    ) { paddingValues ->
-        CalibrationScreen(
-            modifier = modifier.padding(paddingValues),
-            uiState = uiState,
-            uiEvent = viewModel::uiEvent
-        )
+        }
     }
+
+    CalibrationScreen(
+        entities = entities,
+        uiState = uiState,
+        uiEvent = viewModel::uiEvent,
+        navigation = navigation
+    )
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CalibrationScreen(
-    modifier: Modifier = Modifier,
+    entities: LazyPagingItems<Calibration>,
     uiState: CalibrationUiState,
     uiEvent: (CalibrationUiEvent) -> Unit,
+    navigation: () -> Unit
 ) {
-    AnimatedVisibility(visible = uiState.page == PageType.CALIBRATION_LIST) {
-        CalibrationList(modifier, uiState, uiEvent)
-    }
+    Column {
+        CalibrationAppBar(entities.toList(), uiState, uiEvent) { navigation() }
+        AnimatedContent(targetState = uiState.page) {
+            when (uiState.page) {
+                PageType.CALIBRATION_LIST -> CalibrationList(entities, uiState, uiEvent)
+                PageType.CALIBRATION_DETAIL -> CalibrationDetail(
+                    entities.toList(),
+                    uiState,
+                    uiEvent
+                )
 
-    AnimatedVisibility(visible = uiState.page == PageType.CALIBRATION_DETAIL) {
-        CalibrationDetail(modifier, uiState, uiEvent)
+                else -> {}
+            }
+        }
     }
 }
 
-
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CalibrationList(
-    modifier: Modifier = Modifier,
-    uiState: CalibrationUiState = CalibrationUiState(),
-    uiEvent: (CalibrationUiEvent) -> Unit = {},
+    entities: LazyPagingItems<Calibration>,
+    uiState: CalibrationUiState,
+    uiEvent: (CalibrationUiEvent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.small
-            ),
-        columns = GridCells.Fixed(4),
+        modifier = Modifier,
+        columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        itemsIndexed(items = uiState.entities) { index, item ->
-            val background = if (item.id == uiState.selected) {
-                Color.Blue.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            }
-            ElevatedCard(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.medium)
-                    .combinedClickable(
-                        onClick = {
-                            scope.launch {
-                                if (item.id == uiState.selected) {
-                                    uiEvent(CalibrationUiEvent.ToggleSelected(0L))
-                                } else {
-                                    uiEvent(CalibrationUiEvent.ToggleSelected(item.id))
-                                }
-                            }
-                        },
-                        onDoubleClick = {
-                            scope.launch {
-                                uiEvent(CalibrationUiEvent.ToggleSelected(item.id))
-                                uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_DETAIL))
-                            }
-                        }
-                    ),
-                colors = CardDefaults.cardColors(containerColor = background)
-            ) {
-                Column(
-                    modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-
-                    Row(
-                        modifier = Modifier.height(24.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Text(
-                            text = "${index + 1}、",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Monospace,
-                            fontStyle = FontStyle.Italic,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                        Spacer(modifier = Modifier.weight(1f))
-                        AnimatedVisibility(visible = item.active) {
-                            Text(text = "✔")
+        itemsIndexed(entities) { index, item ->
+            CalibrationItem(
+                index = index,
+                item = item,
+                selected = uiState.selected == item.id
+            ) { double ->
+                scope.launch {
+                    if (double) {
+                        uiEvent(CalibrationUiEvent.ToggleSelected(item.id))
+                        uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_DETAIL))
+                    } else {
+                        if (uiState.selected != item.id) {
+                            uiEvent(CalibrationUiEvent.ToggleSelected(item.id))
+                        } else {
+                            uiEvent(CalibrationUiEvent.ToggleSelected(0L))
                         }
                     }
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = item.text,
-                        fontSize = 20.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                    )
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = item.createTime.dateFormat("yyyy/MM/dd"),
-                        style = MaterialTheme.typography.bodySmall,
-                        fontFamily = FontFamily.Monospace,
-                        textAlign = TextAlign.End,
-                    )
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun CalibrationDetail(
-    modifier: Modifier = Modifier,
-    uiState: CalibrationUiState = CalibrationUiState(),
-    uiEvent: (CalibrationUiEvent) -> Unit = {},
+    entities: List<Calibration>,
+    uiState: CalibrationUiState,
+    uiEvent: (CalibrationUiEvent) -> Unit,
 ) {
-
-    val entity = uiState.entities.find { it.id == uiState.selected } ?: Calibration()
-    val list = remember { mutableStateListOf("M0", "M1", "M2", "M3", "M4", "M5") }
+    val scope = rememberCoroutineScope()
+    val softKeyboard = LocalSoftwareKeyboardController.current
+    val forceManager = LocalFocusManager.current
 
     LazyVerticalGrid(
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
-            ),
-        columns = GridCells.Fixed(3),
+        modifier = Modifier,
+        columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        itemsIndexed(items = entity.data) { index, it ->
+        val selected =
+            entities.find { it.id == uiState.selected } ?: Calibration(displayText = "None")
+        item {
             Row(
                 modifier = Modifier
+                    .height(64.dp)
                     .background(
-                        color = Color.Transparent,
-                        shape = MaterialTheme.shapes.medium,
-                    )
-                    .border(
-                        width = 1.dp,
-                        color = Color.LightGray,
+                        color = MaterialTheme.colorScheme.secondaryContainer,
                         shape = MaterialTheme.shapes.medium
                     )
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    .padding(vertical = 8.dp, horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
-                    text = "${index + 1}、",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontStyle = FontStyle.Italic
-                )
-
-                Column {
-                    Text(
-                        text = list[it.first],
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = it.second.format(2) + " μL",
-                        style = MaterialTheme.typography.bodySmall,
-                        fontFamily = FontFamily.Monospace,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                Text(text = "泵编号", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.weight(1f))
-                Icon(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clickable { uiEvent(CalibrationUiEvent.DeleteData(it)) },
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = null,
-                    tint = Color.Red
+                BasicTextField(
+                    modifier = Modifier.width(64.dp),
+                    value = TextFieldValue(
+                        selected.index.toString(),
+                        TextRange(selected.index.toString().length)
+                    ),
+                    onValueChange = {
+                        scope.launch {
+                            uiEvent(
+                                CalibrationUiEvent.Update(
+                                    selected.copy(
+                                        index = it.text.toIntOrNull() ?: 0
+                                    )
+                                )
+                            )
+                        }
+                    },
+                    textStyle = TextStyle(
+                        fontStyle = FontStyle.Italic,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily.Monospace,
+                    ),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            softKeyboard?.hide()
+                            forceManager.clearFocus()
+                        }
+                    ),
+                    decorationBox = @Composable { innerTextField ->
+                        Column {
+                            Row(
+                                verticalAlignment = Alignment.Bottom,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Numbers,
+                                    contentDescription = null
+                                )
+                                innerTextField()
+                            }
+                            Divider()
+                        }
+                    }
                 )
             }
         }
+        item {
+            Row(
+                modifier = Modifier
+                    .height(64.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .padding(vertical = 8.dp, horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(text = "是否生效", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.weight(1f))
+                Switch(
+                    modifier = Modifier.height(32.dp),
+                    checked = selected.enable,
+                    onCheckedChange = {
+                        scope.launch {
+                            uiEvent(CalibrationUiEvent.Update(selected.copy(enable = it)))
+                        }
+                    }
+                )
+            }
+        }
+        itemsIndexed(items = selected.points) { index, item ->
+            PointItem(
+                index = index,
+                item = item,
+                onClickOne = { },
+                onClickTwo = {
+                    scope.launch {
+                        val points = selected.points.toMutableList()
+                        points -= item
+                        uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
+                    }
+                },
+                onPointChange = { point ->
+                    scope.launch {
+                        val points = selected.points.toMutableList()
+                        points[points.indexOf(item)] = point
+                        uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
+                    }
+                }
+            )
+        }
     }
-}
-
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun CalibrationListPreview() {
-    val entities = listOf(Calibration())
-    val uiState = CalibrationUiState(entities = entities)
-    CalibrationList(uiState = uiState)
-}
-
-@Composable
-@Preview(showBackground = true, widthDp = 960, heightDp = 640)
-fun CalibrationDetailPreview() {
-    val entities = listOf(Calibration(id = 1L))
-    val uiState = CalibrationUiState(entities = entities, selected = 1L)
-    CalibrationDetail(uiState = uiState)
 }

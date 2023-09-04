@@ -1,6 +1,6 @@
 package com.zktony.android
 
-import com.zktony.android.utils.extra.Point
+import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.utils.extra.fitQuadraticCurve
 import org.junit.Assert.assertEquals
 import org.junit.Test

@@ -11,7 +11,6 @@
     <string name="qrcode">Scan this QR code</string>
     <string name="system_config">System config</string>
     <string name="calibration">Calibration</string>
-    <string name="container">Container</string>
     <string name="home">Home</string>
     <string name="history">History</string>
     <string name="program">Program</string>
@@ -29,7 +28,7 @@
     <string name="delete">Delete</string>
     <string name="setting">Setting</string>
     <string name="authentication">Authentication</string>
-    <string name="notice_content">1. Please follow the instruction manual\n2. Please fill the coagulant first and then fill the glue\n3. Please stick the needle to the opening of the rubber board during glue filling\n4. During use, please keep the liquid in the pipeline in a flowing state as much as possible\n5. The time interval between filling two gels should not be too long\n6. After the glue filling is completed, rinse the pipeline with clean water to avoid the gel blocking the pipeline</string>
+    <string name="notice_content">1. Do not open the drawer while the kinematic mechanism is running.\n2.Make sure you have enough washing liquid before performing the procedure.\n3. Please clean the container in time after the procedure.\n4. Immediate power off after the end of the experiment prolongs the life of Tec.\n5. Please read the instruction manual before use.</string>
     <string name="notice">Notice</string>
     <string name="dosage">Volume μL</string>
     <string name="confirm">Confirm</string>

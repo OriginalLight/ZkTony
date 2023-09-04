@@ -13,17 +13,13 @@ import com.zktony.android.data.entities.Program
  */
 @Database(
     entities =
-    [
-        Motor::class,
-        Calibration::class,
-        Program::class,
-    ],
+    [Calibration::class, Motor::class, Program::class],
     version = 1,
     exportSchema = false
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun MotorDao(): MotorDao
     abstract fun CalibrationDao(): CalibrationDao
+    abstract fun MotorDao(): MotorDao
     abstract fun ProgramDao(): ProgramDao
 }

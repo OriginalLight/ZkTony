@@ -1,11 +1,9 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -17,44 +15,37 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.datastore.rememberDataSaverState
-import com.zktony.android.data.entities.Coordinate
-import com.zktony.android.data.entities.OrificePlate
 import com.zktony.android.data.entities.Program
+import com.zktony.android.data.entities.internal.OrificePlate
+import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.ui.components.*
-import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.*
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.format
 import com.zktony.android.utils.extra.serial
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProgramRoute(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    viewModel: ProgramViewModel,
-    snackbarHostState: SnackbarHostState,
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
+fun ProgramRoute(viewModel: ProgramViewModel) {
 
+    val scope = rememberCoroutineScope()
+    val navigationActions = LocalNavigationActions.current
+    val snackbarHostState = LocalSnackbarHostState.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val entities = viewModel.entities.collectAsLazyPagingItems()
+    val message by viewModel.message.collectAsStateWithLifecycle()
     val navigation: () -> Unit = {
         scope.launch {
             when (uiState.page) {
-                PageType.PROGRAM_LIST -> navController.navigateUp()
+                PageType.PROGRAM_LIST -> navigationActions.navigateUp()
                 PageType.PROGRAM_EDIT -> viewModel.uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
                 else -> viewModel.uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_LIST))
             }
@@ -63,147 +54,102 @@ fun ProgramRoute(
 
     BackHandler { navigation() }
 
-    Scaffold(
-        topBar = {
-            ProgramAppBar(
-                uiState = uiState,
-                uiEvent = viewModel::uiEvent,
-                navigation = navigation,
-                snackbarHostState = snackbarHostState
+    LaunchedEffect(key1 = message) {
+        if (message != null) {
+            snackbarHostState.showSnackbar(
+                message = message ?: "未知错误",
+                actionLabel = "关闭",
+                duration = SnackbarDuration.Short
             )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
-    ) { paddingValues ->
-        ProgramScreen(
-            modifier = modifier.padding(paddingValues),
-            uiState = uiState,
-            uiEvent = viewModel::uiEvent
-        )
+        }
     }
+
+    ProgramScreen(
+        entities = entities,
+        uiState = uiState,
+        uiEvent = viewModel::uiEvent,
+        navigation = navigation
+    )
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ProgramScreen(
-    modifier: Modifier = Modifier,
+    entities: LazyPagingItems<Program>,
     uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit
+    uiEvent: (ProgramUiEvent) -> Unit,
+    navigation: () -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
-    val selected = remember { mutableIntStateOf(-1) }
+    val selected = remember { mutableIntStateOf(0) }
 
-    AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_LIST) {
-        ProgramList(modifier, uiState, uiEvent)
-    }
+    Column {
+        ProgramAppBar(entities.toList(), uiState, uiEvent) { navigation() }
+        AnimatedContent(targetState = uiState.page) {
+            when (uiState.page) {
+                PageType.PROGRAM_LIST -> ProgramList(entities, uiState, uiEvent)
+                PageType.PROGRAM_DETAIL -> ProgramDetail(entities.toList(), uiState, uiEvent) {
+                    scope.launch {
+                        selected.intValue = it
+                        uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_EDIT))
+                    }
 
-    AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_DETAIL) {
-        ProgramDetail(modifier, uiState, uiEvent) {
-            scope.launch {
-                selected.intValue = it
-                uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_EDIT))
-            }
-        }
-    }
+                }
 
-    AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_EDIT) {
-        val program = uiState.entities.find { it.id == uiState.selected } ?: Program()
-        val orificePlate = program.orificePlates.getOrNull(selected.intValue) ?: OrificePlate()
+                PageType.PROGRAM_EDIT -> {
+                    val program = entities.itemSnapshotList.items.find { it.id == uiState.selected }
+                        ?: Program()
+                    val orificePlate =
+                        program.orificePlates.getOrNull(selected.intValue) ?: OrificePlate()
 
-        ProgramEdit(modifier, orificePlate) {
-            scope.launch {
-                val array = program.orificePlates.toMutableList()
-                array[selected.intValue] = it
-                uiEvent(ProgramUiEvent.Update(program.copy(orificePlates = array)))
+                    ProgramEdit(orificePlate) {
+                        scope.launch {
+                            val array = program.orificePlates.toMutableList()
+                            array[selected.intValue] = it
+                            uiEvent(ProgramUiEvent.Update(program.copy(orificePlates = array)))
+                        }
+                    }
+                }
+
+                else -> {}
             }
         }
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProgramList(
-    modifier: Modifier = Modifier,
-    uiState: ProgramUiState = ProgramUiState(),
-    uiEvent: (ProgramUiEvent) -> Unit = {},
+    entities: LazyPagingItems<Program>,
+    uiState: ProgramUiState,
+    uiEvent: (ProgramUiEvent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.small
-            ),
+        modifier = Modifier,
         contentPadding = PaddingValues(16.dp),
-        columns = GridCells.Fixed(4),
+        columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        itemsIndexed(items = uiState.entities) { index, item ->
-            val background = if (item.id == uiState.selected) {
-                Color.Blue.copy(alpha = 0.3f)
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            }
-            ElevatedCard(
-                modifier = Modifier
-                    .clip(MaterialTheme.shapes.medium)
-                    .combinedClickable(
-                        onClick = {
-                            scope.launch {
-                                if (item.id == uiState.selected) {
-                                    uiEvent(ProgramUiEvent.ToggleSelected(0L))
-                                } else {
-                                    uiEvent(ProgramUiEvent.ToggleSelected(item.id))
-                                }
-                            }
-                        },
-                        onDoubleClick = {
-                            scope.launch {
-                                uiEvent(ProgramUiEvent.ToggleSelected(item.id))
-                                uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
-                            }
+        itemsIndexed(entities) { index, item ->
+            ProgramItem(
+                index = index,
+                item = item,
+                selected = uiState.selected == item.id
+            ) { double ->
+                scope.launch {
+                    if (double) {
+                        uiEvent(ProgramUiEvent.ToggleSelected(item.id))
+                        uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
+                    } else {
+                        if (uiState.selected != item.id) {
+                            uiEvent(ProgramUiEvent.ToggleSelected(item.id))
+                        } else {
+                            uiEvent(ProgramUiEvent.ToggleSelected(0L))
                         }
-                    ),
-                colors = CardDefaults.cardColors(containerColor = background)
-            ) {
-                Column(
-                    modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Display the entity image and title
-                    Row(
-                        modifier = Modifier.height(24.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Text(
-                            text = "${index + 1}、",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Monospace,
-                            fontStyle = FontStyle.Italic,
-                            fontWeight = FontWeight.SemiBold,
-                        )
                     }
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = item.text,
-                        fontSize = 20.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                    )
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = item.createTime.dateFormat("yyyy/MM/dd"),
-                        style = MaterialTheme.typography.bodySmall,
-                        fontFamily = FontFamily.Monospace,
-                        textAlign = TextAlign.End,
-                    )
                 }
             }
         }
@@ -212,15 +158,16 @@ fun ProgramList(
 
 @Composable
 fun ProgramDetail(
-    modifier: Modifier = Modifier,
+    entities: List<Program>,
     uiState: ProgramUiState,
     uiEvent: (ProgramUiEvent) -> Unit,
     toggleSelected: (Int) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val selected = entities.find { it.id == uiState.selected } ?: Program()
 
     LazyVerticalGrid(
-        modifier = modifier
+        modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
             .border(
@@ -233,8 +180,6 @@ fun ProgramDetail(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        val selected = uiState.entities.find { it.id == uiState.selected } ?: Program()
-
         itemsIndexed(items = selected.orificePlates) { index, item ->
             OrificePlateBox(
                 modifier = Modifier
@@ -256,7 +201,6 @@ fun ProgramDetail(
 
 @Composable
 fun ProgramEdit(
-    modifier: Modifier = Modifier,
     orificePlate: OrificePlate,
     toggleSelected: (OrificePlate) -> Unit = {},
 ) {
@@ -270,7 +214,7 @@ fun ProgramEdit(
     var delay by remember { mutableStateOf(selected.delay.toString()) }
 
     Row(
-        modifier = modifier
+        modifier = Modifier
             .padding(16.dp)
             .fillMaxSize()
             .border(
@@ -411,14 +355,14 @@ fun ProgramEdit(
             item {
                 CoordinateInput(
                     title = "A1",
-                    limit = Coordinate(abscissa, ordinate),
-                    coordinate = selected.coordinate[0],
+                    limit = Point(abscissa, ordinate),
+                    point = selected.points[0],
                     onCoordinateChange = { coordinate ->
                         scope.launch {
-                            if (coordinate.abscissa <= abscissa && coordinate.ordinate <= ordinate) {
-                                val cd = selected.coordinate.toMutableList()
+                            if (coordinate.x <= abscissa && coordinate.y <= ordinate) {
+                                val cd = selected.points.toMutableList()
                                 cd[0] = coordinate
-                                selected = selected.copy(coordinate = cd)
+                                selected = selected.copy(points = cd)
                                 selected = selected.copy(orifices = selected.generateOrifices())
                                 toggleSelected(selected)
                             }
@@ -427,8 +371,8 @@ fun ProgramEdit(
                     onClick = {
                         scope.launch {
                             serial {
-                                start(index = 0, pdv = selected.coordinate[0].abscissa)
-                                start(index = 1, pdv = selected.coordinate[0].ordinate)
+                                start(index = 0, pdv = selected.points[0].x)
+                                start(index = 1, pdv = selected.points[0].y)
                             }
                         }
                     }
@@ -439,14 +383,14 @@ fun ProgramEdit(
             item {
                 CoordinateInput(
                     title = "${'A' + selected.column - 1}${selected.row}",
-                    limit = Coordinate(abscissa, ordinate),
-                    coordinate = selected.coordinate[1],
+                    limit = Point(abscissa, ordinate),
+                    point = selected.points[1],
                     onCoordinateChange = { coordinate ->
                         scope.launch {
-                            if (coordinate.abscissa <= abscissa && coordinate.ordinate <= ordinate) {
-                                val cd = selected.coordinate.toMutableList()
+                            if (coordinate.x <= abscissa && coordinate.y <= ordinate) {
+                                val cd = selected.points.toMutableList()
                                 cd[1] = coordinate
-                                selected = selected.copy(coordinate = cd)
+                                selected = selected.copy(points = cd)
                                 selected = selected.copy(orifices = selected.generateOrifices())
                                 toggleSelected(selected)
                             }
@@ -455,8 +399,8 @@ fun ProgramEdit(
                     onClick = {
                         scope.launch {
                             serial {
-                                start(index = 0, pdv = selected.coordinate[1].abscissa)
-                                start(index = 1, pdv = selected.coordinate[1].ordinate)
+                                start(index = 0, pdv = selected.points[1].x)
+                                start(index = 1, pdv = selected.points[1].y)
                             }
                         }
                     }
@@ -521,9 +465,7 @@ fun OrificePlateBox(
 ) {
     val deleteCount = remember { mutableIntStateOf(0) }
 
-    Box(
-        modifier = modifier
-    ) {
+    Box(modifier = modifier) {
         OrificePlate(
             modifier = Modifier.fillMaxSize(),
             row = orificePlate.row,

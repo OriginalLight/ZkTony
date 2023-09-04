@@ -1,63 +1,72 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
 import com.zktony.android.BuildConfig
 import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
-import com.zktony.android.data.entities.Coordinate
+import com.zktony.android.data.entities.Motor
+import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.ui.components.*
+import com.zktony.android.ui.utils.AnimatedContent
+import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.extra.isNetworkAvailable
-import com.zktony.android.utils.extra.serial
+import com.zktony.android.utils.extra.*
 import kotlinx.coroutines.launch
-import kotlin.math.roundToLong
 
 @Composable
-fun SettingRoute(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    viewModel: SettingViewModel,
-    snackbarHostState: SnackbarHostState,
-) {
+fun SettingRoute(viewModel: SettingViewModel) {
+
     val scope = rememberCoroutineScope()
+    val navigationActions = LocalNavigationActions.current
+    val snackbarHostState = LocalSnackbarHostState.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
 
     val navigation: () -> Unit = {
         scope.launch {
             when (uiState.page) {
-                PageType.SETTINGS -> navController.navigateUp()
+                PageType.SETTINGS -> navigationActions.navigateUp()
                 PageType.MOTOR_DETAIL -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
                 else -> viewModel.uiEvent(SettingUiEvent.NavTo(PageType.SETTINGS))
             }
@@ -76,67 +85,43 @@ fun SettingRoute(
         }
     }
 
-    Scaffold(
-        topBar = {
-            SettingsAppBar {
-                ElevatedButton(onClick = navigation) {
-                    Icon(
-                        imageVector = Icons.Default.Reply,
-                        contentDescription = null
-                    )
-                }
-            }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
-    ) { paddingValues ->
-        SettingScreen(
-            modifier = modifier.padding(paddingValues),
-            uiState = uiState,
-            uiEvent = viewModel::uiEvent,
-            snackbarHostState = snackbarHostState
-        )
-    }
+    SettingScreen(
+        uiState = uiState, uiEvent = viewModel::uiEvent, navigation = navigation
+    )
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SettingScreen(
-    modifier: Modifier = Modifier,
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit = {},
-    snackbarHostState: SnackbarHostState
+    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit, navigation: () -> Unit
 ) {
-    AnimatedVisibility(visible = uiState.page == PageType.SETTINGS) {
-        SettingContent(modifier, uiState, uiEvent, snackbarHostState)
-    }
-    AnimatedVisibility(visible = uiState.page == PageType.AUTH) {
-        Authentication(modifier, uiEvent)
-    }
-    AnimatedVisibility(visible = uiState.page == PageType.MOTOR_LIST) {
-        MotorList(modifier, uiState, uiEvent)
-    }
-    AnimatedVisibility(visible = uiState.page == PageType.MOTOR_DETAIL) {
-        MotorDetail(modifier, uiState, uiEvent)
-    }
-    AnimatedVisibility(visible = uiState.page == PageType.CONFIG) {
-        ConfigList(modifier)
+    Column {
+        SettingsAppBar(uiState, uiEvent) { navigation() }
+        AnimatedContent(targetState = uiState.page) {
+            when (uiState.page) {
+                PageType.SETTINGS -> SettingContent(uiState, uiEvent)
+                PageType.AUTH -> Authentication(uiEvent)
+                PageType.MOTOR_LIST -> MotorList(uiState, uiEvent)
+                PageType.MOTOR_DETAIL -> MotorDetail(uiState, uiEvent)
+                PageType.CONFIG -> ConfigList()
+                else -> {}
+            }
+        }
     }
 }
 
 @Composable
 fun SettingContent(
-    modifier: Modifier = Modifier,
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit = {},
-    snackbarHostState: SnackbarHostState
+    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    val snackbarHostState = LocalSnackbarHostState.current
     var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
     var helpInfo by remember { mutableStateOf(false) }
 
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -145,10 +130,9 @@ fun SettingContent(
             modifier = Modifier
                 .weight(1f)
                 .border(
-                    width = 1.dp,
-                    color = Color.LightGray,
-                    shape = MaterialTheme.shapes.small
-                ),
+                    width = 1.dp, color = Color.LightGray, shape = MaterialTheme.shapes.small
+                )
+                .animateContentSize(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
@@ -157,41 +141,33 @@ fun SettingContent(
                     icon = Icons.Outlined.Navigation,
                     text = stringResource(id = R.string.navigation)
                 ) {
-                    Switch(
-                        modifier = Modifier.height(32.dp),
+                    Switch(modifier = Modifier.height(32.dp),
                         checked = navigation,
                         onCheckedChange = {
                             scope.launch {
                                 navigation = it
                                 uiEvent(SettingUiEvent.Navigation(it))
                             }
-                        }
-                    )
+                        })
                 }
             }
 
             item {
-                SettingsCard(
-                    icon = Icons.Outlined.Wifi,
+                SettingsCard(icon = Icons.Outlined.Wifi,
                     text = stringResource(id = R.string.network),
-                    onClick = { uiEvent(SettingUiEvent.Network) }
-                ) {
+                    onClick = { uiEvent(SettingUiEvent.Network) }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowRight,
-                        contentDescription = null
+                        imageVector = Icons.Default.ArrowRight, contentDescription = null
                     )
                 }
             }
 
             item {
-                SettingsCard(
-                    icon = Icons.Outlined.Security,
+                SettingsCard(icon = Icons.Outlined.Security,
                     text = stringResource(id = R.string.parameters),
-                    onClick = { uiEvent(SettingUiEvent.NavTo(PageType.AUTH)) }
-                ) {
+                    onClick = { uiEvent(SettingUiEvent.NavTo(PageType.AUTH)) }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowRight,
-                        contentDescription = null
+                        imageVector = Icons.Default.ArrowRight, contentDescription = null
                     )
                 }
             }
@@ -201,17 +177,15 @@ fun SettingContent(
             modifier = Modifier
                 .weight(1f)
                 .border(
-                    width = 1.dp,
-                    color = Color.LightGray,
-                    shape = MaterialTheme.shapes.small
-                ),
+                    width = 1.dp, color = Color.LightGray, shape = MaterialTheme.shapes.small
+                )
+                .animateContentSize(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
                 SettingsCard(
-                    icon = Icons.Outlined.Info,
-                    text = stringResource(id = R.string.version)
+                    icon = Icons.Outlined.Info, text = stringResource(id = R.string.version)
                 ) {
                     Text(
                         text = BuildConfig.VERSION_NAME,
@@ -223,11 +197,9 @@ fun SettingContent(
             }
 
             item {
-                SettingsCard(
-                    icon = Icons.Outlined.HelpOutline,
+                SettingsCard(icon = Icons.Outlined.HelpOutline,
                     text = if (helpInfo) stringResource(id = R.string.qrcode) else stringResource(id = R.string.help),
-                    onClick = { helpInfo = !helpInfo },
-                ) {
+                    onClick = { helpInfo = !helpInfo }) {
                     if (helpInfo) {
                         Text(
                             text = "025-68790636",
@@ -237,8 +209,7 @@ fun SettingContent(
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.Default.ArrowRight,
-                            contentDescription = null
+                            imageVector = Icons.Default.ArrowRight, contentDescription = null
                         )
                     }
                 }
@@ -269,30 +240,24 @@ fun SettingContent(
                     }
                 }
 
-                SettingsCard(
-                    icon = image,
-                    text = text,
-                    onClick = {
-                        scope.launch {
-                            if (context.isNetworkAvailable()) {
-                                uiEvent(SettingUiEvent.CheckUpdate)
-                            } else {
-                                snackbarHostState.showSnackbar(message = "网络不可用")
-                            }
+                SettingsCard(icon = image, text = text, onClick = {
+                    scope.launch {
+                        if (context.isNetworkAvailable()) {
+                            uiEvent(SettingUiEvent.CheckUpdate)
+                        } else {
+                            snackbarHostState.showSnackbar(message = "网络不可用")
                         }
                     }
-                ) {
+                }) {
 
                     if (uiState.application == null) {
                         Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null
+                            imageVector = Icons.Default.Check, contentDescription = null
                         )
                     } else {
                         if (uiState.progress == 0) {
                             Icon(
-                                imageVector = Icons.Default.ArrowCircleUp,
-                                contentDescription = null
+                                imageVector = Icons.Default.ArrowCircleUp, contentDescription = null
                             )
                         } else {
                             Text(
@@ -324,179 +289,131 @@ fun SettingContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsCard(
-    paddingStart: Dp = 0.dp,
     onClick: () -> Unit = { },
     icon: ImageVector,
     text: String? = null,
     content: @Composable () -> Unit
 ) {
-    Card(
-        modifier = Modifier.padding(start = paddingStart),
-        onClick = onClick,
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                modifier = Modifier.size(32.dp),
-                imageVector = icon,
-                contentDescription = text,
-                tint = MaterialTheme.colorScheme.primary
+    Row(modifier = Modifier
+        .background(
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            shape = MaterialTheme.shapes.medium
+        )
+        .clip(MaterialTheme.shapes.medium)
+        .clickable { onClick() }
+        .padding(horizontal = 16.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Icon(
+            modifier = Modifier.size(32.dp),
+            imageVector = icon,
+            contentDescription = text,
+            tint = MaterialTheme.colorScheme.primary
+        )
+        text?.let {
+            Text(
+                text = text, style = MaterialTheme.typography.titleMedium
             )
-            text?.let {
-                Text(
-                    text = text,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontFamily = FontFamily.Serif,
-                        fontSize = 16.sp,
-                        lineHeight = 24.sp,
-                        letterSpacing = 0.15.sp
-                    )
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            content.invoke()
         }
+        Spacer(modifier = Modifier.weight(1f))
+        content.invoke()
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Authentication(
-    modifier: Modifier = Modifier,
-    uiEvent: (SettingUiEvent) -> Unit = {}
-) {
+fun Authentication(uiEvent: (SettingUiEvent) -> Unit) {
+
+    val scope = rememberCoroutineScope()
     var show by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = modifier
+    Box(
+        modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .windowInsetsPadding(WindowInsets.imeAnimationSource),
+        contentAlignment = Alignment.Center
     ) {
-        Spacer(modifier = Modifier.height(64.dp))
-        AnimatedVisibility(visible = !show) {
+        if (show) {
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                FloatingActionButton(onClick = {
+                    scope.launch {
+                        uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
+                    }
+                }) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Cyclone, contentDescription = null
+                        )
+                        Text(
+                            text = stringResource(id = R.string.motor_config),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+                FloatingActionButton(onClick = {
+                    scope.launch {
+                        uiEvent(SettingUiEvent.NavTo(PageType.CONFIG))
+                    }
+                }) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Tune, contentDescription = null
+                        )
+                        Text(
+                            text = stringResource(id = R.string.system_config),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                }
+            }
+        } else {
             VerificationCodeField(digits = 6, inputCallback = {
                 show = true
             }) { text, focused ->
                 VerificationCodeItem(text, focused)
             }
         }
-        AnimatedVisibility(visible = show) {
-            Row(
-                modifier = Modifier.padding(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                ElevatedCard(onClick = { uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST)) }) {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(96.dp),
-                            imageVector = Icons.Default.Cyclone,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            modifier = Modifier.padding(bottom = 8.dp),
-                            text = stringResource(id = R.string.motor_config),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Serif
-                        )
-                    }
-                }
-                ElevatedCard(onClick = { uiEvent(SettingUiEvent.NavTo(PageType.CONFIG)) }) {
-                    Column(
-                        modifier = Modifier.padding(horizontal = 64.dp, vertical = 16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(96.dp),
-                            imageVector = Icons.Default.Tune,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Text(
-                            modifier = Modifier.padding(bottom = 8.dp),
-                            text = stringResource(id = R.string.system_config),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Serif
-                        )
-                    }
-                }
-            }
-        }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MotorList(
-    modifier: Modifier = Modifier,
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit = {}
+    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = modifier
-            .padding(16.dp)
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.small
-            ),
+        modifier = Modifier,
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         columns = GridCells.Fixed(3)
     ) {
-        items(items = uiState.entities) {
-            Card(
-                onClick = {
-                    scope.launch {
-                        uiEvent(SettingUiEvent.ToggleSelected(it.id))
+        items(items = uiState.entities) { item ->
+            MotorItem(
+                item = item,
+                selected = uiState.selected == item.id
+            ) { double ->
+                scope.launch {
+                    if (double) {
+                        uiEvent(SettingUiEvent.ToggleSelected(item.id))
                         uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL))
-                    }
-                }
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = it.text,
-                        fontSize = 50.sp,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                    Column(
-                        modifier = Modifier.padding(start = 16.dp),
-                    ) {
-                        Text(
-                            text = "S - ${it.speed}", style = MaterialTheme.typography.bodyLarge
-                        )
-
-                        Text(
-                            text = "A - ${it.acc}", style = MaterialTheme.typography.bodyLarge
-                        )
-
-                        Text(
-                            text = "D - ${it.dec}", style = MaterialTheme.typography.bodyLarge
-                        )
+                    } else {
+                        if (uiState.selected != item.id) {
+                            uiEvent(SettingUiEvent.ToggleSelected(item.id))
+                        } else {
+                            uiEvent(SettingUiEvent.ToggleSelected(0L))
+                        }
                     }
                 }
             }
@@ -504,133 +421,179 @@ fun MotorList(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun MotorDetail(
-    modifier: Modifier = Modifier,
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit = {}
+    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
 ) {
+
     val scope = rememberCoroutineScope()
-    val entity = uiState.entities.find { it.id == uiState.selected }!!
-    var speed by remember { mutableLongStateOf(entity.speed) }
-    var acc by remember { mutableLongStateOf(entity.acc) }
-    var dec by remember { mutableLongStateOf(entity.dec) }
+    val softKeyboard = LocalSoftwareKeyboardController.current
+    val selected = uiState.entities.find { it.id == uiState.selected } ?: Motor()
+    var ads by remember { mutableStateOf(selected.toAdsString()) }
+    var index by remember { mutableStateOf(selected.index.toString()) }
 
-    Column(
-        modifier = modifier
+    val keyboardOptions = KeyboardOptions(
+        keyboardType = KeyboardType.Number,
+        imeAction = ImeAction.Done,
+    )
+
+    val keyboardActions = KeyboardActions(onDone = {
+        softKeyboard?.hide()
+    })
+
+    val colors = TextFieldDefaults.colors(
+        unfocusedIndicatorColor = Color.Transparent,
+        focusedIndicatorColor = Color.Transparent,
+    )
+
+    val textStyle = TextStyle(
+        fontStyle = FontStyle.Italic,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp,
+        fontFamily = FontFamily.Monospace,
+    )
+
+    LazyColumn(
+        modifier = Modifier
             .padding(16.dp)
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.small
-            )
-            .padding(32.dp)
+            .windowInsetsPadding(WindowInsets.imeAnimationSource),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.Speed,
-                contentDescription = stringResource(id = R.string.speed),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = "S - $speed",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Slider(
-                value = speed.toFloat(),
-                onValueChange = { speed = it.roundToLong() },
-                valueRange = 0f..800f,
-                steps = 79,
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.TrendingUp,
-                contentDescription = stringResource(id = R.string.acceleration),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = "A - $acc",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Slider(
-                value = acc.toFloat(),
-                onValueChange = { acc = it.roundToLong() },
-                valueRange = 0f..800f,
-                steps = 79,
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                modifier = Modifier.size(36.dp),
-                imageVector = Icons.Default.TrendingDown,
-                contentDescription = stringResource(id = R.string.deceleration),
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
-                text = "D - $dec",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Slider(
-                value = dec.toFloat(),
-                onValueChange = { dec = it.roundToLong() },
-                valueRange = 0f..800f,
-                steps = 79,
-            )
-        }
-
-        AnimatedVisibility(visible = entity.speed != speed || entity.acc != acc || entity.dec != dec) {
-            Row(
+        item {
+            TextField(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-            ) {
-                FloatingActionButton(
-                    modifier = Modifier.width(192.dp),
-                    onClick = {
-                        scope.launch {
-                            uiEvent(
-                                SettingUiEvent.Update(
-                                    entity.copy(
-                                        speed = speed,
-                                        acc = acc,
-                                        dec = dec
-                                    )
+                value = index,
+                onValueChange = {
+                    scope.launch {
+                        index = it
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                selected.copy(index = it.toIntOrNull() ?: 0)
+                            )
+                        )
+                    }
+                },
+                leadingIcon = {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.Numbers, contentDescription = null
+                        )
+                    }
+                },
+                suffix = {
+                    Text(text = "电机编号", style = textStyle)
+                },
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                shape = CircleShape,
+                colors = colors,
+                textStyle = textStyle,
+            )
+        }
+        item {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = ads.first,
+                onValueChange = {
+                    scope.launch {
+                        ads = Triple(it, ads.second, ads.third)
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                selected.copy(acceleration = it.toLongOrNull() ?: 0L)
+                            )
+                        )
+                    }
+                },
+                leadingIcon = {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.TrendingUp,
+                            contentDescription = stringResource(id = R.string.acceleration)
+                        )
+                    }
+                },
+                suffix = {
+                    Text(text = stringResource(id = R.string.acceleration), style = textStyle)
+                },
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                shape = CircleShape,
+                colors = colors,
+                textStyle = textStyle,
+            )
+        }
+        item {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = ads.second,
+                onValueChange = {
+                    scope.launch {
+                        ads = Triple(ads.first, it, ads.third)
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                selected.copy(
+                                    deceleration = it.toLongOrNull() ?: 0L
                                 )
                             )
-                            uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
-                        }
-                    },
-                ) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Default.Done,
-                        contentDescription = null
-                    )
-                }
-            }
+                        )
+                    }
+                },
+                leadingIcon = {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.TrendingDown,
+                            contentDescription = stringResource(id = R.string.deceleration)
+                        )
+                    }
+                },
+                suffix = {
+                    Text(text = stringResource(id = R.string.deceleration), style = textStyle)
+                },
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                shape = CircleShape,
+                colors = colors,
+                textStyle = textStyle,
+            )
+        }
+        item {
+            TextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = ads.third,
+                onValueChange = {
+                    scope.launch {
+                        ads = Triple(ads.first, ads.second, it)
+                        uiEvent(
+                            SettingUiEvent.Update(
+                                selected.copy(
+                                    speed = it.toLongOrNull() ?: 0L
+                                )
+                            )
+                        )
+                    }
+                },
+                leadingIcon = {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.Speed,
+                            contentDescription = stringResource(id = R.string.speed)
+                        )
+                    }
+                },
+                suffix = {
+                    Text(text = stringResource(id = R.string.speed), style = textStyle)
+                },
+                keyboardOptions = keyboardOptions,
+                keyboardActions = keyboardActions,
+                shape = CircleShape,
+                colors = colors,
+                textStyle = textStyle,
+            )
         }
     }
 }
-
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -664,11 +627,11 @@ fun ConfigList(modifier: Modifier = Modifier) {
                 CoordinateInput(
                     modifier = Modifier.weight(1f),
                     title = "行程",
-                    coordinate = Coordinate(abscissa = abscissa, ordinate = ordinate),
+                    point = Point(x = abscissa, y = ordinate),
                     onCoordinateChange = {
                         scope.launch {
-                            abscissa = it.abscissa
-                            ordinate = it.ordinate
+                            abscissa = it.x
+                            ordinate = it.y
                         }
                     }
                 ) {
@@ -682,11 +645,11 @@ fun ConfigList(modifier: Modifier = Modifier) {
                 CoordinateInput(
                     modifier = Modifier.weight(1f),
                     title = "废液槽",
-                    coordinate = Coordinate(abscissa = tankAbscissa, ordinate = tankOrdinate),
+                    point = Point(x = tankAbscissa, y = tankOrdinate),
                     onCoordinateChange = {
                         scope.launch {
-                            tankAbscissa = it.abscissa
-                            tankOrdinate = it.ordinate
+                            tankAbscissa = it.x
+                            tankOrdinate = it.y
                         }
                     }
                 ) {
@@ -705,5 +668,5 @@ fun ConfigList(modifier: Modifier = Modifier) {
 @Composable
 @Preview(showBackground = true, widthDp = 960, heightDp = 640)
 fun SettingsPreview() {
-    SettingContent(uiState = SettingUiState(), snackbarHostState = SnackbarHostState())
+    SettingContent(uiState = SettingUiState()) {}
 }

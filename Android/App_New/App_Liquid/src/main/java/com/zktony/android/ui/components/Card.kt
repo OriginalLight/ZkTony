@@ -11,20 +11,16 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zktony.android.data.entities.OrificePlate
+import com.zktony.android.data.entities.internal.OrificePlate
 import com.zktony.android.ui.HomeUiEvent
 import com.zktony.android.ui.HomeUiState
-import com.zktony.android.ui.JobStatus
 import com.zktony.android.utils.extra.format
-import com.zktony.android.utils.extra.timeFormat
-import kotlinx.coroutines.delay
 
 /**
  * @author 刘贺贺
@@ -154,32 +150,13 @@ fun JobActionCard(
     uiState: HomeUiState,
     uiEvent: (HomeUiEvent) -> Unit
 ) {
-    var time by remember { mutableLongStateOf(0L) }
-
-    LaunchedEffect(key1 = uiState.jobState.status) {
-        while (true) {
-            when (uiState.jobState.status) {
-                JobStatus.RUNNING -> {
-                    time += 1
-                }
-
-                JobStatus.STOPPED -> {
-                    time = 0
-                }
-
-                else -> {}
-            }
-            delay(1000L)
-        }
-    }
-
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        if (uiState.jobState.status == JobStatus.STOPPED) {
+        if (uiState.jobState.status == 0) {
             Card(
-                enabled = uiState.loading == 0 && uiState.selected != 0L,
+                enabled = uiState.uiFlags == 0 && uiState.selected != 0L,
                 onClick = { uiEvent(HomeUiEvent.Start) }
             ) {
                 Icon(
@@ -190,63 +167,38 @@ fun JobActionCard(
                 )
             }
         } else {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .width(296.dp)
-                            .height(64.dp),
-                        progress = uiState.jobState.process,
-                        color = Color.Blue,
-                        strokeCap = StrokeCap.Round,
-                    )
-
-                    Text(
-                        text = time.timeFormat(),
-                        style = TextStyle(
-                            fontSize = 40.sp,
-                            fontWeight = FontWeight.Bold,
-                            fontFamily = FontFamily.Monospace
-                        ),
-                    )
-                }
-
-                Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                    Card(onClick = {
-                        if (uiState.jobState.status == JobStatus.RUNNING) {
-                            uiEvent(HomeUiEvent.Pause)
-                        } else {
-                            uiEvent(HomeUiEvent.Resume)
-                        }
-                    }) {
-                        if (uiState.jobState.status == JobStatus.RUNNING) {
-                            Icon(
-                                modifier = Modifier.size(128.dp),
-                                imageVector = Icons.Default.Pause,
-                                contentDescription = null,
-                                tint = Color.DarkGray
-                            )
-                        } else {
-                            Icon(
-                                modifier = Modifier.size(128.dp),
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = null,
-                                tint = Color.Blue
-                            )
-                        }
+            Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+                Card(onClick = {
+                    if (uiState.jobState.status == 1) {
+                        uiEvent(HomeUiEvent.Pause)
+                    } else {
+                        uiEvent(HomeUiEvent.Resume)
                     }
-
-                    Card(onClick = { uiEvent(HomeUiEvent.Stop) }) {
+                }) {
+                    if (uiState.jobState.status == 1) {
                         Icon(
                             modifier = Modifier.size(128.dp),
-                            imageVector = Icons.Default.Close,
+                            imageVector = Icons.Default.Pause,
                             contentDescription = null,
-                            tint = Color.Red
+                            tint = Color.DarkGray
+                        )
+                    } else {
+                        Icon(
+                            modifier = Modifier.size(128.dp),
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            tint = Color.Blue
                         )
                     }
+                }
+
+                Card(onClick = { uiEvent(HomeUiEvent.Stop) }) {
+                    Icon(
+                        modifier = Modifier.size(128.dp),
+                        imageVector = Icons.Default.Close,
+                        contentDescription = null,
+                        tint = Color.Red
+                    )
                 }
             }
         }

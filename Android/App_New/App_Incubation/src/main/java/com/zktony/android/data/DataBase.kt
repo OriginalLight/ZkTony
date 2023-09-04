@@ -9,13 +9,13 @@ import com.zktony.android.data.entities.*
  */
 @Database(
     entities =
-    [Curve::class, Motor::class, History::class, Program::class],
+    [Calibration::class, Motor::class, History::class, Program::class],
     version = 1,
     exportSchema = false
 )
 @TypeConverters(DateConverters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun CurveDao(): CurveDao
+    abstract fun CalibrationDao(): CalibrationDao
     abstract fun MotorDao(): MotorDao
     abstract fun HistoryDao(): HistoryDao
     abstract fun ProgramDao(): ProgramDao

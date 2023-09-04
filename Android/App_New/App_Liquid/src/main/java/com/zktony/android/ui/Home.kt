@@ -1,14 +1,12 @@
 package com.zktony.android.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -22,33 +20,26 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.*
-import com.zktony.android.ui.navigation.NavigationActions
 import com.zktony.android.ui.navigation.Route
-import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.*
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeRoute(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    viewModel: HomeViewModel,
-    navigationActions: NavigationActions,
-    snackbarHostState: SnackbarHostState,
-) {
-    val scope = rememberCoroutineScope()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val message by viewModel.message.collectAsStateWithLifecycle()
+fun HomeRoute(viewModel: HomeViewModel) {
 
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val entities = viewModel.entities.collectAsLazyPagingItems()
+    val message by viewModel.message.collectAsStateWithLifecycle()
     val navigation: () -> Unit = {
         scope.launch {
             when (uiState.page) {
@@ -70,59 +61,36 @@ fun HomeRoute(
         }
     }
 
-    Scaffold(
-        topBar = {
-            HomeAppBar(
-                enable = uiState.jobState.status == JobStatus.STOPPED,
-                navigationActions = navigationActions
-            ) {
-                AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_LIST) {
-                    ElevatedButton(onClick = navigation) {
-                        Icon(
-                            imageVector = Icons.Default.Reply,
-                            contentDescription = null
-                        )
-                    }
-                }
-            }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
-    ) { paddingValues ->
-        HomeScreen(
-            modifier = modifier.padding(paddingValues),
-            navController = navController,
-            uiState = uiState,
-            uiEvent = viewModel::uiEvent
-        )
-    }
+    HomeScreen(
+        entities = entities,
+        uiState = uiState,
+        uiEvent = viewModel::uiEvent,
+        navigation = navigation
+    )
+
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
+    entities: LazyPagingItems<Program>,
     uiState: HomeUiState,
-    uiEvent: (HomeUiEvent) -> Unit
+    uiEvent: (HomeUiEvent) -> Unit,
+    navigation: () -> Unit
 ) {
 
-    Column(
-        modifier = modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        AnimatedVisibility(visible = uiState.jobState.status == JobStatus.STOPPED) {
-            HomeActions(uiState, uiEvent)
+    Column {
+        HomeAppBar(uiState) { navigation() }
+        HomeActions(uiState, uiEvent)
+        AnimatedContent(targetState = uiState.page) {
+            when (uiState.page) {
+                PageType.PROGRAM_LIST -> ProgramList(entities, uiState, uiEvent)
+                PageType.HOME -> JobContent(entities, uiState, uiEvent)
+                else -> {}
+            }
         }
 
-        AnimatedVisibility(visible = uiState.page == PageType.PROGRAM_LIST) {
-            ProgramList(uiState, uiEvent)
-        }
-
-        AnimatedVisibility(visible = uiState.page == PageType.HOME) {
-            JobContent(uiState, uiEvent, navController)
-        }
     }
-
 }
 
 @Composable
@@ -132,40 +100,27 @@ fun HomeActions(
 ) {
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(key1 = uiState.entities) {
-        if (uiState.entities.isEmpty()) {
-            uiEvent(HomeUiEvent.ToggleSelected(0L))
-        } else {
-            if (uiState.selected == 0L) {
-                uiEvent(HomeUiEvent.ToggleSelected(uiState.entities.getOrNull(0)?.id ?: 0L))
-            } else {
-                if (!uiState.entities.any { it.id == uiState.selected }) {
-                    uiEvent(HomeUiEvent.ToggleSelected(uiState.entities.getOrNull(0)?.id ?: 0L))
-                }
-            }
-        }
-    }
-
     Row(
         modifier = Modifier
+            .padding(16.dp)
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.surfaceVariant,
                 shape = CircleShape
             )
-            .padding(horizontal = 16.dp, vertical = 4.dp),
+            .padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         ElevatedButton(
-            enabled = uiState.loading == 0 || uiState.loading == 1,
+            enabled = uiState.uiFlags == 0 || uiState.uiFlags == 1,
             onClick = {
                 scope.launch {
-                    if (uiState.loading == 0 || uiState.loading == 1) {
+                    if (uiState.uiFlags == 0 || uiState.uiFlags == 1) {
                         uiEvent(HomeUiEvent.Reset)
                     }
                 }
             }) {
-            if (uiState.loading == 1) {
+            if (uiState.uiFlags == 1) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
@@ -184,17 +139,17 @@ fun HomeActions(
         }
 
         ElevatedButton(
-            enabled = uiState.loading == 0 || uiState.loading == 2,
+            enabled = uiState.uiFlags == 0 || uiState.uiFlags == 2,
             onClick = {
                 scope.launch {
-                    if (uiState.loading == 0) {
+                    if (uiState.uiFlags == 0) {
                         uiEvent(HomeUiEvent.Pipeline(1))
-                    } else if (uiState.loading == 2) {
+                    } else if (uiState.uiFlags == 2) {
                         uiEvent(HomeUiEvent.Pipeline(0))
                     }
                 }
             }) {
-            if (uiState.loading == 2) {
+            if (uiState.uiFlags == 2) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
@@ -213,17 +168,17 @@ fun HomeActions(
         }
 
         ElevatedButton(
-            enabled = uiState.loading == 0 || uiState.loading == 3,
+            enabled = uiState.uiFlags == 0 || uiState.uiFlags == 3,
             onClick = {
                 scope.launch {
-                    if (uiState.loading == 0) {
+                    if (uiState.uiFlags == 0) {
                         uiEvent(HomeUiEvent.Pipeline(2))
-                    } else if (uiState.loading == 3) {
+                    } else if (uiState.uiFlags == 3) {
                         uiEvent(HomeUiEvent.Pipeline(0))
                     }
                 }
             }) {
-            if (uiState.loading == 3) {
+            if (uiState.uiFlags == 3) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
@@ -242,17 +197,17 @@ fun HomeActions(
         }
 
         ElevatedButton(
-            enabled = uiState.loading == 0 || uiState.loading == 4,
+            enabled = uiState.uiFlags == 0 || uiState.uiFlags == 4,
             onClick = {
                 scope.launch {
-                    if (uiState.loading == 0) {
+                    if (uiState.uiFlags == 0) {
                         uiEvent(HomeUiEvent.Pipeline(3))
-                    } else if (uiState.loading == 4) {
+                    } else if (uiState.uiFlags == 4) {
                         uiEvent(HomeUiEvent.Pipeline(0))
                     }
                 }
             }) {
-            if (uiState.loading == 4) {
+            if (uiState.uiFlags == 4) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
@@ -272,83 +227,73 @@ fun HomeActions(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgramList(
+    entities: LazyPagingItems<Program>,
     uiState: HomeUiState,
     uiEvent: (HomeUiEvent) -> Unit = {},
 ) {
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = Modifier
-            .fillMaxSize()
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.small
-            ),
-        columns = GridCells.Fixed(4),
+        modifier = Modifier.padding(16.dp),
         contentPadding = PaddingValues(16.dp),
+        columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        itemsIndexed(items = uiState.entities) { index, item ->
-            Card(
-                onClick = {
-                    scope.launch {
+        itemsIndexed(entities) { index, item ->
+            ProgramItem(
+                index = index,
+                item = item,
+                selected = uiState.selected == item.id
+            ) { double ->
+                scope.launch {
+                    if (!double) {
                         uiEvent(HomeUiEvent.ToggleSelected(item.id))
                         uiEvent(HomeUiEvent.NavTo(PageType.HOME))
                     }
-                },
-            ) {
-                Column(
-                    modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.height(24.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Text(
-                            text = "${index + 1}、",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Monospace,
-                            fontStyle = FontStyle.Italic,
-                            fontWeight = FontWeight.SemiBold,
-                        )
-                    }
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = item.text,
-                        fontSize = 20.sp,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center,
-                        maxLines = 1,
-                    )
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        text = item.createTime.dateFormat("yyyy/MM/dd"),
-                        style = MaterialTheme.typography.bodySmall,
-                        fontFamily = FontFamily.Monospace,
-                        textAlign = TextAlign.End,
-                    )
                 }
             }
         }
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun JobContent(
+    entities: LazyPagingItems<Program>,
     uiState: HomeUiState,
-    uiEvent: (HomeUiEvent) -> Unit,
-    navController: NavHostController
+    uiEvent: (HomeUiEvent) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
-    var showInfo by remember { mutableStateOf(false) }
+    val navigationActions = LocalNavigationActions.current
+    val info by remember(uiState.jobState.orificePlate) {
+        mutableStateOf(uiState.jobState.orificePlate.getInfo())
+    }
+
+    LaunchedEffect(key1 = entities.itemSnapshotList.items) {
+        if (entities.itemSnapshotList.items.isEmpty()) {
+            uiEvent(HomeUiEvent.ToggleSelected(0L))
+        } else {
+            if (uiState.selected == 0L) {
+                uiEvent(
+                    HomeUiEvent.ToggleSelected(
+                        entities.itemSnapshotList.items.getOrNull(0)?.id ?: 0L
+                    )
+                )
+            } else {
+                if (!entities.itemSnapshotList.items.any { it.id == uiState.selected }) {
+                    uiEvent(
+                        HomeUiEvent.ToggleSelected(
+                            entities.itemSnapshotList.items.getOrNull(0)?.id ?: 0L
+                        )
+                    )
+                }
+            }
+        }
+    }
 
     Row(
         modifier = Modifier
@@ -357,101 +302,77 @@ fun JobContent(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        val height = if (uiState.jobState.status == JobStatus.STOPPED) 0.7f else 0.6f
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.5f)
-                .fillMaxHeight(height),
-            contentAlignment = Alignment.Center
+        Column(
+            modifier = Modifier.fillMaxWidth(0.5f),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            if (showInfo) {
-                OrificePlateCard(
-                    modifier = Modifier.fillMaxSize(),
-                    orificePlate = uiState.jobState.orificePlate
-                )
-            } else {
-                OrificePlate(
-                    modifier = Modifier.fillMaxSize(),
-                    row = uiState.jobState.orificePlate.row,
-                    column = uiState.jobState.orificePlate.column,
-                    selected = uiState.jobState.finished
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .offset {
-                        IntOffset(
-                            x = 0.dp.roundToPx(),
-                            y = (-64).dp.roundToPx(),
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Column(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            shape = MaterialTheme.shapes.small,
                         )
-                    }
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.small,
-                    )
-                    .align(Alignment.TopEnd),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconButton(
-                    modifier = Modifier.size(48.dp),
-                    onClick = { showInfo = !showInfo },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.SwapHoriz,
-                        contentDescription = null,
-                        tint = Color.Black,
-                    )
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .offset {
-                        IntOffset(
-                            x = 0.dp.roundToPx(),
-                            y = (-64).dp.roundToPx(),
-                        )
-                    }
-                    .background(
-                        color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = MaterialTheme.shapes.small,
-                    )
-                    .clip(MaterialTheme.shapes.small)
-                    .align(Alignment.TopStart)
-                    .clickable {
-                        scope.launch {
-                            if (uiState.jobState.status == JobStatus.STOPPED) {
-                                if (uiState.entities.isNotEmpty()) {
-                                    uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
-                                } else {
-                                    navController.navigate(Route.Program)
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable {
+                            scope.launch {
+                                if (uiState.jobState.status == 0) {
+                                    if (entities.itemSnapshotList.items.isNotEmpty()) {
+                                        uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
+                                    } else {
+                                        navigationActions.navigate(Route.PROGRAM)
+                                    }
                                 }
                             }
                         }
-                    }
-                    .padding(horizontal = 32.dp, vertical = 4.dp)
-            ) {
-                val selected = uiState.entities.find { it.id == uiState.selected } ?: Program()
-                Text(
-                    text = selected.text,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp,
-                        fontStyle = FontStyle.Italic,
+                        .padding(horizontal = 32.dp, vertical = 4.dp)
+                ) {
+                    val selected =
+                        entities.itemSnapshotList.items.find { it.id == uiState.selected }
+                            ?: Program()
+                    Text(
+                        text = selected.displayText,
+                        style = TextStyle(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            fontStyle = FontStyle.Italic,
+                        )
                     )
-                )
-                Text(
-                    text = selected.createTime.dateFormat("yyyy/MM/dd"),
-                    style = TextStyle(
-                        fontFamily = FontFamily.Monospace,
-                        fontSize = 12.sp,
-                    ),
-                    color = Color.Gray,
-                )
-            }
+                    Text(
+                        text = selected.createTime.dateFormat("yyyy/MM/dd"),
+                        style = TextStyle(
+                            fontFamily = FontFamily.Monospace,
+                            fontSize = 12.sp,
+                        ),
+                        color = Color.Gray,
+                    )
+                }
+                FlowRow {
+                    info.forEach {
+                        Text(
+                            modifier = Modifier
+                                .padding(4.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.surfaceVariant,
+                                    shape = MaterialTheme.shapes.small
+                                )
+                                .padding(vertical = 4.dp, horizontal = 8.dp),
+                            text = it,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
 
+            }
+            OrificePlate(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(328.dp)
+                    .padding(16.dp),
+                row = uiState.jobState.orificePlate.row,
+                column = uiState.jobState.orificePlate.column,
+                selected = uiState.jobState.finished
+            )
         }
 
         JobActionCard(

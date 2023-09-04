@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.zktony.android.data.entities.Coordinate
+import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.utils.extra.format
 
 /**
@@ -38,14 +38,14 @@ import com.zktony.android.utils.extra.format
 fun CoordinateInput(
     modifier: Modifier = Modifier,
     title: String,
-    coordinate: Coordinate = Coordinate(),
-    limit: Coordinate? = null,
-    onCoordinateChange: (Coordinate) -> Unit = {},
+    point: Point = Point(),
+    limit: Point? = null,
+    onCoordinateChange: (Point) -> Unit = {},
     onClick: () -> Unit = {}
 ) {
     val softKeyboard = LocalSoftwareKeyboardController.current
-    var abscissa by remember { mutableStateOf(coordinate.abscissa.format(1)) }
-    var ordinate by remember { mutableStateOf(coordinate.ordinate.format(1)) }
+    var abscissa by remember { mutableStateOf(point.x.format(1)) }
+    var ordinate by remember { mutableStateOf(point.y.format(1)) }
 
     ElevatedCard(modifier = modifier) {
         Row(
@@ -71,7 +71,7 @@ fun CoordinateInput(
                     onValueChange = {
                         abscissa = it
                         onCoordinateChange(
-                            Coordinate(
+                            Point(
                                 abscissa.toDoubleOrNull() ?: 0.0,
                                 ordinate.toDoubleOrNull() ?: 0.0
                             )
@@ -110,7 +110,7 @@ fun CoordinateInput(
                                 innerTextField()
                                 if (limit != null) {
                                     Text(
-                                        text = "<= ${limit.abscissa}",
+                                        text = "<= ${limit.x}",
                                         fontStyle = FontStyle.Italic,
                                         fontSize = 14.sp,
                                         fontFamily = FontFamily.Serif,
@@ -128,7 +128,7 @@ fun CoordinateInput(
                     onValueChange = {
                         ordinate = it
                         onCoordinateChange(
-                            Coordinate(
+                            Point(
                                 abscissa.toDoubleOrNull() ?: 0.0,
                                 ordinate.toDoubleOrNull() ?: 0.0
                             )
@@ -167,7 +167,7 @@ fun CoordinateInput(
                                 innerTextField()
                                 if (limit != null) {
                                     Text(
-                                        text = "<= ${limit.ordinate}",
+                                        text = "<= ${limit.y}",
                                         fontStyle = FontStyle.Italic,
                                         fontSize = 14.sp,
                                         fontFamily = FontFamily.Serif,
@@ -254,8 +254,8 @@ fun CircleTextField(
 fun CoordinateInputPreview() {
     CoordinateInput(
         title = "坐标",
-        limit = Coordinate(10.0, 10.0),
-        coordinate = Coordinate(1.0, 1.0)
+        limit = Point(10.0, 10.0),
+        point = Point(1.0, 1.0)
     )
 }
 

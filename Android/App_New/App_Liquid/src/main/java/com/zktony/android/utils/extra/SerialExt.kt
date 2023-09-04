@@ -1,7 +1,5 @@
 package com.zktony.android.utils.extra
 
-import com.zktony.android.data.entities.Motor
-import com.zktony.android.utils.extra.internal.AppStateObserver
 import com.zktony.android.utils.extra.internal.ExceptionPolicy
 import com.zktony.android.utils.extra.internal.ExecuteType
 import com.zktony.android.utils.extra.internal.SerialExtension
@@ -15,41 +13,6 @@ import com.zktony.serialport.ext.readInt8
 import com.zktony.serialport.ext.splitByteArray
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicLong
-
-val x: AtomicLong = AtomicLong(0L)
-val y: AtomicLong = AtomicLong(0L)
-
-/**
- * 轴状态
- */
-val hpa: MutableMap<Int, Boolean> = ConcurrentHashMap<Int, Boolean>().apply {
-    repeat(16) { put(it, false) }
-}
-
-/**
- * GPIO 状态
- */
-val hpg: MutableMap<Int, Boolean> = ConcurrentHashMap<Int, Boolean>().apply {
-    repeat(16) { put(it, false) }
-}
-
-/**
- * 电机信息
- */
-val hpm: MutableMap<Int, Motor> = ConcurrentHashMap<Int, Motor>().apply {
-    repeat(16) { put(it, Motor()) }
-}
-
-/**
- * 校准信息
- */
-val hpc: MutableMap<Int, Double> = ConcurrentHashMap<Int, Double>().apply {
-    put(0, 4.0 / 3200)
-    put(1, 6.35 / 3200)
-    repeat(14) { put(it + 2, 0.01) }
-}
 
 /**
  * 串口通信
@@ -99,7 +62,7 @@ val serialport = object : AbstractSerialHelper(SerialConfig()) {
                     for (i in 0 until rec.data.size / 2) {
                         val index = rec.data.readInt8(offset = i * 2)
                         val status = rec.data.readInt8(offset = i * 2 + 1)
-                        hpa[index] = status == 1
+                        appState.hpa[index] = status == 1
                     }
                 }
                 // 处理 GPIO 状态数据
@@ -107,7 +70,7 @@ val serialport = object : AbstractSerialHelper(SerialConfig()) {
                     for (i in 0 until rec.data.size / 2) {
                         val index = rec.data.readInt8(offset = i * 2)
                         val status = rec.data.readInt8(offset = i * 2 + 1)
-                        hpg[index] = status == 1
+                        appState.hpg[index] = status == 1
                     }
                 }
                 // 处理错误信息
@@ -125,23 +88,6 @@ val serialport = object : AbstractSerialHelper(SerialConfig()) {
 }
 
 /**
- * 应用状态观察者
- */
-val observer = object : AppStateObserver() {
-    override fun callbackOne(list: List<Motor>) {
-        list.forEach {
-            hpm[it.index] = it
-        }
-    }
-
-    override fun callbackTwo(list: List<Double>) {
-        list.forEachIndexed { index, d ->
-            hpc[index + 2] = d
-        }
-    }
-}
-
-/**
  * 脉冲转换
  *
  * @param index Int
@@ -149,27 +95,18 @@ val observer = object : AppStateObserver() {
  * @return Long
  */
 fun <T : Number> pulse(index: Int, dvp: T): Long {
-
     val p = when (dvp) {
-        is Double -> (dvp / hpc[index]!!).toLong()
+        is Double -> ((appState.hpc[index] ?: { x -> x * 100 }).invoke(dvp) ?: 0.0).toLong()
         is Long -> dvp
         else -> dvp.toLong()
     }
 
-    return when (index) {
-        0 -> {
-            val d = p - x.get()
-            x.set(maxOf(p, 0))
-            d
-        }
-
-        1 -> {
-            val d = p - y.get()
-            y.set(maxOf(p, 0))
-            d
-        }
-
-        else -> p
+    return if (index in 0..1) {
+        val d = p - (appState.hpp[index] ?: 0L)
+        appState.hpp[index] = maxOf(p, 0L)
+        d
+    } else {
+        p
     }
 }
 
@@ -189,7 +126,7 @@ inline fun sendProtocol(block: Protocol.() -> Unit) =
  * @param isLock Boolean
  * @return Unit
  */
-fun setLock(ids: List<Int>, isLock: Boolean = true) = ids.forEach { hpa[it] = isLock }
+fun setLock(ids: List<Int>, isLock: Boolean = true) = ids.forEach { appState.hpa[it] = isLock }
 
 /**
  * 设置轴锁定状态
@@ -198,7 +135,7 @@ fun setLock(ids: List<Int>, isLock: Boolean = true) = ids.forEach { hpa[it] = is
  * @param isLock Boolean
  * @return Unit
  */
-fun setLock(vararg ids: Int, isLock: Boolean = true) = ids.forEach { hpa[it] = isLock }
+fun setLock(vararg ids: Int, isLock: Boolean = true) = ids.forEach { appState.hpa[it] = isLock }
 
 /**
  * 获取轴锁定状态
@@ -206,7 +143,7 @@ fun setLock(vararg ids: Int, isLock: Boolean = true) = ids.forEach { hpa[it] = i
  * @param ids List<Int>
  * @return Boolean
  */
-fun getLock(ids: List<Int>) = ids.any { hpa[it] ?: false }
+fun getLock(ids: List<Int>) = ids.any { appState.hpa[it] ?: false }
 
 /**
  * 获取轴锁定状态
@@ -214,7 +151,7 @@ fun getLock(ids: List<Int>) = ids.any { hpa[it] ?: false }
  * @param ids IntArray
  * @return Boolean
  */
-fun getLock(vararg ids: Int) = ids.any { hpa[it] ?: false }
+fun getLock(vararg ids: Int) = ids.any { appState.hpa[it] ?: false }
 
 /**
  * 获取 GPIO 状态
@@ -222,7 +159,7 @@ fun getLock(vararg ids: Int) = ids.any { hpa[it] ?: false }
  * @param id Int
  * @return Boolean
  */
-fun getGpio(id: Int): Boolean = hpg[id] ?: false
+fun getGpio(id: Int): Boolean = appState.hpg[id] ?: false
 
 /**
  * 串口通信

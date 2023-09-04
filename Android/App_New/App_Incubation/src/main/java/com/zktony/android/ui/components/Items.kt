@@ -31,14 +31,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.R
-import com.zktony.android.data.entities.Curve
+import com.zktony.android.data.entities.Calibration
 import com.zktony.android.data.entities.History
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Log
+import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.data.entities.internal.Process
 import com.zktony.android.data.entities.internal.ProcessType
-import com.zktony.android.utils.extra.Point
+import com.zktony.android.ui.utils.selectedColor
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
 
@@ -48,19 +49,22 @@ import kotlinx.coroutines.launch
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CurveItem(
-    modifier: Modifier = Modifier,
+fun CalibrationItem(
     index: Int,
-    item: Curve,
-    onClick: (Curve) -> Unit,
-    onDoubleClick: (Curve) -> Unit
+    item: Calibration,
+    selected: Boolean,
+    onClick: (Boolean) -> Unit
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
+            .background(
+                color = selectedColor(boolean = selected),
+                shape = MaterialTheme.shapes.medium
+            )
             .clip(MaterialTheme.shapes.medium)
             .combinedClickable(
-                onClick = { onClick(item) },
-                onDoubleClick = { onDoubleClick(item) }
+                onClick = { onClick(false) },
+                onDoubleClick = { onClick(true) }
             )
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -349,18 +353,21 @@ fun LogItem(item: Log) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ProgramItem(
-    modifier: Modifier = Modifier,
     index: Int,
     item: Program,
-    onClick: (Program) -> Unit,
-    onDoubleClick: (Program) -> Unit
+    selected: Boolean,
+    onClick: (Boolean) -> Unit
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
+            .background(
+                color = selectedColor(selected),
+                shape = MaterialTheme.shapes.medium
+            )
             .clip(MaterialTheme.shapes.medium)
             .combinedClickable(
-                onClick = { onClick(item) },
-                onDoubleClick = { onDoubleClick(item) }
+                onClick = { onClick(false) },
+                onDoubleClick = { onClick(true) }
             )
             .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -506,18 +513,21 @@ fun ProcessItem(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MotorItem(
-    modifier: Modifier = Modifier,
     item: Motor,
-    onClick: () -> Unit,
-    onDoubleClick: () -> Unit
+    selected: Boolean,
+    onClick: (Boolean) -> Unit
 ) {
     Row(
-        modifier = modifier
+        modifier = Modifier
+            .background(
+                color = selectedColor(selected),
+                shape = MaterialTheme.shapes.medium
+            )
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.medium)
             .combinedClickable(
-                onClick = { onClick() },
-                onDoubleClick = { onDoubleClick() }
+                onClick = { onClick(false) },
+                onDoubleClick = { onClick(true) }
             )
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,

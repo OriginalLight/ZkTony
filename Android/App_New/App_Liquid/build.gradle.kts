@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
 }
@@ -94,23 +95,28 @@ dependencies {
     val composeBom = platform(libs.androidx.compose.bom)
 
     ksp(libs.androidx.room.compiler)
+    ksp(libs.hilt.compiler)
+
     implementation(project(mapOf("path" to ":Lib_SerialPort")))
 
     implementation(libs.accompanist.insets)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.paging)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewModelCompose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.paging)
     implementation(libs.androidx.room.runtime)
     implementation(libs.gson)
-    implementation(libs.koin.androidx.compose)
+    implementation(libs.hilt.android)
     implementation(libs.okhttp3)
 
     debugImplementation(libs.androidx.compose.ui.test.manifest)

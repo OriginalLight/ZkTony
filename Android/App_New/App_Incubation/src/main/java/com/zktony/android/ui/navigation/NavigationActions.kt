@@ -13,7 +13,7 @@ import com.zktony.android.R
 object Route {
     const val HOME = "Home"
     const val PROGRAM = "Program"
-    const val CURVE = "Curve"
+    const val CALIBRATION = "Calibration"
     const val HISTORY = "History"
     const val SETTING = "Setting"
     const val SPLASH = "Splash"
@@ -60,7 +60,7 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         iconTextId = R.string.program
     ),
     TopLevelDestination(
-        route = Route.CURVE,
+        route = Route.CALIBRATION,
         icon = Icons.Outlined.Analytics,
         iconTextId = R.string.calibration
     ),

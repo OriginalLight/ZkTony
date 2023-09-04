@@ -21,16 +21,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.paging.compose.LazyPagingItems
 import com.zktony.android.R
-import com.zktony.android.data.entities.Curve
+import com.zktony.android.data.entities.Calibration
 import com.zktony.android.data.entities.History
 import com.zktony.android.data.entities.Program
+import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.data.entities.internal.defaults.ProcessDefaults
 import com.zktony.android.ui.*
 import com.zktony.android.ui.navigation.TOP_LEVEL_DESTINATIONS
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.extra.Point
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
 
@@ -173,7 +173,7 @@ fun SettingsAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProgramAppBar(
-    entities: LazyPagingItems<Program>,
+    entities: List<Program>,
     uiState: ProgramUiState,
     uiEvent: (ProgramUiEvent) -> Unit,
     navigation: () -> Unit
@@ -218,7 +218,7 @@ fun ProgramAppBar(
                         .padding(horizontal = 32.dp, vertical = 4.dp)
                 ) {
                     val selected =
-                        entities.itemSnapshotList.items.find { it.id == uiState.selected }
+                        entities.find { it.id == uiState.selected }
                             ?: Program()
                     Text(
                         text = selected.displayText,
@@ -255,9 +255,7 @@ fun ProgramAppBar(
                         if (uiState.page == PageType.PROGRAM_LIST) {
                             dialog = true
                         } else {
-                            val selected =
-                                entities.itemSnapshotList.items.find { it.id == uiState.selected }
-                                    ?: Program()
+                            val selected = entities.find { it.id == uiState.selected } ?: Program()
                             val processes = selected.processes.toMutableList()
                             processes.add(ProcessDefaults.defaultPrimaryAntibody())
                             uiEvent(ProgramUiEvent.Update(selected.copy(processes = processes)))
@@ -315,10 +313,10 @@ fun ProgramAppBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CurveAppBar(
-    entities: LazyPagingItems<Curve>,
-    uiState: CurveUiState,
-    uiEvent: (CurveUiEvent) -> Unit,
+fun CalibrationAppBar(
+    entities: List<Calibration>,
+    uiState: CalibrationUiState,
+    uiEvent: (CalibrationUiEvent) -> Unit,
     navigation: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -329,7 +327,7 @@ fun CurveAppBar(
     if (dialog) {
         InputDialog(
             onConfirm = {
-                uiEvent(CurveUiEvent.Insert(it))
+                uiEvent(CalibrationUiEvent.Insert(it))
                 dialog = false
             },
             onCancel = { dialog = false }
@@ -338,7 +336,7 @@ fun CurveAppBar(
 
     TopAppBar(
         title = {
-            if (uiState.page == PageType.CURVE_LIST) {
+            if (uiState.page == PageType.CALIBRATION_LIST) {
                 Text(
                     modifier = Modifier
                         .background(
@@ -359,8 +357,8 @@ fun CurveAppBar(
                         .padding(horizontal = 32.dp, vertical = 4.dp)
                 ) {
                     val selected =
-                        entities.itemSnapshotList.items.find { it.id == uiState.selected }
-                            ?: Curve(displayText = "None")
+                        entities.find { it.id == uiState.selected }
+                            ?: Calibration(displayText = "None")
                     Text(
                         text = selected.displayText,
                         style = TextStyle(
@@ -393,15 +391,16 @@ fun CurveAppBar(
             ) {
                 ElevatedButton(onClick = {
                     scope.launch {
-                        if (uiState.page == PageType.CURVE_LIST) {
+                        if (uiState.page == PageType.CALIBRATION_LIST) {
                             dialog = true
                         } else {
                             val selected =
-                                entities.itemSnapshotList.items.find { it.id == uiState.selected }
-                                    ?: Curve(displayText = "None")
+                                entities.find { it.id == uiState.selected } ?: Calibration(
+                                    displayText = "None"
+                                )
                             val points = selected.points.toMutableList()
                             points.add(Point(0.0, 0.0))
-                            uiEvent(CurveUiEvent.Update(selected.copy(points = points)))
+                            uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
                         }
                     }
                 }) {
@@ -412,10 +411,10 @@ fun CurveAppBar(
                 }
 
                 AnimatedVisibility(
-                    visible = uiState.page == PageType.CURVE_LIST
+                    visible = uiState.page == PageType.CALIBRATION_LIST
                             && uiState.selected != 0L
                 ) {
-                    ElevatedButton(onClick = { uiEvent(CurveUiEvent.NavTo(PageType.CURVE_DETAIL)) }) {
+                    ElevatedButton(onClick = { uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_DETAIL)) }) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = null
@@ -424,7 +423,7 @@ fun CurveAppBar(
                 }
 
                 AnimatedVisibility(
-                    visible = uiState.page == PageType.CURVE_LIST
+                    visible = uiState.page == PageType.CALIBRATION_LIST
                             && uiState.selected != 0L
                 ) {
                     ElevatedButton(onClick = {
@@ -434,7 +433,7 @@ fun CurveAppBar(
                                 snackbarHostState.showSnackbar("再次点击删除")
                             } else {
                                 count = 0
-                                uiEvent(CurveUiEvent.Delete(uiState.selected))
+                                uiEvent(CalibrationUiEvent.Delete(uiState.selected))
                             }
                         }
                     }) {

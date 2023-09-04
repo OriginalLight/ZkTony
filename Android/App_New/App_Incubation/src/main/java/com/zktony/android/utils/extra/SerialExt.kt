@@ -8,6 +8,7 @@ import com.zktony.serialport.command.runze.toRunzeProtocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
 
 /**
  * 串口通信
@@ -48,7 +49,7 @@ val serialHelper = object : AbstractSerialHelper(SerialConfig(device = "/dev/tty
                 0x05.toByte() -> throw Exception("电机堵转")
                 0x06.toByte() -> throw Exception("未知位置")
                 0xFE.toByte() -> {
-                    appState.valve[rx.slaveAddr.toInt()] = false
+                    appState.hpv[rx.slaveAddr.toInt()] = false
                 }
 
                 0xFF.toByte() -> throw Exception("未知错误")
@@ -60,7 +61,7 @@ val serialHelper = object : AbstractSerialHelper(SerialConfig(device = "/dev/tty
                 0x03.toByte() -> {
                     val height = rx.data.copyOfRange(3, 5)
                     val low = rx.data.copyOfRange(1, 3)
-                    appState.location[rx.slaveAddr.toInt() - 1] = height.plus(low).readInt32BE()
+                    appState.hpp[rx.slaveAddr.toInt() - 1] = height.plus(low).readInt32BE()
                 }
 
                 else -> {}
@@ -75,15 +76,17 @@ fun sendRunzeProtocol(block: RunzeProtocol.() -> Unit) =
 fun sendRtuProtocol(block: RtuProtocol.() -> Unit) =
     serialHelper.sendByteArray(RtuProtocol().apply(block).toByteArray())
 
-suspend fun valve(slaveAddr: Int, channel: Int) {
-    appState.valve[slaveAddr] = true
-    sendRunzeProtocol {
-        this.slaveAddr = slaveAddr.toByte()
-        funcCode = 0x44
-        data = byteArrayOf(channel.toByte(), 0x00)
-    }
-    while (appState.valve[slaveAddr] == true) {
-        delay(10L)
+suspend fun valve(slaveAddr: Int, channel: Int, timeOut: Long = 1000L * 20) {
+    withTimeout(timeOut) {
+        appState.hpv[slaveAddr] = true
+        sendRunzeProtocol {
+            this.slaveAddr = slaveAddr.toByte()
+            funcCode = 0x44
+            data = byteArrayOf(channel.toByte(), 0x00)
+        }
+        while (appState.hpv[slaveAddr] == true) {
+            delay(10L)
+        }
     }
 }
 

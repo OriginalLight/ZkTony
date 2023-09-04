@@ -1,5 +1,6 @@
 package com.zktony.android.utils.extra
 
+import androidx.annotation.Keep
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.zktony.android.BuildConfig
@@ -43,6 +44,7 @@ fun httpCall(
     })
 }
 
+@Keep
 data class Application(
     val id: Int,
     val application_id: String,

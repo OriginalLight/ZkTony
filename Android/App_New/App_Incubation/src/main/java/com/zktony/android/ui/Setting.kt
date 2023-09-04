@@ -388,7 +388,8 @@ fun Authentication(uiEvent: (SettingUiEvent) -> Unit) {
 
 @Composable
 fun MotorList(
-    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
+    uiState: SettingUiState,
+    uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
@@ -400,27 +401,23 @@ fun MotorList(
         columns = GridCells.Fixed(3)
     ) {
         items(items = uiState.entities) { item ->
-            val color = if (uiState.selected == item.id) {
-                MaterialTheme.colorScheme.secondaryContainer
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            }
-            MotorItem(modifier = Modifier.background(
-                color = color, shape = MaterialTheme.shapes.medium
-            ), item = item, onClick = {
+            MotorItem(
+                item = item,
+                selected = uiState.selected == item.id
+            ) { double ->
                 scope.launch {
-                    if (uiState.selected != item.id) {
+                    if (double) {
                         uiEvent(SettingUiEvent.ToggleSelected(item.id))
+                        uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL))
                     } else {
-                        uiEvent(SettingUiEvent.ToggleSelected(0L))
+                        if (uiState.selected != item.id) {
+                            uiEvent(SettingUiEvent.ToggleSelected(item.id))
+                        } else {
+                            uiEvent(SettingUiEvent.ToggleSelected(0L))
+                        }
                     }
                 }
-            }, onDoubleClick = {
-                scope.launch {
-                    uiEvent(SettingUiEvent.ToggleSelected(item.id))
-                    uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL))
-                }
-            })
+            }
         }
     }
 }

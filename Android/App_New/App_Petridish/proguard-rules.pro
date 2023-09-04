@@ -75,7 +75,3 @@
     <fields>;
     <methods>;
 }
-
--keepclassmembers class * extends com.google.protobuf.GeneratedMessageLite* {
-   <fields>;
-}

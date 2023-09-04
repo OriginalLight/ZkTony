@@ -3,8 +3,9 @@ package com.zktony.android.data
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.zktony.android.data.entities.internal.*
-import com.zktony.android.utils.extra.Point
+import com.zktony.android.data.entities.internal.Log
+import com.zktony.android.data.entities.internal.Point
+import com.zktony.android.data.entities.internal.Process
 import java.util.Date
 
 /**

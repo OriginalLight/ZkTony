@@ -10,13 +10,13 @@ data class AppState(
     /**
      * 阀门状态
      */
-    val valve: MutableMap<Int, Boolean> = ConcurrentHashMap(),
+    val hpv: MutableMap<Int, Boolean> = ConcurrentHashMap(),
     /**
      * 绝对位置
      */
-    val location: MutableMap<Int, Int> = ConcurrentHashMap(),
+    val hpp: MutableMap<Int, Int> = ConcurrentHashMap(),
     /**
-     * 校准曲线
+     * 校准函数
      */
-    val curve: MutableMap<Int, (Double) -> Double?> = ConcurrentHashMap()
+    val hpc: MutableMap<Int, (Double) -> Double?> = ConcurrentHashMap()
 )

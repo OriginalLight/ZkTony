@@ -1,8 +1,8 @@
 package com.zktony.android.di
 
-import com.zktony.android.data.dao.CurveDao
+import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.dao.HistoryDao
-import com.zktony.android.utils.service.CurveService
+import com.zktony.android.utils.service.CalibrationService
 import com.zktony.android.utils.service.HistoryService
 import com.zktony.android.utils.service.ServiceObserver
 import dagger.Module
@@ -14,16 +14,16 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object ServiceModule {
     @Provides
-    fun curveService(dao: CurveDao) = CurveService(dao)
+    fun calibrationService(dao: CalibrationDao) = CalibrationService(dao)
 
     @Provides
     fun historyService(dao: HistoryDao) = HistoryService(dao)
 
     @Provides
     fun serviceObserver(
-        curveService: CurveService,
+        calibrationService: CalibrationService,
         historyService: HistoryService
     ): ServiceObserver {
-        return ServiceObserver(curveService, historyService)
+        return ServiceObserver(calibrationService, historyService)
     }
 }

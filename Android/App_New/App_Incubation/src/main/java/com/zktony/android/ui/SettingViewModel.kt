@@ -9,13 +9,7 @@ import com.zktony.android.R
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.extra.Application
-import com.zktony.android.utils.extra.DownloadState
-import com.zktony.android.utils.extra.Ext
-import com.zktony.android.utils.extra.download
-import com.zktony.android.utils.extra.httpCall
-import com.zktony.android.utils.extra.installApk
-import com.zktony.android.utils.extra.isNetworkAvailable
+import com.zktony.android.utils.extra.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

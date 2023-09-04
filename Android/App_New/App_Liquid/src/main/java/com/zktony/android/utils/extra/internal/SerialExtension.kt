@@ -1,7 +1,7 @@
 package com.zktony.android.utils.extra.internal
 
 import com.zktony.android.data.entities.Motor
-import com.zktony.android.utils.extra.hpm
+import com.zktony.android.utils.extra.appState
 import com.zktony.android.utils.extra.pulse
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
@@ -23,15 +23,16 @@ class SerialExtension {
         index: Int = 0,
         pdv: T,
         ads: Triple<Long, Long, Long> = Triple(
-            hpm[index]!!.acc,
-            hpm[index]!!.dec,
-            hpm[index]!!.speed
+            (appState.hpm[index] ?: Motor()).acceleration,
+            (appState.hpm[index] ?: Motor()).deceleration,
+            (appState.hpm[index] ?: Motor()).speed
         ),
     ) {
         controlType = 0x01
         val step = pulse(index, pdv)
         if (step != 0L) {
-            val config = Motor(acc = ads.first * 20, dec = ads.second * 20, speed = ads.third * 20)
+            val config =
+                Motor(acceleration = ads.first, deceleration = ads.second, speed = ads.third)
             val ba = ByteArray(5)
             ba.writeInt8(index, 0).writeInt32LE(step, 1)
             byteList.addAll(ba.toList())

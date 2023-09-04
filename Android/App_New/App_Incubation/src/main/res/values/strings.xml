@@ -12,7 +12,6 @@
     <string name="qrcode">微信扫码关注公众号</string>
     <string name="system_config">系统参数</string>
     <string name="calibration">校准管理</string>
-    <string name="container">容器</string>
     <string name="home">主页面</string>
     <string name="program">孵育程序</string>
     <string name="update">检测更新</string>
@@ -29,7 +28,7 @@
     <string name="delete">删除</string>
     <string name="setting">系统设置</string>
     <string name="authentication">权限认证</string>
-    <string name="notice_content">1、请按照说明书进行操作\n2、请先填充促凝剂再填充胶液\n3、灌胶中请将针头贴紧胶板开口\n4、使用中请尽可能保持管路中液体处于流动状态\n5、灌装两块凝胶之间的时间间隔不宜过长\n6、灌胶完成后用清水冲洗管路避免凝胶堵塞管路</string>
+    <string name="notice_content">1. 运动机构运行时请不要打开抽屉\n2. 执行程序前请确认有充足的洗涤液\n3. 程序结束后请及时清理容器，避免滋生微生物等问题\n4. 实验结束后即时断电，延长Tec寿命\n5. 请阅读说明书后使用，避免误操作</string>
     <string name="notice">注意事项</string>
     <string name="dosage">出液量 μL</string>
     <string name="confirm">确认</string>

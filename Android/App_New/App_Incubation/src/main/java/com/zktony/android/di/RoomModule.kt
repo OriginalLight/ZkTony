@@ -25,7 +25,7 @@ object RoomModule {
     }
 
     @Provides
-    fun curveDao(database: AppDatabase) = database.CurveDao()
+    fun calibrationDao(database: AppDatabase) = database.CalibrationDao()
 
     @Provides
     fun historyDao(database: AppDatabase) = database.HistoryDao()
