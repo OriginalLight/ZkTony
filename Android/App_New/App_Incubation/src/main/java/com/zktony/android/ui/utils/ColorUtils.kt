@@ -16,3 +16,11 @@ fun selectedColor(boolean: Boolean): Color {
         MaterialTheme.colorScheme.surfaceVariant
     }
 }
+
+@Composable
+fun randomColor() = Color(
+    red = (0..255).random(),
+    green = (0..255).random(),
+    blue = (0..255).random(),
+    alpha = 255
+)

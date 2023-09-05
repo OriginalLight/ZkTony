@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,8 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.R
@@ -39,6 +42,7 @@ import com.zktony.android.data.entities.internal.Log
 import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.data.entities.internal.Process
 import com.zktony.android.data.entities.internal.ProcessType
+import com.zktony.android.ui.utils.randomColor
 import com.zktony.android.ui.utils.selectedColor
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
@@ -55,68 +59,64 @@ fun CalibrationItem(
     selected: Boolean,
     onClick: (Boolean) -> Unit
 ) {
-    Column(
+    ListItem(
         modifier = Modifier
-            .background(
-                color = selectedColor(boolean = selected),
-                shape = MaterialTheme.shapes.medium
-            )
-            .clip(MaterialTheme.shapes.medium)
+            .clip(MaterialTheme.shapes.small)
             .combinedClickable(
                 onClick = { onClick(false) },
                 onDoubleClick = { onClick(true) }
-            )
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+            ),
+        headlineContent = {
             Text(
-                text = "# ${index + 1}",
-                style = MaterialTheme.typography.titleLarge,
+                text = item.displayText,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        supportingContent = {
+            Text(
+                text = item.createTime.dateFormat("yyyy/MM/dd"),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
+        },
+        leadingContent = {
+            Text(
+                text = "${index + 1}、",
+                style = MaterialTheme.typography.headlineSmall,
                 fontStyle = FontStyle.Italic
             )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = "M${item.index}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = if (item.enable) "生效中" else "未生效",
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (item.enable) MaterialTheme.colorScheme.onSurface else Color.Red
-            )
-        }
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = item.displayText,
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+        },
+        trailingContent = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .padding(vertical = 4.dp, horizontal = 8.dp),
+                    text = "M${item.index}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .padding(vertical = 4.dp, horizontal = 8.dp),
+                    text = if (item.enable) "生效中" else "未生效",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (item.enable) MaterialTheme.colorScheme.onSurface else Color.Red
+                )
+            }
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = selectedColor(selected)
         )
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = item.createTime.dateFormat("yyyy/MM/dd"),
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.End,
-            color = Color.Gray
-        )
-    }
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -124,8 +124,7 @@ fun CalibrationItem(
 fun PointItem(
     item: Point,
     index: Int,
-    onClickOne: () -> Unit,
-    onClickTwo: () -> Unit,
+    onClick: (Int) -> Unit,
     onPointChange: (Point) -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -152,120 +151,119 @@ fun PointItem(
             forceManager.clearFocus()
         }
     )
-    Column(
-        modifier = Modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            )
-            .padding(vertical = 8.dp, horizontal = 16.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+    ListItem(
+        modifier = Modifier.clip(MaterialTheme.shapes.small),
+        headlineContent = {
+            Column(modifier = Modifier.padding(end = 16.dp)) {
+                BasicTextField(
+                    value = TextFieldValue(x, TextRange(x.length)),
+                    onValueChange = {
+                        scope.launch {
+                            x = it.text
+                            val value = it.text.toDoubleOrNull() ?: 0.0
+                            if (value != item.x) {
+                                onPointChange(item.copy(x = value))
+                            }
+                        }
+                    },
+                    textStyle = textStyle,
+                    keyboardOptions = keyboardOptions,
+                    keyboardActions = keyboardActions,
+                    decorationBox = @Composable { innerTextField ->
+                        Column {
+                            Row(
+                                verticalAlignment = Alignment.Bottom,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = "出液",
+                                    fontStyle = FontStyle.Italic,
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily.Serif,
+                                    color = Color.Gray
+                                )
+                                innerTextField()
+                            }
+                            Divider()
+                        }
+                    }
+                )
+
+                BasicTextField(
+                    value = TextFieldValue(y, TextRange(y.length)),
+                    onValueChange = {
+                        scope.launch {
+                            y = it.text
+                            val value = it.text.toDoubleOrNull() ?: 0.0
+                            if (value != item.y) {
+                                onPointChange(item.copy(y = value))
+                            }
+                        }
+                    },
+                    textStyle = textStyle,
+                    keyboardOptions = keyboardOptions,
+                    keyboardActions = keyboardActions,
+                    decorationBox = @Composable { innerTextField ->
+                        Column {
+                            Row(
+                                verticalAlignment = Alignment.Bottom,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = "步数",
+                                    fontStyle = FontStyle.Italic,
+                                    fontSize = 14.sp,
+                                    fontFamily = FontFamily.Serif,
+                                    color = Color.Gray
+                                )
+                                innerTextField()
+                            }
+                            Divider()
+                        }
+                    }
+                )
+            }
+        },
+        leadingContent = {
             Text(
-                text = "# ${index + 1}",
-                style = MaterialTheme.typography.titleMedium,
+                text = "${index + 1}、",
+                style = MaterialTheme.typography.headlineSmall,
                 fontStyle = FontStyle.Italic
             )
-            Spacer(modifier = Modifier.weight(1f))
-            Text(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .clip(MaterialTheme.shapes.small)
-                    .clickable { onClickOne() }
-                    .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = "加液测试",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .clip(MaterialTheme.shapes.small)
-                    .clickable { onClickTwo() }
-                    .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = stringResource(id = R.string.delete),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Red
-            )
-        }
-        Column(modifier = Modifier.padding(vertical = 8.dp, horizontal = 16.dp)) {
-            BasicTextField(
-                value = TextFieldValue(x, TextRange(x.length)),
-                onValueChange = {
-                    scope.launch {
-                        x = it.text
-                        val value = it.text.toDoubleOrNull() ?: 0.0
-                        if (value != item.x) {
-                            onPointChange(item.copy(x = value))
-                        }
-                    }
-                },
-                textStyle = textStyle,
-                keyboardOptions = keyboardOptions,
-                keyboardActions = keyboardActions,
-                decorationBox = @Composable { innerTextField ->
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.Bottom,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = "出液",
-                                fontStyle = FontStyle.Italic,
-                                fontSize = 14.sp,
-                                fontFamily = FontFamily.Serif,
-                                color = Color.Gray
-                            )
-                            innerTextField()
-                        }
-                        Divider()
-                    }
-                }
-            )
-
-            BasicTextField(
-                value = TextFieldValue(y, TextRange(y.length)),
-                onValueChange = {
-                    scope.launch {
-                        y = it.text
-                        val value = it.text.toDoubleOrNull() ?: 0.0
-                        if (value != item.y) {
-                            onPointChange(item.copy(y = value))
-                        }
-                    }
-                },
-                textStyle = textStyle,
-                keyboardOptions = keyboardOptions,
-                keyboardActions = keyboardActions,
-                decorationBox = @Composable { innerTextField ->
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.Bottom,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Text(
-                                text = "步数",
-                                fontStyle = FontStyle.Italic,
-                                fontSize = 14.sp,
-                                fontFamily = FontFamily.Serif,
-                                color = Color.Gray
-                            )
-                            innerTextField()
-                        }
-                        Divider()
-                    }
-                }
-            )
-        }
-    }
+        },
+        trailingContent = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable { onClick(0) }
+                        .padding(vertical = 4.dp, horizontal = 8.dp),
+                    text = "加液",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .clip(MaterialTheme.shapes.small)
+                        .clickable { onClick(1) }
+                        .padding(vertical = 4.dp, horizontal = 8.dp),
+                    text = stringResource(id = R.string.delete),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Red
+                )
+            }
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    )
 }
 
 
@@ -275,65 +273,62 @@ fun HistoryItem(
     item: History,
     onClick: (History) -> Unit,
 ) {
-    Column(
+    ListItem(
         modifier = Modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
+            .clip(MaterialTheme.shapes.small)
+            .clickable { onClick(item) },
+        headlineContent = {
+            Text(
+                text = item.createTime.dateFormat("yyyy/MM/dd"),
+                style = MaterialTheme.typography.titleMedium
             )
-            .clip(MaterialTheme.shapes.medium)
-            .clickable { onClick(item) }
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "# ${index + 1}",
-            style = MaterialTheme.typography.titleLarge,
-            fontStyle = FontStyle.Italic
+        },
+        supportingContent = {
+            Text(
+                text = item.createTime.dateFormat("HH:mm:ss"),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
+        },
+        leadingContent = {
+            Text(
+                text = "${index + 1}、",
+                style = MaterialTheme.typography.headlineSmall,
+                fontStyle = FontStyle.Italic
+            )
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = item.createTime.dateFormat("yyyy/MM/dd"),
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
+    )
 }
 
 
 @Composable
 fun LogItem(item: Log) {
-    Column(
-        modifier = Modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = MaterialTheme.shapes.medium
-            )
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+
+    var expand by remember { mutableStateOf(false) }
+
+    ListItem(
+        modifier = Modifier.clip(MaterialTheme.shapes.small),
+        headlineContent = {
             Text(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(vertical = 4.dp, horizontal = 8.dp),
                 text = item.createTime.dateFormat("HH:mm:ss"),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyLarge
             )
+        },
+        supportingContent = {
             Text(
-                modifier = Modifier
-                    .background(
-                        color = MaterialTheme.colorScheme.surface,
-                        shape = MaterialTheme.shapes.small
-                    )
-                    .padding(vertical = 4.dp, horizontal = 8.dp),
-                text = item.level,
+                text = item.message,
                 style = MaterialTheme.typography.bodyMedium,
+                maxLines = if (expand) Int.MAX_VALUE else 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        },
+        leadingContent = {
+            Text(
+                text = item.level,
+                style = MaterialTheme.typography.bodyLarge,
                 color = when (item.level) {
                     "DEBUG" -> Color.Blue
                     "INFO" -> Color.Green
@@ -342,18 +337,19 @@ fun LogItem(item: Log) {
                     else -> Color.Gray
                 }
             )
-
-        }
-
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            text = item.message,
-            style = MaterialTheme.typography.bodyLarge
+        },
+        trailingContent = {
+            IconButton(onClick = { expand = !expand }) {
+                Icon(
+                    imageVector = if (expand) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
+                    contentDescription = null
+                )
+            }
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
-
-    }
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -364,51 +360,47 @@ fun ProgramItem(
     selected: Boolean,
     onClick: (Boolean) -> Unit
 ) {
-    Column(
+    ListItem(
         modifier = Modifier
-            .background(
-                color = selectedColor(selected),
-                shape = MaterialTheme.shapes.medium
-            )
-            .clip(MaterialTheme.shapes.medium)
+            .clip(MaterialTheme.shapes.small)
             .combinedClickable(
                 onClick = { onClick(false) },
                 onDoubleClick = { onClick(true) }
+            ),
+        headlineContent = {
+            Text(
+                text = item.displayText,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-            .padding(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "# ${index + 1}",
-            style = MaterialTheme.typography.titleLarge,
-            fontStyle = FontStyle.Italic
+        },
+        supportingContent = {
+            Text(
+                text = item.createTime.dateFormat("yyyy/MM/dd"),
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Gray
+            )
+        },
+        leadingContent = {
+            Text(
+                text = "${index + 1}、",
+                style = MaterialTheme.typography.headlineSmall,
+                fontStyle = FontStyle.Italic
+            )
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = selectedColor(selected)
         )
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = item.displayText,
-            style = MaterialTheme.typography.titleLarge,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = item.createTime.dateFormat("yyyy/MM/dd"),
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.End,
-            color = Color.Gray
-        )
-    }
+    )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ProcessItem(
-    modifier: Modifier = Modifier,
     item: Process,
-    onClick: () -> Unit,
-    onDelete: () -> Unit,
-    onUpOrDown: (Boolean) -> Unit
+    selected: Boolean,
+    onClick: (Int) -> Unit
 ) {
 
     val displayText = when (item.type) {
@@ -425,12 +417,12 @@ fun ProcessItem(
         add("${item.duration} ${if (item.type == ProcessType.WASHING) "Min" else "Hour"}")
 
         if (item.type == ProcessType.PRIMARY_ANTIBODY) {
-            add("${'A' + item.origin}")
+            add("${'@' + item.origin}")
             add(if (item.recycle) "Recycle" else "No Recycle")
         }
 
         if (item.type == ProcessType.SECONDARY_ANTIBODY) {
-            add("${'A' + item.origin}")
+            add("${'@' + item.origin}")
         }
 
         if (item.type == ProcessType.WASHING) {
@@ -439,10 +431,14 @@ fun ProcessItem(
     }
 
     Column(
-        modifier = modifier
-            .clip(MaterialTheme.shapes.medium)
-            .clickable { onClick() }
-            .padding(vertical = 8.dp, horizontal = 16.dp),
+        modifier = Modifier
+            .background(
+                color = selectedColor(selected),
+                shape = MaterialTheme.shapes.small
+            )
+            .clip(MaterialTheme.shapes.small)
+            .clickable { onClick(0) }
+            .padding(8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
@@ -461,7 +457,7 @@ fun ProcessItem(
                         shape = MaterialTheme.shapes.small
                     )
                     .clip(MaterialTheme.shapes.small)
-                    .clickable { onUpOrDown(true) }
+                    .clickable { onClick(1) }
                     .padding(vertical = 4.dp, horizontal = 8.dp),
                 text = " ${stringResource(id = R.string.up)} ",
                 style = MaterialTheme.typography.bodyMedium
@@ -473,7 +469,7 @@ fun ProcessItem(
                         shape = MaterialTheme.shapes.small
                     )
                     .clip(MaterialTheme.shapes.small)
-                    .clickable { onUpOrDown(false) }
+                    .clickable { onClick(2) }
                     .padding(vertical = 4.dp, horizontal = 8.dp),
                 text = " ${stringResource(id = R.string.down)} ",
                 style = MaterialTheme.typography.bodyMedium
@@ -485,7 +481,7 @@ fun ProcessItem(
                         shape = MaterialTheme.shapes.small
                     )
                     .clip(MaterialTheme.shapes.small)
-                    .clickable { onDelete() }
+                    .clickable { onClick(3) }
                     .padding(vertical = 4.dp, horizontal = 8.dp),
                 text = stringResource(id = R.string.delete),
                 style = MaterialTheme.typography.bodyMedium,
@@ -527,10 +523,10 @@ fun MotorItem(
         modifier = Modifier
             .background(
                 color = selectedColor(selected),
-                shape = MaterialTheme.shapes.medium
+                shape = MaterialTheme.shapes.small
             )
             .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium)
+            .clip(MaterialTheme.shapes.small)
             .combinedClickable(
                 onClick = { onClick(false) },
                 onDoubleClick = { onClick(true) }
@@ -560,5 +556,49 @@ fun MotorItem(
                 style = MaterialTheme.typography.bodyLarge
             )
         }
+    }
+}
+
+@Composable
+fun ModuleItem(
+    index: Int,
+    selected: Boolean,
+) {
+    Box {
+        Column(
+            modifier = Modifier
+                .sizeIn(minWidth = 196.dp, minHeight = 96.dp)
+                .background(
+                    color = selectedColor(selected),
+                    shape = MaterialTheme.shapes.small
+                )
+                .clip(MaterialTheme.shapes.small)
+                .clickable { },
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "${'A' + index}",
+                style = MaterialTheme.typography.headlineLarge,
+                fontStyle = FontStyle.Italic
+            )
+        }
+
+        Text(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .offset {
+                    IntOffset(
+                        x = -16.dp.roundToPx(),
+                        y = -32.dp.roundToPx()
+                    )
+                },
+            text = "${'A' + index}",
+            style = TextStyle(
+                fontSize = 64.sp,
+                fontStyle = FontStyle.Italic,
+                color = randomColor()
+            )
+        )
     }
 }

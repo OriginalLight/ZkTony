@@ -129,7 +129,7 @@ fun ProgramList(
     LazyVerticalGrid(
         modifier = Modifier,
         contentPadding = PaddingValues(16.dp),
-        columns = GridCells.Fixed(2),
+        columns = GridCells.Fixed(3),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {

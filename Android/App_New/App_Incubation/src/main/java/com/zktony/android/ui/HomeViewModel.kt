@@ -2,8 +2,10 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.zktony.android.data.dao.ProgramDao
-import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,18 +32,18 @@ class HomeViewModel @Inject constructor(
 
     val uiState = _uiState.asStateFlow()
     val message = _message.asStateFlow()
+    val entities = Pager(
+        config = PagingConfig(pageSize = 20, initialLoadSize = 40)
+    ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     init {
         viewModelScope.launch {
             combine(
-                dao.getAll(),
-                _selected,
-                _page,
-                _uiFlags
-            ) { entities, selected, page, uiFlags ->
-                HomeUiState(entities, selected, page, uiFlags)
+                _selected, _page, _uiFlags
+            ) { selected, page, uiFlags ->
+                HomeUiState(selected, page, uiFlags)
             }.catch { ex ->
-                ex.printStackTrace()
+                _message.value = ex.message
             }.collect {
                 _uiState.value = it
             }
@@ -58,7 +60,6 @@ class HomeViewModel @Inject constructor(
 }
 
 data class HomeUiState(
-    val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
     val page: PageType = PageType.HOME,
     val uiFlags: Int = 0,

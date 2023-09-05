@@ -120,7 +120,7 @@ fun CalibrationList(
 
     LazyVerticalGrid(
         modifier = Modifier,
-        columns = GridCells.Fixed(2),
+        columns = GridCells.Fixed(3),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -173,7 +173,7 @@ fun CalibrationDetail(
                     .height(64.dp)
                     .background(
                         color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.small
                     )
                     .padding(vertical = 8.dp, horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -238,7 +238,7 @@ fun CalibrationDetail(
                     .height(64.dp)
                     .background(
                         color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.small
                     )
                     .padding(vertical = 8.dp, horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -261,22 +261,24 @@ fun CalibrationDetail(
             PointItem(
                 index = index,
                 item = item,
-                onClickOne = { },
-                onClickTwo = {
+                onClick = { flag ->
                     scope.launch {
-                        val points = selected.points.toMutableList()
-                        points -= item
-                        uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
+                        if (flag == 0) {
+                            //TODO 添加
+                        } else {
+                            val points = selected.points.toMutableList()
+                            points -= item
+                            uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
+                        }
                     }
                 },
-                onPointChange = { point ->
-                    scope.launch {
-                        val points = selected.points.toMutableList()
-                        points[points.indexOf(item)] = point
-                        uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
-                    }
+            ) { point ->
+                scope.launch {
+                    val points = selected.points.toMutableList()
+                    points[points.indexOf(item)] = point
+                    uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
                 }
-            )
+            }
         }
     }
 }

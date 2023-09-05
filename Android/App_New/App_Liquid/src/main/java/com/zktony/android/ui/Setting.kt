@@ -444,14 +444,14 @@ fun MotorDetail(
 
     val colors = TextFieldDefaults.colors(
         unfocusedIndicatorColor = Color.Transparent,
-        focusedIndicatorColor = Color.Transparent,
+        focusedIndicatorColor = Color.Transparent
     )
 
     val textStyle = TextStyle(
         fontStyle = FontStyle.Italic,
         fontWeight = FontWeight.Bold,
         fontSize = 20.sp,
-        fontFamily = FontFamily.Monospace,
+        fontFamily = FontFamily.Monospace
     )
 
     LazyColumn(

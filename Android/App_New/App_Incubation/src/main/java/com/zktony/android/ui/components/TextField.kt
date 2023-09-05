@@ -78,6 +78,52 @@ fun CircleTextField(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun SquareTextField(
+    modifier: Modifier = Modifier,
+    title: String,
+    value: String,
+    keyboardType: KeyboardType = KeyboardType.Decimal,
+    trailingIcon: @Composable (() -> Unit)?,
+    onValueChange: (String) -> Unit = {}
+) {
+    val softKeyboard = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
+    TextField(
+        modifier = modifier.fillMaxWidth(),
+        value = TextFieldValue(value, TextRange(value.length)),
+        onValueChange = {
+            onValueChange(it.text)
+        },
+        leadingIcon = {
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                text = title,
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
+        trailingIcon = trailingIcon,
+        keyboardOptions = KeyboardOptions(
+            keyboardType = keyboardType,
+            imeAction = ImeAction.Done,
+        ),
+        keyboardActions = KeyboardActions(
+            onDone = {
+                softKeyboard?.hide()
+                focusManager.clearFocus()
+            }
+        ),
+        shape = MaterialTheme.shapes.small,
+        colors = TextFieldDefaults.colors(
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+        ),
+        textStyle = MaterialTheme.typography.titleMedium
+    )
+}
+
 @Preview
 @Composable
 fun CircleTextFieldPreview() {

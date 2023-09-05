@@ -8,6 +8,7 @@ import androidx.paging.cachedIn
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.extra.serial
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -63,6 +64,15 @@ class CalibrationViewModel @Inject constructor(
 
             is CalibrationUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
             is CalibrationUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.calibration) }
+            is CalibrationUiEvent.AddLiquid -> addLiquid(uiEvent.index, uiEvent.step)
+        }
+    }
+
+    private fun addLiquid(index: Int, step: Long) {
+        viewModelScope.launch {
+            _uiFlags.value = 1
+            serial { start(index + 2, step) }
+            _uiFlags.value = 0
         }
     }
 }
@@ -79,4 +89,5 @@ sealed class CalibrationUiEvent {
     data class Insert(val displayText: String) : CalibrationUiEvent()
     data class Delete(val id: Long) : CalibrationUiEvent()
     data class Update(val calibration: Calibration) : CalibrationUiEvent()
+    data class AddLiquid(val index: Int, val step: Long) : CalibrationUiEvent()
 }

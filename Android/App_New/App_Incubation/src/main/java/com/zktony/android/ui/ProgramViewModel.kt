@@ -50,16 +50,15 @@ class ProgramViewModel @Inject constructor(
     }
 
 
-    fun uiEvent(event: ProgramUiEvent) {
-        when (event) {
-            is ProgramUiEvent.NavTo -> _page.value = event.page
-            is ProgramUiEvent.ToggleSelected -> _selected.value = event.id
-            is ProgramUiEvent.Insert -> viewModelScope.launch { dao.insert(Program(displayText = event.name)) }
-            is ProgramUiEvent.Update -> viewModelScope.launch { dao.update(event.program) }
-            is ProgramUiEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
+    fun uiEvent(uiEvent: ProgramUiEvent) {
+        when (uiEvent) {
+            is ProgramUiEvent.NavTo -> _page.value = uiEvent.page
+            is ProgramUiEvent.ToggleSelected -> _selected.value = uiEvent.id
+            is ProgramUiEvent.Insert -> viewModelScope.launch { dao.insert(Program(displayText = uiEvent.name)) }
+            is ProgramUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.program) }
+            is ProgramUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
         }
     }
-
 }
 
 data class ProgramUiState(
