@@ -8,9 +8,9 @@ import java.util.concurrent.ConcurrentHashMap
  */
 data class AppState(
     /**
-     * 阀门状态
+     * 阀门通道
      */
-    val hpv: MutableMap<Int, Boolean> = ConcurrentHashMap(),
+    val hpv: MutableMap<Int, Int> = ConcurrentHashMap(),
     /**
      * 绝对位置
      */
@@ -18,5 +18,9 @@ data class AppState(
     /**
      * 校准函数
      */
-    val hpc: MutableMap<Int, (Double) -> Double?> = ConcurrentHashMap()
+    val hpc: MutableMap<Int, (Double) -> Double?> = ConcurrentHashMap(),
+    /**
+     * 温度
+     */
+    val hpt: MutableMap<Int, Double> = ConcurrentHashMap()
 )

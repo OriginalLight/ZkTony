@@ -1,10 +1,7 @@
 package com.zktony.android.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Analytics
-import androidx.compose.material.icons.outlined.History
-import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material.icons.outlined.Terminal
+import androidx.compose.material.icons.outlined.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -15,6 +12,7 @@ object Route {
     const val PROGRAM = "Program"
     const val CALIBRATION = "Calibration"
     const val HISTORY = "History"
+    const val DEBUG = "Debug"
     const val SETTING = "Setting"
     const val SPLASH = "Splash"
 }
@@ -68,6 +66,11 @@ val TOP_LEVEL_DESTINATIONS = listOf(
         route = Route.HISTORY,
         icon = Icons.Outlined.History,
         iconTextId = R.string.history
+    ),
+    TopLevelDestination(
+        route = Route.DEBUG,
+        icon = Icons.Outlined.Checklist,
+        iconTextId = R.string.debug
     ),
     TopLevelDestination(
         route = Route.SETTING,

@@ -36,6 +36,7 @@ fun AppNavigation(
             composable(Route.PROGRAM) { ProgramRoute(viewModel = hiltViewModel()) }
             composable(Route.CALIBRATION) { CalibrationRoute(viewModel = hiltViewModel()) }
             composable(Route.HISTORY) { HistoryRoute(viewModel = hiltViewModel()) }
+            composable(Route.DEBUG) { DebugRoute(viewModel = hiltViewModel()) }
             composable(Route.SETTING) { SettingRoute(viewModel = hiltViewModel()) }
         }
     }

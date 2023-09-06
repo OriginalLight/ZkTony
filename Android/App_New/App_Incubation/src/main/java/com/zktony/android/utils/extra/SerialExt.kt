@@ -41,17 +41,17 @@ val serialHelper = object : AbstractSerialHelper(SerialConfig(device = "/dev/tty
         if (byteArray[0] == 0xCC.toByte()) {
             val rx = byteArray.toRunzeProtocol()
             when (rx.funcCode) {
-                0x00.toByte() -> {}
+                0x00.toByte() -> {
+                    appState.hpv[rx.slaveAddr.toInt()] = rx.data[0].toInt()
+                }
+
                 0x01.toByte() -> throw Exception("帧错误")
                 0x02.toByte() -> throw Exception("参数错误")
                 0x03.toByte() -> throw Exception("光耦错误")
                 0x04.toByte() -> throw Exception("电机忙")
                 0x05.toByte() -> throw Exception("电机堵转")
                 0x06.toByte() -> throw Exception("未知位置")
-                0xFE.toByte() -> {
-                    appState.hpv[rx.slaveAddr.toInt()] = false
-                }
-
+                0xFE.toByte() -> throw Exception("任务挂起")
                 0xFF.toByte() -> throw Exception("未知错误")
                 else -> {}
             }
@@ -78,14 +78,19 @@ fun sendRtuProtocol(block: RtuProtocol.() -> Unit) =
 
 suspend fun valve(slaveAddr: Int, channel: Int, timeOut: Long = 1000L * 20) {
     withTimeout(timeOut) {
-        appState.hpv[slaveAddr] = true
+        appState.hpv[slaveAddr] = 0
         sendRunzeProtocol {
             this.slaveAddr = slaveAddr.toByte()
             funcCode = 0x44
             data = byteArrayOf(channel.toByte(), 0x00)
         }
-        while (appState.hpv[slaveAddr] == true) {
-            delay(10L)
+        while (appState.hpv[slaveAddr] != channel) {
+            delay(200L)
+            sendRunzeProtocol {
+                this.slaveAddr = slaveAddr.toByte()
+                funcCode = 0x3E
+                data = byteArrayOf(0x00, 0x00)
+            }
         }
     }
 }

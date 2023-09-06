@@ -524,3 +524,41 @@ fun HistoryAppBar(
         }
     )
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DebugAppBar(navigation: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.small,
+                    )
+                    .padding(horizontal = 32.dp, vertical = 4.dp),
+                text = stringResource(id = R.string.debug),
+                style = MaterialTheme.typography.headlineSmall
+            )
+        },
+        actions = {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = CircleShape
+                    )
+                    .padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ElevatedButton(onClick = navigation) {
+                    Icon(
+                        imageVector = Icons.Default.Reply,
+                        contentDescription = null
+                    )
+                }
+            }
+        }
+    )
+}

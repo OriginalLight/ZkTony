@@ -45,4 +45,5 @@
     <string name="up">Up</string>
     <string name="down">Down</string>
     <string name="add">Add</string>
+    <string name="debug">Debug</string>
 </resources>

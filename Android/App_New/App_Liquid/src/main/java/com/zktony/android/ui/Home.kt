@@ -85,7 +85,7 @@ fun HomeScreen(
         AnimatedContent(targetState = uiState.page) {
             when (uiState.page) {
                 PageType.PROGRAM_LIST -> ProgramList(entities, uiState, uiEvent)
-                PageType.HOME -> JobContent(entities, uiState, uiEvent)
+                PageType.HOME -> JobContent(entities.toList(), uiState, uiEvent)
                 else -> {}
             }
         }
@@ -262,7 +262,7 @@ fun ProgramList(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun JobContent(
-    entities: LazyPagingItems<Program>,
+    entities: List<Program>,
     uiState: HomeUiState,
     uiEvent: (HomeUiEvent) -> Unit
 ) {
@@ -273,23 +273,15 @@ fun JobContent(
         mutableStateOf(uiState.jobState.orificePlate.getInfo())
     }
 
-    LaunchedEffect(key1 = entities.itemSnapshotList.items) {
-        if (entities.itemSnapshotList.items.isEmpty()) {
+    LaunchedEffect(key1 = entities) {
+        if (entities.isEmpty()) {
             uiEvent(HomeUiEvent.ToggleSelected(0L))
         } else {
             if (uiState.selected == 0L) {
-                uiEvent(
-                    HomeUiEvent.ToggleSelected(
-                        entities.itemSnapshotList.items.getOrNull(0)?.id ?: 0L
-                    )
-                )
+                uiEvent(HomeUiEvent.ToggleSelected(entities.getOrNull(0)?.id ?: 0L))
             } else {
-                if (!entities.itemSnapshotList.items.any { it.id == uiState.selected }) {
-                    uiEvent(
-                        HomeUiEvent.ToggleSelected(
-                            entities.itemSnapshotList.items.getOrNull(0)?.id ?: 0L
-                        )
-                    )
+                if (!entities.any { it.id == uiState.selected }) {
+                    uiEvent(HomeUiEvent.ToggleSelected(entities.getOrNull(0)?.id ?: 0L))
                 }
             }
         }
@@ -317,7 +309,7 @@ fun JobContent(
                         .clickable {
                             scope.launch {
                                 if (uiState.jobState.status == 0) {
-                                    if (entities.itemSnapshotList.items.isNotEmpty()) {
+                                    if (entities.isNotEmpty()) {
                                         uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
                                     } else {
                                         navigationActions.navigate(Route.PROGRAM)
@@ -327,9 +319,7 @@ fun JobContent(
                         }
                         .padding(horizontal = 32.dp, vertical = 4.dp)
                 ) {
-                    val selected =
-                        entities.itemSnapshotList.items.find { it.id == uiState.selected }
-                            ?: Program()
+                    val selected = entities.find { it.id == uiState.selected } ?: Program()
                     Text(
                         text = selected.displayText,
                         style = TextStyle(

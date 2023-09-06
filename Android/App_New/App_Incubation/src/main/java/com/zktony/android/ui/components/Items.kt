@@ -38,13 +38,12 @@ import com.zktony.android.data.entities.Calibration
 import com.zktony.android.data.entities.History
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.Program
-import com.zktony.android.data.entities.internal.Log
-import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.data.entities.internal.ProcessType
-import com.zktony.android.ui.utils.randomColor
+import com.zktony.android.data.entities.internal.*
+import com.zktony.android.ui.HomeUiState
+import com.zktony.android.ui.JobState
 import com.zktony.android.ui.utils.selectedColor
 import com.zktony.android.utils.extra.dateFormat
+import com.zktony.android.utils.extra.timeFormat
 import kotlinx.coroutines.launch
 
 /**
@@ -512,6 +511,99 @@ fun ProcessItem(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun ProcessItem(item: Process) {
+
+    val displayText = when (item.type) {
+        ProcessType.BLOCKING -> stringResource(id = R.string.blocking)
+        ProcessType.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
+        ProcessType.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
+        ProcessType.WASHING -> stringResource(id = R.string.washing)
+        ProcessType.PHOSPHATE_BUFFERED_SALINE -> stringResource(id = R.string.phosphate_buffered_saline)
+    }
+
+    val info: List<String> = mutableListOf<String>().apply {
+        add("${item.temperature} ℃")
+        add("${item.dosage} μL")
+        add("${item.duration} ${if (item.type == ProcessType.WASHING) "Min" else "Hour"}")
+
+        if (item.type == ProcessType.PRIMARY_ANTIBODY) {
+            add("${'@' + item.origin}")
+            add(if (item.recycle) "Recycle" else "No Recycle")
+        }
+
+        if (item.type == ProcessType.SECONDARY_ANTIBODY) {
+            add("${'@' + item.origin}")
+        }
+
+        if (item.type == ProcessType.WASHING) {
+            add("${item.times} Cycle")
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = MaterialTheme.shapes.small
+            )
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = displayText,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.surface,
+                        shape = MaterialTheme.shapes.small
+                    )
+                    .padding(vertical = 4.dp, horizontal = 8.dp),
+                text = when (item.status) {
+                    ProcessStatus.UPCOMING -> "未开始"
+                    ProcessStatus.RUNNING -> "进行中"
+                    ProcessStatus.FINISHED -> "已完成"
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = when (item.status) {
+                    ProcessStatus.UPCOMING -> Color.Gray
+                    ProcessStatus.RUNNING -> Color.Green
+                    ProcessStatus.FINISHED -> Color.Blue
+                }
+            )
+        }
+        Divider()
+        FlowRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+        ) {
+            info.forEach { text ->
+                Text(
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = MaterialTheme.shapes.small
+                        )
+                        .padding(vertical = 4.dp, horizontal = 8.dp),
+                    text = text,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MotorItem(
@@ -562,24 +654,39 @@ fun MotorItem(
 @Composable
 fun ModuleItem(
     index: Int,
-    selected: Boolean,
+    uiState: HomeUiState,
+    selected: Int,
+    onClick: () -> Unit
 ) {
+    val jobState = uiState.jobList.find { it.index == index } ?: JobState()
+
     Box {
         Column(
             modifier = Modifier
                 .sizeIn(minWidth = 196.dp, minHeight = 96.dp)
                 .background(
-                    color = selectedColor(selected),
+                    color = selectedColor(index == selected),
                     shape = MaterialTheme.shapes.small
                 )
                 .clip(MaterialTheme.shapes.small)
-                .clickable { },
-            verticalArrangement = Arrangement.Center,
+                .clickable { onClick() }
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Bottom,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            val message = when (jobState.status) {
+                0 -> "已就绪"
+                1 -> jobState.time.timeFormat()
+                2 -> "已暂停"
+                3 -> "已完成"
+                4 -> "等待中"
+                else -> "未知"
+            }
+
             Text(
-                text = "${'A' + index}",
-                style = MaterialTheme.typography.headlineLarge,
+                text = message,
+                style = MaterialTheme.typography.headlineSmall,
                 fontStyle = FontStyle.Italic
             )
         }
@@ -597,8 +704,22 @@ fun ModuleItem(
             style = TextStyle(
                 fontSize = 64.sp,
                 fontStyle = FontStyle.Italic,
-                color = randomColor()
+                color = if (index == selected) Color.Blue else Color.Black
             )
+        )
+
+        Text(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .offset {
+                    IntOffset(
+                        x = -8.dp.roundToPx(),
+                        y = 4.dp.roundToPx()
+                    )
+                },
+            text = "${jobState.temperature} ℃",
+            style = MaterialTheme.typography.bodyMedium,
+            fontStyle = FontStyle.Italic
         )
     }
 }
