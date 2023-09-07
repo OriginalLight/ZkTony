@@ -15,10 +15,8 @@ import kotlinx.coroutines.withTimeout
  */
 val serialport = object : AbstractSerialHelper(SerialConfig()) {
 
-    val protocol = Protocol()
-
     override fun callbackHandler(byteArray: ByteArray) {
-        protocol.callbackHandler(byteArray) { code, rx ->
+        Protocol.Protocol.callbackHandler(byteArray) { code, rx ->
             when (code) {
                 Protocol.AXIS -> {
                     for (i in 0 until rx.data.size / 2) {

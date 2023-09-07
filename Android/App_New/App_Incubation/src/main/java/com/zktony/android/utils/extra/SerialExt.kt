@@ -1,39 +1,40 @@
 package com.zktony.android.utils.extra
 
 import com.zktony.serialport.AbstractSerialHelper
+import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.command.modbus.RtuProtocol
 import com.zktony.serialport.command.runze.RunzeProtocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
+import java.lang.Math.random
 
 /**
  * 串口通信
  */
-val serialHelper = object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS3")) {
-
-    val rtuProtocol = RtuProtocol()
-    val runzeProtocol = RunzeProtocol()
-
+val serialPV = object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS3")) {
     override fun callbackHandler(byteArray: ByteArray) {
-        // 解析协议
         if (byteArray[0] == 0xCC.toByte()) {
-            runzeProtocol.callbackHandler(byteArray) { code, rx ->
+            RunzeProtocol.Protocol.callbackHandler(byteArray) { code, rx ->
                 when (code) {
                     RunzeProtocol.CHANNEL -> {
                         appState.hpv[rx.slaveAddr.toInt()] = rx.data[0].toInt()
                     }
+
+                    else -> {}
                 }
             }
         } else {
-            rtuProtocol.callbackHandler(byteArray) { code, rx ->
+            RtuProtocol.Protocol.callbackHandler(byteArray) { code, rx ->
                 when (code) {
                     RtuProtocol.LOCATION -> {
                         val height = rx.data.copyOfRange(3, 5)
                         val low = rx.data.copyOfRange(1, 3)
                         appState.hpp[rx.slaveAddr.toInt() - 1] = height.plus(low).readInt32BE()
                     }
+
+                    else -> {}
                 }
             }
         }
@@ -41,10 +42,10 @@ val serialHelper = object : AbstractSerialHelper(SerialConfig(device = "/dev/tty
 }
 
 inline fun sendRunzeProtocol(block: RunzeProtocol.() -> Unit) =
-    serialHelper.sendByteArray(RunzeProtocol().apply(block).toByteArray())
+    serialPV.sendByteArray(RunzeProtocol().apply(block).toByteArray())
 
 inline fun sendRtuProtocol(block: RtuProtocol.() -> Unit) =
-    serialHelper.sendByteArray(RtuProtocol().apply(block).toByteArray())
+    serialPV.sendByteArray(RtuProtocol().apply(block).toByteArray())
 
 /**
  * 读取寄存器

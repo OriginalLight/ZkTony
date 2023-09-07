@@ -1,6 +1,5 @@
 package com.zktony.serialport
 
-import android.os.Message
 import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.ascii2ByteArray
@@ -17,14 +16,6 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
     init {
         // Open the serial port
         openDevice(config)
-        // register callback
-        callback = {
-            try {
-                callbackHandler(it)
-            } catch (ex: Exception) {
-                Log.e(TAG, "Callback Exception: ${ex.message}")
-            }
-        }
     }
 
     /**
@@ -56,9 +47,7 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      * @param bytes byte data
      */
     fun sendByteArray(bytes: ByteArray) {
-        val msg = Message.obtain()
-        msg.obj = bytes
-        addWaitMessage(msg)
+        addWaitMessage(bytes)
     }
 
     /**
@@ -67,9 +56,7 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      * @param hex String
      */
     fun sendHexString(hex: String) {
-        val msg = Message.obtain()
-        msg.obj = hex.hex2ByteArray()
-        addWaitMessage(msg)
+        addWaitMessage(hex.hex2ByteArray())
     }
 
     /**
@@ -78,19 +65,12 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      * @param ascii String
      */
     fun sendAsciiString(ascii: String) {
-        val msg = Message.obtain()
-        msg.obj = ascii.ascii2ByteArray(true)
-        addWaitMessage(msg)
+        addWaitMessage(ascii.ascii2ByteArray(true))
     }
 
-    /**
-     * Callback verify
-     * 包括分包、crc校验等
-     *
-     * @param byteArray ByteArray
-     */
-    @Throws(Exception::class)
-    abstract fun callbackHandler(byteArray: ByteArray)
+    override fun exceptionHandler(e: Exception) {
+        Log.e(TAG, "Exception: ${e.message}")
+    }
 
 
     companion object {

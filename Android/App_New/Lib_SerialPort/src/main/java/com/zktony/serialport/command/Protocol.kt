@@ -63,7 +63,7 @@ class Protocol : BaseProtocol<Protocol> {
         )
     }
 
-    override fun toProtocol(byteArray: ByteArray): Protocol {
+    override fun toProtocol(byteArray: ByteArray) {
         head = byteArray[0]
         addr = byteArray[1]
         func = byteArray[2]
@@ -71,7 +71,6 @@ class Protocol : BaseProtocol<Protocol> {
         data = byteArray.copyOfRange(5, byteArray.size - 6)
         crc = byteArray.copyOfRange(byteArray.size - 6, byteArray.size - 4)
         end = byteArray.copyOfRange(byteArray.size - 4, byteArray.size)
-        return this
     }
 
     override fun callbackHandler(byteArray: ByteArray, block: (Int, Protocol) -> Unit) {
@@ -81,58 +80,62 @@ class Protocol : BaseProtocol<Protocol> {
         }
 
         // 分包处理
-        val expectHead = byteArrayOf(0xEE.toByte())
-        val expectEnd = byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
-        byteArray.splitByteArray(expectHead, expectEnd).forEach { packet ->
+        byteArray.splitByteArray(expectHead, expectEnd).forEach { pkg ->
             // 验证包头和包尾
-            val head = packet.copyOfRange(0, 1)
+            val head = pkg.copyOfRange(0, 1)
             if (!head.contentEquals(expectHead)) {
                 throw Exception("RX Header Error")
             }
-            val end = packet.copyOfRange(packet.size - 4, packet.size)
+            val end = pkg.copyOfRange(pkg.size - 4, pkg.size)
             if (!end.contentEquals(expectEnd)) {
                 throw Exception("RX End Error")
             }
 
             // crc 校验
-            val crc = packet.copyOfRange(packet.size - 6, packet.size - 4)
-            val bytes = packet.copyOfRange(0, packet.size - 6)
+            val crc = pkg.copyOfRange(pkg.size - 6, pkg.size - 4)
+            val bytes = pkg.copyOfRange(0, pkg.size - 6)
             if (!bytes.crc16LE().contentEquals(crc)) {
                 throw Exception("RX Crc Error")
             }
 
-            // 校验通过
             // 解析协议
-            val rx = toProtocol(packet)
+            toProtocol(pkg)
 
             // 处理地址为 0x02 的数据包
-            if (rx.addr == 0x02.toByte()) {
-                when (rx.func) {
-                    // 处理轴状态数据
-                    0x01.toByte() -> {
-                        block(AXIS, rx)
-                    }
-                    // 处理 GPIO 状态数据
-                    0x02.toByte() -> {
-                        block(GPIO, rx)
-                    }
-                    // 处理错误信息
-                    0xFF.toByte() -> {
-                        when (rx.data.readInt16LE()) {
-                            1 -> throw Exception("TX Header Error")
-                            2 -> throw Exception("TX Addr Error")
-                            3 -> throw Exception("TX Crc Error")
-                            4 -> throw Exception("TX No Com")
-                        }
+            when (func) {
+                // 处理轴状态数据
+                0x01.toByte() -> {
+                    block(AXIS, this)
+                }
+                // 处理 GPIO 状态数据
+                0x02.toByte() -> {
+                    block(GPIO, this)
+                }
+                // 处理错误信息
+                0xFF.toByte() -> {
+                    when (data.readInt16LE()) {
+                        1 -> throw Exception("TX Header Error")
+                        2 -> throw Exception("TX Addr Error")
+                        3 -> throw Exception("TX Crc Error")
+                        4 -> throw Exception("TX No Com")
                     }
                 }
+
+                else -> {}
             }
 
         }
     }
 
     companion object {
-        const val AXIS = 0
-        const val GPIO = 1
+        const val AXIS = 1
+        const val GPIO = 2
+
+        // 协议包头和包尾
+        val expectHead = byteArrayOf(0xEE.toByte())
+        val expectEnd = byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
+
+        // 单例 Protocol 协议 用于返回
+        val Protocol: Protocol by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { Protocol() }
     }
 }
