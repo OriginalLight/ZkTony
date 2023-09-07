@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -27,7 +26,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.data.entities.internal.ProcessType
 import com.zktony.android.ui.components.ProcessItem
 import com.zktony.android.ui.components.ProgramAppBar
 import com.zktony.android.ui.components.ProgramItem
@@ -65,7 +63,7 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
         }
     }
 
-    ProgramScreen(
+    ProgramWrapper(
         entities = entities,
         uiState = uiState,
         uiEvent = viewModel::uiEvent,
@@ -76,7 +74,7 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun ProgramScreen(
+fun ProgramWrapper(
     entities: LazyPagingItems<Program>,
     uiState: ProgramUiState,
     uiEvent: (ProgramUiEvent) -> Unit,
@@ -140,7 +138,8 @@ fun ProgramDetail(
 ) {
     val scope = rememberCoroutineScope()
     val selected = entities.find { it.id == uiState.selected } ?: Program()
-    var selectedIndex by remember { mutableIntStateOf(0) }
+    val selectedIndex = remember { mutableIntStateOf(0) }
+    val process = selected.processes.getOrNull(selectedIndex.intValue)
 
     Row(
         modifier = Modifier.padding(16.dp),
@@ -153,12 +152,12 @@ fun ProgramDetail(
             itemsIndexed(selected.processes) { index, item ->
                 ProcessItem(
                     item = item,
-                    selected = index == selectedIndex
+                    selected = index == selectedIndex.intValue
                 ) { func ->
                     scope.launch {
                         when (func) {
                             0 -> {
-                                selectedIndex = index
+                                selectedIndex.intValue = index
                             }
 
                             1, 2 -> {
@@ -191,19 +190,20 @@ fun ProgramDetail(
             }
         }
 
-        selected.processes.getOrNull(selectedIndex)?.let { process ->
+        if (process != null) {
             ProgramForm(
                 modifier = Modifier.fillMaxWidth(),
-                key = selectedIndex,
+                key = selectedIndex.intValue,
                 process = process
             ) { p ->
                 scope.launch {
                     val processes = selected.processes.toMutableList()
-                    processes[selectedIndex] = p
+                    processes[selectedIndex.intValue] = p
                     uiEvent(ProgramUiEvent.Update(selected.copy(processes = processes)))
                 }
             }
         }
+
     }
 }
 
@@ -228,13 +228,15 @@ fun ProgramForm(
         modifier = modifier.windowInsetsPadding(WindowInsets.imeAnimationSource),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        val displayText: @Composable (ProcessType) -> String = {
+
+        val displayText: @Composable (Int) -> String = {
             when (it) {
-                ProcessType.BLOCKING -> stringResource(id = R.string.blocking)
-                ProcessType.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
-                ProcessType.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
-                ProcessType.WASHING -> stringResource(id = R.string.washing)
-                ProcessType.PHOSPHATE_BUFFERED_SALINE -> stringResource(id = R.string.phosphate_buffered_saline)
+                Process.BLOCKING -> stringResource(id = R.string.blocking)
+                Process.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
+                Process.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
+                Process.WASHING -> stringResource(id = R.string.washing)
+                Process.PHOSPHATE_BUFFERED_SALINE -> stringResource(id = R.string.phosphate_buffered_saline)
+                else -> ""
             }
         }
 
@@ -264,7 +266,7 @@ fun ProgramForm(
         }
 
         if (typeExpand) {
-            items(ProcessType.values()) { type ->
+            items(count = 5) { type ->
                 Row(
                     modifier = Modifier
                         .padding(start = 32.dp)
@@ -320,7 +322,7 @@ fun ProgramForm(
                 trailingIcon = {
                     Text(
                         modifier = Modifier.padding(end = 16.dp),
-                        text = if (process.type == ProcessType.WASHING) "Min" else "Hour",
+                        text = if (process.type == Process.WASHING) "Min" else "Hour",
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
@@ -340,7 +342,7 @@ fun ProgramForm(
                 title = "液量",
                 value = dosage,
                 trailingIcon = {
-                    if (process.type == ProcessType.PRIMARY_ANTIBODY || process.type == ProcessType.SECONDARY_ANTIBODY) {
+                    if (process.type == Process.PRIMARY_ANTIBODY || process.type == Process.SECONDARY_ANTIBODY) {
                         Text(
                             modifier = Modifier
                                 .padding(end = 16.dp)
@@ -379,7 +381,7 @@ fun ProgramForm(
             }
         }
 
-        if (process.type == ProcessType.PRIMARY_ANTIBODY || process.type == ProcessType.SECONDARY_ANTIBODY) {
+        if (process.type == Process.PRIMARY_ANTIBODY || process.type == Process.SECONDARY_ANTIBODY) {
             item {
                 Row(
                     modifier = Modifier
@@ -409,7 +411,7 @@ fun ProgramForm(
             }
         }
 
-        if (process.type == ProcessType.WASHING) {
+        if (process.type == Process.WASHING) {
             item {
                 SquareTextField(
                     title = "次数",

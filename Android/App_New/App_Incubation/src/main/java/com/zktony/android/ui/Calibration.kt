@@ -77,7 +77,7 @@ fun CalibrationRoute(viewModel: CalibrationViewModel) {
         }
     }
 
-    CalibrationScreen(
+    CalibrationWrapper(
         entities = entities,
         uiState = uiState,
         uiEvent = viewModel::uiEvent,
@@ -87,7 +87,7 @@ fun CalibrationRoute(viewModel: CalibrationViewModel) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun CalibrationScreen(
+fun CalibrationWrapper(
     entities: LazyPagingItems<Calibration>,
     uiState: CalibrationUiState,
     uiEvent: (CalibrationUiEvent) -> Unit,

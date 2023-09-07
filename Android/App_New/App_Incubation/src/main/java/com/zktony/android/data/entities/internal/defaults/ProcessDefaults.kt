@@ -1,8 +1,6 @@
 package com.zktony.android.data.entities.internal.defaults
 
 import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.data.entities.internal.ProcessStatus
-import com.zktony.android.data.entities.internal.ProcessType
 
 /**
  * @author 刘贺贺
@@ -11,57 +9,57 @@ import com.zktony.android.data.entities.internal.ProcessType
 object ProcessDefaults {
 
     fun defaultBlocking() = Process(
-        type = ProcessType.BLOCKING,
+        type = Process.BLOCKING,
         duration = 1.0,
         temperature = 37.0,
         dosage = 8000.0,
         recycle = false,
         origin = 0,
         times = 0,
-        status = ProcessStatus.UPCOMING
+        status = Process.UPCOMING
     )
 
     fun defaultPrimaryAntibody() = Process(
-        type = ProcessType.PRIMARY_ANTIBODY,
+        type = Process.PRIMARY_ANTIBODY,
         duration = 12.0,
         temperature = 4.0,
         dosage = 8000.0,
         recycle = true,
         origin = 0,
         times = 0,
-        status = ProcessStatus.UPCOMING
+        status = Process.UPCOMING
     )
 
     fun defaultSecondaryAntibody() = Process(
-        type = ProcessType.SECONDARY_ANTIBODY,
+        type = Process.SECONDARY_ANTIBODY,
         duration = 1.0,
         temperature = 37.0,
         dosage = 8000.0,
         recycle = false,
         origin = 0,
         times = 0,
-        status = ProcessStatus.UPCOMING
+        status = Process.UPCOMING
     )
 
     fun defaultWashing() = Process(
-        type = ProcessType.WASHING,
+        type = Process.WASHING,
         duration = 5.0,
         temperature = 37.0,
         dosage = 8000.0,
         recycle = false,
         origin = 0,
         times = 3,
-        status = ProcessStatus.UPCOMING
+        status = Process.UPCOMING
     )
 
     fun defaultPhosphateBufferedSaline() = Process(
-        type = ProcessType.PHOSPHATE_BUFFERED_SALINE,
+        type = Process.PHOSPHATE_BUFFERED_SALINE,
         duration = 0.0,
         temperature = 37.0,
         dosage = 8000.0,
         recycle = false,
         origin = 0,
         times = 0,
-        status = ProcessStatus.UPCOMING
+        status = Process.UPCOMING
     )
 }

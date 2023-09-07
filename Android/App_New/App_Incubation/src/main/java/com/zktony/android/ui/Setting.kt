@@ -85,15 +85,19 @@ fun SettingRoute(viewModel: SettingViewModel) {
         }
     }
 
-    SettingScreen(
-        uiState = uiState, uiEvent = viewModel::uiEvent, navigation = navigation
+    SettingWrapper(
+        uiState = uiState,
+        uiEvent = viewModel::uiEvent,
+        navigation = navigation
     )
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SettingScreen(
-    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit, navigation: () -> Unit
+fun SettingWrapper(
+    uiState: SettingUiState,
+    uiEvent: (SettingUiEvent) -> Unit,
+    navigation: () -> Unit
 ) {
     Column {
         SettingsAppBar(uiState, uiEvent) { navigation() }
@@ -112,7 +116,8 @@ fun SettingScreen(
 
 @Composable
 fun SettingContent(
-    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
+    uiState: SettingUiState,
+    uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -425,11 +430,13 @@ fun MotorList(
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun MotorDetail(
-    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
+    uiState: SettingUiState,
+    uiEvent: (SettingUiEvent) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
+    val snackbarHostState = LocalSnackbarHostState.current
     val selected = uiState.entities.find { it.id == uiState.selected } ?: Motor()
     var ads by remember { mutableStateOf(selected.toAdsString()) }
     var index by remember { mutableStateOf(selected.index.toString()) }
@@ -483,8 +490,18 @@ fun MotorDetail(
                         )
                     }
                 },
-                suffix = {
-                    Text(text = "电机编号", style = textStyle)
+                trailingIcon = {
+                    ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
+                        scope.launch {
+                            snackbarHostState.showSnackbar(message = "已设置当前位置为原点")
+                            writeRegister(selected.index, 210, 0L)
+                            delay(500L)
+                            writeRegister(selected.index, 220, 1)
+                            appState.hpp[selected.index] = 0
+                        }
+                    }) {
+                        Icon(imageVector = Icons.Default.Settings, contentDescription = null)
+                    }
                 },
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
@@ -518,6 +535,7 @@ fun MotorDetail(
                 trailingIcon = {
                     ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         scope.launch {
+                            snackbarHostState.showSnackbar(message = "已下载加速时间")
                             writeRegister(selected.index, 152, selected.acceleration.toInt())
                             delay(500L)
                             writeRegister(selected.index, 220, 1)
@@ -560,6 +578,7 @@ fun MotorDetail(
                 trailingIcon = {
                     ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         scope.launch {
+                            snackbarHostState.showSnackbar(message = "已下载减速时间")
                             writeRegister(selected.index, 153, selected.deceleration.toInt())
                             delay(500L)
                             writeRegister(selected.index, 220, 1)
@@ -602,6 +621,7 @@ fun MotorDetail(
                 trailingIcon = {
                     ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         scope.launch {
+                            snackbarHostState.showSnackbar(message = "已下载最大运行速度")
                             writeRegister(selected.index, 154, selected.speed.toInt())
                             delay(500L)
                             writeRegister(selected.index, 220, 1)

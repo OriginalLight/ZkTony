@@ -149,14 +149,14 @@ data class SettingUiState(
     val entities: List<Motor> = emptyList(),
     val selected: Long = 0,
     val progress: Int = 0,
-    val page: PageType = PageType.SETTINGS
+    val page: Int = PageType.SETTINGS
 )
 
 sealed class SettingUiEvent {
     data object Network : SettingUiEvent()
     data object CheckUpdate : SettingUiEvent()
     data object Insert : SettingUiEvent()
-    data class NavTo(val page: PageType) : SettingUiEvent()
+    data class NavTo(val page: Int) : SettingUiEvent()
     data class Navigation(val navigation: Boolean) : SettingUiEvent()
     data class ToggleSelected(val id: Long) : SettingUiEvent()
     data class Update(val entity: Motor) : SettingUiEvent()

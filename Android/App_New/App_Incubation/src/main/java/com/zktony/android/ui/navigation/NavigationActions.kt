@@ -59,7 +59,7 @@ val TOP_LEVEL_DESTINATIONS = listOf(
     ),
     TopLevelDestination(
         route = Route.CALIBRATION,
-        icon = Icons.Outlined.Analytics,
+        icon = Icons.Outlined.Checklist,
         iconTextId = R.string.calibration
     ),
     TopLevelDestination(
@@ -69,7 +69,7 @@ val TOP_LEVEL_DESTINATIONS = listOf(
     ),
     TopLevelDestination(
         route = Route.DEBUG,
-        icon = Icons.Outlined.Checklist,
+        icon = Icons.Outlined.Analytics,
         iconTextId = R.string.debug
     ),
     TopLevelDestination(

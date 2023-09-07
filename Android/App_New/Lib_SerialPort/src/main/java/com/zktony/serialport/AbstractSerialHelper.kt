@@ -91,6 +91,7 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      *
      * @param byteArray ByteArray
      */
+    @Throws(Exception::class)
     abstract fun callbackVerify(byteArray: ByteArray, block: (ByteArray) -> Unit = {})
 
     /**
@@ -98,6 +99,7 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      *
      * @param byteArray ByteArray
      */
+    @Throws(Exception::class)
     abstract fun callbackProcess(byteArray: ByteArray)
 
     companion object {

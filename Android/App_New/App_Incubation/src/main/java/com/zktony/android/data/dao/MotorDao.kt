@@ -1,5 +1,6 @@
 package com.zktony.android.data.dao
 
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.zktony.android.data.entities.Motor
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,13 @@ abstract class MotorDao : BaseDao<Motor> {
     )
     abstract fun getAll(): Flow<List<Motor>>
 
+    @Query(
+        """
+        SELECT * FROM motor
+        ORDER BY createTime DESC
+        """
+    )
+    abstract fun getByPage(): PagingSource<Int, Motor>
 
     @Query(
         """

@@ -66,7 +66,7 @@ fun HomeRoute(viewModel: HomeViewModel) {
         }
     }
 
-    HomeScreen(
+    HomeWrapper(
         entities = entities,
         uiState = uiState,
         uiEvent = viewModel::uiEvent,
@@ -76,7 +76,7 @@ fun HomeRoute(viewModel: HomeViewModel) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun HomeScreen(
+fun HomeWrapper(
     entities: LazyPagingItems<Program>,
     uiState: HomeUiState,
     uiEvent: (HomeUiEvent) -> Unit,
@@ -182,9 +182,9 @@ fun HomeContent(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            if (jobState.status == 0) {
+            if (jobState.status == JobState.STOPPED) {
                 Card(
-                    enabled = uiState.uiFlags == 0 && jobState.processes.isNotEmpty(),
+                    enabled = uiState.uiFlags == UiFlags.NONE && jobState.processes.isNotEmpty(),
                     onClick = { uiEvent(HomeUiEvent.Start(uiState.selected)) }
                 ) {
                     Icon(
@@ -197,20 +197,20 @@ fun HomeContent(
             } else {
                 Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
                     Card(onClick = {
-                        if (jobState.status == 1) {
+                        if (jobState.status == JobState.RUNNING) {
                             uiEvent(HomeUiEvent.Pause(uiState.selected))
-                        } else if (jobState.status == 2) {
+                        } else if (jobState.status == JobState.PAUSED) {
                             uiEvent(HomeUiEvent.Start(uiState.selected))
                         }
                     }) {
-                        if (jobState.status == 1) {
+                        if (jobState.status == JobState.RUNNING) {
                             Icon(
                                 modifier = Modifier.size(128.dp),
                                 imageVector = Icons.Default.Pause,
                                 contentDescription = null,
                                 tint = Color.DarkGray
                             )
-                        } else if (jobState.status == 2) {
+                        } else if (jobState.status == JobState.PAUSED) {
                             Icon(
                                 modifier = Modifier.size(128.dp),
                                 imageVector = Icons.Default.PlayArrow,
@@ -264,7 +264,7 @@ fun HomeContent(
                             shape = MaterialTheme.shapes.small
                         )
                         .clip(MaterialTheme.shapes.small)
-                        .clickable { }
+                        .clickable { scope.launch { uiEvent(HomeUiEvent.Shaker) } }
                         .padding(vertical = 8.dp, horizontal = 16.dp),
                     text = if (uiState.common.shaker) "ON" else "OFF",
                     style = MaterialTheme.typography.titleMedium

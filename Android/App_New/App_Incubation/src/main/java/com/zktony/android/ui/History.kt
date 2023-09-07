@@ -60,7 +60,7 @@ fun HistoryRoute(viewModel: HistoryViewModel) {
         }
     }
 
-    HistoryScreen(
+    HistoryWrapper(
         entities = entities,
         uiState = uiState,
         uiEvent = viewModel::uiEvent,
@@ -70,7 +70,7 @@ fun HistoryRoute(viewModel: HistoryViewModel) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun HistoryScreen(
+fun HistoryWrapper(
     entities: LazyPagingItems<History>,
     uiState: HistoryUiState,
     uiEvent: (HistoryUiEvent) -> Unit,

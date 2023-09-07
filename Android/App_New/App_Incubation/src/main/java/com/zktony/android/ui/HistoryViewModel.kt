@@ -7,6 +7,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.zktony.android.data.dao.HistoryDao
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,7 +27,7 @@ class HistoryViewModel @Inject constructor(
 
     private val _page = MutableStateFlow(PageType.HISTORY_LIST)
     private val _selected = MutableStateFlow(0L)
-    private val _uiFlags = MutableStateFlow(0)
+    private val _uiFlags = MutableStateFlow(UiFlags.NONE)
     private val _uiState = MutableStateFlow(HistoryUiState())
     private val _message = MutableStateFlow<String?>(null)
 
@@ -60,12 +61,12 @@ class HistoryViewModel @Inject constructor(
 
 data class HistoryUiState(
     val selected: Long = 0L,
-    val page: PageType = PageType.HISTORY_LIST,
-    val uiFlags: Int = 0
+    val page: Int = PageType.HISTORY_LIST,
+    val uiFlags: Int = UiFlags.NONE
 )
 
 sealed class HistoryUiEvent {
-    data class NavTo(val page: PageType) : HistoryUiEvent()
+    data class NavTo(val page: Int) : HistoryUiEvent()
     data class ToggleSelected(val id: Long) : HistoryUiEvent()
     data class Delete(val id: Long) : HistoryUiEvent()
 }

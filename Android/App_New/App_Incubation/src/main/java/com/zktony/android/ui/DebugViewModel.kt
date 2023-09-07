@@ -3,8 +3,9 @@ package com.zktony.android.ui
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.extra.valve
-import com.zktony.android.utils.extra.writeRegister
+import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.utils.extra.writeWithPulse
+import com.zktony.android.utils.extra.writeWithValve
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +24,7 @@ class DebugViewModel @Inject constructor() : ViewModel() {
     private val _uiState = MutableStateFlow(DebugUiState())
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.DEBUG)
-    private val _uiFlags = MutableStateFlow(0)
+    private val _uiFlags = MutableStateFlow(UiFlags.NONE)
     private val _message = MutableStateFlow<String?>(null)
 
     val uiState = _uiState.asStateFlow()
@@ -47,15 +48,25 @@ class DebugViewModel @Inject constructor() : ViewModel() {
             is DebugUiEvent.NavTo -> _page.value = uiEvent.page
             is DebugUiEvent.ToggleSelected -> _selected.value = uiEvent.id
             is DebugUiEvent.Valve -> viewModelScope.launch {
-                _uiFlags.value = 1
-                valve(uiEvent.id, uiEvent.value)
-                _uiFlags.value = 0
+                try {
+                    _uiFlags.value = UiFlags.VALVE
+                    writeWithValve(uiEvent.id, uiEvent.value)
+                } catch (ex: Exception) {
+                    _message.value = ex.message
+                } finally {
+                    _uiFlags.value = UiFlags.NONE
+                }
             }
 
             is DebugUiEvent.Pulse -> viewModelScope.launch {
-                _uiFlags.value = 1
-                writeRegister(startAddr = 222, slaveAddr = uiEvent.id, value = uiEvent.value)
-                _uiFlags.value = 0
+                try {
+                    _uiFlags.value = UiFlags.PUMP
+                    writeWithPulse(uiEvent.id, uiEvent.value, uiEvent.value / 6400L * 1000L)
+                } catch (ex: Exception) {
+                    _message.value = ex.message
+                } finally {
+                    _uiFlags.value = UiFlags.NONE
+                }
             }
         }
     }
@@ -63,12 +74,12 @@ class DebugViewModel @Inject constructor() : ViewModel() {
 
 data class DebugUiState(
     val selected: Long = 0L,
-    val page: PageType = PageType.DEBUG,
-    val uiFlags: Int = 0
+    val page: Int = PageType.DEBUG,
+    val uiFlags: Int = UiFlags.NONE
 )
 
 sealed class DebugUiEvent {
-    data class NavTo(val page: PageType) : DebugUiEvent()
+    data class NavTo(val page: Int) : DebugUiEvent()
     data class ToggleSelected(val id: Long) : DebugUiEvent()
     data class Valve(val id: Int, val value: Int) : DebugUiEvent()
     data class Pulse(val id: Int, val value: Long) : DebugUiEvent()

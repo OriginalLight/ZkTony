@@ -8,6 +8,7 @@ import androidx.paging.cachedIn
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +29,7 @@ class ProgramViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ProgramUiState())
     private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.PROGRAM_LIST)
-    private val _uiFlags = MutableStateFlow(0)
+    private val _uiFlags = MutableStateFlow(UiFlags.NONE)
     private val _message = MutableStateFlow<String?>(null)
 
     val uiState = _uiState.asStateFlow()
@@ -63,12 +64,12 @@ class ProgramViewModel @Inject constructor(
 
 data class ProgramUiState(
     val selected: Long = 0L,
-    val page: PageType = PageType.PROGRAM_LIST,
-    val uiFlags: Int = 0
+    val page: Int = PageType.PROGRAM_LIST,
+    val uiFlags: Int = UiFlags.NONE
 )
 
 sealed class ProgramUiEvent {
-    data class NavTo(val page: PageType) : ProgramUiEvent()
+    data class NavTo(val page: Int) : ProgramUiEvent()
     data class ToggleSelected(val id: Long) : ProgramUiEvent()
     data class Insert(val name: String) : ProgramUiEvent()
     data class Update(val program: Program) : ProgramUiEvent()

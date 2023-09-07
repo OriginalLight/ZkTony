@@ -8,6 +8,8 @@ import androidx.paging.cachedIn
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.internal.Process
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.utils.extra.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +31,7 @@ class HomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0)
     private val _page = MutableStateFlow(PageType.HOME)
-    private val _uiFlags = MutableStateFlow(0)
+    private val _uiFlags = MutableStateFlow(UiFlags.NONE)
     private val _message = MutableStateFlow<String?>(null)
     private val _jobList = MutableStateFlow(listOf<JobState>())
     private val _common = MutableStateFlow(CommonState())
@@ -54,6 +56,7 @@ class HomeViewModel @Inject constructor(
                 }
             }
             launch {
+                init()
                 jobLoop()
             }
         }
@@ -113,6 +116,48 @@ class HomeViewModel @Inject constructor(
                 }
                 _jobList.value = jobList
             }
+
+            is HomeUiEvent.Shaker -> viewModelScope.launch {
+                val shaker = _common.value.shaker
+                try {
+                    if (shaker) {
+                        val before = appState.hpp[0] ?: 0
+                        writeWithSwitch(0, 0)
+                        while (before == (appState.hpp[0] ?: 0)) {
+                            delay(200L)
+                            readWithPulse(0)
+                        }
+                        val after = appState.hpp[0] ?: 0
+                        val remainder = after % 6400
+                        val value = if (remainder > 3200) {
+                            after + 6400 - remainder
+                        } else {
+                            after - remainder
+                        }
+                        writeWithPosition(0, value.toLong())
+                    } else {
+                        writeWithSwitch(0, 1)
+                    }
+                } catch (ex: Exception) {
+                    _message.value = ex.message
+                } finally {
+                    _common.value = _common.value.copy(shaker = !shaker)
+                }
+
+            }
+        }
+    }
+
+    private suspend fun init() {
+        repeat(3) {
+            // 读取绝对位置
+            readWithPulse(slaveAddr = it)
+            delay(200L)
+        }
+        repeat(4) {
+            // 读取阀门状态
+            readWithValve(slaveAddr = it)
+            delay(200L)
         }
     }
 
@@ -136,8 +181,8 @@ class HomeViewModel @Inject constructor(
 
 data class HomeUiState(
     val selected: Int = 0,
-    val page: PageType = PageType.HOME,
-    val uiFlags: Int = 0,
+    val page: Int = PageType.HOME,
+    val uiFlags: Int = UiFlags.NONE,
     val jobList: List<JobState> = listOf(),
     val common: CommonState = CommonState()
 )
@@ -149,7 +194,15 @@ data class JobState(
     val status: Int = 0,
     val temperature: Double = 0.0,
     val time: Long = 0L
-)
+) {
+    companion object {
+        const val STOPPED = 0
+        const val RUNNING = 1
+        const val PAUSED = 2
+        const val FINISHED = 3
+        const val WAITING = 4
+    }
+}
 
 data class CommonState(
     val temperature: Double = 0.0,
@@ -157,7 +210,8 @@ data class CommonState(
 )
 
 sealed class HomeUiEvent {
-    data class NavTo(val page: PageType) : HomeUiEvent()
+    data object Shaker : HomeUiEvent()
+    data class NavTo(val page: Int) : HomeUiEvent()
     data class ToggleSelected(val id: Int) : HomeUiEvent()
     data class Start(val index: Int) : HomeUiEvent()
     data class Pause(val index: Int) : HomeUiEvent()

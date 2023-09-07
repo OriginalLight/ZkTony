@@ -403,28 +403,29 @@ fun ProcessItem(
 ) {
 
     val displayText = when (item.type) {
-        ProcessType.BLOCKING -> stringResource(id = R.string.blocking)
-        ProcessType.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
-        ProcessType.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
-        ProcessType.WASHING -> stringResource(id = R.string.washing)
-        ProcessType.PHOSPHATE_BUFFERED_SALINE -> stringResource(id = R.string.phosphate_buffered_saline)
+        Process.BLOCKING -> stringResource(id = R.string.blocking)
+        Process.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
+        Process.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
+        Process.WASHING -> stringResource(id = R.string.washing)
+        Process.PHOSPHATE_BUFFERED_SALINE -> stringResource(id = R.string.phosphate_buffered_saline)
+        else -> "未知"
     }
 
     val info: List<String> = mutableListOf<String>().apply {
         add("${item.temperature} ℃")
         add("${item.dosage} μL")
-        add("${item.duration} ${if (item.type == ProcessType.WASHING) "Min" else "Hour"}")
+        add("${item.duration} ${if (item.type == Process.WASHING) "Min" else "Hour"}")
 
-        if (item.type == ProcessType.PRIMARY_ANTIBODY) {
+        if (item.type == Process.PRIMARY_ANTIBODY) {
             add("${'@' + item.origin}")
             add(if (item.recycle) "Recycle" else "No Recycle")
         }
 
-        if (item.type == ProcessType.SECONDARY_ANTIBODY) {
+        if (item.type == Process.SECONDARY_ANTIBODY) {
             add("${'@' + item.origin}")
         }
 
-        if (item.type == ProcessType.WASHING) {
+        if (item.type == Process.WASHING) {
             add("${item.times} Cycle")
         }
     }
@@ -516,28 +517,29 @@ fun ProcessItem(
 fun ProcessItem(item: Process) {
 
     val displayText = when (item.type) {
-        ProcessType.BLOCKING -> stringResource(id = R.string.blocking)
-        ProcessType.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
-        ProcessType.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
-        ProcessType.WASHING -> stringResource(id = R.string.washing)
-        ProcessType.PHOSPHATE_BUFFERED_SALINE -> stringResource(id = R.string.phosphate_buffered_saline)
+        Process.BLOCKING -> stringResource(id = R.string.blocking)
+        Process.PRIMARY_ANTIBODY -> stringResource(id = R.string.primary_antibody)
+        Process.SECONDARY_ANTIBODY -> stringResource(id = R.string.secondary_antibody)
+        Process.WASHING -> stringResource(id = R.string.washing)
+        Process.PHOSPHATE_BUFFERED_SALINE -> stringResource(id = R.string.phosphate_buffered_saline)
+        else -> "未知"
     }
 
     val info: List<String> = mutableListOf<String>().apply {
         add("${item.temperature} ℃")
         add("${item.dosage} μL")
-        add("${item.duration} ${if (item.type == ProcessType.WASHING) "Min" else "Hour"}")
+        add("${item.duration} ${if (item.type == Process.WASHING) "Min" else "Hour"}")
 
-        if (item.type == ProcessType.PRIMARY_ANTIBODY) {
+        if (item.type == Process.PRIMARY_ANTIBODY) {
             add("${'@' + item.origin}")
             add(if (item.recycle) "Recycle" else "No Recycle")
         }
 
-        if (item.type == ProcessType.SECONDARY_ANTIBODY) {
+        if (item.type == Process.SECONDARY_ANTIBODY) {
             add("${'@' + item.origin}")
         }
 
-        if (item.type == ProcessType.WASHING) {
+        if (item.type == Process.WASHING) {
             add("${item.times} Cycle")
         }
     }
@@ -568,15 +570,17 @@ fun ProcessItem(item: Process) {
                     )
                     .padding(vertical = 4.dp, horizontal = 8.dp),
                 text = when (item.status) {
-                    ProcessStatus.UPCOMING -> "未开始"
-                    ProcessStatus.RUNNING -> "进行中"
-                    ProcessStatus.FINISHED -> "已完成"
+                    Process.UPCOMING -> "未开始"
+                    Process.RUNNING -> "进行中"
+                    Process.FINISHED -> "已完成"
+                    else -> "未知"
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = when (item.status) {
-                    ProcessStatus.UPCOMING -> Color.Gray
-                    ProcessStatus.RUNNING -> Color.Green
-                    ProcessStatus.FINISHED -> Color.Blue
+                    Process.UPCOMING -> Color.Gray
+                    Process.RUNNING -> Color.Green
+                    Process.FINISHED -> Color.Blue
+                    else -> Color.Red
                 }
             )
         }
@@ -676,11 +680,11 @@ fun ModuleItem(
         ) {
 
             val message = when (jobState.status) {
-                0 -> "已就绪"
-                1 -> jobState.time.timeFormat()
-                2 -> "已暂停"
-                3 -> "已完成"
-                4 -> "等待中"
+                JobState.STOPPED -> "已就绪"
+                JobState.RUNNING -> jobState.time.timeFormat()
+                JobState.PAUSED -> "已暂停"
+                JobState.FINISHED -> "已完成"
+                JobState.WAITING -> "等待中"
                 else -> "未知"
             }
 

@@ -23,4 +23,9 @@ object Constants {
      * 保温温度
      */
     const val ZT_0001 = "ZT_0001"
+
+    /**
+     * 管路死体积
+     */
+    const val ZT_0002 = "ZT_0002"
 }
