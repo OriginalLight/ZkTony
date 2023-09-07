@@ -20,9 +20,7 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
         // register callback
         callback = {
             try {
-                callbackVerify(it) { bytes ->
-                    callbackProcess(bytes)
-                }
+                callbackHandler(it)
             } catch (ex: Exception) {
                 Log.e(TAG, "Callback Exception: ${ex.message}")
             }
@@ -92,15 +90,8 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      * @param byteArray ByteArray
      */
     @Throws(Exception::class)
-    abstract fun callbackVerify(byteArray: ByteArray, block: (ByteArray) -> Unit = {})
+    abstract fun callbackHandler(byteArray: ByteArray)
 
-    /**
-     * Callback process
-     *
-     * @param byteArray ByteArray
-     */
-    @Throws(Exception::class)
-    abstract fun callbackProcess(byteArray: ByteArray)
 
     companion object {
         private const val TAG = "AbstractSerial"

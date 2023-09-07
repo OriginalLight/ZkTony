@@ -493,11 +493,10 @@ fun MotorDetail(
                 trailingIcon = {
                     ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         scope.launch {
-                            snackbarHostState.showSnackbar(message = "已设置当前位置为原点")
                             writeRegister(selected.index, 210, 0L)
                             delay(500L)
                             writeRegister(selected.index, 220, 1)
-                            appState.hpp[selected.index] = 0
+                            snackbarHostState.showSnackbar(message = "已设置当前位置为原点")
                         }
                     }) {
                         Icon(imageVector = Icons.Default.Settings, contentDescription = null)
@@ -535,10 +534,10 @@ fun MotorDetail(
                 trailingIcon = {
                     ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         scope.launch {
-                            snackbarHostState.showSnackbar(message = "已下载加速时间")
                             writeRegister(selected.index, 152, selected.acceleration.toInt())
                             delay(500L)
                             writeRegister(selected.index, 220, 1)
+                            snackbarHostState.showSnackbar(message = "已下载加速时间")
                         }
                     }) {
                         Icon(imageVector = Icons.Default.Download, contentDescription = null)
@@ -578,10 +577,10 @@ fun MotorDetail(
                 trailingIcon = {
                     ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         scope.launch {
-                            snackbarHostState.showSnackbar(message = "已下载减速时间")
                             writeRegister(selected.index, 153, selected.deceleration.toInt())
                             delay(500L)
                             writeRegister(selected.index, 220, 1)
+                            snackbarHostState.showSnackbar(message = "已下载减速时间")
                         }
                     }) {
                         Icon(imageVector = Icons.Default.Download, contentDescription = null)
@@ -621,10 +620,10 @@ fun MotorDetail(
                 trailingIcon = {
                     ElevatedButton(modifier = Modifier.padding(horizontal = 16.dp), onClick = {
                         scope.launch {
-                            snackbarHostState.showSnackbar(message = "已下载最大运行速度")
                             writeRegister(selected.index, 154, selected.speed.toInt())
                             delay(500L)
                             writeRegister(selected.index, 220, 1)
+                            snackbarHostState.showSnackbar(message = "已下载最大运行速度")
                         }
                     }) {
                         Icon(imageVector = Icons.Default.Download, contentDescription = null)

@@ -2,9 +2,7 @@ package com.zktony.android.utils.extra
 
 import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.modbus.RtuProtocol
-import com.zktony.serialport.command.modbus.toRtuProtocol
 import com.zktony.serialport.command.runze.RunzeProtocol
-import com.zktony.serialport.command.runze.toRunzeProtocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.*
 import kotlinx.coroutines.delay
@@ -14,57 +12,29 @@ import kotlinx.coroutines.withTimeout
  * 串口通信
  */
 val serialHelper = object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS3")) {
-    override fun callbackVerify(byteArray: ByteArray, block: (ByteArray) -> Unit) {
-        byteArray.toHexString().loge()
-        if (byteArray[0] == 0xCC.toByte()) {
-            // checksum 校验
-            val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-            val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
-            if (!bytes.checkSumLE().contentEquals(crc)) {
-                throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
-            }
-        } else {
-            // crc 校验
-            val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-            val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
-            if (!bytes.crc16LE().contentEquals(crc)) {
-                throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
-            }
-        }
 
-        // 校验通过
-        block(byteArray)
-    }
+    val rtuProtocol = RtuProtocol()
+    val runzeProtocol = RunzeProtocol()
 
-    override fun callbackProcess(byteArray: ByteArray) {
+    override fun callbackHandler(byteArray: ByteArray) {
         // 解析协议
         if (byteArray[0] == 0xCC.toByte()) {
-            val rx = byteArray.toRunzeProtocol()
-            when (rx.funcCode) {
-                0x00.toByte() -> {
-                    appState.hpv[rx.slaveAddr.toInt()] = rx.data[0].toInt()
+            runzeProtocol.callbackHandler(byteArray) { code, rx ->
+                when (code) {
+                    RunzeProtocol.CHANNEL -> {
+                        appState.hpv[rx.slaveAddr.toInt()] = rx.data[0].toInt()
+                    }
                 }
-
-                0x01.toByte() -> throw Exception("帧错误")
-                0x02.toByte() -> throw Exception("参数错误")
-                0x03.toByte() -> throw Exception("光耦错误")
-                0x04.toByte() -> throw Exception("电机忙")
-                0x05.toByte() -> throw Exception("电机堵转")
-                0x06.toByte() -> throw Exception("未知位置")
-                0xFE.toByte() -> throw Exception("任务挂起")
-                0xFF.toByte() -> throw Exception("未知错误")
-                else -> {}
             }
         } else {
-            val rx = byteArray.toRtuProtocol()
-            when (rx.funcCode) {
-                0x03.toByte() -> {
-                    val height = rx.data.copyOfRange(3, 5)
-                    val low = rx.data.copyOfRange(1, 3)
-                    appState.hpp[rx.slaveAddr.toInt() - 1] = height.plus(low).readInt32BE()
+            rtuProtocol.callbackHandler(byteArray) { code, rx ->
+                when (code) {
+                    RtuProtocol.LOCATION -> {
+                        val height = rx.data.copyOfRange(3, 5)
+                        val low = rx.data.copyOfRange(1, 3)
+                        appState.hpp[rx.slaveAddr.toInt() - 1] = height.plus(low).readInt32BE()
+                    }
                 }
-
-                else -> {}
             }
         }
     }
@@ -173,6 +143,7 @@ fun writeWithSwitch(slaveAddr: Int, value: Int) {
     if (value !in listOf(0, 1, 256, 257)) throw Exception("value must be 0, 1, 256, 257")
     writeRegister(slaveAddr = slaveAddr, startAddr = 200, value = value)
 }
+
 
 /**
  * 运行到指定位置

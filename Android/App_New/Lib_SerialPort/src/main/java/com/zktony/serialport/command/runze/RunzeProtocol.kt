@@ -1,6 +1,8 @@
 package com.zktony.serialport.command.runze
 
+import com.zktony.serialport.command.BaseProtocol
 import com.zktony.serialport.ext.checkSumLE
+import com.zktony.serialport.ext.toHexString
 
 /**
  *
@@ -86,7 +88,7 @@ import com.zktony.serialport.ext.checkSumLE
  * 0xFF      未知错误       参数=0x00 0x00
  *
  */
-class RunzeProtocol {
+class RunzeProtocol : BaseProtocol<RunzeProtocol> {
     var head: Byte = 0xCC.toByte()
     var slaveAddr: Byte = 0x00.toByte()
     var funcCode: Byte = 0x00.toByte()
@@ -94,22 +96,49 @@ class RunzeProtocol {
     var end: Byte = 0xDD.toByte()
     var checksum: ByteArray = byteArrayOf(0x00.toByte(), 0x00.toByte())
 
-    fun toByteArray(): ByteArray {
+    override fun toByteArray(): ByteArray {
         val byteArray = byteArrayOf(head, slaveAddr, funcCode)
             .plus(data)
             .plus(end)
         return byteArray.plus(byteArray.checkSumLE())
     }
-}
 
-fun ByteArray.toRunzeProtocol(): RunzeProtocol {
-    val byteArray = this
-    return RunzeProtocol().apply {
+    override fun toProtocol(byteArray: ByteArray): RunzeProtocol {
         head = byteArray[0]
         slaveAddr = byteArray[1]
         funcCode = byteArray[2]
         data = byteArray.copyOfRange(3, byteArray.size - 3)
         end = byteArray[byteArray.size - 3]
         checksum = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
+        return this
+    }
+
+    override fun callbackHandler(byteArray: ByteArray, block: (Int, RunzeProtocol) -> Unit) {
+        // checksum 校验
+        val crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
+        val bytes = byteArray.copyOfRange(0, byteArray.size - 2)
+        if (!bytes.checkSumLE().contentEquals(crc)) {
+            throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
+        }
+        val rx = toProtocol(byteArray)
+        when (rx.funcCode) {
+            0x00.toByte() -> {
+                block(CHANNEL, rx)
+            }
+
+            0x01.toByte() -> throw Exception("帧错误")
+            0x02.toByte() -> throw Exception("参数错误")
+            0x03.toByte() -> throw Exception("光耦错误")
+            0x04.toByte() -> throw Exception("电机忙")
+            0x05.toByte() -> throw Exception("电机堵转")
+            0x06.toByte() -> throw Exception("未知位置")
+            0xFE.toByte() -> throw Exception("任务挂起")
+            0xFF.toByte() -> throw Exception("未知错误")
+            else -> {}
+        }
+    }
+
+    companion object {
+        const val CHANNEL = 0
     }
 }

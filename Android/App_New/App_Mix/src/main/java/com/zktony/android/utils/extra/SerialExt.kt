@@ -7,12 +7,8 @@ import com.zktony.android.utils.extra.internal.ExecuteType
 import com.zktony.android.utils.extra.internal.SerialExtension
 import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.Protocol
-import com.zktony.serialport.command.toProtocol
 import com.zktony.serialport.config.SerialConfig
-import com.zktony.serialport.ext.crc16LE
-import com.zktony.serialport.ext.readInt16LE
 import com.zktony.serialport.ext.readInt8
-import com.zktony.serialport.ext.splitByteArray
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import java.util.concurrent.ConcurrentHashMap
@@ -55,68 +51,25 @@ val hpc: MutableMap<Int, Double> = ConcurrentHashMap<Int, Double>().apply {
  * 串口通信
  */
 val serialport = object : AbstractSerialHelper(SerialConfig()) {
-    override fun callbackVerify(byteArray: ByteArray, block: (ByteArray) -> Unit) {
-        // 验证包长 >= 12
-        if (byteArray.size < 12) {
-            throw Exception("RX Length Error")
-        }
 
-        // 分包处理
-        val expectHead = byteArrayOf(0xEE.toByte())
-        val expectEnd = byteArrayOf(0xFF.toByte(), 0xFC.toByte(), 0xFF.toByte(), 0xFF.toByte())
-        byteArray.splitByteArray(expectHead, expectEnd).forEach { packet ->
-            // 验证包头和包尾
-            val head = packet.copyOfRange(0, 1)
-            if (!head.contentEquals(expectHead)) {
-                throw Exception("RX Header Error")
-            }
-            val end = packet.copyOfRange(packet.size - 4, packet.size)
-            if (!end.contentEquals(expectEnd)) {
-                throw Exception("RX End Error")
-            }
+    val protocol = Protocol()
 
-            // crc 校验
-            val crc = packet.copyOfRange(packet.size - 6, packet.size - 4)
-            val bytes = packet.copyOfRange(0, packet.size - 6)
-            if (!bytes.crc16LE().contentEquals(crc)) {
-                throw Exception("RX Crc Error")
-            }
-
-            // 校验通过
-            block(packet)
-        }
-    }
-
-    override fun callbackProcess(byteArray: ByteArray) {
-        // 解析协议
-        val rec = byteArray.toProtocol()
-
-        // 处理地址为 0x02 的数据包
-        if (rec.addr == 0x02.toByte()) {
-            when (rec.func) {
-                // 处理轴状态数据
-                0x01.toByte() -> {
-                    for (i in 0 until rec.data.size / 2) {
-                        val index = rec.data.readInt8(offset = i * 2)
-                        val status = rec.data.readInt8(offset = i * 2 + 1)
+    override fun callbackHandler(byteArray: ByteArray) {
+        protocol.callbackHandler(byteArray) { code, rx ->
+            when (code) {
+                Protocol.AXIS -> {
+                    for (i in 0 until rx.data.size / 2) {
+                        val index = rx.data.readInt8(offset = i * 2)
+                        val status = rx.data.readInt8(offset = i * 2 + 1)
                         hpa[index] = status == 1
                     }
                 }
-                // 处理 GPIO 状态数据
-                0x02.toByte() -> {
-                    for (i in 0 until rec.data.size / 2) {
-                        val index = rec.data.readInt8(offset = i * 2)
-                        val status = rec.data.readInt8(offset = i * 2 + 1)
+
+                Protocol.GPIO -> {
+                    for (i in 0 until rx.data.size / 2) {
+                        val index = rx.data.readInt8(offset = i * 2)
+                        val status = rx.data.readInt8(offset = i * 2 + 1)
                         hpg[index] = status == 1
-                    }
-                }
-                // 处理错误信息
-                0xFF.toByte() -> {
-                    when (rec.data.readInt16LE()) {
-                        1 -> throw Exception("TX Header Error")
-                        2 -> throw Exception("TX Addr Error")
-                        3 -> throw Exception("TX Crc Error")
-                        4 -> throw Exception("TX No Com")
                     }
                 }
             }
