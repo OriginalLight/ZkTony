@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.ext.dataSaver
 import com.zktony.android.utils.tx.ExecuteType
 import com.zktony.android.utils.tx.MoveType
@@ -1062,6 +1063,7 @@ data class HomeUiState(
     val loading: Int = 0,
     val job: Job? = null,
     val count: Int = 0,
+    val uiFlags: Int = UiFlags.NONE
 )
 
 /**

@@ -2,14 +2,13 @@ package com.zktony.android.ui
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,21 +19,22 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
+import com.zktony.android.ui.components.CircularButtonsWithSelection
 import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.ext.format
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -51,7 +51,7 @@ fun Home(
     // Observe the UI state from the view model
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val count by viewModel.count.collectAsStateWithLifecycle()
-    // Handle the back button press
+    // Handle the back ElevatedButton press
     BackHandler {
         when (uiState.page) {
             PageType.START -> viewModel.event(HomeEvent.NavTo(PageType.LIST))
@@ -96,6 +96,23 @@ fun MenuContent(
 
     var spRunIndex = 1
 
+    /**
+     * 紫外状态-默认关闭
+     * false关
+     * true开
+     */
+    var uvState by remember { mutableStateOf(false) }
+
+    /**
+     * 保存上盘移动孔位
+     */
+//    var valveOne by remember { mutableIntStateOf(0) }
+
+
+    val valveOne = rememberDataSaverState(key = "valveOne", default = 0)
+    var valveOne_ex by remember { mutableStateOf(0) }
+
+
     // Start a timer to display the runtime
     LaunchedEffect(key1 = uiState.loading) {
         if (uiState.loading == 0) {
@@ -120,243 +137,81 @@ fun MenuContent(
         horizontalArrangement = Arrangement.spacedBy(32.dp),
         verticalArrangement = Arrangement.spacedBy(32.dp),
     ) {
-        // Reset item
-        item {
-            FunctionCard(
-                title = "复位",
-                description = "依次复位举升，下盘，上盘",
-                image = {
-                    if (uiState.loading == 1) {
-                        // Display loading indicator
-                        Box(
-                            modifier = Modifier.size(96.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(72.dp),
-                                strokeWidth = 8.dp,
-                            )
 
-                            Text(
-                                modifier = Modifier.align(Alignment.BottomEnd),
-                                text = "${time}s",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontFamily = FontFamily.Monospace,
-                                fontStyle = FontStyle.Italic,
-                            )
-                        }
-                    } else {
-                        // Display reset icon
-                        Image(
-                            modifier = Modifier.size(96.dp),
-                            painter = painterResource(id = R.drawable.ic_reset),
-                            contentDescription = null,
-                        )
-                    }
-                })
-            {
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = uiState.loading == 0,
-                    onClick = {
-                        event(HomeEvent.Reset)
-                        spRunIndex = 1
-                    }
+        item(span = { GridItemSpan(maxLineSpan) }) {
+            Row {
+
+                Column(
+                    modifier = Modifier
+                        .height(600.dp)
+                        .width(800.dp)
                 ) {
-                    Text(
-                        text = "开始复位",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontFamily = FontFamily.Serif,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-            }
-        }
-        // Clean item
-        item {
-            FunctionCard(
-                title = "紫外",
-                description = "",
-                image = {
-                    if (uiState.loading == 2) {
-                        // Display loading indicator
-                        Box(
-                            modifier = Modifier.size(96.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(72.dp),
-                                strokeWidth = 8.dp,
-                            )
-                            Text(
-                                modifier = Modifier.align(Alignment.BottomEnd),
-                                text = "${time}s",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontFamily = FontFamily.Monospace,
-                                fontStyle = FontStyle.Italic,
-                            )
-                        }
-                    } else {
-                        // Display reset icon
-                        Image(
-                            modifier = Modifier.size(96.dp),
-                            painter = painterResource(id = R.drawable.ic_uv),
-                            contentDescription = null,
-                        )
-                    }
-                })
-            {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        enabled = uiState.loading == 2,
-                        onClick = { event(HomeEvent.Clean(0)) }
+                    Row(
+                        modifier = Modifier
+                            .height(30.dp)
+                            .width(800.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(
-                            text = "取消",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
+                        Text(text = "培养皿(0)", fontSize = 20.sp, textAlign = TextAlign.Center)
                     }
-
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        enabled = uiState.loading == 0,
-                        onClick = { event(HomeEvent.Clean(1)) }
+                    Row(
+                        modifier = Modifier
+                            .height(570.dp)
+                            .width(800.dp)
+                            .padding(16.dp)
                     ) {
-                        Text(
-                            text = "开始",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-                }
-
-            }
-        }
-        // Syringe item
-        item {
-            FunctionCard(
-                title = "${if (syringe == 0) "排液" else "回吸"}",
-                description = "排液/回吸，点击按钮切换",
-                image = {
-                    if (uiState.loading == 3) {
-                        // Display loading indicator
                         Box(
-                            modifier = Modifier.size(96.dp),
-                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.weight(1f).padding(top = 100.dp),
+                            contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(72.dp),
-                                strokeWidth = 8.dp,
-                            )
-                            Text(
-                                modifier = Modifier.align(Alignment.BottomEnd),
-                                text = "${time}s",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontFamily = FontFamily.Monospace,
-                                fontStyle = FontStyle.Italic,
-                            )
-                        }
-                    } else {
-                        // Display reset icon
-                        Image(
-                            modifier = Modifier.size(96.dp),
-                            painter = painterResource(id = R.drawable.ic_pipeline),
-                            contentDescription = null,
-                        )
-                    }
-                })
-            {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        onClick = {
-                            if (uiState.loading == 3) {
-                                event(HomeEvent.Syringe(0))
-                            } else {
-                                syringe = if (syringe == 0) 1 else 0
+                            CircularButtonsWithSelection(
+                                buttonEnabled = uiState.uiFlags != UiFlags.VALVE,
+                                selectedButtonIndex = valveOne_ex
+                            ) { index ->
+                                scope.launch {
+                                    valveOne.value = index
+                                    println("valveOne===" + valveOne)
+//                                    event(HomeEvent.spStart(index + 1))
+                                }
                             }
                         }
-                    ) {
-                        if (uiState.loading == 3) {
-                            Text(
-                                text = "取消",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.SwapHoriz,
-                                contentDescription = null,
-                            )
-                        }
-                    }
-
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        enabled = uiState.loading == 0,
-                        onClick = { event(HomeEvent.Syringe(syringe + 1)) }
-                    ) {
-                        Text(
-                            text = "开始",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
                     }
                 }
-
-            }
-        }
-        // Start item
-        item {
-            FunctionCard(
-                title = "程序运行(" + count +
-                        ")",
-                description =
-                "当前停止不是即停,需要等当前举升1上方所有培养血清空后停止，如需即停，请关闭电源",
-                image = {
-                    Image(
-                        modifier = Modifier.size(96.dp),
-                        painter = painterResource(id = R.drawable.ic_start),
-                        contentDescription = null,
-                    )
-                })
-            {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                Column(
+                    modifier = Modifier
+                        .height(600.dp)
+                        .width(200.dp)
                 ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .padding(start = 20.dp, top = 50.dp),
+                        value = tiji_ex,
+                        onValueChange = {
+                            scope.launch {
+                                tiji_ex = it
+                                tiji.value = it.toFloatOrNull() ?: 0f
+                            }
+                        },
+                        label = { Text(text = "体积") },
+                        shape = MaterialTheme.shapes.medium,
+                        textStyle = MaterialTheme.typography.bodyLarge,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done,
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                keyboard?.hide()
+                            }
+                        ),
+                    )
 
-                    Button(
-                        modifier = Modifier.weight(1f),
-                        enabled = uiState.loading == 0,
-                        onClick = {
-                            event(HomeEvent.spStart(spRunIndex))
-                            spRunIndex += 1
-
-                        }
-                    ) {
-                        Text(
-                            text = "上盘",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-
-                    Button(
-                        modifier = Modifier.weight(1f),
+                    ElevatedButton(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .padding(start = 20.dp, top = 10.dp),
                         enabled = uiState.loading == 0 || uiState.loading == 7,
                         onClick = {
                             if (tiji.value.toFloat() != 0f) {
@@ -393,34 +248,137 @@ fun MenuContent(
 
                     }
 
-                    OutlinedTextField(
+//                    ElevatedButton(
+//                        modifier = Modifier
+//                            .width(140.dp)
+//                            .padding(start = 20.dp, top = 10.dp),
+//
+//                        enabled = uiState.loading == 0,
+//                        onClick = {
+//                            event(HomeEvent.spStart(spRunIndex))
+//                            spRunIndex += 1
+//
+//                        }
+//                    ) {
+//                        Text(
+//                            text = "上盘",
+//                            style = MaterialTheme.typography.titleMedium,
+//                            fontFamily = FontFamily.Serif,
+//                            fontWeight = FontWeight.Bold,
+//                        )
+//                    }
+//
+//                    ElevatedButton(
+//                        modifier = Modifier
+//                            .width(140.dp)
+//                            .padding(start = 20.dp, top = 10.dp),
+//
+//                        enabled = uiState.loading == 1,
+//                        onClick = {
+//                            event(HomeEvent.spStart(spRunIndex))
+//                            spRunIndex += 1
+//
+//                        }
+//                    ) {
+//                        Text(
+//                            text = "下盘",
+//                            style = MaterialTheme.typography.titleMedium,
+//                            fontFamily = FontFamily.Serif,
+//                            fontWeight = FontWeight.Bold,
+//                        )
+//                    }
+
+                    ElevatedButton(
                         modifier = Modifier
-                            .width(70.dp),
-                        value = tiji_ex,
-                        onValueChange = {
-                            scope.launch {
-                                tiji_ex = it
-                                tiji.value = it.toFloatOrNull() ?: 0f
-                            }
-                        },
-                        label = { Text(text = "体积") },
-                        shape = MaterialTheme.shapes.medium,
-                        textStyle = MaterialTheme.typography.bodyLarge,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
-                    )
+                            .width(140.dp)
+                            .padding(start = 20.dp, top = 10.dp),
+
+                        enabled = uiState.loading == 0,
+                        onClick = {
+                            //TODO 紫外没写
+                            uvState = !uvState
+                        }
+                    ) {
+                        if (!uvState) {
+                            Text(
+                                text = "紫外(关)",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        } else {
+                            Text(
+                                text = "紫外(开)",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
+
+                    ElevatedButton(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .padding(start = 20.dp, top = 10.dp),
+
+                        enabled = uiState.loading == 0,
+                        onClick = {
+                            event(HomeEvent.Reset)
+                            spRunIndex = 1
+                        }
+                    ) {
+                        Text(
+                            text = "复位",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    ElevatedButton(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .padding(start = 20.dp, top = 10.dp),
+
+                        enabled = uiState.loading == 0,
+                        onClick = {
+                            //TODO 排液没写
+                        }
+                    ) {
+                        Text(
+                            text = "排液",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    ElevatedButton(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .padding(start = 20.dp, top = 10.dp),
+
+                        enabled = uiState.loading == 0,
+                        onClick = {
+                            //TODO 回吸没写
+                        }
+                    ) {
+                        Text(
+                            text = "回吸",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
 
                 }
 
             }
+
         }
+
+
     }
 }
 
@@ -430,7 +388,7 @@ fun FunctionCard(
     title: String,
     description: String,
     image: @Composable () -> Unit,
-    button: @Composable () -> Unit,
+    ElevatedButton: @Composable () -> Unit,
 ) {
     ElevatedCard(
         modifier = modifier,
@@ -480,7 +438,7 @@ fun FunctionCard(
                     )
                 }
             }
-            button()
+            ElevatedButton()
 
         }
     }

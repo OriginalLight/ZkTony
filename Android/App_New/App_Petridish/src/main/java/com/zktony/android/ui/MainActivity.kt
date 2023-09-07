@@ -20,11 +20,11 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore("dataStore
  */
 /**
  * 培养皿
- * 1.举升1是电机1
- * 2.举升2是电机0
- * 3.夹爪是电机2
- * 4.上盘是电机5
- * 5.下盘是电机4
+ * 举升1是电机1
+ * 举升2是电机0
+ * 夹爪是电机2
+ * 上盘是电机5
+ * 下盘是电机4
  * 紫外线灯或者蠕动泵是3
  * 检测培养皿是否摆放正确7
  * 检测是否有培养皿6
