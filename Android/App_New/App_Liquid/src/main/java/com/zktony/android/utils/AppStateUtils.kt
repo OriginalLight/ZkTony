@@ -28,4 +28,9 @@ data class AppState(
      * 校准曲线
      */
     val hpc: MutableMap<Int, (Double) -> Double?> = ConcurrentHashMap()
-)
+) {
+    companion object {
+        // 单例
+        val instance: AppState by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { AppState() }
+    }
+}
