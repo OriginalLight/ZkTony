@@ -68,6 +68,8 @@ fun Splash(
 
     var clickNum = 0;
 
+    val valveOne = rememberDataSaverState(key = "valveOne", default = 0)
+
     // Animate the splash screen and hide it when the animation is complete
     LaunchedEffect(key1 = true) {
         scale.animateTo(
@@ -213,6 +215,8 @@ fun Splash(
                                             speed = 100
                                         }
                                     }
+                                    valveOne.value = 0
+
                                     toggleDrawer(NavigationType.NAVIGATION_RAIL)
                                     navController.popBackStack()
                                     navController.navigate(Route.HOME)

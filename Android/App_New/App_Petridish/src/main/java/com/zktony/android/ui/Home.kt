@@ -51,6 +51,8 @@ fun Home(
     // Observe the UI state from the view model
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val count by viewModel.count.collectAsStateWithLifecycle()
+    val spCount by viewModel.spCount.collectAsStateWithLifecycle()
+
     // Handle the back ElevatedButton press
     BackHandler {
         when (uiState.page) {
@@ -64,6 +66,7 @@ fun Home(
         uiState = uiState,
         event = viewModel::event,
         count = count,
+        spCount = spCount,
         navController = navController,
         toggleDrawer = toggleDrawer,
     )
@@ -76,6 +79,7 @@ fun MenuContent(
     uiState: HomeUiState,
     event: (HomeEvent) -> Unit = {},
     count: Int = 0,
+    spCount: Int = 0,
     toggleDrawer: (NavigationType) -> Unit = {},
     navController: NavHostController,
 ) {
@@ -94,7 +98,6 @@ fun MenuContent(
     val tiji = rememberDataSaverState(key = "tiji", default = 0f)
     var tiji_ex by remember { mutableStateOf(tiji.value.format(1)) }
 
-    var spRunIndex = 1
 
     /**
      * 紫外状态-默认关闭
@@ -153,7 +156,11 @@ fun MenuContent(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Text(text = "培养皿(0)", fontSize = 20.sp, textAlign = TextAlign.Center)
+                        Text(
+                            text = "培养皿(" + count + ")",
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center
+                        )
                     }
                     Row(
                         modifier = Modifier
@@ -161,19 +168,19 @@ fun MenuContent(
                             .width(800.dp)
                             .padding(16.dp)
                     ) {
+                        LaunchedEffect(key1 = uiState.spCount) {
+                            valveOne.value = spCount
+                        }
                         Box(
-                            modifier = Modifier.weight(1f).padding(top = 100.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(top = 100.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularButtonsWithSelection(
                                 buttonEnabled = uiState.uiFlags != UiFlags.VALVE,
-                                selectedButtonIndex = valveOne_ex
-                            ) { index ->
-                                scope.launch {
-                                    valveOne.value = index
-                                    println("valveOne===" + valveOne)
-//                                    event(HomeEvent.spStart(index + 1))
-                                }
+                                selectedButtonIndex = valveOne.value
+                            ) {
                             }
                         }
                     }
@@ -248,45 +255,45 @@ fun MenuContent(
 
                     }
 
-//                    ElevatedButton(
-//                        modifier = Modifier
-//                            .width(140.dp)
-//                            .padding(start = 20.dp, top = 10.dp),
-//
-//                        enabled = uiState.loading == 0,
-//                        onClick = {
-//                            event(HomeEvent.spStart(spRunIndex))
-//                            spRunIndex += 1
-//
-//                        }
-//                    ) {
-//                        Text(
-//                            text = "上盘",
-//                            style = MaterialTheme.typography.titleMedium,
-//                            fontFamily = FontFamily.Serif,
-//                            fontWeight = FontWeight.Bold,
-//                        )
-//                    }
-//
-//                    ElevatedButton(
-//                        modifier = Modifier
-//                            .width(140.dp)
-//                            .padding(start = 20.dp, top = 10.dp),
-//
-//                        enabled = uiState.loading == 1,
-//                        onClick = {
-//                            event(HomeEvent.spStart(spRunIndex))
-//                            spRunIndex += 1
-//
-//                        }
-//                    ) {
-//                        Text(
-//                            text = "下盘",
-//                            style = MaterialTheme.typography.titleMedium,
-//                            fontFamily = FontFamily.Serif,
-//                            fontWeight = FontWeight.Bold,
-//                        )
-//                    }
+                    ElevatedButton(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .padding(start = 20.dp, top = 10.dp),
+
+                        enabled = uiState.loading == 0,
+                        onClick = {
+                            if (valveOne.value < 7) {
+//                                valveOne.value += 1
+                                event(HomeEvent.spStart(valveOne.value))
+                            }
+
+                        }
+                    ) {
+                        Text(
+                            text = "上盘",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    ElevatedButton(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .padding(start = 20.dp, top = 10.dp),
+
+                        enabled = uiState.loading == 2,
+                        onClick = {
+                            event(HomeEvent.xpStart)
+                        }
+                    ) {
+                        Text(
+                            text = "下盘",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
 
                     ElevatedButton(
                         modifier = Modifier
@@ -321,10 +328,10 @@ fun MenuContent(
                             .width(140.dp)
                             .padding(start = 20.dp, top = 10.dp),
 
-                        enabled = uiState.loading == 0,
+                        enabled = uiState.loading == 0 || uiState.loading == 2,
                         onClick = {
                             event(HomeEvent.Reset)
-                            spRunIndex = 1
+                            valveOne.value = 0
                         }
                     ) {
                         Text(

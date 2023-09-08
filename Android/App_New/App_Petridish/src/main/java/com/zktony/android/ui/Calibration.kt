@@ -126,10 +126,10 @@ fun CalibrationList(
     var jiaozgd_ex by remember { mutableStateOf(jiaozgd.value.format(4)) }
 
     /**
-     * 下盘高度
+     * 上盘高度
      */
-    val xpgd = rememberDataSaverState(key = "xpgd", default = 0f)
-    var xpgd_ex by remember { mutableStateOf(xpgd.value.format(4)) }
+    val spgd = rememberDataSaverState(key = "spgd", default = 0f)
+    var spgd_ex by remember { mutableStateOf(spgd.value.format(4)) }
 
 
     /**
@@ -143,6 +143,12 @@ fun CalibrationList(
      */
     val pzjl2 = rememberDataSaverState(key = "pzjl2", default = 0f)
     var pzjl2_ex by remember { mutableStateOf(pzjl2.value.format(4)) }
+
+    /**
+     * 上盘高度
+     */
+    val spgd2 = rememberDataSaverState(key = "spgd2", default = 0f)
+    var spgd2_ex by remember { mutableStateOf(spgd2.value.format(4)) }
 
     /**
      * 夹紧距离
@@ -248,6 +254,8 @@ fun CalibrationList(
     val jyh = rememberDataSaverState(key = "jyh", default = 0f)
     var jyh_ex by remember { mutableStateOf(jyh.value.format(4)) }
 
+    val valveOne = rememberDataSaverState(key = "valveOne", default = 0)
+
     val context = LocalContext.current;
 
     // Show the input dialog if showDialog is true
@@ -297,6 +305,7 @@ fun CalibrationList(
 
                 Button(
                     onClick = {
+                        valveOne.value = 0
                         event(
                             CalibrationEvent.Reset(
                                 listOf(1, 0, 2, 4, 5),
@@ -587,14 +596,14 @@ fun CalibrationList(
                     modifier = Modifier
                         .width(120.dp)
                         .padding(start = 20.dp),
-                    value = xpgd_ex,
+                    value = spgd_ex,
                     onValueChange = {
                         scope.launch {
-                            xpgd_ex = it
-                            xpgd.value = it.toFloatOrNull() ?: 0f
+                            spgd_ex = it
+                            spgd.value = it.toFloatOrNull() ?: 0f
                         }
                     },
-                    label = { Text(text = "下盘高度") },
+                    label = { Text(text = "上盘高度") },
                     shape = MaterialTheme.shapes.medium,
                     textStyle = MaterialTheme.typography.bodyLarge,
                     keyboardOptions = KeyboardOptions(
@@ -615,7 +624,7 @@ fun CalibrationList(
                                 tx {
                                     move(MoveType.MOVE_PULSE) {
                                         index = 1
-                                        pulse = (3200L * xpgd.value.toDouble()).toLong();
+                                        pulse = (3200L * spgd.value.toDouble()).toLong();
                                     }
                                 }
                             } catch (e: Exception) {
@@ -749,6 +758,58 @@ fun CalibrationList(
                                     move(MoveType.MOVE_PULSE) {
                                         index = 0
                                         pulse = (3200L * pzjl2.value.toDouble()).toLong();
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Toast.makeText(
+                                    context,
+                                    "请先复位再移动！",
+                                    Toast.LENGTH_SHORT
+                                ).show();
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .padding(start = 10.dp, top = 10.dp)
+                        .height(50.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("移    动")
+                }
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = spgd2_ex,
+                    onValueChange = {
+                        scope.launch {
+                            spgd2_ex = it
+                            spgd2.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "上盘高度") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+
+                Button(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                tx {
+                                    move(MoveType.MOVE_PULSE) {
+                                        index = 1
+                                        pulse = (3200L * spgd2.value.toDouble()).toLong();
                                     }
                                 }
                             } catch (e: Exception) {

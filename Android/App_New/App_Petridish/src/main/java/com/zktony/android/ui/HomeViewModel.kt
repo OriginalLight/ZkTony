@@ -32,9 +32,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private val _loading = MutableStateFlow(0)
 
     /**
-     * 计数
+     * 下盘计数
      */
     private val _count = MutableStateFlow(0)
+
+    /**
+     * 上盘运动计数
+     */
+    private val _spCount = MutableStateFlow(0)
 
     private val _job = MutableStateFlow<Job?>(null)
     private var syringeJob: Job? = null
@@ -44,6 +49,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     val count = _count.asStateFlow()
 
+    val spCount = _spCount.asStateFlow()
 
     /**
      * 举升1复位高度
@@ -73,9 +79,9 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     val jiaozgd = dataSaver.readData("jiaozgd", 0f);
 
     /**
-     * 举升1下盘高度
+     * 举升1上盘高度
      */
-    val xpgd = dataSaver.readData("xpgd", 0f);
+    val spgd = dataSaver.readData("spgd", 0f);
 
 
     /**
@@ -87,6 +93,12 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
      * 举升2盘子距离
      */
     val pzgd2 = dataSaver.readData("pzjl2", 0f);
+
+    /**
+     * 举升2上盘高度
+     */
+    val spgd2 = dataSaver.readData("spgd2", 0f);
+
 
     /**
      * 夹紧距离
@@ -164,7 +176,18 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
      */
     val xpkwjl3 = dataSaver.readData("xpkwjl1", 0f);
 
-    val tiji = dataSaver.readData("tiji", 0f);
+    val tiji = dataSaver.readData("tiji", 0f)
+
+    /**
+     * 上培养皿运动了几次
+     */
+    var valveOne = dataSaver.readData("valveOne", 0)
+
+    /**
+     * 上盘运动次数
+     * 默认上培养皿运动了次数开始
+     */
+    var spStartNum = 0
 
 
     init {
@@ -201,6 +224,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             is HomeEvent.Reset -> reset()
             is HomeEvent.Start -> start(event.index)
             is HomeEvent.spStart -> spStart(event.index)
+            is HomeEvent.xpStart -> xpStart()
             is HomeEvent.Stop -> stop()
             is HomeEvent.NavTo -> _page.value = event.page
             is HomeEvent.ToggleSelected -> _selected.value = event.id
@@ -302,8 +326,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             speed = 100
                         }
                     }
-
-
                 }
             } catch (ex: Exception) {
                 _loading.value = 0
@@ -314,32 +336,88 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     }
 
     /**
-     * 上盘运动
+     * 上培养皿运动
      */
     private fun spStart(runIndex: Int) {
         viewModelScope.launch {
-            val spkwjl = dataSaver.readData("spkwjl" + runIndex, 0f);
+            _spCount.value = valveOne
+            _spCount.value += 1
+            spCount.value
+        }
+    }
+
+    /**
+     * 下培养皿运动
+     */
+    private fun xpStart() {
+        viewModelScope.launch {
+
+            /**
+             * 1.获取移动步数
+             */
+            var spydjl = dataSaver.readData("spydjl", 0f)
+            var spydbs = (spydjl * 3200).toLong()
+            spydbs += spStartNum * 1666
+
+            /**
+             * 1.举升1到上盘高度
+             *
+             * 2.上盘移动400步
+             *
+             * 3.1举升1到复位高度
+             * 3.2举升2到上盘高度
+             *
+             * 4.上盘移动剩余的1266
+             *
+             * 5.举升2到复位高度
+             *
+             */
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 1
+                    pulse = (spgd * 3200L).toLong()
+                }
+            }
+
             tx {
                 move(MoveType.MOVE_PULSE) {
                     index = 5
-                    pulse = (3200L * spkwjl).toLong();
+                    pulse = spydbs - 1266
                 }
             }
+
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 1
+                    pulse = (fwgd * 3200L).toLong()
+                }
+                move(MoveType.MOVE_PULSE) {
+                    index = 0
+                    pulse = (spgd2 * 3200L).toLong()
+                }
+
+            }
+
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 5
+                    pulse = spydbs
+                }
+            }
+
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 0
+                    pulse = (fwgd2 * 3200L).toLong()
+                }
+
+            }
+
+
         }
 
     }
 
-
-//    private fun start(index: Int) {
-//        viewModelScope.launch {
-//            _loading.value = 7
-//            while (true) {
-//                _count.value += 1
-//                delay(100L)
-//            }
-//
-//        }
-//    }
 
     /**
      * Starts the execution of the selected program entity.
@@ -353,10 +431,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                  */
                 var isStart = false
 
-                /**
-                 * 上盘运动次数
-                 */
-                var spStartNum = 0
 
                 /**
                  * 下盘移动坐标
@@ -396,6 +470,10 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                  * 检测正确的培养皿个数,坐标从2到0
                  */
                 var jiance2PYM = 0
+
+                spStartNum = valveOne
+
+                _spCount.value = valveOne
 
 
                 /**
@@ -552,23 +630,29 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
                             }
                             if (spStartCoordinates < 7) {
+                                /**
+                                 * 上盘原点距离
+                                 */
+                                val spydjl =
+                                    dataSaver.readData("spydjl", 0f);
+                                spStartNum += 1
+                                if (_spCount.value == 7) {
+                                    _spCount.value = 0
+                                } else {
+                                    _spCount.value += 1
+                                }
+                                println("上盘运动步数===" + spydjl * 3200 + spStartNum * 1666)
                                 tx {
                                     //上盘移动1格
-                                    /**
-                                     * 上盘孔位距离
-                                     */
-                                    val spkwjl =
-                                        dataSaver.readData("spkwjl" + spStartCoordinates, 0f);
-
                                     move(MoveType.MOVE_PULSE) {
                                         index = 5
-                                        pulse = (3200L * spkwjl).toLong();
+                                        pulse = (spydjl * 3200 + spStartNum * 1666).toLong();
                                     }
                                 }
                             }
 
                             if (spStartCoordinates == 7) {
-                                _loading.value = 0
+                                _loading.value = 2
                                 break;
                             } else {
                                 spStartCoordinates += 1;
@@ -710,28 +794,35 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
 
                             if (spStartCoordinates < 7) {
-                                //1.上盘移动1格
                                 /**
-                                 * 上盘孔位距离
+                                 * 上盘原点距离
                                  */
-                                val spkwjl =
-                                    dataSaver.readData("spkwjl" + spStartCoordinates, 0f);
+                                val spydjl =
+                                    dataSaver.readData("spydjl", 0f);
+                                spStartNum += 1
+                                if (_spCount.value == 7) {
+                                    _spCount.value = 0
+                                } else {
+                                    _spCount.value += 1
+                                }
+                                println("上盘运动步数===" + spydjl * 3200 + spStartNum * 1666)
                                 tx {
+                                    //上盘移动1格
                                     move(MoveType.MOVE_PULSE) {
                                         index = 5
-                                        pulse = (3200L * spkwjl).toLong();
+                                        pulse = (spydjl * 3200 + spStartNum * 1666).toLong();
                                     }
                                 }
 
                             }
 
                             if (_loading.value == 8) {
-                                _loading.value = 0
+                                _loading.value = 2
                                 break;
                             }
 
                             if (spStartCoordinates == 7) {
-                                _loading.value = 0
+                                _loading.value = 2
                                 break;
                             }
                             spStartCoordinates += 1;
@@ -870,7 +961,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             displayError += 1
 
                         }
-                        _loading.value = 0
+                        _loading.value = 2
                         break;
                     }
                 }
@@ -1063,6 +1154,7 @@ data class HomeUiState(
     val loading: Int = 0,
     val job: Job? = null,
     val count: Int = 0,
+    val spCount: Int = 0,
     val uiFlags: Int = UiFlags.NONE
 )
 
@@ -1073,6 +1165,7 @@ sealed class HomeEvent {
     data object Reset : HomeEvent()
     data class Start(val index: Int) : HomeEvent()
     data class spStart(val index: Int) : HomeEvent()
+    data object xpStart : HomeEvent()
     data object Stop : HomeEvent()
     data class NavTo(val page: PageType) : HomeEvent()
     data class ToggleSelected(val id: Long) : HomeEvent()
