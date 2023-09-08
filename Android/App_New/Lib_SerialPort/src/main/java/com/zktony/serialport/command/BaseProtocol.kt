@@ -9,7 +9,7 @@ interface BaseProtocol<T> {
     fun toByteArray(): ByteArray
 
     @Throws(Exception::class)
-    fun toProtocol(byteArray: ByteArray): T
+    fun toProtocol(byteArray: ByteArray)
 
     @Throws(Exception::class)
     fun callbackHandler(byteArray: ByteArray, block: (Int, T) -> Unit)

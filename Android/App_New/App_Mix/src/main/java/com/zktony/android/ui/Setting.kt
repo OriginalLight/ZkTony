@@ -248,7 +248,7 @@ fun SettingContent(
                 val image = if (uiState.application == null) {
                     Icons.Outlined.Sync
                 } else {
-                    if (uiState.application.version_code > BuildConfig.VERSION_CODE) {
+                    if (uiState.application.versionCode > BuildConfig.VERSION_CODE) {
                         Icons.Outlined.Grade
                     } else {
                         Icons.Outlined.Verified
@@ -259,7 +259,7 @@ fun SettingContent(
                     stringResource(id = R.string.update)
                 } else {
                     if (uiState.progress == 0) {
-                        if (uiState.application.version_code > BuildConfig.VERSION_CODE) {
+                        if (uiState.application.versionCode > BuildConfig.VERSION_CODE) {
                             stringResource(id = R.string.update_available)
                         } else {
                             stringResource(id = R.string.already_latest)

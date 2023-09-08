@@ -1,5 +1,6 @@
 package com.zktony.android.utils
 
+import com.zktony.android.utils.ext.loge
 import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.config.SerialConfig
@@ -12,8 +13,6 @@ class SerialPortHelper : AbstractSerialHelper(
     )
 ) {
 
-    val protocol = Protocol()
-
     val axis: CopyOnWriteArrayList<Boolean> = CopyOnWriteArrayList<Boolean>().apply {
         repeat(16) { add(false) }
     }
@@ -22,7 +21,7 @@ class SerialPortHelper : AbstractSerialHelper(
     }
 
     override fun callbackHandler(byteArray: ByteArray) {
-        protocol.callbackHandler(byteArray) { code, rx ->
+        Protocol.Protocol.callbackHandler(byteArray) { code, rx ->
             when (code) {
                 Protocol.AXIS -> {
                     for (i in 0 until rx.data.size / 2) {
@@ -41,6 +40,10 @@ class SerialPortHelper : AbstractSerialHelper(
                 }
             }
         }
+    }
+
+    override fun exceptionHandler(e: Exception) {
+        "Serial Exception: ${e.message}".loge()
     }
 
     companion object {

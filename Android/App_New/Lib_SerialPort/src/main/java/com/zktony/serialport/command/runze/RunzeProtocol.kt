@@ -103,14 +103,13 @@ class RunzeProtocol : BaseProtocol<RunzeProtocol> {
         return byteArray.plus(byteArray.checkSumLE())
     }
 
-    override fun toProtocol(byteArray: ByteArray): RunzeProtocol {
+    override fun toProtocol(byteArray: ByteArray) {
         head = byteArray[0]
         slaveAddr = byteArray[1]
         funcCode = byteArray[2]
         data = byteArray.copyOfRange(3, byteArray.size - 3)
         end = byteArray[byteArray.size - 3]
         checksum = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-        return this
     }
 
     override fun callbackHandler(byteArray: ByteArray, block: (Int, RunzeProtocol) -> Unit) {
@@ -120,10 +119,14 @@ class RunzeProtocol : BaseProtocol<RunzeProtocol> {
         if (!bytes.checkSumLE().contentEquals(crc)) {
             throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
         }
-        val rx = toProtocol(byteArray)
-        when (rx.funcCode) {
+
+        // 解析协议
+        toProtocol(byteArray)
+
+        // 处理数据包
+        when (funcCode) {
             0x00.toByte() -> {
-                block(CHANNEL, rx)
+                block(CHANNEL, this)
             }
 
             0x01.toByte() -> throw Exception("帧错误")
@@ -140,5 +143,8 @@ class RunzeProtocol : BaseProtocol<RunzeProtocol> {
 
     companion object {
         const val CHANNEL = 0
+
+        // 单例 RunzeProtocol 协议 用于返回
+        val Protocol: RunzeProtocol by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { RunzeProtocol() }
     }
 }

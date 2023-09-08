@@ -23,4 +23,9 @@ data class AppState(
      * 温度
      */
     val hpt: MutableMap<Int, Double> = ConcurrentHashMap()
-)
+) {
+    companion object {
+        // 单例
+        val instance: AppState by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { AppState() }
+    }
+}

@@ -7,7 +7,7 @@ package com.zktony.android.utils
 object Constants {
     const val DATABASE_NAME = "zktony-db"
     const val DOMAIN = "https://www.zktony.com"
-    const val OSS_APP = "https://njzkty.oss-cn-beijing.aliyuncs.com/App.json"
+    const val OSS_APP = "https://njzkty.oss-cn-beijing.aliyuncs.com/Application.json"
 
     /**
      * Navigation

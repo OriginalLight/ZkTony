@@ -19,12 +19,11 @@ class RtuProtocol : BaseProtocol<RtuProtocol> {
         return byteArray.plus(byteArray.crc16LE())
     }
 
-    override fun toProtocol(byteArray: ByteArray): RtuProtocol {
+    override fun toProtocol(byteArray: ByteArray) {
         slaveAddr = byteArray[0]
         funcCode = byteArray[1]
         data = byteArray.copyOfRange(2, byteArray.size - 2)
         crc = byteArray.copyOfRange(byteArray.size - 2, byteArray.size)
-        return this
     }
 
     override fun callbackHandler(byteArray: ByteArray, block: (Int, RtuProtocol) -> Unit) {
@@ -34,11 +33,14 @@ class RtuProtocol : BaseProtocol<RtuProtocol> {
         if (!bytes.crc16LE().contentEquals(crc)) {
             throw Exception("RX Crc Error with byteArray: ${byteArray.toHexString()}")
         }
+
         // 解析协议
-        val rx = toProtocol(byteArray)
-        when (rx.funcCode) {
+        toProtocol(byteArray)
+
+        // 处理数据包
+        when (funcCode) {
             0x03.toByte() -> {
-                block(LOCATION, rx)
+                block(LOCATION, this)
             }
 
             else -> {}
@@ -47,5 +49,8 @@ class RtuProtocol : BaseProtocol<RtuProtocol> {
 
     companion object {
         const val LOCATION = 0
+
+        // 单例 RtuProtocol 协议 用于返回
+        val Protocol: RtuProtocol by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { RtuProtocol() }
     }
 }

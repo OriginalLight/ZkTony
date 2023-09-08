@@ -11,40 +11,43 @@ import kotlinx.coroutines.withTimeout
 /**
  * 串口通信
  */
-val serialHelper = object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS3")) {
-
-    val rtuProtocol = RtuProtocol()
-    val runzeProtocol = RunzeProtocol()
-
+val serialPV = object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS3")) {
     override fun callbackHandler(byteArray: ByteArray) {
-        // 解析协议
         if (byteArray[0] == 0xCC.toByte()) {
-            runzeProtocol.callbackHandler(byteArray) { code, rx ->
+            RunzeProtocol.Protocol.callbackHandler(byteArray) { code, rx ->
                 when (code) {
                     RunzeProtocol.CHANNEL -> {
                         appState.hpv[rx.slaveAddr.toInt()] = rx.data[0].toInt()
                     }
+
+                    else -> {}
                 }
             }
         } else {
-            rtuProtocol.callbackHandler(byteArray) { code, rx ->
+            RtuProtocol.Protocol.callbackHandler(byteArray) { code, rx ->
                 when (code) {
                     RtuProtocol.LOCATION -> {
                         val height = rx.data.copyOfRange(3, 5)
                         val low = rx.data.copyOfRange(1, 3)
                         appState.hpp[rx.slaveAddr.toInt() - 1] = height.plus(low).readInt32BE()
                     }
+
+                    else -> {}
                 }
             }
         }
     }
+
+    override fun exceptionHandler(e: Exception) {
+        "Serial Exception: ${e.message}".logE()
+    }
 }
 
 inline fun sendRunzeProtocol(block: RunzeProtocol.() -> Unit) =
-    serialHelper.sendByteArray(RunzeProtocol().apply(block).toByteArray())
+    serialPV.sendByteArray(RunzeProtocol().apply(block).toByteArray())
 
 inline fun sendRtuProtocol(block: RtuProtocol.() -> Unit) =
-    serialHelper.sendByteArray(RtuProtocol().apply(block).toByteArray())
+    serialPV.sendByteArray(RtuProtocol().apply(block).toByteArray())
 
 /**
  * 读取寄存器
@@ -108,7 +111,7 @@ suspend fun writeWithValve(slaveAddr: Int, channel: Int, timeOut: Long = 1000L *
             data = byteArrayOf(channel.toByte(), 0x00)
         }
         while (appState.hpv[slaveAddr] != channel) {
-            delay(200L)
+            delay(800L)
             readWithValve(slaveAddr)
         }
     }
@@ -124,7 +127,7 @@ suspend fun writeWithPulse(slaveAddr: Int, value: Long, timeOut: Long = 1000L * 
         val startPosition = appState.hpp[slaveAddr] ?: 0
         writeRegister(startAddr = 222, slaveAddr = slaveAddr, value = value)
         while (appState.hpp[slaveAddr] != startPosition + value.toInt()) {
-            delay(200L)
+            delay(1000L)
             readRegister(slaveAddr = slaveAddr, startAddr = 4, quantity = 2)
         }
     }
@@ -153,7 +156,7 @@ suspend fun writeWithPosition(slaveAddr: Int, value: Long, timeOut: Long = 1000L
     withTimeout(timeOut) {
         writeRegister(slaveAddr = slaveAddr, startAddr = 208, value = value)
         while (appState.hpp[slaveAddr] != value.toInt()) {
-            delay(200L)
+            delay(1000L)
             readRegister(slaveAddr = slaveAddr, startAddr = 4, quantity = 2)
         }
     }

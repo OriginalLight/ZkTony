@@ -224,7 +224,7 @@ fun SettingContent(
                 val image = if (uiState.application == null) {
                     Icons.Outlined.Sync
                 } else {
-                    if (uiState.application.version_code > BuildConfig.VERSION_CODE) {
+                    if (uiState.application.versionCode > BuildConfig.VERSION_CODE) {
                         Icons.Outlined.Grade
                     } else {
                         Icons.Outlined.Verified
@@ -235,7 +235,7 @@ fun SettingContent(
                     stringResource(id = R.string.update)
                 } else {
                     if (uiState.progress == 0) {
-                        if (uiState.application.version_code > BuildConfig.VERSION_CODE) {
+                        if (uiState.application.versionCode > BuildConfig.VERSION_CODE) {
                             stringResource(id = R.string.update_available)
                         } else {
                             stringResource(id = R.string.already_latest)
@@ -657,23 +657,47 @@ fun ConfigList() {
             var value by rememberDataSaverState(key = Constants.ZT_0000, default = 4)
             var string by remember { mutableStateOf(value.toString()) }
 
-            CircleTextField(title = "模块数量",
+            CircleTextField(
+                title = "模块数量",
                 value = string,
-                keyboardType = KeyboardType.Number,
-                onValueChange = {
+                keyboardType = KeyboardType.Number
+            ) {
+                scope.launch {
                     string = it
-                    scope.launch { value = it.toIntOrNull() ?: 4 }
-                })
+                    value = it.toIntOrNull() ?: 0
+                }
+            }
         }
 
         item {
             var value by rememberDataSaverState(key = Constants.ZT_0001, default = 4.0)
             var string by remember { mutableStateOf(value.toString()) }
 
-            CircleTextField(title = "保温温度", value = string, onValueChange = {
-                string = it
-                scope.launch { value = it.toDoubleOrNull() ?: 0.0 }
-            })
+            CircleTextField(
+                title = "保温温度",
+                value = string
+            ) {
+                scope.launch {
+                    string = it
+                    value = it.toDoubleOrNull() ?: 0.0
+                }
+            }
+        }
+
+        item {
+            var value by rememberDataSaverState(key = Constants.ZT_0002, default = 0L)
+            var string by remember { mutableStateOf(value.toString()) }
+
+            CircleTextField(
+                title = "补偿步数",
+                value = string,
+                keyboardType = KeyboardType.Number
+            ) {
+                scope.launch {
+                    string = it
+                    value = it.toLongOrNull() ?: 0L
+                }
+            }
         }
     }
 }

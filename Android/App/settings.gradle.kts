@@ -17,16 +17,9 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "App"
-include(":core")
-include(":datastore")
-include(":gpio")
-include(":protobuf")
-include(":serialport")
-include(":Incubation")
-include(":Liquid_Four")
-include(":Liquid_One")
-include(":Mix_Auto")
-include(":Mix_Manual")
-include(":Mix_Pro")
-include(":Test")
-include(":Transfer")
+include(":Lib_Core")
+include(":Lib_SerialPort")
+include(":App_Incubation")
+include(":App_Liquid")
+include(":App_Mix")
+include(":App_Transfer")

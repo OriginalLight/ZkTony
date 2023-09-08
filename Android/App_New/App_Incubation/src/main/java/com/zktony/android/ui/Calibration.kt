@@ -264,7 +264,9 @@ fun CalibrationDetail(
                 onClick = { flag ->
                     scope.launch {
                         if (flag == 0) {
-                            //TODO 添加
+                            if (uiState.uiFlags == UiFlags.NONE) {
+                                uiEvent(CalibrationUiEvent.Pulse(selected.index, item.y))
+                            }
                         } else {
                             val points = selected.points.toMutableList()
                             points -= item

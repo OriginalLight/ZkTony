@@ -103,12 +103,12 @@ class SettingViewModel @Inject constructor(
         viewModelScope.launch {
             val application = _application.value
             if (application != null) {
-                if (application.version_code > BuildConfig.VERSION_CODE
-                    && application.download_url.isNotEmpty()
+                if (application.versionCode > BuildConfig.VERSION_CODE
+                    && application.downloadUrl.isNotEmpty()
                     && _progress.value == 0
                 ) {
                     _progress.value = 1
-                    application.download_url.download(
+                    application.downloadUrl.download(
                         File(
                             Ext.ctx.getExternalFilesDir(null),
                             "update.apk"
