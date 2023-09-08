@@ -1,7 +1,6 @@
 package com.zktony.serialport.command.modbus
 
 import com.zktony.serialport.command.BaseProtocol
-import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.ext.crc16LE
 import com.zktony.serialport.ext.toHexString
 

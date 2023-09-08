@@ -7,26 +7,30 @@ const val TAG = "ZKTONY"
 
 var show = BuildConfig.DEBUG
 
-private enum class LEVEL {
-    V, D, I, W, E
+object LEVEL {
+    const val V = 0
+    const val D = 1
+    const val I = 2
+    const val W = 3
+    const val E = 4
 }
 
-fun String.logv(tag: String = TAG) =
+fun String.logV(tag: String = TAG) =
     log(LEVEL.V, tag, this)
 
-fun String.logd(tag: String = TAG) =
+fun String.logD(tag: String = TAG) =
     log(LEVEL.D, tag, this)
 
-fun String.logi(tag: String = TAG) =
+fun String.logI(tag: String = TAG) =
     log(LEVEL.I, tag, this)
 
-fun String.logw(tag: String = TAG) =
+fun String.logW(tag: String = TAG) =
     log(LEVEL.W, tag, this)
 
-fun String.loge(tag: String = TAG) =
+fun String.logE(tag: String = TAG) =
     log(LEVEL.E, tag, this)
 
-private fun log(level: LEVEL, tag: String, message: String) {
+private fun log(level: Int, tag: String, message: String) {
     if (!show) return
     when (level) {
         LEVEL.V -> Log.v(tag, message)

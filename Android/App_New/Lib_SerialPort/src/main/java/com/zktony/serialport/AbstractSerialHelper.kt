@@ -47,7 +47,7 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      * @param bytes byte data
      */
     fun sendByteArray(bytes: ByteArray) {
-        addWaitMessage(bytes)
+        addByteArrayToQueue(bytes)
     }
 
     /**
@@ -56,7 +56,7 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      * @param hex String
      */
     fun sendHexString(hex: String) {
-        addWaitMessage(hex.hex2ByteArray())
+        addByteArrayToQueue(hex.hex2ByteArray())
     }
 
     /**
@@ -65,11 +65,7 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      * @param ascii String
      */
     fun sendAsciiString(ascii: String) {
-        addWaitMessage(ascii.ascii2ByteArray(true))
-    }
-
-    override fun exceptionHandler(e: Exception) {
-        Log.e(TAG, "Exception: ${e.message}")
+        addByteArrayToQueue(ascii.ascii2ByteArray(true))
     }
 
 

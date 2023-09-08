@@ -1,5 +1,6 @@
 package com.zktony.android.utils
 
+import com.zktony.android.utils.ext.loge
 import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.config.SerialConfig
@@ -39,6 +40,10 @@ class SerialPortHelper : AbstractSerialHelper(
                 }
             }
         }
+    }
+
+    override fun exceptionHandler(e: Exception) {
+        "Serial Exception: ${e.message}".loge()
     }
 
     companion object {

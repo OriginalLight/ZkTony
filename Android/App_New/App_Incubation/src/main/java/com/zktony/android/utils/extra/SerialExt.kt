@@ -1,14 +1,12 @@
 package com.zktony.android.utils.extra
 
 import com.zktony.serialport.AbstractSerialHelper
-import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.command.modbus.RtuProtocol
 import com.zktony.serialport.command.runze.RunzeProtocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
-import java.lang.Math.random
 
 /**
  * 串口通信
@@ -38,6 +36,10 @@ val serialPV = object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS3")
                 }
             }
         }
+    }
+
+    override fun exceptionHandler(e: Exception) {
+        "Serial Exception: ${e.message}".logE()
     }
 }
 
@@ -109,7 +111,7 @@ suspend fun writeWithValve(slaveAddr: Int, channel: Int, timeOut: Long = 1000L *
             data = byteArrayOf(channel.toByte(), 0x00)
         }
         while (appState.hpv[slaveAddr] != channel) {
-            delay(200L)
+            delay(800L)
             readWithValve(slaveAddr)
         }
     }
@@ -125,7 +127,7 @@ suspend fun writeWithPulse(slaveAddr: Int, value: Long, timeOut: Long = 1000L * 
         val startPosition = appState.hpp[slaveAddr] ?: 0
         writeRegister(startAddr = 222, slaveAddr = slaveAddr, value = value)
         while (appState.hpp[slaveAddr] != startPosition + value.toInt()) {
-            delay(200L)
+            delay(1000L)
             readRegister(slaveAddr = slaveAddr, startAddr = 4, quantity = 2)
         }
     }
@@ -154,7 +156,7 @@ suspend fun writeWithPosition(slaveAddr: Int, value: Long, timeOut: Long = 1000L
     withTimeout(timeOut) {
         writeRegister(slaveAddr = slaveAddr, startAddr = 208, value = value)
         while (appState.hpp[slaveAddr] != value.toInt()) {
-            delay(200L)
+            delay(1000L)
             readRegister(slaveAddr = slaveAddr, startAddr = 4, quantity = 2)
         }
     }

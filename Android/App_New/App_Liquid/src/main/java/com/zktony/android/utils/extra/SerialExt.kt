@@ -14,7 +14,6 @@ import kotlinx.coroutines.withTimeout
  * 串口通信
  */
 val serialport = object : AbstractSerialHelper(SerialConfig()) {
-
     override fun callbackHandler(byteArray: ByteArray) {
         Protocol.Protocol.callbackHandler(byteArray) { code, rx ->
             when (code) {
@@ -35,6 +34,10 @@ val serialport = object : AbstractSerialHelper(SerialConfig()) {
                 }
             }
         }
+    }
+
+    override fun exceptionHandler(e: Exception) {
+        "Serial Exception: ${e.message}".logE()
     }
 }
 

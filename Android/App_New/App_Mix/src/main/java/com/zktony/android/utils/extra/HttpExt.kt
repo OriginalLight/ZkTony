@@ -32,7 +32,7 @@ fun httpCall(
                     val resp = response.body.string()
                     val type = object : TypeToken<List<Application>>() {}.type
                     val list = Gson().fromJson<List<Application>>(resp, type)
-                    callback(list.find { app -> app.application_id == BuildConfig.APPLICATION_ID })
+                    callback(list.find { app -> app.applicationId == BuildConfig.APPLICATION_ID })
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                     exception(ex)
@@ -47,11 +47,11 @@ fun httpCall(
 @Keep
 data class Application(
     val id: Int,
-    val application_id: String,
-    val build_type: String,
-    val version_code: Int,
-    val version_name: String,
-    val create_time: String,
+    val applicationId: String,
+    val buildType: String,
+    val versionCode: Int,
+    val versionName: String,
+    val createTime: String,
     val description: String,
-    val download_url: String,
+    val downloadUrl: String,
 )

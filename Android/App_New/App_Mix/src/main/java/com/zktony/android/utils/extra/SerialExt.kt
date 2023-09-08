@@ -72,6 +72,10 @@ val serialport = object : AbstractSerialHelper(SerialConfig()) {
             }
         }
     }
+
+    override fun exceptionHandler(e: Exception) {
+        "Serial Exception: ${e.message}".logE()
+    }
 }
 
 /**

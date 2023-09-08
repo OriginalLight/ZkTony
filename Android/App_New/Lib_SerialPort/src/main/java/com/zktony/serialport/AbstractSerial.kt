@@ -1,14 +1,8 @@
 package com.zktony.serialport
 
-import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.core.SerialPort
-import com.zktony.serialport.ext.toHexString
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.*
 import java.security.InvalidParameterException
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
@@ -26,7 +20,7 @@ abstract class AbstractSerial {
     private var delay: Long = 10L
     private var isOpen: Boolean = false
     private val buffer = ByteArrayOutputStream()
-    private val messageQueue = LinkedBlockingQueue<ByteArray>()
+    private val byteArrayQueue = LinkedBlockingQueue<ByteArray>()
 
     /**
      * Callback handler
@@ -60,8 +54,8 @@ abstract class AbstractSerial {
         }
 
         isOpen = true
-        startMessageReceiver()
-        startMessageSender()
+        byteArrayReceiver()
+        byteArraySender()
     }
 
     /**
@@ -82,8 +76,8 @@ abstract class AbstractSerial {
     /**
      * Add message to the message queue
      */
-    fun addWaitMessage(byteArray: ByteArray) {
-        messageQueue.add(byteArray)
+    fun addByteArrayToQueue(byteArray: ByteArray) {
+        byteArrayQueue.add(byteArray)
     }
 
     /**
@@ -121,14 +115,19 @@ abstract class AbstractSerial {
     /**
      * Thread for receiving data
      */
-    private fun startMessageReceiver() {
+    private fun byteArrayReceiver() {
         executor.execute {
             val buffer = ByteArray(1024)
             while (isOpen) {
                 try {
-                    val bytesRead = inputStream?.read(buffer)
-                    if (bytesRead != null && bytesRead > 0) {
-                        dataProcess(buffer.copyOfRange(0, bytesRead))
+                    val available = inputStream?.available()
+                    if (available != null && available > 0) {
+                        val bytesRead = inputStream?.read(buffer)
+                        if (bytesRead != null && bytesRead > 0) {
+                            dataProcess(buffer.copyOfRange(0, bytesRead))
+                        } else {
+                            dataProcess(null)
+                        }
                     } else {
                         dataProcess(null)
                     }
@@ -138,8 +137,8 @@ abstract class AbstractSerial {
                     } catch (ex: InterruptedException) {
                         exceptionHandler(ex)
                     }
-                } catch (e: Exception) {
-                    exceptionHandler(e)
+                } catch (ex: Exception) {
+                    exceptionHandler(ex)
                 }
             }
         }
@@ -148,15 +147,13 @@ abstract class AbstractSerial {
     /**
      * Thread for sending data
      */
-    private fun startMessageSender() {
+    private fun byteArraySender() {
         executor.execute {
             while (isOpen) {
                 try {
-                    val message = messageQueue.poll(10L, TimeUnit.MILLISECONDS)
-                    Log.d("AbstractSerial", "Send message: ${message.toHexString()}")
-                    if (message != null && message.isNotEmpty()) {
+                    val message = byteArrayQueue.poll(delay, TimeUnit.MILLISECONDS)
+                    if (message != null) {
                         send(message)
-                        Thread.sleep(delay)
                     }
                 } catch (ex: Exception) {
                     exceptionHandler(ex)

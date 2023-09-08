@@ -12,5 +12,5 @@ object Constants {
     const val WASH_TANK_X = "wash_tank_x"
     const val WASH_TANK_Y = "wash_tank_y"
     const val NAVIGATION = "navigation"
-    const val OSS_APP = "https://njzkty.oss-cn-beijing.aliyuncs.com/App.json"
+    const val OSS_APP = "https://njzkty.oss-cn-beijing.aliyuncs.com/Application.json"
 }
