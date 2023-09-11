@@ -37,7 +37,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private val _count = MutableStateFlow(0)
 
     /**
-     * 上盘运动计数
+     * 记录上盘运动位置，改变ui
      */
     private val _spCount = MutableStateFlow(0)
 
@@ -178,10 +178,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     val tiji = dataSaver.readData("tiji", 0f)
 
-    /**
-     * 上培养皿运动了几次
-     */
-    var valveOne = dataSaver.readData("valveOne", 0)
 
     /**
      * 上盘运动次数
@@ -340,10 +336,71 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
      */
     private fun spStart(runIndex: Int) {
         viewModelScope.launch {
-            _spCount.value = valveOne
-            _spCount.value += 1
-            spCount.value
+
+            /**
+             * 1.获取移动步数
+             */
+            var spydjl = dataSaver.readData("spydjl", 0f)
+            var spydbs = (spydjl * 3200).toLong()
+            spydbs += runIndex * 1666
+
+            /**
+             * 1.举升1到上盘高度
+             *
+             * 2.上盘移动400步
+             *
+             * 3.1举升1到复位高度
+             * 3.2举升2到上盘高度
+             *
+             * 4.上盘移动剩余的1266
+             *
+             * 5.举升2到复位高度
+             *
+             */
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 1
+                    pulse = (spgd * 3200L).toLong()
+                }
+            }
+
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 5
+                    pulse = spydbs - 1266
+                }
+            }
+
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 1
+                    pulse = (fwgd * 3200L).toLong()
+                }
+                move(MoveType.MOVE_PULSE) {
+                    index = 0
+                    pulse = (spgd2 * 3200L).toLong()
+                }
+
+            }
+
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 5
+                    pulse = spydbs
+                }
+            }
+
+            tx {
+                move(MoveType.MOVE_PULSE) {
+                    index = 0
+                    pulse = (fwgd2 * 3200L).toLong()
+                }
+
+            }
+
+
         }
+
     }
 
     /**
@@ -470,6 +527,13 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                  * 检测正确的培养皿个数,坐标从2到0
                  */
                 var jiance2PYM = 0
+
+
+                /**
+                 * 上培养皿运动了几次
+                 */
+                var valveOne = dataSaver.readData("valveOne", 0)
+
 
                 spStartNum = valveOne
 

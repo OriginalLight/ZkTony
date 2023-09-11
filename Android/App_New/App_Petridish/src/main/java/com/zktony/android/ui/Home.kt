@@ -133,6 +133,10 @@ fun MenuContent(
         }
     }
 
+    LaunchedEffect(key1 = spCount) {
+        valveOne.value = spCount
+    }
+
     LazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
         columns = GridCells.Fixed(3),
@@ -168,9 +172,6 @@ fun MenuContent(
                             .width(800.dp)
                             .padding(16.dp)
                     ) {
-                        LaunchedEffect(key1 = uiState.spCount) {
-                            valveOne.value = spCount
-                        }
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -222,6 +223,8 @@ fun MenuContent(
                         enabled = uiState.loading == 0 || uiState.loading == 7,
                         onClick = {
                             if (tiji.value.toFloat() != 0f) {
+                                println("valveOne.value==="+valveOne.value)
+                                println("valveOne_ex==="+valveOne_ex)
                                 if (uiState.loading == 0) {
                                     event(HomeEvent.Start(7))
                                 } else {
@@ -263,7 +266,7 @@ fun MenuContent(
                         enabled = uiState.loading == 0,
                         onClick = {
                             if (valveOne.value < 7) {
-//                                valveOne.value += 1
+                                valveOne.value += 1
                                 event(HomeEvent.spStart(valveOne.value))
                             }
 
@@ -300,6 +303,26 @@ fun MenuContent(
                             .width(140.dp)
                             .padding(start = 20.dp, top = 10.dp),
 
+                        enabled = uiState.loading == 0 || uiState.loading == 2,
+                        onClick = {
+                            event(HomeEvent.Reset)
+                            valveOne.value = 0
+                            valveOne_ex = 0
+                        }
+                    ) {
+                        Text(
+                            text = "复位",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    ElevatedButton(
+                        modifier = Modifier
+                            .width(140.dp)
+                            .padding(start = 20.dp, top = 10.dp),
+
                         enabled = uiState.loading == 0,
                         onClick = {
                             //TODO 紫外没写
@@ -323,24 +346,7 @@ fun MenuContent(
                         }
                     }
 
-                    ElevatedButton(
-                        modifier = Modifier
-                            .width(140.dp)
-                            .padding(start = 20.dp, top = 10.dp),
 
-                        enabled = uiState.loading == 0 || uiState.loading == 2,
-                        onClick = {
-                            event(HomeEvent.Reset)
-                            valveOne.value = 0
-                        }
-                    ) {
-                        Text(
-                            text = "复位",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
 
                     ElevatedButton(
                         modifier = Modifier

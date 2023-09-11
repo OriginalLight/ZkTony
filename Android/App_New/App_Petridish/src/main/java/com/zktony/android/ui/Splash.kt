@@ -17,9 +17,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -69,6 +71,7 @@ fun Splash(
     var clickNum = 0;
 
     val valveOne = rememberDataSaverState(key = "valveOne", default = 0)
+    var valveOne_ex by remember { mutableStateOf(0) }
 
     // Animate the splash screen and hide it when the animation is complete
     LaunchedEffect(key1 = true) {
@@ -216,7 +219,7 @@ fun Splash(
                                         }
                                     }
                                     valveOne.value = 0
-
+                                    valveOne_ex = 0
                                     toggleDrawer(NavigationType.NAVIGATION_RAIL)
                                     navController.popBackStack()
                                     navController.navigate(Route.HOME)

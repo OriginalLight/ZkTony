@@ -255,6 +255,7 @@ fun CalibrationList(
     var jyh_ex by remember { mutableStateOf(jyh.value.format(4)) }
 
     val valveOne = rememberDataSaverState(key = "valveOne", default = 0)
+    var valveOne_ex by remember { mutableStateOf(0) }
 
     val context = LocalContext.current;
 
@@ -306,6 +307,7 @@ fun CalibrationList(
                 Button(
                     onClick = {
                         valveOne.value = 0
+                        valveOne_ex = 0
                         event(
                             CalibrationEvent.Reset(
                                 listOf(1, 0, 2, 4, 5),
