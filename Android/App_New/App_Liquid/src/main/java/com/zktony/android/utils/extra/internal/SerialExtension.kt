@@ -8,11 +8,11 @@ import com.zktony.serialport.ext.writeInt8
 
 class SerialExtension {
 
-    var controlType: Byte = 0x00
+    var controlType: Byte = ControlType.RESET
     val byteList: MutableList<Byte> = mutableListOf()
     val indexList: MutableList<Int> = mutableListOf()
-    var executeType: ExecuteType = ExecuteType.SYNC
-    var exceptionPolicy: ExceptionPolicy = ExceptionPolicy.SKIP
+    var executeType: Int = ExecuteType.SYNC
+    var exceptionPolicy: Int = ExceptionPolicy.SKIP
     var timeout: Long = 1000L * 10
 
     fun init() {
@@ -22,36 +22,32 @@ class SerialExtension {
     fun <T : Number> start(
         index: Int = 0,
         pdv: T,
-        ads: Triple<Long, Long, Long> = Triple(
-            (appState.hpm[index] ?: Motor()).acceleration,
-            (appState.hpm[index] ?: Motor()).deceleration,
-            (appState.hpm[index] ?: Motor()).speed
-        ),
+        ads: Triple<Long, Long, Long>? = null,
     ) {
-        controlType = 0x01
+        controlType = ControlType.START
         val step = pulse(index, pdv)
         if (step != 0L) {
-            val config =
-                Motor(acceleration = ads.first, deceleration = ads.second, speed = ads.third)
-            val ba = ByteArray(5)
-            ba.writeInt8(index, 0).writeInt32LE(step, 1)
-            byteList.addAll(ba.toList())
-            byteList.addAll(config.toByteArray().toList())
+            val ba1 = ByteArray(5)
+            val ba2 = ByteArray(12)
+            ba1.writeInt8(index, 0).writeInt32LE(step, 1)
+            if (ads == null) {
+                val motor = appState.hpm[index] ?: Motor()
+                ba2.writeInt32LE(motor.acceleration, 0).writeInt32LE(motor.deceleration, 4)
+                    .writeInt32LE(motor.speed, 8)
+            } else {
+                ba2.writeInt32LE(ads.first, 0).writeInt32LE(ads.second, 4)
+                    .writeInt32LE(ads.third, 8)
+            }
+            byteList.addAll(ba1.toList())
+            byteList.addAll(ba2.toList())
             indexList.add(index)
         }
     }
 
-    fun stop(ids: List<Int>) {
-        controlType = 0x02
-        val byteArray = ByteArray(ids.size)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i, index)
-        }
-        byteList.addAll(byteArray.toList())
-    }
+    fun stop(ids: List<Int>) = stop(*ids.toIntArray())
 
     fun stop(vararg ids: Int) {
-        controlType = 0x02
+        controlType = ControlType.STOP
         val byteArray = ByteArray(ids.size)
         ids.forEachIndexed { index, i ->
             byteArray.writeInt8(i, index)
@@ -59,17 +55,10 @@ class SerialExtension {
         byteList.addAll(byteArray.toList())
     }
 
-    fun query(ids: List<Int>) {
-        controlType = 0x03
-        val byteArray = ByteArray(ids.size)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i, index)
-        }
-        byteList.addAll(byteArray.toList())
-    }
+    fun query(ids: List<Int>) = query(*ids.toIntArray())
 
     fun query(vararg ids: Int) {
-        controlType = 0x03
+        controlType = ControlType.QUERY
         val byteArray = ByteArray(ids.size)
         ids.forEachIndexed { index, i ->
             byteArray.writeInt8(i, index)
@@ -77,18 +66,10 @@ class SerialExtension {
         byteList.addAll(byteArray.toList())
     }
 
-
-    fun gpio(ids: List<Int>) {
-        controlType = 0x04
-        val byteArray = ByteArray(ids.size)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i, index)
-        }
-        byteList.addAll(byteArray.toList())
-    }
+    fun gpio(ids: List<Int>) = gpio(*ids.toIntArray())
 
     fun gpio(vararg ids: Int) {
-        controlType = 0x04
+        controlType = ControlType.GPIO
         val byteArray = ByteArray(ids.size)
         ids.forEachIndexed { index, i ->
             byteArray.writeInt8(i, index)
@@ -96,19 +77,10 @@ class SerialExtension {
         byteList.addAll(byteArray.toList())
     }
 
-    fun valve(ids: List<Pair<Int, Int>>) {
-        controlType = 0x05
-        val byteArray = ByteArray(ids.size * 2)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i.first, index * 2)
-            byteArray.writeInt8(i.second, index * 2 + 1)
-        }
-        byteList.addAll(byteArray.toList())
-    }
-
+    fun valve(ids: List<Pair<Int, Int>>) = valve(*ids.toTypedArray())
 
     fun valve(vararg ids: Pair<Int, Int>) {
-        controlType = 0x05
+        controlType = ControlType.VALVE
         val byteArray = ByteArray(ids.size * 2)
         ids.forEachIndexed { index, i ->
             byteArray.writeInt8(i.first, index * 2)

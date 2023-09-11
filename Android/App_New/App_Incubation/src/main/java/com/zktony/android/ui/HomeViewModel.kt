@@ -9,7 +9,9 @@ import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.internal.Process
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
-import com.zktony.android.utils.extra.*
+import com.zktony.android.utils.extra.readWithPosition
+import com.zktony.android.utils.extra.readWithValve
+import com.zktony.android.utils.extra.writeWithShaker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -120,30 +122,12 @@ class HomeViewModel @Inject constructor(
             is HomeUiEvent.Shaker -> viewModelScope.launch {
                 val shaker = _common.value.shaker
                 try {
-                    if (shaker) {
-                        val before = appState.hpp[0] ?: 0
-                        writeWithSwitch(0, 0)
-                        while (before == (appState.hpp[0] ?: 0)) {
-                            delay(200L)
-                            readWithPulse(0)
-                        }
-                        val after = appState.hpp[0] ?: 0
-                        val remainder = after % 6400
-                        val value = if (remainder > 3200) {
-                            after + 6400 - remainder
-                        } else {
-                            after - remainder
-                        }
-                        writeWithPosition(0, value.toLong())
-                    } else {
-                        writeWithSwitch(0, 1)
-                    }
+                    writeWithShaker(shaker)
                 } catch (ex: Exception) {
                     _message.value = ex.message
                 } finally {
                     _common.value = _common.value.copy(shaker = !shaker)
                 }
-
             }
         }
     }
@@ -151,13 +135,13 @@ class HomeViewModel @Inject constructor(
     private suspend fun init() {
         repeat(3) {
             // 读取绝对位置
-            readWithPulse(slaveAddr = it)
-            delay(200L)
+            readWithPosition(slaveAddr = it)
+            delay(300L)
         }
         repeat(4) {
             // 读取阀门状态
             readWithValve(slaveAddr = it)
-            delay(200L)
+            delay(300L)
         }
     }
 

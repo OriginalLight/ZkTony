@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -429,8 +430,12 @@ fun MotorDetail(
 
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current
+
     val selected = uiState.entities.find { it.id == uiState.selected } ?: Motor()
-    var ads by remember { mutableStateOf(selected.toAdsString()) }
+    var acceleration by remember { mutableStateOf(selected.acceleration.toString()) }
+    var deceleration by remember { mutableStateOf(selected.deceleration.toString()) }
+    var speed by remember { mutableStateOf(selected.speed.toString()) }
     var index by remember { mutableStateOf(selected.index.toString()) }
 
     val keyboardOptions = KeyboardOptions(
@@ -440,6 +445,7 @@ fun MotorDetail(
 
     val keyboardActions = KeyboardActions(onDone = {
         softKeyboard?.hide()
+        focusManager.clearFocus()
     })
 
     val colors = TextFieldDefaults.colors(
@@ -495,10 +501,10 @@ fun MotorDetail(
         item {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = ads.first,
+                value = acceleration,
                 onValueChange = {
                     scope.launch {
-                        ads = Triple(it, ads.second, ads.third)
+                        acceleration = it
                         uiEvent(
                             SettingUiEvent.Update(
                                 selected.copy(acceleration = it.toLongOrNull() ?: 0L)
@@ -527,10 +533,10 @@ fun MotorDetail(
         item {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = ads.second,
+                value = deceleration,
                 onValueChange = {
                     scope.launch {
-                        ads = Triple(ads.first, it, ads.third)
+                        deceleration = it
                         uiEvent(
                             SettingUiEvent.Update(
                                 selected.copy(
@@ -561,10 +567,10 @@ fun MotorDetail(
         item {
             TextField(
                 modifier = Modifier.fillMaxWidth(),
-                value = ads.third,
+                value = speed,
                 onValueChange = {
                     scope.launch {
-                        ads = Triple(ads.first, ads.second, it)
+                        speed = it
                         uiEvent(
                             SettingUiEvent.Update(
                                 selected.copy(
@@ -598,6 +604,7 @@ fun MotorDetail(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ConfigList(modifier: Modifier = Modifier) {
+
     val scope = rememberCoroutineScope()
 
     LazyColumn(
@@ -613,6 +620,7 @@ fun ConfigList(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {
+
             var abscissa by rememberDataSaverState(key = Constants.ZT_0001, default = 0.0)
             var ordinate by rememberDataSaverState(key = Constants.ZT_0002, default = 0.0)
             var tankAbscissa by rememberDataSaverState(

@@ -11,43 +11,46 @@ import kotlinx.coroutines.withTimeout
 /**
  * 串口通信
  */
-val serialPV = object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS3")) {
-    override fun callbackHandler(byteArray: ByteArray) {
-        if (byteArray[0] == 0xCC.toByte()) {
-            RunzeProtocol.Protocol.callbackHandler(byteArray) { code, rx ->
-                when (code) {
-                    RunzeProtocol.CHANNEL -> {
-                        appState.hpv[rx.slaveAddr.toInt()] = rx.data[0].toInt()
-                    }
+val serialHelper =
+    object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS3", baudRate = 9600)) {
+        override fun callbackHandler(byteArray: ByteArray) {
+            byteArray.toHexString().logW()
+            if (byteArray[0] == 0xCC.toByte()) {
+                RunzeProtocol.Protocol.callbackHandler(byteArray) { code, rx ->
+                    when (code) {
+                        RunzeProtocol.CHANNEL -> {
+                            appState.hpv[rx.slaveAddr.toInt()] = rx.data[0].toInt()
+                        }
 
-                    else -> {}
+                        else -> {}
+                    }
                 }
-            }
-        } else {
-            RtuProtocol.Protocol.callbackHandler(byteArray) { code, rx ->
-                when (code) {
-                    RtuProtocol.LOCATION -> {
-                        val height = rx.data.copyOfRange(3, 5)
-                        val low = rx.data.copyOfRange(1, 3)
-                        appState.hpp[rx.slaveAddr.toInt() - 1] = height.plus(low).readInt32BE()
-                    }
+            } else {
+                RtuProtocol.Protocol.callbackHandler(byteArray) { code, rx ->
+                    when (code) {
+                        RtuProtocol.LOCATION -> {
+                            val height = rx.data.copyOfRange(3, 5)
+                            val low = rx.data.copyOfRange(1, 3)
+                            appState.hpp[rx.slaveAddr.toInt() - 1] = height.plus(low).readInt32BE()
+                            height.plus(low).readInt32BE().toString().logW()
+                        }
 
-                    else -> {}
+                        else -> {}
+                    }
                 }
             }
         }
-    }
 
-    override fun exceptionHandler(e: Exception) {
-        "Serial Exception: ${e.message}".logE()
+        override fun exceptionHandler(e: Exception) {
+            "Serial Exception: ${e.message}".logE()
+        }
     }
-}
 
 inline fun sendRunzeProtocol(block: RunzeProtocol.() -> Unit) =
-    serialPV.sendByteArray(RunzeProtocol().apply(block).toByteArray())
+    serialHelper.sendByteArray(RunzeProtocol().apply(block).toByteArray())
 
 inline fun sendRtuProtocol(block: RtuProtocol.() -> Unit) =
-    serialPV.sendByteArray(RtuProtocol().apply(block).toByteArray())
+    serialHelper.sendByteArray(RtuProtocol().apply(block).toByteArray())
 
 /**
  * 读取寄存器
@@ -95,7 +98,10 @@ fun readWithValve(slaveAddr: Int) =
         data = byteArrayOf(0x00, 0x00)
     }
 
-fun readWithPulse(slaveAddr: Int) =
+/**
+ * 读取脉冲数
+ */
+fun readWithPosition(slaveAddr: Int) =
     readRegister(slaveAddr = slaveAddr, startAddr = 4, quantity = 2)
 
 /**
@@ -104,14 +110,17 @@ fun readWithPulse(slaveAddr: Int) =
 @Throws(Exception::class)
 suspend fun writeWithValve(slaveAddr: Int, channel: Int, timeOut: Long = 1000L * 10) {
     withTimeout(timeOut) {
-        appState.hpv[slaveAddr] = 0
+        if ((appState.hpv[slaveAddr] ?: 0) == channel) return@withTimeout
         sendRunzeProtocol {
             this.slaveAddr = slaveAddr.toByte()
             funcCode = 0x44
             data = byteArrayOf(channel.toByte(), 0x00)
         }
         while (appState.hpv[slaveAddr] != channel) {
-            delay(800L)
+            repeat(10) {
+                delay(30L)
+                if (appState.hpv[slaveAddr] == channel) return@withTimeout
+            }
             readWithValve(slaveAddr)
         }
     }
@@ -124,21 +133,25 @@ suspend fun writeWithValve(slaveAddr: Int, channel: Int, timeOut: Long = 1000L *
 suspend fun writeWithPulse(slaveAddr: Int, value: Long, timeOut: Long = 1000L * 10) {
     if (value == 0L) throw Exception("value must be greater than 0")
     withTimeout(timeOut) {
-        val startPosition = appState.hpp[slaveAddr] ?: 0
+        val after = (appState.hpp[slaveAddr] ?: 0) + value.toInt()
+        val target = (after - 50)..(after + 50)
         writeRegister(startAddr = 222, slaveAddr = slaveAddr, value = value)
-        while (appState.hpp[slaveAddr] != startPosition + value.toInt()) {
-            delay(1000L)
-            readRegister(slaveAddr = slaveAddr, startAddr = 4, quantity = 2)
+        while (appState.hpp[slaveAddr] !in target) {
+            repeat(10) {
+                delay(30L)
+                if (appState.hpp[slaveAddr] in target) return@withTimeout
+            }
+            readWithPosition(slaveAddr = slaveAddr)
         }
     }
 }
 
 /**
- * 电机一直转
- * 0 - 减速停止
- * 1 - 正转
- * 256 - 急停
- * 257 - 反转
+ * 电机控制
+ * 1. 0 - 减速停止
+ * 2. 1 - 正转一直转
+ * 3. 256 - 急停
+ * 4. 257 - 反转一直转
  */
 @Throws(Exception::class)
 fun writeWithSwitch(slaveAddr: Int, value: Int) {
@@ -147,17 +160,45 @@ fun writeWithSwitch(slaveAddr: Int, value: Int) {
     writeRegister(slaveAddr = slaveAddr, startAddr = 200, value = value)
 }
 
-
 /**
  * 运行到指定位置
  */
 @Throws(Exception::class)
 suspend fun writeWithPosition(slaveAddr: Int, value: Long, timeOut: Long = 1000L * 10) {
     withTimeout(timeOut) {
+        val target = (value.toInt() - 50)..(value.toInt() + 50)
         writeRegister(slaveAddr = slaveAddr, startAddr = 208, value = value)
-        while (appState.hpp[slaveAddr] != value.toInt()) {
-            delay(1000L)
-            readRegister(slaveAddr = slaveAddr, startAddr = 4, quantity = 2)
+        while (appState.hpp[slaveAddr] !in target) {
+            repeat(10) {
+                delay(30L)
+                if (appState.hpp[slaveAddr] in target) return@withTimeout
+            }
+            readWithPosition(slaveAddr = slaveAddr)
         }
+    }
+}
+
+@Throws(Exception::class)
+suspend fun writeWithShaker(value: Boolean) {
+    if (value) {
+        withTimeout(1000L * 5) {
+            writeWithSwitch(0, 0)
+            val before = appState.hpp[0] ?: 0
+            delay(300L)
+            while (appState.hpp[0] == before) {
+                readWithPosition(slaveAddr = 0)
+                delay(300L)
+            }
+            val after = appState.hpp[0] ?: 0
+            val remainder = after % 6400
+            val position = if (remainder > 3200) {
+                after + 6400 - remainder
+            } else {
+                after - remainder
+            }
+            writeWithPosition(0, position.toLong())
+        }
+    } else {
+        writeWithSwitch(0, 1)
     }
 }

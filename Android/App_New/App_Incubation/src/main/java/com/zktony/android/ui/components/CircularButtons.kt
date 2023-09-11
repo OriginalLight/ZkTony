@@ -25,15 +25,15 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 
 @Composable
-fun CircularButtonsWithSelection(
-    buttonCount: Int = 12,
-    buttonRadius: Dp = 24.dp,
-    buttonEnabled: Boolean = true,
+fun CircularButtons(
+    count: Int = 12,
+    radius: Dp = 24.dp,
+    enabled: Boolean = true,
     circleRadius: Dp = 300.dp,
-    selectedButtonIndex: Int,
-    onButtonSelected: (Int) -> Unit
+    selected: Int,
+    onSelected: (Int) -> Unit
 ) {
-    val angleStep = (2 * PI / buttonCount).toFloat()
+    val angleStep = (2 * PI / count).toFloat()
 
     Box(
         modifier = Modifier.size(circleRadius),
@@ -51,17 +51,17 @@ fun CircularButtonsWithSelection(
         ) {}
 
         // 绘制圆形按钮
-        for (i in 0 until buttonCount) {
+        for (i in 0 until count) {
             val angle = i * angleStep
             val x = (circleRadius / 2).value * cos(angle)
             val y = (circleRadius / 2).value * sin(angle)
-            val isSelected = selectedButtonIndex == i
+            val isSelected = selected == i
 
             Button(
-                onClick = { onButtonSelected(i) },
-                enabled = buttonEnabled,
+                onClick = { onSelected(i) },
+                enabled = enabled,
                 modifier = Modifier
-                    .size(buttonRadius * 2)
+                    .size(radius * 2)
                     .offset { IntOffset(x.roundToInt(), y.roundToInt()) }
                     .background(
                         color = if (isSelected) Color.Red else Color.Green,
@@ -69,12 +69,12 @@ fun CircularButtonsWithSelection(
                     )
                     .padding(8.dp)
                     .clip(CircleShape)
-                    .clickable { onButtonSelected(i) }
+                    .clickable { onSelected(i) }
             ) {}
         }
 
         Text(
-            text = (selectedButtonIndex + 1).toString(),
+            text = (selected + 1).toString(),
             style = MaterialTheme.typography.headlineMedium
         )
     }
@@ -83,12 +83,12 @@ fun CircularButtonsWithSelection(
 @Preview
 @Composable
 fun CircularButtonsWithSelectionPreview() {
-    var selectedButton by remember { mutableIntStateOf(0) }
+    var selected by remember { mutableIntStateOf(0) }
 
-    CircularButtonsWithSelection(
-        selectedButtonIndex = selectedButton,
-        onButtonSelected = { index ->
-            selectedButton = index
+    CircularButtons(
+        selected = selected,
+        onSelected = { index ->
+            selected = index
         }
     )
 }

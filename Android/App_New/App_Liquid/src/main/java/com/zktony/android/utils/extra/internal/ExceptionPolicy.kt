@@ -6,29 +6,29 @@ package com.zktony.android.utils.extra.internal
  * @author 刘贺贺
  * @date 2023/6/7 14:23
  */
-enum class ExceptionPolicy {
+object ExceptionPolicy {
     /**
      * 重试
      */
-    RETRY,
+    const val RETRY = 0
 
     /**
      * 查询
      */
-    QUERY,
+    const val QUERY = 1
 
     /**
      * 复位
      */
-    RESET,
+    const val RESET = 2
 
     /**
      * 跳过
      */
-    SKIP,
+    const val SKIP = 3
 
     /**
      * 抛出异常
      */
-    THROW
+    const val THROW = 4
 }

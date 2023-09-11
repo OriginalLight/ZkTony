@@ -1,5 +1,6 @@
 package com.zktony.android.utils.extra
 
+import com.zktony.android.utils.extra.internal.ControlType
 import com.zktony.android.utils.extra.internal.ExceptionPolicy
 import com.zktony.android.utils.extra.internal.ExecuteType
 import com.zktony.android.utils.extra.internal.SerialExtension
@@ -13,7 +14,7 @@ import kotlinx.coroutines.withTimeout
 /**
  * 串口通信
  */
-val serialport = object : AbstractSerialHelper(SerialConfig()) {
+val serialHelper = object : AbstractSerialHelper(SerialConfig()) {
     override fun callbackHandler(byteArray: ByteArray) {
         Protocol.Protocol.callbackHandler(byteArray) { code, rx ->
             when (code) {
@@ -71,7 +72,7 @@ fun <T : Number> pulse(index: Int, dvp: T): Long {
  * @return Unit
  */
 inline fun sendProtocol(block: Protocol.() -> Unit) =
-    serialport.sendByteArray(Protocol().apply(block).toByteArray())
+    serialHelper.sendByteArray(Protocol().apply(block).toByteArray())
 
 /**
  * 设置轴锁定状态
@@ -126,7 +127,7 @@ suspend fun serial(block: SerialExtension.() -> Unit) {
     val ext = SerialExtension().apply(block)
 
     when (ext.controlType) {
-        0x01.toByte() -> {
+        ControlType.START -> {
             when (ext.executeType) {
                 // 同步运动
                 ExecuteType.SYNC -> {

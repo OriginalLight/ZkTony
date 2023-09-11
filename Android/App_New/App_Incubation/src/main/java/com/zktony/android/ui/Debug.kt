@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.zktony.android.data.datastore.rememberDataSaverState
-import com.zktony.android.ui.components.CircularButtonsWithSelection
+import com.zktony.android.ui.components.CircularButtons
 import com.zktony.android.ui.components.DebugAppBar
 import com.zktony.android.ui.components.SquareTextField
 import com.zktony.android.ui.utils.LocalNavigationActions
@@ -102,9 +102,9 @@ fun ValveGroup(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.Center
         ) {
-            CircularButtonsWithSelection(
-                buttonEnabled = uiState.uiFlags != UiFlags.VALVE,
-                selectedButtonIndex = valveOne
+            CircularButtons(
+                enabled = uiState.uiFlags != UiFlags.VALVE,
+                selected = valveOne
             ) { index ->
                 scope.launch {
                     valveOne = index
@@ -117,10 +117,10 @@ fun ValveGroup(
             modifier = Modifier.weight(1f),
             contentAlignment = Alignment.Center
         ) {
-            CircularButtonsWithSelection(
-                buttonCount = 6,
-                buttonEnabled = uiState.uiFlags != UiFlags.VALVE,
-                selectedButtonIndex = valveTwo
+            CircularButtons(
+                count = 6,
+                enabled = uiState.uiFlags != UiFlags.VALVE,
+                selected = valveTwo
             ) { index ->
                 scope.launch {
                     valveTwo = index

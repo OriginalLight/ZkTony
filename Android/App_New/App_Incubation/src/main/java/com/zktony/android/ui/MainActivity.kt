@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Add the service observer to the lifecycle
         lifecycle.addObserver(serviceObserver)
 
         setContent {

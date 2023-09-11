@@ -15,7 +15,6 @@ import com.zktony.android.utils.extra.appState
 import com.zktony.android.utils.extra.writeWithPulse
 import com.zktony.android.utils.extra.writeWithValve
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -71,19 +70,16 @@ class CalibrationViewModel @Inject constructor(
                 try {
                     _uiFlags.value = UiFlags.PUMP
                     val volume = dataStore.readData(Constants.ZT_0002, 0L)
+                    if (uiEvent.pulse == 0.0) throw Exception("步数不能为 0")
                     if (appState.hpv[2 * uiEvent.id] != 10) {
                         writeWithValve(2 * uiEvent.id, 10)
-                        delay(1000L)
                     }
                     if (appState.hpv[2 * uiEvent.id + 1] != 1) {
                         writeWithValve(2 * uiEvent.id + 1, 1)
-                        delay(1000L)
                     }
                     writeWithPulse(uiEvent.id + 1, uiEvent.pulse.toLong() + volume)
-                    delay(1000L)
                     if (volume > 0L) {
                         writeWithValve(2 * uiEvent.id + 1, 6)
-                        delay(1000L)
                         writeWithPulse(uiEvent.id + 1, -volume)
                     }
                 } catch (ex: Exception) {

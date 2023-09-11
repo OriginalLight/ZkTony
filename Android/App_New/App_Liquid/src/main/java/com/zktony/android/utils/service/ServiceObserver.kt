@@ -11,15 +11,17 @@ class ServiceObserver @Inject constructor(
 ) : LifecycleEventObserver {
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
         when (event) {
-            Lifecycle.Event.ON_CREATE, Lifecycle.Event.ON_DESTROY -> {
-                calibrationService.takeIf { event == Lifecycle.Event.ON_CREATE }?.create()
-                motorService.takeIf { event == Lifecycle.Event.ON_CREATE }?.create()
-                calibrationService.takeIf { event == Lifecycle.Event.ON_DESTROY }?.destroy()
-                motorService.takeIf { event == Lifecycle.Event.ON_DESTROY }?.destroy()
+            Lifecycle.Event.ON_CREATE -> {
+                calibrationService.create()
+                motorService.create()
             }
 
-            else -> {
+            Lifecycle.Event.ON_DESTROY -> {
+                calibrationService.destroy()
+                motorService.destroy()
             }
+
+            else -> {}
         }
     }
 }

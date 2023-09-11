@@ -19,8 +19,4 @@ data class Motor(
     val acceleration: Long = 120L,
     val deceleration: Long = 120L,
     val createTime: Date = Date(System.currentTimeMillis())
-) {
-    fun toAdsString(): Triple<String, String, String> {
-        return Triple(acceleration.toString(), deceleration.toString(), speed.toString())
-    }
-}
+)
