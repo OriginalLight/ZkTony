@@ -134,7 +134,9 @@ fun MenuContent(
     }
 
     LaunchedEffect(key1 = spCount) {
-        valveOne.value = spCount
+        if (uiState.loading != 0) {
+            valveOne.value = spCount
+        }
     }
 
     LazyVerticalGrid(
@@ -223,8 +225,8 @@ fun MenuContent(
                         enabled = uiState.loading == 0 || uiState.loading == 7,
                         onClick = {
                             if (tiji.value.toFloat() != 0f) {
-                                println("valveOne.value==="+valveOne.value)
-                                println("valveOne_ex==="+valveOne_ex)
+                                println("valveOne.value===" + valveOne.value)
+                                println("valveOne_ex===" + valveOne_ex)
                                 if (uiState.loading == 0) {
                                     event(HomeEvent.Start(7))
                                 } else {
@@ -267,6 +269,7 @@ fun MenuContent(
                         onClick = {
                             if (valveOne.value < 7) {
                                 valveOne.value += 1
+                                valveOne_ex += 1
                                 event(HomeEvent.spStart(valveOne.value))
                             }
 
@@ -353,17 +356,33 @@ fun MenuContent(
                             .width(140.dp)
                             .padding(start = 20.dp, top = 10.dp),
 
-                        enabled = uiState.loading == 0,
+                        enabled = uiState.loading == 0 || uiState.loading == 4,
                         onClick = {
-                            //TODO 排液没写
+                            if (uiState.loading == 0) {
+                                event(HomeEvent.PumpingOrRecrement(4))
+                            } else {
+                                event(HomeEvent.PumpingOrRecrement(3))
+                            }
                         }
                     ) {
-                        Text(
-                            text = "排液",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
+
+                        if (uiState.loading == 4) {
+                            Text(
+                                text = "停止",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        } else {
+                            Text(
+                                text = "排液",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+
+
                     }
 
                     ElevatedButton(
@@ -371,17 +390,31 @@ fun MenuContent(
                             .width(140.dp)
                             .padding(start = 20.dp, top = 10.dp),
 
-                        enabled = uiState.loading == 0,
+                        enabled = uiState.loading == 0 || uiState.loading == 5,
                         onClick = {
-                            //TODO 回吸没写
+                            if (uiState.loading == 0) {
+                                event(HomeEvent.PumpingOrRecrement(5))
+                            } else {
+                                event(HomeEvent.PumpingOrRecrement(6))
+                            }
                         }
                     ) {
-                        Text(
-                            text = "回吸",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
+                        if (uiState.loading == 5) {
+                            Text(
+                                text = "停止",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        } else {
+                            Text(
+                                text = "回吸",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontFamily = FontFamily.Serif,
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+
                     }
 
 

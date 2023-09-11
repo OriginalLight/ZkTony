@@ -1021,7 +1021,6 @@ fun CalibrationList(
                                     move(MoveType.MOVE_PULSE) {
                                         index = 5
                                         pulse = (3200L * spydjl.value.toDouble()).toLong();
-                                        speed = 100
                                     }
                                 }
                             } catch (e: Exception) {
@@ -1521,7 +1520,6 @@ fun CalibrationList(
                                     move(MoveType.MOVE_PULSE) {
                                         index = 4
                                         pulse = (2599L * xpydjl.value.toDouble()).toLong()
-                                        speed = 100
                                     }
                                 }
                             } catch (e: Exception) {

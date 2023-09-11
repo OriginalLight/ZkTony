@@ -185,6 +185,11 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
      */
     var spStartNum = 0
 
+    /**
+     * 下培养皿的运动次数
+     */
+    var xpStartNum = 1
+
 
     init {
         viewModelScope.launch {
@@ -221,6 +226,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             is HomeEvent.Start -> start(event.index)
             is HomeEvent.spStart -> spStart(event.index)
             is HomeEvent.xpStart -> xpStart()
+            is HomeEvent.PumpingOrRecrement -> PumpingOrRecrement(event.index)
             is HomeEvent.Stop -> stop()
             is HomeEvent.NavTo -> _page.value = event.page
             is HomeEvent.ToggleSelected -> _selected.value = event.id
@@ -258,9 +264,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 move(MoveType.MOVE_PULSE) {
                                     index = it
                                     pulse = 3200L * -30
-                                    acc = 50
-                                    dec = 80
-                                    speed = 100
+                                    ads = Triple(50L, 80L, 100L)
                                 }
 
                             }
@@ -272,9 +276,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             move(MoveType.MOVE_PULSE) {
                                 index = it
                                 pulse = 800L
-                                acc = 50
-                                dec = 80
-                                speed = 100
+                                ads = Triple(50L, 80L, 100L)
                             }
                         }
 
@@ -284,9 +286,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             move(MoveType.MOVE_PULSE) {
                                 index = it
                                 pulse = 3200L * -3
-                                acc = 50
-                                dec = 80
-                                speed = 100
+                                ads = Triple(50L, 80L, 100L)
                             }
                         }
                     }
@@ -296,14 +296,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         move(MoveType.MOVE_PULSE) {
                             index = 5
                             pulse = (3200L * spydjl).toLong();
-                            speed = 100
+                            ads = Triple(50L, 80L, 100L)
                         }
 
                         //移动下盘到原点距离
                         move(MoveType.MOVE_PULSE) {
                             index = 4
                             pulse = (2599L * xpydjl).toLong();
-                            speed = 100
+                            ads = Triple(50L, 80L, 100L)
                         }
 
                     }
@@ -313,15 +313,16 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         move(MoveType.MOVE_PULSE) {
                             index = 1
                             pulse = (3200L * fwgd).toLong();
-                            speed = 100
+                            ads = Triple(50L, 80L, 100L)
                         }
                         //移动到复位高度
                         move(MoveType.MOVE_PULSE) {
                             index = 0
                             pulse = (3200L * fwgd2).toLong();
-                            speed = 100
+                            ads = Triple(50L, 80L, 100L)
                         }
                     }
+                    xpStartNum = 1
                 }
             } catch (ex: Exception) {
                 _loading.value = 0
@@ -409,70 +410,122 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private fun xpStart() {
         viewModelScope.launch {
 
-            /**
-             * 1.获取移动步数
-             */
-            var spydjl = dataSaver.readData("spydjl", 0f)
-            var spydbs = (spydjl * 3200).toLong()
-            spydbs += spStartNum * 1666
+            if (xpStartNum < 8) {
+                /**
+                 * 1.获取移动步数
+                 */
+                var spydjl = dataSaver.readData("spydjl", 0f)
+                var spydbs = (spydjl * 3200).toLong()
+                spydbs += (spStartNum + xpStartNum) * 1666
 
-            /**
-             * 1.举升1到上盘高度
-             *
-             * 2.上盘移动400步
-             *
-             * 3.1举升1到复位高度
-             * 3.2举升2到上盘高度
-             *
-             * 4.上盘移动剩余的1266
-             *
-             * 5.举升2到复位高度
-             *
-             */
-            tx {
-                move(MoveType.MOVE_PULSE) {
-                    index = 1
-                    pulse = (spgd * 3200L).toLong()
+                /**
+                 * 1.举升1到上盘高度
+                 *
+                 * 2.上盘移动400步
+                 *
+                 * 3.1举升1到复位高度
+                 * 3.2举升2到上盘高度
+                 *
+                 * 4.上盘移动剩余的1266
+                 *
+                 * 5.举升2到复位高度
+                 *
+                 */
+                tx {
+                    move(MoveType.MOVE_PULSE) {
+                        index = 1
+                        pulse = (spgd * 3200L).toLong()
+                    }
                 }
+
+                tx {
+                    move(MoveType.MOVE_PULSE) {
+                        index = 5
+                        pulse = spydbs - 1266
+                    }
+                }
+
+                tx {
+                    move(MoveType.MOVE_PULSE) {
+                        index = 1
+                        pulse = (fwgd * 3200L).toLong()
+                    }
+                    move(MoveType.MOVE_PULSE) {
+                        index = 0
+                        pulse = (spgd2 * 3200L).toLong()
+                    }
+
+                }
+
+                tx {
+                    move(MoveType.MOVE_PULSE) {
+                        index = 5
+                        pulse = spydbs
+                    }
+                }
+
+                tx {
+                    move(MoveType.MOVE_PULSE) {
+                        index = 0
+                        pulse = (fwgd2 * 3200L).toLong()
+                    }
+
+                }
+
+                if (_spCount.value == 7) {
+                    _spCount.value = 0
+                } else {
+                    _spCount.value += 1
+                }
+                xpStartNum += 1
             }
 
-            tx {
-                move(MoveType.MOVE_PULSE) {
-                    index = 5
-                    pulse = spydbs - 1266
-                }
-            }
 
-            tx {
-                move(MoveType.MOVE_PULSE) {
-                    index = 1
-                    pulse = (fwgd * 3200L).toLong()
-                }
-                move(MoveType.MOVE_PULSE) {
-                    index = 0
-                    pulse = (spgd2 * 3200L).toLong()
-                }
-
-            }
-
-            tx {
-                move(MoveType.MOVE_PULSE) {
-                    index = 5
-                    pulse = spydbs
-                }
-            }
-
-            tx {
-                move(MoveType.MOVE_PULSE) {
-                    index = 0
-                    pulse = (fwgd2 * 3200L).toLong()
-                }
-
-            }
 
 
         }
 
+
+    }
+
+
+    private fun PumpingOrRecrement(int: Int) {
+
+        viewModelScope.launch {
+            /**
+             * 4=排液
+             * 5=回吸
+             * 3=停止
+             */
+            _loading.value = int
+
+            if (_loading.value == 3 || _loading.value == 6) {
+                tx { stop(3) }
+                _loading.value = 0
+            }
+
+            while (_loading.value == 4 || _loading.value == 5) {
+                if (_loading.value == 4) {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 3
+                            pulse = 32000L
+                        }
+
+                    }
+                } else {
+                    tx {
+                        move(MoveType.MOVE_PULSE) {
+                            index = 3
+                            pulse = -32000L
+                        }
+
+                    }
+                }
+
+            }
+
+        }
     }
 
 
@@ -794,9 +847,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 move(MoveType.MOVE_PULSE) {
                                     index = 4
                                     pulse = 3200L * -30
-                                    acc = 50
-                                    dec = 80
-                                    speed = 100
+                                    ads = Triple(50L, 80L, 100L)
                                 }
 
                             }
@@ -806,9 +857,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 move(MoveType.MOVE_PULSE) {
                                     index = 4
                                     pulse = 800L
-                                    acc = 50
-                                    dec = 80
-                                    speed = 100
+                                    ads = Triple(50L, 80L, 100L)
                                 }
                             }
 
@@ -818,9 +867,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 move(MoveType.MOVE_PULSE) {
                                     index = 4
                                     pulse = 3200L * -3
-                                    acc = 50
-                                    dec = 80
-                                    speed = 100
+                                    ads = Triple(50L, 80L, 100L)
                                 }
                             }
 
@@ -829,7 +876,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 move(MoveType.MOVE_PULSE) {
                                     index = 4
                                     pulse = xpydjl.toLong();
-                                    speed = 100
+                                    ads = Triple(50L, 80L, 100L)
                                 }
                             }
                             xpkwjj = 2599
@@ -1230,6 +1277,7 @@ sealed class HomeEvent {
     data class Start(val index: Int) : HomeEvent()
     data class spStart(val index: Int) : HomeEvent()
     data object xpStart : HomeEvent()
+    data class PumpingOrRecrement(val index: Int) : HomeEvent()
     data object Stop : HomeEvent()
     data class NavTo(val page: PageType) : HomeEvent()
     data class ToggleSelected(val id: Long) : HomeEvent()

@@ -101,7 +101,7 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                                 move(MoveType.MOVE_PULSE) {
                                     index = it
                                     pulse = 3200L * -30
-                                    speed = 100
+                                    ads = Triple(50L, 80L, 100L)
                                 }
 
                             }
@@ -113,9 +113,7 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                             move(MoveType.MOVE_PULSE) {
                                 index = it
                                 pulse = 800L
-                                acc = 50
-                                dec = 80
-                                speed = 100
+                                ads = Triple(50L, 80L, 100L)
                             }
                         }
 
@@ -126,9 +124,7 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                             move(MoveType.MOVE_PULSE) {
                                 index = it
                                 pulse = 3200L * -3
-                                acc = 50
-                                dec = 80
-                                speed = 100
+                                ads = Triple(50L, 80L, 100L)
                             }
                         }
                     }
@@ -138,14 +134,14 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                             move(MoveType.MOVE_PULSE) {
                                 index = 5
                                 pulse = (3200L * spydjl).toLong();
-                                speed = 100
+                                ads = Triple(50L, 80L, 100L)
                             }
 
                             //移动下盘到原点距离
                             move(MoveType.MOVE_PULSE) {
                                 index = 4
                                 pulse = (2599L * xpydjl).toLong();
-                                speed = 100
+                                ads = Triple(50L, 80L, 100L)
                             }
 
                         }
@@ -155,13 +151,13 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
                             move(MoveType.MOVE_PULSE) {
                                 index = 1
                                 pulse = (3200L * fwgd).toLong();
-                                speed = 100
+                                ads = Triple(50L, 80L, 100L)
                             }
                             //移动到复位高度
                             move(MoveType.MOVE_PULSE) {
                                 index = 0
                                 pulse = (3200L * fwgd2).toLong();
-                                speed = 100
+                                ads = Triple(50L, 80L, 100L)
                             }
                         }
 
