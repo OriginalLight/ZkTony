@@ -32,7 +32,6 @@ val serialHelper =
                             val height = rx.data.copyOfRange(3, 5)
                             val low = rx.data.copyOfRange(1, 3)
                             appState.hpp[rx.slaveAddr.toInt() - 1] = height.plus(low).readInt32BE()
-                            height.plus(low).readInt32BE().toString().logW()
                         }
 
                         else -> {}

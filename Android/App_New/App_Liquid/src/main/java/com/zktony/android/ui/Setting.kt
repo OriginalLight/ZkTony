@@ -422,7 +422,7 @@ fun MotorList(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MotorDetail(
     uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
@@ -461,10 +461,8 @@ fun MotorDetail(
     )
 
     LazyColumn(
-        modifier = Modifier
-            .padding(16.dp)
-            .windowInsetsPadding(WindowInsets.imeAnimationSource),
-        contentPadding = PaddingValues(16.dp),
+        modifier = Modifier.imePadding(),
+        contentPadding = PaddingValues(32.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
@@ -601,22 +599,15 @@ fun MotorDetail(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+
 @Composable
 fun ConfigList(modifier: Modifier = Modifier) {
 
     val scope = rememberCoroutineScope()
 
     LazyColumn(
-        modifier = modifier
-            .padding(16.dp)
-            .border(
-                width = 1.dp,
-                color = Color.LightGray,
-                shape = MaterialTheme.shapes.medium
-            )
-            .windowInsetsPadding(WindowInsets.imeAnimationSource),
-        contentPadding = PaddingValues(16.dp),
+        modifier = modifier.imePadding(),
+        contentPadding = PaddingValues(32.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {

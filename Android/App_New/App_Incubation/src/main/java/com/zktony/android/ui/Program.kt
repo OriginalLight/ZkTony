@@ -26,10 +26,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.ui.components.ProcessItem
-import com.zktony.android.ui.components.ProgramAppBar
-import com.zktony.android.ui.components.ProgramItem
-import com.zktony.android.ui.components.SquareTextField
+import com.zktony.android.ui.components.*
 import com.zktony.android.ui.utils.*
 import kotlinx.coroutines.launch
 
@@ -51,12 +48,13 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
         }
     }
 
+
     BackHandler { navigation() }
 
     LaunchedEffect(key1 = message) {
-        if (message != null) {
+        message?.let {
             snackbarHostState.showSnackbar(
-                message = message ?: "未知错误",
+                message = it,
                 actionLabel = "关闭",
                 duration = SnackbarDuration.Short
             )
@@ -190,8 +188,8 @@ fun ProgramDetail(
             }
         }
 
-        if (process != null) {
-            ProgramForm(
+        process?.let {
+            ProgramInput(
                 modifier = Modifier.fillMaxWidth(),
                 key = selectedIndex.intValue,
                 process = process
@@ -203,13 +201,11 @@ fun ProgramDetail(
                 }
             }
         }
-
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ProgramForm(
+fun ProgramInput(
     modifier: Modifier = Modifier,
     key: Int,
     process: Process,
@@ -225,7 +221,7 @@ fun ProgramForm(
     var times by remember(key) { mutableStateOf(process.times.toString()) }
 
     LazyColumn(
-        modifier = modifier.windowInsetsPadding(WindowInsets.imeAnimationSource),
+        modifier = modifier.imePadding(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
@@ -381,7 +377,7 @@ fun ProgramForm(
             }
         }
 
-        if (process.type == Process.PRIMARY_ANTIBODY || process.type == Process.SECONDARY_ANTIBODY) {
+        if (process.type == Process.PRIMARY_ANTIBODY) {
             item {
                 Row(
                     modifier = Modifier

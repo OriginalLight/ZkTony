@@ -103,7 +103,7 @@ fun ProgramScreen(
                     val orificePlate =
                         program.orificePlates.getOrNull(selected.intValue) ?: OrificePlate()
 
-                    ProgramEdit(orificePlate) {
+                    ProgramInput(orificePlate) {
                         scope.launch {
                             val array = program.orificePlates.toMutableList()
                             array[selected.intValue] = it
@@ -200,7 +200,7 @@ fun ProgramDetail(
 }
 
 @Composable
-fun ProgramEdit(
+fun ProgramInput(
     orificePlate: OrificePlate,
     toggleSelected: (OrificePlate) -> Unit = {},
 ) {

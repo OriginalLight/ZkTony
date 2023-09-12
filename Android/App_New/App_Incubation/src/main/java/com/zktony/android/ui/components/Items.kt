@@ -40,7 +40,7 @@ import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.*
 import com.zktony.android.ui.HomeUiState
-import com.zktony.android.ui.JobState
+import com.zktony.android.ui.utils.JobState
 import com.zktony.android.ui.utils.selectedColor
 import com.zktony.android.utils.extra.dateFormat
 import com.zktony.android.utils.extra.timeFormat
@@ -721,7 +721,7 @@ fun ModuleItem(
                         y = 4.dp.roundToPx()
                     )
                 },
-            text = "${jobState.temperature} ℃",
+            text = "${uiState.stand.insulation.getOrNull(index + 1) ?: 0.0} ℃",
             style = MaterialTheme.typography.bodyMedium,
             fontStyle = FontStyle.Italic
         )

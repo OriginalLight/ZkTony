@@ -1,6 +1,5 @@
 package com.zktony.android.ui
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -27,10 +26,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
-import com.zktony.android.ui.components.HomeAppBar
-import com.zktony.android.ui.components.ModuleItem
-import com.zktony.android.ui.components.ProcessItem
-import com.zktony.android.ui.components.ProgramItem
+import com.zktony.android.ui.components.*
 import com.zktony.android.ui.utils.*
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.dateFormat
@@ -54,12 +50,10 @@ fun HomeRoute(viewModel: HomeViewModel) {
         }
     }
 
-    BackHandler { navigation() }
-
     LaunchedEffect(key1 = message) {
-        if (message != null) {
+        message?.let {
             snackbarHostState.showSnackbar(
-                message = message ?: "未知错误",
+                message = it,
                 actionLabel = "关闭",
                 duration = SnackbarDuration.Short
             )
@@ -134,7 +128,8 @@ fun HomeContent(
 
     Row(
         modifier = Modifier.padding(horizontal = 32.dp, vertical = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth(0.5f),
@@ -178,6 +173,7 @@ fun HomeContent(
                 ProcessItem(item = item)
             }
         }
+
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -246,14 +242,18 @@ fun HomeContent(
                         .clickable {
                             scope.launch {
                                 snackbarHostState.showSnackbar(
-                                    message = "当前抗体保温温度${uiState.common.temperature} ℃",
+                                    message = "当前抗体保温温度${
+                                        uiState.stand.insulation.getOrNull(
+                                            0
+                                        ) ?: 0.0
+                                    } ℃",
                                     actionLabel = "关闭",
                                     duration = SnackbarDuration.Short
                                 )
                             }
                         }
                         .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = "${uiState.common.temperature} ℃",
+                    text = "${uiState.stand.insulation.getOrNull(0) ?: 0.0} ℃",
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -266,7 +266,7 @@ fun HomeContent(
                         .clip(MaterialTheme.shapes.small)
                         .clickable { scope.launch { uiEvent(HomeUiEvent.Shaker) } }
                         .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = if (uiState.common.shaker) "ON" else "OFF",
+                    text = if (uiState.stand.shaker) "ON" else "OFF",
                     style = MaterialTheme.typography.titleMedium
                 )
             }

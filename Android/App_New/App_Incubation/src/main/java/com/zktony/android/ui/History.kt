@@ -51,9 +51,9 @@ fun HistoryRoute(viewModel: HistoryViewModel) {
     BackHandler { navigation() }
 
     LaunchedEffect(key1 = message) {
-        if (message != null) {
+        message?.let {
             snackbarHostState.showSnackbar(
-                message = message ?: "未知错误",
+                message = it,
                 actionLabel = "关闭",
                 duration = SnackbarDuration.Short
             )

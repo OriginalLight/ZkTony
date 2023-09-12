@@ -99,7 +99,6 @@ dependencies {
 
     implementation(project(mapOf("path" to ":Lib_SerialPort")))
 
-    implementation(libs.accompanist.insets)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material.iconsExtended)
     implementation(libs.androidx.compose.material3)

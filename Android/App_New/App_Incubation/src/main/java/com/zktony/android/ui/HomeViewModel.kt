@@ -6,9 +6,14 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.zktony.android.data.dao.ProgramDao
+import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.entities.internal.Process
+import com.zktony.android.ui.utils.JobExecutorUtils
+import com.zktony.android.ui.utils.JobState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.utils.Constants
+import com.zktony.android.utils.extra.appState
 import com.zktony.android.utils.extra.readWithPosition
 import com.zktony.android.utils.extra.readWithValve
 import com.zktony.android.utils.extra.writeWithShaker
@@ -27,7 +32,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val dao: ProgramDao
+    private val dao: ProgramDao,
+    dataStore: DataSaverDataStore
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -36,7 +42,7 @@ class HomeViewModel @Inject constructor(
     private val _uiFlags = MutableStateFlow(UiFlags.NONE)
     private val _message = MutableStateFlow<String?>(null)
     private val _jobList = MutableStateFlow(listOf<JobState>())
-    private val _common = MutableStateFlow(CommonState())
+    private val _stand = MutableStateFlow(StandState())
 
     val uiState = _uiState.asStateFlow()
     val message = _message.asStateFlow()
@@ -44,13 +50,32 @@ class HomeViewModel @Inject constructor(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40)
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
+    val jobExecutorUtils = JobExecutorUtils(
+        recoup = dataStore.readData(Constants.ZT_0002, 0L),
+        callback = { jobState ->
+            viewModelScope.launch {
+                val jobList = _jobList.value.toMutableList()
+                val jobIndex = jobList.indexOfFirst { it.index == jobState.index }
+                if (jobIndex != -1) {
+                    jobList[jobIndex] = jobState
+                }
+                _jobList.value = jobList
+            }
+        },
+        exception = { ex ->
+            viewModelScope.launch {
+                _message.value = ex.message
+            }
+        }
+    )
+
     init {
         viewModelScope.launch {
             launch {
                 combine(
-                    _selected, _page, _uiFlags, _jobList, _common
-                ) { selected, page, uiFlags, jobList, common ->
-                    HomeUiState(selected, page, uiFlags, jobList, common)
+                    _selected, _page, _uiFlags, _jobList, _stand
+                ) { selected, page, uiFlags, jobList, stand ->
+                    HomeUiState(selected, page, uiFlags, jobList, stand)
                 }.catch { ex ->
                     _message.value = ex.message
                 }.collect {
@@ -59,7 +84,7 @@ class HomeViewModel @Inject constructor(
             }
             launch {
                 init()
-                jobLoop()
+                loop()
             }
         }
     }
@@ -71,12 +96,11 @@ class HomeViewModel @Inject constructor(
             is HomeUiEvent.Start -> viewModelScope.launch {
                 val jobList = _jobList.value.toMutableList()
                 val jobIndex = jobList.indexOfFirst { it.index == uiEvent.index }
-                if (jobIndex == -1) {
-                    jobList.add(JobState(index = uiEvent.index, status = 1))
-                } else {
-                    jobList[jobIndex] = jobList[jobIndex].copy(status = 1)
+                if (jobIndex != -1) {
+                    val job = jobList[jobIndex]
+                    val processes = job.processes.map { it.copy(status = Process.UPCOMING) }
+                    jobExecutorUtils.create(job.copy(processes = processes))
                 }
-                _jobList.value = jobList
             }
 
             is HomeUiEvent.Pause -> viewModelScope.launch {
@@ -91,14 +115,7 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeUiEvent.Stop -> viewModelScope.launch {
-                val jobList = _jobList.value.toMutableList()
-                val jobIndex = jobList.indexOfFirst { it.index == uiEvent.index }
-                if (jobIndex == -1) {
-                    jobList.add(JobState(index = uiEvent.index, status = 0))
-                } else {
-                    jobList[jobIndex] = jobList[jobIndex].copy(status = 0)
-                }
-                _jobList.value = jobList
+                jobExecutorUtils.destroy(uiEvent.index)
             }
 
             is HomeUiEvent.ToggleProcess -> viewModelScope.launch {
@@ -120,13 +137,13 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeUiEvent.Shaker -> viewModelScope.launch {
-                val shaker = _common.value.shaker
+                val shaker = _stand.value.shaker
                 try {
                     writeWithShaker(shaker)
                 } catch (ex: Exception) {
                     _message.value = ex.message
                 } finally {
-                    _common.value = _common.value.copy(shaker = !shaker)
+                    _stand.value = _stand.value.copy(shaker = !shaker)
                 }
             }
         }
@@ -145,20 +162,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun jobLoop() {
-        var startTime = 0L
-        var endTime = 0L
-
+    private suspend fun loop() {
         while (true) {
-            try {
-                startTime = System.currentTimeMillis()
-                // logic
-                endTime = System.currentTimeMillis()
-            } catch (e: Exception) {
-                _message.value = e.message
-            } finally {
-                delay(1000L - (endTime - startTime))
-            }
+            _stand.value = _stand.value.copy(insulation = appState.hpt.values.toList())
+            delay(3000L)
         }
     }
 }
@@ -168,28 +175,11 @@ data class HomeUiState(
     val page: Int = PageType.HOME,
     val uiFlags: Int = UiFlags.NONE,
     val jobList: List<JobState> = listOf(),
-    val common: CommonState = CommonState()
+    val stand: StandState = StandState()
 )
 
-data class JobState(
-    val index: Int = 0,
-    val id: Long = 0L,
-    val processes: List<Process> = listOf(),
-    val status: Int = 0,
-    val temperature: Double = 0.0,
-    val time: Long = 0L
-) {
-    companion object {
-        const val STOPPED = 0
-        const val RUNNING = 1
-        const val PAUSED = 2
-        const val FINISHED = 3
-        const val WAITING = 4
-    }
-}
-
-data class CommonState(
-    val temperature: Double = 0.0,
+data class StandState(
+    val insulation: List<Double> = emptyList(),
     val shaker: Boolean = false
 )
 

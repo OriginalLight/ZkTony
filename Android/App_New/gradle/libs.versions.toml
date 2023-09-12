@@ -10,11 +10,11 @@ minSdk = "21"
 ndk = "25.2.9519653"
 targetSdk = "33"
 ## dependencies
-accompanist = "0.30.1"
+accompanist = "0.32.0"
 androidGradlePlugin = "8.1.1"
 androidx-activity-compose = "1.7.2"
 androidx-appcompat = "1.6.1"
-androidx-compose-bom = "2023.08.00"
+androidx-compose-bom = "2023.09.00"
 androidx-constraintlayout = "1.0.1"
 androidx-corektx = "1.10.1"
 androidx-datastore = "1.0.0"
@@ -29,8 +29,8 @@ androidx-test-ext-junit = "1.1.5"
 androidx-test-ext-truth = "1.5.0"
 androidx-window = "1.2.0-beta01"
 androix-test-uiautomator = "2.2.0"
-coil = "2.2.2"
-compose-compiler = "1.5.0"
+coil = "2.4.0"
+compose-compiler = "1.5.3"
 compose-paging = "3.2.0"
 coroutines = "1.7.3"
 gson = "2.10.1"
@@ -39,21 +39,15 @@ hiltExt = "1.0.0"
 jdkDesugar = "2.0.3"
 junit = "4.13.2"
 koin = "3.4.6"
-kotlin = "1.9.0"
-ksp = "1.9.0-1.0.13"
+kotlin = "1.9.10"
+ksp = "1.9.10-1.0.13"
 material = "1.9.0"
 okhttp = "5.0.0-alpha.11"
 room = "2.5.2"
 
 [libraries]
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive", version.ref = "accompanist" }
-accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
-accompanist-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "accompanist" }
-accompanist-navigation-material = { module = "com.google.accompanist:accompanist-navigation-material", version.ref = "accompanist" }
-accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
-accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanist" }
-accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity-compose" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }

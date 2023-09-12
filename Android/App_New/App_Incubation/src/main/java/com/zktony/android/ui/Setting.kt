@@ -77,9 +77,9 @@ fun SettingRoute(viewModel: SettingViewModel) {
     BackHandler { navigation() }
 
     LaunchedEffect(key1 = message) {
-        if (message != null) {
+        message?.let {
             snackbarHostState.showSnackbar(
-                message = message ?: "未知错误",
+                message = it,
                 actionLabel = "关闭",
                 duration = SnackbarDuration.Short
             )
@@ -136,7 +136,9 @@ fun SettingContent(
             modifier = Modifier
                 .weight(1f)
                 .border(
-                    width = 1.dp, color = Color.LightGray, shape = MaterialTheme.shapes.small
+                    width = 1.dp,
+                    color = Color.LightGray,
+                    shape = MaterialTheme.shapes.small
                 )
                 .animateContentSize(),
             contentPadding = PaddingValues(16.dp),
@@ -163,7 +165,8 @@ fun SettingContent(
                     text = stringResource(id = R.string.network),
                     onClick = { uiEvent(SettingUiEvent.Network) }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowRight, contentDescription = null
+                        imageVector = Icons.Default.ArrowRight,
+                        contentDescription = null
                     )
                 }
             }
@@ -173,7 +176,8 @@ fun SettingContent(
                     text = stringResource(id = R.string.parameters),
                     onClick = { uiEvent(SettingUiEvent.NavTo(PageType.AUTH)) }) {
                     Icon(
-                        imageVector = Icons.Default.ArrowRight, contentDescription = null
+                        imageVector = Icons.Default.ArrowRight,
+                        contentDescription = null
                     )
                 }
             }
@@ -183,7 +187,9 @@ fun SettingContent(
             modifier = Modifier
                 .weight(1f)
                 .border(
-                    width = 1.dp, color = Color.LightGray, shape = MaterialTheme.shapes.small
+                    width = 1.dp,
+                    color = Color.LightGray,
+                    shape = MaterialTheme.shapes.small
                 )
                 .animateContentSize(),
             contentPadding = PaddingValues(16.dp),
@@ -329,7 +335,6 @@ fun SettingsCard(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Authentication(uiEvent: (SettingUiEvent) -> Unit) {
 
@@ -339,7 +344,7 @@ fun Authentication(uiEvent: (SettingUiEvent) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.imeAnimationSource),
+            .imePadding(),
         contentAlignment = Alignment.Center
     ) {
         if (show) {
@@ -429,7 +434,7 @@ fun MotorList(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun MotorDetail(
     uiState: SettingUiState,
@@ -471,7 +476,7 @@ fun MotorDetail(
 
     LazyColumn(
         modifier = Modifier
-            .windowInsetsPadding(WindowInsets.imeAnimationSource),
+            .imePadding(),
         contentPadding = PaddingValues(32.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -646,7 +651,6 @@ fun MotorDetail(
 }
 
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ConfigList() {
 
@@ -654,9 +658,8 @@ fun ConfigList() {
 
     LazyColumn(
         modifier = Modifier
-            .padding(16.dp)
-            .windowInsetsPadding(WindowInsets.imeAnimationSource),
-        contentPadding = PaddingValues(16.dp),
+            .imePadding(),
+        contentPadding = PaddingValues(32.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         item {

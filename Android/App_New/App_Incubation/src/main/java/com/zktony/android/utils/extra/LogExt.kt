@@ -3,7 +3,7 @@ package com.zktony.android.utils.extra
 import android.util.Log
 import com.zktony.android.BuildConfig
 
-const val TAG = "ZKTONY"
+const val TAG = "App Log"
 
 var show = BuildConfig.DEBUG
 
