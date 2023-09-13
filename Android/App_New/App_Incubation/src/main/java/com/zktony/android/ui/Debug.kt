@@ -19,8 +19,8 @@ import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.utils.AppStateUtils.hpv
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.extra.appState
 import kotlinx.coroutines.launch
 
 /**
@@ -93,8 +93,8 @@ fun ValveGroup(
     var valveTwo by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(key1 = uiState.page) {
-        valveOne = (appState.hpv[0 + 2 * group] ?: 1) - 1
-        valveTwo = (appState.hpv[1 + 2 * group] ?: 1) - 1
+        valveOne = (hpv[0 + 2 * group] ?: 1) - 1
+        valveTwo = (hpv[1 + 2 * group] ?: 1) - 1
     }
 
     Row(modifier = Modifier.padding(16.dp)) {

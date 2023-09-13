@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
-import com.zktony.android.utils.extra.writeWithPulse
-import com.zktony.android.utils.extra.writeWithValve
+import com.zktony.android.utils.SerialPortUtils.writeWithPulse
+import com.zktony.android.utils.SerialPortUtils.writeWithValve
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -61,7 +61,7 @@ class DebugViewModel @Inject constructor() : ViewModel() {
             is DebugUiEvent.Pulse -> viewModelScope.launch {
                 try {
                     _uiFlags.value = UiFlags.PUMP
-                    writeWithPulse(uiEvent.id, uiEvent.value, uiEvent.value / 6400L * 1000L)
+                    writeWithPulse(uiEvent.id, uiEvent.value)
                 } catch (ex: Exception) {
                     _message.value = ex.message
                 } finally {

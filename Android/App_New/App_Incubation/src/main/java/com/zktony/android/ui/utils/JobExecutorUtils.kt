@@ -1,10 +1,14 @@
 package com.zktony.android.ui.utils
 
 import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.utils.extra.appState
-import com.zktony.android.utils.extra.writeWithPulse
-import com.zktony.android.utils.extra.writeWithValve
+import com.zktony.android.utils.AppStateUtils.hpc
+import com.zktony.android.utils.AppStateUtils.hpp
+import com.zktony.android.utils.SerialPortUtils.readWithPosition
+import com.zktony.android.utils.SerialPortUtils.writeRegister
+import com.zktony.android.utils.SerialPortUtils.writeWithPulse
+import com.zktony.android.utils.SerialPortUtils.writeWithValve
 import kotlinx.coroutines.*
+import java.util.LinkedList
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -13,8 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class JobExecutorUtils(
     private val recoup: Long,
-    private val callback: (JobState) -> Unit,
-    private val exception: (Exception) -> Unit
+    private val callback: (JobEvent) -> Unit
 ) {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val hashMap = HashMap<Int, JobState>()
@@ -22,183 +25,334 @@ class JobExecutorUtils(
     private val lock = AtomicBoolean(false)
 
     fun create(jobState: JobState) {
-        jobMap[jobState.index] = scope.launch { interpreter(jobState) }
+        val job = scope.launch { interpreter(jobState) }
+        jobMap[jobState.index] = job
+        job.invokeOnCompletion { jobMap.remove(jobState.index) }
     }
 
     fun destroy(index: Int) {
         jobMap[index]?.cancel()
         jobMap.remove(index)
+        val state = hashMap[index] ?: return
+        callback(JobEvent.Changed(state.copy(status = JobState.STOPPED)))
+        hashMap.remove(index)
+        if (jobMap.isEmpty()) {
+            scope.launch {
+                writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+                delay(300L)
+
+                readWithPosition(slaveAddr = 0)
+                delay(100L)
+
+                val p = (hpp[0] ?: 0) % 6400L
+                writeWithPulse(0, if (p > 3200) 6400L - p else -p)
+                delay(100L)
+            }
+        }
     }
 
     private suspend fun interpreter(jobState: JobState) {
 
         val index = jobState.index
         val processes = jobState.processes
-
+        val linkedList = LinkedList<Process>()
+        linkedList.addAll(processes)
         hashMap[index] = jobState
 
-        processes.forEach { process ->
+        linkedList.forEach { process ->
             when (process.type) {
-                Process.BLOCKING -> {
-                    blocking(index, process)
-                }
-
-                Process.PRIMARY_ANTIBODY -> {
-                    primaryAntibody(index, process)
-                }
-
-                Process.SECONDARY_ANTIBODY -> {
-                    secondaryAntibody(index, process)
-                }
-
-                Process.WASHING -> {
-                    washing(index, process)
-                }
-
-                Process.PHOSPHATE_BUFFERED_SALINE -> {
-                    phosphateBufferedSaline(index, process)
-                }
+                Process.BLOCKING -> blocking(index, process)
+                Process.PRIMARY_ANTIBODY -> primaryAntibody(index, process)
+                Process.SECONDARY_ANTIBODY -> secondaryAntibody(index, process)
+                Process.WASHING -> washing(index, process)
+                Process.PHOSPHATE_BUFFERED_SALINE -> phosphateBufferedSaline(index, process)
             }
         }
-
     }
 
     val blocking: suspend (Int, Process) -> Unit = start@{ index, process ->
         // check
-        var state = hashMap[index] ?: return@start
+        try {
+            verify(index, process)
+        } catch (ex: Exception) {
+            callback(JobEvent.Error(ex))
+            return@start
+        }
+
+        var state = hashMap[index]!!
         val processes = state.processes.toMutableList()
         val processIndex = processes.indexOf(process)
-        val allTime = process.duration * 60 * 60
-        val group = index / 4
-        val pulse = (appState.hpc[group + 1] ?: { x -> x * 100 }).invoke(process.dosage)
 
-        if (process.dosage == 0.0) {
-            exception(Exception("加液量为零错误"))
-            return@start
-        }
-
-        if (pulse == null) {
-            exception(Exception("校准方法错误"))
-            return@start
-        }
-
-        if (processIndex != -1) {
+        waitForLock(state) {
+            state = state.copy(status = JobState.LIQUID)
+            callback(JobEvent.Changed(state))
+            liquid(index, process, 9, (index - ((index / 4) * 4)) + 1)
             processes[processIndex] = process.copy(status = Process.RUNNING)
             state = state.copy(status = JobState.RUNNING, processes = processes)
-            callback(state)
-        } else {
-            exception(Exception("进程不存在"))
-            return@start
+            callback(JobEvent.Changed(state))
         }
 
-        while (lock.get()) {
-            state = state.copy(status = JobState.WAITING)
-            callback(state)
-            delay(1000L)
-        }
+        countDown(state, (process.duration * 60 * 60).toLong())
 
-        // add lock
-        lock.set(true)
-        // 加液
-        try {
-            state = state.copy(status = JobState.LIQUID)
-            callback(state)
-
-            if (appState.hpv[2 * group] != IN_9) {
-                writeWithValve(2 * group, IN_9)
-            }
-
-            if (appState.hpv[2 * group + 1] != index % 4) {
-                writeWithValve(2 * group + 1, index % 4)
-            }
-
-            writeWithPulse(group + 1, pulse.toLong() + recoup)
-
-            if (recoup > 0.0) {
-                writeWithValve(2 * group + 1, OUT_6)
-                writeWithPulse(group + 1, -recoup)
-            }
-        } catch (ex: Exception) {
-            exception(ex)
-        } finally {
-            state = state.copy(status = JobState.RUNNING)
-            callback(state)
-            lock.set(false)
-        }
-
-        repeat(allTime.toInt()) {
-            state = state.copy(time = (allTime - it).toLong())
-            callback(state)
-            delay(1000L)
-        }
-
-        while (lock.get()) {
-            state = state.copy(status = JobState.WAITING)
-            callback(state)
-            delay(1000L)
-        }
-
-        lock.set(true)
-        // 废液
-        try {
+        waitForLock(state) {
             state = state.copy(status = JobState.WASTE)
-            callback(state)
-
-            if (appState.hpv[2 * group] != IN_11) {
-                writeWithValve(2 * group, IN_11)
-            }
-
-            if (appState.hpv[2 * group + 1] != index % 4) {
-                writeWithValve(2 * group + 1, index % 4)
-            }
-
-            writeWithPulse(group + 1, -(pulse + recoup).toLong() * 2)
-        } catch (ex: Exception) {
-            exception(ex)
-        } finally {
+            callback(JobEvent.Changed(state))
+            clean(index, process, 11, (index - ((index / 4) * 4)) + 1)
             processes[processIndex] = process.copy(status = Process.FINISHED)
-            state = state.copy(status = JobState.RUNNING, processes = processes)
-            callback(state)
-            lock.set(false)
+            state = state.copy(status = JobState.FINISHED, processes = processes)
+            callback(JobEvent.Changed(state))
+            hashMap[index] = state
         }
     }
 
     val primaryAntibody: suspend (Int, Process) -> Unit = start@{ index, process ->
+        try {
+            verify(index, process)
+        } catch (ex: Exception) {
+            callback(JobEvent.Error(ex))
+            return@start
+        }
 
+        var state = hashMap[index]!!
+        val processes = state.processes.toMutableList()
+        val processIndex = processes.indexOf(process)
+
+        waitForLock(state) {
+            state = state.copy(status = JobState.LIQUID)
+            callback(JobEvent.Changed(state))
+            val inChannel =
+                if (process.origin == 0) (index - ((index / 4) * 4)) + 1 else process.origin
+            liquid(index, process, inChannel, (index - ((index / 4) * 4)) + 1)
+            processes[processIndex] = process.copy(status = Process.RUNNING)
+            state = state.copy(status = JobState.RUNNING, processes = processes)
+            callback(JobEvent.Changed(state))
+        }
+
+        countDown(state, (process.duration * 60 * 60).toLong())
+        waitForLock(state) {
+            val inChannel =
+                if (process.origin == 0) (index - (index / 4) * 4) + 1 else process.origin
+            if (process.recycle) {
+                state = state.copy(status = JobState.RECYCLE)
+                callback(JobEvent.Changed(state))
+                liquid(index, process, inChannel, (index - ((index / 4) * 4)) + 1)
+            } else {
+                state = state.copy(status = JobState.WASTE)
+                callback(JobEvent.Changed(state))
+                clean(index, process, 11, (index - ((index / 4) * 4)) + 1)
+            }
+            processes[processIndex] = process.copy(status = Process.FINISHED)
+            state = state.copy(status = JobState.FINISHED, processes = processes)
+            callback(JobEvent.Changed(state))
+            hashMap[index] = state
+        }
     }
 
     val secondaryAntibody: suspend (Int, Process) -> Unit = start@{ index, process ->
+        try {
+            verify(index, process)
+        } catch (ex: Exception) {
+            callback(JobEvent.Error(ex))
+            return@start
+        }
 
+        var state = hashMap[index]!!
+        val processes = state.processes.toMutableList()
+        val processIndex = processes.indexOf(process)
+
+        waitForLock(state) {
+            state = state.copy(status = JobState.LIQUID)
+            callback(JobEvent.Changed(state))
+            val inChannel =
+                if (process.origin == 0) (index - ((index / 4) * 4)) + 5 else process.origin
+            liquid(index, process, inChannel, (index - ((index / 4) * 4)) + 1)
+            processes[processIndex] = process.copy(status = Process.RUNNING)
+            state = state.copy(status = JobState.RUNNING, processes = processes)
+            callback(JobEvent.Changed(state))
+        }
+
+        countDown(state, (process.duration * 60 * 60).toLong())
+
+        waitForLock(state) {
+            state = state.copy(status = JobState.WASTE)
+            callback(JobEvent.Changed(state))
+            clean(index, process, 11, (index - ((index / 4) * 4)) + 1)
+            processes[processIndex] = process.copy(status = Process.FINISHED)
+            state = state.copy(status = JobState.FINISHED, processes = processes)
+            callback(JobEvent.Changed(state))
+            hashMap[index] = state
+        }
     }
 
     val washing: suspend (Int, Process) -> Unit = start@{ index, process ->
+        // check
+        try {
+            verify(index, process)
+        } catch (ex: Exception) {
+            callback(JobEvent.Error(ex))
+            return@start
+        }
 
+        var state = hashMap[index]!!
+        val processes = state.processes.toMutableList()
+        val processIndex = processes.indexOf(process)
+
+        repeat(process.times) {
+            waitForLock(state) {
+                state = state.copy(status = JobState.LIQUID)
+                callback(JobEvent.Changed(state))
+                liquid(index, process, 10, (index - ((index / 4) * 4)) + 1)
+                processes[processIndex] = process.copy(status = Process.RUNNING)
+                state = state.copy(status = JobState.RUNNING, processes = processes)
+                callback(JobEvent.Changed(state))
+                lock.set(false)
+            }
+
+            countDown(state, (process.duration * 60).toLong())
+
+            waitForLock(state) {
+                state = state.copy(status = JobState.WASTE)
+                callback(JobEvent.Changed(state))
+                clean(index, process, 11, (index - ((index / 4) * 4)) + 1)
+            }
+        }
+
+        processes[processIndex] = process.copy(status = Process.FINISHED)
+        state = state.copy(status = JobState.FINISHED, processes = processes)
+        callback(JobEvent.Changed(state))
+        hashMap[index] = state
     }
 
     val phosphateBufferedSaline: suspend (Int, Process) -> Unit = start@{ index, process ->
+        // check
+        try {
+            verify(index, process)
+        } catch (ex: Exception) {
+            callback(JobEvent.Error(ex))
+            return@start
+        }
 
+        var state = hashMap[index]!!
+        val processes = state.processes.toMutableList()
+        val processIndex = processes.indexOf(process)
+
+        waitForLock(state) {
+            state = state.copy(status = JobState.LIQUID)
+            callback(JobEvent.Changed(state))
+            liquid(index, process, 10, (index - ((index / 4) * 4)) + 1)
+            processes[processIndex] = process.copy(status = Process.RUNNING)
+            state = state.copy(status = JobState.RUNNING, processes = processes)
+            callback(JobEvent.Changed(state))
+        }
+
+        countDown(state, (process.duration * 60 * 60).toLong())
+
+        waitForLock(state) {
+            state = state.copy(status = JobState.WASTE)
+            callback(JobEvent.Changed(state))
+            clean(index, process, 11, (index - ((index / 4) * 4)) + 1)
+            processes[processIndex] = process.copy(status = Process.FINISHED)
+            state = state.copy(status = JobState.FINISHED, processes = processes)
+            callback(JobEvent.Changed(state))
+            hashMap[index] = state
+        }
     }
 
-    companion object {
-        const val IN_1 = 1
-        const val IN_2 = 2
-        const val IN_3 = 3
-        const val IN_4 = 4
-        const val IN_5 = 5
-        const val IN_6 = 6
-        const val IN_7 = 7
-        const val IN_8 = 8
-        const val IN_9 = 9
-        const val IN_10 = 10
-        const val IN_11 = 11
-        const val IN_12 = 12
+    private fun verify(index: Int, process: Process) {
+        var state = hashMap[index] ?: throw Exception("程序不存在")
+        val processes = state.processes.toMutableList()
+        val processIndex = processes.indexOf(process)
 
-        const val OUT_1 = 1
-        const val OUT_2 = 2
-        const val OUT_3 = 3
-        const val OUT_4 = 4
-        const val OUT_5 = 5
-        const val OUT_6 = 6
+        if (process.dosage == 0.0) {
+            throw Exception("加液量为零错误")
+        }
+
+        (hpc[index / 4 + 1] ?: { x -> x * 100 }).invoke(process.dosage)
+            ?: throw Exception("校准方法错误")
+
+        if (processIndex != -1) {
+            processes[processIndex] = process.copy(status = Process.RUNNING)
+            state = state.copy(status = JobState.RUNNING, processes = processes)
+            callback(JobEvent.Changed(state))
+        } else {
+            throw Exception("进程不存在")
+        }
+    }
+
+    private suspend fun liquid(index: Int, process: Process, inChannel: Int, outChannel: Int) {
+        val group = index / 4
+        val pulse = (hpc[group + 1] ?: { x -> x * 100 }).invoke(process.dosage)!!
+        val inAddr = 2 * group
+        val outAddr = 2 * group + 1
+        callback(JobEvent.Shaker(true))
+        writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
+        delay(100L)
+        writeWithValve(inAddr, inChannel)
+        delay(100L)
+        writeWithValve(outAddr, outChannel)
+        delay(100L)
+        writeWithPulse(
+            slaveAddr = group + 1,
+            value = pulse.toLong() + recoup
+        )
+        delay(100L)
+        if (recoup > 0.0) {
+            // 后边段残留的液体
+            writeWithValve(inAddr, 12)
+            delay(100L)
+            writeWithPulse(slaveAddr = group + 1, value = recoup * 2)
+            delay(100L)
+            // 退回前半段残留的液体
+            writeWithValve(inAddr, inChannel)
+            delay(100L)
+            writeWithValve(outAddr, 6)
+            delay(100L)
+            writeWithPulse(
+                slaveAddr = group + 1,
+                value = -recoup * 2
+            )
+            delay(100L)
+        }
+    }
+
+    private suspend fun clean(index: Int, process: Process, inChannel: Int, outChannel: Int) {
+        val group = index / 4
+        val pulse = (hpc[group + 1] ?: { x -> x * 100 }).invoke(process.dosage)!!
+        val inAddr = 2 * group
+        val outAddr = 2 * group + 1
+        callback(JobEvent.Shaker(false))
+        writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+        delay(300L)
+        readWithPosition(slaveAddr = 0)
+        delay(100L)
+        val p = (hpp[0] ?: 0) % 6400L
+        writeWithPulse(0, if (p > 3200) 6400L - p else -p)
+        delay(100L)
+        writeWithValve(inAddr, inChannel)
+        delay(100L)
+        writeWithValve(outAddr, outChannel)
+        delay(100L)
+        writeWithPulse(group + 1, -(pulse + recoup).toLong() * 2)
+        delay(100L)
+    }
+
+    private suspend fun waitForLock(state: JobState, block: suspend () -> Unit) {
+        if (lock.get()) {
+            callback(JobEvent.Changed(state.copy(status = JobState.WAITING)))
+            while (lock.get()) {
+                delay(1000L)
+            }
+        }
+        lock.set(true)
+        block()
+        lock.set(false)
+    }
+
+    private suspend fun countDown(state: JobState, allTime: Long) {
+        repeat(allTime.toInt()) {
+            callback(JobEvent.Changed(state.copy(time = allTime - it)))
+            delay(1000L)
+        }
     }
 }
 
@@ -219,4 +373,10 @@ data class JobState(
         const val WASTE = 6
         const val RECYCLE = 7
     }
+}
+
+sealed class JobEvent {
+    data class Changed(val state: JobState) : JobEvent()
+    data class Error(val ex: Exception) : JobEvent()
+    data class Shaker(val shaker: Boolean) : JobEvent()
 }

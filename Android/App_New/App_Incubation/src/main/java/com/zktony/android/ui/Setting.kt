@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -50,7 +49,9 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
+import com.zktony.android.utils.SerialPortUtils.writeRegister
 import com.zktony.android.utils.extra.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -121,7 +122,6 @@ fun SettingContent(
     uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val snackbarHostState = LocalSnackbarHostState.current
     var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
     var helpInfo by remember { mutableStateOf(false) }
@@ -254,7 +254,7 @@ fun SettingContent(
 
                 SettingsCard(icon = image, text = text, onClick = {
                     scope.launch {
-                        if (context.isNetworkAvailable()) {
+                        if (ApplicationUtils.isNetworkAvailable()) {
                             uiEvent(SettingUiEvent.CheckUpdate)
                         } else {
                             snackbarHostState.showSnackbar(message = "网络不可用")

@@ -685,6 +685,9 @@ fun ModuleItem(
                 JobState.PAUSED -> "已暂停"
                 JobState.FINISHED -> "已完成"
                 JobState.WAITING -> "等待中"
+                JobState.LIQUID -> "加液中"
+                JobState.WASTE -> "排液中"
+                JobState.RECYCLE -> "回收中"
                 else -> "未知"
             }
 
