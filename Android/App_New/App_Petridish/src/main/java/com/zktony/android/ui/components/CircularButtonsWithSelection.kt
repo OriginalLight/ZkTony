@@ -55,26 +55,65 @@ fun CircularButtonsWithSelection(
         ) {}
 
         // 绘制圆形按钮
-        for (i in 0 until buttonCount) {
-            val angle = i * angleStep
+        for (i in 7 downTo 0) {
+            var angle = 0f
+            if (i != 0) {
+                angle = -((i - 1) * angleStep)
+            } else {
+                angle = -(7 * angleStep)
+            }
+//            angle = -(i * angleStep)
             val x = (circleRadius / 2).value * cos(angle)
             val y = (circleRadius / 2).value * sin(angle)
             val isSelected = selectedButtonIndex == i
+            if (isSelected) {
+                Button(
+                    onClick = { onButtonSelected(i) },
+                    enabled = buttonEnabled,
+                    modifier = Modifier
+                        .size(buttonRadius * 2)
+                        .offset { IntOffset(x.roundToInt(), y.roundToInt()) }
+                        .background(
+                            color = Color.Green,
+                            shape = CircleShape
+                        )
+                        .padding(8.dp)
+                        .clip(CircleShape)
+                        .clickable { onButtonSelected(i) }
+                ) {}
+            } else if (i == 1) {
+                Button(
+                    onClick = { onButtonSelected(i) },
+                    enabled = buttonEnabled,
+                    modifier = Modifier
+                        .size(buttonRadius * 2)
+                        .offset { IntOffset(x.roundToInt(), y.roundToInt()) }
+                        .background(
+                            color = Color.Red,
+                            shape = CircleShape
+                        )
+                        .padding(8.dp)
+                        .clip(CircleShape)
+                        .clickable { onButtonSelected(i) }
+                ) {}
+            } else {
+                Button(
+                    onClick = { onButtonSelected(i) },
+                    enabled = buttonEnabled,
+                    modifier = Modifier
+                        .size(buttonRadius * 2)
+                        .offset { IntOffset(x.roundToInt(), y.roundToInt()) }
+                        .background(
+                            color = Color.White,
+                            shape = CircleShape
+                        )
+                        .padding(8.dp)
+                        .clip(CircleShape)
+                        .clickable { onButtonSelected(i) }
+                ) {}
+            }
 
-            Button(
-                onClick = { onButtonSelected(i) },
-                enabled = buttonEnabled,
-                modifier = Modifier
-                    .size(buttonRadius * 2)
-                    .offset { IntOffset(x.roundToInt(), y.roundToInt()) }
-                    .background(
-                        color = if (isSelected) Color.Red else Color.Green,
-                        shape = CircleShape
-                    )
-                    .padding(8.dp)
-                    .clip(CircleShape)
-                    .clickable { onButtonSelected(i) }
-            ) {}
+
         }
 
         Text(

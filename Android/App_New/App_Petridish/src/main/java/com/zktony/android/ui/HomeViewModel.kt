@@ -190,6 +190,12 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
      */
     var xpStartNum = 1
 
+    /**
+     * 判断上盘是否运动过
+     * 复位回到false
+     */
+    var spStratBool = false
+
 
     init {
         viewModelScope.launch {
@@ -323,6 +329,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                         }
                     }
                     xpStartNum = 1
+                    spStratBool = false
                 }
             } catch (ex: Exception) {
                 _loading.value = 0
@@ -341,9 +348,15 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             /**
              * 1.获取移动步数
              */
+
+            spStratBool = true
             var spydjl = dataSaver.readData("spydjl", 0f)
             var spydbs = (spydjl * 3200).toLong()
-            spydbs += runIndex * 1666
+            if (runIndex == 0) {
+                spydbs += 8 * 1666
+            } else {
+                spydbs += runIndex * 1666
+            }
 
             /**
              * 1.举升1到上盘高度
@@ -481,8 +494,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             }
 
 
-
-
         }
 
 
@@ -587,6 +598,9 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                  */
                 var valveOne = dataSaver.readData("valveOne", 0)
 
+                if (spStratBool && valveOne == 0) {
+                    valveOne = 8
+                }
 
                 spStartNum = valveOne
 
@@ -746,14 +760,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 }
 
                             }
-                            if (spStartCoordinates < 7) {
+                            if (spStartCoordinates < 8) {
                                 /**
                                  * 上盘原点距离
                                  */
                                 val spydjl =
                                     dataSaver.readData("spydjl", 0f);
                                 spStartNum += 1
-                                if (_spCount.value == 7) {
+                                if (_spCount.value == 8) {
                                     _spCount.value = 0
                                 } else {
                                     _spCount.value += 1
@@ -766,6 +780,11 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                         pulse = (spydjl * 3200 + spStartNum * 1666).toLong();
                                     }
                                 }
+                            }
+
+                            if (_loading.value == 8) {
+                                _loading.value = 2
+                                break;
                             }
 
                             if (spStartCoordinates == 7) {
@@ -904,14 +923,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             }
 
 
-                            if (spStartCoordinates < 7) {
+                            if (spStartCoordinates < 8) {
                                 /**
                                  * 上盘原点距离
                                  */
                                 val spydjl =
                                     dataSaver.readData("spydjl", 0f);
                                 spStartNum += 1
-                                if (_spCount.value == 7) {
+                                if (_spCount.value == 8) {
                                     _spCount.value = 0
                                 } else {
                                     _spCount.value += 1

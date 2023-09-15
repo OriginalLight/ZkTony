@@ -9,7 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList
 
 class SerialPortHelper : AbstractSerialHelper(
     SerialConfig(
-        device = "/dev/ttyS4"
+        device = "/dev/ttyS0"
     )
 ) {
 

@@ -73,6 +73,15 @@ fun Splash(
     val valveOne = rememberDataSaverState(key = "valveOne", default = 0)
     var valveOne_ex by remember { mutableStateOf(0) }
 
+
+    /**
+     * 判断是否复位
+     * true=复位完成
+     * false=没复位
+     */
+    val isResetBool = rememberDataSaverState(key = "isResetBool", default = false)
+    var isResetBool_ex by remember { mutableStateOf(false) }
+
     // Animate the splash screen and hide it when the animation is complete
     LaunchedEffect(key1 = true) {
         scale.animateTo(
@@ -214,6 +223,9 @@ fun Splash(
                                     }
                                     valveOne.value = 0
                                     valveOne_ex = 0
+
+                                    isResetBool.value = true
+                                    isResetBool_ex = true
                                     toggleDrawer(NavigationType.NAVIGATION_RAIL)
                                     navController.popBackStack()
                                     navController.navigate(Route.HOME)
@@ -232,6 +244,8 @@ fun Splash(
                     Button(
                         modifier = Modifier.width(300.dp),
                         onClick = {
+                            isResetBool.value = false
+                            isResetBool_ex = false
                             toggleDrawer(NavigationType.NAVIGATION_RAIL)
                             navController.popBackStack()
                             navController.navigate(Route.CALIBRATION)

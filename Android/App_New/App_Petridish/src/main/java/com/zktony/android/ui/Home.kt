@@ -4,9 +4,6 @@ import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.filled.*
@@ -36,9 +33,13 @@ import com.zktony.android.ui.utils.NavigationType
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.ext.format
+import com.zktony.android.utils.tx.tx
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+
+
+var spStartNum = 0;
 
 @Composable
 fun Home(
@@ -104,16 +105,21 @@ fun MenuContent(
      * false关
      * true开
      */
-    var uvState by remember { mutableStateOf(false) }
-
-    /**
-     * 保存上盘移动孔位
-     */
-//    var valveOne by remember { mutableIntStateOf(0) }
+    val uvState = rememberDataSaverState(key = "uvState", default = false)
+    var uvState_ex by remember { mutableStateOf(false) }
 
 
     val valveOne = rememberDataSaverState(key = "valveOne", default = 0)
     var valveOne_ex by remember { mutableStateOf(0) }
+
+
+    /**
+     * 判断是否复位
+     * true=复位完成
+     * false=没复位
+     */
+    val isResetBool = rememberDataSaverState(key = "isResetBool", default = false)
+    var isResetBool_ex by remember { mutableStateOf(false) }
 
 
     // Start a timer to display the runtime
@@ -139,288 +145,309 @@ fun MenuContent(
         }
     }
 
-    LazyVerticalGrid(
+    Row(
         modifier = modifier.fillMaxSize(),
-        columns = GridCells.Fixed(3),
-        contentPadding = PaddingValues(32.dp),
-        horizontalArrangement = Arrangement.spacedBy(32.dp),
-        verticalArrangement = Arrangement.spacedBy(32.dp),
     ) {
 
-        item(span = { GridItemSpan(maxLineSpan) }) {
-            Row {
 
-                Column(
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1f)
+        ) {
+            Row(
+                modifier = Modifier
+                    .height(30.dp)
+                    .width(800.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "培养皿(" + count + ")",
+                    fontSize = 20.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .height(570.dp)
+                    .width(800.dp)
+                    .padding(16.dp)
+            ) {
+                Box(
                     modifier = Modifier
-                        .height(600.dp)
-                        .width(800.dp)
+                        .weight(1f)
+                        .padding(top = 100.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .height(30.dp)
-                            .width(800.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
+                    CircularButtonsWithSelection(
+                        buttonEnabled = uiState.uiFlags != UiFlags.VALVE,
+                        selectedButtonIndex = valveOne.value
                     ) {
-                        Text(
-                            text = "培养皿(" + count + ")",
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                    Row(
-                        modifier = Modifier
-                            .height(570.dp)
-                            .width(800.dp)
-                            .padding(16.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(top = 100.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularButtonsWithSelection(
-                                buttonEnabled = uiState.uiFlags != UiFlags.VALVE,
-                                selectedButtonIndex = valveOne.value
-                            ) {
-                            }
-                        }
                     }
                 }
-                Column(
-                    modifier = Modifier
-                        .height(600.dp)
-                        .width(200.dp)
-                ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .width(140.dp)
-                            .padding(start = 20.dp, top = 50.dp),
-                        value = tiji_ex,
-                        onValueChange = {
-                            scope.launch {
-                                tiji_ex = it
-                                tiji.value = it.toFloatOrNull() ?: 0f
+            }
+        }
+        Column(
+            modifier = Modifier
+                .width(200.dp)
+        ) {
+            OutlinedTextField(
+                modifier = Modifier
+                    .width(140.dp)
+                    .padding(start = 20.dp, top = 50.dp),
+                value = tiji_ex,
+                onValueChange = {
+                    scope.launch {
+                        tiji_ex = it
+                        tiji.value = it.toFloatOrNull() ?: 0f
+                    }
+                },
+                label = { Text(text = "体积") },
+                shape = MaterialTheme.shapes.medium,
+                textStyle = MaterialTheme.typography.bodyLarge,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboard?.hide()
+                    }
+                ),
+            )
+
+            ElevatedButton(
+                modifier = Modifier
+                    .width(140.dp)
+                    .padding(start = 20.dp, top = 10.dp),
+                enabled = uiState.loading == 0 || uiState.loading == 7,
+                onClick = {
+                    if (isResetBool.value) {
+                        if (tiji.value.toFloat() != 0f) {
+                            println("valveOne.value===" + valveOne.value)
+                            println("valveOne_ex===" + valveOne_ex)
+                            if (uiState.loading == 0) {
+                                event(HomeEvent.Start(7))
+                            } else {
+                                event(HomeEvent.Start(8))
                             }
-                        },
-                        label = { Text(text = "体积") },
-                        shape = MaterialTheme.shapes.medium,
-                        textStyle = MaterialTheme.typography.bodyLarge,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                keyboard?.hide()
-                            }
-                        ),
+                        } else {
+                            Toast.makeText(
+                                context,
+                                "加液量不能为0!",
+                                Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "复位后再运动!",
+                            Toast.LENGTH_SHORT
+                        ).show();
+                    }
+
+
+                }
+            ) {
+                if (uiState.loading == 7) {
+                    Text(
+                        text = "停止",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
                     )
-
-                    ElevatedButton(
-                        modifier = Modifier
-                            .width(140.dp)
-                            .padding(start = 20.dp, top = 10.dp),
-                        enabled = uiState.loading == 0 || uiState.loading == 7,
-                        onClick = {
-                            if (tiji.value.toFloat() != 0f) {
-                                println("valveOne.value===" + valveOne.value)
-                                println("valveOne_ex===" + valveOne_ex)
-                                if (uiState.loading == 0) {
-                                    event(HomeEvent.Start(7))
-                                } else {
-                                    event(HomeEvent.Start(8))
-                                }
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "加液量不能为0!",
-                                    Toast.LENGTH_SHORT
-                                ).show();
-                            }
-
-                        }
-                    ) {
-                        if (uiState.loading == 7) {
-                            Text(
-                                text = "停止",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        } else {
-                            Text(
-                                text = "运行",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-
-                    }
-
-                    ElevatedButton(
-                        modifier = Modifier
-                            .width(140.dp)
-                            .padding(start = 20.dp, top = 10.dp),
-
-                        enabled = uiState.loading == 0,
-                        onClick = {
-                            if (valveOne.value < 7) {
-                                valveOne.value += 1
-                                valveOne_ex += 1
-                                event(HomeEvent.spStart(valveOne.value))
-                            }
-
-                        }
-                    ) {
-                        Text(
-                            text = "上盘",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-
-                    ElevatedButton(
-                        modifier = Modifier
-                            .width(140.dp)
-                            .padding(start = 20.dp, top = 10.dp),
-
-                        enabled = uiState.loading == 2,
-                        onClick = {
-                            event(HomeEvent.xpStart)
-                        }
-                    ) {
-                        Text(
-                            text = "下盘",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-
-                    ElevatedButton(
-                        modifier = Modifier
-                            .width(140.dp)
-                            .padding(start = 20.dp, top = 10.dp),
-
-                        enabled = uiState.loading == 0 || uiState.loading == 2,
-                        onClick = {
-                            event(HomeEvent.Reset)
-                            valveOne.value = 0
-                            valveOne_ex = 0
-                        }
-                    ) {
-                        Text(
-                            text = "复位",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontFamily = FontFamily.Serif,
-                            fontWeight = FontWeight.Bold,
-                        )
-                    }
-
-                    ElevatedButton(
-                        modifier = Modifier
-                            .width(140.dp)
-                            .padding(start = 20.dp, top = 10.dp),
-
-                        enabled = uiState.loading == 0,
-                        onClick = {
-                            //TODO 紫外没写
-                            uvState = !uvState
-                        }
-                    ) {
-                        if (!uvState) {
-                            Text(
-                                text = "紫外(关)",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        } else {
-                            Text(
-                                text = "紫外(开)",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-
-
-
-                    ElevatedButton(
-                        modifier = Modifier
-                            .width(140.dp)
-                            .padding(start = 20.dp, top = 10.dp),
-
-                        enabled = uiState.loading == 0 || uiState.loading == 4,
-                        onClick = {
-                            if (uiState.loading == 0) {
-                                event(HomeEvent.PumpingOrRecrement(4))
-                            } else {
-                                event(HomeEvent.PumpingOrRecrement(3))
-                            }
-                        }
-                    ) {
-
-                        if (uiState.loading == 4) {
-                            Text(
-                                text = "停止",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        } else {
-                            Text(
-                                text = "排液",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-
-
-                    }
-
-                    ElevatedButton(
-                        modifier = Modifier
-                            .width(140.dp)
-                            .padding(start = 20.dp, top = 10.dp),
-
-                        enabled = uiState.loading == 0 || uiState.loading == 5,
-                        onClick = {
-                            if (uiState.loading == 0) {
-                                event(HomeEvent.PumpingOrRecrement(5))
-                            } else {
-                                event(HomeEvent.PumpingOrRecrement(6))
-                            }
-                        }
-                    ) {
-                        if (uiState.loading == 5) {
-                            Text(
-                                text = "停止",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        } else {
-                            Text(
-                                text = "回吸",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontFamily = FontFamily.Serif,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-
-                    }
-
-
+                } else {
+                    Text(
+                        text = "运行",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
+                    )
                 }
 
             }
+
+            ElevatedButton(
+                modifier = Modifier
+                    .width(140.dp)
+                    .padding(start = 20.dp, top = 10.dp),
+
+                enabled = uiState.loading == 0,
+                onClick = {
+                    if (spStartNum < 8) {
+                        if (valveOne.value == 7) {
+                            valveOne.value = 0
+                        } else {
+                            valveOne.value += 1
+                            valveOne_ex += 1
+                        }
+                        spStartNum += 1
+                        event(HomeEvent.spStart(valveOne.value))
+                    }
+
+                }
+            ) {
+                Text(
+                    text = "上盘",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontFamily = FontFamily.Serif,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+
+            ElevatedButton(
+                modifier = Modifier
+                    .width(140.dp)
+                    .padding(start = 20.dp, top = 10.dp),
+
+                enabled = uiState.loading == 2,
+                onClick = {
+                    event(HomeEvent.xpStart)
+                }
+            ) {
+                Text(
+                    text = "下盘",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontFamily = FontFamily.Serif,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+
+            ElevatedButton(
+                modifier = Modifier
+                    .width(140.dp)
+                    .padding(start = 20.dp, top = 10.dp),
+
+                enabled = uiState.loading == 0 || uiState.loading == 2,
+                onClick = {
+                    event(HomeEvent.Reset)
+                    valveOne.value = 0
+                    valveOne_ex = 0
+                    isResetBool.value = true
+                    isResetBool_ex = true
+                    spStartNum = 0
+                }
+            ) {
+                Text(
+                    text = "复位",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontFamily = FontFamily.Serif,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+
+            ElevatedButton(
+                modifier = Modifier
+                    .width(140.dp)
+                    .padding(start = 20.dp, top = 10.dp),
+
+                enabled = uiState.loading == 0,
+                onClick = {
+                    if (!uvState.value) {
+                        uvState.value = true
+                        uvState_ex = true
+                        scope.launch {
+                            tx {
+                                valve(1 to 1)
+                            }
+                        }
+                    } else {
+                        uvState.value = false
+                        uvState_ex = false
+                        scope.launch {
+                            tx {
+                                valve(1 to 0)
+                            }
+                        }
+                    }
+                }
+            ) {
+                if (!uvState.value) {
+                    Text(
+                        text = "紫外(关)",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
+                    )
+                } else {
+                    Text(
+                        text = "紫外(开)",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+
+
+
+            ElevatedButton(
+                modifier = Modifier
+                    .width(140.dp)
+                    .padding(start = 20.dp, top = 10.dp),
+
+                enabled = uiState.loading == 0 || uiState.loading == 4,
+                onClick = {
+                    if (uiState.loading == 0) {
+                        event(HomeEvent.PumpingOrRecrement(4))
+                    } else {
+                        event(HomeEvent.PumpingOrRecrement(3))
+                    }
+                }
+            ) {
+
+                if (uiState.loading == 4) {
+                    Text(
+                        text = "停止",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
+                    )
+                } else {
+                    Text(
+                        text = "排液",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+
+
+            }
+
+            ElevatedButton(
+                modifier = Modifier
+                    .width(140.dp)
+                    .padding(start = 20.dp, top = 10.dp),
+
+                enabled = uiState.loading == 0 || uiState.loading == 5,
+                onClick = {
+                    if (uiState.loading == 0) {
+                        event(HomeEvent.PumpingOrRecrement(5))
+                    } else {
+                        event(HomeEvent.PumpingOrRecrement(6))
+                    }
+                }
+            ) {
+                if (uiState.loading == 5) {
+                    Text(
+                        text = "停止",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
+                    )
+                } else {
+                    Text(
+                        text = "回吸",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontFamily = FontFamily.Serif,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+
+            }
+
 
         }
 
