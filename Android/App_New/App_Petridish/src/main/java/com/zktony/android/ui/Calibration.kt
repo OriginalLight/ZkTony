@@ -269,6 +269,9 @@ fun CalibrationList(
     val isResetBool = rememberDataSaverState(key = "isResetBool", default = false)
     var isResetBool_ex by remember { mutableStateOf(false) }
 
+    isResetBool.value = false
+    isResetBool_ex = false
+
     val context = LocalContext.current;
 
     // Show the input dialog if showDialog is true
@@ -367,8 +370,6 @@ fun CalibrationList(
 
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -426,8 +427,6 @@ fun CalibrationList(
 
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -481,8 +480,6 @@ fun CalibrationList(
 
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -537,8 +534,6 @@ fun CalibrationList(
 
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -591,8 +586,6 @@ fun CalibrationList(
 
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -646,8 +639,6 @@ fun CalibrationList(
 
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -683,8 +674,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         event(
                             CalibrationEvent.Reset(
                                 listOf(0),
@@ -731,8 +720,6 @@ fun CalibrationList(
 
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -785,8 +772,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -839,8 +824,6 @@ fun CalibrationList(
 
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -919,8 +902,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -973,8 +954,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1055,8 +1034,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
 
                             try {
@@ -1110,8 +1087,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1164,8 +1139,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1220,8 +1193,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1274,8 +1245,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1328,8 +1297,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1384,8 +1351,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1438,8 +1403,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1492,8 +1455,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1573,8 +1534,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1627,8 +1586,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1681,8 +1638,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {
@@ -1737,8 +1692,6 @@ fun CalibrationList(
                 )
                 Button(
                     onClick = {
-                        isResetBool.value = false
-                        isResetBool_ex = false
                         scope.launch {
                             try {
                                 tx {

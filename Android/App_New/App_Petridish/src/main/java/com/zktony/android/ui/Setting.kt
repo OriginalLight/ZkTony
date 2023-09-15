@@ -73,6 +73,13 @@ fun Setting(
         }
     }
 
+    val isResetBool = rememberDataSaverState(key = "isResetBool", default = false)
+    var isResetBool_ex by remember { mutableStateOf(false) }
+
+    isResetBool.value = false
+    isResetBool_ex = false
+
+
     Column(
         modifier = modifier
             .fillMaxSize()
