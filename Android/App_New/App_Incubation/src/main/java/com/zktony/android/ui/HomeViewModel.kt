@@ -8,15 +8,14 @@ import androidx.paging.cachedIn
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.ui.utils.JobExecutorUtils
-import com.zktony.android.ui.utils.JobState
-import com.zktony.android.ui.utils.PageType
-import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.ui.utils.*
+import com.zktony.android.utils.AppStateUtils.hpp
+import com.zktony.android.utils.AppStateUtils.hpt
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.extra.appState
-import com.zktony.android.utils.extra.readWithPosition
-import com.zktony.android.utils.extra.readWithValve
-import com.zktony.android.utils.extra.writeWithShaker
+import com.zktony.android.utils.SerialPortUtils.readWithPosition
+import com.zktony.android.utils.SerialPortUtils.readWithValve
+import com.zktony.android.utils.SerialPortUtils.writeRegister
+import com.zktony.android.utils.SerialPortUtils.writeWithPulse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,24 +49,30 @@ class HomeViewModel @Inject constructor(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40)
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
-    val jobExecutorUtils = JobExecutorUtils(
-        recoup = dataStore.readData(Constants.ZT_0002, 0L),
-        callback = { jobState ->
-            viewModelScope.launch {
-                val jobList = _jobList.value.toMutableList()
-                val jobIndex = jobList.indexOfFirst { it.index == jobState.index }
-                if (jobIndex != -1) {
-                    jobList[jobIndex] = jobState
+    private val jobExecutorUtils = JobExecutorUtils(
+        recoup = dataStore.readData(Constants.ZT_0002, 0L)
+    ) { event ->
+        viewModelScope.launch {
+            when (event) {
+                is JobEvent.Changed -> {
+                    val jobList = _jobList.value.toMutableList()
+                    val jobIndex = jobList.indexOfFirst { it.index == event.state.index }
+                    if (jobIndex != -1) {
+                        jobList[jobIndex] = event.state
+                    }
+                    _jobList.value = jobList
                 }
-                _jobList.value = jobList
-            }
-        },
-        exception = { ex ->
-            viewModelScope.launch {
-                _message.value = ex.message
+
+                is JobEvent.Error -> {
+                    _message.value = event.ex.message
+                }
+
+                is JobEvent.Shaker -> {
+                    _stand.value = _stand.value.copy(shaker = event.shaker)
+                }
             }
         }
-    )
+    }
 
     init {
         viewModelScope.launch {
@@ -139,7 +144,18 @@ class HomeViewModel @Inject constructor(
             is HomeUiEvent.Shaker -> viewModelScope.launch {
                 val shaker = _stand.value.shaker
                 try {
-                    writeWithShaker(shaker)
+                    if (shaker) {
+                        writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
+                        delay(300L)
+
+                        readWithPosition(slaveAddr = 0)
+                        delay(100L)
+
+                        val pulse = (hpp[0] ?: 0) % 6400L
+                        writeWithPulse(0, if (pulse > 3200) 6400L - pulse else -pulse)
+                    } else {
+                        writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
+                    }
                 } catch (ex: Exception) {
                     _message.value = ex.message
                 } finally {
@@ -164,7 +180,7 @@ class HomeViewModel @Inject constructor(
 
     private suspend fun loop() {
         while (true) {
-            _stand.value = _stand.value.copy(insulation = appState.hpt.values.toList())
+            _stand.value = _stand.value.copy(insulation = hpt.values.toList())
             delay(3000L)
         }
     }

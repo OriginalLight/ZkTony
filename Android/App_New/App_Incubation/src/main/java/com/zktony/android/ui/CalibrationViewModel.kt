@@ -10,10 +10,10 @@ import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.utils.AppStateUtils.hpv
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.extra.appState
-import com.zktony.android.utils.extra.writeWithPulse
-import com.zktony.android.utils.extra.writeWithValve
+import com.zktony.android.utils.SerialPortUtils.writeWithPulse
+import com.zktony.android.utils.SerialPortUtils.writeWithValve
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,10 +71,10 @@ class CalibrationViewModel @Inject constructor(
                     _uiFlags.value = UiFlags.PUMP
                     val volume = dataStore.readData(Constants.ZT_0002, 0L)
                     if (uiEvent.pulse == 0.0) throw Exception("步数不能为 0")
-                    if (appState.hpv[2 * uiEvent.id] != 10) {
+                    if (hpv[2 * uiEvent.id] != 10) {
                         writeWithValve(2 * uiEvent.id, 10)
                     }
-                    if (appState.hpv[2 * uiEvent.id + 1] != 1) {
+                    if (hpv[2 * uiEvent.id + 1] != 1) {
                         writeWithValve(2 * uiEvent.id + 1, 1)
                     }
                     writeWithPulse(uiEvent.id + 1, uiEvent.pulse.toLong() + volume)

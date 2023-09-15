@@ -1,7 +1,7 @@
 package com.zktony.android
 
 import android.app.Application
-import com.zktony.android.utils.extra.Ext
+import com.zktony.android.utils.ApplicationUtils
 import dagger.hilt.android.HiltAndroidApp
 
 /**
@@ -17,6 +17,6 @@ class App : Application() {
         super.onCreate()
 
         // Initialize the application context
-        Ext.with(this)
+        ApplicationUtils.with(this)
     }
 }

@@ -9,10 +9,7 @@ import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -178,44 +175,59 @@ fun HomeContent(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            if (jobState.status == JobState.STOPPED) {
-                Card(
-                    enabled = uiState.uiFlags == UiFlags.NONE && jobState.processes.isNotEmpty(),
-                    onClick = { uiEvent(HomeUiEvent.Start(uiState.selected)) }
-                ) {
-                    Icon(
-                        modifier = Modifier.size(128.dp),
-                        imageVector = Icons.Default.PlayArrow,
-                        contentDescription = null,
-                        tint = Color.Blue
-                    )
+            when (jobState.status) {
+                JobState.STOPPED, JobState.FINISHED -> {
+                    Card(
+                        enabled = uiState.uiFlags == UiFlags.NONE && jobState.processes.isNotEmpty(),
+                        onClick = { uiEvent(HomeUiEvent.Start(uiState.selected)) }
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(128.dp),
+                            imageVector = Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            tint = Color.Blue
+                        )
+                    }
                 }
-            } else {
-                Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                    Card(onClick = {
-                        if (jobState.status == JobState.RUNNING) {
-                            uiEvent(HomeUiEvent.Pause(uiState.selected))
-                        } else if (jobState.status == JobState.PAUSED) {
-                            uiEvent(HomeUiEvent.Start(uiState.selected))
+
+                JobState.RUNNING, JobState.PAUSED -> {
+                    Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
+                        Card(onClick = {
+                            if (jobState.status == JobState.RUNNING) {
+                                uiEvent(HomeUiEvent.Pause(uiState.selected))
+                            } else {
+                                uiEvent(HomeUiEvent.Start(uiState.selected))
+                            }
+                        }) {
+                            if (jobState.status == JobState.RUNNING) {
+                                Icon(
+                                    modifier = Modifier.size(128.dp),
+                                    imageVector = Icons.Default.Pause,
+                                    contentDescription = null,
+                                    tint = Color.DarkGray
+                                )
+                            } else {
+                                Icon(
+                                    modifier = Modifier.size(128.dp),
+                                    imageVector = Icons.Default.PlayArrow,
+                                    contentDescription = null,
+                                    tint = Color.Blue
+                                )
+                            }
                         }
-                    }) {
-                        if (jobState.status == JobState.RUNNING) {
+
+                        Card(onClick = { uiEvent(HomeUiEvent.Stop(uiState.selected)) }) {
                             Icon(
                                 modifier = Modifier.size(128.dp),
-                                imageVector = Icons.Default.Pause,
+                                imageVector = Icons.Default.Close,
                                 contentDescription = null,
-                                tint = Color.DarkGray
-                            )
-                        } else if (jobState.status == JobState.PAUSED) {
-                            Icon(
-                                modifier = Modifier.size(128.dp),
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = null,
-                                tint = Color.Blue
+                                tint = Color.Red
                             )
                         }
                     }
+                }
 
+                JobState.WAITING -> {
                     Card(onClick = { uiEvent(HomeUiEvent.Stop(uiState.selected)) }) {
                         Icon(
                             modifier = Modifier.size(128.dp),
@@ -224,6 +236,15 @@ fun HomeContent(
                             tint = Color.Red
                         )
                     }
+                }
+
+                else -> {
+                    Icon(
+                        modifier = Modifier.size(128.dp),
+                        imageVector = Icons.Default.DoDisturb,
+                        contentDescription = null,
+                        tint = Color.Red
+                    )
                 }
             }
 

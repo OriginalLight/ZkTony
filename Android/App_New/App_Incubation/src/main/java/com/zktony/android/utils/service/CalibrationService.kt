@@ -2,9 +2,9 @@ package com.zktony.android.utils.service
 
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.entities.Calibration
-import com.zktony.android.utils.extra.appState
-import com.zktony.android.utils.extra.calculateLinearRelation
-import com.zktony.android.utils.extra.fitQuadraticCurve
+import com.zktony.android.utils.AlgorithmUtils.calculateLinearRelation
+import com.zktony.android.utils.AlgorithmUtils.fitQuadraticCurve
+import com.zktony.android.utils.AppStateUtils.hpc
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,7 +26,7 @@ class CalibrationService @Inject constructor(
             dao.getAll().collect { items ->
                 items.forEach { item ->
                     val curveFunction = calculateCurveFunction(item)
-                    appState.hpc[item.index] = curveFunction
+                    hpc[item.index] = curveFunction
                 }
             }
         }
