@@ -147,6 +147,7 @@ fun SettingsAppBar(
                             } else {
                                 count = 0
                                 uiEvent(SettingUiEvent.Delete(uiState.selected))
+                                uiEvent(SettingUiEvent.ToggleSelected(0L))
                             }
                         }
                     }) {
@@ -275,6 +276,7 @@ fun ProgramAppBar(
                             } else {
                                 count = 0
                                 uiEvent(ProgramUiEvent.Delete(uiState.selected))
+                                uiEvent(ProgramUiEvent.ToggleSelected(0L))
                             }
                         }
                     }) {
@@ -421,6 +423,7 @@ fun CalibrationAppBar(
                             } else {
                                 count = 0
                                 uiEvent(CalibrationUiEvent.Delete(uiState.selected))
+                                uiEvent(CalibrationUiEvent.ToggleSelected(0L))
                             }
                         }
                     }) {
