@@ -1,14 +1,16 @@
 package com.zktony.android.utils
 
 import com.zktony.android.utils.AppStateUtils.hpp
+import com.zktony.android.utils.AppStateUtils.hpt
 import com.zktony.android.utils.AppStateUtils.hpv
-import com.zktony.android.utils.extra.logE
-import com.zktony.android.utils.extra.logW
+import com.zktony.android.utils.LogUtils.logE
 import com.zktony.serialport.AbstractSerialHelper
+import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.command.modbus.RtuProtocol
 import com.zktony.serialport.command.runze.RunzeProtocol
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.*
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import kotlin.math.absoluteValue
@@ -18,10 +20,9 @@ object SerialPortUtils {
     /**
      * 串口通信
      */
-    val serialHelper =
+    val serialRtu =
         object : AbstractSerialHelper(SerialConfig(device = "/dev/ttyS3", baudRate = 9600)) {
             override fun callbackHandler(byteArray: ByteArray) {
-                byteArray.toHexString().logW()
                 if (byteArray[0] == 0xCC.toByte()) {
                     RunzeProtocol.Protocol.callbackHandler(byteArray) { code, rx ->
                         when (code) {
@@ -48,17 +49,41 @@ object SerialPortUtils {
             }
 
             override fun exceptionHandler(e: Exception) {
-                "Serial Exception: ${e.message}".logE()
+                logE(message = "Serial Exception: ${e.message}")
+            }
+        }
+
+    val serialZkty =
+        object : AbstractSerialHelper(SerialConfig()) {
+            override fun callbackHandler(byteArray: ByteArray) {
+                Protocol.Protocol.callbackHandler(byteArray) { code, rx ->
+                    when (code) {
+                        Protocol.RX_0X01 -> {
+                            for (i in 0 until rx.data.size / 5) {
+                                val index = rx.data.readInt8(offset = i * 5)
+                                val status = rx.data.readFloatLE(offset = i * 5 + 1)
+                                hpt[index] = status.toDouble()
+                            }
+                        }
+
+                        else -> {}
+                    }
+                }
+            }
+
+            override fun exceptionHandler(e: Exception) {
+                logE(message = "Serial Exception: ${e.message}")
             }
         }
 
     inline fun sendRunzeProtocol(block: RunzeProtocol.() -> Unit) =
-        serialHelper.sendByteArray(RunzeProtocol().apply(block).toByteArray())
+        serialRtu.sendByteArray(RunzeProtocol().apply(block).toByteArray())
 
-    inline fun sendRtuProtocol(block: RtuProtocol.() -> Unit) {
-        serialHelper.sendByteArray(RtuProtocol().apply(block).toByteArray())
-        RtuProtocol().apply(block).toByteArray().toHexString().logE()
-    }
+    inline fun sendRtuProtocol(block: RtuProtocol.() -> Unit) =
+        serialRtu.sendByteArray(RtuProtocol().apply(block).toByteArray())
+
+    inline fun sendProtocol(block: Protocol.() -> Unit) =
+        serialZkty.sendByteArray(Protocol().apply(block).toByteArray())
 
 
     /**
@@ -114,9 +139,24 @@ object SerialPortUtils {
         readRegister(slaveAddr = slaveAddr, startAddr = 4, quantity = 2)
 
     /**
+     * 读取温度
+     */
+    fun readWithTemperature(ids: List<Int>) {
+        val byteArray = ByteArray(ids.size)
+        ids.forEachIndexed { index, i ->
+            byteArray.writeInt8(i, index)
+        }
+        if (byteArray.isNotEmpty()) {
+            sendProtocol {
+                func = 0x02
+                data = byteArray
+            }
+        }
+    }
+
+    /**
      * 设置阀门状态
      */
-    @Throws(Exception::class)
     suspend fun writeWithValve(slaveAddr: Int, channel: Int, retry: Int = 3) {
         val current = hpv[slaveAddr] ?: 0
         if (current == channel) return
@@ -136,12 +176,11 @@ object SerialPortUtils {
                     readWithValve(slaveAddr)
                 }
             }
-        } catch (ex: Exception) {
+        } catch (ex: TimeoutCancellationException) {
             if (hpv[slaveAddr] != channel && retry > 0) {
                 writeWithValve(slaveAddr, channel, retry - 1)
             }
         }
-
     }
 
     /**
@@ -152,7 +191,7 @@ object SerialPortUtils {
         val before = hpp[slaveAddr] ?: 0
         try {
             withTimeout(maxOf(value.absoluteValue / 6400L, 1) * 1000L) {
-                val target = (before + value - 50).toInt()..(before + value + 50).toInt()
+                val target = (before + value - 5).toInt()..(before + value + 5).toInt()
                 writeRegister(startAddr = 222, slaveAddr = slaveAddr, value = value)
                 while ((hpp[slaveAddr] ?: 0) !in target) {
                     repeat(3) {
@@ -162,9 +201,43 @@ object SerialPortUtils {
                     readWithPosition(slaveAddr)
                 }
             }
-        } catch (ex: Exception) {
+        } catch (ex: TimeoutCancellationException) {
             if ((hpp[slaveAddr] ?: 0) == before && retry > 0) {
                 writeWithPulse(slaveAddr, value, retry - 1)
+            }
+        }
+    }
+
+    /**
+     * 发送温度
+     */
+    fun writeWithTemperature(ids: List<Pair<Int, Double>>) {
+        val byteArray = ByteArray(ids.size * 5)
+        ids.forEachIndexed { index, i ->
+            byteArray.writeInt8(i.first, index * 5)
+            byteArray.writeFloatLE(i.second.toFloat(), index * 5 + 1)
+        }
+        if (byteArray.isNotEmpty()) {
+            sendProtocol {
+                func = 0x01
+                data = byteArray
+            }
+        }
+    }
+
+    /**
+     * 设置温控开关
+     */
+    fun writeWithSwitch(ids: List<Pair<Int, Int>>) {
+        val byteArray = ByteArray(ids.size * 2)
+        ids.forEachIndexed { index, i ->
+            byteArray.writeInt8(i.first, index * 2)
+            byteArray.writeInt8(i.second, index * 2 + 1)
+        }
+        if (byteArray.isNotEmpty()) {
+            sendProtocol {
+                func = 0x00
+                data = byteArray
             }
         }
     }

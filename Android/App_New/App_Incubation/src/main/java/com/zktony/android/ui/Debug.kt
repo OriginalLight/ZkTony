@@ -5,7 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.*
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,11 +51,8 @@ fun DebugRoute(viewModel: DebugViewModel) {
 
     LaunchedEffect(key1 = message) {
         message?.let {
-            snackbarHostState.showSnackbar(
-                message = it,
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(DebugUiEvent.Message(null))
         }
     }
 

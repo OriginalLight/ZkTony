@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -49,11 +50,8 @@ fun HomeRoute(viewModel: HomeViewModel) {
 
     LaunchedEffect(key1 = message) {
         message?.let {
-            snackbarHostState.showSnackbar(
-                message = it,
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(HomeUiEvent.Message(null))
         }
     }
 
@@ -112,7 +110,7 @@ fun ModuleList(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeContent(
     entities: List<Program>,
@@ -177,65 +175,37 @@ fun HomeContent(
         ) {
             when (jobState.status) {
                 JobState.STOPPED, JobState.FINISHED -> {
-                    Card(
-                        enabled = uiState.uiFlags == UiFlags.NONE && jobState.processes.isNotEmpty(),
-                        onClick = { uiEvent(HomeUiEvent.Start(uiState.selected)) }
-                    ) {
-                        Icon(
-                            modifier = Modifier.size(128.dp),
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = null,
-                            tint = Color.Blue
-                        )
-                    }
+                    Icon(
+                        modifier = Modifier
+                            .size(128.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                scope.launch {
+                                    if (uiState.uiFlags == UiFlags.NONE && jobState.processes.isNotEmpty()) {
+                                        uiEvent(HomeUiEvent.Start(uiState.selected))
+                                    }
+                                }
+                            },
+                        imageVector = Icons.Default.PlayArrow,
+                        contentDescription = null,
+                        tint = Color.Blue
+                    )
                 }
 
-                JobState.RUNNING, JobState.PAUSED -> {
-                    Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                        Card(onClick = {
-                            if (jobState.status == JobState.RUNNING) {
-                                uiEvent(HomeUiEvent.Pause(uiState.selected))
-                            } else {
-                                uiEvent(HomeUiEvent.Start(uiState.selected))
-                            }
-                        }) {
-                            if (jobState.status == JobState.RUNNING) {
-                                Icon(
-                                    modifier = Modifier.size(128.dp),
-                                    imageVector = Icons.Default.Pause,
-                                    contentDescription = null,
-                                    tint = Color.DarkGray
-                                )
-                            } else {
-                                Icon(
-                                    modifier = Modifier.size(128.dp),
-                                    imageVector = Icons.Default.PlayArrow,
-                                    contentDescription = null,
-                                    tint = Color.Blue
-                                )
-                            }
-                        }
-
-                        Card(onClick = { uiEvent(HomeUiEvent.Stop(uiState.selected)) }) {
-                            Icon(
-                                modifier = Modifier.size(128.dp),
-                                imageVector = Icons.Default.Close,
-                                contentDescription = null,
-                                tint = Color.Red
-                            )
-                        }
-                    }
-                }
-
-                JobState.WAITING -> {
-                    Card(onClick = { uiEvent(HomeUiEvent.Stop(uiState.selected)) }) {
-                        Icon(
-                            modifier = Modifier.size(128.dp),
-                            imageVector = Icons.Default.Close,
-                            contentDescription = null,
-                            tint = Color.Red
-                        )
-                    }
+                JobState.RUNNING, JobState.WAITING -> {
+                    Icon(
+                        modifier = Modifier
+                            .size(128.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                scope.launch {
+                                    uiEvent(HomeUiEvent.Stop(uiState.selected))
+                                }
+                            },
+                        imageVector = Icons.Default.Close,
+                        contentDescription = null,
+                        tint = Color.Red
+                    )
                 }
 
                 else -> {
@@ -263,7 +233,7 @@ fun HomeContent(
                         .clickable {
                             scope.launch {
                                 snackbarHostState.showSnackbar(
-                                    message = "当前抗体保温温度${
+                                    message = "当前抗体保温温度 ${
                                         uiState.stand.insulation.getOrNull(
                                             0
                                         ) ?: 0.0
@@ -317,13 +287,7 @@ fun ProgramList(
                 selected = false
             ) {
                 scope.launch {
-                    uiEvent(
-                        HomeUiEvent.ToggleProcess(
-                            index = uiState.selected,
-                            id = item.id,
-                            processes = item.processes
-                        )
-                    )
+                    uiEvent(HomeUiEvent.ToggleProcess(uiState.selected, item))
                     uiEvent(HomeUiEvent.NavTo(PageType.HOME))
                 }
             }

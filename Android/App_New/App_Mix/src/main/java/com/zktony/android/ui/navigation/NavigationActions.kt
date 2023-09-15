@@ -10,11 +10,11 @@ import androidx.navigation.NavHostController
 import com.zktony.android.R
 
 object Route {
-    const val Home = "Home"
-    const val Program = "Program"
-    const val Calibration = "Calibration"
-    const val Setting = "Setting"
-    const val Splash = "Splash"
+    const val HOME = "Home"
+    const val PROGRAM = "Program"
+    const val CALIBRATION = "Calibration"
+    const val SETTING = "Setting"
+    const val SPLASH = "Splash"
 }
 
 data class TopLevelDestination(
@@ -24,8 +24,10 @@ data class TopLevelDestination(
 )
 
 class NavigationActions(private val navController: NavHostController) {
-    fun navigateTo(destination: TopLevelDestination) {
-        navController.navigate(destination.route) {
+    fun navigateTo(destination: TopLevelDestination) = navigate(destination.route)
+
+    fun navigate(route: String) {
+        navController.navigate(route) {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations
             // on the back stack as users select items
@@ -43,22 +45,26 @@ class NavigationActions(private val navController: NavHostController) {
     fun navigateUp() {
         navController.navigateUp()
     }
+
+    fun popBackStack() {
+        navController.popBackStack()
+    }
 }
 
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
-        route = Route.Program,
+        route = Route.PROGRAM,
         icon = Icons.Outlined.Terminal,
-        iconTextId = R.string.tab_program
+        iconTextId = R.string.program
     ),
     TopLevelDestination(
-        route = Route.Calibration,
+        route = Route.CALIBRATION,
         icon = Icons.Outlined.Analytics,
-        iconTextId = R.string.tab_calibration
+        iconTextId = R.string.calibration
     ),
     TopLevelDestination(
-        route = Route.Setting,
+        route = Route.SETTING,
         icon = Icons.Outlined.Settings,
-        iconTextId = R.string.tab_setting
+        iconTextId = R.string.setting
     )
 )

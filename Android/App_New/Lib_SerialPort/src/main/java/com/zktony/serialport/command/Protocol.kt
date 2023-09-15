@@ -101,35 +101,22 @@ class Protocol : BaseProtocol<Protocol> {
             // 解析协议
             toProtocol(pkg)
 
-            // 处理地址为 0x02 的数据包
-            when (func) {
-                // 处理轴状态数据
-                0x01.toByte() -> {
-                    block(AXIS, this)
+            if (func == 0xFF.toByte()) {
+                when (data.readInt16LE()) {
+                    1 -> throw Exception("TX Header Error")
+                    2 -> throw Exception("TX Addr Error")
+                    3 -> throw Exception("TX Crc Error")
+                    4 -> throw Exception("TX No Com")
                 }
-                // 处理 GPIO 状态数据
-                0x02.toByte() -> {
-                    block(GPIO, this)
-                }
-                // 处理错误信息
-                0xFF.toByte() -> {
-                    when (data.readInt16LE()) {
-                        1 -> throw Exception("TX Header Error")
-                        2 -> throw Exception("TX Addr Error")
-                        3 -> throw Exception("TX Crc Error")
-                        4 -> throw Exception("TX No Com")
-                    }
-                }
-
-                else -> {}
+            } else {
+                block(func.toInt(), this)
             }
-
         }
     }
 
     companion object {
-        const val AXIS = 1
-        const val GPIO = 2
+        const val RX_0X01 = 1
+        const val Rx_0X02 = 2
 
         // 协议包头和包尾
         val expectHead = byteArrayOf(0xEE.toByte())

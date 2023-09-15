@@ -79,11 +79,8 @@ fun SettingRoute(viewModel: SettingViewModel) {
 
     LaunchedEffect(key1 = message) {
         message?.let {
-            snackbarHostState.showSnackbar(
-                message = it,
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(SettingUiEvent.Message(null))
         }
     }
 

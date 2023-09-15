@@ -29,8 +29,8 @@ import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.ui.components.*
 import com.zktony.android.ui.utils.*
 import com.zktony.android.utils.Constants
+import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.format
-import com.zktony.android.utils.extra.serial
 import kotlinx.coroutines.launch
 
 @Composable
@@ -55,16 +55,13 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
     BackHandler { navigation() }
 
     LaunchedEffect(key1 = message) {
-        if (message != null) {
-            snackbarHostState.showSnackbar(
-                message = message ?: "未知错误",
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+        message?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(ProgramUiEvent.Message(null))
         }
     }
 
-    ProgramScreen(
+    ProgramWrapper(
         entities = entities,
         uiState = uiState,
         uiEvent = viewModel::uiEvent,
@@ -74,7 +71,7 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun ProgramScreen(
+fun ProgramWrapper(
     entities: LazyPagingItems<Program>,
     uiState: ProgramUiState,
     uiEvent: (ProgramUiEvent) -> Unit,
@@ -370,9 +367,9 @@ fun ProgramInput(
                     },
                     onClick = {
                         scope.launch {
-                            serial {
-                                start(index = 0, pdv = selected.points[0].x)
-                                start(index = 1, pdv = selected.points[0].y)
+                            start {
+                                with(index = 0, pdv = selected.points[0].x)
+                                with(index = 1, pdv = selected.points[0].y)
                             }
                         }
                     }
@@ -398,9 +395,9 @@ fun ProgramInput(
                     },
                     onClick = {
                         scope.launch {
-                            serial {
-                                start(index = 0, pdv = selected.points[1].x)
-                                start(index = 1, pdv = selected.points[1].y)
+                            start {
+                                with(index = 0, pdv = selected.points[1].x)
+                                with(index = 1, pdv = selected.points[1].y)
                             }
                         }
                     }

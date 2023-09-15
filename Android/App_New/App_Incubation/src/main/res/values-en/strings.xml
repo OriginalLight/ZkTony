@@ -47,4 +47,5 @@
     <string name="add">Add</string>
     <string name="debug">Debug</string>
     <string name="checking">Checking</string>
+    <string name="copyright">Copyright © 2023 Zktony Inc. All rights reserved.</string>
 </resources>

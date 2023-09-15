@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -51,7 +50,9 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
+import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.*
 import kotlinx.coroutines.launch
 
@@ -77,23 +78,20 @@ fun SettingRoute(viewModel: SettingViewModel) {
     BackHandler { navigation() }
 
     LaunchedEffect(key1 = message) {
-        if (message != null) {
-            snackbarHostState.showSnackbar(
-                message = message ?: "未知错误",
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+        message?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(SettingUiEvent.Message(null))
         }
     }
 
-    SettingScreen(
+    SettingWrapper(
         uiState = uiState, uiEvent = viewModel::uiEvent, navigation = navigation
     )
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SettingScreen(
+fun SettingWrapper(
     uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit, navigation: () -> Unit
 ) {
     Column {
@@ -113,10 +111,10 @@ fun SettingScreen(
 
 @Composable
 fun SettingContent(
-    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
+    uiState: SettingUiState,
+    uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val snackbarHostState = LocalSnackbarHostState.current
     var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
     var helpInfo by remember { mutableStateOf(false) }
@@ -243,7 +241,7 @@ fun SettingContent(
 
                 SettingsCard(icon = image, text = text, onClick = {
                     scope.launch {
-                        if (context.isNetworkAvailable()) {
+                        if (ApplicationUtils.isNetworkAvailable()) {
                             uiEvent(SettingUiEvent.CheckUpdate)
                         } else {
                             snackbarHostState.showSnackbar(message = "网络不可用")
@@ -635,9 +633,9 @@ fun ConfigList(modifier: Modifier = Modifier) {
                     }
                 ) {
                     scope.launch {
-                        serial {
-                            start(index = 0, pdv = abscissa)
-                            start(index = 1, pdv = ordinate)
+                        start {
+                            with(index = 0, pdv = abscissa)
+                            with(index = 1, pdv = ordinate)
                         }
                     }
                 }
@@ -653,9 +651,9 @@ fun ConfigList(modifier: Modifier = Modifier) {
                     }
                 ) {
                     scope.launch {
-                        serial {
-                            start(index = 0, pdv = tankAbscissa)
-                            start(index = 1, pdv = tankOrdinate)
+                        start {
+                            with(index = 0, pdv = tankAbscissa)
+                            with(index = 1, pdv = tankOrdinate)
                         }
                     }
                 }

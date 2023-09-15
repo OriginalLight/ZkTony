@@ -1,5 +1,6 @@
 package com.zktony.android.ui.utils
 
+import com.zktony.android.data.entities.internal.Log
 import com.zktony.android.data.entities.internal.Process
 import com.zktony.android.utils.AppStateUtils.hpc
 import com.zktony.android.utils.AppStateUtils.hpp
@@ -23,11 +24,21 @@ class JobExecutorUtils(
     private val hashMap = HashMap<Int, JobState>()
     private val jobMap = HashMap<Int, Job>()
     private val lock = AtomicBoolean(false)
+    private val logLinkedList = LinkedList<Log>()
 
     fun create(jobState: JobState) {
         val job = scope.launch { interpreter(jobState) }
         jobMap[jobState.index] = job
-        job.invokeOnCompletion { jobMap.remove(jobState.index) }
+        job.invokeOnCompletion {
+            jobMap.remove(jobState.index)
+            if (jobMap.isEmpty()) {
+                scope.launch {
+                    val logs = logLinkedList.toList()
+                    callback(JobEvent.Logs(logs))
+                    logLinkedList.clear()
+                }
+            }
+        }
     }
 
     fun destroy(index: Int) {
@@ -40,13 +51,12 @@ class JobExecutorUtils(
             scope.launch {
                 writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
                 delay(300L)
-
                 readWithPosition(slaveAddr = 0)
                 delay(100L)
-
                 val p = (hpp[0] ?: 0) % 6400L
-                writeWithPulse(0, if (p > 3200) 6400L - p else -p)
-                delay(100L)
+                if (p > 0) {
+                    writeWithPulse(0, if (p > 3200) 6400L - p else -p)
+                }
             }
         }
     }
@@ -76,6 +86,13 @@ class JobExecutorUtils(
             verify(index, process)
         } catch (ex: Exception) {
             callback(JobEvent.Error(ex))
+            logLinkedList.add(
+                Log(
+                    index = index,
+                    level = "ERROR",
+                    message = "${ex.message}"
+                )
+            )
             return@start
         }
 
@@ -91,6 +108,13 @@ class JobExecutorUtils(
             state = state.copy(status = JobState.RUNNING, processes = processes)
             callback(JobEvent.Changed(state))
         }
+        logLinkedList.add(
+            Log(
+                index = index,
+                level = "INFO",
+                message = "添加封闭液完成 √ \n加液量：${process.dosage} \n进液通道：9 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            )
+        )
 
         countDown(state, (process.duration * 60 * 60).toLong())
 
@@ -103,6 +127,13 @@ class JobExecutorUtils(
             callback(JobEvent.Changed(state))
             hashMap[index] = state
         }
+        logLinkedList.add(
+            Log(
+                index = index,
+                level = "INFO",
+                message = "封闭液废液处理完成 √ \n进液通道：11 \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            )
+        )
     }
 
     val primaryAntibody: suspend (Int, Process) -> Unit = start@{ index, process ->
@@ -110,12 +141,20 @@ class JobExecutorUtils(
             verify(index, process)
         } catch (ex: Exception) {
             callback(JobEvent.Error(ex))
+            logLinkedList.add(
+                Log(
+                    index = index,
+                    level = "ERROR",
+                    message = "${ex.message}"
+                )
+            )
             return@start
         }
 
         var state = hashMap[index]!!
         val processes = state.processes.toMutableList()
         val processIndex = processes.indexOf(process)
+
 
         waitForLock(state) {
             state = state.copy(status = JobState.LIQUID)
@@ -127,8 +166,17 @@ class JobExecutorUtils(
             state = state.copy(status = JobState.RUNNING, processes = processes)
             callback(JobEvent.Changed(state))
         }
+        logLinkedList.add(
+            Log(
+                index = index,
+                level = "INFO",
+                message = "添加一抗完成 √ \n加液量：${process.dosage} \n进液通道：${if (process.origin == 0) (index - ((index / 4) * 4)) + 1 else process.origin} \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            )
+        )
 
         countDown(state, (process.duration * 60 * 60).toLong())
+
+
         waitForLock(state) {
             val inChannel =
                 if (process.origin == 0) (index - (index / 4) * 4) + 1 else process.origin
@@ -146,6 +194,13 @@ class JobExecutorUtils(
             callback(JobEvent.Changed(state))
             hashMap[index] = state
         }
+        logLinkedList.add(
+            Log(
+                index = index,
+                level = "INFO",
+                message = "一抗废液${if (process.recycle) "回收" else "清理"}完成 √ \n进液通道：${if (process.origin == 0) (index - ((index / 4) * 4)) + 1 else process.origin} \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            )
+        )
     }
 
     val secondaryAntibody: suspend (Int, Process) -> Unit = start@{ index, process ->
@@ -153,6 +208,13 @@ class JobExecutorUtils(
             verify(index, process)
         } catch (ex: Exception) {
             callback(JobEvent.Error(ex))
+            logLinkedList.add(
+                Log(
+                    index = index,
+                    level = "ERROR",
+                    message = "${ex.message}"
+                )
+            )
             return@start
         }
 
@@ -170,6 +232,13 @@ class JobExecutorUtils(
             state = state.copy(status = JobState.RUNNING, processes = processes)
             callback(JobEvent.Changed(state))
         }
+        logLinkedList.add(
+            Log(
+                index = index,
+                level = "INFO",
+                message = "添加二抗完成 √ \n加液量：${process.dosage} \n进液通道：${if (process.origin == 0) (index - ((index / 4) * 4)) + 5 else process.origin} \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            )
+        )
 
         countDown(state, (process.duration * 60 * 60).toLong())
 
@@ -182,14 +251,27 @@ class JobExecutorUtils(
             callback(JobEvent.Changed(state))
             hashMap[index] = state
         }
+        logLinkedList.add(
+            Log(
+                index = index,
+                level = "INFO",
+                message = "二抗废液清理完成 √ \n进液通道：${if (process.origin == 0) (index - ((index / 4) * 4)) + 5 else process.origin} \n出液通道：${(index - ((index / 4) * 4)) + 1}"
+            )
+        )
     }
 
     val washing: suspend (Int, Process) -> Unit = start@{ index, process ->
-        // check
         try {
             verify(index, process)
         } catch (ex: Exception) {
             callback(JobEvent.Error(ex))
+            logLinkedList.add(
+                Log(
+                    index = index,
+                    level = "ERROR",
+                    message = "${ex.message}"
+                )
+            )
             return@start
         }
 
@@ -215,6 +297,13 @@ class JobExecutorUtils(
                 callback(JobEvent.Changed(state))
                 clean(index, process, 11, (index - ((index / 4) * 4)) + 1)
             }
+            logLinkedList.add(
+                Log(
+                    index = index,
+                    level = "INFO",
+                    message = "第${it + 1}次洗涤完成"
+                )
+            )
         }
 
         processes[processIndex] = process.copy(status = Process.FINISHED)
@@ -224,11 +313,17 @@ class JobExecutorUtils(
     }
 
     val phosphateBufferedSaline: suspend (Int, Process) -> Unit = start@{ index, process ->
-        // check
         try {
             verify(index, process)
         } catch (ex: Exception) {
             callback(JobEvent.Error(ex))
+            logLinkedList.add(
+                Log(
+                    index = index,
+                    level = "ERROR",
+                    message = "${ex.message}"
+                )
+            )
             return@start
         }
 
@@ -240,22 +335,17 @@ class JobExecutorUtils(
             state = state.copy(status = JobState.LIQUID)
             callback(JobEvent.Changed(state))
             liquid(index, process, 10, (index - ((index / 4) * 4)) + 1)
-            processes[processIndex] = process.copy(status = Process.RUNNING)
-            state = state.copy(status = JobState.RUNNING, processes = processes)
-            callback(JobEvent.Changed(state))
-        }
-
-        countDown(state, (process.duration * 60 * 60).toLong())
-
-        waitForLock(state) {
-            state = state.copy(status = JobState.WASTE)
-            callback(JobEvent.Changed(state))
-            clean(index, process, 11, (index - ((index / 4) * 4)) + 1)
             processes[processIndex] = process.copy(status = Process.FINISHED)
             state = state.copy(status = JobState.FINISHED, processes = processes)
             callback(JobEvent.Changed(state))
-            hashMap[index] = state
         }
+        logLinkedList.add(
+            Log(
+                index = index,
+                level = "INFO",
+                message = "添加缓冲液完成"
+            )
+        )
     }
 
     private fun verify(index: Int, process: Process) {
@@ -267,7 +357,7 @@ class JobExecutorUtils(
             throw Exception("加液量为零错误")
         }
 
-        (hpc[index / 4 + 1] ?: { x -> x * 100 }).invoke(process.dosage)
+        (hpc[index / 4] ?: { x -> x * 100 }).invoke(process.dosage)
             ?: throw Exception("校准方法错误")
 
         if (processIndex != -1) {
@@ -281,43 +371,29 @@ class JobExecutorUtils(
 
     private suspend fun liquid(index: Int, process: Process, inChannel: Int, outChannel: Int) {
         val group = index / 4
-        val pulse = (hpc[group + 1] ?: { x -> x * 100 }).invoke(process.dosage)!!
+        val pulse = (hpc[group] ?: { x -> x * 100 }).invoke(process.dosage)!!
         val inAddr = 2 * group
         val outAddr = 2 * group + 1
         callback(JobEvent.Shaker(true))
         writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
         delay(100L)
         writeWithValve(inAddr, inChannel)
-        delay(100L)
         writeWithValve(outAddr, outChannel)
-        delay(100L)
-        writeWithPulse(
-            slaveAddr = group + 1,
-            value = pulse.toLong() + recoup
-        )
-        delay(100L)
+        writeWithPulse(group + 1, pulse.toLong() + recoup)
         if (recoup > 0.0) {
             // 后边段残留的液体
             writeWithValve(inAddr, 12)
-            delay(100L)
             writeWithPulse(slaveAddr = group + 1, value = recoup * 2)
-            delay(100L)
             // 退回前半段残留的液体
             writeWithValve(inAddr, inChannel)
-            delay(100L)
             writeWithValve(outAddr, 6)
-            delay(100L)
-            writeWithPulse(
-                slaveAddr = group + 1,
-                value = -recoup * 2
-            )
-            delay(100L)
+            writeWithPulse(group + 1, -recoup * 2)
         }
     }
 
     private suspend fun clean(index: Int, process: Process, inChannel: Int, outChannel: Int) {
         val group = index / 4
-        val pulse = (hpc[group + 1] ?: { x -> x * 100 }).invoke(process.dosage)!!
+        val pulse = (hpc[group] ?: { x -> x * 100 }).invoke(process.dosage)!!
         val inAddr = 2 * group
         val outAddr = 2 * group + 1
         callback(JobEvent.Shaker(false))
@@ -326,14 +402,13 @@ class JobExecutorUtils(
         readWithPosition(slaveAddr = 0)
         delay(100L)
         val p = (hpp[0] ?: 0) % 6400L
-        writeWithPulse(0, if (p > 3200) 6400L - p else -p)
-        delay(100L)
+        if (p > 0) {
+            writeWithPulse(0, if (p > 3200) 6400L - p else -p)
+            delay(100L)
+        }
         writeWithValve(inAddr, inChannel)
-        delay(100L)
         writeWithValve(outAddr, outChannel)
-        delay(100L)
         writeWithPulse(group + 1, -(pulse + recoup).toLong() * 2)
-        delay(100L)
     }
 
     private suspend fun waitForLock(state: JobState, block: suspend () -> Unit) {
@@ -366,12 +441,11 @@ data class JobState(
     companion object {
         const val STOPPED = 0
         const val RUNNING = 1
-        const val PAUSED = 2
-        const val FINISHED = 3
-        const val WAITING = 4
-        const val LIQUID = 5
-        const val WASTE = 6
-        const val RECYCLE = 7
+        const val FINISHED = 2
+        const val WAITING = 3
+        const val LIQUID = 4
+        const val WASTE = 5
+        const val RECYCLE = 6
     }
 }
 
@@ -379,4 +453,5 @@ sealed class JobEvent {
     data class Changed(val state: JobState) : JobEvent()
     data class Error(val ex: Exception) : JobEvent()
     data class Shaker(val shaker: Boolean) : JobEvent()
+    data class Logs(val logs: List<Log>) : JobEvent()
 }

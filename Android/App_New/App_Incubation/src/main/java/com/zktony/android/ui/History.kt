@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,11 +51,8 @@ fun HistoryRoute(viewModel: HistoryViewModel) {
 
     LaunchedEffect(key1 = message) {
         message?.let {
-            snackbarHostState.showSnackbar(
-                message = it,
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(HistoryUiEvent.Message(null))
         }
     }
 

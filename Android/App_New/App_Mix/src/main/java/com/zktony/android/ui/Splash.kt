@@ -1,7 +1,7 @@
 package com.zktony.android.ui
 
 import android.view.animation.OvershootInterpolator
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -23,20 +23,19 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
 import com.zktony.android.R
 import com.zktony.android.ui.navigation.Route
+import com.zktony.android.ui.utils.AnimatedContent
+import com.zktony.android.ui.utils.LocalNavigationActions
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun Splash(
-    modifier: Modifier = Modifier,
-    navController: NavHostController
-) {
+fun Splash() {
 
+    val navigationActions = LocalNavigationActions.current
     val scale = remember { Animatable(0f) }
     val splash = remember { mutableStateOf(true) }
 
@@ -53,59 +52,69 @@ fun Splash(
     }
 
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(
                 color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.medium
-            ),
+            )
+            .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
-        AnimatedVisibility(visible = splash.value) {
-            Image(
-                painter = painterResource(id = R.mipmap.logo),
-                contentDescription = "Logo",
-                modifier = Modifier.scale(scale.value)
-            )
-        }
-
-        AnimatedVisibility(visible = !splash.value) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(32.dp)
-            ) {
-                Text(
-                    text = stringResource(id = R.string.notice),
-                    style = TextStyle(
-                        fontSize = 36.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        lineHeight = 50.sp,
-                    ),
-                    fontFamily = FontFamily.Serif
+        AnimatedContent(targetState = splash.value) {
+            if (splash.value) {
+                Image(
+                    painter = painterResource(id = R.mipmap.logo),
+                    contentDescription = "Logo",
+                    modifier = Modifier.scale(scale.value)
                 )
-                Text(
-                    text = stringResource(id = R.string.notice_content),
-                    style = TextStyle(
-                        fontSize = 22.sp,
-                        lineHeight = 32.sp,
-                        fontWeight = FontWeight.Medium,
-                    ),
-                    fontFamily = FontFamily.Serif
-                )
-                FloatingActionButton(
-                    modifier = Modifier.width(192.dp),
-                    onClick = {
-                        navController.popBackStack()
-                        navController.navigate(Route.Home)
-                    }
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(32.dp)
                 ) {
-                    Icon(
-                        modifier = Modifier.size(32.dp),
-                        imageVector = Icons.Default.Done,
-                        contentDescription = null
+                    Text(
+                        text = stringResource(id = R.string.notice),
+                        style = TextStyle(
+                            fontSize = 36.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            lineHeight = 50.sp,
+                        )
                     )
+                    Text(
+                        text = stringResource(id = R.string.notice_content),
+                        style = TextStyle(
+                            fontSize = 22.sp,
+                            lineHeight = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    )
+                    FloatingActionButton(
+                        modifier = Modifier.width(192.dp),
+                        onClick = {
+                            navigationActions.popBackStack()
+                            navigationActions.navigate(Route.HOME)
+                        }
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(32.dp),
+                            imageVector = Icons.Default.Done,
+                            contentDescription = null
+                        )
+                    }
                 }
             }
         }
+
+        // copyright
+        Text(
+            text = stringResource(id = R.string.copyright),
+            style = TextStyle(
+                fontSize = 14.sp,
+                lineHeight = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+            ),
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }

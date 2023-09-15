@@ -47,4 +47,5 @@
     <string name="motor">Motor</string>
     <string name="downloading">Downloading</string>
     <string name="debug">Debug</string>
+    <string name="copyright">Copyright © 2023 Zktony Inc. All rights reserved.</string>
 </resources>

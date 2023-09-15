@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -121,6 +118,7 @@ fun CalibrationItem(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PointItem(
+    key: Int,
     item: Point,
     index: Int,
     onClick: (Int) -> Unit,
@@ -129,8 +127,8 @@ fun PointItem(
     val scope = rememberCoroutineScope()
     val softKeyboard = LocalSoftwareKeyboardController.current
     val forceManager = LocalFocusManager.current
-    var x by remember { mutableStateOf(item.x.toString()) }
-    var y by remember { mutableStateOf(item.y.toString()) }
+    var x by remember(key) { mutableStateOf(item.x.toString()) }
+    var y by remember(key) { mutableStateOf(item.y.toString()) }
 
     val textStyle = TextStyle(
         fontStyle = FontStyle.Italic,
@@ -306,8 +304,6 @@ fun HistoryItem(
 @Composable
 fun LogItem(item: Log) {
 
-    var expand by remember { mutableStateOf(false) }
-
     ListItem(
         modifier = Modifier.clip(MaterialTheme.shapes.small),
         headlineContent = {
@@ -318,9 +314,9 @@ fun LogItem(item: Log) {
         },
         supportingContent = {
             Text(
+                modifier = Modifier.padding(8.dp),
                 text = item.message,
                 style = MaterialTheme.typography.bodyMedium,
-                maxLines = if (expand) Int.MAX_VALUE else 1,
                 overflow = TextOverflow.Ellipsis
             )
         },
@@ -338,12 +334,7 @@ fun LogItem(item: Log) {
             )
         },
         trailingContent = {
-            IconButton(onClick = { expand = !expand }) {
-                Icon(
-                    imageVector = if (expand) Icons.Filled.KeyboardArrowUp else Icons.Filled.KeyboardArrowDown,
-                    contentDescription = null
-                )
-            }
+            Text(text = "${'A' + item.index}", style = MaterialTheme.typography.headlineMedium)
         },
         colors = ListItemDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -682,7 +673,6 @@ fun ModuleItem(
             val message = when (jobState.status) {
                 JobState.STOPPED -> "已就绪"
                 JobState.RUNNING -> jobState.time.timeFormat()
-                JobState.PAUSED -> "已暂停"
                 JobState.FINISHED -> "已完成"
                 JobState.WAITING -> "等待中"
                 JobState.LIQUID -> "加液中"

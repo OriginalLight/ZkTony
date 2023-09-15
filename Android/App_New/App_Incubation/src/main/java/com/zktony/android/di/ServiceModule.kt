@@ -21,9 +21,9 @@ object ServiceModule {
 
     @Provides
     fun serviceObserver(
-        calibrationService: CalibrationService,
-        historyService: HistoryService
+        s1: CalibrationService,
+        s2: HistoryService
     ): ServiceObserver {
-        return ServiceObserver(calibrationService, historyService)
+        return ServiceObserver(s1, s2)
     }
 }

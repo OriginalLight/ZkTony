@@ -7,6 +7,7 @@ import java.util.Date
  * @date 2023/8/31 9:43
  */
 data class Log(
+    val index: Int = 0,
     val level: String = "INFO",
     val message: String,
     val createTime: Date = Date(System.currentTimeMillis())

@@ -53,11 +53,8 @@ fun ProgramRoute(viewModel: ProgramViewModel) {
 
     LaunchedEffect(key1 = message) {
         message?.let {
-            snackbarHostState.showSnackbar(
-                message = it,
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(ProgramUiEvent.Message(null))
         }
     }
 
@@ -311,23 +308,25 @@ fun ProgramInput(
             }
         }
 
-        item {
-            SquareTextField(
-                title = "时长",
-                value = duration,
-                trailingIcon = {
-                    Text(
-                        modifier = Modifier.padding(end = 16.dp),
-                        text = if (process.type == Process.WASHING) "Min" else "Hour",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-            ) {
-                scope.launch {
-                    duration = it
-                    val time = it.toDoubleOrNull() ?: 0.0
-                    if (time != process.duration) {
-                        onProcessChange(process.copy(duration = time))
+        if (process.type != Process.PHOSPHATE_BUFFERED_SALINE) {
+            item {
+                SquareTextField(
+                    title = "时长",
+                    value = duration,
+                    trailingIcon = {
+                        Text(
+                            modifier = Modifier.padding(end = 16.dp),
+                            text = if (process.type == Process.WASHING) "Min" else "Hour",
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
+                ) {
+                    scope.launch {
+                        duration = it
+                        val time = it.toDoubleOrNull() ?: 0.0
+                        if (time != process.duration) {
+                            onProcessChange(process.copy(duration = time))
+                        }
                     }
                 }
             }

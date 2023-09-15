@@ -9,19 +9,28 @@ import com.zktony.android.R
 import com.zktony.android.data.dao.MotorDao
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.extra.*
+import com.zktony.android.utils.ApplicationUtils
+import com.zktony.android.utils.extra.Application
+import com.zktony.android.utils.extra.DownloadState
+import com.zktony.android.utils.extra.download
+import com.zktony.android.utils.extra.httpCall
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.io.File
+import javax.inject.Inject
 
 /**
  * @author: 刘贺贺
  * @date: 2023-02-14 15:37
  */
-class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
+@HiltViewModel
+class SettingViewModel @Inject constructor(
+    private val dao: MotorDao
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingUiState())
     private val _application = MutableStateFlow<Application?>(null)
@@ -51,21 +60,24 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
                 }
             }
             launch {
-                if (Ext.ctx.isNetworkAvailable()) {
+                if (ApplicationUtils.isNetworkAvailable()) {
                     httpCall { _application.value = it }
                 }
             }
         }
     }
 
-    fun uiEvent(event: SettingUiEvent) {
-        when (event) {
-            is SettingUiEvent.NavTo -> _page.value = event.page
-            is SettingUiEvent.Navigation -> navigation(event.navigation)
-            is SettingUiEvent.Network -> network()
+    fun uiEvent(uiEvent: SettingUiEvent) {
+        when (uiEvent) {
             is SettingUiEvent.CheckUpdate -> checkUpdate()
-            is SettingUiEvent.ToggleSelected -> _selected.value = event.id
-            is SettingUiEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
+            is SettingUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
+            is SettingUiEvent.Insert -> viewModelScope.launch { dao.insert(Motor()) }
+            is SettingUiEvent.Message -> _message.value = uiEvent.message
+            is SettingUiEvent.Navigation -> navigation(uiEvent.navigation)
+            is SettingUiEvent.NavTo -> _page.value = uiEvent.page
+            is SettingUiEvent.Network -> network()
+            is SettingUiEvent.ToggleSelected -> _selected.value = uiEvent.id
+            is SettingUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.entity) }
         }
     }
 
@@ -75,7 +87,7 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
                 action = "ACTION_SHOW_NAVBAR"
                 putExtra("cmd", if (nav) "show" else "hide")
             }
-            Ext.ctx.sendBroadcast(intent)
+            ApplicationUtils.ctx.sendBroadcast(intent)
         }
     }
 
@@ -85,11 +97,11 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
             // Set the extra preferences to show the button bar and custom text
             putExtra("extra_prefs_show_button_bar", true)
-            putExtra("extra_prefs_set_next_text", Ext.ctx.getString(R.string.finish))
-            putExtra("extra_prefs_set_back_text", Ext.ctx.getString(R.string.cancel))
+            putExtra("extra_prefs_set_next_text", ApplicationUtils.ctx.getString(R.string.finish))
+            putExtra("extra_prefs_set_back_text", ApplicationUtils.ctx.getString(R.string.cancel))
         }
         // Launch the Wi-Fi settings screen
-        Ext.ctx.startActivity(intent)
+        ApplicationUtils.ctx.startActivity(intent)
     }
 
     private fun checkUpdate() {
@@ -103,14 +115,14 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
                     _progress.value = 1
                     application.downloadUrl.download(
                         File(
-                            Ext.ctx.getExternalFilesDir(null),
+                            ApplicationUtils.ctx.getExternalFilesDir(null),
                             "update.apk"
                         )
                     ).collect {
                         when (it) {
                             is DownloadState.Success -> {
                                 _progress.value = 0
-                                Ext.ctx.installApk(it.file)
+                                ApplicationUtils.installApp(it.file)
                             }
 
                             is DownloadState.Err -> {
@@ -142,14 +154,17 @@ data class SettingUiState(
     val entities: List<Motor> = emptyList(),
     val selected: Long = 0,
     val progress: Int = 0,
-    val page: PageType = PageType.SETTINGS,
+    val page: Int = PageType.SETTINGS
 )
 
 sealed class SettingUiEvent {
-    data object Network : SettingUiEvent()
-    data object CheckUpdate : SettingUiEvent()
-    data class NavTo(val page: PageType) : SettingUiEvent()
+    data class Message(val message: String?) : SettingUiEvent()
+    data class Delete(val id: Long) : SettingUiEvent()
     data class Navigation(val navigation: Boolean) : SettingUiEvent()
+    data class NavTo(val page: Int) : SettingUiEvent()
     data class ToggleSelected(val id: Long) : SettingUiEvent()
     data class Update(val entity: Motor) : SettingUiEvent()
+    data object CheckUpdate : SettingUiEvent()
+    data object Insert : SettingUiEvent()
+    data object Network : SettingUiEvent()
 }

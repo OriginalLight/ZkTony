@@ -50,13 +50,14 @@ class ProgramViewModel @Inject constructor(
     }
 
 
-    fun uiEvent(event: ProgramUiEvent) {
-        when (event) {
-            is ProgramUiEvent.NavTo -> _page.value = event.page
-            is ProgramUiEvent.ToggleSelected -> _selected.value = event.id
-            is ProgramUiEvent.Insert -> viewModelScope.launch { dao.insert(Program(displayText = event.name)) }
-            is ProgramUiEvent.Update -> viewModelScope.launch { dao.update(event.program) }
-            is ProgramUiEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
+    fun uiEvent(uiEvent: ProgramUiEvent) {
+        when (uiEvent) {
+            is ProgramUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
+            is ProgramUiEvent.Insert -> viewModelScope.launch { dao.insert(Program(displayText = uiEvent.name)) }
+            is ProgramUiEvent.Message -> _message.value = uiEvent.message
+            is ProgramUiEvent.NavTo -> _page.value = uiEvent.page
+            is ProgramUiEvent.ToggleSelected -> _selected.value = uiEvent.id
+            is ProgramUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.program) }
         }
     }
 
@@ -64,14 +65,15 @@ class ProgramViewModel @Inject constructor(
 
 data class ProgramUiState(
     val selected: Long = 0L,
-    val page: PageType = PageType.PROGRAM_LIST,
+    val page: Int = PageType.PROGRAM_LIST,
     val uiFlags: Int = 0
 )
 
 sealed class ProgramUiEvent {
-    data class NavTo(val page: PageType) : ProgramUiEvent()
-    data class ToggleSelected(val id: Long) : ProgramUiEvent()
-    data class Insert(val name: String) : ProgramUiEvent()
-    data class Update(val program: Program) : ProgramUiEvent()
     data class Delete(val id: Long) : ProgramUiEvent()
+    data class Insert(val name: String) : ProgramUiEvent()
+    data class Message(val message: String?) : ProgramUiEvent()
+    data class NavTo(val page: Int) : ProgramUiEvent()
+    data class ToggleSelected(val id: Long) : ProgramUiEvent()
+    data class Update(val program: Program) : ProgramUiEvent()
 }

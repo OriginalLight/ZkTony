@@ -5,17 +5,24 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
+import com.zktony.android.data.dao.HistoryDao
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.datastore.DataSaverDataStore
+import com.zktony.android.data.entities.History
+import com.zktony.android.data.entities.Program
+import com.zktony.android.data.entities.internal.Log
 import com.zktony.android.data.entities.internal.Process
 import com.zktony.android.ui.utils.*
 import com.zktony.android.utils.AppStateUtils.hpp
 import com.zktony.android.utils.AppStateUtils.hpt
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.readWithPosition
+import com.zktony.android.utils.SerialPortUtils.readWithTemperature
 import com.zktony.android.utils.SerialPortUtils.readWithValve
 import com.zktony.android.utils.SerialPortUtils.writeRegister
 import com.zktony.android.utils.SerialPortUtils.writeWithPulse
+import com.zktony.android.utils.SerialPortUtils.writeWithSwitch
+import com.zktony.android.utils.SerialPortUtils.writeWithTemperature
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +39,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val dao: ProgramDao,
-    dataStore: DataSaverDataStore
+    private val historyDao: HistoryDao,
+    private val dataStore: DataSaverDataStore
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -70,6 +78,12 @@ class HomeViewModel @Inject constructor(
                 is JobEvent.Shaker -> {
                     _stand.value = _stand.value.copy(shaker = event.shaker)
                 }
+
+                is JobEvent.Logs -> {
+                    val startTime = (event.logs.firstOrNull() ?: Log(message = "None")).createTime
+                    val logs = event.logs.sortedBy { it.index }
+                    historyDao.insert(History(logs = logs, createTime = startTime))
+                }
             }
         }
     }
@@ -96,6 +110,7 @@ class HomeViewModel @Inject constructor(
 
     fun uiEvent(uiEvent: HomeUiEvent) {
         when (uiEvent) {
+            is HomeUiEvent.Message -> _message.value = uiEvent.message
             is HomeUiEvent.NavTo -> _page.value = uiEvent.page
             is HomeUiEvent.ToggleSelected -> _selected.value = uiEvent.id
             is HomeUiEvent.Start -> viewModelScope.launch {
@@ -130,13 +145,15 @@ class HomeViewModel @Inject constructor(
                     jobList.add(
                         JobState(
                             index = uiEvent.index,
-                            id = uiEvent.id,
-                            processes = uiEvent.processes
+                            id = uiEvent.program.id,
+                            processes = uiEvent.program.processes
                         )
                     )
                 } else {
-                    jobList[jobIndex] =
-                        jobList[jobIndex].copy(id = uiEvent.id, processes = uiEvent.processes)
+                    jobList[jobIndex] = jobList[jobIndex].copy(
+                        id = uiEvent.program.id,
+                        processes = uiEvent.program.processes
+                    )
                 }
                 _jobList.value = jobList
             }
@@ -152,7 +169,9 @@ class HomeViewModel @Inject constructor(
                         delay(100L)
 
                         val pulse = (hpp[0] ?: 0) % 6400L
-                        writeWithPulse(0, if (pulse > 3200) 6400L - pulse else -pulse)
+                        if (pulse > 0L) {
+                            writeWithPulse(0, if (pulse > 3200) 6400L - pulse else -pulse)
+                        }
                     } else {
                         writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
                     }
@@ -176,12 +195,27 @@ class HomeViewModel @Inject constructor(
             readWithValve(slaveAddr = it)
             delay(300L)
         }
+        // 打开温控
+        writeWithSwitch(
+            mutableListOf<Pair<Int, Int>>().apply {
+                repeat(9) { add(it to 1) }
+            }
+        )
+        // 设置温度
+        writeWithTemperature(
+            mutableListOf<Pair<Int, Double>>().apply {
+                add(0 to dataStore.readData(Constants.ZT_0001, 4.0))
+                repeat(8) { add(it + 1 to 26.0) }
+            }
+        )
     }
 
     private suspend fun loop() {
         while (true) {
             _stand.value = _stand.value.copy(insulation = hpt.values.toList())
-            delay(3000L)
+            delay(1000L)
+            readWithTemperature(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8))
+            delay(1000L)
         }
     }
 }
@@ -200,13 +234,13 @@ data class StandState(
 )
 
 sealed class HomeUiEvent {
-    data object Shaker : HomeUiEvent()
+    data class Message(val message: String?) : HomeUiEvent()
     data class NavTo(val page: Int) : HomeUiEvent()
-    data class ToggleSelected(val id: Int) : HomeUiEvent()
-    data class Start(val index: Int) : HomeUiEvent()
     data class Pause(val index: Int) : HomeUiEvent()
+    data class Start(val index: Int) : HomeUiEvent()
     data class Stop(val index: Int) : HomeUiEvent()
-    data class ToggleProcess(val index: Int, val id: Long, val processes: List<Process>) :
-        HomeUiEvent()
+    data class ToggleProcess(val index: Int, val program: Program) : HomeUiEvent()
+    data class ToggleSelected(val id: Int) : HomeUiEvent()
+    data object Shaker : HomeUiEvent()
 }
 

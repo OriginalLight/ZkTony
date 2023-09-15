@@ -69,11 +69,8 @@ fun CalibrationRoute(viewModel: CalibrationViewModel) {
 
     LaunchedEffect(key1 = message) {
         message?.let {
-            snackbarHostState.showSnackbar(
-                message = it,
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(CalibrationUiEvent.Message(null))
         }
     }
 
@@ -259,6 +256,7 @@ fun CalibrationDetail(
         }
         itemsIndexed(items = selected.points) { index, item ->
             PointItem(
+                key = selected.points.size,
                 index = index,
                 item = item,
                 onClick = { flag ->
@@ -269,7 +267,7 @@ fun CalibrationDetail(
                             }
                         } else {
                             val points = selected.points.toMutableList()
-                            points -= item
+                            points.remove(item)
                             uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
                         }
                     }
