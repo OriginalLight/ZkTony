@@ -604,7 +604,7 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
                 spStartNum = valveOne
 
-                _spCount.value = valveOne
+                _spCount.value = valveOne + 1
 
 
                 /**
@@ -760,14 +760,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 }
 
                             }
-                            if (spStartCoordinates < 8) {
+                            if (spStartCoordinates < 7) {
                                 /**
                                  * 上盘原点距离
                                  */
                                 val spydjl =
                                     dataSaver.readData("spydjl", 0f);
                                 spStartNum += 1
-                                if (_spCount.value == 8) {
+                                if (_spCount.value == 7) {
                                     _spCount.value = 0
                                 } else {
                                     _spCount.value += 1
@@ -923,14 +923,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             }
 
 
-                            if (spStartCoordinates < 8) {
+                            if (spStartCoordinates < 7) {
                                 /**
                                  * 上盘原点距离
                                  */
                                 val spydjl =
                                     dataSaver.readData("spydjl", 0f);
                                 spStartNum += 1
-                                if (_spCount.value == 8) {
+                                if (_spCount.value == 7) {
                                     _spCount.value = 0
                                 } else {
                                     _spCount.value += 1
