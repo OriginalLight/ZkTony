@@ -37,6 +37,7 @@ public partial class App
                 services.AddSingleton<IActivationService, ActivationService>();
                 services.AddSingleton<IPageService, PageService>();
                 services.AddSingleton<INavigationService, NavigationService>();
+                services.AddSingleton<IVisionService, VisionService>();
 
                 // Core Services
                 services.AddSingleton<IFileService, FileService>();

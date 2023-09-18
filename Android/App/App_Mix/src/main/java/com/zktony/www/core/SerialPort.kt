@@ -1,11 +1,8 @@
 package com.zktony.www.core
 
-import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.ext.logi
-import com.zktony.core.ext.showShortToast
 import com.zktony.serialport.SerialHelper
 import com.zktony.serialport.config.serialConfig
-import com.zktony.serialport.ext.hexFormat
 import com.zktony.serialport.ext.hexToInt
 import com.zktony.serialport.ext.splitString
 import com.zktony.serialport.protocol.toV1

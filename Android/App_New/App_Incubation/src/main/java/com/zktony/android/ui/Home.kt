@@ -25,6 +25,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.components.*
+import com.zktony.android.ui.navigation.Route
 import com.zktony.android.ui.utils.*
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.dateFormat
@@ -102,10 +103,9 @@ fun ModuleList(
             ModuleItem(
                 index = index,
                 uiState = uiState,
-                selected = uiState.selected
-            ) {
-                uiEvent(HomeUiEvent.ToggleSelected(index))
-            }
+                selected = uiState.selected,
+                onClick = { uiEvent(HomeUiEvent.ToggleSelected(index)) }
+            )
         }
     }
 }
@@ -119,6 +119,7 @@ fun HomeContent(
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = LocalSnackbarHostState.current
+    val navigationActions = LocalNavigationActions.current
     val jobState = uiState.jobList.find { it.index == uiState.selected } ?: JobState()
 
     Row(
@@ -137,7 +138,11 @@ fun HomeContent(
                         .clip(MaterialTheme.shapes.small)
                         .clickable {
                             scope.launch {
-                                uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
+                                if (entities.isNotEmpty()) {
+                                    uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
+                                } else {
+                                    navigationActions.navigate(Route.PROGRAM)
+                                }
                             }
                         },
                     headlineContent = {

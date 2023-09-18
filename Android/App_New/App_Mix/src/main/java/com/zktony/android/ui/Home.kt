@@ -78,7 +78,7 @@ fun HomeWrapper(
     entities: LazyPagingItems<Program>,
     uiState: HomeUiState,
     uiEvent: (HomeUiEvent) -> Unit,
-    navigation: () -> Unit,
+    navigation: () -> Unit
 ) {
 
     Column {

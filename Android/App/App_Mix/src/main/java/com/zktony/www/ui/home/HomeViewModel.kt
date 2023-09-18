@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.kongzue.dialogx.dialogs.PopTip
 import com.zktony.core.base.BaseViewModel
 import com.zktony.core.ext.Ext
+import com.zktony.serialport.ext.asciiToHex
 import com.zktony.www.R
 import com.zktony.www.core.ext.asyncHex
 import com.zktony.www.core.ext.syncHex
@@ -92,6 +93,27 @@ class HomeViewModel constructor(
             }
         }
         _uiState.value = _uiState.value.copy(job = job)
+    }
+
+    fun stop() {
+        viewModelScope.launch {
+            asyncHex {
+                pa = "0B"
+                data = "0400"
+            }
+            _uiState.value = _uiState.value.copy(
+                time = 0L,
+                previous = !_uiState.value.previous
+            )
+            updateValue()
+            _uiState.value.job?.cancel()
+            _uiState.value = _uiState.value.copy(job = null)
+            delay(200L)
+            syncHex {
+                pa = "0B"
+                data = "0305"
+            }
+        }
     }
 
     /**

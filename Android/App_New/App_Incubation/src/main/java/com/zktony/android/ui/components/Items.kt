@@ -99,13 +99,13 @@ fun CalibrationItem(
                 Text(
                     modifier = Modifier
                         .background(
-                            color = MaterialTheme.colorScheme.surface,
+                            color = if (item.enable) MaterialTheme.colorScheme.surface else Color.Red,
                             shape = MaterialTheme.shapes.small
                         )
                         .padding(vertical = 4.dp, horizontal = 8.dp),
                     text = if (item.enable) "生效中" else "未生效",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (item.enable) MaterialTheme.colorScheme.onSurface else Color.Red
+                    color = if (item.enable) Color.Black else MaterialTheme.colorScheme.surface
                 )
             }
         },
@@ -263,7 +263,6 @@ fun PointItem(
     )
 }
 
-
 @Composable
 fun HistoryItem(
     index: Int,
@@ -299,7 +298,6 @@ fun HistoryItem(
         )
     )
 }
-
 
 @Composable
 fun LogItem(item: Log) {
