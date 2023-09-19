@@ -51,133 +51,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
     val spCount = _spCount.asStateFlow()
 
-    /**
-     * 举升1复位高度
-     */
-    val fwgd = dataSaver.readData("fwgd", 0f);
-
-
-    /**
-     * 举升1盘子距离
-     */
-    val pzgd = dataSaver.readData("pzjl", 0f);
-
-
-    /**
-     * 举升1夹爪高度
-     */
-    val jzgd = dataSaver.readData("jzgd", 0f);
-
-    /**
-     * 举升1分离距离
-     */
-    val fljl = dataSaver.readData("fljl", 0f);
-
-    /**
-     * 举升1矫正高度
-     */
-    val jiaozgd = dataSaver.readData("jiaozgd", 0f);
-
-    /**
-     * 举升1上盘高度
-     */
-    val spgd = dataSaver.readData("spgd", 0f);
-
-
-    /**
-     * 举升2复位高度
-     */
-    val fwgd2 = dataSaver.readData("fwgd2", 0f);
-
-    /**
-     * 举升2盘子距离
-     */
-    val pzgd2 = dataSaver.readData("pzjl2", 0f);
-
-    /**
-     * 举升2上盘高度
-     */
-    val spgd2 = dataSaver.readData("spgd2", 0f);
-
-
-    /**
-     * 夹紧距离
-     */
-    val jjjl = dataSaver.readData("jjjl", 0f);
-
-    /**
-     * 松开距离
-     */
-    val skjl = dataSaver.readData("skjl", 0f);
-
-    /**
-     * 上盘原点距离
-     */
-    val spydjl = dataSaver.readData("spydjl", 0f);
-
-    /**
-     * 上盘孔位距离1
-     */
-    val spkwjl1 = dataSaver.readData("spkwjl1", 0f);
-
-    /**
-     * 上盘孔位距离2
-     */
-    val spkwjl2 = dataSaver.readData("spkwjl1", 0f);
-
-    /**
-     * 上盘孔位距离3
-     */
-    val spkwjl3 = dataSaver.readData("spkwjl1", 0f);
-
-    /**
-     * 上盘孔位距离4
-     */
-    val spkwjl4 = dataSaver.readData("spkwjl1", 0f);
-
-    /**
-     * 上盘孔位距离5
-     */
-    val spkwjl5 = dataSaver.readData("spkwjl1", 0f);
-
-    /**
-     * 上盘孔位距离6
-     */
-    val spkwjl6 = dataSaver.readData("spkwjl1", 0f);
-
-    /**
-     * 上盘孔位距离7
-     */
-    val spkwjl7 = dataSaver.readData("spkwjl1", 0f);
-
-    /**
-     * 上盘孔位距离8
-     */
-    val spkwjl8 = dataSaver.readData("spkwjl1", 0f);
-
-
-    /**
-     * 下盘原点距离
-     */
-    val xpydjl = dataSaver.readData("xpydjl", 0f);
-
-    /**
-     * 下盘孔位距离1
-     */
-    val xpkwjl1 = dataSaver.readData("xpkwjl", 0f);
-
-    /**
-     * 下盘孔位距离2
-     */
-    val xpkwjl2 = dataSaver.readData("xpkwjl1", 0f);
-
-    /**
-     * 下盘孔位距离3
-     */
-    val xpkwjl3 = dataSaver.readData("xpkwjl1", 0f);
-
-    val tiji = dataSaver.readData("tiji", 0f)
-
 
     /**
      * 上盘运动次数
@@ -249,6 +122,31 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
     private fun reset() {
         viewModelScope.launch {
             _loading.value = 1
+
+            /**
+             * 举升1复位高度
+             */
+            val fwgd = dataSaver.readData("fwgd", 0f);
+
+
+            /**
+             * 举升2复位高度
+             */
+            val fwgd2 = dataSaver.readData("fwgd2", 0f);
+
+
+            /**
+             * 上盘原点距离
+             */
+            val spydjl = dataSaver.readData("spydjl", 0f);
+
+
+            /**
+             * 下盘原点距离
+             */
+            val xpydjl = dataSaver.readData("xpydjl", 0f);
+
+
             try {
                 // Initialize the axes and syringe within a timeout of 60 seconds
                 withTimeout(60 * 1000L) {
@@ -346,6 +244,30 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         viewModelScope.launch {
 
             /**
+             * 举升1复位高度
+             */
+            val fwgd = dataSaver.readData("fwgd", 0f);
+
+
+            /**
+             * 举升1上盘高度
+             */
+            val spgd = dataSaver.readData("spgd", 0f);
+
+
+            /**
+             * 举升2复位高度
+             */
+            val fwgd2 = dataSaver.readData("fwgd2", 0f);
+
+
+            /**
+             * 举升2上盘高度
+             */
+            val spgd2 = dataSaver.readData("spgd2", 0f);
+
+
+            /**
              * 1.获取移动步数
              */
 
@@ -424,6 +346,31 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         viewModelScope.launch {
 
             if (xpStartNum < 8) {
+
+                /**
+                 * 举升1复位高度
+                 */
+                val fwgd = dataSaver.readData("fwgd", 0f);
+
+
+                /**
+                 * 举升1上盘高度
+                 */
+                val spgd = dataSaver.readData("spgd", 0f);
+
+
+                /**
+                 * 举升2复位高度
+                 */
+                val fwgd2 = dataSaver.readData("fwgd2", 0f);
+
+
+                /**
+                 * 举升2上盘高度
+                 */
+                val spgd2 = dataSaver.readData("spgd2", 0f);
+
+
                 /**
                  * 1.获取移动步数
                  */
@@ -539,14 +486,81 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
         }
     }
 
+//    private fun start(int: Int) {
+//        viewModelScope.launch {
+//            tx {
+//
+//                /**
+//                 * 加液
+//                 */
+//                move(MoveType.MOVE_DV) {
+//                    index = 3
+//                    dv = tiji
+//                }
+//            }
+//        }
+//    }
 
     /**
      * Starts the execution of the selected program entity.
      */
+//
     private fun start(int: Int) {
         viewModelScope.launch {
             _loading.value = int
             if (_loading.value != 8) {
+
+
+                /**
+                 * 举升1复位高度
+                 */
+                val fwgd = dataSaver.readData("fwgd", 0f);
+
+
+                /**
+                 * 举升1夹爪高度
+                 */
+                val jzgd = dataSaver.readData("jzgd", 0f);
+
+                /**
+                 * 举升1分离距离
+                 */
+                val fljl = dataSaver.readData("fljl", 0f);
+
+                /**
+                 * 举升1矫正高度
+                 */
+                val jiaozgd = dataSaver.readData("jiaozgd", 0f);
+
+                /**
+                 * 举升1上盘高度
+                 */
+                val spgd = dataSaver.readData("spgd", 0f);
+
+
+                /**
+                 * 举升2复位高度
+                 */
+                val fwgd2 = dataSaver.readData("fwgd2", 0f);
+
+                /**
+                 * 举升2盘子距离
+                 */
+                val pzgd2 = dataSaver.readData("pzjl2", 0f);
+
+
+                /**
+                 * 夹紧距离
+                 */
+                val jjjl = dataSaver.readData("jjjl", 0f);
+
+                /**
+                 * 松开距离
+                 */
+                val skjl = dataSaver.readData("skjl", 0f);
+
+                val tiji = dataSaver.readData("tiji", 0f)
+
                 /**
                  * 是否有培养皿运动过
                  */

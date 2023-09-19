@@ -203,7 +203,7 @@ fun MenuContent(
                         tiji.value = it.toFloatOrNull() ?: 0f
                     }
                 },
-                label = { Text(text = "体积/ml") },
+                label = { Text(text = "体积/μL") },
                 shape = MaterialTheme.shapes.medium,
                 textStyle = MaterialTheme.typography.bodyLarge,
                 keyboardOptions = KeyboardOptions(

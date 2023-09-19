@@ -48,7 +48,7 @@ class TxScope {
      * @param block [@kotlin.ExtensionFunctionType] Function1<MoveScope, Unit>
      * @return Unit
      */
-    fun move(type: MoveType = MoveType.MOVE_DV, block: MoveScope.() -> Unit){
+    fun move(type: MoveType = MoveType.MOVE_DV, block: MoveScope.() -> Unit) {
         controlType = ControlType.CONTROL_MOVE
         val moveScope = MoveScope().apply(block)
 
@@ -58,7 +58,8 @@ class TxScope {
             val hpm = asyncTask.hpm[moveScope.index] ?: Motor()
             adsBytes.writeInt32LE(hpm.acc, 0).writeInt32LE(hpm.dec, 4).writeInt32LE(hpm.speed, 8)
         } else {
-            adsBytes.writeInt32LE(ads.first, 0).writeInt32LE(ads.second, 4).writeInt32LE(ads.third, 8)
+            adsBytes.writeInt32LE(ads.first, 0).writeInt32LE(ads.second, 4)
+                .writeInt32LE(ads.third, 8)
         }
 
         when (type) {
@@ -66,7 +67,11 @@ class TxScope {
             MoveType.MOVE_DV -> {
                 val jyh = dataSaver.readData("jyh", 0f)
                 val jyq = dataSaver.readData("jyq", 0f)
-                val pulse = (moveScope.dv / ((jyh - jyq) / 3200 * 10L)).toLong()
+                val pulse = ((moveScope.dv / ((jyh - jyq) / 10 * 1000)) * 3200L).toLong()
+                println("moveScope.dv===" + moveScope.dv)
+                println("jyh===" + jyh)
+                println("jyq===" + jyq)
+                println("pulse===" + pulse)
                 if (pulse != 0L) {
                     val ba = ByteArray(5)
                     ba.writeInt8(moveScope.index, 0).writeInt32LE(pulse, 1)
