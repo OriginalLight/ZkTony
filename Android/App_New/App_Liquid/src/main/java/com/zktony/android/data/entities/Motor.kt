@@ -3,7 +3,6 @@ package com.zktony.android.data.entities
 import androidx.compose.runtime.Immutable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.zktony.serialport.ext.writeInt32LE
 import java.util.Date
 
 /**
@@ -20,16 +19,4 @@ data class Motor(
     val acceleration: Long = 300L,
     val deceleration: Long = 400L,
     val createTime: Date = Date(System.currentTimeMillis())
-) {
-    fun toAdsString(): Triple<String, String, String> {
-        return Triple(acceleration.toString(), deceleration.toString(), speed.toString())
-    }
-
-    fun toByteArray(): ByteArray {
-        val ba = ByteArray(12)
-        ba.writeInt32LE(acceleration, 4)
-        ba.writeInt32LE(deceleration, 8)
-        ba.writeInt32LE(speed, 0)
-        return ba
-    }
-}
+)

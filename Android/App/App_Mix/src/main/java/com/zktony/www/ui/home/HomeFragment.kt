@@ -45,6 +45,8 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                                 it.coagulant > 0f && it.colloid > 0f && it.job == null && !it.lock
                             start.text =
                                 if (it.previous) getString(R.string.pre_drainage) else getString(com.zktony.core.R.string.start)
+
+                            stop.isVisible = it.job != null
                             mode.isVisible = it.job == null
 
                             title.text =
@@ -78,6 +80,18 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
         binding.apply {
             start.clickNoRepeat {
                 viewModel.start()
+            }
+            stop.clickNoRepeat {
+                viewModel.stop()
+            }
+            with(stop) {
+                clickNoRepeat {
+                    PopTip.show("长按停止")
+                }
+                setOnLongClickListener {
+                    viewModel.stop()
+                    true
+                }
             }
             with(reset) {
                 clickScale()

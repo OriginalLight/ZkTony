@@ -1,5 +1,6 @@
 package com.zktony.android.data.dao
 
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.zktony.android.data.entities.Calibration
 import kotlinx.coroutines.flow.Flow
@@ -12,23 +13,23 @@ import kotlinx.coroutines.flow.Flow
 abstract class CalibrationDao : BaseDao<Calibration> {
     @Query(
         """
-        SELECT * FROM calibrations
-        ORDER BY create_time ASC
+        SELECT * FROM calibration
+        ORDER BY `index` ASC
         """
     )
     abstract fun getAll(): Flow<List<Calibration>>
 
     @Query(
         """
-        UPDATE calibrations
-        SET active = (CASE WHEN id = :id THEN 1 ELSE 0 END)
+        SELECT * FROM calibration
+        ORDER BY `index` ASC
         """
     )
-    abstract suspend fun active(id: Long)
+    abstract fun getByPage(): PagingSource<Int, Calibration>
 
     @Query(
         """
-        DELETE FROM calibrations
+        DELETE FROM calibration
         WHERE id = :id
         """
     )

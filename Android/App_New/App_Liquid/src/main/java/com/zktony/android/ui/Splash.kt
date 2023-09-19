@@ -57,7 +57,8 @@ fun Splash() {
             .background(
                 color = MaterialTheme.colorScheme.surface,
                 shape = MaterialTheme.shapes.medium
-            ),
+            )
+            .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         AnimatedContent(targetState = splash.value) {
@@ -85,7 +86,7 @@ fun Splash() {
                         style = TextStyle(
                             fontSize = 22.sp,
                             lineHeight = 32.sp,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.Bold,
                         )
                     )
                     FloatingActionButton(
@@ -104,5 +105,16 @@ fun Splash() {
                 }
             }
         }
+
+        // copyright
+        Text(
+            text = stringResource(id = R.string.copyright),
+            style = TextStyle(
+                fontSize = 14.sp,
+                lineHeight = 16.sp,
+                fontWeight = FontWeight.SemiBold,
+            ),
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 }

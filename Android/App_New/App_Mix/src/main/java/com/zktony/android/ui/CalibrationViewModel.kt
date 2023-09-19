@@ -2,130 +2,95 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.Constants
-import com.zktony.android.utils.extra.serial
-import kotlinx.coroutines.delay
+import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.utils.SerialPortUtils.start
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * @author 刘贺贺
  * @date 2023/5/9 13:19
  */
-class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewModel() {
+@HiltViewModel
+class CalibrationViewModel @Inject constructor(
+    private val dao: CalibrationDao
+) : ViewModel() {
 
-    private val _selected = MutableStateFlow(0L)
     private val _page = MutableStateFlow(PageType.CALIBRATION_LIST)
-    private val _loading = MutableStateFlow(0)
+    private val _selected = MutableStateFlow(0L)
+    private val _uiFlags = MutableStateFlow(UiFlags.NONE)
     private val _uiState = MutableStateFlow(CalibrationUiState())
+    private val _message = MutableStateFlow<String?>(null)
 
     val uiState = _uiState.asStateFlow()
+    val message = _message.asStateFlow()
+    val entities = Pager(
+        config = PagingConfig(pageSize = 20, initialLoadSize = 40),
+    ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     init {
         viewModelScope.launch {
-            combine(
-                dao.getAll(),
-                _selected,
-                _page,
-                _loading,
-            ) { entities, selected, page, loading ->
-                CalibrationUiState(
-                    entities = entities,
-                    selected = selected,
-                    page = page,
-                    loading = loading
-                )
+            combine(_selected, _page, _uiFlags) { selected, page, uiFlags ->
+                CalibrationUiState(selected, page, uiFlags)
             }.catch { ex ->
-                ex.printStackTrace()
+                _message.value = ex.message
             }.collect {
                 _uiState.value = it
             }
         }
     }
 
-    fun uiEvent(event: CalibrationUiEvent) {
-        when (event) {
-            is CalibrationUiEvent.NavTo -> _page.value = event.page
-            is CalibrationUiEvent.ToggleSelected -> _selected.value = event.id
-            is CalibrationUiEvent.Insert -> viewModelScope.launch { dao.insert(Calibration(text = event.name)) }
-            is CalibrationUiEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
-            is CalibrationUiEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
-            is CalibrationUiEvent.Active -> viewModelScope.launch { dao.active(event.id) }
-            is CalibrationUiEvent.AddLiquid -> addLiquid(event.index)
-            is CalibrationUiEvent.DeleteData -> deleteData(event.data)
-            is CalibrationUiEvent.InsertData -> insertData(event.index, event.volume)
-        }
-    }
-
-    private fun addLiquid(index: Int) {
-        viewModelScope.launch {
-            _loading.value = 1
-            if (index == 0) {
-                serial { valve(2 to 0) }
-                delay(100L)
-            }
-            serial {
-                timeout = 1000L * 40L
-                start(index = index + 2, pdv = 3200L * 20)
-            }
-            if (index == 0) {
-                serial { valve(2 to 1) }
-                delay(30L)
-                serial {
-                    timeout = 1000L * 60L
-                    start(index = 2, pdv = Constants.ZT_0005 * -1)
-                }
-            }
-            _loading.value = 0
-        }
-    }
-
-    private fun deleteData(data: Triple<Int, Double, Double>) {
-        viewModelScope.launch {
-            val entity = _uiState.value.entities.find { it.id == _uiState.value.selected }
-
-            entity?.let {
-                val updatedEntity = it.copy(data = it.data - data)
-                dao.update(updatedEntity)
-            }
-        }
-    }
-
-    private fun insertData(index: Int, volume: Double) {
-        viewModelScope.launch {
-            val entity = _uiState.value.entities.find { it.id == _uiState.value.selected }
-
-            entity?.let {
-                val updatedEntity = it.copy(
-                    data = it.data + Triple(index, volume, 3200 * 20.0)
+    fun uiEvent(uiEvent: CalibrationUiEvent) {
+        when (uiEvent) {
+            is CalibrationUiEvent.Message -> _message.value = uiEvent.message
+            is CalibrationUiEvent.NavTo -> _page.value = uiEvent.page
+            is CalibrationUiEvent.ToggleSelected -> _selected.value = uiEvent.id
+            is CalibrationUiEvent.Insert -> viewModelScope.launch {
+                dao.insert(
+                    Calibration(
+                        displayText = uiEvent.displayText
+                    )
                 )
-                dao.update(updatedEntity)
             }
+
+            is CalibrationUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
+            is CalibrationUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.calibration) }
+            is CalibrationUiEvent.AddLiquid -> addLiquid(uiEvent.index, uiEvent.step)
+        }
+    }
+
+    private fun addLiquid(index: Int, step: Long) {
+        viewModelScope.launch {
+            _uiFlags.value = UiFlags.PUMP
+            start { with(index + 2, step) }
+            _uiFlags.value = UiFlags.PUMP
         }
     }
 }
 
 data class CalibrationUiState(
-    val entities: List<Calibration> = emptyList(),
     val selected: Long = 0L,
-    val page: PageType = PageType.CALIBRATION_LIST,
-    val loading: Int = 0
+    val page: Int = PageType.CALIBRATION_LIST,
+    val uiFlags: Int = UiFlags.NONE,
 )
 
 sealed class CalibrationUiEvent {
-    data class NavTo(val page: PageType) : CalibrationUiEvent()
+    data class Message(val message: String?) : CalibrationUiEvent()
+    data class NavTo(val page: Int) : CalibrationUiEvent()
     data class ToggleSelected(val id: Long) : CalibrationUiEvent()
-    data class Insert(val name: String) : CalibrationUiEvent()
+    data class Insert(val displayText: String) : CalibrationUiEvent()
     data class Delete(val id: Long) : CalibrationUiEvent()
-    data class Update(val entity: Calibration) : CalibrationUiEvent()
-    data class Active(val id: Long) : CalibrationUiEvent()
-    data class AddLiquid(val index: Int) : CalibrationUiEvent()
-    data class DeleteData(val data: Triple<Int, Double, Double>) : CalibrationUiEvent()
-    data class InsertData(val index: Int, val volume: Double) : CalibrationUiEvent()
+    data class Update(val calibration: Calibration) : CalibrationUiEvent()
+    data class AddLiquid(val index: Int, val step: Long) : CalibrationUiEvent()
 }

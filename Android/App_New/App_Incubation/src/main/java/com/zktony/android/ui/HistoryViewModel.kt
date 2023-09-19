@@ -51,9 +51,10 @@ class HistoryViewModel @Inject constructor(
 
     fun uiEvent(uiEvent: HistoryUiEvent) {
         when (uiEvent) {
+            is HistoryUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
+            is HistoryUiEvent.Message -> _message.value = uiEvent.message
             is HistoryUiEvent.NavTo -> _page.value = uiEvent.page
             is HistoryUiEvent.ToggleSelected -> _selected.value = uiEvent.id
-            is HistoryUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
         }
     }
 
@@ -66,8 +67,9 @@ data class HistoryUiState(
 )
 
 sealed class HistoryUiEvent {
+    data class Delete(val id: Long) : HistoryUiEvent()
+    data class Message(val message: String?) : HistoryUiEvent()
     data class NavTo(val page: Int) : HistoryUiEvent()
     data class ToggleSelected(val id: Long) : HistoryUiEvent()
-    data class Delete(val id: Long) : HistoryUiEvent()
 }
 

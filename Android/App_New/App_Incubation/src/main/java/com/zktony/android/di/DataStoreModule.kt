@@ -21,5 +21,5 @@ object DataStoreModule {
     }
 
     @Provides
-    fun dataSaverDataStore(dataStore: DataStore<Preferences>) = DataSaverDataStore(dataStore)
+    fun dataSaverDataStore(dataStore: DataStore<Preferences>) = DataSaverDataStore(dataStore, true)
 }

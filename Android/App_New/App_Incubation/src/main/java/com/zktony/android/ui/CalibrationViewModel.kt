@@ -58,6 +58,7 @@ class CalibrationViewModel @Inject constructor(
 
     fun uiEvent(uiEvent: CalibrationUiEvent) {
         when (uiEvent) {
+            is CalibrationUiEvent.Message -> _message.value = uiEvent.message
             is CalibrationUiEvent.NavTo -> _page.value = uiEvent.page
             is CalibrationUiEvent.ToggleSelected -> _selected.value = uiEvent.id
             is CalibrationUiEvent.Insert -> viewModelScope.launch {
@@ -99,10 +100,11 @@ data class CalibrationUiState(
 )
 
 sealed class CalibrationUiEvent {
-    data class NavTo(val page: Int) : CalibrationUiEvent()
-    data class ToggleSelected(val id: Long) : CalibrationUiEvent()
-    data class Insert(val displayText: String) : CalibrationUiEvent()
     data class Delete(val id: Long) : CalibrationUiEvent()
-    data class Update(val calibration: Calibration) : CalibrationUiEvent()
+    data class Insert(val displayText: String) : CalibrationUiEvent()
+    data class Message(val message: String?) : CalibrationUiEvent()
+    data class NavTo(val page: Int) : CalibrationUiEvent()
     data class Pulse(val id: Int, val pulse: Double) : CalibrationUiEvent()
+    data class ToggleSelected(val id: Long) : CalibrationUiEvent()
+    data class Update(val calibration: Calibration) : CalibrationUiEvent()
 }

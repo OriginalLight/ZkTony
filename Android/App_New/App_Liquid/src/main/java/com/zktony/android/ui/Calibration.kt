@@ -13,10 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -68,16 +65,13 @@ fun CalibrationRoute(viewModel: CalibrationViewModel) {
     BackHandler { navigation() }
 
     LaunchedEffect(key1 = message) {
-        if (message != null) {
-            snackbarHostState.showSnackbar(
-                message = message ?: "未知错误",
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+        message?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(CalibrationUiEvent.Message(null))
         }
     }
 
-    CalibrationScreen(
+    CalibrationWrapper(
         entities = entities,
         uiState = uiState,
         uiEvent = viewModel::uiEvent,
@@ -87,7 +81,7 @@ fun CalibrationRoute(viewModel: CalibrationViewModel) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun CalibrationScreen(
+fun CalibrationWrapper(
     entities: LazyPagingItems<Calibration>,
     uiState: CalibrationUiState,
     uiEvent: (CalibrationUiEvent) -> Unit,
@@ -259,6 +253,7 @@ fun CalibrationDetail(
         }
         itemsIndexed(items = selected.points) { index, item ->
             PointItem(
+                key = selected.points.size,
                 index = index,
                 item = item,
                 uiState = uiState,
@@ -268,7 +263,7 @@ fun CalibrationDetail(
                             uiEvent(CalibrationUiEvent.AddLiquid(selected.index, item.y.toLong()))
                         } else {
                             val points = selected.points.toMutableList()
-                            points -= item
+                            points.remove(item)
                             uiEvent(CalibrationUiEvent.Update(selected.copy(points = points)))
                         }
                     }

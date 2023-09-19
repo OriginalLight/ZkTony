@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -37,6 +36,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,7 +51,9 @@ import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
 import com.zktony.android.ui.utils.PageType
+import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
+import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.*
 import kotlinx.coroutines.launch
 
@@ -77,23 +79,20 @@ fun SettingRoute(viewModel: SettingViewModel) {
     BackHandler { navigation() }
 
     LaunchedEffect(key1 = message) {
-        if (message != null) {
-            snackbarHostState.showSnackbar(
-                message = message ?: "未知错误",
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+        message?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(SettingUiEvent.Message(null))
         }
     }
 
-    SettingScreen(
+    SettingWrapper(
         uiState = uiState, uiEvent = viewModel::uiEvent, navigation = navigation
     )
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun SettingScreen(
+fun SettingWrapper(
     uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit, navigation: () -> Unit
 ) {
     Column {
@@ -113,10 +112,10 @@ fun SettingScreen(
 
 @Composable
 fun SettingContent(
-    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
+    uiState: SettingUiState,
+    uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val snackbarHostState = LocalSnackbarHostState.current
     var navigation by rememberDataSaverState(key = Constants.NAVIGATION, default = false)
     var helpInfo by remember { mutableStateOf(false) }
@@ -243,7 +242,7 @@ fun SettingContent(
 
                 SettingsCard(icon = image, text = text, onClick = {
                     scope.launch {
-                        if (context.isNetworkAvailable()) {
+                        if (ApplicationUtils.isNetworkAvailable()) {
                             uiEvent(SettingUiEvent.CheckUpdate)
                         } else {
                             snackbarHostState.showSnackbar(message = "网络不可用")
@@ -323,65 +322,90 @@ fun SettingsCard(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Authentication(uiEvent: (SettingUiEvent) -> Unit) {
 
     val scope = rememberCoroutineScope()
     var show by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(WindowInsets.imeAnimationSource),
-        contentAlignment = Alignment.Center
-    ) {
-        if (show) {
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                FloatingActionButton(onClick = {
-                    scope.launch {
-                        uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
-                    }
-                }) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Cyclone, contentDescription = null
+    AnimatedContent(targetState = show) {
+        if (it) {
+            LazyVerticalGrid(
+                contentPadding = PaddingValues(16.dp),
+                columns = GridCells.Fixed(3),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    ListItem(
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                scope.launch {
+                                    uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
+                                }
+                            },
+                        headlineContent = {
+                            Text(
+                                text = stringResource(id = R.string.motor_config),
+                                style = MaterialTheme.typography.titleMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                        trailingContent = {
+                            Icon(
+                                imageVector = Icons.Default.Cyclone,
+                                contentDescription = null
+                            )
+                        },
+                        colors = ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
                         )
-                        Text(
-                            text = stringResource(id = R.string.motor_config),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
+                    )
                 }
-                FloatingActionButton(onClick = {
-                    scope.launch {
-                        uiEvent(SettingUiEvent.NavTo(PageType.CONFIG))
-                    }
-                }) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Tune, contentDescription = null
+                item {
+                    ListItem(
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                scope.launch {
+                                    uiEvent(SettingUiEvent.NavTo(PageType.CONFIG))
+                                }
+                            },
+                        headlineContent = {
+                            Text(
+                                text = stringResource(id = R.string.system_config),
+                                style = MaterialTheme.typography.titleMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                        trailingContent = {
+                            Icon(
+                                imageVector = Icons.Default.Tune,
+                                contentDescription = null
+                            )
+                        },
+                        colors = ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
                         )
-                        Text(
-                            text = stringResource(id = R.string.system_config),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
+                    )
                 }
             }
         } else {
-            VerificationCodeField(digits = 6, inputCallback = {
-                show = true
-            }) { text, focused ->
-                VerificationCodeItem(text, focused)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding(),
+                contentAlignment = Alignment.Center
+            ) {
+                VerificationCodeField(digits = 6, inputCallback = {
+                    show = true
+                }) { text, focused ->
+                    VerificationCodeItem(text, focused)
+                }
             }
         }
     }
@@ -635,9 +659,9 @@ fun ConfigList(modifier: Modifier = Modifier) {
                     }
                 ) {
                     scope.launch {
-                        serial {
-                            start(index = 0, pdv = abscissa)
-                            start(index = 1, pdv = ordinate)
+                        start {
+                            with(index = 0, pdv = abscissa)
+                            with(index = 1, pdv = ordinate)
                         }
                     }
                 }
@@ -653,9 +677,9 @@ fun ConfigList(modifier: Modifier = Modifier) {
                     }
                 ) {
                     scope.launch {
-                        serial {
-                            start(index = 0, pdv = tankAbscissa)
-                            start(index = 1, pdv = tankOrdinate)
+                        start {
+                            with(index = 0, pdv = tankAbscissa)
+                            with(index = 1, pdv = tankOrdinate)
                         }
                     }
                 }

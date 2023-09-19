@@ -9,13 +9,12 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
 /**
  * The implementation using [PreferenceDataStore] to save data. And because DataStore supports coroutine,
  * so does this.
  */
-class DataSaverDataStore @Inject constructor(
+class DataSaverDataStore(
     private val dataStore: DataStore<Preferences>,
     senseExternalDataChange: Boolean = false
 ) : DataSaverInterface(senseExternalDataChange) {

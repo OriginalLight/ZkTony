@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -79,11 +80,8 @@ fun SettingRoute(viewModel: SettingViewModel) {
 
     LaunchedEffect(key1 = message) {
         message?.let {
-            snackbarHostState.showSnackbar(
-                message = it,
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(SettingUiEvent.Message(null))
         }
     }
 
@@ -335,64 +333,90 @@ fun SettingsCard(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun Authentication(uiEvent: (SettingUiEvent) -> Unit) {
 
     val scope = rememberCoroutineScope()
     var show by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
-        contentAlignment = Alignment.Center
-    ) {
-        if (show) {
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                FloatingActionButton(onClick = {
-                    scope.launch {
-                        uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
-                    }
-                }) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Cyclone, contentDescription = null
+    AnimatedContent(targetState = show) {
+        if (it) {
+            LazyVerticalGrid(
+                contentPadding = PaddingValues(16.dp),
+                columns = GridCells.Fixed(3),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                item {
+                    ListItem(
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                scope.launch {
+                                    uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_LIST))
+                                }
+                            },
+                        headlineContent = {
+                            Text(
+                                text = stringResource(id = R.string.motor_config),
+                                style = MaterialTheme.typography.titleMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                        trailingContent = {
+                            Icon(
+                                imageVector = Icons.Default.Cyclone,
+                                contentDescription = null
+                            )
+                        },
+                        colors = ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
                         )
-                        Text(
-                            text = stringResource(id = R.string.motor_config),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
+                    )
                 }
-                FloatingActionButton(onClick = {
-                    scope.launch {
-                        uiEvent(SettingUiEvent.NavTo(PageType.CONFIG))
-                    }
-                }) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Tune, contentDescription = null
+                item {
+                    ListItem(
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                scope.launch {
+                                    uiEvent(SettingUiEvent.NavTo(PageType.CONFIG))
+                                }
+                            },
+                        headlineContent = {
+                            Text(
+                                text = stringResource(id = R.string.system_config),
+                                style = MaterialTheme.typography.titleMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        },
+                        trailingContent = {
+                            Icon(
+                                imageVector = Icons.Default.Tune,
+                                contentDescription = null
+                            )
+                        },
+                        colors = ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
                         )
-                        Text(
-                            text = stringResource(id = R.string.system_config),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                    }
+                    )
                 }
             }
         } else {
-            VerificationCodeField(digits = 6, inputCallback = {
-                show = true
-            }) { text, focused ->
-                VerificationCodeItem(text, focused)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .imePadding(),
+                contentAlignment = Alignment.Center
+            ) {
+                VerificationCodeField(digits = 6, inputCallback = {
+                    show = true
+                }) { text, focused ->
+                    VerificationCodeItem(text, focused)
+                }
             }
         }
     }

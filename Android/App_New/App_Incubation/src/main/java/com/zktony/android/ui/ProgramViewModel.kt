@@ -53,11 +53,12 @@ class ProgramViewModel @Inject constructor(
 
     fun uiEvent(uiEvent: ProgramUiEvent) {
         when (uiEvent) {
+            is ProgramUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
+            is ProgramUiEvent.Insert -> viewModelScope.launch { dao.insert(Program(displayText = uiEvent.name)) }
+            is ProgramUiEvent.Message -> _message.value = uiEvent.message
             is ProgramUiEvent.NavTo -> _page.value = uiEvent.page
             is ProgramUiEvent.ToggleSelected -> _selected.value = uiEvent.id
-            is ProgramUiEvent.Insert -> viewModelScope.launch { dao.insert(Program(displayText = uiEvent.name)) }
             is ProgramUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.program) }
-            is ProgramUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
         }
     }
 }
@@ -69,9 +70,10 @@ data class ProgramUiState(
 )
 
 sealed class ProgramUiEvent {
+    data class Delete(val id: Long) : ProgramUiEvent()
+    data class Insert(val name: String) : ProgramUiEvent()
+    data class Message(val message: String?) : ProgramUiEvent()
     data class NavTo(val page: Int) : ProgramUiEvent()
     data class ToggleSelected(val id: Long) : ProgramUiEvent()
-    data class Insert(val name: String) : ProgramUiEvent()
     data class Update(val program: Program) : ProgramUiEvent()
-    data class Delete(val id: Long) : ProgramUiEvent()
 }

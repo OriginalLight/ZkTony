@@ -20,6 +20,8 @@ import androidx.compose.ui.unit.sp
 import com.zktony.android.data.entities.internal.OrificePlate
 import com.zktony.android.ui.HomeUiEvent
 import com.zktony.android.ui.HomeUiState
+import com.zktony.android.ui.JobState
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.extra.format
 
 /**
@@ -154,9 +156,9 @@ fun JobActionCard(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        if (uiState.jobState.status == 0) {
+        if (uiState.jobState.status == JobState.STEPPED) {
             Card(
-                enabled = uiState.uiFlags == 0 && uiState.selected != 0L,
+                enabled = uiState.uiFlags == UiFlags.NONE && uiState.selected != 0L,
                 onClick = { uiEvent(HomeUiEvent.Start) }
             ) {
                 Icon(
@@ -169,13 +171,13 @@ fun JobActionCard(
         } else {
             Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
                 Card(onClick = {
-                    if (uiState.jobState.status == 1) {
+                    if (uiState.jobState.status == JobState.RUNNING) {
                         uiEvent(HomeUiEvent.Pause)
                     } else {
                         uiEvent(HomeUiEvent.Resume)
                     }
                 }) {
-                    if (uiState.jobState.status == 1) {
+                    if (uiState.jobState.status == JobState.RUNNING) {
                         Icon(
                             modifier = Modifier.size(128.dp),
                             imageVector = Icons.Default.Pause,

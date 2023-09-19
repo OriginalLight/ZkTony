@@ -52,16 +52,13 @@ fun HomeRoute(viewModel: HomeViewModel) {
     BackHandler { navigation() }
 
     LaunchedEffect(key1 = message) {
-        if (message != null) {
-            snackbarHostState.showSnackbar(
-                message = message ?: "未知错误",
-                actionLabel = "关闭",
-                duration = SnackbarDuration.Short
-            )
+        message?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.uiEvent(HomeUiEvent.Message(null))
         }
     }
 
-    HomeScreen(
+    HomeWrapper(
         entities = entities,
         uiState = uiState,
         uiEvent = viewModel::uiEvent,
@@ -72,7 +69,7 @@ fun HomeRoute(viewModel: HomeViewModel) {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun HomeScreen(
+fun HomeWrapper(
     entities: LazyPagingItems<Program>,
     uiState: HomeUiState,
     uiEvent: (HomeUiEvent) -> Unit,
@@ -112,15 +109,9 @@ fun HomeActions(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         ElevatedButton(
-            enabled = uiState.uiFlags == 0 || uiState.uiFlags == 1,
-            onClick = {
-                scope.launch {
-                    if (uiState.uiFlags == 0 || uiState.uiFlags == 1) {
-                        uiEvent(HomeUiEvent.Reset)
-                    }
-                }
-            }) {
-            if (uiState.uiFlags == 1) {
+            enabled = uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.RESET,
+            onClick = { uiEvent(HomeUiEvent.Reset) }) {
+            if (uiState.uiFlags == UiFlags.RESET) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
@@ -139,17 +130,17 @@ fun HomeActions(
         }
 
         ElevatedButton(
-            enabled = uiState.uiFlags == 0 || uiState.uiFlags == 2,
+            enabled = uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.CLEAN,
             onClick = {
                 scope.launch {
-                    if (uiState.uiFlags == 0) {
+                    if (uiState.uiFlags == UiFlags.NONE) {
                         uiEvent(HomeUiEvent.Pipeline(1))
-                    } else if (uiState.uiFlags == 2) {
+                    } else if (uiState.uiFlags == UiFlags.CLEAN) {
                         uiEvent(HomeUiEvent.Pipeline(0))
                     }
                 }
             }) {
-            if (uiState.uiFlags == 2) {
+            if (uiState.uiFlags == UiFlags.CLEAN) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
@@ -168,17 +159,17 @@ fun HomeActions(
         }
 
         ElevatedButton(
-            enabled = uiState.uiFlags == 0 || uiState.uiFlags == 3,
+            enabled = uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_IN,
             onClick = {
                 scope.launch {
-                    if (uiState.uiFlags == 0) {
+                    if (uiState.uiFlags == UiFlags.NONE) {
                         uiEvent(HomeUiEvent.Pipeline(2))
-                    } else if (uiState.uiFlags == 3) {
+                    } else if (uiState.uiFlags == UiFlags.PIPELINE_IN) {
                         uiEvent(HomeUiEvent.Pipeline(0))
                     }
                 }
             }) {
-            if (uiState.uiFlags == 3) {
+            if (uiState.uiFlags == UiFlags.PIPELINE_IN) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
@@ -186,7 +177,7 @@ fun HomeActions(
             } else {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    imageVector = Icons.Default.ArrowForwardIos,
+                    imageVector = Icons.Default.ArrowRight,
                     contentDescription = null
                 )
             }
@@ -197,17 +188,17 @@ fun HomeActions(
         }
 
         ElevatedButton(
-            enabled = uiState.uiFlags == 0 || uiState.uiFlags == 4,
+            enabled = uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_OUT,
             onClick = {
                 scope.launch {
-                    if (uiState.uiFlags == 0) {
+                    if (uiState.uiFlags == UiFlags.NONE) {
                         uiEvent(HomeUiEvent.Pipeline(3))
-                    } else if (uiState.uiFlags == 4) {
+                    } else if (uiState.uiFlags == UiFlags.PIPELINE_OUT) {
                         uiEvent(HomeUiEvent.Pipeline(0))
                     }
                 }
             }) {
-            if (uiState.uiFlags == 4) {
+            if (uiState.uiFlags == UiFlags.PIPELINE_OUT) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
@@ -215,7 +206,7 @@ fun HomeActions(
             } else {
                 Icon(
                     modifier = Modifier.size(24.dp),
-                    imageVector = Icons.Default.ArrowBackIos,
+                    imageVector = Icons.Default.ArrowLeft,
                     contentDescription = null
                 )
             }
@@ -308,7 +299,7 @@ fun JobContent(
                         .clip(MaterialTheme.shapes.small)
                         .clickable {
                             scope.launch {
-                                if (uiState.jobState.status == 0) {
+                                if (uiState.jobState.status == JobState.STEPPED) {
                                     if (entities.isNotEmpty()) {
                                         uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
                                     } else {

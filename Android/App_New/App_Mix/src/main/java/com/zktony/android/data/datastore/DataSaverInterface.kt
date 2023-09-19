@@ -2,10 +2,6 @@
 
 package com.zktony.android.data.datastore
 
-/**
- * @author 刘贺贺
- * @date 2023/7/24 10:59
- */
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ReadOnlyComposable
@@ -84,7 +80,7 @@ class DataSaverInMemory(senseExternalDataChange: Boolean = false) :
  * You can call `LocalDataSaver.current` inside a [androidx.compose.runtime.Composable] to
  * get the instance you've provided. You can call `readData` and `saveData` then.
  */
-var LocalDataSaver: ProvidableCompositionLocal<DataSaverInterface> = staticCompositionLocalOf {
+val LocalDataSaver: ProvidableCompositionLocal<DataSaverInterface> = staticCompositionLocalOf {
     DefaultDataSaverInMemory
 }
 

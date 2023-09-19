@@ -45,6 +45,7 @@ class DebugViewModel @Inject constructor() : ViewModel() {
 
     fun uiEvent(uiEvent: DebugUiEvent) {
         when (uiEvent) {
+            is DebugUiEvent.Message -> _message.value = uiEvent.message
             is DebugUiEvent.NavTo -> _page.value = uiEvent.page
             is DebugUiEvent.ToggleSelected -> _selected.value = uiEvent.id
             is DebugUiEvent.Valve -> viewModelScope.launch {
@@ -79,8 +80,9 @@ data class DebugUiState(
 )
 
 sealed class DebugUiEvent {
+    data class Message(val message: String?) : DebugUiEvent()
     data class NavTo(val page: Int) : DebugUiEvent()
+    data class Pulse(val id: Int, val value: Long) : DebugUiEvent()
     data class ToggleSelected(val id: Long) : DebugUiEvent()
     data class Valve(val id: Int, val value: Int) : DebugUiEvent()
-    data class Pulse(val id: Int, val value: Long) : DebugUiEvent()
 }

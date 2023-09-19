@@ -69,14 +69,15 @@ class SettingViewModel @Inject constructor(
 
     fun uiEvent(uiEvent: SettingUiEvent) {
         when (uiEvent) {
-            is SettingUiEvent.NavTo -> _page.value = uiEvent.page
-            is SettingUiEvent.Navigation -> navigation(uiEvent.navigation)
-            is SettingUiEvent.Network -> network()
             is SettingUiEvent.CheckUpdate -> checkUpdate()
-            is SettingUiEvent.ToggleSelected -> _selected.value = uiEvent.id
-            is SettingUiEvent.Insert -> viewModelScope.launch { dao.insert(Motor()) }
-            is SettingUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.entity) }
             is SettingUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
+            is SettingUiEvent.Insert -> viewModelScope.launch { dao.insert(Motor()) }
+            is SettingUiEvent.Message -> _message.value = uiEvent.message
+            is SettingUiEvent.Navigation -> navigation(uiEvent.navigation)
+            is SettingUiEvent.NavTo -> _page.value = uiEvent.page
+            is SettingUiEvent.Network -> network()
+            is SettingUiEvent.ToggleSelected -> _selected.value = uiEvent.id
+            is SettingUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.entity) }
         }
     }
 
@@ -157,12 +158,13 @@ data class SettingUiState(
 )
 
 sealed class SettingUiEvent {
-    data object Network : SettingUiEvent()
-    data object CheckUpdate : SettingUiEvent()
-    data object Insert : SettingUiEvent()
-    data class NavTo(val page: Int) : SettingUiEvent()
+    data class Delete(val id: Long) : SettingUiEvent()
+    data class Message(val message: String?) : SettingUiEvent()
     data class Navigation(val navigation: Boolean) : SettingUiEvent()
+    data class NavTo(val page: Int) : SettingUiEvent()
     data class ToggleSelected(val id: Long) : SettingUiEvent()
     data class Update(val entity: Motor) : SettingUiEvent()
-    data class Delete(val id: Long) : SettingUiEvent()
+    data object CheckUpdate : SettingUiEvent()
+    data object Insert : SettingUiEvent()
+    data object Network : SettingUiEvent()
 }

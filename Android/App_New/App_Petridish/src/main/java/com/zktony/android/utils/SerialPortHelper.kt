@@ -23,7 +23,7 @@ class SerialPortHelper : AbstractSerialHelper(
     override fun callbackHandler(byteArray: ByteArray) {
         Protocol.Protocol.callbackHandler(byteArray) { code, rx ->
             when (code) {
-                Protocol.AXIS -> {
+                Protocol.RX_0X01 -> {
                     for (i in 0 until rx.data.size / 2) {
                         val index = rx.data.readInt8(offset = i * 2)
                         val status = rx.data.readInt8(offset = i * 2 + 1)
@@ -31,7 +31,7 @@ class SerialPortHelper : AbstractSerialHelper(
                     }
                 }
 
-                Protocol.GPIO -> {
+                Protocol.Rx_0X02 -> {
                     for (i in 0 until rx.data.size / 2) {
                         val index = rx.data.readInt8(offset = i * 2)
                         val status = rx.data.readInt8(offset = i * 2 + 1)

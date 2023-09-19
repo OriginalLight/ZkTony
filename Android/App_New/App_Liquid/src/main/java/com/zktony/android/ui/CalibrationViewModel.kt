@@ -8,7 +8,8 @@ import androidx.paging.cachedIn
 import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.extra.serial
+import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.utils.SerialPortUtils.start
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +29,7 @@ class CalibrationViewModel @Inject constructor(
 
     private val _page = MutableStateFlow(PageType.CALIBRATION_LIST)
     private val _selected = MutableStateFlow(0L)
-    private val _uiFlags = MutableStateFlow(0)
+    private val _uiFlags = MutableStateFlow(UiFlags.NONE)
     private val _uiState = MutableStateFlow(CalibrationUiState())
     private val _message = MutableStateFlow<String?>(null)
 
@@ -65,29 +66,31 @@ class CalibrationViewModel @Inject constructor(
             is CalibrationUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
             is CalibrationUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.calibration) }
             is CalibrationUiEvent.AddLiquid -> addLiquid(uiEvent.index, uiEvent.step)
+            is CalibrationUiEvent.Message -> _message.value = uiEvent.message
         }
     }
 
     private fun addLiquid(index: Int, step: Long) {
         viewModelScope.launch {
-            _uiFlags.value = 1
-            serial { start(index + 2, step) }
-            _uiFlags.value = 0
+            _uiFlags.value = UiFlags.PUMP
+            start { with(index + 2, step) }
+            _uiFlags.value = UiFlags.NONE
         }
     }
 }
 
 data class CalibrationUiState(
     val selected: Long = 0L,
-    val page: PageType = PageType.CALIBRATION_LIST,
-    val uiFlags: Int = 0,
+    val page: Int = PageType.CALIBRATION_LIST,
+    val uiFlags: Int = UiFlags.NONE,
 )
 
 sealed class CalibrationUiEvent {
-    data class NavTo(val page: PageType) : CalibrationUiEvent()
-    data class ToggleSelected(val id: Long) : CalibrationUiEvent()
-    data class Insert(val displayText: String) : CalibrationUiEvent()
-    data class Delete(val id: Long) : CalibrationUiEvent()
-    data class Update(val calibration: Calibration) : CalibrationUiEvent()
     data class AddLiquid(val index: Int, val step: Long) : CalibrationUiEvent()
+    data class Delete(val id: Long) : CalibrationUiEvent()
+    data class Insert(val displayText: String) : CalibrationUiEvent()
+    data class NavTo(val page: Int) : CalibrationUiEvent()
+    data class ToggleSelected(val id: Long) : CalibrationUiEvent()
+    data class Update(val calibration: Calibration) : CalibrationUiEvent()
+    data class Message(val message: String?) : CalibrationUiEvent()
 }
