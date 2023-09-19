@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+
 using Exposure.Contracts.Services;
 using Exposure.ViewModels;
 using Exposure.Views;
+
 using Microsoft.UI.Xaml.Controls;
 
 namespace Exposure.Services;
@@ -14,6 +16,8 @@ public class PageService : IPageService
     {
         Configure<MainViewModel, MainPage>();
         Configure<SettingsViewModel, SettingsPage>();
+        Configure<PictureViewModel, PicturePage>();
+        Configure<PictureDetailViewModel, PictureDetailPage>();
     }
 
     public Type GetPageType(string key)

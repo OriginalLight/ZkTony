@@ -184,4 +184,7 @@
   <data name="Settings_UsefulLinks.Header" xml:space="preserve">
     <value>UsefulLinks</value>
   </data>
+  <data name="Shell_Picture.Content" xml:space="preserve">
+    <value>Picture</value>
+  </data>
 </root>

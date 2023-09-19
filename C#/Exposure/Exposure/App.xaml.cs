@@ -5,10 +5,13 @@ using Exposure.Notifications;
 using Exposure.Services;
 using Exposure.ViewModels;
 using Exposure.Views;
+
 using Logging;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
+
 using UnhandledExceptionEventArgs = Microsoft.UI.Xaml.UnhandledExceptionEventArgs;
 
 namespace Exposure;
@@ -43,6 +46,8 @@ public partial class App
                 // Core Services
                 services.AddSingleton<IFileService, FileService>();
                 services.AddSingleton<IAppInfoService, AppInfoService>();
+                services.AddSingleton<IPictureService, PictureService>();
+                services.AddSingleton<ISampleDataService, SampleDataService>();
 
                 // Views and ViewModels
                 services.AddTransient<SettingsViewModel>();
@@ -51,6 +56,10 @@ public partial class App
                 services.AddTransient<MainPage>();
                 services.AddTransient<ShellPage>();
                 services.AddTransient<ShellViewModel>();
+                services.AddTransient<PictureViewModel>();
+                services.AddTransient<PicturePage>();
+                services.AddTransient<PictureDetailViewModel>();
+                services.AddTransient<PictureDetailPage>();
 
                 // Configuration
                 services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
