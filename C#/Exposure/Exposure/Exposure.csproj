@@ -39,6 +39,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Logging\Logging.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <None Update="appsettings.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>

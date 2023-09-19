@@ -11,13 +11,14 @@ internal class AppInfoService : IAppInfoService
 
     public Version GetAppVersion()
     {
-        if (RuntimeHelper.IsMSIX)
+        if (!RuntimeHelper.IsMSIX)
         {
-            var packageVersion = Package.Current.Id.Version;
-            return new Version(packageVersion.Major, packageVersion.Minor, packageVersion.Build,
-                packageVersion.Revision);
+            return Assembly.GetExecutingAssembly().GetName().Version!;
         }
 
-        return Assembly.GetExecutingAssembly().GetName().Version!;
+        var packageVersion = Package.Current.Id.Version;
+        return new Version(packageVersion.Major, packageVersion.Minor, packageVersion.Build,
+            packageVersion.Revision);
+
     }
 }

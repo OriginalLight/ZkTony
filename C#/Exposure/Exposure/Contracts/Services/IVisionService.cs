@@ -3,6 +3,10 @@
 public interface IVisionService
 {
     Task InitAsync();
-    
-    string? GetVisionText();
+
+    Task UninitAsync();
+
+    string GetVisionText();
+
+    int SearchforDevice();
 }

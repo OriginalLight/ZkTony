@@ -5,6 +5,7 @@ using Exposure.Notifications;
 using Exposure.Services;
 using Exposure.ViewModels;
 using Exposure.Views;
+using Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
@@ -52,8 +53,7 @@ public partial class App
                 services.AddTransient<ShellViewModel>();
 
                 // Configuration
-                services.Configure<LocalSettingsOptions>(
-                    context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+                services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
             }).Build();
 
         GetService<IAppNotificationService>().Initialize();
@@ -90,7 +90,7 @@ public partial class App
 
     private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e)
     {
-        // TODO: Log and handle exceptions as appropriate.
+        GlobalLog.Logger?.ReportError(e.Exception.Message);
         // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
     }
 

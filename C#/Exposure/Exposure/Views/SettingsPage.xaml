@@ -37,21 +37,31 @@
                 </labs:SettingsCard.HeaderIcon>
                 <Button Content="{x:Bind ViewModel.Storage, Mode=OneWay}" Click="PickFolderButton_Click" />
             </labs:SettingsCard>
-            <labs:SettingsExpander x:Uid="Settings_About_Card" IsExpanded="True">
-                <labs:SettingsExpander.HeaderIcon>
+            <labs:SettingsCard x:Uid="Settings_About_Card" Description="{x:Bind ViewModel.Version, Mode=OneWay}">
+                <labs:SettingsCard.HeaderIcon>
                     <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/WindowIcon.ico" />
+                </labs:SettingsCard.HeaderIcon>
+                <Button Click="{x:Bind ViewModel.CopyVersion, Mode=OneWay}">
+                    <FontIcon Glyph="&#xE8C8;"/>
+                </Button>
+            </labs:SettingsCard>
+            <labs:SettingsCard x:Uid="Settings_Log">
+                <labs:SettingsCard.HeaderIcon>
+                    <FontIcon Glyph="&#xE8E5;" />
+                </labs:SettingsCard.HeaderIcon>
+                <Button Click="{x:Bind ViewModel.OpenLogsAsync, Mode=OneWay}">
+                    <FontIcon Glyph="&#xE8A7;"/>
+                </Button>
+            </labs:SettingsCard>
+            <labs:SettingsExpander x:Uid="Settings_UsefulLinks">
+                <labs:SettingsExpander.HeaderIcon>
+                    <FontIcon Glyph="&#xE71B;" />
                 </labs:SettingsExpander.HeaderIcon>
-                <TextBlock
-                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                    IsTextSelectionEnabled="True"
-                    Text="{x:Bind ViewModel.VersionDescription, Mode=OneWay}" />
                 <labs:SettingsExpander.Items>
                     <labs:SettingsCard HorizontalContentAlignment="Left" ContentAlignment="Left">
                         <StackPanel Orientation="Vertical">
-                            <TextBlock x:Uid="Settings_About_RelatedLinks"
-                                       Margin="{StaticResource XSmallTopBottomMargin}" />
-                            <HyperlinkButton x:Uid="SettingsPage_SourceCodeLink"
-                                             Margin="{StaticResource HyperlinkButtonNegativeMargin}" />
+                            <HyperlinkButton x:Uid="Domain" />
+                            <HyperlinkButton x:Uid="SourceCode" />
                         </StackPanel>
                     </labs:SettingsCard>
                 </labs:SettingsExpander.Items>

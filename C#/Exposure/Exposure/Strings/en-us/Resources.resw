@@ -155,23 +155,33 @@
   &lt;/actions&gt;
 &lt;/toast&gt;</value>
   </data>
-  <data name="Settings_About_Card.Description" xml:space="preserve">
-    <value>Made with 💗 by ZkTony</value>
-  </data>
   <data name="Settings_About_Card.Header" xml:space="preserve">
     <value>Exposure</value>
   </data>
   <data name="Settings_About_RelatedLinks.Text" xml:space="preserve">
     <value>Related links</value>
   </data>
-  <data name="SettingsPage_SourceCodeLink.Content" xml:space="preserve">
+  <data name="SourceCode.Content" xml:space="preserve">
     <value>Source code</value>
   </data>
-  <data name="SettingsPage_SourceCodeLink.NavigateUri" xml:space="preserve">
+  <data name="SourceCode.NavigateUri" xml:space="preserve">
     <value>https://github.com/OriginalLight/ZkTony</value>
     <comment>URL</comment>
   </data>
   <data name="Settings_Storage.Header" xml:space="preserve">
     <value>Storage</value>
+  </data>
+  <data name="Domain.Content" xml:space="preserve">
+    <value>公司网站</value>
+  </data>
+  <data name="Domain.NavigateUri" xml:space="preserve">
+    <value>https://www.zktony.com</value>
+    <comment>URL</comment>
+  </data>
+  <data name="Settings_Log.Header" xml:space="preserve">
+    <value>Open Logs</value>
+  </data>
+  <data name="Settings_UsefulLinks.Header" xml:space="preserve">
+    <value>UsefulLinks</value>
   </data>
 </root>
