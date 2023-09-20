@@ -1,5 +1,9 @@
-﻿namespace Exposure.Contracts.Services;
+﻿using Exposure.Models;
+
+namespace Exposure.Contracts.Services;
 public interface IPictureService
 {
-    Task LoadPicturesAsync();
+    Task<IEnumerable<string>> GetFolderAsync();
+
+    Task<IEnumerable<Picture>> GetPicturesAsync(string folder);
 }

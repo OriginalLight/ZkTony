@@ -18,9 +18,19 @@ public class VisionService : IVisionService
         }
 
         VisionHelper.Init();
-        GlobalLog.Logger?.ReportInfo("初始化VISION");
+        GlobalLog.Logger?.ReportInfo("初始化SDK");
 
         isInit = true;
+
+        var device = SearchforDevice();
+        if (device == 0)
+        {
+            GlobalLog.Logger?.ReportInfo("未找到设备");
+        }
+        else
+        {
+            GlobalLog.Logger?.ReportInfo($"找到设备数量：{device}");
+        }
 
         await Task.CompletedTask;
     }
@@ -33,7 +43,7 @@ public class VisionService : IVisionService
         }
 
         VisionHelper.Uninit();
-        GlobalLog.Logger?.ReportInfo("释放VISION");
+        GlobalLog.Logger?.ReportInfo("释放SDK");
 
         isInit = false;
 

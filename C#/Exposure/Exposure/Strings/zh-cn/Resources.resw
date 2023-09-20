@@ -181,4 +181,7 @@
   <data name="Settings_UsefulLinks.Header" xml:space="preserve">
     <value>更多链接</value>
   </data>
+  <data name="Shell_Picture.Content" xml:space="preserve">
+    <value>图片</value>
+  </data>
 </root>

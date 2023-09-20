@@ -1,29 +1,27 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
-
-using Exposure.Contracts.ViewModels;
 using Exposure.Contracts.Services;
+using Exposure.Contracts.ViewModels;
 using Exposure.Models;
 
 namespace Exposure.ViewModels;
 
 public partial class PictureDetailViewModel : ObservableRecipient, INavigationAware
 {
-    private readonly ISampleDataService _sampleDataService;
+    private readonly IPictureService _pictureService;
 
     [ObservableProperty]
-    private SampleOrder? item;
+    private Picture? item;
 
-    public PictureDetailViewModel(ISampleDataService sampleDataService)
+    public PictureDetailViewModel(IPictureService pictureService)
     {
-        _sampleDataService = sampleDataService;
+        _pictureService = pictureService;
     }
 
-    public async void OnNavigatedTo(object parameter)
+    public void OnNavigatedTo(object parameter)
     {
-        if (parameter is long orderID)
+        if (parameter is Picture pi)
         {
-            var data = await _sampleDataService.GetContentGridDataAsync();
-            Item = data.First(i => i.OrderID == orderID);
+            item = pi;
         }
     }
 

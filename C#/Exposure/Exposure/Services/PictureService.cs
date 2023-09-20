@@ -1,77 +1,40 @@
 ﻿using System.Text.RegularExpressions;
 using Exposure.Contracts.Services;
 using Exposure.Models;
-using Logging;
 
 namespace Exposure.Services;
 
-public class PictureService : IPictureService
+public partial class PictureService : IPictureService
 {
     private readonly ILocalSettingsService _localSettingsService;
 
-    public IDictionary<DateTime, List<Picture>> PictureLibrary { get; private set; } = new Dictionary<DateTime, List<Picture>>();
+    [GeneratedRegex("\\d{4}-\\d{2}-\\d{2}")]
+    private static partial Regex DateRegex();
 
     public PictureService(ILocalSettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
     }
 
-    public async Task LoadPicturesAsync()
+    public async Task<IEnumerable<string>> GetFolderAsync()
     {
-        var folder = await _localSettingsService.ReadSettingAsync<string>("Storage")
-            ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        if (folder == null)
-        {
-            GlobalLog.Logger?.ReportError("图片文件夹错误");
-            return;
-        }
-        else
-        {
-            var folders = Directory.GetDirectories(folder);
-            // 检查文件名是否符合日期格式
-            var regex = new Regex(@"\d{4}-\d{2}-\d{2}");
-            foreach (var f in folders)
-            {
-                if (Regex.IsMatch(f, regex.ToString()))
-                {
-                    var date = DateTime.Parse(Regex.Match(f, regex.ToString()).Value);
-                    var pictures = Directory.GetFiles(f);
-                    foreach (var p in pictures)
-                    {
-                        // 判断文件是否符合图片格式
-                        if (!p.EndsWith(".jpg") && !p.EndsWith(".png"))
-                        {
-                            continue;
-                        }
+        var path = await _localSettingsService.ReadSettingAsync<string>("Storage")
+                   ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        var fs = Directory.GetDirectories(path);
+        var regex = DateRegex();
+        return (from f in fs where Regex.IsMatch(f, regex.ToString()) select Regex.Match(f, regex.ToString()).Value into folder where DateTime.Parse(folder) >= DateTime.Now.AddDays(-180) select folder).ToList();
+    }
 
-                        var picture = new Picture
-                        {
-                            Name = Path.GetFileName(p),
-                            Path = f
-                        };
-                        if (PictureLibrary.ContainsKey(date))
-                        {
-                            PictureLibrary[date].Add(picture);
-                        }
-                        else
-                        {
-                            PictureLibrary.Add(date, new List<Picture> { picture });
-                        }
-                    }
-                }
-            }
-        }
-        PictureLibrary = PictureLibrary.OrderByDescending(p => p.Key).ToDictionary(p => p.Key, p => p.Value);
-        GlobalLog.Logger?.ReportInfo("图片加载完成");
-        // 打印图片信息
-        foreach (var p in PictureLibrary)
+    public async Task<IEnumerable<Picture>> GetPicturesAsync(string folder)
+    {
+        var path = await _localSettingsService.ReadSettingAsync<string>("Storage")
+                   ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        var full = Path.Combine(path, folder);
+        if (!Directory.Exists(full))
         {
-            GlobalLog.Logger?.ReportInfo(p.Key.ToString());
-            foreach (var pic in p.Value)
-            {
-                GlobalLog.Logger?.ReportInfo(pic.GetFullPath());
-            }
+            return new List<Picture>();
         }
-        await Task.CompletedTask;
+        var ps = Directory.GetFiles(full);
+        return (from p in ps where p.EndsWith(".jpg") || p.EndsWith(".png") select new Picture { Name = Path.GetFileNameWithoutExtension(p), Path = p }).ToList();
     }
 }

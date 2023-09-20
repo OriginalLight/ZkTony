@@ -47,7 +47,6 @@ public partial class App
                 services.AddSingleton<IFileService, FileService>();
                 services.AddSingleton<IAppInfoService, AppInfoService>();
                 services.AddSingleton<IPictureService, PictureService>();
-                services.AddSingleton<ISampleDataService, SampleDataService>();
 
                 // Views and ViewModels
                 services.AddTransient<SettingsViewModel>();

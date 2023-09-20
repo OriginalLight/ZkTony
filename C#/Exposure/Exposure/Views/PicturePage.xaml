@@ -4,42 +4,58 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:behaviors="using:Exposure.Behaviors"
     behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
     xmlns:models="using:Exposure.Models"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Loaded="Page_Loaded">
 
-    <Grid x:Name="ContentArea">
-        <controls:AdaptiveGridView
-            animations:Connected.ListItemElementName="itemThumbnail"
-            animations:Connected.ListItemKey="animationKeyContentGrid"
-            DesiredWidth="180"
-            ItemHeight="160"
-            IsItemClickEnabled="True"
-            ItemClickCommand="{x:Bind ViewModel.ItemClickCommand}"
-            ItemsSource="{x:Bind ViewModel.Source,Mode=OneWay}"
-            SelectionMode="None"
-            StretchContentForSingleRow="False">
-            <controls:AdaptiveGridView.ItemTemplate>
-                <DataTemplate x:DataType="models:SampleOrder">
-                    <Grid
-                        x:Name="itemThumbnail"
-                        Padding="{StaticResource XSmallLeftTopRightBottomMargin}">
-                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <FontIcon
-                                Glyph="{x:Bind Symbol}"
-                                AutomationProperties.Name="{x:Bind SymbolName}" />
-                            <TextBlock
-                                Margin="{StaticResource XXSmallTopMargin}"
-                                HorizontalAlignment="Center"
-                                Style="{ThemeResource BodyTextStyle}"
-                                Text="{x:Bind Company}" />
-                        </StackPanel>
-                    </Grid>
-                </DataTemplate>
-            </controls:AdaptiveGridView.ItemTemplate>
-        </controls:AdaptiveGridView>
+    <Grid Padding="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <StackPanel Height="32" Orientation="Horizontal" Spacing="16" Grid.Row="0" Padding="4,0,4,0">
+            <AutoSuggestBox
+                x:Name="AutoSuggestBox"
+                MinWidth="300"
+                MaxWidth="600"
+                HorizontalAlignment="Left"
+                PlaceholderText="请输入日期"
+                QueryIcon="Find"
+                TextChanged="TextChanged"
+                SuggestionChosen="SuggestionChosen"
+                QuerySubmitted="QuerySubmitted"/>
+            <CalendarDatePicker x:Name="CalendarDatePicker" DateChanged="DateChanged"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Padding="0,8,0,0">
+            <GridView
+                AutomationProperties.AccessibilityView="Raw"
+                VirtualizingStackPanel.VirtualizationMode="Recycling"
+                AutomationProperties.Name="{x:Bind ViewModel.Pictures}"
+                IsItemClickEnabled="True"
+                ItemClick="OnItemClick"
+                ItemsSource="{x:Bind ViewModel.Pictures,Mode=OneWay}"
+                SelectionMode="None">
+                <GridView.ItemContainerStyle>
+                    <Style TargetType="GridViewItem">
+                        <Setter Property="Margin" Value="4"/>
+                    </Style>
+                </GridView.ItemContainerStyle>
+                <GridView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Picture">
+                        <Grid Width="250">
+                            <Image Source="{x:Bind Path}" Stretch="UniformToFill"/>
+                            <StackPanel Orientation="Vertical" Height="24" VerticalAlignment="Bottom" Padding="5,1,5,1"
+                                        Background="Gray" Opacity=".75">
+                                <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyTextBlockStyle}"/>
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </GridView.ItemTemplate>
+            </GridView>
+        </ScrollViewer>
     </Grid>
 </Page>

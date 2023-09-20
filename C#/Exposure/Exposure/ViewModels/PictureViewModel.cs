@@ -1,7 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
 
 using Exposure.Contracts.Services;
 using Exposure.Contracts.ViewModels;
@@ -11,29 +10,35 @@ namespace Exposure.ViewModels;
 
 public partial class PictureViewModel : ObservableRecipient, INavigationAware
 {
-    private readonly INavigationService _navigationService;
-    private readonly ISampleDataService _sampleDataService;
     private readonly IPictureService _pictureService;
 
-    public ObservableCollection<SampleOrder> Source { get; } = new ObservableCollection<SampleOrder>();
+    public ObservableCollection<string> Folders { get; } = new();
+    public ObservableCollection<Picture> Pictures { get; } = new();
 
-    public PictureViewModel(INavigationService navigationService, ISampleDataService sampleDataService, IPictureService pictureService)
+    public PictureViewModel(IPictureService pictureService)
     {
-        _navigationService = navigationService;
-        _sampleDataService = sampleDataService;
         _pictureService = pictureService;
-        _pictureService.LoadPicturesAsync();
     }
 
     public async void OnNavigatedTo(object parameter)
     {
-        Source.Clear();
-
-        // TODO: Replace with real data.
-        var data = await _sampleDataService.GetContentGridDataAsync();
-        foreach (var item in data)
+        Folders.Clear();
+        Pictures.Clear();
+        var folders = await _pictureService.GetFolderAsync();
+        foreach (var folder in folders)
         {
-            Source.Add(item);
+            Folders.Add(folder);
+        }
+        var first = Folders.LastOrDefault();
+        if (first == null)
+        {
+            return;
+        }
+
+        var pictures = await _pictureService.GetPicturesAsync(first);
+        foreach (var picture in pictures)
+        {
+            Pictures.Add(picture);
         }
     }
 
@@ -41,13 +46,13 @@ public partial class PictureViewModel : ObservableRecipient, INavigationAware
     {
     }
 
-    [RelayCommand]
-    private void OnItemClick(SampleOrder? clickedItem)
+    public async Task OnFolderChanged(string folder)
     {
-        if (clickedItem != null)
+        Pictures.Clear();
+        var pictures = await _pictureService.GetPicturesAsync(folder);
+        foreach (var picture in pictures)
         {
-            _navigationService.SetListDataItemForNextConnectedAnimation(clickedItem);
-            _navigationService.NavigateTo(typeof(PictureDetailViewModel).FullName!, clickedItem.OrderID);
+            Pictures.Add(picture);
         }
     }
 }

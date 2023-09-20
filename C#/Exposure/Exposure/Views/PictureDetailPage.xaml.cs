@@ -24,20 +24,22 @@ public sealed partial class PictureDetailPage : Page
     protected override void OnNavigatedTo(NavigationEventArgs e)
     {
         base.OnNavigatedTo(e);
-        this.RegisterElementForConnectedAnimation("animationKeyContentGrid", itemHero);
+        this.RegisterElementForConnectedAnimation("animationKeyContentGrid", ItemHero);
     }
 
     protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
     {
         base.OnNavigatingFrom(e);
-        if (e.NavigationMode == NavigationMode.Back)
+        if (e.NavigationMode != NavigationMode.Back)
         {
-            var navigationService = App.GetService<INavigationService>();
+            return;
+        }
 
-            if (ViewModel.Item != null)
-            {
-                navigationService.SetListDataItemForNextConnectedAnimation(ViewModel.Item);
-            }
+        var navigationService = App.GetService<INavigationService>();
+
+        if (ViewModel.Item != null)
+        {
+            navigationService.SetListDataItemForNextConnectedAnimation(ViewModel.Item);
         }
     }
 }
