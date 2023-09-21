@@ -3,7 +3,7 @@
 
 using System.Globalization;
 
-namespace Logging.Listeners;
+namespace Exposure.Logging.Listeners;
 public class StdoutListener : ListenerBase
 {
     private static readonly ConsoleColor CDefaultColor = ConsoleColor.White;

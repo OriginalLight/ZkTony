@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors
 // Licensed under the MIT license.
 
-using Logging.Helpers;
-using Logging.Listeners;
+using Exposure.Logging.Helpers;
+using Exposure.Logging.Listeners;
 
-namespace Logging;
+namespace Exposure.Logging;
 public class Logger : ILoggerHost, IDisposable
 {
     public Logger(string name, Options options)

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors
 // Licensed under the MIT license.
 
-namespace Logging;
+namespace Exposure.Logging;
 public enum SeverityLevel
 {
     Debug,

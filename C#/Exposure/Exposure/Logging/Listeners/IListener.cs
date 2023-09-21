@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors
 // Licensed under the MIT license.
 
-namespace Logging.Listeners;
+namespace Exposure.Logging.Listeners;
 public interface IListener
 {
     string Name

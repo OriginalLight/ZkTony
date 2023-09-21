@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors
 // Licensed under the MIT license.
 
-using Logging.Helpers;
+using Exposure.Logging.Helpers;
 
-namespace Logging;
+namespace Exposure.Logging;
 public class LogEvent
 {
     public string Source

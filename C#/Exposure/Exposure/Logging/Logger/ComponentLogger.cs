@@ -3,7 +3,7 @@
 
 using Windows.Storage;
 
-namespace Logging;
+namespace Exposure.Logging;
 
 /// <summary>
 /// A logger for an individual component; each component's logs go to a different file.

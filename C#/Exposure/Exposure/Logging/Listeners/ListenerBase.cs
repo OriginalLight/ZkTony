@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors
 // Licensed under the MIT license.
 
-using Logging;
+using Exposure.Logging;
 
-namespace Logging.Listeners;
+namespace Exposure.Logging.Listeners;
 
 public abstract class ListenerBase : IListener
 {

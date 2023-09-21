@@ -10,7 +10,7 @@ public partial class PictureDetailViewModel : ObservableRecipient, INavigationAw
     private readonly IPictureService _pictureService;
 
     [ObservableProperty]
-    private Picture? item;
+    private Picture? _item;
 
     public PictureDetailViewModel(IPictureService pictureService)
     {

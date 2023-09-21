@@ -3,7 +3,7 @@
 
 using System.Globalization;
 
-namespace Logging.Listeners;
+namespace Exposure.Logging.Listeners;
 public class LogFileListener : ListenerBase, IDisposable
 {
     private readonly TextWriter? writer;

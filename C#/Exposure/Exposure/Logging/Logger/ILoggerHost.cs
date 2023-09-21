@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors
 // Licensed under the MIT license.
 
-using Logging.Listeners;
+using Exposure.Logging.Listeners;
 
-namespace Logging;
+namespace Exposure.Logging;
 public interface ILoggerHost : IDisposable
 {
     string Name

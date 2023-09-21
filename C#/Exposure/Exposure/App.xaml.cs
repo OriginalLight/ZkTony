@@ -6,7 +6,7 @@ using Exposure.Services;
 using Exposure.ViewModels;
 using Exposure.Views;
 
-using Logging;
+using Exposure.Logging;
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

@@ -14,8 +14,8 @@
         <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
         <ApplicationIcon>Assets/WindowIcon.ico</ApplicationIcon>
         <ApplicationManifest>app.manifest</ApplicationManifest>
-        <PackageCertificateThumbprint>262C8CED3137187EFA41E3F0A187BF31ED1E886C</PackageCertificateThumbprint>
         <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
+        <PackageCertificateThumbprint>262C8CED3137187EFA41E3F0A187BF31ED1E886C</PackageCertificateThumbprint>
     </PropertyGroup>
 
     <ItemGroup>
@@ -39,6 +39,7 @@
         <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.230822000" />
         <PackageReference Include="Microsoft.Xaml.Behaviors.WinUI.Managed" Version="2.0.9" />
         <PackageReference Include="CommunityToolkit.Labs.WinUI.SettingsControls" Version="0.0.18" />
+        <PackageReference Include="OpenCV" Version="2.4.11" />
         <PackageReference Include="WinUIEx" Version="2.3.0" />
     </ItemGroup>
 
@@ -46,8 +47,8 @@
         <None Update="appsettings.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
-        <None Update="Libraries\Vision.dll">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <None Update="Libraries\**">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 

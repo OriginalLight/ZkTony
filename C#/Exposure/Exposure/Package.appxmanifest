@@ -10,7 +10,7 @@
         IgnorableNamespaces="uap rescap genTemplate">
 
     <Identity
-            Name="ZkTony.Exposure"
+            Name="Exposure"
             Publisher="CN=ZkTony"
             Version="1.0.0.0"/>
 

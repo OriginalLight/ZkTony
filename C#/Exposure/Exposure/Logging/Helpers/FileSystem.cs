@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors
 // Licensed under the MIT license.
 
-namespace Logging.Helpers;
+namespace Exposure.Logging.Helpers;
 public class FileSystem
 {
     public static string BuildOutputFilename(string filename, string outputFolder, bool createPathIfNecessary = true)

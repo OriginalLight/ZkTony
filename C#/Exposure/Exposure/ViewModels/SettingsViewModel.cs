@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Exposure.Contracts.Services;
-using Logging;
+using Exposure.Logging;
 using Microsoft.UI.Xaml;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.DataTransfer;

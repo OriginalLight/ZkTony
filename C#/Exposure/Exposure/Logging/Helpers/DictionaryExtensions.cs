@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation and Contributors
 // Licensed under the MIT license.
 
-namespace Logging.Helpers;
+namespace Exposure.Logging.Helpers;
 
 public static class DictionaryExtensions
 {

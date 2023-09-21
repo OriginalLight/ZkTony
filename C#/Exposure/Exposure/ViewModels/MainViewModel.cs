@@ -1,11 +1,15 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Data;
+using System.Globalization;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Exposure.Contracts.Services;
-using Exposure.Contracts.ViewModels;
+using System.Threading;
+using Windows.System;
 
 namespace Exposure.ViewModels;
 
-public partial class MainViewModel : ObservableRecipient, INavigationAware
+public partial class MainViewModel : ObservableRecipient, IDisposable
 {
+    private readonly Timer _timer;
     private readonly IVisionService _visionService;
 
     [ObservableProperty] private string _versionText = "Unknow";
@@ -13,15 +17,21 @@ public partial class MainViewModel : ObservableRecipient, INavigationAware
     public MainViewModel(IVisionService visionService)
     {
         _visionService = visionService;
-        _visionService.InitAsync();
+        _timer = new Timer(QueryTimerCallback, null, 0, 5000);
     }
-
-    public void OnNavigatedTo(object parameter)
+    
+    private async void QueryTimerCallback(object? state)
     {
-        VersionText = _visionService.GetVisionText();
+        await _visionService.InitAsync();
+        await _visionService.ConnectAsync();
+        var temp = _visionService.GetAttributeFloatAsync("SensorTemperature");
     }
+    
 
-    public void OnNavigatedFrom()
+    public async void Dispose()
     {
+        await _timer.DisposeAsync();
+        await _visionService.DisconnectAsync();
+        await _visionService.UninitAsync();
     }
 }

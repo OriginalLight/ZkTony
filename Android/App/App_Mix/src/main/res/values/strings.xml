@@ -9,7 +9,7 @@
     <string name="fill_coagulant">填充促凝剂</string>
     <string name="fill_colloid">填充胶体</string>
     <string name="motor_setting">电机设置</string>
-    <string name="notice_content">1、请按照说明书进行操作\n2、请先填充促凝剂再填充胶液\n3、灌胶中请将针头贴紧胶板开口\n4、使用中请尽可能保持管路中液体处于流动状态\n5、灌装两块凝胶之间的时间间隔不宜过长\n6、灌胶完成后用清水冲洗管路避免凝胶堵塞管路</string>
+    <string name="notice_content">1、请按照说明书进行操作\n2、请先填充促凝剂再填充胶液\n3、灌胶中请将针头贴紧胶板开口\n4、使用中请尽可能保持管路中液体处于流动状态\n5、灌装两块凝胶之间的时间间隔不宜过长\n6、实际参数请根据胶板的容积进行调整\n7、灌胶完成后用清水冲洗管路避免凝胶堵塞管路</string>
     <string name="pre_drainage">预排液</string>
     <string name="pump_name">泵名</string>
     <string name="pump_one">重液泵</string>

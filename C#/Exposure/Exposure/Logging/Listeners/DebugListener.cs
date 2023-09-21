@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 
-namespace Logging.Listeners;
+namespace Exposure.Logging.Listeners;
 public class DebugListener : ListenerBase
 {
     public DebugListener(string name)
