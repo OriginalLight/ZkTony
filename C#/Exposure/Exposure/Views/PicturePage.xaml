@@ -47,7 +47,11 @@
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="models:Picture">
                         <Grid Width="250">
-                            <Image Source="{x:Bind Path}" Stretch="UniformToFill"/>
+                            <Image Source="{x:Bind Path}" Stretch="UniformToFill">
+                                <Image.Clip>
+                                    <EllipseGeometry RadiusX="10" RadiusY="10"/>
+                                </Image.Clip>
+                            </Image>
                             <StackPanel Orientation="Vertical" Height="24" VerticalAlignment="Bottom" Padding="5,1,5,1"
                                         Background="Gray" Opacity=".75">
                                 <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyTextBlockStyle}"/>
