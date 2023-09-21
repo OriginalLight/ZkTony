@@ -14,6 +14,8 @@
         <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
         <ApplicationIcon>Assets/WindowIcon.ico</ApplicationIcon>
         <ApplicationManifest>app.manifest</ApplicationManifest>
+        <PackageCertificateThumbprint>262C8CED3137187EFA41E3F0A187BF31ED1E886C</PackageCertificateThumbprint>
+        <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
     </PropertyGroup>
 
     <ItemGroup>
@@ -41,23 +43,16 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Logging\Logging.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
         <None Update="appsettings.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Libraries\Vision.dll">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 
     <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
         <ProjectCapability Include="Msix" />
-    </ItemGroup>
-	
-	<ItemGroup>
-		<None Include="Library\**">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
     </ItemGroup>
 
     <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">

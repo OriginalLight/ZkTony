@@ -5,7 +5,7 @@ namespace Exposure.Helpers;
 
 public class VisionHelper
 {
-    const string dll = @"Library\Vision.dll";
+    const string dll = "Vision.dll";
 
     [DllImport("kernel32.dll")]
     private static extern bool WriteFile(FileStream steam, IntPtr buffer, int numberOfBytesToWrite, out int lpNumberOfBytesWritten, IntPtr lpOverlapped);

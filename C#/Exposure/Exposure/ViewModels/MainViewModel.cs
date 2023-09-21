@@ -18,7 +18,7 @@ public partial class MainViewModel : ObservableRecipient, INavigationAware
 
     public void OnNavigatedTo(object parameter)
     {
-        _versionText = _visionService.GetVisionText();
+        VersionText = _visionService.GetVisionText();
     }
 
     public void OnNavigatedFrom()

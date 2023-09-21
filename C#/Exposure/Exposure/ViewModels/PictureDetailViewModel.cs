@@ -21,7 +21,7 @@ public partial class PictureDetailViewModel : ObservableRecipient, INavigationAw
     {
         if (parameter is Picture pi)
         {
-            item = pi;
+            Item = pi;
         }
     }
 
