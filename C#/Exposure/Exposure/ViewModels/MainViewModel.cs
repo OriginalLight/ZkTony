@@ -1,15 +1,13 @@
-﻿using System.Data;
-using System.Globalization;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Exposure.Contracts.Services;
-using System.Threading;
-using Windows.System;
+using DispatcherTimer = Microsoft.UI.Xaml.DispatcherTimer;
 
 namespace Exposure.ViewModels;
 
 public partial class MainViewModel : ObservableRecipient, IDisposable
 {
-    private readonly Timer _timer;
+    private readonly DispatcherTimer _dispatcherTimer;
     private readonly IVisionService _visionService;
 
     [ObservableProperty] private string _versionText = "Unknow";
@@ -17,20 +15,29 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
     public MainViewModel(IVisionService visionService)
     {
         _visionService = visionService;
-        _timer = new Timer(QueryTimerCallback, null, 0, 5000);
+        _dispatcherTimer = new DispatcherTimer();
+        _dispatcherTimer.Tick += QueryTimerCallback;
+        _dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
+        _dispatcherTimer.Start();
     }
     
-    private async void QueryTimerCallback(object? state)
+    [RelayCommand]
+    private async Task StartCapture()
+    {
+        await _visionService.StartCaptureAsync();
+    }
+    private async void QueryTimerCallback(object? sender, object e)
     {
         await _visionService.InitAsync();
         await _visionService.ConnectAsync();
         var temp = _visionService.GetAttributeFloatAsync("SensorTemperature");
+        var status = _visionService.GetAttributeIntAsync("DeviceStatus");
+        VersionText = $"SensorTemperature: {temp}";
     }
-    
 
     public async void Dispose()
     {
-        await _timer.DisposeAsync();
+        _dispatcherTimer.Stop();
         await _visionService.DisconnectAsync();
         await _visionService.UninitAsync();
     }

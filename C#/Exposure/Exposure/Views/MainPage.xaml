@@ -8,7 +8,8 @@
     behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
     mc:Ignorable="d">
 
-    <ScrollViewer>
+    <StackPanel Orientation="Vertical">
         <TextBlock Text="{x:Bind ViewModel.VersionText, Mode=OneWay}"></TextBlock>
-    </ScrollViewer>
+        <Button Content="拍摄" Command="{x:Bind ViewModel.StartCaptureCommand}"></Button>
+    </StackPanel>
 </Page>

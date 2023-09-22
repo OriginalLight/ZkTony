@@ -3,7 +3,7 @@ using System.Text;
 using Exposure.Contracts.Services;
 using Exposure.Helpers;
 using Exposure.Logging;
-using Windows.Storage;
+using OpenCvSharp;
 
 namespace Exposure.Services;
 
@@ -12,6 +12,12 @@ public class VisionService : IVisionService
     //存储用来判断是否已经格式化
     private bool _isInit;
     private IntPtr _deviceId = IntPtr.Zero;
+    private readonly ILocalSettingsService _localSettingsService;
+
+    public VisionService(ILocalSettingsService localSettingsService)
+    {
+        _localSettingsService = localSettingsService;
+    }
 
     public async Task InitAsync()
     {
@@ -62,7 +68,7 @@ public class VisionService : IVisionService
             _deviceId = IntPtr.Zero;
             return;
         }
-        
+
         var deviceId = VisionHelper.GetDeviceID(0);
         // DeviceInfo
         var device = new VisionHelper.SDeviceInfo();
@@ -72,7 +78,7 @@ public class VisionService : IVisionService
         var local = new VisionHelper.SNICInfo();
         VisionHelper.GetLocalNICInfo(deviceId, ref local);
         GlobalLog.Logger?.ReportInfo($"L_MAC：{Marshal.PtrToStringAnsi(local.pMAC)}");
-        
+
         // 判断Device的网段是否与Local的网段一致
         var deviceIp = Marshal.PtrToStringAnsi(device.pIP) ?? string.Empty;
         var localIp = Marshal.PtrToStringAnsi(local.pIP) ?? string.Empty;
@@ -93,7 +99,7 @@ public class VisionService : IVisionService
                 return;
             }
         }
-        
+
         // OpenDevice
         if (VisionHelper.OpenDevice(deviceId))
         {
@@ -103,7 +109,7 @@ public class VisionService : IVisionService
         {
             GlobalLog.Logger?.ReportError("OpenDevice 失败");
         }
-        
+
         _deviceId = deviceId;
 
         await Task.CompletedTask;
@@ -130,7 +136,7 @@ public class VisionService : IVisionService
         {
             return;
         }
-        
+
         var steam = VisionHelper.CreateStream(_deviceId!);
         GlobalLog.Logger?.ReportInfo(steam != IntPtr.Zero
             ? "CreateStream 成功"
@@ -142,27 +148,34 @@ public class VisionService : IVisionService
         var frame = VisionHelper.GetRawFrame(steam, ref iFrameId, ref iWidth, ref iHeight, ref iPixelBits);
         if (frame != IntPtr.Zero)
         {
-            var fileStream = new FileStream(Path.Combine(ApplicationData.Current.TemporaryFolder.Path, "frame.raw"), FileMode.OpenOrCreate, FileAccess.Write);
-            var binaryWriter = new BinaryWriter(fileStream);
-
             var iPixelNum = iWidth * iHeight;
+            var bytes = new byte[iPixelNum * sizeof(ushort)];
             for (var k = 0; k < iPixelNum; k++)
             {
                 var iPixelValue = VisionHelper.GetRawPixelValue(frame, iPixelBits, k);
-                binaryWriter.Write(iPixelValue);
+                var pixelBytes = BitConverter.GetBytes(iPixelValue);
+                Array.Copy(pixelBytes, 0, bytes, k * sizeof(ushort), sizeof(ushort));
             }
-            fileStream.Close();
+            var rawImage = new Mat(iHeight, iWidth, MatType.CV_16U, bytes);
+            var root = await _localSettingsService.ReadSettingAsync<string>("Storage") ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var now = DateTime.Now.ToString("yyyy-MM-dd");
+            if (!Directory.Exists(Path.Combine(root, now)))
+            {
+                Directory.CreateDirectory(Path.Combine(root, now));
+            }
+            var fileName = DateTime.Now.ToString("HH-mm-ss") + ".tiff";
+            var outImage = Path.Combine(Path.Combine(root, now), fileName);
+            rawImage.SaveImage(outImage);
             GlobalLog.Logger?.ReportInfo($"GetRawFrame 成功 {iWidth}x{iHeight}");
         }
         else
         {
             GlobalLog.Logger?.ReportInfo("GetRawFrame 失败");
         }
-        
+
         VisionHelper.StopStream(steam);
         VisionHelper.DestroyStream(steam);
 
-        await Task.CompletedTask;
     }
 
     public bool SetAttributeIntAsync(long value, string attribute)
@@ -198,7 +211,7 @@ public class VisionService : IVisionService
         {
             return -1L;
         }
-        
+
         var att = Marshal.StringToHGlobalAnsi(attribute);
         var iValue = 0L;
         if (VisionHelper.GetAttrInt(_deviceId, att, ref iValue, 0))
@@ -211,7 +224,7 @@ public class VisionService : IVisionService
     }
 
     public bool SetAttributeFloatAsync(double value, string attribute)
-    { 
+    {
         if (!_isInit)
         {
             return false;
@@ -242,7 +255,7 @@ public class VisionService : IVisionService
         {
             return -1.0;
         }
-        
+
         var att = Marshal.StringToHGlobalAnsi(attribute);
         var dValue = 0.0;
         if (VisionHelper.GetAttrFloat(_deviceId, att, ref dValue, 0))
@@ -264,14 +277,14 @@ public class VisionService : IVisionService
         {
             return string.Empty;
         }
-        
+
         var att = Marshal.StringToHGlobalAnsi(attribute);
         var sValue = new StringBuilder(128);
         if (VisionHelper.GetAttrString(_deviceId, att, sValue, 0))
         {
             return sValue.ToString();
         }
-        
+
         GlobalLog.Logger?.ReportError($"GetAttrString {attribute} 失败");
         return string.Empty;
     }
@@ -297,7 +310,7 @@ public class VisionService : IVisionService
             {
                 continue;
             }
-            
+
             var attrType = 0;
             if (!VisionHelper.GetAttributeType(_deviceId, attrName, ref attrType))
             {
@@ -307,119 +320,124 @@ public class VisionService : IVisionService
             switch (attrType)
             {
                 case 0:
-                {
-                    long iValue = 0;
-                    if (VisionHelper.GetAttrMaxInt(_deviceId, attrName, ref iValue))
                     {
-                        GlobalLog.Logger?.ReportInfo($"GetAttrMaxInt {Marshal.PtrToStringAnsi(attrName)} 成功 {iValue}");
-                    }
-                    else
-                    {
-                        GlobalLog.Logger?.ReportError($"GetAttrMaxInt {Marshal.PtrToStringAnsi(attrName)} 失败");
-                    }
-
-                    if (VisionHelper.GetAttrMinInt(_deviceId, attrName, ref iValue))
-                    {
-                        GlobalLog.Logger?.ReportInfo($"GetAttrMinInt {Marshal.PtrToStringAnsi(attrName)} 成功 {iValue}");
-                    } 
-                    else
-                    {
-                        GlobalLog.Logger?.ReportError($"GetAttrMinInt {Marshal.PtrToStringAnsi(attrName)} 失败");
-                    }
-
-                    if (VisionHelper.GetAttrInt(_deviceId, attrName, ref iValue, 0))
-                    {
-                        GlobalLog.Logger?.ReportInfo($"GetAttrInt {Marshal.PtrToStringAnsi(attrName)} 成功 {iValue}");
-                    }
-                    else
-                    {
-                        GlobalLog.Logger?.ReportError($"GetAttrInt {Marshal.PtrToStringAnsi(attrName)} 失败");
-                    }
-                } break;
-                case 1:
-                {
-                    double dValue = 0;
-                    if (VisionHelper.GetAttrMaxFloat(_deviceId, attrName, ref dValue))
-                    {
-                        GlobalLog.Logger?.ReportInfo($"GetAttrMaxFloat {Marshal.PtrToStringAnsi(attrName)} 成功 {dValue}");
-                    }
-                    else
-                    {
-                        GlobalLog.Logger?.ReportError($"GetAttrMaxFloat {Marshal.PtrToStringAnsi(attrName)} 失败");
-                    }
-
-                    if (VisionHelper.GetAttrMinFloat(_deviceId, attrName, ref dValue))
-                    {
-                        GlobalLog.Logger?.ReportInfo($"GetAttrMinFloat {Marshal.PtrToStringAnsi(attrName)} 成功 {dValue}");
-                    }
-                    else
-                    {
-                        GlobalLog.Logger?.ReportError($"GetAttrMinFloat {Marshal.PtrToStringAnsi(attrName)} 失败");
-                    }
-
-                    if (VisionHelper.GetAttrFloat(_deviceId,attrName, ref dValue, 0))
-                    {
-                        GlobalLog.Logger?.ReportInfo($"GetAttrFloat {Marshal.PtrToStringAnsi(attrName)} 成功 {dValue}");
-                    }
-                    else
-                    {
-                        GlobalLog.Logger?.ReportError($"GetAttrFloat {Marshal.PtrToStringAnsi(attrName)} 失败");
-                    }
-                } break;
-                case 2:
-                {
-                    var sValue = new StringBuilder(128);
-                    if (VisionHelper.GetAttrString(_deviceId, attrName, sValue, 0))
-                    {
-                        GlobalLog.Logger?.ReportInfo($"GetAttrString {Marshal.PtrToStringAnsi(attrName)} 成功 {sValue}");
-                    }
-                    else
-                    {
-                        GlobalLog.Logger?.ReportError($"GetAttrString {Marshal.PtrToStringAnsi(attrName)} 失败");
-                    }
-                } break;
-                case 3:
-                {
-                    var iEntryNumber = VisionHelper.GetNumberOfEntry(_deviceId, attrName);
-                    for (var k = 0; k < iEntryNumber; k++)
-                    {
-                        var id = VisionHelper.GetEntryID(_deviceId, attrName, (uint)k);
-                        var pName = VisionHelper.GetEntryName(_deviceId, attrName, (uint)k);
-                        if (id != -1 && pName != IntPtr.Zero)
+                        long iValue = 0;
+                        if (VisionHelper.GetAttrMaxInt(_deviceId, attrName, ref iValue))
                         {
-                            Console.WriteLine("      {0:D}={1}", id, Marshal.PtrToStringAnsi(pName));
+                            GlobalLog.Logger?.ReportInfo($"GetAttrMaxInt {Marshal.PtrToStringAnsi(attrName)} 成功 {iValue}");
                         }
                         else
                         {
-                            Console.WriteLine("	   Fail to get the entry with index={0:D}", k);
+                            GlobalLog.Logger?.ReportError($"GetAttrMaxInt {Marshal.PtrToStringAnsi(attrName)} 失败");
+                        }
+
+                        if (VisionHelper.GetAttrMinInt(_deviceId, attrName, ref iValue))
+                        {
+                            GlobalLog.Logger?.ReportInfo($"GetAttrMinInt {Marshal.PtrToStringAnsi(attrName)} 成功 {iValue}");
+                        }
+                        else
+                        {
+                            GlobalLog.Logger?.ReportError($"GetAttrMinInt {Marshal.PtrToStringAnsi(attrName)} 失败");
+                        }
+
+                        if (VisionHelper.GetAttrInt(_deviceId, attrName, ref iValue, 0))
+                        {
+                            GlobalLog.Logger?.ReportInfo($"GetAttrInt {Marshal.PtrToStringAnsi(attrName)} 成功 {iValue}");
+                        }
+                        else
+                        {
+                            GlobalLog.Logger?.ReportError($"GetAttrInt {Marshal.PtrToStringAnsi(attrName)} 失败");
                         }
                     }
+                    break;
+                case 1:
+                    {
+                        double dValue = 0;
+                        if (VisionHelper.GetAttrMaxFloat(_deviceId, attrName, ref dValue))
+                        {
+                            GlobalLog.Logger?.ReportInfo($"GetAttrMaxFloat {Marshal.PtrToStringAnsi(attrName)} 成功 {dValue}");
+                        }
+                        else
+                        {
+                            GlobalLog.Logger?.ReportError($"GetAttrMaxFloat {Marshal.PtrToStringAnsi(attrName)} 失败");
+                        }
 
-                    long iEntryId = 0;
-                    if (VisionHelper.GetAttrInt(_deviceId, attrName, ref iEntryId, 0))
-                    {
-                        Console.WriteLine("    Current Value={0:D} text={1}", iEntryId, Marshal.PtrToStringAnsi(VisionHelper.GetEntryNameByID(_deviceId, attrName, (uint)iEntryId)));
+                        if (VisionHelper.GetAttrMinFloat(_deviceId, attrName, ref dValue))
+                        {
+                            GlobalLog.Logger?.ReportInfo($"GetAttrMinFloat {Marshal.PtrToStringAnsi(attrName)} 成功 {dValue}");
+                        }
+                        else
+                        {
+                            GlobalLog.Logger?.ReportError($"GetAttrMinFloat {Marshal.PtrToStringAnsi(attrName)} 失败");
+                        }
+
+                        if (VisionHelper.GetAttrFloat(_deviceId, attrName, ref dValue, 0))
+                        {
+                            GlobalLog.Logger?.ReportInfo($"GetAttrFloat {Marshal.PtrToStringAnsi(attrName)} 成功 {dValue}");
+                        }
+                        else
+                        {
+                            GlobalLog.Logger?.ReportError($"GetAttrFloat {Marshal.PtrToStringAnsi(attrName)} 失败");
+                        }
                     }
-                    else
+                    break;
+                case 2:
                     {
-                        Console.WriteLine("    Current Value=Error:{0}", Marshal.PtrToStringAnsi(VisionHelper.GetLastErrorText()));
+                        var sValue = new StringBuilder(128);
+                        if (VisionHelper.GetAttrString(_deviceId, attrName, sValue, 0))
+                        {
+                            GlobalLog.Logger?.ReportInfo($"GetAttrString {Marshal.PtrToStringAnsi(attrName)} 成功 {sValue}");
+                        }
+                        else
+                        {
+                            GlobalLog.Logger?.ReportError($"GetAttrString {Marshal.PtrToStringAnsi(attrName)} 失败");
+                        }
                     }
-                    if (VisionHelper.SetAttrInt(_deviceId, attrName, iEntryId, 0))
+                    break;
+                case 3:
                     {
-                        Console.WriteLine("    New Value={0:D}", iEntryId);
+                        var iEntryNumber = VisionHelper.GetNumberOfEntry(_deviceId, attrName);
+                        for (var k = 0; k < iEntryNumber; k++)
+                        {
+                            var id = VisionHelper.GetEntryID(_deviceId, attrName, (uint)k);
+                            var pName = VisionHelper.GetEntryName(_deviceId, attrName, (uint)k);
+                            if (id != -1 && pName != IntPtr.Zero)
+                            {
+                                Console.WriteLine("      {0:D}={1}", id, Marshal.PtrToStringAnsi(pName));
+                            }
+                            else
+                            {
+                                Console.WriteLine("	   Fail to get the entry with index={0:D}", k);
+                            }
+                        }
+
+                        long iEntryId = 0;
+                        if (VisionHelper.GetAttrInt(_deviceId, attrName, ref iEntryId, 0))
+                        {
+                            Console.WriteLine("    Current Value={0:D} text={1}", iEntryId, Marshal.PtrToStringAnsi(VisionHelper.GetEntryNameByID(_deviceId, attrName, (uint)iEntryId)));
+                        }
+                        else
+                        {
+                            Console.WriteLine("    Current Value=Error:{0}", Marshal.PtrToStringAnsi(VisionHelper.GetLastErrorText()));
+                        }
+                        if (VisionHelper.SetAttrInt(_deviceId, attrName, iEntryId, 0))
+                        {
+                            Console.WriteLine("    New Value={0:D}", iEntryId);
+                        }
+                        else
+                        {
+                            Console.WriteLine("    Current Value=Error:{0}", Marshal.PtrToStringAnsi(VisionHelper.GetLastErrorText()));
+                        }
                     }
-                    else
-                    {
-                        Console.WriteLine("    Current Value=Error:{0}", Marshal.PtrToStringAnsi(VisionHelper.GetLastErrorText()));
-                    }
-                } break;
+                    break;
                 default:
-                {
-                    GlobalLog.Logger?.ReportError($"UnSupport AttrType {attrType}");
-                } break;
+                    {
+                        GlobalLog.Logger?.ReportError($"UnSupport AttrType {attrType}");
+                    }
+                    break;
             }
         }
-        
+
         await Task.CompletedTask;
     }
 }

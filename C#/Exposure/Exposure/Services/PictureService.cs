@@ -35,6 +35,6 @@ public partial class PictureService : IPictureService
             return new List<Picture>();
         }
         var ps = Directory.GetFiles(full);
-        return (from p in ps where p.EndsWith(".jpg") || p.EndsWith(".png") select new Picture { Name = Path.GetFileNameWithoutExtension(p), Path = p }).ToList();
+        return (from p in ps where p.EndsWith(".jpg") || p.EndsWith(".png") || p.EndsWith(".tiff") select new Picture { Name = Path.GetFileNameWithoutExtension(p), Path = p }).ToList();
     }
 }
