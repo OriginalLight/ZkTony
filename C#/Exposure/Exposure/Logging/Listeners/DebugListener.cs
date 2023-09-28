@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Text;
 
 namespace Exposure.Logging.Listeners;
+
 public class DebugListener : ListenerBase
 {
     public DebugListener(string name)
@@ -26,7 +27,8 @@ public class DebugListener : ListenerBase
     private void DebugHandleLogEvent(LogEvent evt)
     {
         var sb = new StringBuilder();
-        sb.Append(CultureInfo.InvariantCulture, $"[{evt.FullSourceName}] {evt.Severity.ToString().ToUpper(CultureInfo.InvariantCulture)}: {evt.Message}");
+        sb.Append(CultureInfo.InvariantCulture,
+            $"[{evt.FullSourceName}] {evt.Severity.ToString().ToUpper(CultureInfo.InvariantCulture)}: {evt.Message}");
         if (evt.Exception != null)
         {
             sb.Append(CultureInfo.InvariantCulture, $"{Environment.NewLine}{evt.Exception}");

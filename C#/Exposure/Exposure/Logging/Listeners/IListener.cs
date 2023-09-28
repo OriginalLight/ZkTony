@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 namespace Exposure.Logging.Listeners;
+
 public interface IListener
 {
     string Name

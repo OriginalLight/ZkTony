@@ -4,8 +4,20 @@
 using Exposure.Logging.Helpers;
 
 namespace Exposure.Logging;
+
 public class LogEvent
 {
+    private LogEvent(string source, string subSource, SeverityLevel severity, string message, Exception exception,
+        TimeSpan elapsed)
+    {
+        Source = source;
+        SubSource = subSource;
+        Severity = severity;
+        Message = message;
+        Exception = exception;
+        Elapsed = elapsed;
+    }
+
     public string Source
     {
         get;
@@ -37,31 +49,11 @@ public class LogEvent
         private set;
     }
 
-    internal void SetElapsed(TimeSpan elapsed) => Elapsed = elapsed;
-
     public static long NoElapsedTicks => -1L;
 
-    public static TimeSpan NoElapsed => new (NoElapsedTicks);
+    public static TimeSpan NoElapsed => new(NoElapsedTicks);
 
     public bool HasElapsed => Elapsed.Ticks >= 0;
-
-    private LogEvent(string source, string subSource, SeverityLevel severity, string message, Exception exception, TimeSpan elapsed)
-    {
-        Source = source;
-        SubSource = subSource;
-        Severity = severity;
-        Message = message;
-        Exception = exception;
-        Elapsed = elapsed;
-    }
-
-    public static LogEvent Create(string source, string subSource, SeverityLevel severity, string message) => Create(source, subSource, severity, message, null, NoElapsed);
-
-    public static LogEvent Create(string source, string subSource, SeverityLevel severity, string message, Exception exception) => Create(source, subSource, severity, message, exception, NoElapsed);
-
-    public static LogEvent Create(string source, string subSource, SeverityLevel severity, string message, TimeSpan elapsed) => Create(source, subSource, severity, message, null, elapsed);
-
-    public static LogEvent Create(string source, string subSource, SeverityLevel severity, string message, Exception? exception, TimeSpan elapsed) => new (source, subSource, severity, message, exception!, elapsed);
 
     public string FullSourceName
     {
@@ -71,12 +63,24 @@ public class LogEvent
             {
                 return $"{Source}/{SubSource}";
             }
-            else
-            {
-                return Source;
-            }
+
+            return Source;
         }
     }
+
+    internal void SetElapsed(TimeSpan elapsed) => Elapsed = elapsed;
+
+    public static LogEvent Create(string source, string subSource, SeverityLevel severity, string message) =>
+        Create(source, subSource, severity, message, null, NoElapsed);
+
+    public static LogEvent Create(string source, string subSource, SeverityLevel severity, string message,
+        Exception exception) => Create(source, subSource, severity, message, exception, NoElapsed);
+
+    public static LogEvent Create(string source, string subSource, SeverityLevel severity, string message,
+        TimeSpan elapsed) => Create(source, subSource, severity, message, null, elapsed);
+
+    public static LogEvent Create(string source, string subSource, SeverityLevel severity, string message,
+        Exception? exception, TimeSpan elapsed) => new(source, subSource, severity, message, exception!, elapsed);
 
     public override string ToString()
     {
@@ -84,19 +88,20 @@ public class LogEvent
 
         if (hasException && HasElapsed)
         {
-            return "[{0}] {1} {2} {3} {4}".FormatInvariant(FullSourceName, Severity.ToString(), Message, Exception!, Elapsed);
+            return "[{0}] {1} {2} {3} {4}".FormatInvariant(FullSourceName, Severity.ToString(), Message, Exception!,
+                Elapsed);
         }
-        else if (hasException && !HasElapsed)
+
+        if (hasException && !HasElapsed)
         {
             return "[{0}] {1} {2} {3}".FormatInvariant(FullSourceName, Severity.ToString(), Message, Exception!);
         }
-        else if (!hasException && HasElapsed)
+
+        if (!hasException && HasElapsed)
         {
             return "[{0}] {1} {2} {3}".FormatInvariant(FullSourceName, Severity.ToString(), Message, Elapsed);
         }
-        else
-        {
-            return "[{0}] {1} {2}".FormatInvariant(FullSourceName, Severity.ToString(), Message);
-        }
+
+        return "[{0}] {1} {2}".FormatInvariant(FullSourceName, Severity.ToString(), Message);
     }
 }

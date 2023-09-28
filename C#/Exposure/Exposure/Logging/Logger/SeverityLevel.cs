@@ -2,13 +2,14 @@
 // Licensed under the MIT license.
 
 namespace Exposure.Logging;
+
 public enum SeverityLevel
 {
     Debug,
     Info,
     Warn,
     Error,
-    Critical,
+    Critical
 }
 
 // For setting fail-fast behavior, at what level of failure will we conduct a fail-fast?
@@ -19,19 +20,17 @@ public enum FailFastSeverityLevel
     Ignore = -1,
     Warning = SeverityLevel.Warn,
     Error = SeverityLevel.Error,
-    Critical = SeverityLevel.Critical,
+    Critical = SeverityLevel.Critical
 }
 
 public class FailFast
 {
-    public static bool IsFailFastSeverityLevel(SeverityLevel severity, FailFastSeverityLevel failFastSeverity)
-    {
-        return failFastSeverity switch
+    public static bool IsFailFastSeverityLevel(SeverityLevel severity, FailFastSeverityLevel failFastSeverity) =>
+        failFastSeverity switch
         {
             FailFastSeverityLevel.Warning => severity >= SeverityLevel.Warn,
             FailFastSeverityLevel.Error => severity >= SeverityLevel.Error,
             FailFastSeverityLevel.Critical => severity >= SeverityLevel.Critical,
-            _ => false,
+            _ => false
         };
-    }
 }

@@ -2,7 +2,12 @@
 // Licensed under the MIT license.
 
 namespace Exposure.Logging;
+
 public partial class Options
 {
-    public bool DebugListenerEnabled { get; set; } = true;
+    public bool DebugListenerEnabled
+    {
+        get;
+        set;
+    } = true;
 }

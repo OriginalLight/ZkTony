@@ -1,24 +1,29 @@
 ﻿using System.Collections.ObjectModel;
-
 using CommunityToolkit.Mvvm.ComponentModel;
-
 using Exposure.Contracts.Services;
 using Exposure.Contracts.ViewModels;
 using Exposure.Models;
 
 namespace Exposure.ViewModels;
 
-public partial class PictureViewModel : ObservableRecipient, INavigationAware
+public class PictureViewModel : ObservableRecipient, INavigationAware
 {
     private readonly IPictureService _pictureService;
-
-    public ObservableCollection<string> Folders { get; } = new();
-    public ObservableCollection<Picture> Pictures { get; } = new();
 
     public PictureViewModel(IPictureService pictureService)
     {
         _pictureService = pictureService;
     }
+
+    public ObservableCollection<string> Folders
+    {
+        get;
+    } = new();
+
+    public ObservableCollection<Picture> Pictures
+    {
+        get;
+    } = new();
 
     public async void OnNavigatedTo(object parameter)
     {
@@ -29,6 +34,7 @@ public partial class PictureViewModel : ObservableRecipient, INavigationAware
         {
             Folders.Add(folder);
         }
+
         var first = Folders.LastOrDefault();
         if (first == null)
         {
@@ -36,7 +42,7 @@ public partial class PictureViewModel : ObservableRecipient, INavigationAware
         }
 
         var pictures = await _pictureService.GetPicturesAsync(first);
-        foreach (var picture in pictures)
+        foreach (var picture in pictures.Reverse())
         {
             Pictures.Add(picture);
         }

@@ -4,9 +4,12 @@
 using System.Globalization;
 
 namespace Exposure.Logging.Listeners;
+
 public class LogFileListener : ListenerBase, IDisposable
 {
     private readonly TextWriter? writer;
+
+    private bool disposed; // To detect redundant calls
 
     public LogFileListener(string name, string filename)
         : base(name)
@@ -25,15 +28,16 @@ public class LogFileListener : ListenerBase, IDisposable
         }
     }
 
-    public override void HandleLogEvent(LogEvent evt)
+    public void Dispose()
     {
-        HandleLogFileEvent(evt, true);
+        // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
-    private void HandleLogFileEvent(LogEvent evt, bool newline)
-    {
-        HandleLogFileEvent(evt, newline, LogEvent.NoElapsed);
-    }
+    public override void HandleLogEvent(LogEvent evt) => HandleLogFileEvent(evt, true);
+
+    private void HandleLogFileEvent(LogEvent evt, bool newline) => HandleLogFileEvent(evt, newline, LogEvent.NoElapsed);
 
     private void HandleLogFileEvent(LogEvent evt, bool newline, TimeSpan elapsed)
     {
@@ -42,7 +46,8 @@ public class LogFileListener : ListenerBase, IDisposable
             return;
         }
 
-        writer?.Write($"[{DateTime.UtcNow:yyyy/MM/dd hh\\:mm\\:ss\\.ffff}][{evt.FullSourceName}] {evt.Severity.ToString().ToUpper(CultureInfo.InvariantCulture)}: {evt.Message}");
+        writer?.Write(
+            $"[{DateTime.UtcNow:yyyy/MM/dd hh\\:mm\\:ss\\.ffff}][{evt.FullSourceName}] {evt.Severity.ToString().ToUpper(CultureInfo.InvariantCulture)}: {evt.Message}");
         if (elapsed != LogEvent.NoElapsed)
         {
             writer?.Write($" [Elapsed: {elapsed:hh\\:mm\\:ss\\.ffffff}]");
@@ -72,8 +77,6 @@ public class LogFileListener : ListenerBase, IDisposable
 
     private bool MeetsFilter(LogEvent evt) => evt?.Severity >= Options?.LogFileFilter;
 
-    private bool disposed; // To detect redundant calls
-
     protected virtual void Dispose(bool disposing)
     {
         if (disposed)
@@ -87,12 +90,5 @@ public class LogFileListener : ListenerBase, IDisposable
         }
 
         disposed = true;
-    }
-
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 }

@@ -172,7 +172,7 @@
     <value>Storage</value>
   </data>
   <data name="Domain.Content" xml:space="preserve">
-    <value>公司网站</value>
+    <value>Domain</value>
   </data>
   <data name="Domain.NavigateUri" xml:space="preserve">
     <value>https://www.zktony.com</value>
@@ -186,5 +186,20 @@
   </data>
   <data name="Shell_Picture.Content" xml:space="preserve">
     <value>Picture</value>
+  </data>
+  <data name="Calibrate" xml:space="preserve">
+    <value>Calibrate</value>
+  </data>
+  <data name="ExposureTime.Header" xml:space="preserve">
+    <value>ExposureTime</value>
+  </data>
+  <data name="OffsetX.Header" xml:space="preserve">
+    <value>OffsetX</value>
+  </data>
+  <data name="OffsetY.Header" xml:space="preserve">
+    <value>OffsetY</value>
+  </data>
+  <data name="Shooting" xml:space="preserve">
+    <value>Shooting</value>
   </data>
 </root>

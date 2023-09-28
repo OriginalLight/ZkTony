@@ -42,7 +42,7 @@
                     <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/WindowIcon.ico" />
                 </labs:SettingsCard.HeaderIcon>
                 <Button Click="{x:Bind ViewModel.CopyVersion, Mode=OneWay}">
-                    <FontIcon Glyph="&#xE8C8;"/>
+                    <FontIcon Glyph="&#xE8C8;" />
                 </Button>
             </labs:SettingsCard>
             <labs:SettingsCard x:Uid="Settings_Log">
@@ -50,7 +50,7 @@
                     <FontIcon Glyph="&#xE8E5;" />
                 </labs:SettingsCard.HeaderIcon>
                 <Button Click="{x:Bind ViewModel.OpenLogsAsync, Mode=OneWay}">
-                    <FontIcon Glyph="&#xE8A7;"/>
+                    <FontIcon Glyph="&#xE8A7;" />
                 </Button>
             </labs:SettingsCard>
             <labs:SettingsExpander x:Uid="Settings_UsefulLinks">

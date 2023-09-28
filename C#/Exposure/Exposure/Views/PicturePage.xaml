@@ -10,13 +10,13 @@
     mc:Ignorable="d"
     Loaded="Page_Loaded">
 
-    <Grid Padding="8">
+    <Grid Padding="8" RowSpacing="16">
         <Grid.RowDefinitions>
-            <RowDefinition Height="32"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="32" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <StackPanel Height="32" Orientation="Horizontal" Spacing="16" Grid.Row="0" Padding="4,0,4,0">
+        <StackPanel Height="32" Orientation="Horizontal" Spacing="16" Grid.Row="0">
             <AutoSuggestBox
                 x:Name="AutoSuggestBox"
                 MinWidth="300"
@@ -26,11 +26,15 @@
                 QueryIcon="Find"
                 TextChanged="TextChanged"
                 SuggestionChosen="SuggestionChosen"
-                QuerySubmitted="QuerySubmitted"/>
-            <CalendarDatePicker x:Name="CalendarDatePicker" DateChanged="DateChanged"/>
+                QuerySubmitted="QuerySubmitted" />
+            <CalendarDatePicker DateChanged="DateChanged" />
         </StackPanel>
 
-        <ScrollViewer Grid.Row="1" Padding="0,8,0,0">
+        <ScrollViewer
+            Grid.Row="1"
+            Padding="8"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+            CornerRadius="4">
             <GridView
                 AutomationProperties.AccessibilityView="Raw"
                 VirtualizingStackPanel.VirtualizationMode="Recycling"
@@ -39,20 +43,15 @@
                 ItemClick="OnItemClick"
                 ItemsSource="{x:Bind ViewModel.Pictures,Mode=OneWay}"
                 SelectionMode="None">
-                <GridView.ItemContainerStyle>
-                    <Style TargetType="GridViewItem">
-                        <Setter Property="Margin" Value="4"/>
-                    </Style>
-                </GridView.ItemContainerStyle>
                 <GridView.ItemTemplate>
                     <DataTemplate x:DataType="models:Picture">
-                        <Grid Width="250">
-                            <Border CornerRadius="4,4,0,0">
+                        <Grid Width="200" Height="160">
+                            <Border CornerRadius="4">
                                 <Image Source="{x:Bind Path}" Stretch="UniformToFill" />
                             </Border>
                             <StackPanel Orientation="Vertical" Height="24" VerticalAlignment="Bottom" Padding="5,1,5,1"
                                         Background="Gray" Opacity=".75">
-                                <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyTextBlockStyle}"/>
+                                <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyTextBlockStyle}" />
                             </StackPanel>
                         </Grid>
                     </DataTemplate>

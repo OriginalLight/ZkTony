@@ -38,7 +38,7 @@
                         VerticalAlignment="Top"
                         RelativePanel.AlignTopWithPanel="True"
                         RelativePanel.AlignLeftWithPanel="True">
-                        <Image Source="{x:Bind ViewModel.Item.Path}" Stretch="UniformToFill"/>
+                        <Image Source="{x:Bind ViewModel.Item.Path}" Stretch="UniformToFill" />
                     </Grid>
                 </RelativePanel>
             </StackPanel>

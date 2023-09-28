@@ -1,12 +1,12 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Windows.ApplicationModel;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
+using Windows.System;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Exposure.Contracts.Services;
 using Exposure.Logging;
 using Microsoft.UI.Xaml;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage;
-using Windows.System;
 
 namespace Exposure.ViewModels;
 
@@ -47,7 +47,8 @@ public partial class SettingsViewModel : ObservableRecipient
             };
             data.SetText(GetVersion());
 
-            Clipboard.SetContentWithOptions(data, new ClipboardContentOptions() { IsAllowedInHistory = true, IsRoamable = true });
+            Clipboard.SetContentWithOptions(data,
+                new ClipboardContentOptions { IsAllowedInHistory = true, IsRoamable = true });
             Clipboard.Flush();
         }
         catch (Exception ex)
@@ -95,6 +96,5 @@ public partial class SettingsViewModel : ObservableRecipient
         var buildConfiguration = "RELEASE";
 #endif
         return $"{version} | {architecture} | {buildConfiguration}";
-
     }
 }

@@ -7,15 +7,15 @@ namespace Exposure.Views;
 
 public sealed partial class PicturePage : Page
 {
-    public PictureViewModel ViewModel
-    {
-        get;
-    }
-
     public PicturePage()
     {
         ViewModel = App.GetService<PictureViewModel>();
         InitializeComponent();
+    }
+
+    public PictureViewModel ViewModel
+    {
+        get;
     }
 
     private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -34,7 +34,8 @@ public sealed partial class PicturePage : Page
             return;
         }
 
-        var suggestions = ViewModel.Folders.Where(p => p.StartsWith(sender.Text, StringComparison.OrdinalIgnoreCase)).ToList();
+        var suggestions = ViewModel.Folders.Where(p => p.StartsWith(sender.Text, StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
         if (suggestions.Count > 0)
         {
@@ -48,15 +49,11 @@ public sealed partial class PicturePage : Page
         await ViewModel.OnFolderChanged(sender.Text);
     }
 
-    private async void QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
-    {
+    private async void QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args) =>
         await ViewModel.OnFolderChanged(args.QueryText);
-    }
 
-    private async void SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-    {
+    private async void SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args) =>
         await ViewModel.OnFolderChanged(sender.Text);
-    }
 
     private async void DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
     {
@@ -65,6 +62,7 @@ public sealed partial class PicturePage : Page
         {
             return;
         }
+
         var text = date.Value.ToString("yyyy-MM-dd");
         AutoSuggestBox.Text = text;
         await ViewModel.OnFolderChanged(text);
@@ -76,6 +74,7 @@ public sealed partial class PicturePage : Page
         {
             return;
         }
+
         var navigationService = App.GetService<INavigationService>();
         navigationService.SetListDataItemForNextConnectedAnimation(e.ClickedItem);
         navigationService.NavigateTo(typeof(PictureDetailViewModel).FullName!, e.ClickedItem);

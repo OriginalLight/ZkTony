@@ -6,7 +6,7 @@ using Windows.Storage;
 namespace Exposure.Logging;
 
 /// <summary>
-/// A logger for an individual component; each component's logs go to a different file.
+///     A logger for an individual component; each component's logs go to a different file.
 /// </summary>
 public class ComponentLogger : IDisposable
 {
@@ -43,6 +43,13 @@ public class ComponentLogger : IDisposable
         }
     }
 
+    public void Dispose()
+    {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
     public void Attach(Logger logger)
     {
         if (logger is not null)
@@ -69,7 +76,7 @@ public class ComponentLogger : IDisposable
             LogStdoutFilter = SeverityLevel.Info,
             LogFileFilter = SeverityLevel.Info,
 #endif
-            FailFastSeverity = FailFastSeverityLevel.Critical,
+            FailFastSeverity = FailFastSeverityLevel.Critical
         };
     }
 
@@ -85,12 +92,5 @@ public class ComponentLogger : IDisposable
 
             disposedValue = true;
         }
-    }
-
-    public void Dispose()
-    {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
     }
 }

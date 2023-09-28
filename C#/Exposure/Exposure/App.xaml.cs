@@ -1,17 +1,14 @@
 ﻿using Exposure.Activation;
 using Exposure.Contracts.Services;
+using Exposure.Logging;
 using Exposure.Models;
 using Exposure.Notifications;
 using Exposure.Services;
 using Exposure.ViewModels;
 using Exposure.Views;
-
-using Exposure.Logging;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.UI.Xaml;
-
 using UnhandledExceptionEventArgs = Microsoft.UI.Xaml.UnhandledExceptionEventArgs;
 
 namespace Exposure;
@@ -61,7 +58,8 @@ public partial class App
                 services.AddTransient<PictureDetailPage>();
 
                 // Configuration
-                services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+                services.Configure<LocalSettingsOptions>(
+                    context.Configuration.GetSection(nameof(LocalSettingsOptions)));
             }).Build();
 
         GetService<IAppNotificationService>().Initialize();
@@ -96,12 +94,10 @@ public partial class App
         return service;
     }
 
-    private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-    {
+    private void App_UnhandledException(object sender, UnhandledExceptionEventArgs e) =>
         GlobalLog.Logger?.ReportError(e.Exception.Message);
-        // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
-    }
 
+    // https://docs.microsoft.com/windows/windows-app-sdk/api/winrt/microsoft.ui.xaml.application.unhandledexception.
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
         base.OnLaunched(args);

@@ -4,6 +4,7 @@
 using Exposure.Logging.Listeners;
 
 namespace Exposure.Logging;
+
 public interface ILoggerHost : IDisposable
 {
     string Name
@@ -27,11 +28,12 @@ public interface ILoggerHost : IDisposable
 
     void ReportEvent(string component, SeverityLevel severity, string message);
 
-    void ReportEvent(string component, SeverityLevel severity, string message, System.Exception exception);
+    void ReportEvent(string component, SeverityLevel severity, string message, Exception exception);
 
     void ReportEvent(string component, string subComponent, SeverityLevel severity, string message);
 
-    void ReportEvent(string component, string subComponent, SeverityLevel severity, string message, System.Exception exception);
+    void ReportEvent(string component, string subComponent, SeverityLevel severity, string message,
+        Exception exception);
 
     void ReportDebug(string component, string message);
 

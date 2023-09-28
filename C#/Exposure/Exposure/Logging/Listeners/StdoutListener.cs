@@ -4,6 +4,7 @@
 using System.Globalization;
 
 namespace Exposure.Logging.Listeners;
+
 public class StdoutListener : ListenerBase
 {
     private static readonly ConsoleColor CDefaultColor = ConsoleColor.White;
@@ -21,15 +22,10 @@ public class StdoutListener : ListenerBase
     {
     }
 
-    public override void HandleLogEvent(LogEvent evt)
-    {
-        ConsoleHandleLogEvent(evt, true);
-    }
+    public override void HandleLogEvent(LogEvent evt) => ConsoleHandleLogEvent(evt, true);
 
-    private void ConsoleHandleLogEvent(LogEvent evt, bool newline)
-    {
+    private void ConsoleHandleLogEvent(LogEvent evt, bool newline) =>
         ConsoleHandleLogEvent(evt, newline, LogEvent.NoElapsed);
-    }
 
     private void ConsoleHandleLogEvent(LogEvent evt, bool newline, TimeSpan elapsed)
     {
@@ -41,11 +37,11 @@ public class StdoutListener : ListenerBase
         var line = new List<Tuple<ConsoleColor, string>>
         {
             Tuple.Create(CDefaultColor, "["),
-            Tuple.Create(CSourceColor, (evt.SubSource != null) ? $"{evt.Source}/{evt.SubSource}" : $"{evt.Source}"),
+            Tuple.Create(CSourceColor, evt.SubSource != null ? $"{evt.Source}/{evt.SubSource}" : $"{evt.Source}"),
             Tuple.Create(CDefaultColor, "] "),
             Tuple.Create(GetSeverityColor(evt.Severity), evt.Severity.ToString().ToUpper(CultureInfo.InvariantCulture)),
             Tuple.Create(CDefaultColor, ": "),
-            Tuple.Create(GetSeverityColor(evt.Severity), evt.Message),
+            Tuple.Create(GetSeverityColor(evt.Severity), evt.Message)
         };
 
         if (elapsed != LogEvent.NoElapsed)
@@ -70,10 +66,7 @@ public class StdoutListener : ListenerBase
         Console.Out.Flush();
     }
 
-    private bool MeetsFilter(LogEvent evt)
-    {
-        return evt.Severity >= Options?.LogStdoutFilter;
-    }
+    private bool MeetsFilter(LogEvent evt) => evt.Severity >= Options?.LogStdoutFilter;
 
     private void WriteColor(List<Tuple<ConsoleColor, string>> strings)
     {
@@ -103,16 +96,14 @@ public class StdoutListener : ListenerBase
         }
     }
 
-    private ConsoleColor GetSeverityColor(SeverityLevel severity)
-    {
-        return severity switch
+    private ConsoleColor GetSeverityColor(SeverityLevel severity) =>
+        severity switch
         {
             SeverityLevel.Debug => CDebugColor,
             SeverityLevel.Info => CInfoColor,
             SeverityLevel.Warn => CWarnColor,
             SeverityLevel.Error => CErrorColor,
             SeverityLevel.Critical => CCriticalColor,
-            _ => CDefaultColor,
+            _ => CDefaultColor
         };
-    }
 }

@@ -7,7 +7,7 @@ namespace Exposure.Services;
 
 internal class AppInfoService : IAppInfoService
 {
-    public string GetAppNameLocalized() => "AppDisplayName".GetLocalized();
+    public string GetAppNameLocalized() => "AppDisplayName".GetAppLocalized();
 
     public Version GetAppVersion()
     {
@@ -19,6 +19,5 @@ internal class AppInfoService : IAppInfoService
         var packageVersion = Package.Current.Id.Version;
         return new Version(packageVersion.Major, packageVersion.Minor, packageVersion.Build,
             packageVersion.Revision);
-
     }
 }

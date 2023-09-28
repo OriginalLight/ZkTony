@@ -1,8 +1,6 @@
 ﻿using CommunityToolkit.WinUI.UI.Animations;
-
 using Exposure.Contracts.Services;
 using Exposure.ViewModels;
-
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 
@@ -10,15 +8,15 @@ namespace Exposure.Views;
 
 public sealed partial class PictureDetailPage : Page
 {
-    public PictureDetailViewModel ViewModel
-    {
-        get;
-    }
-
     public PictureDetailPage()
     {
         ViewModel = App.GetService<PictureDetailViewModel>();
         InitializeComponent();
+    }
+
+    public PictureDetailViewModel ViewModel
+    {
+        get;
     }
 
     protected override void OnNavigatedTo(NavigationEventArgs e)

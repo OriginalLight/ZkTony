@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 namespace Exposure.Logging.Helpers;
+
 public class FileSystem
 {
     public static string BuildOutputFilename(string filename, string outputFolder, bool createPathIfNecessary = true)
@@ -28,8 +29,6 @@ public class FileSystem
         return s;
     }
 
-    public static string SubstituteOutputFilename(string filename, string outputDirectory)
-    {
-        return Path.Combine(SubstituteNow(outputDirectory), SubstituteNow(filename));
-    }
+    public static string SubstituteOutputFilename(string filename, string outputDirectory) =>
+        Path.Combine(SubstituteNow(outputDirectory), SubstituteNow(filename));
 }
