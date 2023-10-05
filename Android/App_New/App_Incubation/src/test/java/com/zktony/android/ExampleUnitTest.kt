@@ -1,7 +1,7 @@
 package com.zktony.android
 
 import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.utils.fitQuadraticCurve
+import com.zktony.android.utils.AlgorithmUtils
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.CopyOnWriteArrayList
@@ -41,7 +41,7 @@ class ExampleUnitTest {
             Point(986.0, 640000.0)
         )
 
-        val quadraticCurve = fitQuadraticCurve(points)
+        val quadraticCurve = AlgorithmUtils.fitQuadraticCurve(points)
 
         val x = 986.0
         val y = quadraticCurve(x)
