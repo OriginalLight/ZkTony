@@ -18,13 +18,10 @@ public sealed partial class PicturePage : Page
         get;
     }
 
-    private void Page_Loaded(object sender, RoutedEventArgs e)
+    private async void OnLoaded(object sender, RoutedEventArgs e)
     {
-        var text = ViewModel.Folders.LastOrDefault();
-        if (text != null)
-        {
-            AutoSuggestBox.Text = text;
-        }
+        var text = await ViewModel.GetSelectedFolder();
+        AutoSuggestBox.Text = text;
     }
 
     private async void TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
@@ -55,19 +52,6 @@ public sealed partial class PicturePage : Page
     private async void SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args) =>
         await ViewModel.OnFolderChanged(sender.Text);
 
-    private async void DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
-    {
-        var date = sender.Date;
-        if (date == null)
-        {
-            return;
-        }
-
-        var text = date.Value.ToString("yyyy-MM-dd");
-        AutoSuggestBox.Text = text;
-        await ViewModel.OnFolderChanged(text);
-    }
-
     private void OnItemClick(object sender, ItemClickEventArgs e)
     {
         if (e.ClickedItem == null)
@@ -76,7 +60,21 @@ public sealed partial class PicturePage : Page
         }
 
         var navigationService = App.GetService<INavigationService>();
-        navigationService.SetListDataItemForNextConnectedAnimation(e.ClickedItem);
         navigationService.NavigateTo(typeof(PictureDetailViewModel).FullName!, e.ClickedItem);
+    }
+
+    private async void OnSelectedDatesChanged(CalendarView sender, CalendarViewSelectedDatesChangedEventArgs args)
+    {
+        if (args.AddedDates.Count <= 0)
+        {
+            return;
+        }
+
+        // 获取选择的日期
+        var selectedDate = args.AddedDates[0].Date;
+
+        var text = selectedDate.ToString("yyyy-MM-dd");
+        AutoSuggestBox.Text = text;
+        await ViewModel.OnFolderChanged(text);
     }
 }

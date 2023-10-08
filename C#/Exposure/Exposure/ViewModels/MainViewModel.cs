@@ -1,19 +1,20 @@
 ﻿using System.Collections.ObjectModel;
-using Windows.Storage;
-using Windows.System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
 using Exposure.Contracts.Services;
+using Exposure.Contracts.ViewModels;
 using Exposure.Helpers;
 using Exposure.Logging;
 using Exposure.Models;
 using Microsoft.UI.Xaml;
+using Windows.Storage;
+using Windows.System;
 using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 
 namespace Exposure.ViewModels;
 
-public partial class MainViewModel : ObservableRecipient, IDisposable
+public partial class MainViewModel : ObservableRecipient, INavigationAware
 {
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly DispatcherTimer _dispatcherTimer;
@@ -28,7 +29,11 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
     [ObservableProperty] private string _temperature = "OFF";
     [ObservableProperty] private string _calibrate = "Calibrate".GetAppLocalized();
     [ObservableProperty] private string _shooting = "Shooting".GetAppLocalized();
-    public ObservableCollection<Picture> Pictures { get; } = new();
+
+    public ObservableCollection<Picture> Pictures
+    {
+        get;
+    } = new();
 
     public MainViewModel(IVisionService visionService, IPictureService pictureService,
         ILocalSettingsService localSettingsService)
@@ -41,16 +46,6 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
         _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         _dispatcherTimer.Tick += QueryTimerCallback;
         _dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
-        _dispatcherTimer.Start();
-        LoadSettings();
-        LoadPictures();
-    }
-
-    public async void Dispose()
-    {
-        _dispatcherTimer.Stop();
-        await _visionService.DisconnectAsync();
-        await _visionService.UninitAsync();
     }
 
     [RelayCommand]
@@ -72,9 +67,9 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
         }
 
         var progress = new Progress<int>();
-        progress.ProgressChanged += (sender, value) =>
+        progress.ProgressChanged += (_, value) =>
         {
-            _dispatcherQueue.EnqueueAsync( () =>
+            _dispatcherQueue.EnqueueAsync(() =>
             {
                 var profile = "Shooting".GetAppLocalized();
                 if (value == 0)
@@ -111,7 +106,8 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
                 {
                     return;
                 }
-                await _visionService.ShootingAsync(progress, ExposureTime,cts.Token);
+
+                await _visionService.ShootingAsync(progress, ExposureTime, cts.Token);
             }
             else
             {
@@ -151,7 +147,7 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
         var progress = new Progress<int>();
         progress.ProgressChanged += (sender, value) =>
         {
-            _dispatcherQueue.EnqueueAsync( () =>
+            _dispatcherQueue.EnqueueAsync(() =>
             {
                 var profile = "Calibrate".GetAppLocalized();
                 if (value == 0)
@@ -164,7 +160,7 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
                 }
             });
         };
-        
+
         var cts = new CancellationTokenSource();
         var timeout = TimeSpan.FromMilliseconds(1000 * 60);
 
@@ -174,9 +170,8 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
             {
                 return;
             }
-            
+
             await _visionService.CalibrateAsync(progress);
-            
         }, cts.Token);
 
         if (await Task.WhenAny(task, Task.Delay(timeout)) != task)
@@ -185,7 +180,7 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
             GlobalLog.Logger?.ReportError("Failed to calibrate, timeout.");
         }
     }
-    
+
     [RelayCommand]
     private void Reverse()
     {
@@ -200,20 +195,20 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
     [RelayCommand]
     private async Task OpenFolder()
     {
-        var root =  await _localSettingsService.ReadSettingAsync<string>("Storage")
-                              ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        var root = await _localSettingsService.ReadSettingAsync<string>("Storage")
+                   ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         var folders = await _pictureService.GetFolderAsync();
-        var path = await StorageFolder.GetFolderFromPathAsync(Path.Combine(root, folders.LastOrDefault() ?? string.Empty));
+        var path = await StorageFolder.GetFolderFromPathAsync(Path.Combine(root,
+            folders.LastOrDefault() ?? string.Empty));
         if (path == null)
         {
             return;
         }
-        
+
         _ = Launcher.LaunchFolderAsync(path);
     }
 
-    public async void LoadPictures()
-    {
+    public async void LoadPictures() =>
         await _dispatcherQueue.EnqueueAsync(async () =>
         {
             Pictures.Clear();
@@ -230,7 +225,6 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
                 Pictures.Add(picture);
             }
         });
-    }
 
     private async void LoadSettings()
     {
@@ -260,7 +254,7 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
         }
 
         var temperature = _visionService.GetAttributeFloat("SensorTemperature");
-        if (Math.Abs(temperature - -1.0) < 0.1)
+        if (temperature <= 0)
         {
             Status = "\uF384";
             Temperature = "OFF";
@@ -271,4 +265,13 @@ public partial class MainViewModel : ObservableRecipient, IDisposable
             Temperature = $"{temperature} ℃";
         }
     }
+
+    public void OnNavigatedTo(object parameter)
+    {
+        _dispatcherTimer.Start();
+        LoadSettings();
+        LoadPictures();
+    }
+
+    public void OnNavigatedFrom() => _dispatcherTimer.Stop();
 }

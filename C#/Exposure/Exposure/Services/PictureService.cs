@@ -8,6 +8,12 @@ public partial class PictureService : IPictureService
 {
     private readonly ILocalSettingsService _localSettingsService;
 
+    public string? SelectedFolder
+    {
+        get;
+        set;
+    }
+
     public PictureService(ILocalSettingsService localSettingsService)
     {
         _localSettingsService = localSettingsService;
@@ -20,15 +26,20 @@ public partial class PictureService : IPictureService
         var fs = Directory.GetDirectories(path);
         var regex = DateRegex();
         return (from f in fs
-            where Regex.IsMatch(f, regex.ToString())
-            select Regex.Match(f, regex.ToString()).Value
+                where Regex.IsMatch(f, regex.ToString())
+                select Regex.Match(f, regex.ToString()).Value
             into folder
-            where DateTime.Parse(folder) >= DateTime.Now.AddDays(-180)
-            select folder).ToList();
+                where DateTime.Parse(folder) >= DateTime.Now.AddDays(-180)
+                select folder).ToList();
     }
 
-    public async Task<IEnumerable<Picture>> GetPicturesAsync(string folder)
+    public async Task<IEnumerable<Picture>> GetPicturesAsync(string? folder)
     {
+        if (folder == null)
+        {
+            return new List<Picture>();
+        }
+
         var path = await _localSettingsService.ReadSettingAsync<string>("Storage")
                    ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
         var full = Path.Combine(path, folder);
@@ -39,8 +50,8 @@ public partial class PictureService : IPictureService
 
         var ps = Directory.GetFiles(full);
         return (from p in ps
-            where p.EndsWith(".jpg") || p.EndsWith(".png") || p.EndsWith(".tiff")
-            select new Picture { Name = Path.GetFileNameWithoutExtension(p), Path = p }).ToList();
+                where p.EndsWith(".jpg") || p.EndsWith(".png") || p.EndsWith(".tiff")
+                select new Picture { Name = Path.GetFileNameWithoutExtension(p), Path = p }).ToList();
     }
 
     [GeneratedRegex("\\d{4}-\\d{2}-\\d{2}")]

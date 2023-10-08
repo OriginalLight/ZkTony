@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using CommunityToolkit.WinUI.UI.Animations;
 using Exposure.Contracts.Services;
 using Exposure.Contracts.ViewModels;
 using Exposure.Helpers;
@@ -88,9 +87,6 @@ public class NavigationService : INavigationService
 
         return false;
     }
-
-    public void SetListDataItemForNextConnectedAnimation(object item) =>
-        Frame.SetListDataItemForNextConnectedAnimation(item);
 
     private void RegisterFrameEvents()
     {

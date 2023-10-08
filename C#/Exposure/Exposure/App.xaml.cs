@@ -52,6 +52,7 @@ public partial class App
                 services.AddTransient<MainPage>();
                 services.AddTransient<ShellPage>();
                 services.AddTransient<ShellViewModel>();
+                services.AddTransient<ChartViewModel>();
                 services.AddTransient<PictureViewModel>();
                 services.AddTransient<PicturePage>();
                 services.AddTransient<PictureDetailViewModel>();
@@ -101,8 +102,6 @@ public partial class App
     protected async override void OnLaunched(LaunchActivatedEventArgs args)
     {
         base.OnLaunched(args);
-
-        //App.GetService<IAppNotificationService>().Show(string.Format("AppNotificationSamplePayload".GetLocalized(), AppContext.BaseDirectory));
 
         await GetService<IActivationService>().ActivateAsync(args);
     }

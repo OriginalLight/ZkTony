@@ -6,42 +6,102 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:behaviors="using:Exposure.Behaviors"
     behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    Loaded="OnLoaded">
 
     <Grid>
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState>
-                    <VisualState.StateTriggers>
-                        <!--641 is the default CompactModeThresholdWidth in NavigationView -->
-                        <AdaptiveTrigger MinWindowWidth="641" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="propertiesGroup1.(RelativePanel.RightOf)" Value="ItemHero" />
-                        <Setter Target="propertiesGroup1.(RelativePanel.Below)" Value="title" />
-                        <Setter Target="propertiesGroup2.(RelativePanel.RightOf)" Value="propertiesGroup1" />
-                        <Setter Target="propertiesGroup2.(RelativePanel.Below)" Value="title" />
-                        <Setter Target="propertiesGroup1.Width" Value="200" />
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
+        <Image
+            x:Name="ImageItem"
+            Source="{x:Bind ViewModel.Item.Path}"
+            ManipulationMode="All"
+            RenderTransformOrigin="0.5,0.5">
+            <Image.RenderTransform>
+                <CompositeTransform x:Name="ImageTransform" />
+            </Image.RenderTransform>
+        </Image>
 
-        <ScrollViewer IsTabStop="True">
-            <StackPanel>
-                <RelativePanel>
-                    <Grid
-                        x:Name="ItemHero"
-                        Margin="{StaticResource SmallRightMargin}"
-                        Padding="{StaticResource XSmallLeftTopRightBottomMargin}"
-                        HorizontalAlignment="Left"
-                        VerticalAlignment="Top"
-                        RelativePanel.AlignTopWithPanel="True"
-                        RelativePanel.AlignLeftWithPanel="True">
-                        <Image Source="{x:Bind ViewModel.Item.Path}" Stretch="UniformToFill" />
-                    </Grid>
-                </RelativePanel>
-            </StackPanel>
-        </ScrollViewer>
+        <StackPanel
+            Padding="8"
+            VerticalAlignment="Top"
+            HorizontalAlignment="Center"
+            Orientation="Horizontal"
+            Spacing="8">
+
+            <Button Click="Rotate">
+                <ToolTipService.ToolTip>
+                    <ToolTip x:Uid="Rotate" />
+                </ToolTipService.ToolTip>
+                <FontIcon Glyph="&#xE7AD;" />
+            </Button>
+
+            <Button Click="ZoomIn">
+                <ToolTipService.ToolTip>
+                    <ToolTip x:Uid="ZoomIn" />
+                </ToolTipService.ToolTip>
+                <FontIcon Glyph="&#xE8A3;" />
+            </Button>
+
+            <Button Click="ZoomOut">
+                <ToolTipService.ToolTip>
+                    <ToolTip x:Uid="ZoomOut" />
+                </ToolTipService.ToolTip>
+                <FontIcon Glyph="&#xE71F;" />
+            </Button>
+
+            <Button Click="Delete">
+                <ToolTipService.ToolTip>
+                    <ToolTip x:Uid="Delete" />
+                </ToolTipService.ToolTip>
+                <FontIcon Glyph="&#xE74D;" />
+            </Button>
+
+            <Button Click="Copy">
+                <ToolTipService.ToolTip>
+                    <ToolTip x:Uid="Copy" />
+                </ToolTipService.ToolTip>
+                <FontIcon Glyph="&#xE8C8;" />
+            </Button>
+
+            <Button>
+                <ToolTipService.ToolTip>
+                    <ToolTip x:Uid="Export" />
+                </ToolTipService.ToolTip>
+                <FontIcon Glyph="&#xEE71;" />
+                <Button.Flyout>
+                    <Flyout>
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <Button Content="150" Click="Export" Tag="150" ToolTipService.ToolTip="150 dpi" />
+                            <Button Content="300" Click="Export" Tag="300" ToolTipService.ToolTip="300 dpi" />
+                            <Button Content="600" Click="Export" Tag="600" ToolTipService.ToolTip="600 dpi" />
+                            <Button Content="1200" Click="Export" Tag="1200" ToolTipService.ToolTip="1200 dpi" />
+                        </StackPanel>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button Click="OpenWithPhoto">
+                <ToolTipService.ToolTip>
+                    <ToolTip x:Uid="OpenWithPhoto" />
+                </ToolTipService.ToolTip>
+                <FontIcon Glyph="&#xE8B9;" />
+            </Button>
+
+            <Button Click="Chart3D">
+                <ToolTipService.ToolTip>
+                    <ToolTip x:Uid="Chart3D" />
+                </ToolTipService.ToolTip>
+                <FontIcon Glyph="&#xF158;" />
+            </Button>
+        </StackPanel>
+
+        <StackPanel
+            Padding="8"
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Left"
+            Orientation="Horizontal"
+            Spacing="8">
+            <HyperlinkButton Content="{x:Bind ViewModel.Item.Name, Mode= OneWay}" />
+            <HyperlinkButton Content="{x:Bind ImageTransform.ScaleX, Mode= OneWay}" />
+        </StackPanel>
     </Grid>
 </Page>

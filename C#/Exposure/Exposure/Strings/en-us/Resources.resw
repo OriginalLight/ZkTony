@@ -187,9 +187,6 @@
   <data name="Shell_Picture.Content" xml:space="preserve">
     <value>Picture</value>
   </data>
-  <data name="Calibrate" xml:space="preserve">
-    <value>Calibrate</value>
-  </data>
   <data name="ExposureTime.Header" xml:space="preserve">
     <value>ExposureTime</value>
   </data>
@@ -199,7 +196,52 @@
   <data name="OffsetY.Header" xml:space="preserve">
     <value>OffsetY</value>
   </data>
+  <data name="Calibrate" xml:space="preserve">
+    <value>Calibrate</value>
+  </data>
+  <data name="Connect.Content" xml:space="preserve">
+    <value>Connect Status</value>
+  </data>
+  <data name="OpenFolder.Content" xml:space="preserve">
+    <value>Open Folder</value>
+  </data>
+  <data name="Refresh.Content" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Reverse.Content" xml:space="preserve">
+    <value>Reverse</value>
+  </data>
+  <data name="Rotate.Content" xml:space="preserve">
+    <value>Rotate</value>
+  </data>
   <data name="Shooting" xml:space="preserve">
     <value>Shooting</value>
+  </data>
+  <data name="Temperature.Content" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
+  <data name="ZoomIn.Content" xml:space="preserve">
+    <value>ZoomIn</value>
+  </data>
+  <data name="ZoomOut.Content" xml:space="preserve">
+    <value>ZommOut</value>
+  </data>
+  <data name="Chart3D.Content" xml:space="preserve">
+    <value>3D Chart</value>
+  </data>
+  <data name="Copy.Content" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="Delete.Content" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Export.Content" xml:space="preserve">
+    <value>Export</value>
+  </data>
+  <data name="OpenWithPhoto.Content" xml:space="preserve">
+    <value>Open With Photo</value>
+  </data>
+  <data name="Shell_Chart.Content" xml:space="preserve">
+    <value>Chart</value>
   </data>
 </root>

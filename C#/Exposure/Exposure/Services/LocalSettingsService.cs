@@ -8,8 +8,8 @@ namespace Exposure.Services;
 
 public class LocalSettingsService : ILocalSettingsService
 {
-    private const string _defaultApplicationDataFolder = "Exposure/ApplicationData";
-    private const string _defaultLocalSettingsFile = "LocalSettings.json";
+    private const string DefaultApplicationDataFolder = "Exposure/ApplicationData";
+    private const string DefaultLocalSettingsFile = "LocalSettings.json";
 
     private readonly string _applicationDataFolder;
 
@@ -31,8 +31,8 @@ public class LocalSettingsService : ILocalSettingsService
         _options = options.Value;
 
         _applicationDataFolder = Path.Combine(_localApplicationData,
-            _options.ApplicationDataFolder ?? _defaultApplicationDataFolder);
-        _localsettingsFile = _options.LocalSettingsFile ?? _defaultLocalSettingsFile;
+            _options.ApplicationDataFolder ?? DefaultApplicationDataFolder);
+        _localsettingsFile = _options.LocalSettingsFile ?? DefaultLocalSettingsFile;
 
         _settings = new Dictionary<string, object>();
     }
@@ -50,7 +50,7 @@ public class LocalSettingsService : ILocalSettingsService
         {
             await InitializeAsync();
 
-            if (_settings != null && _settings.TryGetValue(key, out var obj))
+            if (_settings.TryGetValue(key, out var obj))
             {
                 return await Json.ToObjectAsync<T>((string)obj);
             }

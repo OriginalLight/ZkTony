@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Exposure.Models;
+﻿using Exposure.Models;
 using Exposure.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -21,17 +20,6 @@ public sealed partial class MainPage : Page
     public MainViewModel ViewModel
     {
         get;
-    }
-
-    private void Photos(object sender, RoutedEventArgs e)
-    {
-        var path = @"C:\Users\ThinkBook\Desktop\WindowIcon.png";
-        if (!File.Exists(path))
-        {
-            return;
-        }
-
-        Process.Start("explorer.exe", "/open, \"" + path + "\"");
     }
 
     private void OnItemClick(object sender, ItemClickEventArgs e)
@@ -83,10 +71,8 @@ public sealed partial class MainPage : Page
         e.Handled = true;
     }
 
-    private void Rotate(object sender, RoutedEventArgs e)
-    {
+    private void Rotate(object sender, RoutedEventArgs e) =>
         ImageTransform.Rotation = (ImageTransform.Rotation + 90) % 360;
-    }
 
     private void ZoomIn(object sender, RoutedEventArgs e)
     {
@@ -104,8 +90,5 @@ public sealed partial class MainPage : Page
         ImageTransform.ScaleY = scale;
     }
 
-    private void ReLoadPictures(object sender, RoutedEventArgs e)
-    {
-        ViewModel.LoadPictures();
-    }
+    private void ReLoadPictures(object sender, RoutedEventArgs e) => ViewModel.LoadPictures();
 }

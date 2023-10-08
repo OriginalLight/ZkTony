@@ -20,7 +20,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="280" />
             </Grid.ColumnDefinitions>
-            
+
             <Grid
                 Grid.Column="0"
                 Padding="8"
@@ -42,12 +42,18 @@
 
                     <Button>
                         <StackPanel Orientation="Horizontal" Spacing="16">
+                            <ToolTipService.ToolTip>
+                                <ToolTip x:Uid="Temperature" />
+                            </ToolTipService.ToolTip>
                             <FontIcon Glyph="&#xE950;" />
                             <TextBlock Text="{x:Bind ViewModel.Temperature, Mode=OneWay}" />
                         </StackPanel>
                     </Button>
 
                     <Button>
+                        <ToolTipService.ToolTip>
+                            <ToolTip x:Uid="Connect" />
+                        </ToolTipService.ToolTip>
                         <FontIcon Glyph="{x:Bind ViewModel.Status, Mode=OneWay}" />
                     </Button>
                 </StackPanel>
@@ -58,14 +64,23 @@
                     Spacing="8">
 
                     <Button Click="Rotate">
+                        <ToolTipService.ToolTip>
+                            <ToolTip x:Uid="Rotate" />
+                        </ToolTipService.ToolTip>
                         <FontIcon Glyph="&#xE7AD;" />
                     </Button>
-                    
+
                     <Button Click="ZoomIn">
+                        <ToolTipService.ToolTip>
+                            <ToolTip x:Uid="ZoomIn" />
+                        </ToolTipService.ToolTip>
                         <FontIcon Glyph="&#xE8A3;" />
                     </Button>
 
                     <Button Click="ZoomOut">
+                        <ToolTipService.ToolTip>
+                            <ToolTip x:Uid="ZoomOut" />
+                        </ToolTipService.ToolTip>
                         <FontIcon Glyph="&#xE71F;" />
                     </Button>
                 </StackPanel>
@@ -134,7 +149,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            
+
             <ScrollViewer
                 Grid.Column="0"
                 VerticalScrollMode="Disabled"
@@ -156,7 +171,8 @@
                                 <Border CornerRadius="4">
                                     <Image Source="{x:Bind Path}" Stretch="UniformToFill" />
                                 </Border>
-                                <StackPanel Orientation="Vertical" Height="24" VerticalAlignment="Bottom" Padding="5,1,5,1"
+                                <StackPanel Orientation="Vertical" Height="24" VerticalAlignment="Bottom"
+                                            Padding="5,1,5,1"
                                             Background="Gray" Opacity=".75">
                                     <TextBlock Text="{x:Bind Name}" Style="{StaticResource BodyTextBlockStyle}" />
                                 </StackPanel>
@@ -165,21 +181,30 @@
                     </GridView.ItemTemplate>
                 </GridView>
             </ScrollViewer>
-            
+
             <StackPanel
                 Grid.Column="1"
                 Orientation="Vertical"
                 Spacing="8">
 
                 <Button Click="ReLoadPictures">
+                    <ToolTipService.ToolTip>
+                        <ToolTip x:Uid="Refresh" />
+                    </ToolTipService.ToolTip>
                     <FontIcon Glyph="&#xE72C;" />
                 </Button>
 
                 <Button Command="{x:Bind ViewModel.ReverseCommand}">
+                    <ToolTipService.ToolTip>
+                        <ToolTip x:Uid="Reverse" />
+                    </ToolTipService.ToolTip>
                     <FontIcon Glyph="&#xE8AB;" />
                 </Button>
-                
+
                 <Button Command="{x:Bind ViewModel.OpenFolderCommand}">
+                    <ToolTipService.ToolTip>
+                        <ToolTip x:Uid="OpenFolder" />
+                    </ToolTipService.ToolTip>
                     <FontIcon Glyph="&#xE8A7;" />
                 </Button>
             </StackPanel>

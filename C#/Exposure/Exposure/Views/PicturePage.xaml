@@ -8,9 +8,9 @@
     behaviors:NavigationViewHeaderBehavior.HeaderMode="Never"
     xmlns:models="using:Exposure.Models"
     mc:Ignorable="d"
-    Loaded="Page_Loaded">
+    Loaded="OnLoaded">
 
-    <Grid Padding="8" RowSpacing="16">
+    <Grid Padding="8" RowSpacing="8">
         <Grid.RowDefinitions>
             <RowDefinition Height="32" />
             <RowDefinition Height="*" />
@@ -27,13 +27,30 @@
                 TextChanged="TextChanged"
                 SuggestionChosen="SuggestionChosen"
                 QuerySubmitted="QuerySubmitted" />
-            <CalendarDatePicker DateChanged="DateChanged" />
+
+            <Button>
+                <FontIcon Glyph="&#xE787;" />
+                <Button.Flyout>
+                    <Flyout Placement="BottomEdgeAlignedLeft">
+                        <CalendarView
+                            SelectedDatesChanged="OnSelectedDatesChanged"
+                            SelectionMode="Single"
+                            IsGroupLabelVisible="True"
+                            IsOutOfScopeEnabled="True" />
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+
+            <Button Command="{x:Bind ViewModel.OpenFolderCommand}">
+                <ToolTipService.ToolTip>
+                    <ToolTip x:Uid="OpenFolder" />
+                </ToolTipService.ToolTip>
+                <FontIcon Glyph="&#xE8A7;" />
+            </Button>
         </StackPanel>
 
         <ScrollViewer
             Grid.Row="1"
-            Padding="8"
-            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
             CornerRadius="4">
             <GridView
                 AutomationProperties.AccessibilityView="Raw"

@@ -19,7 +19,7 @@ public interface IVisionService
     Task ConnectAsync();
 
     Task DisconnectAsync();
-    
+
     Task CalibrateAsync(IProgress<int> progress);
 
     Task ShootingAsync(IProgress<int> progress, int exposureTime, CancellationToken token);
@@ -33,6 +33,4 @@ public interface IVisionService
     double GetAttributeFloat(string attribute);
 
     string GetAttributeString(string attribute);
-
-    Task GetAttributeAsync();
 }
