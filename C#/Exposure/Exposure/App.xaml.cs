@@ -2,7 +2,6 @@
 using Exposure.Contracts.Services;
 using Exposure.Logging;
 using Exposure.Models;
-using Exposure.Notifications;
 using Exposure.Services;
 using Exposure.ViewModels;
 using Exposure.Views;
@@ -14,7 +13,6 @@ using UnhandledExceptionEventArgs = Microsoft.UI.Xaml.UnhandledExceptionEventArg
 namespace Exposure;
 
 // To learn more about WinUI 3, see https://docs.microsoft.com/windows/apps/winui/winui3/.
-public partial class App
 {
     public App()
     {
@@ -25,9 +23,6 @@ public partial class App
             {
                 // Default Activation Handler
                 services.AddTransient<ActivationHandler<LaunchActivatedEventArgs>, DefaultActivationHandler>();
-
-                // Other Activation Handlers
-                services.AddTransient<IActivationHandler, AppNotificationActivationHandler>();
 
                 // Services
                 services.AddSingleton<IAppNotificationService, AppNotificationService>();
@@ -52,19 +47,16 @@ public partial class App
                 services.AddTransient<MainPage>();
                 services.AddTransient<ShellPage>();
                 services.AddTransient<ShellViewModel>();
-                services.AddTransient<ChartViewModel>();
                 services.AddTransient<PictureViewModel>();
                 services.AddTransient<PicturePage>();
                 services.AddTransient<PictureDetailViewModel>();
                 services.AddTransient<PictureDetailPage>();
 
                 // Configuration
-                services.Configure<LocalSettingsOptions>(
-                    context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+                services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
             }).Build();
 
         GetService<IAppNotificationService>().Initialize();
-
         UnhandledException += App_UnhandledException;
     }
 

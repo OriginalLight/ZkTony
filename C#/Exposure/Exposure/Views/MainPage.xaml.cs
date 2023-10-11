@@ -26,8 +26,8 @@ public sealed partial class MainPage : Page
     {
         var picture = (Picture)e.ClickedItem;
         Image.Source = new BitmapImage(new Uri(picture.Path));
-        ImageTransform.ScaleX = 1;
-        ImageTransform.ScaleY = 1;
+        ImageTransform.ScaleX = 0.9;
+        ImageTransform.ScaleY = 0.9;
         ImageTransform.TranslateX = 0;
         ImageTransform.TranslateY = 0;
         ImageTransform.Rotation = 0;

@@ -38,10 +38,6 @@ public sealed partial class PicturePage : Page
         {
             sender.ItemsSource = suggestions;
         }
-        else
-        {
-            sender.ItemsSource = new[] { "没有匹配项" };
-        }
 
         await ViewModel.OnFolderChanged(sender.Text);
     }

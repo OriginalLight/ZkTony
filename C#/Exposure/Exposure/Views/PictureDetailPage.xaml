@@ -86,12 +86,6 @@
                 <FontIcon Glyph="&#xE8B9;" />
             </Button>
 
-            <Button Click="Chart3D">
-                <ToolTipService.ToolTip>
-                    <ToolTip x:Uid="Chart3D" />
-                </ToolTipService.ToolTip>
-                <FontIcon Glyph="&#xF158;" />
-            </Button>
         </StackPanel>
 
         <StackPanel

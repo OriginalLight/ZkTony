@@ -35,9 +35,8 @@ public partial class PictureViewModel : ObservableRecipient, INavigationAware
     {
         var root = await _localSettingsService.ReadSettingAsync<string>("Storage")
                    ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        var folders = await _pictureService.GetFolderAsync();
-        var path = await StorageFolder.GetFolderFromPathAsync(Path.Combine(root,
-            folders.LastOrDefault() ?? string.Empty));
+        var folder = await GetSelectedFolder();
+        var path = await StorageFolder.GetFolderFromPathAsync(Path.Combine(root, folder));
         if (path == null)
         {
             return;

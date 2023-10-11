@@ -1,8 +1,11 @@
-﻿using Windows.Storage.AccessCache;
-using Windows.Storage.Pickers;
+﻿using Exposure.Contracts.Services;
 using Exposure.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.Windows.AppNotifications.Builder;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage.AccessCache;
+using Windows.Storage.Pickers;
 using WinRT.Interop;
 
 namespace Exposure.Views;
@@ -37,7 +40,7 @@ public sealed partial class SettingsPage : Page
         await ViewModel.GetStorageAsync();
     }
 
-    private async void PickFolderButton_Click(object sender, RoutedEventArgs e)
+    private async void PickFolder(object sender, RoutedEventArgs e)
     {
         // Create a folder picker
         var openPicker = new FolderPicker();
@@ -60,5 +63,21 @@ public sealed partial class SettingsPage : Page
             StorageApplicationPermissions.FutureAccessList.AddOrReplace("PickedFolderToken", folder);
             await ViewModel.SetStorageAsync(folder.Path);
         }
+    }
+
+    private void Copy(object sender, RoutedEventArgs e)
+    {
+        var ver = ViewModel.Version;
+        var data = new DataPackage
+        {
+            RequestedOperation = DataPackageOperation.Copy
+        };
+        data.SetText(ver);
+        Clipboard.SetContentWithOptions(data, new ClipboardContentOptions { IsAllowedInHistory = true, IsRoamable = true });
+        Clipboard.Flush();
+        var builder = new AppNotificationBuilder();
+        builder.AddText("已复制到剪贴板");
+        builder.AddText(ver);
+        App.GetService<IAppNotificationService>().Show(builder.BuildNotification().Payload);
     }
 }

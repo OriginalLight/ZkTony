@@ -4,10 +4,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:labs="using:CommunityToolkit.Labs.WinUI"
     xmlns:xaml="using:Microsoft.UI.Xaml"
     xmlns:ic="using:Microsoft.Xaml.Interactions.Core"
     xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     mc:Ignorable="d"
     Loaded="Page_Loaded">
 
@@ -15,10 +15,10 @@
         Padding="36,16,36,16"
         VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="8" Margin="{StaticResource SmallTopBottomMargin}">
-            <labs:SettingsCard x:Uid="Settings_Theme">
-                <labs:SettingsCard.HeaderIcon>
+            <controls:SettingsCard x:Uid="Settings_Theme">
+                <controls:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE790;" />
-                </labs:SettingsCard.HeaderIcon>
+                </controls:SettingsCard.HeaderIcon>
                 <ComboBox x:Name="ThemeSelectionComboBox">
                     <ComboBoxItem x:Uid="Settings_Theme_Default" Tag="{x:Bind xaml:ElementTheme.Default}" />
                     <ComboBoxItem x:Uid="Settings_Theme_Light" Tag="{x:Bind xaml:ElementTheme.Light}" />
@@ -30,42 +30,48 @@
                         </ic:EventTriggerBehavior>
                     </i:Interaction.Behaviors>
                 </ComboBox>
-            </labs:SettingsCard>
-            <labs:SettingsCard x:Uid="Settings_Storage">
-                <labs:SettingsCard.HeaderIcon>
+            </controls:SettingsCard>
+            <controls:SettingsCard x:Uid="Settings_Storage">
+                <controls:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE8B7;" />
-                </labs:SettingsCard.HeaderIcon>
-                <Button Content="{x:Bind ViewModel.Storage, Mode=OneWay}" Click="PickFolderButton_Click" />
-            </labs:SettingsCard>
-            <labs:SettingsCard x:Uid="Settings_About_Card" Description="{x:Bind ViewModel.Version, Mode=OneWay}">
-                <labs:SettingsCard.HeaderIcon>
+                </controls:SettingsCard.HeaderIcon>
+                <Button Content="{x:Bind ViewModel.Storage, Mode=OneWay}" Click="PickFolder" />
+            </controls:SettingsCard>
+            <controls:SettingsCard x:Uid="Settings_About_Card" Description="{x:Bind ViewModel.Version, Mode=OneWay}">
+                <controls:SettingsCard.HeaderIcon>
                     <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/WindowIcon.ico" />
-                </labs:SettingsCard.HeaderIcon>
-                <Button Click="{x:Bind ViewModel.CopyVersion, Mode=OneWay}">
+                </controls:SettingsCard.HeaderIcon>
+                <Button Click="Copy">
+                    <ToolTipService.ToolTip>
+                        <ToolTip x:Uid="Copy" />
+                    </ToolTipService.ToolTip>
                     <FontIcon Glyph="&#xE8C8;" />
                 </Button>
-            </labs:SettingsCard>
-            <labs:SettingsCard x:Uid="Settings_Log">
-                <labs:SettingsCard.HeaderIcon>
+            </controls:SettingsCard>
+            <controls:SettingsCard x:Uid="Settings_Log">
+                <controls:SettingsCard.HeaderIcon>
                     <FontIcon Glyph="&#xE8E5;" />
-                </labs:SettingsCard.HeaderIcon>
+                </controls:SettingsCard.HeaderIcon>
                 <Button Click="{x:Bind ViewModel.OpenLogsAsync, Mode=OneWay}">
+                    <ToolTipService.ToolTip>
+                        <ToolTip x:Uid="OpenFolder" />
+                    </ToolTipService.ToolTip>
                     <FontIcon Glyph="&#xE8A7;" />
                 </Button>
-            </labs:SettingsCard>
-            <labs:SettingsExpander x:Uid="Settings_UsefulLinks">
-                <labs:SettingsExpander.HeaderIcon>
+            </controls:SettingsCard>
+            <controls:SettingsExpander x:Uid="Settings_UsefulLinks">
+                <controls:SettingsExpander.HeaderIcon>
                     <FontIcon Glyph="&#xE71B;" />
-                </labs:SettingsExpander.HeaderIcon>
-                <labs:SettingsExpander.Items>
-                    <labs:SettingsCard HorizontalContentAlignment="Left" ContentAlignment="Left">
+                </controls:SettingsExpander.HeaderIcon>
+                <controls:SettingsExpander.Items>
+                    <controls:SettingsCard HorizontalContentAlignment="Left" ContentAlignment="Left">
                         <StackPanel Orientation="Vertical">
                             <HyperlinkButton x:Uid="Domain" />
                             <HyperlinkButton x:Uid="SourceCode" />
                         </StackPanel>
-                    </labs:SettingsCard>
-                </labs:SettingsExpander.Items>
-            </labs:SettingsExpander>
+                    </controls:SettingsCard>
+                </controls:SettingsExpander.Items>
+            </controls:SettingsExpander>
         </StackPanel>
     </ScrollViewer>
 </Page>

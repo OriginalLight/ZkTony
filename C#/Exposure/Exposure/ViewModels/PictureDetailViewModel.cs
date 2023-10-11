@@ -1,22 +1,68 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+﻿using System.Drawing;
+using System.Drawing.Imaging;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Exposure.Contracts.Services;
 using Exposure.Contracts.ViewModels;
+using Exposure.Logging;
 using Exposure.Models;
+using Microsoft.Windows.AppNotifications.Builder;
+using Windows.Storage;
 
 namespace Exposure.ViewModels;
 
 public partial class PictureDetailViewModel : ObservableRecipient, INavigationAware
 {
-    private readonly IPictureService _pictureService;
-    private readonly INavigationService _navigationService;
-
     [ObservableProperty] private Picture? _item;
 
-    public PictureDetailViewModel(IPictureService pictureService, INavigationService navigationService)
+
+    public void SavePictureToFile(int newDpi, StorageFile file)
     {
-        _pictureService = pictureService;
-        _navigationService = navigationService;
+        Task.Run(() =>
+        {
+            if (Item == null || !File.Exists(Item.Path))
+            {
+                return;
+            }
+
+            var startTime = DateTime.Now;
+
+            var originalImage = new Bitmap(Image.FromFile(Item.Path));
+
+            var newWidth = (int)(originalImage.Width * newDpi / originalImage.HorizontalResolution);
+            var newHeight = (int)(originalImage.Height * newDpi / originalImage.VerticalResolution);
+
+            // 创建一个新的 Bitmap，同时设置新的 DPI 和分辨率
+            var newImage = new Bitmap(newWidth, newHeight, PixelFormat.Format32bppArgb);
+            newImage.SetResolution(newDpi, newDpi);
+
+            using (var graphics = Graphics.FromImage(newImage))
+            {
+                // 使用高质量的插值模式进行绘制
+                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+
+                // 绘制原始图像到新图像上
+                graphics.DrawImage(originalImage, 0, 0, newWidth, newHeight);
+            }
+
+            var imageFormat = file.FileType.ToLower() switch
+            {
+                ".png" => ImageFormat.Png,
+                ".jpg" => ImageFormat.Jpeg,
+                ".tiff" => ImageFormat.Tiff,
+                _ => ImageFormat.Png
+            };
+
+            // 保存新图像
+            newImage.Save(file.Path, imageFormat);
+            var endTime = DateTime.Now;
+            var timeSpan = endTime - startTime;
+            var builder = new AppNotificationBuilder();
+            builder.AddText($"导出完成：{timeSpan.TotalSeconds} 秒");
+            builder.AddText(file.Name);
+            App.GetService<IAppNotificationService>().Show(builder.BuildNotification().Payload);
+            GlobalLog.Logger?.ReportInfo($"导出到 {file.Path}");
+        });
     }
 
     public void OnNavigatedTo(object parameter)

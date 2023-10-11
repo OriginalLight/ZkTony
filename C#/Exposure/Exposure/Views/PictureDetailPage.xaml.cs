@@ -1,16 +1,15 @@
 ﻿using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using Exposure.Contracts.Services;
+using Exposure.Logging;
 using Exposure.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.Windows.AppNotifications.Builder;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
-using Image = System.Drawing.Image;
 
 namespace Exposure.Views;
 
@@ -29,7 +28,7 @@ public sealed partial class PictureDetailPage : Page
         get;
     }
 
-    private async void OnLoaded(object sender, RoutedEventArgs e)
+    private void OnLoaded(object sender, RoutedEventArgs e)
     {
         ImageTransform.ScaleX = 0.8;
         ImageTransform.ScaleY = 0.8;
@@ -92,52 +91,57 @@ public sealed partial class PictureDetailPage : Page
         ImageTransform.ScaleY = scale;
     }
 
-    private void Delete(object sender, RoutedEventArgs e)
+    private async void Delete(object sender, RoutedEventArgs e)
     {
-        if (ViewModel.Item == null)
+        var picture = ViewModel.Item;
+        if (picture == null || !File.Exists(picture.Path))
         {
             return;
         }
 
-        var path = ViewModel.Item.Path;
-        if (!File.Exists(path))
+        var dialog = new ContentDialog
         {
-            return;
-        }
+            Title = "删除图片",
+            Content = $"确定删除 {picture.Name} ？",
+            PrimaryButtonText = "删除",
+            CloseButtonText = "取消"
+        };
 
-        File.Delete(path);
-        App.GetService<INavigationService>().GoBack();
+        dialog.XamlRoot = App.MainWindow.Content.XamlRoot;
+        dialog.PrimaryButtonClick += (_, _) =>
+        {
+            File.Delete(picture.Path);
+            App.GetService<INavigationService>().GoBack();
+            GlobalLog.Logger?.ReportInfo($"删除 {picture.Path}");
+        };
+        await dialog.ShowAsync();
+
     }
 
     private async void Copy(object sender, RoutedEventArgs e)
     {
-        if (ViewModel.Item == null)
-        {
-            return;
-        }
-
-        var path = ViewModel.Item.Path;
-        if (!File.Exists(path))
+        var picture = ViewModel.Item;
+        if (picture == null || !File.Exists(picture.Path))
         {
             return;
         }
 
         // 复制图片到剪贴板
-        var imageFile = await StorageFile.GetFileFromPathAsync(path);
+        var imageFile = await StorageFile.GetFileFromPathAsync(picture.Path);
         var dataPackage = new DataPackage();
         dataPackage.SetStorageItems(new List<IStorageItem> { imageFile });
         Clipboard.SetContent(dataPackage);
+        var builder = new AppNotificationBuilder();
+        builder.AddText("已复制到剪贴板");
+        builder.AddText(picture.Name);
+        App.GetService<IAppNotificationService>().Show(builder.BuildNotification().Payload);
+        GlobalLog.Logger?.ReportInfo($"复制 {picture.Path}");
     }
 
     private async void Export(object sender, RoutedEventArgs e)
     {
-        if (ViewModel.Item == null)
-        {
-            return;
-        }
-
-        var pic = ViewModel.Item;
-        if (!File.Exists(pic.Path))
+        var picture = ViewModel.Item;
+        if (picture == null || !File.Exists(picture.Path))
         {
             return;
         }
@@ -146,12 +150,12 @@ public sealed partial class PictureDetailPage : Page
         var savePicker = new FileSavePicker()
         {
             SuggestedStartLocation = PickerLocationId.PicturesLibrary,
-            SuggestedFileName = pic.Name,
+            SuggestedFileName = picture.Name,
             FileTypeChoices =
             {
+                { ".tiff", new List<string> { ".tiff" } },
                 { ".png", new List<string> { ".png" } },
-                { ".jpg", new List<string> { ".jpg" } },
-                { ".tiff", new List<string> { ".tiff" } }
+                { ".jpg", new List<string> { ".jpg" } }
             }
         };
 
@@ -165,14 +169,6 @@ public sealed partial class PictureDetailPage : Page
             return;
         }
 
-        var imageFormat = file.FileType.ToLower() switch
-        {
-            ".png" => ImageFormat.Png,
-            ".jpg" => ImageFormat.Jpeg,
-            ".tiff" => ImageFormat.Tiff,
-            _ => ImageFormat.Png
-        };
-
         var button = sender as Button;
 
         if (button == null)
@@ -181,58 +177,19 @@ public sealed partial class PictureDetailPage : Page
         }
 
         var newDpi = int.Parse(button.Tag.ToString() ?? "100");
-        var originalImage = new Bitmap(Image.FromFile(pic.Path));
 
-        var newWidth = (int)(originalImage.Width * newDpi / originalImage.HorizontalResolution);
-        var newHeight = (int)(originalImage.Height * newDpi / originalImage.VerticalResolution);
-
-        // 创建一个新的 Bitmap，同时设置新的 DPI 和分辨率
-        var newImage = new Bitmap(newWidth, newHeight, PixelFormat.Format32bppArgb);
-        newImage.SetResolution(newDpi, newDpi);
-
-        using (var graphics = Graphics.FromImage(newImage))
-        {
-            // 使用高质量的插值模式进行绘制
-            graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-
-            // 绘制原始图像到新图像上
-            graphics.DrawImage(originalImage, 0, 0, newWidth, newHeight);
-        }
-
-        // 保存新图像
-        newImage.Save(file.Path, imageFormat);
+        ViewModel.SavePictureToFile(newDpi, file);
     }
 
     private void OpenWithPhoto(object sender, RoutedEventArgs e)
     {
-        if (ViewModel.Item == null)
+        var picture = ViewModel.Item;
+        if (picture == null || !File.Exists(picture.Path))
         {
             return;
         }
 
-        var path = ViewModel.Item.Path;
-        if (!File.Exists(path))
-        {
-            return;
-        }
-
-        Process.Start("explorer.exe", "/open, \"" + path + "\"");
-    }
-
-    private void Chart3D(object sender, RoutedEventArgs e)
-    {
-        if (ViewModel.Item == null)
-        {
-            return;
-        }
-
-        if (!File.Exists(ViewModel.Item.Path))
-        {
-            return;
-        }
-
-        var navigationService = App.GetService<INavigationService>();
-        navigationService.NavigateTo(typeof(ChartViewModel).FullName!, ViewModel.Item);
+        Process.Start("explorer.exe", "/open, \"" + picture.Path + "\"");
+        GlobalLog.Logger?.ReportInfo($"使用照片应用打开 {picture.Path}");
     }
 }

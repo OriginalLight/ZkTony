@@ -1,12 +1,11 @@
-﻿using Windows.ApplicationModel;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage;
-using Windows.System;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Exposure.Contracts.Services;
 using Exposure.Logging;
 using Microsoft.UI.Xaml;
+using Windows.ApplicationModel;
+using Windows.Storage;
+using Windows.System;
 
 namespace Exposure.ViewModels;
 
@@ -35,28 +34,6 @@ public partial class SettingsViewModel : ObservableRecipient
     {
         ElementTheme = elementTheme;
         await _themeSelectorService.SetThemeAsync(elementTheme);
-    }
-
-    public Task CopyVersion()
-    {
-        try
-        {
-            var data = new DataPackage
-            {
-                RequestedOperation = DataPackageOperation.Copy
-            };
-            data.SetText(GetVersion());
-
-            Clipboard.SetContentWithOptions(data,
-                new ClipboardContentOptions { IsAllowedInHistory = true, IsRoamable = true });
-            Clipboard.Flush();
-        }
-        catch (Exception ex)
-        {
-            GlobalLog.Logger?.ReportError(ex.Message);
-        }
-
-        return Task.CompletedTask;
     }
 
     public async Task GetStorageAsync()
