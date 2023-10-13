@@ -59,12 +59,7 @@ public class VisionService : IVisionService
 
     public async Task ConnectAsync()
     {
-        if (!IsInitialized)
-        {
-            return;
-        }
-
-        if (_deviceId != IntPtr.Zero)
+        if (!IsInitialized || _deviceId != IntPtr.Zero)
         {
             return;
         }
@@ -137,18 +132,8 @@ public class VisionService : IVisionService
     public async Task CalibrateAsync(IProgress<int> progress)
     {
         // 验证是否已经初始化
-        if (!IsInitialized)
+        if (!IsInitialized || _deviceId != IntPtr.Zero)
         {
-            progress.Report(0);
-            return;
-        }
-
-        progress.Report(5);
-
-        // 验证是否已经连接
-        if (_deviceId == IntPtr.Zero)
-        {
-            progress.Report(0);
             return;
         }
 
@@ -217,20 +202,8 @@ public class VisionService : IVisionService
         byte[] lightBytes;
 
         // 验证是否已经初始化
-        if (!IsInitialized)
+        if (!IsInitialized || _deviceId != IntPtr.Zero)
         {
-            GlobalLog.Logger?.ReportError("未初始化");
-            progress.Report(0);
-            return;
-        }
-
-        progress.Report(2);
-
-        // 验证是否已经连接
-        if (_deviceId == IntPtr.Zero)
-        {
-            GlobalLog.Logger?.ReportError("未连接");
-            progress.Report(0);
             return;
         }
 
@@ -276,14 +249,12 @@ public class VisionService : IVisionService
         // 设置曝光时间
         if (!SetAttributeFloat(avg, "ExposureTime"))
         {
-            GlobalLog.Logger?.ReportError($"SetAttributeFloat ExposureTime 失败 {avg}");
+            GlobalLog.Logger?.ReportError($"设置曝光时间失败 {avg}");
             progress.Report(0);
             return;
         }
-        else
-        {
-            GlobalLog.Logger?.ReportInfo($"SetAttributeFloat ExposureTime 成功 {avg}");
-        }
+
+        GlobalLog.Logger?.ReportInfo($"设置曝光时间成功 {avg}");
 
         for (var i = 0; i < count; i++)
         {
@@ -301,7 +272,7 @@ public class VisionService : IVisionService
             }
             catch (Exception e)
             {
-                GlobalLog.Logger?.ReportError($"ShootingOnce 失败 {e.Message}");
+                GlobalLog.Logger?.ReportError($"拍摄失败 {e.Message}");
                 progress.Report(0);
                 return;
             }
@@ -334,13 +305,11 @@ public class VisionService : IVisionService
         if (!SetAttributeFloat(100, "ExposureTime"))
         {
             progress.Report(0);
-            GlobalLog.Logger?.ReportError($"SetAttributeFloat ExposureTime 失败 {100}");
+            GlobalLog.Logger?.ReportError($"设置曝光时间失败 {100}");
             return;
         }
-        else
-        {
-            GlobalLog.Logger?.ReportInfo($"SetAttributeFloat ExposureTime 成功 {100}");
-        }
+
+        GlobalLog.Logger?.ReportInfo($"设置曝光时间成功 {100}");
 
         try
         {
@@ -348,7 +317,7 @@ public class VisionService : IVisionService
         }
         catch (Exception e)
         {
-            GlobalLog.Logger?.ReportError($"ShootingOnce 失败 {e.Message}");
+            GlobalLog.Logger?.ReportError($"拍摄失败 {e.Message}");
             progress.Report(0);
             return;
         }
@@ -380,6 +349,78 @@ public class VisionService : IVisionService
         VisionHelper.DestroyStream(steam);
 
         progress.Report(0);
+    }
+
+    public bool SetAttributeInt(long value, string attribute)
+    {
+        if (!IsInitialized || _deviceId != IntPtr.Zero)
+        {
+            return false;
+        }
+
+        var att = Marshal.StringToHGlobalAnsi(attribute);
+        if (VisionHelper.SetAttrInt(_deviceId, att, value, 0))
+        {
+            GlobalLog.Logger?.ReportInfo($"SetAttrInt {attribute} 成功 {value}");
+            return true;
+        }
+
+        GlobalLog.Logger?.ReportError($"SetAttrInt {attribute} 失败 {value}");
+        return false;
+    }
+
+    public long GetAttributeInt(string attribute)
+    {
+        var iValue = 0L;
+        if (!IsInitialized || _deviceId != IntPtr.Zero)
+        {
+            return iValue;
+        }
+
+        VisionHelper.GetAttrInt(_deviceId, Marshal.StringToHGlobalAnsi(attribute), ref iValue, 0);
+
+        return iValue;
+    }
+
+    public bool SetAttributeFloat(double value, string attribute)
+    {
+        if (!IsInitialized || _deviceId != IntPtr.Zero)
+        {
+            return false;
+        }
+
+        var att = Marshal.StringToHGlobalAnsi(attribute);
+        if (VisionHelper.SetAttrFloat(_deviceId, att, value, 0))
+        {
+            return true;
+        }
+
+        GlobalLog.Logger?.ReportError($"SetAttrFloat {attribute} 失败 {value}");
+        return false;
+    }
+
+    public double GetAttributeFloat(string attribute)
+    {
+        var dValue = 0.0;
+        if (!IsInitialized || _deviceId != IntPtr.Zero)
+        {
+            return dValue;
+        }
+
+        VisionHelper.GetAttrFloat(_deviceId, Marshal.StringToHGlobalAnsi(attribute), ref dValue, 0);
+        return dValue;
+    }
+
+    public string GetAttributeString(string attribute)
+    {
+        var sValue = new StringBuilder(128);
+        if (!IsInitialized || _deviceId != IntPtr.Zero)
+        {
+            return sValue.ToString();
+        }
+
+        VisionHelper.GetAttrString(_deviceId, Marshal.StringToHGlobalAnsi(attribute), sValue, 0);
+        return sValue.ToString();
     }
 
     private byte[] ShootingOnce(nint steam, ref int width, ref int height)
@@ -429,103 +470,5 @@ public class VisionService : IVisionService
         }
 
         return bytes;
-    }
-
-    public bool SetAttributeInt(long value, string attribute)
-    {
-        if (!IsInitialized)
-        {
-            return false;
-        }
-
-        if (_deviceId == IntPtr.Zero)
-        {
-            return false;
-        }
-
-        var att = Marshal.StringToHGlobalAnsi(attribute);
-        if (VisionHelper.SetAttrInt(_deviceId, att, value, 0))
-        {
-            GlobalLog.Logger?.ReportInfo($"SetAttrInt {attribute} 成功 {value}");
-            return true;
-        }
-
-        GlobalLog.Logger?.ReportError($"SetAttrInt {attribute} 失败 {value}");
-        return false;
-    }
-
-    public long GetAttributeInt(string attribute)
-    {
-        var iValue = 0L;
-        if (!IsInitialized)
-        {
-            return iValue;
-        }
-
-        if (_deviceId == IntPtr.Zero)
-        {
-            return iValue;
-        }
-
-        VisionHelper.GetAttrInt(_deviceId, Marshal.StringToHGlobalAnsi(attribute), ref iValue, 0);
-
-        return iValue;
-    }
-
-    public bool SetAttributeFloat(double value, string attribute)
-    {
-        if (!IsInitialized)
-        {
-            return false;
-        }
-
-        if (_deviceId == IntPtr.Zero)
-        {
-            return false;
-        }
-
-        var att = Marshal.StringToHGlobalAnsi(attribute);
-        if (VisionHelper.SetAttrFloat(_deviceId, att, value, 0))
-        {
-            return true;
-        }
-
-        GlobalLog.Logger?.ReportError($"SetAttrFloat {attribute} 失败 {value}");
-        return false;
-    }
-
-    public double GetAttributeFloat(string attribute)
-    {
-        var dValue = 0.0;
-
-        if (!IsInitialized)
-        {
-            return dValue;
-        }
-
-        if (_deviceId == IntPtr.Zero)
-        {
-            return dValue;
-        }
-
-        VisionHelper.GetAttrFloat(_deviceId, Marshal.StringToHGlobalAnsi(attribute), ref dValue, 0);
-        return dValue;
-    }
-
-    public string GetAttributeString(string attribute)
-    {
-        var sValue = new StringBuilder(128);
-        if (!IsInitialized)
-        {
-            return sValue.ToString();
-        }
-
-        if (_deviceId == IntPtr.Zero)
-        {
-            return sValue.ToString();
-        }
-
-        VisionHelper.GetAttrString(_deviceId, Marshal.StringToHGlobalAnsi(attribute), sValue, 0);
-        return sValue.ToString();
     }
 }

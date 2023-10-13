@@ -116,7 +116,11 @@ class Protocol : BaseProtocol<Protocol> {
 
     companion object {
         const val RX_0X01 = 1
-        const val Rx_0X02 = 2
+        const val RX_0X02 = 2
+        const val RX_0X03 = 3
+        const val RX_0X04 = 4
+        const val RX_0X05 = 5
+        const val RX_0X06 = 6
 
         // 协议包头和包尾
         val expectHead = byteArrayOf(0xEE.toByte())

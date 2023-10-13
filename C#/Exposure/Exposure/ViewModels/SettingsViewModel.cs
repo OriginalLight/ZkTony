@@ -1,11 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Windows.ApplicationModel;
+using Windows.Storage;
+using Windows.System;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Exposure.Contracts.Services;
 using Exposure.Logging;
 using Microsoft.UI.Xaml;
-using Windows.ApplicationModel;
-using Windows.Storage;
-using Windows.System;
 
 namespace Exposure.ViewModels;
 
@@ -13,11 +13,8 @@ public partial class SettingsViewModel : ObservableRecipient
 {
     private readonly ILocalSettingsService _localSettingsService;
     private readonly IThemeSelectorService _themeSelectorService;
-
     [ObservableProperty] private ElementTheme _elementTheme;
-
     [ObservableProperty] private string _storage;
-
     [ObservableProperty] private string _version;
 
     public SettingsViewModel(IThemeSelectorService themeSelectorService, ILocalSettingsService localSettingsService)
@@ -38,8 +35,8 @@ public partial class SettingsViewModel : ObservableRecipient
 
     public async Task GetStorageAsync()
     {
-        var Default = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        Storage = await _localSettingsService.ReadSettingAsync<string>(nameof(Storage)) ?? Default;
+        var doc = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        Storage = await _localSettingsService.ReadSettingAsync<string>(nameof(Storage)) ?? doc;
     }
 
 

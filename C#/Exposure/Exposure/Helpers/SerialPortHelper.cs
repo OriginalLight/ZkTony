@@ -2,14 +2,12 @@
 using Exposure.Logging;
 
 namespace Exposure.Helpers;
+
 public class SerialPortHelper
 {
     private static SerialPort? _serialPort;
 
-    public static string[] GetPortNames()
-    {
-        return SerialPort.GetPortNames();
-    }
+    public static string[] GetPortNames() => SerialPort.GetPortNames();
 
     public static void Open(string portName, int baudRate)
     {
@@ -27,10 +25,7 @@ public class SerialPortHelper
         _serialPort.DataReceived += ReceiveData;
     }
 
-    public static void Close()
-    {
-        _serialPort?.Close();
-    }
+    public static void Close() => _serialPort?.Close();
 
     public static void Write(byte[] bytes)
     {
@@ -38,6 +33,7 @@ public class SerialPortHelper
         {
             return;
         }
+
         _serialPort.Write(bytes, 0, bytes.Length);
 
         GlobalLog.Logger?.ReportInfo($"发送数据：{bytes}");

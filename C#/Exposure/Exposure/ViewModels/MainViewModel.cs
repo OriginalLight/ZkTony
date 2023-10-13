@@ -1,4 +1,6 @@
 ﻿using System.Collections.ObjectModel;
+using Windows.Storage;
+using Windows.System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.WinUI;
@@ -8,8 +10,7 @@ using Exposure.Helpers;
 using Exposure.Logging;
 using Exposure.Models;
 using Microsoft.UI.Xaml;
-using Windows.Storage;
-using Windows.System;
+using Microsoft.Windows.AppNotifications.Builder;
 using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 
 namespace Exposure.ViewModels;
@@ -18,35 +19,49 @@ public partial class MainViewModel : ObservableRecipient, INavigationAware
 {
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly DispatcherTimer _dispatcherTimer;
+    private readonly IAppNotificationService _appNotificationService;
     private readonly ILocalSettingsService _localSettingsService;
     private readonly IPictureService _pictureService;
     private readonly IVisionService _visionService;
+    [ObservableProperty] private string _calibrate = "Calibrate".GetAppLocalized();
     [ObservableProperty] private int _exposureTime = 100;
     [ObservableProperty] private string? _image;
     [ObservableProperty] private int _offsetX;
     [ObservableProperty] private int _offsetY;
+    [ObservableProperty] private string _shooting = "Shooting".GetAppLocalized();
     [ObservableProperty] private string _status = "\uF384";
     [ObservableProperty] private string _temperature = "OFF";
-    [ObservableProperty] private string _calibrate = "Calibrate".GetAppLocalized();
-    [ObservableProperty] private string _shooting = "Shooting".GetAppLocalized();
+
+    public MainViewModel(
+        IAppNotificationService appNotificationService,
+        IVisionService visionService, 
+        IPictureService pictureService,
+        ILocalSettingsService localSettingsService)
+    {
+        _appNotificationService = appNotificationService;
+        _visionService = visionService;
+        _pictureService = pictureService;
+        _localSettingsService = localSettingsService;
+        _dispatcherTimer = new DispatcherTimer();
+        _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+
+        _dispatcherTimer.Tick += QueryTimerCallback;
+        _dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
+    }
 
     public ObservableCollection<Picture> Pictures
     {
         get;
     } = new();
 
-    public MainViewModel(IVisionService visionService, IPictureService pictureService,
-        ILocalSettingsService localSettingsService)
+    public void OnNavigatedTo(object parameter)
     {
-        _visionService = visionService;
-        _pictureService = pictureService;
-        _localSettingsService = localSettingsService;
-
-        _dispatcherTimer = new DispatcherTimer();
-        _dispatcherQueue = DispatcherQueue.GetForCurrentThread();
-        _dispatcherTimer.Tick += QueryTimerCallback;
-        _dispatcherTimer.Interval = new TimeSpan(0, 0, 5);
+        _dispatcherTimer.Start();
+        LoadSettings();
+        LoadPictures();
     }
+
+    public void OnNavigatedFrom() => _dispatcherTimer.Stop();
 
     [RelayCommand]
     private async Task StartCapture()
@@ -111,18 +126,20 @@ public partial class MainViewModel : ObservableRecipient, INavigationAware
             }
             else
             {
-                GlobalLog.Logger?.ReportError("Failed to set attribute.");
+                GlobalLog.Logger?.ReportError("设置OffsetX和OffsetY失败。");
             }
         }, cts.Token);
 
+        // ReSharper disable once MethodSupportsCancellation
         if (await Task.WhenAny(task, Task.Delay(timeout)) == task)
         {
+            // ReSharper disable once MethodSupportsCancellation
             await Task.Run(LoadPictures);
         }
         else
         {
             cts.Cancel();
-            GlobalLog.Logger?.ReportError("Failed to capture, timeout.");
+            GlobalLog.Logger?.ReportError("超时，拍摄失败。");
         }
     }
 
@@ -145,7 +162,7 @@ public partial class MainViewModel : ObservableRecipient, INavigationAware
         }
 
         var progress = new Progress<int>();
-        progress.ProgressChanged += (sender, value) =>
+        progress.ProgressChanged += (_, value) =>
         {
             _dispatcherQueue.EnqueueAsync(() =>
             {
@@ -172,12 +189,16 @@ public partial class MainViewModel : ObservableRecipient, INavigationAware
             }
 
             await _visionService.CalibrateAsync(progress);
+            var builder = new AppNotificationBuilder();
+            builder.AddText("校准完成");
+            _appNotificationService.Show(builder.BuildNotification().Payload);
         }, cts.Token);
 
+        // ReSharper disable once MethodSupportsCancellation
         if (await Task.WhenAny(task, Task.Delay(timeout)) != task)
         {
             cts.Cancel();
-            GlobalLog.Logger?.ReportError("Failed to calibrate, timeout.");
+            GlobalLog.Logger?.ReportError("超时，校准失败。");
         }
     }
 
@@ -228,12 +249,9 @@ public partial class MainViewModel : ObservableRecipient, INavigationAware
 
     private async void LoadSettings()
     {
-        var offsetX = await _localSettingsService.ReadSettingAsync<int>("OffsetX");
-        var offsetY = await _localSettingsService.ReadSettingAsync<int>("OffsetY");
-        var exposureTime = await _localSettingsService.ReadSettingAsync<int>("ExposureTime");
-        OffsetX = offsetX;
-        OffsetY = offsetY;
-        ExposureTime = exposureTime;
+        OffsetX = await _localSettingsService.ReadSettingAsync<int>("OffsetX");
+        OffsetY = await _localSettingsService.ReadSettingAsync<int>("OffsetY");
+        ExposureTime = await _localSettingsService.ReadSettingAsync<int>("ExposureTime");
     }
 
     private async void QueryTimerCallback(object? sender, object e)
@@ -265,13 +283,4 @@ public partial class MainViewModel : ObservableRecipient, INavigationAware
             Temperature = $"{temperature} ℃";
         }
     }
-
-    public void OnNavigatedTo(object parameter)
-    {
-        _dispatcherTimer.Start();
-        LoadSettings();
-        LoadPictures();
-    }
-
-    public void OnNavigatedFrom() => _dispatcherTimer.Stop();
 }

@@ -58,7 +58,7 @@ object SerialPortUtils {
             override fun callbackHandler(byteArray: ByteArray) {
                 Protocol.Protocol.callbackHandler(byteArray) { code, rx ->
                     when (code) {
-                        Protocol.RX_0X01 -> {
+                        Protocol.RX_0X04 -> {
                             for (i in 0 until rx.data.size / 5) {
                                 val index = rx.data.readInt8(offset = i * 5)
                                 val status = rx.data.readFloatLE(offset = i * 5 + 1)
@@ -139,22 +139,6 @@ object SerialPortUtils {
         readRegister(slaveAddr = slaveAddr, startAddr = 4, quantity = 2)
 
     /**
-     * 读取温度
-     */
-    fun readWithTemperature(ids: List<Int>) {
-        val byteArray = ByteArray(ids.size)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i, index)
-        }
-        if (byteArray.isNotEmpty()) {
-            sendProtocol {
-                func = 0x02
-                data = byteArray
-            }
-        }
-    }
-
-    /**
      * 设置阀门状态
      */
     suspend fun writeWithValve(slaveAddr: Int, channel: Int, retry: Int = 3) {
@@ -219,7 +203,23 @@ object SerialPortUtils {
         }
         if (byteArray.isNotEmpty()) {
             sendProtocol {
-                func = 0x01
+                func = 0x07
+                data = byteArray
+            }
+        }
+    }
+
+    /**
+     * 读取温度
+     */
+    fun readWithTemperature(ids: List<Int>) {
+        val byteArray = ByteArray(ids.size)
+        ids.forEachIndexed { index, i ->
+            byteArray.writeInt8(i, index)
+        }
+        if (byteArray.isNotEmpty()) {
+            sendProtocol {
+                func = 0x08
                 data = byteArray
             }
         }
@@ -236,7 +236,7 @@ object SerialPortUtils {
         }
         if (byteArray.isNotEmpty()) {
             sendProtocol {
-                func = 0x00
+                func = 0x09
                 data = byteArray
             }
         }

@@ -13,6 +13,7 @@ using UnhandledExceptionEventArgs = Microsoft.UI.Xaml.UnhandledExceptionEventArg
 namespace Exposure;
 
 // To learn more about WinUI 3, see https://docs.microsoft.com/windows/apps/winui/winui3/.
+public partial class App
 {
     public App()
     {
@@ -53,7 +54,8 @@ namespace Exposure;
                 services.AddTransient<PictureDetailPage>();
 
                 // Configuration
-                services.Configure<LocalSettingsOptions>(context.Configuration.GetSection(nameof(LocalSettingsOptions)));
+                services.Configure<LocalSettingsOptions>(
+                    context.Configuration.GetSection(nameof(LocalSettingsOptions)));
             }).Build();
 
         GetService<IAppNotificationService>().Initialize();

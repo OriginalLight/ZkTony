@@ -195,26 +195,28 @@ class HomeViewModel @Inject constructor(
             readWithValve(slaveAddr = it)
             delay(300L)
         }
+        val co = dataStore.readData(Constants.ZT_0000, 0)
         // 打开温控
         writeWithSwitch(
             mutableListOf<Pair<Int, Int>>().apply {
-                repeat(9) { add(it to 1) }
+                repeat(co + 1) { add(it to 1) }
             }
         )
         // 设置温度
         writeWithTemperature(
             mutableListOf<Pair<Int, Double>>().apply {
                 add(0 to dataStore.readData(Constants.ZT_0001, 4.0))
-                repeat(8) { add(it + 1 to 26.0) }
+                repeat(co) { add(it + 1 to 26.0) }
             }
         )
     }
 
     private suspend fun loop() {
+        val co = dataStore.readData(Constants.ZT_0000, 0)
         while (true) {
             _stand.value = _stand.value.copy(insulation = hpt.values.toList())
-            delay(1000L)
-            readWithTemperature(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8))
+            delay(2000L)
+            readWithTemperature((0..co).toList())
             delay(1000L)
         }
     }

@@ -40,7 +40,6 @@ public class AppNotificationService : IAppNotificationService
     }
 
     public void OnNotificationInvoked(AppNotificationManager sender, AppNotificationActivatedEventArgs args) =>
-
         App.MainWindow.DispatcherQueue.TryEnqueue(() =>
         {
             App.MainWindow.BringToFront();

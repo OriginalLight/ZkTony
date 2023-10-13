@@ -96,6 +96,7 @@
             Spacing="8">
             <HyperlinkButton Content="{x:Bind ViewModel.Item.Name, Mode= OneWay}" />
             <HyperlinkButton Content="{x:Bind ImageTransform.ScaleX, Mode= OneWay}" />
+            <HyperlinkButton Content="{x:Bind ImageTransform.Rotation, Mode= OneWay}" />
         </StackPanel>
     </Grid>
 </Page>

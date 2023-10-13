@@ -4,9 +4,14 @@ using Exposure.Models;
 
 namespace Exposure.Services;
 
-public partial class PictureService : IPictureService
+public class PictureService : IPictureService
 {
     private readonly ILocalSettingsService _localSettingsService;
+
+    public PictureService(ILocalSettingsService localSettingsService)
+    {
+        _localSettingsService = localSettingsService;
+    }
 
     public string? SelectedFolder
     {
@@ -14,23 +19,18 @@ public partial class PictureService : IPictureService
         set;
     }
 
-    public PictureService(ILocalSettingsService localSettingsService)
-    {
-        _localSettingsService = localSettingsService;
-    }
-
     public async Task<IEnumerable<string>> GetFolderAsync()
     {
-        var path = await _localSettingsService.ReadSettingAsync<string>("Storage")
+        var root = await _localSettingsService.ReadSettingAsync<string>("Storage")
                    ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        var fs = Directory.GetDirectories(path);
-        var regex = DateRegex();
+        var fs = Directory.GetDirectories(root);
+        var regex = new Regex(@"\d{4}-\d{2}-\d{2}");
         return (from f in fs
-                where Regex.IsMatch(f, regex.ToString())
-                select Regex.Match(f, regex.ToString()).Value
+            where Regex.IsMatch(f, regex.ToString())
+            select Regex.Match(f, regex.ToString()).Value
             into folder
-                where DateTime.Parse(folder) >= DateTime.Now.AddDays(-180)
-                select folder).ToList();
+            where DateTime.Parse(folder) >= DateTime.Now.AddDays(-180)
+            select folder).ToList();
     }
 
     public async Task<IEnumerable<Picture>> GetPicturesAsync(string? folder)
@@ -40,20 +40,17 @@ public partial class PictureService : IPictureService
             return new List<Picture>();
         }
 
-        var path = await _localSettingsService.ReadSettingAsync<string>("Storage")
+        var root = await _localSettingsService.ReadSettingAsync<string>("Storage")
                    ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        var full = Path.Combine(path, folder);
-        if (!Directory.Exists(full))
+        var path = Path.Combine(root, folder);
+        if (!Directory.Exists(path))
         {
             return new List<Picture>();
         }
 
-        var ps = Directory.GetFiles(full);
+        var ps = Directory.GetFiles(path);
         return (from p in ps
-                where p.EndsWith(".jpg") || p.EndsWith(".png") || p.EndsWith(".tiff")
-                select new Picture { Name = Path.GetFileNameWithoutExtension(p), Path = p }).ToList();
+            where p.EndsWith(".jpg") || p.EndsWith(".png") || p.EndsWith(".tiff")
+            select new Picture { Name = Path.GetFileNameWithoutExtension(p), Path = p }).ToList();
     }
-
-    [GeneratedRegex("\\d{4}-\\d{2}-\\d{2}")]
-    private static partial Regex DateRegex();
 }

@@ -1,22 +1,40 @@
 ﻿using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using Windows.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Exposure.Contracts.Services;
 using Exposure.Contracts.ViewModels;
 using Exposure.Logging;
 using Exposure.Models;
 using Microsoft.Windows.AppNotifications.Builder;
-using Windows.Storage;
 
 namespace Exposure.ViewModels;
 
 public partial class PictureDetailViewModel : ObservableRecipient, INavigationAware
 {
+    private readonly IAppNotificationService _appNotificationService;
     [ObservableProperty] private Picture? _item;
-
-
-    public void SavePictureToFile(int newDpi, StorageFile file)
+    
+    public PictureDetailViewModel(IAppNotificationService appNotificationService)
     {
+        _appNotificationService = appNotificationService;
+    }
+
+    public void OnNavigatedTo(object parameter)
+    {
+        if (parameter is Picture pic)
+        {
+            Item = pic;
+        }
+    }
+
+    public void OnNavigatedFrom()
+    {
+    }
+
+
+    public void SavePictureToFile(int newDpi, StorageFile file) =>
         Task.Run(() =>
         {
             if (Item == null || !File.Exists(Item.Path))
@@ -38,8 +56,8 @@ public partial class PictureDetailViewModel : ObservableRecipient, INavigationAw
             using (var graphics = Graphics.FromImage(newImage))
             {
                 // 使用高质量的插值模式进行绘制
-                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
 
                 // 绘制原始图像到新图像上
                 graphics.DrawImage(originalImage, 0, 0, newWidth, newHeight);
@@ -60,20 +78,7 @@ public partial class PictureDetailViewModel : ObservableRecipient, INavigationAw
             var builder = new AppNotificationBuilder();
             builder.AddText($"导出完成：{timeSpan.TotalSeconds} 秒");
             builder.AddText(file.Name);
-            App.GetService<IAppNotificationService>().Show(builder.BuildNotification().Payload);
+            _appNotificationService.Show(builder.BuildNotification().Payload);
             GlobalLog.Logger?.ReportInfo($"导出到 {file.Path}");
         });
-    }
-
-    public void OnNavigatedTo(object parameter)
-    {
-        if (parameter is Picture pic)
-        {
-            Item = pic;
-        }
-    }
-
-    public void OnNavigatedFrom()
-    {
-    }
 }

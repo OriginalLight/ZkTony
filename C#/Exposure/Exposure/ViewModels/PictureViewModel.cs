@@ -1,18 +1,18 @@
 ﻿using System.Collections.ObjectModel;
+using Windows.Storage;
+using Windows.System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Exposure.Contracts.Services;
 using Exposure.Contracts.ViewModels;
 using Exposure.Models;
-using Windows.Storage;
-using Windows.System;
 
 namespace Exposure.ViewModels;
 
 public partial class PictureViewModel : ObservableRecipient, INavigationAware
 {
-    private readonly IPictureService _pictureService;
     private readonly ILocalSettingsService _localSettingsService;
+    private readonly IPictureService _pictureService;
 
     public PictureViewModel(IPictureService pictureService, ILocalSettingsService localSettingsService)
     {
@@ -29,46 +29,6 @@ public partial class PictureViewModel : ObservableRecipient, INavigationAware
     {
         get;
     } = new();
-
-    [RelayCommand]
-    private async Task OpenFolder()
-    {
-        var root = await _localSettingsService.ReadSettingAsync<string>("Storage")
-                   ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-        var folder = await GetSelectedFolder();
-        var path = await StorageFolder.GetFolderFromPathAsync(Path.Combine(root, folder));
-        if (path == null)
-        {
-            return;
-        }
-
-        _ = Launcher.LaunchFolderAsync(path);
-    }
-
-    public async Task OnFolderChanged(string folder)
-    {
-        Pictures.Clear();
-        var pictures = await _pictureService.GetPicturesAsync(folder);
-        foreach (var picture in pictures)
-        {
-            Pictures.Add(picture);
-        }
-
-        _pictureService.SelectedFolder = folder;
-    }
-
-    public async Task<string> GetSelectedFolder()
-    {
-        var selected = _pictureService.SelectedFolder;
-        if (selected != null)
-        {
-            return selected;
-        }
-
-        var folders = await _pictureService.GetFolderAsync();
-        var first = folders.LastOrDefault();
-        return first ?? string.Empty;
-    }
 
     public async void OnNavigatedTo(object parameter)
     {
@@ -108,5 +68,45 @@ public partial class PictureViewModel : ObservableRecipient, INavigationAware
 
     public void OnNavigatedFrom()
     {
+    }
+
+    [RelayCommand]
+    private async Task OpenFolder()
+    {
+        var root = await _localSettingsService.ReadSettingAsync<string>("Storage")
+                   ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        var folder = await GetSelectedFolder();
+        var path = await StorageFolder.GetFolderFromPathAsync(Path.Combine(root, folder));
+        if (path == null)
+        {
+            return;
+        }
+
+        _ = Launcher.LaunchFolderAsync(path);
+    }
+
+    public async Task OnFolderChanged(string folder)
+    {
+        Pictures.Clear();
+        var pictures = await _pictureService.GetPicturesAsync(folder);
+        foreach (var picture in pictures)
+        {
+            Pictures.Add(picture);
+        }
+
+        _pictureService.SelectedFolder = folder;
+    }
+
+    public async Task<string> GetSelectedFolder()
+    {
+        var selected = _pictureService.SelectedFolder;
+        if (selected != null)
+        {
+            return selected;
+        }
+
+        var folders = await _pictureService.GetFolderAsync();
+        var first = folders.LastOrDefault();
+        return first ?? string.Empty;
     }
 }

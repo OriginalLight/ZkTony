@@ -1,4 +1,7 @@
 ﻿using System.Diagnostics;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
+using Windows.Storage.Pickers;
 using Exposure.Contracts.Services;
 using Exposure.Logging;
 using Exposure.ViewModels;
@@ -6,9 +9,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.Windows.AppNotifications.Builder;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage;
-using Windows.Storage.Pickers;
 using WinRT.Interop;
 
 namespace Exposure.Views;
@@ -104,18 +104,21 @@ public sealed partial class PictureDetailPage : Page
             Title = "删除图片",
             Content = $"确定删除 {picture.Name} ？",
             PrimaryButtonText = "删除",
-            CloseButtonText = "取消"
+            CloseButtonText = "取消",
+            XamlRoot = App.MainWindow.Content.XamlRoot
         };
 
-        dialog.XamlRoot = App.MainWindow.Content.XamlRoot;
         dialog.PrimaryButtonClick += (_, _) =>
         {
             File.Delete(picture.Path);
             App.GetService<INavigationService>().GoBack();
+            var builder = new AppNotificationBuilder();
+            builder.AddText("已删除图片");
+            builder.AddText(picture.Name);
+            App.GetService<IAppNotificationService>().Show(builder.BuildNotification().Payload);
             GlobalLog.Logger?.ReportInfo($"删除 {picture.Path}");
         };
         await dialog.ShowAsync();
-
     }
 
     private async void Copy(object sender, RoutedEventArgs e)
@@ -147,7 +150,7 @@ public sealed partial class PictureDetailPage : Page
         }
 
         // 保存图片到指定位置
-        var savePicker = new FileSavePicker()
+        var savePicker = new FileSavePicker
         {
             SuggestedStartLocation = PickerLocationId.PicturesLibrary,
             SuggestedFileName = picture.Name,

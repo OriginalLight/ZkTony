@@ -9,10 +9,12 @@ public static class VisionHelper
     public delegate bool FrameProcCbFunc(IntPtr pFrameInShort, ushort iFrameID, int iFrameWidth, int iFrameHeight,
         IntPtr pParam);
 
+    private static readonly bool _x64 = Environment.Is64BitProcess;
+
     //Init
     public static void Init()
     {
-        if (Environment.Is64BitProcess)
+        if (_x64)
         {
             VisionX64.Init();
         }
@@ -23,17 +25,16 @@ public static class VisionHelper
     }
 
     //SearchforDevice
-    public static int SearchforDevice() =>
-        Environment.Is64BitProcess ? VisionX64.SearchforDevice() : VisionX86.SearchforDevice();
+    public static int SearchforDevice() => _x64 ? VisionX64.SearchforDevice() : VisionX86.SearchforDevice();
 
     //GetDeviceID
     public static IntPtr GetDeviceID(uint i) =>
-        Environment.Is64BitProcess ? VisionX64.GetDeviceID(i) : VisionX86.GetDeviceID(i);
+        _x64 ? VisionX64.GetDeviceID(i) : VisionX86.GetDeviceID(i);
 
     // GetDeviceInfo
     public static void GetDeviceInfo(IntPtr pDeviceID, ref SDeviceInfo pDeviceInfo)
     {
-        if (Environment.Is64BitProcess)
+        if (_x64)
         {
             VisionX64.GetDeviceInfo(pDeviceID, ref pDeviceInfo);
         }
@@ -46,7 +47,7 @@ public static class VisionHelper
     // GetLocalNICInfo
     public static void GetLocalNICInfo(IntPtr pDeviceID, ref SNICInfo pNICInfo)
     {
-        if (Environment.Is64BitProcess)
+        if (_x64)
         {
             VisionX64.GetLocalNICInfo(pDeviceID, ref pNICInfo);
         }
@@ -58,220 +59,220 @@ public static class VisionHelper
 
     //ForceIP
     public static bool ForceIP(IntPtr pDeviceID, IntPtr pNewIP, IntPtr pNewMask, IntPtr pNewGateway) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.ForceIP(pDeviceID, pNewIP, pNewMask, pNewGateway)
             : VisionX86.ForceIP(pDeviceID, pNewIP, pNewMask, pNewGateway);
 
     //OpenDevice
-    public static bool OpenDevice(IntPtr pDeviceID) => Environment.Is64BitProcess
+    public static bool OpenDevice(IntPtr pDeviceID) => _x64
         ? VisionX64.OpenDevice(pDeviceID)
         : VisionX86.OpenDevice(pDeviceID);
 
     //GetNumberOfAttribute
-    public static int GetNumberOfAttribute(IntPtr pDeviceID) => Environment.Is64BitProcess
+    public static int GetNumberOfAttribute(IntPtr pDeviceID) => _x64
         ? VisionX64.GetNumberOfAttribute(pDeviceID)
         : VisionX86.GetNumberOfAttribute(pDeviceID);
 
     //GetAttributeName
-    public static IntPtr GetAttributeName(IntPtr pDeviceID, uint i) => Environment.Is64BitProcess
+    public static IntPtr GetAttributeName(IntPtr pDeviceID, uint i) => _x64
         ? VisionX64.GetAttributeName(pDeviceID, i)
         : VisionX86.GetAttributeName(pDeviceID, i);
 
     //GetAttributeType
     public static bool GetAttributeType(IntPtr pDeviceID, IntPtr pAttrName, ref int iAttrType) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetAttributeType(pDeviceID, pAttrName, ref iAttrType)
             : VisionX86.GetAttributeType(pDeviceID, pAttrName, ref iAttrType);
 
     //GetAttrInt
     public static bool GetAttrInt(IntPtr pDeviceID, IntPtr pAttrName, ref long iValue, int iAttrLocation) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetAttrInt(pDeviceID, pAttrName, ref iValue, iAttrLocation)
             : VisionX86.GetAttrInt(pDeviceID, pAttrName, ref iValue, iAttrLocation);
 
     //GetAttrMaxInt
     public static bool GetAttrMaxInt(IntPtr pDeviceID, IntPtr pAttrName, ref long iMaximum) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetAttrMaxInt(pDeviceID, pAttrName, ref iMaximum)
             : VisionX86.GetAttrMaxInt(pDeviceID, pAttrName, ref iMaximum);
 
     //GetAttrMinInt
     public static bool GetAttrMinInt(IntPtr pDeviceID, IntPtr pAttrName, ref long iMinimum) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetAttrMinInt(pDeviceID, pAttrName, ref iMinimum)
             : VisionX86.GetAttrMinInt(pDeviceID, pAttrName, ref iMinimum);
 
     //GetAttrIncInt
     public static bool GetAttrIncInt(IntPtr pDeviceID, IntPtr pAttrName, ref long iIncrement) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetAttrIncInt(pDeviceID, pAttrName, ref iIncrement)
             : VisionX86.GetAttrIncInt(pDeviceID, pAttrName, ref iIncrement);
 
     //GetAttrFloat
     public static bool GetAttrFloat(IntPtr pDeviceID, IntPtr pAttrName, ref double fValue, int iAttrLocation) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetAttrFloat(pDeviceID, pAttrName, ref fValue, iAttrLocation)
             : VisionX86.GetAttrFloat(pDeviceID, pAttrName, ref fValue, iAttrLocation);
 
     //GetAttrMaxFloat
     public static bool GetAttrMaxFloat(IntPtr pDeviceID, IntPtr pAttrName, ref double fMaximum) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetAttrMaxFloat(pDeviceID, pAttrName, ref fMaximum)
             : VisionX86.GetAttrMaxFloat(pDeviceID, pAttrName, ref fMaximum);
 
     //GetAttrMinFloat
     public static bool GetAttrMinFloat(IntPtr pDeviceID, IntPtr pAttrName, ref double fMinimum) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetAttrMinFloat(pDeviceID, pAttrName, ref fMinimum)
             : VisionX86.GetAttrMinFloat(pDeviceID, pAttrName, ref fMinimum);
 
     //GetAttrIncFloat
     public static bool GetAttrIncFloat(IntPtr pDeviceID, IntPtr pAttrName, ref double fIncrement) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetAttrIncFloat(pDeviceID, pAttrName, ref fIncrement)
             : VisionX86.GetAttrIncFloat(pDeviceID, pAttrName, ref fIncrement);
 
     //GetAttrString
     public static bool
         GetAttrString(IntPtr pDeviceID, IntPtr pAttrName, StringBuilder sAttrString, int iAttrLocation) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetAttrString(pDeviceID, pAttrName, sAttrString, iAttrLocation)
             : VisionX86.GetAttrString(pDeviceID, pAttrName, sAttrString, iAttrLocation);
 
     //GetNumberOfEntry
-    public static int GetNumberOfEntry(IntPtr pDeviceID, IntPtr pAttrName) => Environment.Is64BitProcess
+    public static int GetNumberOfEntry(IntPtr pDeviceID, IntPtr pAttrName) => _x64
         ? VisionX64.GetNumberOfEntry(pDeviceID, pAttrName)
         : VisionX86.GetNumberOfEntry(pDeviceID, pAttrName);
 
     //GetEntryID
-    public static int GetEntryID(IntPtr pDeviceID, IntPtr pAttrName, uint i) => Environment.Is64BitProcess
+    public static int GetEntryID(IntPtr pDeviceID, IntPtr pAttrName, uint i) => _x64
         ? VisionX64.GetEntryID(pDeviceID, pAttrName, i)
         : VisionX86.GetEntryID(pDeviceID, pAttrName, i);
 
     //GetEntryName
-    public static IntPtr GetEntryName(IntPtr pDeviceID, IntPtr pAttrName, uint i) => Environment.Is64BitProcess
+    public static IntPtr GetEntryName(IntPtr pDeviceID, IntPtr pAttrName, uint i) => _x64
         ? VisionX64.GetEntryName(pDeviceID, pAttrName, i)
         : VisionX86.GetEntryName(pDeviceID, pAttrName, i);
 
     //GetEntryNameByID
     public static IntPtr GetEntryNameByID(IntPtr pDeviceID, IntPtr pAttrName, uint iEntryID) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetEntryNameByID(pDeviceID, pAttrName, iEntryID)
             : VisionX86.GetEntryNameByID(pDeviceID, pAttrName, iEntryID);
 
     //GetAttributeAccessMode
     public static bool GetAttributeAccessMode(IntPtr pDeviceID, IntPtr pAttrName, ref int iAccessMode) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetAttributeAccessMode(pDeviceID, pAttrName, ref iAccessMode)
             : VisionX86.GetAttributeAccessMode(pDeviceID, pAttrName, ref iAccessMode);
 
     //SetAttrInt
     public static bool SetAttrInt(IntPtr pDeviceID, IntPtr pAttrName, long iValue, int iAttrLocation) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.SetAttrInt(pDeviceID, pAttrName, iValue, iAttrLocation)
             : VisionX86.SetAttrInt(pDeviceID, pAttrName, iValue, iAttrLocation);
 
     //SetAttrFloat
     public static bool SetAttrFloat(IntPtr pDeviceID, IntPtr pAttrName, double fValue, int iAttrLocation) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.SetAttrFloat(pDeviceID, pAttrName, fValue, iAttrLocation)
             : VisionX86.SetAttrFloat(pDeviceID, pAttrName, fValue, iAttrLocation);
 
     //CalibrateCapture
-    public static bool CalibrateCapture(IntPtr pDeviceID, uint iFrameNum) => Environment.Is64BitProcess
+    public static bool CalibrateCapture(IntPtr pDeviceID, uint iFrameNum) => _x64
         ? VisionX64.CalibrateCapture(pDeviceID, iFrameNum)
         : VisionX86.CalibrateCapture(pDeviceID, iFrameNum);
 
     //CalibrateReset
-    public static bool CalibrateReset(IntPtr pDeviceID) => Environment.Is64BitProcess
+    public static bool CalibrateReset(IntPtr pDeviceID) => _x64
         ? VisionX64.CalibrateReset(pDeviceID)
         : VisionX86.CalibrateReset(pDeviceID);
 
     //CalibrateDark
-    public static bool CalibrateDark(IntPtr pDeviceID, uint iModeIndex, IntPtr pWorkDir) => Environment.Is64BitProcess
+    public static bool CalibrateDark(IntPtr pDeviceID, uint iModeIndex, IntPtr pWorkDir) => _x64
         ? VisionX64.CalibrateDark(pDeviceID, iModeIndex, pWorkDir)
         : VisionX86.CalibrateDark(pDeviceID, iModeIndex, pWorkDir);
 
     //CalibrateBright
-    public static bool CalibrateBright(IntPtr pDeviceID, uint iModeIndex, IntPtr pWorkDir) => Environment.Is64BitProcess
+    public static bool CalibrateBright(IntPtr pDeviceID, uint iModeIndex, IntPtr pWorkDir) => _x64
         ? VisionX64.CalibrateBright(pDeviceID, iModeIndex, pWorkDir)
         : VisionX86.CalibrateBright(pDeviceID, iModeIndex, pWorkDir);
 
     //DownloadCalDataToDevice
     public static bool DownloadCalDataToDevice(IntPtr pDeviceID, uint iModeIndex, int iCalType, bool bFlashEnable,
         IntPtr pWorkDir, bool bVerify) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.DownloadCalDataToDevice(pDeviceID, iModeIndex, iCalType, bFlashEnable, pWorkDir, bVerify)
             : VisionX86.DownloadCalDataToDevice(pDeviceID, iModeIndex, iCalType, bFlashEnable, pWorkDir, bVerify);
 
     //OpenCalibrate
-    public static bool OpenCalibrate(IntPtr pDeviceID, uint iModeIndex) => Environment.Is64BitProcess
+    public static bool OpenCalibrate(IntPtr pDeviceID, uint iModeIndex) => _x64
         ? VisionX64.OpenCalibrate(pDeviceID, iModeIndex)
         : VisionX86.OpenCalibrate(pDeviceID, iModeIndex);
 
     //CloseCalibrate
-    public static bool CloseCalibrate(IntPtr pDeviceID) => Environment.Is64BitProcess
+    public static bool CloseCalibrate(IntPtr pDeviceID) => _x64
         ? VisionX64.CloseCalibrate(pDeviceID)
         : VisionX86.CloseCalibrate(pDeviceID);
 
     //CalibrateDefect
-    public static bool CalibrateDefect(IntPtr pDeviceID, int iStepType, IntPtr pWorkDir) => Environment.Is64BitProcess
+    public static bool CalibrateDefect(IntPtr pDeviceID, int iStepType, IntPtr pWorkDir) => _x64
         ? VisionX64.CalibrateDefect(pDeviceID, iStepType, pWorkDir)
         : VisionX86.CalibrateDefect(pDeviceID, iStepType, pWorkDir);
 
     //CreateStream
-    public static IntPtr CreateStream(IntPtr pDeviceID) => Environment.Is64BitProcess
+    public static IntPtr CreateStream(IntPtr pDeviceID) => _x64
         ? VisionX64.CreateStream(pDeviceID)
         : VisionX86.CreateStream(pDeviceID);
 
     //GetStreamStatus
-    public static int GetStreamStatus(IntPtr pStream) => Environment.Is64BitProcess
+    public static int GetStreamStatus(IntPtr pStream) => _x64
         ? VisionX64.GetStreamStatus(pStream)
         : VisionX86.GetStreamStatus(pStream);
 
     //StartStream
     public static bool StartStream(IntPtr pStream, bool bAsync, FrameProcCbFunc? pFrameProcCb, IntPtr pCbParam) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.StartStream(pStream, bAsync, pFrameProcCb, pCbParam)
             : VisionX86.StartStream(pStream, bAsync, pFrameProcCb, pCbParam);
 
     //GetRawFrame
     public static IntPtr GetRawFrame(IntPtr pStream, ref ushort iFrameID, ref int iWidth, ref int iHeight,
         ref int iPixelBits) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetRawFrame(pStream, ref iFrameID, ref iWidth, ref iHeight, ref iPixelBits)
             : VisionX86.GetRawFrame(pStream, ref iFrameID, ref iWidth, ref iHeight, ref iPixelBits);
 
     //GetRawPixelValue
-    public static ushort GetRawPixelValue(IntPtr pFrame, int iPixelBits, int iPixelIndex) => Environment.Is64BitProcess
+    public static ushort GetRawPixelValue(IntPtr pFrame, int iPixelBits, int iPixelIndex) => _x64
         ? VisionX64.GetRawPixelValue(pFrame, iPixelBits, iPixelIndex)
         : VisionX86.GetRawPixelValue(pFrame, iPixelBits, iPixelIndex);
 
     //SetFrameProc
-    public static bool SetFrameProc(IntPtr pStream, int iProcType, int iProcParam) => Environment.Is64BitProcess
+    public static bool SetFrameProc(IntPtr pStream, int iProcType, int iProcParam) => _x64
         ? VisionX64.SetFrameProc(pStream, iProcType, iProcParam)
         : VisionX86.SetFrameProc(pStream, iProcType, iProcParam);
 
     //GetFrameProc
-    public static int GetFrameProc(IntPtr pStream, int iProcType) => Environment.Is64BitProcess
+    public static int GetFrameProc(IntPtr pStream, int iProcType) => _x64
         ? VisionX64.GetFrameProc(pStream, iProcType)
         : VisionX86.GetFrameProc(pStream, iProcType);
 
     //GetFrameInShort
     public static IntPtr GetFrameInShort(IntPtr pStream, ref ushort iFrameID, ref int iWidth, ref int iHeight) =>
-        Environment.Is64BitProcess
+        _x64
             ? VisionX64.GetFrameInShort(pStream, ref iFrameID, ref iWidth, ref iHeight)
             : VisionX86.GetFrameInShort(pStream, ref iFrameID, ref iWidth, ref iHeight);
 
     //SoftTrigger
-    public static bool SoftTrigger(IntPtr pDeviceMAC) => Environment.Is64BitProcess
+    public static bool SoftTrigger(IntPtr pDeviceMAC) => _x64
         ? VisionX64.SoftTrigger(pDeviceMAC)
         : VisionX86.SoftTrigger(pDeviceMAC);
 
     //StopStream
     public static void StopStream(IntPtr pStream)
     {
-        if (Environment.Is64BitProcess)
+        if (_x64)
         {
             VisionX64.StopStream(pStream);
         }
@@ -284,7 +285,7 @@ public static class VisionHelper
     //DestroyStream
     public static void DestroyStream(IntPtr pStream)
     {
-        if (Environment.Is64BitProcess)
+        if (_x64)
         {
             VisionX64.DestroyStream(pStream);
         }
@@ -297,7 +298,7 @@ public static class VisionHelper
     //CloseDevice
     public static void CloseDevice(IntPtr pDeviceID)
     {
-        if (Environment.Is64BitProcess)
+        if (_x64)
         {
             VisionX64.CloseDevice(pDeviceID);
         }
@@ -309,26 +310,26 @@ public static class VisionHelper
 
     //GetLastErrorText
     public static IntPtr GetLastErrorText() =>
-        Environment.Is64BitProcess ? VisionX64.GetLastErrorText() : VisionX86.GetLastErrorText();
+        _x64 ? VisionX64.GetLastErrorText() : VisionX86.GetLastErrorText();
 
     //GetVersionText
     public static IntPtr GetVersionText() =>
-        Environment.Is64BitProcess ? VisionX64.GetVersionText() : VisionX86.GetVersionText();
+        _x64 ? VisionX64.GetVersionText() : VisionX86.GetVersionText();
 
     //SetCallLogEnable
-    public static bool SetCallLogEnable(bool bEnable) => Environment.Is64BitProcess
+    public static bool SetCallLogEnable(bool bEnable) => _x64
         ? VisionX64.SetCallLogEnable(bEnable)
         : VisionX86.SetCallLogEnable(bEnable);
 
     //SetStreamLogEnable
-    public static bool SetStreamLogEnable(IntPtr pStream, bool bEnable) => Environment.Is64BitProcess
+    public static bool SetStreamLogEnable(IntPtr pStream, bool bEnable) => _x64
         ? VisionX64.SetStreamLogEnable(pStream, bEnable)
         : VisionX86.SetStreamLogEnable(pStream, bEnable);
 
     //Uninit
     public static void Uninit()
     {
-        if (Environment.Is64BitProcess)
+        if (_x64)
         {
             VisionX64.Uninit();
         }

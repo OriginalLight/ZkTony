@@ -7,6 +7,7 @@ import com.zktony.android.utils.AppStateUtils.hpp
 import com.zktony.android.utils.SerialPortUtils.readWithPosition
 import com.zktony.android.utils.SerialPortUtils.writeRegister
 import com.zktony.android.utils.SerialPortUtils.writeWithPulse
+import com.zktony.android.utils.SerialPortUtils.writeWithTemperature
 import com.zktony.android.utils.SerialPortUtils.writeWithValve
 import kotlinx.coroutines.*
 import java.util.LinkedList
@@ -375,6 +376,7 @@ class JobExecutorUtils(
         val inAddr = 2 * group
         val outAddr = 2 * group + 1
         callback(JobEvent.Shaker(true))
+        writeWithTemperature(listOf(index + 1 to process.temperature))
         writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
         delay(100L)
         writeWithValve(inAddr, inChannel)
