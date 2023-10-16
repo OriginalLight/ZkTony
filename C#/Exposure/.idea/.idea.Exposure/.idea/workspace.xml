@@ -15,26 +15,8 @@
       <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/HomeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/HomeViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/utils/JobExecutorUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/utils/JobExecutorUtils.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/Lib_SerialPort/src/main/java/com/zktony/serialport/command/Protocol.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/Lib_SerialPort/src/main/java/com/zktony/serialport/command/Protocol.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/App.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/App.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Exposure.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Exposure.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Helpers/SerialPortHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Helpers/SerialPortHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Helpers/VisionHelper.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Helpers/VisionHelper.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Properties/PublishProfiles/win10-x64.pubxml" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Properties/PublishProfiles/win10-x64.pubxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Properties/PublishProfiles/win10-x86.pubxml" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Properties/PublishProfiles/win10-x86.pubxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Services/AppNotificationService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Services/AppNotificationService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Services/PictureService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Services/PictureService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Services/VisionService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Services/VisionService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/TemplateStudio.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/TemplateStudio.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/ViewModels/MainViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/ViewModels/MainViewModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/ViewModels/PictureDetailViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/ViewModels/PictureDetailViewModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/ViewModels/PictureViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/ViewModels/PictureViewModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/ViewModels/SettingsViewModel.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/ViewModels/SettingsViewModel.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Views/MainPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Views/MainPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Views/PictureDetailPage.xaml" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Views/PictureDetailPage.xaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Views/PictureDetailPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Views/PictureDetailPage.xaml.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Exposure/Views/SettingsPage.xaml.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Exposure/Views/SettingsPage.xaml.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/gradle/libs.versions.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -138,7 +120,8 @@
       <workItem from="1697073334466" duration="5259000" />
       <workItem from="1697078983192" duration="6784000" />
       <workItem from="1697158086058" duration="1504000" />
-      <workItem from="1697164826053" duration="1848000" />
+      <workItem from="1697164826053" duration="3096000" />
+      <workItem from="1697426914729" duration="607000" />
     </task>
     <servers />
   </component>

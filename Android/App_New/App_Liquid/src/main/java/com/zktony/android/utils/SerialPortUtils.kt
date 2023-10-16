@@ -1,7 +1,9 @@
 package com.zktony.android.utils
 
 import com.zktony.android.utils.AppStateUtils.hpa
+import com.zktony.android.utils.AppStateUtils.hpc
 import com.zktony.android.utils.AppStateUtils.hpg
+import com.zktony.android.utils.AppStateUtils.hpp
 import com.zktony.android.utils.LogUtils.logE
 import com.zktony.android.utils.internal.ControlType
 import com.zktony.android.utils.internal.ExceptionPolicy
@@ -31,7 +33,7 @@ object SerialPortUtils {
                         }
                     }
 
-                    Protocol.Rx_0X02 -> {
+                    Protocol.RX_0X02 -> {
                         for (i in 0 until rx.data.size / 2) {
                             val index = rx.data.readInt8(offset = i * 2)
                             val status = rx.data.readInt8(offset = i * 2 + 1)
@@ -53,10 +55,9 @@ object SerialPortUtils {
     fun <T : Number> pulse(index: Int, dvp: T): Long {
         val p = when (dvp) {
             is Double -> when (index) {
-                0 -> (dvp / 4.5 * 3200L).toLong()
-                1 -> (dvp / 4.5 * 3200L).toLong()
-                else -> ((AppStateUtils.hpc[index - 2] ?: { x -> x * 100 }).invoke(dvp)
-                    ?: 0.0).toLong()
+                0 -> (dvp / 27.89 * 3200L).toLong()
+                1 -> (dvp / 18.34 * 3200L).toLong()
+                else -> ((hpc[index - 2] ?: { x -> x * 100 }).invoke(dvp) ?: 0.0).toLong()
             }
 
             is Long -> dvp
@@ -64,8 +65,8 @@ object SerialPortUtils {
         }
 
         return if (index in 0..1) {
-            val d = p - (AppStateUtils.hpp[index] ?: 0L)
-            AppStateUtils.hpp[index] = maxOf(p, 0L)
+            val d = p - (hpp[index] ?: 0L)
+            hpp[index] = maxOf(p, 0L)
             d
         } else {
             p

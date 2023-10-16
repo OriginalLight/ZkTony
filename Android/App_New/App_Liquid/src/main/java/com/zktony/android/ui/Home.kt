@@ -4,14 +4,36 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowLeft
+import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.ClearAll
+import androidx.compose.material.icons.filled.RestartAlt
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,9 +48,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.entities.Program
-import com.zktony.android.ui.components.*
+import com.zktony.android.ui.components.HomeAppBar
+import com.zktony.android.ui.components.JobActionCard
+import com.zktony.android.ui.components.OrificePlate
+import com.zktony.android.ui.components.ProgramItem
 import com.zktony.android.ui.navigation.Route
-import com.zktony.android.ui.utils.*
+import com.zktony.android.ui.utils.AnimatedContent
+import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.LocalSnackbarHostState
+import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.ui.utils.itemsIndexed
+import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
 
@@ -110,7 +141,11 @@ fun HomeActions(
     ) {
         ElevatedButton(
             enabled = uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.RESET,
-            onClick = { uiEvent(HomeUiEvent.Reset) }) {
+            onClick = {
+                if (uiState.jobState.status != JobState.RUNNING) {
+                    uiEvent(HomeUiEvent.Reset)
+                }
+            }) {
             if (uiState.uiFlags == UiFlags.RESET) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
@@ -133,10 +168,12 @@ fun HomeActions(
             enabled = uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.CLEAN,
             onClick = {
                 scope.launch {
-                    if (uiState.uiFlags == UiFlags.NONE) {
-                        uiEvent(HomeUiEvent.Pipeline(1))
-                    } else if (uiState.uiFlags == UiFlags.CLEAN) {
-                        uiEvent(HomeUiEvent.Pipeline(0))
+                    if (uiState.jobState.status != JobState.RUNNING) {
+                        if (uiState.uiFlags == UiFlags.NONE) {
+                            uiEvent(HomeUiEvent.Pipeline(1))
+                        } else if (uiState.uiFlags == UiFlags.CLEAN) {
+                            uiEvent(HomeUiEvent.Pipeline(0))
+                        }
                     }
                 }
             }) {
@@ -162,10 +199,12 @@ fun HomeActions(
             enabled = uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_IN,
             onClick = {
                 scope.launch {
-                    if (uiState.uiFlags == UiFlags.NONE) {
-                        uiEvent(HomeUiEvent.Pipeline(2))
-                    } else if (uiState.uiFlags == UiFlags.PIPELINE_IN) {
-                        uiEvent(HomeUiEvent.Pipeline(0))
+                    if (uiState.jobState.status != JobState.RUNNING) {
+                        if (uiState.uiFlags == UiFlags.NONE) {
+                            uiEvent(HomeUiEvent.Pipeline(2))
+                        } else if (uiState.uiFlags == UiFlags.PIPELINE_IN) {
+                            uiEvent(HomeUiEvent.Pipeline(0))
+                        }
                     }
                 }
             }) {
@@ -191,10 +230,12 @@ fun HomeActions(
             enabled = uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_OUT,
             onClick = {
                 scope.launch {
-                    if (uiState.uiFlags == UiFlags.NONE) {
-                        uiEvent(HomeUiEvent.Pipeline(3))
-                    } else if (uiState.uiFlags == UiFlags.PIPELINE_OUT) {
-                        uiEvent(HomeUiEvent.Pipeline(0))
+                    if (uiState.jobState.status != JobState.RUNNING) {
+                        if (uiState.uiFlags == UiFlags.NONE) {
+                            uiEvent(HomeUiEvent.Pipeline(3))
+                        } else if (uiState.uiFlags == UiFlags.PIPELINE_OUT) {
+                            uiEvent(HomeUiEvent.Pipeline(0))
+                        }
                     }
                 }
             }) {

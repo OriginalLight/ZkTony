@@ -12,7 +12,11 @@ import com.zktony.android.data.entities.History
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Log
 import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.ui.utils.*
+import com.zktony.android.ui.utils.JobEvent
+import com.zktony.android.ui.utils.JobExecutorUtils
+import com.zktony.android.ui.utils.JobState
+import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.AppStateUtils.hpp
 import com.zktony.android.utils.AppStateUtils.hpt
 import com.zktony.android.utils.Constants
@@ -21,7 +25,6 @@ import com.zktony.android.utils.SerialPortUtils.readWithTemperature
 import com.zktony.android.utils.SerialPortUtils.readWithValve
 import com.zktony.android.utils.SerialPortUtils.writeRegister
 import com.zktony.android.utils.SerialPortUtils.writeWithPulse
-import com.zktony.android.utils.SerialPortUtils.writeWithSwitch
 import com.zktony.android.utils.SerialPortUtils.writeWithTemperature
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -101,10 +104,7 @@ class HomeViewModel @Inject constructor(
                     _uiState.value = it
                 }
             }
-            launch {
-                init()
-                loop()
-            }
+            launch { init() }
         }
     }
 
@@ -195,29 +195,20 @@ class HomeViewModel @Inject constructor(
             readWithValve(slaveAddr = it)
             delay(300L)
         }
-        val co = dataStore.readData(Constants.ZT_0000, 0)
-        // 打开温控
-        writeWithSwitch(
-            mutableListOf<Pair<Int, Int>>().apply {
-                repeat(co + 1) { add(it to 1) }
-            }
-        )
-        // 设置温度
-        writeWithTemperature(
-            mutableListOf<Pair<Int, Double>>().apply {
-                add(0 to dataStore.readData(Constants.ZT_0001, 4.0))
-                repeat(co) { add(it + 1 to 26.0) }
-            }
-        )
-    }
-
-    private suspend fun loop() {
-        val co = dataStore.readData(Constants.ZT_0000, 0)
+        val coll = dataStore.readData(Constants.ZT_0000, 0)
+        writeWithTemperature(0, dataStore.readData(Constants.ZT_0001, 4.0))
+        delay(500L)
+        repeat(coll) {
+            writeWithTemperature(it + 1, 26.0)
+            delay(500L)
+        }
         while (true) {
             _stand.value = _stand.value.copy(insulation = hpt.values.toList())
             delay(2000L)
-            readWithTemperature((0..co).toList())
-            delay(1000L)
+            repeat(coll + 1) {
+                readWithTemperature(it)
+                delay(100L)
+            }
         }
     }
 }

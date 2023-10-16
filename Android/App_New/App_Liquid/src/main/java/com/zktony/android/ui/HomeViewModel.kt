@@ -18,7 +18,11 @@ import com.zktony.android.utils.internal.ExecuteType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
@@ -29,9 +33,7 @@ import kotlin.math.ceil
  * @date: 2023-02-14 15:37
  */
 @HiltViewModel
-class HomeViewModel @Inject constructor(
-    private val dao: ProgramDao
-) : ViewModel() {
+class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0L)
@@ -160,7 +162,6 @@ class HomeViewModel @Inject constructor(
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                _message.value = ex.message
             } finally {
                 _finished.value = emptyList()
                 _status.value = JobState.STEPPED
@@ -204,15 +205,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private suspend fun separationAlgorithm(orificePlate: OrificePlate) {
-        val row = orificePlate.row
-        val column = orificePlate.column
+    private suspend fun separationAlgorithm(op: OrificePlate) {
+        val row = op.row
+        val column = op.column
         for (i in 0 until ceil(row / 6.0).toInt()) {
             for (j in if (i % 2 == 0) 0 until column else column - 1 downTo 0) {
                 while (_status.value == JobState.PAUSED) {
                     delay(100)
                 }
-                val coordinate = orificePlate.orifices[j][i * 6].point
+                val coordinate = op.orifices[j][i * 6].point
                 start {
                     with(index = 0, pdv = coordinate.x)
                     with(index = 1, pdv = coordinate.y)
@@ -228,7 +229,7 @@ class HomeViewModel @Inject constructor(
                     timeOut = 1000L * 30
                     repeat(6) {
                         if (i * 6 + it < row) {
-                            val orifice = orificePlate.orifices[j][i * 6 + it]
+                            val orifice = op.orifices[j][i * 6 + it]
                             if (orifice.selected) {
                                 with(index = 2 + it, pdv = orifice.volume.getOrNull(0) ?: 0.0)
                                 list += Triple(j, i * 6 + it, Color.Green)
@@ -238,16 +239,16 @@ class HomeViewModel @Inject constructor(
                 }
                 _finished.value += list
 
-                delay(orificePlate.delay)
+                delay(op.delay)
             }
         }
         _finished.value = emptyList()
     }
 
-    private suspend fun hybridAlgorithm(orificePlate: OrificePlate) {
-        val row = orificePlate.row
-        val column = orificePlate.column
-        val coordinate = orificePlate.points
+    private suspend fun hybridAlgorithm(op: OrificePlate) {
+        val row = op.row
+        val column = op.column
+        val coordinate = op.points
         val rowSpace = (coordinate[1].x - coordinate[0].x) / (row - 1)
         for (i in 0 until row + 5) {
             for (j in if (i % 2 == 0) 0 until column else column - 1 downTo 0) {
@@ -255,14 +256,14 @@ class HomeViewModel @Inject constructor(
                     delay(100)
                 }
                 val abscissa = if (i < 6) {
-                    orificePlate.orifices[j][0].point.x - (5 - i) * rowSpace
+                    op.orifices[j][0].point.x - (5 - i) * rowSpace
                 } else {
-                    orificePlate.orifices[j][i - 5].point.x
+                    op.orifices[j][i - 5].point.x
                 }
 
                 start {
                     with(index = 0, pdv = abscissa)
-                    with(index = 1, pdv = orificePlate.orifices[j][0].point.y)
+                    with(index = 1, pdv = op.orifices[j][0].point.y)
                 }
 
                 while (_status.value == JobState.PAUSED) {
@@ -275,7 +276,7 @@ class HomeViewModel @Inject constructor(
                     timeOut = 1000L * 30
                     repeat(6) {
                         if (i - 5 + it in 0 until row) {
-                            val orifice = orificePlate.orifices[j][i - 5 + it]
+                            val orifice = op.orifices[j][i - 5 + it]
                             if (orifice.selected) {
                                 with(index = 2 + it, pdv = orifice.volume.getOrNull(it) ?: 0.0)
                                 list += Triple(
@@ -299,7 +300,7 @@ class HomeViewModel @Inject constructor(
                 }
                 _finished.value += list
 
-                delay(orificePlate.delay)
+                delay(op.delay)
             }
         }
         _finished.value = emptyList()

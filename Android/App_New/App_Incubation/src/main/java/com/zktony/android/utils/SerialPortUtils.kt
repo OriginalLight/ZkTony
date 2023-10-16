@@ -54,21 +54,12 @@ object SerialPortUtils {
         }
 
     val serialZkty =
-        object : AbstractSerialHelper(SerialConfig()) {
+        object : AbstractSerialHelper(SerialConfig(baudRate = 57600)) {
             override fun callbackHandler(byteArray: ByteArray) {
-                Protocol.Protocol.callbackHandler(byteArray) { code, rx ->
-                    when (code) {
-                        Protocol.RX_0X04 -> {
-                            for (i in 0 until rx.data.size / 5) {
-                                val index = rx.data.readInt8(offset = i * 5)
-                                val status = rx.data.readFloatLE(offset = i * 5 + 1)
-                                hpt[index] = status.toDouble()
-                            }
-                        }
-
-                        else -> {}
-                    }
-                }
+                val ascii = byteArray.toAsciiString()
+                val address = ascii.substring(ascii.length - 2, ascii.length - 1).toInt()
+                val data = ascii.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
+                hpt[address] = data.toDoubleOrNull() ?: 0.0
             }
 
             override fun exceptionHandler(e: Exception) {
@@ -195,51 +186,15 @@ object SerialPortUtils {
     /**
      * 发送温度
      */
-    fun writeWithTemperature(ids: List<Pair<Int, Double>>) {
-        val byteArray = ByteArray(ids.size * 5)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i.first, index * 5)
-            byteArray.writeFloatLE(i.second.toFloat(), index * 5 + 1)
-        }
-        if (byteArray.isNotEmpty()) {
-            sendProtocol {
-                func = 0x07
-                data = byteArray
-            }
-        }
+    fun writeWithTemperature(id: Int, value: Double) {
+        serialZkty.sendAsciiString("TC1:TCADJUSTTEMP=${String.format("%.2f", value)}@$id\n")
     }
 
     /**
      * 读取温度
      */
-    fun readWithTemperature(ids: List<Int>) {
-        val byteArray = ByteArray(ids.size)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i, index)
-        }
-        if (byteArray.isNotEmpty()) {
-            sendProtocol {
-                func = 0x08
-                data = byteArray
-            }
-        }
-    }
-
-    /**
-     * 设置温控开关
-     */
-    fun writeWithSwitch(ids: List<Pair<Int, Int>>) {
-        val byteArray = ByteArray(ids.size * 2)
-        ids.forEachIndexed { index, i ->
-            byteArray.writeInt8(i.first, index * 2)
-            byteArray.writeInt8(i.second, index * 2 + 1)
-        }
-        if (byteArray.isNotEmpty()) {
-            sendProtocol {
-                func = 0x09
-                data = byteArray
-            }
-        }
+    fun readWithTemperature(id: Int) {
+        serialZkty.sendAsciiString("TC1:TCACTUALTEMP?@$id\n")
     }
 }
 
