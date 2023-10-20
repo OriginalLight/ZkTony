@@ -29,6 +29,17 @@ object AlgorithmUtils {
         }
     }
 
+    fun calculateCalibrationFactor(points: List<Point>): (Double) -> Double {
+        if (points.isEmpty()) return { x -> x * 100 }
+        val slopeList = mutableListOf<Double>()
+        points.forEach {
+            if (it.x == 0.0) return@forEach
+            slopeList.add(it.y / it.x)
+        }
+        val averageSlope = slopeList.average()
+        return { x -> x * averageSlope }
+    }
+
     fun fitQuadraticCurve(points: List<Point>): (Double) -> Double? {
         val n = points.size
 
@@ -146,4 +157,3 @@ object AlgorithmUtils {
         array[idx2] = temp
     }
 }
-

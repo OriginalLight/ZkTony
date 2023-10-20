@@ -7,9 +7,11 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.zktony.android.data.dao.ProgramDao
+import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.entities.internal.OrificePlate
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.getGpio
 import com.zktony.android.utils.SerialPortUtils.gpio
 import com.zktony.android.utils.SerialPortUtils.start
@@ -33,7 +35,10 @@ import kotlin.math.ceil
  * @date: 2023-02-14 15:37
  */
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel() {
+class HomeViewModel @Inject constructor(
+    private val dao: ProgramDao,
+    private val dataStore: DataSaverDataStore
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     private val _selected = MutableStateFlow(0L)
@@ -110,14 +115,18 @@ class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel
                         job[it] = launch {
                             if (!getGpio(it)) {
                                 start {
-                                    with(index = it, pdv = 3200L * -30)
+                                    with(
+                                        index = it,
+                                        pdv = 3200L * -30,
+                                        ads = Triple(50, 80, 100)
+                                    )
                                 }
                             }
 
                             start {
                                 with(
                                     index = it,
-                                    pdv = 3200L * 2,
+                                    pdv = 3200L,
                                     ads = Triple(50, 80, 100)
                                 )
                             }
@@ -125,7 +134,7 @@ class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel
                             start {
                                 with(
                                     index = it,
-                                    pdv = 3200L * -3,
+                                    pdv = 3200L * -2,
                                     ads = Triple(50, 80, 100)
                                 )
                             }
@@ -151,13 +160,14 @@ class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel
 
                 val orificePlates = selected.orificePlates
 
-                orificePlates.forEach { orificePlate ->
-                    _orificePlate.value = orificePlate
+                orificePlates.forEach { op ->
+                    _orificePlate.value = op
+                    previousAlgorithm(op)
 
-                    if (orificePlate.type == 0) {
-                        separationAlgorithm(orificePlate)
+                    if (op.type == 0) {
+                        separationAlgorithm(op)
                     } else {
-                        hybridAlgorithm(orificePlate)
+                        hybridAlgorithm(op)
                     }
                 }
             } catch (ex: Exception) {
@@ -173,6 +183,7 @@ class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel
         viewModelScope.launch {
             _job.value?.cancel()
             _job.value = null
+            stop(0, 1, 2, 3, 4, 5, 6, 7)
         }
     }
 
@@ -205,11 +216,41 @@ class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel
         }
     }
 
+    private suspend fun previousAlgorithm(op: OrificePlate) {
+        if (op.previous > 0.0) {
+            val x = dataStore.readData(Constants.ZT_0003, 0.0)
+            val y = dataStore.readData(Constants.ZT_0004, 0.0)
+            start {
+                with(index = 0, pdv = x)
+                with(index = 1, pdv = y)
+            }
+            start {
+                repeat(6) {
+                    with(index = 2 + it, pdv = op.previous)
+                }
+            }
+        }
+    }
+
     private suspend fun separationAlgorithm(op: OrificePlate) {
         val row = op.row
         val column = op.column
         for (i in 0 until ceil(row / 6.0).toInt()) {
             for (j in if (i % 2 == 0) 0 until column else column - 1 downTo 0) {
+                if (_job.value == null) return
+
+                var next = false
+                repeat(6) {
+                    if (i * 6 + it < row) {
+                        val orifice = op.orifices[j][i * 6 + it]
+                        val pvd = orifice.volume.getOrNull(0) ?: 0.0
+                        if (pvd > 0.0) {
+                            next = true
+                        }
+                    }
+                }
+                if (!next) continue
+
                 while (_status.value == JobState.PAUSED) {
                     delay(100)
                 }
@@ -239,7 +280,7 @@ class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel
                 }
                 _finished.value += list
 
-                delay(op.delay)
+                delay((op.delay * 1000L).toLong())
             }
         }
         _finished.value = emptyList()
@@ -252,6 +293,21 @@ class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel
         val rowSpace = (coordinate[1].x - coordinate[0].x) / (row - 1)
         for (i in 0 until row + 5) {
             for (j in if (i % 2 == 0) 0 until column else column - 1 downTo 0) {
+                if (_job.value == null) return
+                var next = false
+                repeat(6) {
+                    if (i - 5 + it in 0 until row) {
+                        val orifice = op.orifices[j][i - 5 + it]
+                        if (orifice.selected) {
+                            val pvd = orifice.volume.getOrNull(it) ?: 0.0
+                            if (pvd > 0.0) {
+                                next = true
+                            }
+                        }
+                    }
+                }
+                if (!next) continue
+
                 while (_status.value == JobState.PAUSED) {
                     delay(100)
                 }
@@ -300,7 +356,7 @@ class HomeViewModel @Inject constructor(private val dao: ProgramDao) : ViewModel
                 }
                 _finished.value += list
 
-                delay(op.delay)
+                delay((op.delay * 1000L).toLong())
             }
         }
         _finished.value = emptyList()

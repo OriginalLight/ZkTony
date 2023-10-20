@@ -133,7 +133,7 @@ abstract class AbstractSerial {
                     }
 
                     try {
-                        Thread.sleep(4L)
+                        Thread.sleep(10L)
                     } catch (ex: InterruptedException) {
                         exceptionHandler(ex)
                     }

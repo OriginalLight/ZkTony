@@ -35,10 +35,8 @@ class AdminViewModel constructor(
         val cmd = SM.send.value
         if (pump) {
             cmd.motorX = 1
-            cmd.motorY = 1
         } else {
             cmd.motorX = 0
-            cmd.motorY = 0
         }
         SM.send(cmd)
     }

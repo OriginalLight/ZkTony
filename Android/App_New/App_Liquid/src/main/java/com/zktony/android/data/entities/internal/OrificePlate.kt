@@ -1,14 +1,17 @@
 package com.zktony.android.data.entities.internal
 
+import androidx.annotation.Keep
 import androidx.compose.ui.graphics.Color
 
 /**
  * @author 刘贺贺
  * @date 2023/8/1 15:38
  */
+@Keep
 data class OrificePlate(
     val column: Int = 8,
-    val delay: Long = 0L,
+    val delay: Double = 0.0,
+    val previous: Double = 0.0,
     val row: Int = 12,
     val type: Int = 0,
     val points: List<Point> = List(2) { Point() },
@@ -73,12 +76,14 @@ data class OrificePlate(
 
     fun getInfo(): List<String> {
         val list = mutableListOf<String>()
-        list.add("$column x $row")
-        list.add("${
-            orifices.flatten().count { it.selected }
-        }/${orifices.flatten().size}")
-        list.add(if (type == 0) "分液模式" else "混合模式")
-        list.add("$delay ms")
+        list.add("规格：$column x $row")
+        list.add("已选：${orifices.flatten().count { it.selected }} 孔")
+        list.add("模式：" + if (type == 0) "分液模式" else "混合模式")
+        list.add("延时：$delay 秒")
+        list.add("预排：$previous 微升")
+        if (type == 0) {
+            list.add("液量：${orifices.flatten().firstOrNull()?.volume?.firstOrNull() ?: 0.0} 微升")
+        }
         return list
     }
 }

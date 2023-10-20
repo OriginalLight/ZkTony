@@ -3,7 +3,14 @@ package com.zktony.android.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
@@ -12,8 +19,15 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Numbers
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -36,7 +50,12 @@ import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.components.CalibrationAppBar
 import com.zktony.android.ui.components.CalibrationItem
 import com.zktony.android.ui.components.PointItem
-import com.zktony.android.ui.utils.*
+import com.zktony.android.ui.utils.AnimatedContent
+import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.LocalSnackbarHostState
+import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.itemsIndexed
+import com.zktony.android.ui.utils.toList
 import kotlinx.coroutines.launch
 
 /**
@@ -91,7 +110,7 @@ fun CalibrationWrapper(
         CalibrationAppBar(entities.toList(), uiState, uiEvent) { navigation() }
         AnimatedContent(targetState = uiState.page) {
             when (uiState.page) {
-                PageType.CALIBRATION_LIST -> CalibrationList(entities, uiState, uiEvent)
+                PageType.CALIBRATION_LIST -> CalibrationList(entities, uiEvent)
                 PageType.CALIBRATION_DETAIL -> CalibrationDetail(
                     entities.toList(),
                     uiState,
@@ -107,14 +126,14 @@ fun CalibrationWrapper(
 @Composable
 fun CalibrationList(
     entities: LazyPagingItems<Calibration>,
-    uiState: CalibrationUiState,
     uiEvent: (CalibrationUiEvent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
 
     LazyVerticalGrid(
         modifier = Modifier,
-        columns = GridCells.Fixed(3),
+        columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -123,21 +142,19 @@ fun CalibrationList(
             CalibrationItem(
                 index = index,
                 item = item,
-                selected = uiState.selected == item.id
-            ) { double ->
-                scope.launch {
-                    if (double) {
+                onClick = {
+                    scope.launch {
                         uiEvent(CalibrationUiEvent.ToggleSelected(item.id))
                         uiEvent(CalibrationUiEvent.NavTo(PageType.CALIBRATION_DETAIL))
-                    } else {
-                        if (uiState.selected != item.id) {
-                            uiEvent(CalibrationUiEvent.ToggleSelected(item.id))
-                        } else {
-                            uiEvent(CalibrationUiEvent.ToggleSelected(0L))
-                        }
+                    }
+                },
+                onDelete = {
+                    scope.launch {
+                        uiEvent(CalibrationUiEvent.Delete(item.id))
+                        snackbarHostState.showSnackbar("删除成功")
                     }
                 }
-            }
+            )
         }
     }
 }

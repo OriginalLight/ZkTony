@@ -7,7 +7,18 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,10 +27,38 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowCircleUp
+import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Cyclone
+import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.TrendingDown
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.outlined.Grade
+import androidx.compose.material.icons.outlined.HelpOutline
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Navigation
+import androidx.compose.material.icons.outlined.Security
+import androidx.compose.material.icons.outlined.Sync
+import androidx.compose.material.icons.outlined.Verified
+import androidx.compose.material.icons.outlined.Wifi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -46,7 +85,11 @@ import com.zktony.android.R
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Motor
 import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.ui.components.*
+import com.zktony.android.ui.components.CoordinateInput
+import com.zktony.android.ui.components.MotorItem
+import com.zktony.android.ui.components.SettingsAppBar
+import com.zktony.android.ui.components.VerificationCodeField
+import com.zktony.android.ui.components.VerificationCodeItem
 import com.zktony.android.ui.utils.AnimatedContent
 import com.zktony.android.ui.utils.LocalNavigationActions
 import com.zktony.android.ui.utils.LocalSnackbarHostState
@@ -54,7 +97,6 @@ import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.ApplicationUtils
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.start
-import com.zktony.android.utils.extra.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -416,6 +458,7 @@ fun MotorList(
     uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
 
     LazyVerticalGrid(
         modifier = Modifier,
@@ -427,21 +470,19 @@ fun MotorList(
         items(items = uiState.entities) { item ->
             MotorItem(
                 item = item,
-                selected = uiState.selected == item.id
-            ) { double ->
-                scope.launch {
-                    if (double) {
+                onClick = {
+                    scope.launch {
                         uiEvent(SettingUiEvent.ToggleSelected(item.id))
                         uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL))
-                    } else {
-                        if (uiState.selected != item.id) {
-                            uiEvent(SettingUiEvent.ToggleSelected(item.id))
-                        } else {
-                            uiEvent(SettingUiEvent.ToggleSelected(0L))
-                        }
+                    }
+                },
+                onDelete = {
+                    scope.launch {
+                        uiEvent(SettingUiEvent.Delete(item.id))
+                        snackbarHostState.showSnackbar(message = "删除成功")
                     }
                 }
-            }
+            )
         }
     }
 }

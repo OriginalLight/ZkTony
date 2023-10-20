@@ -1,7 +1,11 @@
 package com.zktony.android.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.outlined.Analytics
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -43,7 +47,11 @@ class NavigationActions(private val navController: NavHostController) {
     }
 
     fun navigateUp() {
-        navController.navigateUp()
+        if (navController.previousBackStackEntry == null) {
+            navigate(Route.HOME)
+        } else {
+            navController.navigateUp()
+        }
     }
 
     fun popBackStack() {
@@ -59,7 +67,7 @@ val TOP_LEVEL_DESTINATIONS = listOf(
     ),
     TopLevelDestination(
         route = Route.CALIBRATION,
-        icon = Icons.Outlined.Checklist,
+        icon = Icons.Outlined.BarChart,
         iconTextId = R.string.calibration
     ),
     TopLevelDestination(

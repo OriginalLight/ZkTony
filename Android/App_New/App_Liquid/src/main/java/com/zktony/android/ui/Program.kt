@@ -4,15 +4,41 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,8 +52,19 @@ import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.OrificePlate
 import com.zktony.android.data.entities.internal.Point
-import com.zktony.android.ui.components.*
-import com.zktony.android.ui.utils.*
+import com.zktony.android.ui.components.CircleTabRow
+import com.zktony.android.ui.components.CircleTextField
+import com.zktony.android.ui.components.CoordinateInput
+import com.zktony.android.ui.components.OrificePlate
+import com.zktony.android.ui.components.OrificePlateCard
+import com.zktony.android.ui.components.ProgramAppBar
+import com.zktony.android.ui.components.ProgramItem
+import com.zktony.android.ui.utils.AnimatedContent
+import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.LocalSnackbarHostState
+import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.itemsIndexed
+import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.start
 import com.zktony.android.utils.extra.format
@@ -85,7 +122,7 @@ fun ProgramWrapper(
         ProgramAppBar(entities.toList(), uiState, uiEvent) { navigation() }
         AnimatedContent(targetState = uiState.page) {
             when (uiState.page) {
-                PageType.PROGRAM_LIST -> ProgramList(entities, uiState, uiEvent)
+                PageType.PROGRAM_LIST -> ProgramList(entities, uiEvent)
                 PageType.PROGRAM_DETAIL -> ProgramDetail(entities.toList(), uiState, uiEvent) {
                     scope.launch {
                         selected.intValue = it
@@ -118,14 +155,14 @@ fun ProgramWrapper(
 @Composable
 fun ProgramList(
     entities: LazyPagingItems<Program>,
-    uiState: ProgramUiState,
     uiEvent: (ProgramUiEvent) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
 
     LazyVerticalGrid(
         contentPadding = PaddingValues(16.dp),
-        columns = GridCells.Fixed(3),
+        columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -133,21 +170,19 @@ fun ProgramList(
             ProgramItem(
                 index = index,
                 item = item,
-                selected = uiState.selected == item.id
-            ) { double ->
-                scope.launch {
-                    if (double) {
+                onClick = {
+                    scope.launch {
                         uiEvent(ProgramUiEvent.ToggleSelected(item.id))
                         uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
-                    } else {
-                        if (uiState.selected != item.id) {
-                            uiEvent(ProgramUiEvent.ToggleSelected(item.id))
-                        } else {
-                            uiEvent(ProgramUiEvent.ToggleSelected(0L))
-                        }
+                    }
+                },
+                onDelete = {
+                    scope.launch {
+                        uiEvent(ProgramUiEvent.Delete(item.id))
+                        snackbarHostState.showSnackbar("删除成功")
                     }
                 }
-            }
+            )
         }
     }
 }
@@ -160,6 +195,7 @@ fun ProgramDetail(
     toggleSelected: (Int) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
     val selected = entities.find { it.id == uiState.selected } ?: Program()
 
     LazyVerticalGrid(
@@ -187,6 +223,7 @@ fun ProgramDetail(
                         val array = selected.orificePlates.toMutableList()
                         array.removeAt(index)
                         uiEvent(ProgramUiEvent.Update(selected.copy(orificePlates = array)))
+                        snackbarHostState.showSnackbar("删除成功")
                     }
                 },
                 toggleSelected = { toggleSelected(index) },
@@ -206,7 +243,8 @@ fun ProgramInput(
 
     var selected by remember { mutableStateOf(orificePlate) }
     var volumeIndex by remember { mutableIntStateOf(0) }
-    var volume by remember { mutableStateOf(selected.getVolume()[0].format(1)) }
+    var volume by remember { mutableStateOf(selected.getVolume()[0].toString()) }
+    var previous by remember { mutableStateOf(selected.previous.toString()) }
     var delay by remember { mutableStateOf(selected.delay.toString()) }
 
     Row(
@@ -421,7 +459,7 @@ fun ProgramInput(
 
             item {
                 CircleTextField(
-                    title = "液量 μL",
+                    title = "液量 微升",
                     value = volume
                 ) {
                     scope.launch {
@@ -438,12 +476,25 @@ fun ProgramInput(
 
             item {
                 CircleTextField(
-                    title = "延时 ms",
+                    title = "预排 微升",
+                    value = previous
+                ) {
+                    scope.launch {
+                        previous = it
+                        selected = selected.copy(previous = it.toDoubleOrNull() ?: 0.0)
+                        toggleSelected(selected)
+                    }
+                }
+            }
+
+            item {
+                CircleTextField(
+                    title = "延时 秒",
                     value = delay
                 ) {
                     scope.launch {
                         delay = it
-                        selected = selected.copy(delay = it.toLongOrNull() ?: 0L)
+                        selected = selected.copy(delay = it.toDoubleOrNull() ?: 0.0)
                         toggleSelected(selected)
                     }
                 }

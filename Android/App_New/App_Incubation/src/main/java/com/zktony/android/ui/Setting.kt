@@ -424,10 +424,10 @@ fun Authentication(uiEvent: (SettingUiEvent) -> Unit) {
 
 @Composable
 fun MotorList(
-    uiState: SettingUiState,
-    uiEvent: (SettingUiEvent) -> Unit
+    uiState: SettingUiState, uiEvent: (SettingUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
 
     LazyVerticalGrid(
         modifier = Modifier,
@@ -439,24 +439,23 @@ fun MotorList(
         items(items = uiState.entities) { item ->
             MotorItem(
                 item = item,
-                selected = uiState.selected == item.id
-            ) { double ->
-                scope.launch {
-                    if (double) {
+                onClick = {
+                    scope.launch {
                         uiEvent(SettingUiEvent.ToggleSelected(item.id))
                         uiEvent(SettingUiEvent.NavTo(PageType.MOTOR_DETAIL))
-                    } else {
-                        if (uiState.selected != item.id) {
-                            uiEvent(SettingUiEvent.ToggleSelected(item.id))
-                        } else {
-                            uiEvent(SettingUiEvent.ToggleSelected(0L))
-                        }
+                    }
+                },
+                onDelete = {
+                    scope.launch {
+                        uiEvent(SettingUiEvent.Delete(item.id))
+                        snackbarHostState.showSnackbar(message = "删除成功")
                     }
                 }
-            }
+            )
         }
     }
 }
+
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

@@ -4,19 +4,42 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DoDisturb
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Icon
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -24,9 +47,18 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.data.datastore.rememberDataSaverState
 import com.zktony.android.data.entities.Program
-import com.zktony.android.ui.components.*
+import com.zktony.android.ui.components.HomeAppBar
+import com.zktony.android.ui.components.ModuleItem
+import com.zktony.android.ui.components.ProcessItem
 import com.zktony.android.ui.navigation.Route
-import com.zktony.android.ui.utils.*
+import com.zktony.android.ui.utils.AnimatedContent
+import com.zktony.android.ui.utils.JobState
+import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.LocalSnackbarHostState
+import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.ui.utils.itemsIndexed
+import com.zktony.android.ui.utils.toList
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
@@ -279,23 +311,48 @@ fun ProgramList(
     val scope = rememberCoroutineScope()
 
     LazyVerticalGrid(
-        modifier = Modifier,
-        contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp),
-        columns = GridCells.Fixed(3),
+        modifier = Modifier.padding(16.dp),
+        contentPadding = PaddingValues(16.dp),
+        columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         itemsIndexed(entities) { index, item ->
-            ProgramItem(
-                index = index,
-                item = item,
-                selected = false
-            ) {
-                scope.launch {
-                    uiEvent(HomeUiEvent.ToggleProcess(uiState.selected, item))
-                    uiEvent(HomeUiEvent.NavTo(PageType.HOME))
-                }
-            }
+            ListItem(
+                modifier = Modifier
+                    .clip(MaterialTheme.shapes.small)
+                    .clickable {
+                        scope.launch {
+                            uiEvent(HomeUiEvent.ToggleProcess(uiState.selected, item))
+                            uiEvent(HomeUiEvent.NavTo(PageType.HOME))
+                        }
+                    },
+                headlineContent = {
+                    Text(
+                        text = item.displayText,
+                        style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
+                supportingContent = {
+                    Text(
+                        text = item.createTime.dateFormat("yyyy/MM/dd"),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray
+                    )
+                },
+                leadingContent = {
+                    Text(
+                        text = "${index + 1}、",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontStyle = FontStyle.Italic
+                    )
+                },
+                colors = ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            )
         }
     }
 }

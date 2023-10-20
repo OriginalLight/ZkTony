@@ -43,7 +43,11 @@ class NavigationActions(private val navController: NavHostController) {
     }
 
     fun navigateUp() {
-        navController.navigateUp()
+        if (navController.previousBackStackEntry == null) {
+            navigate(Route.HOME)
+        } else {
+            navController.navigateUp()
+        }
     }
 
     fun popBackStack() {

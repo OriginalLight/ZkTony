@@ -4,7 +4,14 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -13,8 +20,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.ArrowRight
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,8 +43,16 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.zktony.android.R
 import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Process
-import com.zktony.android.ui.components.*
-import com.zktony.android.ui.utils.*
+import com.zktony.android.ui.components.ProcessItem
+import com.zktony.android.ui.components.ProgramAppBar
+import com.zktony.android.ui.components.ProgramItem
+import com.zktony.android.ui.components.SquareTextField
+import com.zktony.android.ui.utils.AnimatedContent
+import com.zktony.android.ui.utils.LocalNavigationActions
+import com.zktony.android.ui.utils.LocalSnackbarHostState
+import com.zktony.android.ui.utils.PageType
+import com.zktony.android.ui.utils.itemsIndexed
+import com.zktony.android.ui.utils.toList
 import kotlinx.coroutines.launch
 
 @Composable
@@ -79,7 +104,7 @@ fun ProgramWrapper(
         ProgramAppBar(entities.toList(), uiState, uiEvent) { navigation() }
         AnimatedContent(targetState = uiState.page) {
             when (it) {
-                PageType.PROGRAM_LIST -> ProgramList(entities, uiState, uiEvent)
+                PageType.PROGRAM_LIST -> ProgramList(entities, uiEvent)
                 PageType.PROGRAM_DETAIL -> ProgramDetail(entities.toList(), uiState, uiEvent)
                 else -> {}
             }
@@ -90,15 +115,15 @@ fun ProgramWrapper(
 @Composable
 fun ProgramList(
     entities: LazyPagingItems<Program>,
-    uiState: ProgramUiState,
-    uiEvent: (ProgramUiEvent) -> Unit,
+    uiEvent: (ProgramUiEvent) -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val snackbarHostState = LocalSnackbarHostState.current
 
     LazyVerticalGrid(
         modifier = Modifier,
         contentPadding = PaddingValues(16.dp),
-        columns = GridCells.Fixed(3),
+        columns = GridCells.Fixed(2),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -106,21 +131,19 @@ fun ProgramList(
             ProgramItem(
                 index = index,
                 item = item,
-                selected = uiState.selected == item.id
-            ) { double ->
-                scope.launch {
-                    if (double) {
+                onClick = {
+                    scope.launch {
                         uiEvent(ProgramUiEvent.ToggleSelected(item.id))
                         uiEvent(ProgramUiEvent.NavTo(PageType.PROGRAM_DETAIL))
-                    } else {
-                        if (uiState.selected != item.id) {
-                            uiEvent(ProgramUiEvent.ToggleSelected(item.id))
-                        } else {
-                            uiEvent(ProgramUiEvent.ToggleSelected(0L))
-                        }
+                    }
+                },
+                onDelete = {
+                    scope.launch {
+                        uiEvent(ProgramUiEvent.Delete(item.id))
+                        snackbarHostState.showSnackbar("删除成功")
                     }
                 }
-            }
+            )
         }
     }
 }

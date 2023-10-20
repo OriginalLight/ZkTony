@@ -1,13 +1,17 @@
 package com.zktony.android.ui.components
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Pause
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,10 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.zktony.android.data.entities.internal.OrificePlate
-import com.zktony.android.ui.HomeUiEvent
-import com.zktony.android.ui.HomeUiState
-import com.zktony.android.ui.JobState
-import com.zktony.android.ui.utils.UiFlags
 import com.zktony.android.utils.extra.format
 
 /**
@@ -138,68 +138,6 @@ fun OrificePlateCard(
                             fontFamily = FontFamily.Monospace,
                             fontStyle = FontStyle.Italic,
                         ),
-                    )
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun JobActionCard(
-    modifier: Modifier = Modifier,
-    uiState: HomeUiState,
-    uiEvent: (HomeUiEvent) -> Unit
-) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        if (uiState.jobState.status == JobState.STEPPED) {
-            Card(
-                enabled = uiState.uiFlags == UiFlags.NONE && uiState.selected != 0L,
-                onClick = { uiEvent(HomeUiEvent.Start) }
-            ) {
-                Icon(
-                    modifier = Modifier.size(128.dp),
-                    imageVector = Icons.Default.PlayArrow,
-                    contentDescription = null,
-                    tint = Color.Blue
-                )
-            }
-        } else {
-            Row(horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                Card(onClick = {
-                    if (uiState.jobState.status == JobState.RUNNING) {
-                        uiEvent(HomeUiEvent.Pause)
-                    } else {
-                        uiEvent(HomeUiEvent.Resume)
-                    }
-                }) {
-                    if (uiState.jobState.status == JobState.RUNNING) {
-                        Icon(
-                            modifier = Modifier.size(128.dp),
-                            imageVector = Icons.Default.Pause,
-                            contentDescription = null,
-                            tint = Color.DarkGray
-                        )
-                    } else {
-                        Icon(
-                            modifier = Modifier.size(128.dp),
-                            imageVector = Icons.Default.PlayArrow,
-                            contentDescription = null,
-                            tint = Color.Blue
-                        )
-                    }
-                }
-
-                Card(onClick = { uiEvent(HomeUiEvent.Stop) }) {
-                    Icon(
-                        modifier = Modifier.size(128.dp),
-                        imageVector = Icons.Default.Close,
-                        contentDescription = null,
-                        tint = Color.Red
                     )
                 }
             }
