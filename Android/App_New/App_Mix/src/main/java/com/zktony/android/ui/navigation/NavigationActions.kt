@@ -1,7 +1,7 @@
 package com.zktony.android.ui.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Analytics
+import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Terminal
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -63,7 +63,7 @@ val TOP_LEVEL_DESTINATIONS = listOf(
     ),
     TopLevelDestination(
         route = Route.CALIBRATION,
-        icon = Icons.Outlined.Analytics,
+        icon = Icons.Outlined.BarChart,
         iconTextId = R.string.calibration
     ),
     TopLevelDestination(

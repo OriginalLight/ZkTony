@@ -80,7 +80,7 @@ fun CalibrationItem(
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
-    var delete by remember { mutableStateOf(false) }
+    var delete by remember(item) { mutableStateOf(false) }
 
     ListItem(
         modifier = Modifier
@@ -155,6 +155,7 @@ fun CalibrationItem(
         )
     )
 }
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PointItem(
@@ -388,7 +389,7 @@ fun ProgramItem(
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
-    var delete by remember { mutableStateOf(false) }
+    var delete by remember(item) { mutableStateOf(false) }
 
     ListItem(
         modifier = Modifier
@@ -657,7 +658,7 @@ fun MotorItem(
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
-    var delete by remember { mutableStateOf(false) }
+    var delete by remember(item) { mutableStateOf(false) }
 
     ListItem(
         modifier = Modifier

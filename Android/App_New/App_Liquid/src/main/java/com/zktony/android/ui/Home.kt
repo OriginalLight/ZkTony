@@ -296,7 +296,7 @@ fun JobContent(
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Icon(
                     modifier = Modifier
-                        .size(128.dp)
+                        .size(150.dp)
                         .clip(CircleShape)
                         .clickable {
                             scope.launch {
@@ -335,7 +335,7 @@ fun JobContent(
                 if (uiState.jobState.status != JobState.STEPPED) {
                     Icon(
                         modifier = Modifier
-                            .size(128.dp)
+                            .size(150.dp)
                             .clip(CircleShape)
                             .clickable {
                                 scope.launch {
@@ -350,147 +350,128 @@ fun JobContent(
                 }
             }
 
-            Column(
-                modifier = Modifier.align(Alignment.CenterEnd),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable {
-                            scope.launch {
-                                if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.RESET) {
-                                    if (uiState.jobState.status != JobState.RUNNING) {
+            if (uiState.jobState.status != JobState.RUNNING) {
+                Column(
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                scope.launch {
+                                    if (uiState.uiFlags == UiFlags.NONE) {
                                         uiEvent(HomeUiEvent.Reset)
-                                    } else {
-                                        snackbarHostState.showSnackbar("请中止程序")
                                     }
                                 }
                             }
+                            .padding(vertical = 8.dp, horizontal = 16.dp),
+                        text = if (uiState.uiFlags == UiFlags.RESET) "复位中" else "复位",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (uiState.uiFlags == UiFlags.RESET) Color.Red else Color.Unspecified
+                    )
 
-                        }
-                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = if (uiState.uiFlags == UiFlags.RESET) "复位中" else "复位",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = if (uiState.uiFlags == UiFlags.RESET) Color.Red else Color.Unspecified
-                )
-
-                Text(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable {
-                            scope.launch {
-                                if (uiState.uiFlags == UiFlags.NONE) {
-                                    if (uiState.jobState.status != JobState.RUNNING) {
+                    Text(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                scope.launch {
+                                    if (uiState.uiFlags == UiFlags.NONE) {
                                         dialog = true
-                                    } else {
-                                        snackbarHostState.showSnackbar("请中止程序")
                                     }
                                 }
                             }
-                        }
-                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = "清洗",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                            .padding(vertical = 8.dp, horizontal = 16.dp),
+                        text = "清洗",
+                        style = MaterialTheme.typography.titleMedium
+                    )
 
-                Text(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable {
-                            scope.launch {
-                                if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_IN) {
-                                    if (uiState.jobState.status != JobState.RUNNING) {
+                    Text(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                scope.launch {
+                                    if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_IN) {
                                         if (uiState.uiFlags == UiFlags.NONE) {
                                             uiEvent(HomeUiEvent.Pipeline(2))
                                         } else {
                                             uiEvent(HomeUiEvent.Pipeline(0))
                                         }
-                                    } else {
-                                        snackbarHostState.showSnackbar("请中止程序")
                                     }
                                 }
                             }
-                        }
-                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = if (uiState.uiFlags == UiFlags.PIPELINE_IN) "填充中" else "填充",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = if (uiState.uiFlags == UiFlags.PIPELINE_IN) Color.Red else Color.Unspecified
-                )
+                            .padding(vertical = 8.dp, horizontal = 16.dp),
+                        text = if (uiState.uiFlags == UiFlags.PIPELINE_IN) "填充中" else "填充",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (uiState.uiFlags == UiFlags.PIPELINE_IN) Color.Red else Color.Unspecified
+                    )
 
-                Text(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable {
-                            scope.launch {
-                                if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_OUT) {
-                                    if (uiState.jobState.status != JobState.RUNNING) {
+                    Text(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                scope.launch {
+                                    if (uiState.uiFlags == UiFlags.NONE || uiState.uiFlags == UiFlags.PIPELINE_OUT) {
                                         if (uiState.uiFlags == UiFlags.NONE) {
                                             uiEvent(HomeUiEvent.Pipeline(3))
                                         } else {
                                             uiEvent(HomeUiEvent.Pipeline(0))
                                         }
-                                    } else {
-                                        snackbarHostState.showSnackbar("请中止程序")
                                     }
                                 }
                             }
-                        }
-                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = if (uiState.uiFlags == UiFlags.PIPELINE_OUT) "回吸中" else "回吸",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = if (uiState.uiFlags == UiFlags.PIPELINE_OUT) Color.Red else Color.Unspecified
-                )
+                            .padding(vertical = 8.dp, horizontal = 16.dp),
+                        text = if (uiState.uiFlags == UiFlags.PIPELINE_OUT) "回吸中" else "回吸",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = if (uiState.uiFlags == UiFlags.PIPELINE_OUT) Color.Red else Color.Unspecified
+                    )
 
-                val tankAbscissa by rememberDataSaverState(
-                    key = Constants.ZT_0003,
-                    default = 0.0
-                )
-                val tankOrdinate by rememberDataSaverState(
-                    key = Constants.ZT_0004,
-                    default = 0.0
-                )
+                    val tankAbscissa by rememberDataSaverState(
+                        key = Constants.ZT_0003,
+                        default = 0.0
+                    )
+                    val tankOrdinate by rememberDataSaverState(
+                        key = Constants.ZT_0004,
+                        default = 0.0
+                    )
 
-                Text(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .clip(MaterialTheme.shapes.small)
-                        .clickable {
-                            scope.launch {
-                                if (uiState.jobState.status != JobState.RUNNING) {
+                    Text(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surfaceVariant,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .clip(MaterialTheme.shapes.small)
+                            .clickable {
+                                scope.launch {
                                     start {
                                         with(index = 0, pdv = tankAbscissa)
                                         with(index = 1, pdv = tankOrdinate)
                                     }
-                                } else {
-                                    snackbarHostState.showSnackbar("请中止程序")
                                 }
                             }
-                        }
-                        .padding(vertical = 8.dp, horizontal = 16.dp),
-                    text = "废液槽",
-                    style = MaterialTheme.typography.titleMedium,
-                )
+                            .padding(vertical = 8.dp, horizontal = 16.dp),
+                        text = "废液槽",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
             }
         }
     }

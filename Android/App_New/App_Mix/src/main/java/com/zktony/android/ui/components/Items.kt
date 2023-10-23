@@ -4,12 +4,28 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -36,7 +52,6 @@ import com.zktony.android.data.entities.Program
 import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.ui.CalibrationUiState
 import com.zktony.android.ui.utils.UiFlags
-import com.zktony.android.ui.utils.selectedColor
 import com.zktony.android.utils.extra.dateFormat
 import kotlinx.coroutines.launch
 
@@ -49,15 +64,17 @@ import kotlinx.coroutines.launch
 fun CalibrationItem(
     index: Int,
     item: Calibration,
-    selected: Boolean,
-    onClick: (Boolean) -> Unit
+    onClick: () -> Unit,
+    onDelete: () -> Unit
 ) {
+    var delete by remember(item) { mutableStateOf(false) }
+
     ListItem(
         modifier = Modifier
             .clip(MaterialTheme.shapes.small)
             .combinedClickable(
-                onClick = { onClick(false) },
-                onDoubleClick = { onClick(true) }
+                onClick = { onClick() },
+                onLongClick = { delete = true },
             ),
         headlineContent = {
             Text(
@@ -82,32 +99,46 @@ fun CalibrationItem(
             )
         },
         trailingContent = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = MaterialTheme.shapes.small
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surface,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .padding(vertical = 4.dp, horizontal = 8.dp),
+                        text = "M${item.index}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colorScheme.surface,
+                                shape = MaterialTheme.shapes.small
+                            )
+                            .padding(vertical = 4.dp, horizontal = 8.dp),
+                        text = if (item.enable) "生效中" else "未生效",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if (item.enable) MaterialTheme.colorScheme.onSurface else Color.Red
+                    )
+                }
+                if (delete) {
+                    IconButton(onClick = onDelete) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = Color.Red
                         )
-                        .padding(vertical = 4.dp, horizontal = 8.dp),
-                    text = "M${item.index}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .padding(vertical = 4.dp, horizontal = 8.dp),
-                    text = if (item.enable) "生效中" else "未生效",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (item.enable) MaterialTheme.colorScheme.onSurface else Color.Red
-                )
+                    }
+                }
             }
         },
         colors = ListItemDefaults.colors(
-            containerColor = selectedColor(selected)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     )
 }
@@ -268,15 +299,17 @@ fun PointItem(
 fun ProgramItem(
     index: Int,
     item: Program,
-    selected: Boolean,
-    onClick: (Boolean) -> Unit
+    onClick: () -> Unit,
+    onDelete: () -> Unit
 ) {
+    var delete by remember(item) { mutableStateOf(false) }
+
     ListItem(
         modifier = Modifier
             .clip(MaterialTheme.shapes.small)
             .combinedClickable(
-                onClick = { onClick(false) },
-                onDoubleClick = { onClick(true) }
+                onClick = onClick,
+                onLongClick = { delete = true },
             ),
         headlineContent = {
             Text(
@@ -300,8 +333,19 @@ fun ProgramItem(
                 fontStyle = FontStyle.Italic
             )
         },
+        trailingContent = {
+            if (delete) {
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = Color.Red
+                    )
+                }
+            }
+        },
         colors = ListItemDefaults.colors(
-            containerColor = selectedColor(selected)
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
     )
 }
@@ -310,45 +354,57 @@ fun ProgramItem(
 @Composable
 fun MotorItem(
     item: Motor,
-    selected: Boolean,
-    onClick: (Boolean) -> Unit
+    onClick: () -> Unit,
+    onDelete: () -> Unit
 ) {
-    Row(
+    var delete by remember(item) { mutableStateOf(false) }
+
+    ListItem(
         modifier = Modifier
-            .background(
-                color = selectedColor(selected),
-                shape = MaterialTheme.shapes.small
-            )
-            .fillMaxWidth()
             .clip(MaterialTheme.shapes.small)
             .combinedClickable(
-                onClick = { onClick(false) },
-                onDoubleClick = { onClick(true) }
+                onClick = onClick,
+                onLongClick = { delete = true },
+            ),
+        headlineContent = {
+            Column(modifier = Modifier.padding(start = 16.dp)) {
+                Text(
+                    text = "A - ${item.acceleration}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Text(
+                    text = "D - ${item.deceleration}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+
+                Text(
+                    text = "S - ${item.speed}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        },
+        leadingContent = {
+            Text(
+                text = "M ${item.index}",
+                fontSize = 36.sp,
+                fontWeight = FontWeight.SemiBold,
             )
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "M ${item.index}",
-            fontSize = 50.sp,
-            fontWeight = FontWeight.SemiBold,
+        },
+        trailingContent = {
+            if (delete) {
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = Color.Red
+                    )
+                }
+            }
+        },
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
         )
-        Column(modifier = Modifier.padding(start = 16.dp)) {
-            Text(
-                text = "A - ${item.acceleration}",
-                style = MaterialTheme.typography.bodyLarge
-            )
+    )
 
-            Text(
-                text = "D - ${item.deceleration}",
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            Text(
-                text = "S - ${item.speed}",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-    }
 }

@@ -21,7 +21,11 @@ import com.zktony.android.utils.internal.ExecuteType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
@@ -136,16 +140,16 @@ class HomeViewModel @Inject constructor(
 
     private fun startJob() {
         viewModelScope.launch {
-            try {
-                val selected = dao.getById(_selected.value).firstOrNull()
-                if (selected == null) {
-                    _message.value = "未选择程序"
-                    return@launch
-                }
-                val abscissa = dataStore.readData(Constants.ZT_0003, 0.0)
-                val ordinate = dataStore.readData(Constants.ZT_0004, 0.0)
-                _job.value?.cancel()
-                _job.value = launch {
+            val selected = dao.getById(_selected.value).firstOrNull()
+            if (selected == null) {
+                _message.value = "未选择程序"
+                return@launch
+            }
+            val abscissa = dataStore.readData(Constants.ZT_0003, 0.0)
+            val ordinate = dataStore.readData(Constants.ZT_0004, 0.0)
+            _job.value?.cancel()
+            _job.value = launch {
+                try {
                     start {
                         timeOut = 1000L * 60L
                         with(index = 1, pdv = ordinate)
@@ -174,7 +178,6 @@ class HomeViewModel @Inject constructor(
                         with(index = 4, pdv = p3, ads = Triple(ad, ad, s2))
                         with(index = 5, pdv = p4, ads = Triple(ad, ad, s2))
                     }
-
                     start {
                         timeOut = 1000L * 60L
                         with(index = 0, pdv = selected.point.x)
@@ -183,7 +186,6 @@ class HomeViewModel @Inject constructor(
                         timeOut = 1000L * 60L
                         with(index = 1, pdv = selected.point.y)
                     }
-
                     glue {
                         timeOut = 1000L * 60 * 10
                         val s = selected.speed.glue
@@ -269,13 +271,11 @@ class HomeViewModel @Inject constructor(
                             )
                         )
                     }
-
                     _uiFlags.value = UiFlags.RESET
                     start {
                         timeOut = 1000L * 60L
                         with(index = 1, pdv = ordinate)
                     }
-
                     start {
                         timeOut = 1000L * 60L
                         with(index = 0, pdv = abscissa)
@@ -290,13 +290,13 @@ class HomeViewModel @Inject constructor(
                             with(index = 2, pdv = Constants.ZT_0005 * -1)
                         }
                     }
+                } catch (ex: Exception) {
+                    ex.printStackTrace()
+                } finally {
+                    _uiFlags.value = UiFlags.NONE
+                    _job.value?.cancel()
+                    _job.value = null
                 }
-            } catch (ex: Exception) {
-                _message.value = ex.message
-            } finally {
-                _uiFlags.value = UiFlags.NONE
-                _job.value?.cancel()
-                _job.value = null
             }
         }
     }
@@ -305,10 +305,9 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _job.value?.cancel()
             _job.value = null
-
+            delay(200L)
             stop(0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
             delay(200L)
-
             init()
         }
     }

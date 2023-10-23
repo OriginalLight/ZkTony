@@ -3,7 +3,11 @@ package com.zktony.android.utils
 import com.zktony.android.utils.AppStateUtils.hpa
 import com.zktony.android.utils.AppStateUtils.hpg
 import com.zktony.android.utils.LogUtils.logE
-import com.zktony.android.utils.internal.*
+import com.zktony.android.utils.internal.ControlType
+import com.zktony.android.utils.internal.ExceptionPolicy
+import com.zktony.android.utils.internal.ExecuteType
+import com.zktony.android.utils.internal.GlueBuilder
+import com.zktony.android.utils.internal.StartBuilder
 import com.zktony.serialport.AbstractSerialHelper
 import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.config.SerialConfig
@@ -28,7 +32,7 @@ object SerialPortUtils {
                         }
                     }
 
-                    Protocol.Rx_0X02 -> {
+                    Protocol.RX_0X02 -> {
                         for (i in 0 until rx.data.size / 2) {
                             val index = rx.data.readInt8(offset = i * 2)
                             val status = rx.data.readInt8(offset = i * 2 + 1)
