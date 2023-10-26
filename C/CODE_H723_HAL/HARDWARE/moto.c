@@ -492,8 +492,14 @@ void StopMotor(uint8_t num)
 	//		srd[num].step_delay = 0;
 	//		srd[num].min_delay = 0;
 	//		//Moto[num].MotionStatus = STOP;
-	srd[num].run_state = STOP;
+				srd[num].run_state = STOP;
 
 	//		Moto[num].Mflag = 0;
 	//		srd[num].lock = 0;
+}
+
+void STEPMOTOR_EN()
+{
+	HAL_GPIO_WritePin(GPIOE,GPIO_PIN_0,GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(GPIOB,GPIO_PIN_6 | GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9,GPIO_PIN_RESET);
 }

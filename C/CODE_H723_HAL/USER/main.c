@@ -21,7 +21,7 @@ extern uint8_t cmd_buffer[CMD_MAX_SIZE];
 
 extern uint8_t Frame_flag;
 extern AckPack pack[2];
-
+ extern int32_t step_position[MOTONUM];
 
 int main(void)
 {
@@ -61,8 +61,15 @@ int main(void)
 		if (1 == pack[0].flag)
 		{
 			USART3_Send(pack[0].data, pack[0].datalen);
-
+			//printf("%d\n",step_position[pack[0].data[5]]);
 			pack[0].flag = 0;
+			
+//		for(uint8_t i=0;i<pack[0].datalen;i++)
+//		{
+//			printf("%x \t",cmd_buffer[i]);
+//		}
+//		printf("\n");
+		
 			memset(pack[0].data, 0, pack[0].datalen);
 		}
 		else if (1 == pack[1].flag)

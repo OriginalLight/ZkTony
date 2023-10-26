@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "timer.h": "c",
-        "string": "c"
+        "string": "c",
+        "cmd_process.h": "c"
     }
 }

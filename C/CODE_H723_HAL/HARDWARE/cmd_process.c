@@ -115,6 +115,8 @@ void CmdRun(uint8_t *RXbuffer)
 	uint16_t data_len = *p | (*(p + 1) << 8);
 	p += 2;
 	uint8_t count = data_len / 17;
+	
+	STEPMOTOR_EN();
 
 	for (int i = 0; i < count; i++, p += 17)
 	{
@@ -127,6 +129,7 @@ void CmdRun(uint8_t *RXbuffer)
 		Moto[id].MotoSpeed = *(p + 13) | (*(p + 14) << 8) | (*(p + 15) << 16) | (*(p + 16) << 24);
 
 		STEPMOTOR_AxisMoveRel(Moto[id].MID, Moto[id].Mstep, Moto[id].Maccel, Moto[id].Mdecel, Moto[id].MotoSpeed);
+		printf("%d %d %d %d\n",Moto[id].Mstep, Moto[id].Maccel, Moto[id].Mdecel, Moto[id].MotoSpeed);
 	}
 }
 
@@ -209,6 +212,13 @@ void CmdAnalysis()
 {
 	if (Cmd_Cnt >= 12)
 	{
+//		for(uint8_t i=0;i<Cmd_Cnt;i++)
+//		{
+//			printf("%x \t",cmd_buffer[i]);
+//		}
+//		printf("\n");
+			
+		
 		uint8_t *p = cmd_buffer;
 		// head check
 		if (*p++ != PACK_HEAD || *p++ != PACK_CMD)

@@ -95,6 +95,6 @@ void TIMControl(uint8_t num, uint8_t operation);
 void Moto_Dir_Set(uint8_t num, uint8_t set);
 uint8_t Moto_Dir_Get(uint8_t num);
 void StopMotor(uint8_t num);
-
+void STEPMOTOR_EN(void);
 
 #endif
