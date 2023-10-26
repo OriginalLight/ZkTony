@@ -401,16 +401,15 @@ fun ProgramInput(
                                 toggleSelected(selected)
                             }
                         }
-                    },
-                    onClick = {
-                        scope.launch {
-                            start {
-                                with(index = 0, pdv = selected.points[0].x)
-                                with(index = 1, pdv = selected.points[0].y)
-                            }
+                    }
+                ) {
+                    scope.launch {
+                        start {
+                            with(index = 0, pdv = selected.points[0].x)
+                            with(index = 1, pdv = selected.points[0].y)
                         }
                     }
-                )
+                }
             }
 
 
@@ -429,16 +428,15 @@ fun ProgramInput(
                                 toggleSelected(selected)
                             }
                         }
-                    },
-                    onClick = {
-                        scope.launch {
-                            start {
-                                with(index = 0, pdv = selected.points[1].x)
-                                with(index = 1, pdv = selected.points[1].y)
-                            }
+                    }
+                ) {
+                    scope.launch {
+                        start {
+                            with(index = 0, pdv = selected.points[1].x)
+                            with(index = 1, pdv = selected.points[1].y)
                         }
                     }
-                )
+                }
             }
 
 

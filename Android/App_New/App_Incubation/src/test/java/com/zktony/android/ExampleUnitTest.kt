@@ -2,6 +2,8 @@ package com.zktony.android
 
 import com.zktony.android.data.entities.internal.Point
 import com.zktony.android.utils.AlgorithmUtils
+import com.zktony.serialport.ext.toHexString
+import com.zktony.serialport.ext.writeInt16BE
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.CopyOnWriteArrayList
@@ -49,5 +51,12 @@ class ExampleUnitTest {
         if (y != null) {
             assertEquals(639982.8994101394, y, 1.0)
         }
+    }
+
+    @Test
+    fun test1() {
+        val data = ByteArray(4).writeInt16BE(201).writeInt16BE(45610, 2)
+        assertEquals(data.toHexString(), "00 C9 B2 2A")
+
     }
 }

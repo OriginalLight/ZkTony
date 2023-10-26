@@ -17,14 +17,11 @@ import com.zktony.android.ui.utils.JobExecutorUtils
 import com.zktony.android.ui.utils.JobState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
-import com.zktony.android.utils.AppStateUtils.hpp
 import com.zktony.android.utils.AppStateUtils.hpt
 import com.zktony.android.utils.Constants
-import com.zktony.android.utils.SerialPortUtils.readWithPosition
 import com.zktony.android.utils.SerialPortUtils.readWithTemperature
 import com.zktony.android.utils.SerialPortUtils.readWithValve
 import com.zktony.android.utils.SerialPortUtils.writeRegister
-import com.zktony.android.utils.SerialPortUtils.writeWithPulse
 import com.zktony.android.utils.SerialPortUtils.writeWithTemperature
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -43,7 +40,8 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val dao: ProgramDao,
     private val historyDao: HistoryDao,
-    private val dataStore: DataSaverDataStore
+    private val dataStore: DataSaverDataStore,
+    private val jobExecutorUtils: JobExecutorUtils
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -60,37 +58,6 @@ class HomeViewModel @Inject constructor(
         config = PagingConfig(pageSize = 20, initialLoadSize = 40)
     ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
-    private val jobExecutorUtils = JobExecutorUtils(
-        recoup = dataStore.readData(Constants.ZT_0002, 0L)
-    ) { event ->
-        viewModelScope.launch {
-            when (event) {
-                is JobEvent.Changed -> {
-                    val jobList = _jobList.value.toMutableList()
-                    val jobIndex = jobList.indexOfFirst { it.index == event.state.index }
-                    if (jobIndex != -1) {
-                        jobList[jobIndex] = event.state
-                    }
-                    _jobList.value = jobList
-                }
-
-                is JobEvent.Error -> {
-                    _message.value = event.ex.message
-                }
-
-                is JobEvent.Shaker -> {
-                    _stand.value = _stand.value.copy(shaker = event.shaker)
-                }
-
-                is JobEvent.Logs -> {
-                    val startTime = (event.logs.firstOrNull() ?: Log(message = "None")).createTime
-                    val logs = event.logs.sortedBy { it.index }
-                    historyDao.insert(History(logs = logs, createTime = startTime))
-                }
-            }
-        }
-    }
-
     init {
         viewModelScope.launch {
             launch {
@@ -105,6 +72,37 @@ class HomeViewModel @Inject constructor(
                 }
             }
             launch { init() }
+            launch {
+                jobExecutorUtils.callback = { event ->
+                    when (event) {
+                        is JobEvent.Changed -> {
+                            val jobList = _jobList.value.toMutableList()
+                            val jobIndex = jobList.indexOfFirst { it.index == event.state.index }
+                            if (jobIndex != -1) {
+                                jobList[jobIndex] = event.state
+                            }
+                            _jobList.value = jobList
+                        }
+
+                        is JobEvent.Error -> {
+                            _message.value = event.ex.message
+                        }
+
+                        is JobEvent.Shaker -> {
+                            _stand.value = _stand.value.copy(shaker = event.shaker)
+                        }
+
+                        is JobEvent.Logs -> {
+                            val startTime =
+                                (event.logs.firstOrNull() ?: Log(message = "None")).createTime
+                            val logs = event.logs.sortedBy { it.index }
+                            launch {
+                                historyDao.insert(History(logs = logs, createTime = startTime))
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -164,14 +162,7 @@ class HomeViewModel @Inject constructor(
                     if (shaker) {
                         writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
                         delay(300L)
-
-                        readWithPosition(slaveAddr = 0)
-                        delay(100L)
-
-                        val pulse = (hpp[0] ?: 0) % 6400L
-                        if (pulse > 0L) {
-                            writeWithPulse(0, if (pulse > 3200) 6400L - pulse else -pulse)
-                        }
+                        writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
                     } else {
                         writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
                     }
@@ -185,11 +176,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private suspend fun init() {
-        repeat(3) {
-            // 读取绝对位置
-            readWithPosition(slaveAddr = it)
-            delay(300L)
-        }
         repeat(4) {
             // 读取阀门状态
             readWithValve(slaveAddr = it)

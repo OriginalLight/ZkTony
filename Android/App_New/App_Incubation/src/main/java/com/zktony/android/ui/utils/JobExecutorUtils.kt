@@ -1,10 +1,10 @@
 package com.zktony.android.ui.utils
 
+import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.entities.internal.Log
 import com.zktony.android.data.entities.internal.Process
 import com.zktony.android.utils.AppStateUtils.hpc
-import com.zktony.android.utils.AppStateUtils.hpp
-import com.zktony.android.utils.SerialPortUtils.readWithPosition
+import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.writeRegister
 import com.zktony.android.utils.SerialPortUtils.writeWithPulse
 import com.zktony.android.utils.SerialPortUtils.writeWithTemperature
@@ -17,15 +17,16 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.LinkedList
 import java.util.concurrent.atomic.AtomicBoolean
+import javax.inject.Inject
 
 /**
  * @author 刘贺贺
  * @date 2023/9/12 14:52
  */
-class JobExecutorUtils(
-    private val recoup: Long,
-    private val callback: (JobEvent) -> Unit
+class JobExecutorUtils @Inject constructor(
+    private val dataStore: DataSaverDataStore
 ) {
+    var callback: (JobEvent) -> Unit = {}
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val hashMap = HashMap<Int, JobState>()
     private val jobMap = HashMap<Int, Job>()
@@ -57,12 +58,7 @@ class JobExecutorUtils(
             scope.launch {
                 writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
                 delay(300L)
-                readWithPosition(slaveAddr = 0)
-                delay(100L)
-                val p = (hpp[0] ?: 0) % 6400L
-                if (p > 0) {
-                    writeWithPulse(0, if (p > 3200) 6400L - p else -p)
-                }
+                writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
             }
         }
     }
@@ -189,7 +185,7 @@ class JobExecutorUtils(
             if (process.recycle) {
                 state = state.copy(status = JobState.RECYCLE)
                 callback(JobEvent.Changed(state))
-                liquid(index, process, inChannel, (index - ((index / 4) * 4)) + 1)
+                clean(index, process, inChannel, (index - ((index / 4) * 4)) + 1)
             } else {
                 state = state.copy(status = JobState.WASTE)
                 callback(JobEvent.Changed(state))
@@ -363,9 +359,6 @@ class JobExecutorUtils(
             throw Exception("加液量为零错误")
         }
 
-        (hpc[index / 4] ?: { x -> x * 100 }).invoke(process.dosage)
-            ?: throw Exception("校准方法错误")
-
         if (processIndex != -1) {
             processes[processIndex] = process.copy(status = Process.RUNNING)
             state = state.copy(status = JobState.RUNNING, processes = processes)
@@ -377,9 +370,10 @@ class JobExecutorUtils(
 
     private suspend fun liquid(index: Int, process: Process, inChannel: Int, outChannel: Int) {
         val group = index / 4
-        val pulse = (hpc[group] ?: { x -> x * 100 }).invoke(process.dosage)!!
+        val pulse = (hpc[group] ?: { x -> x * 100 }).invoke(process.dosage)
         val inAddr = 2 * group
         val outAddr = 2 * group + 1
+        val recoup = dataStore.readData(Constants.ZT_0002, 0L)
         callback(JobEvent.Shaker(true))
         writeWithTemperature(index + 1, process.temperature)
         writeRegister(slaveAddr = 0, startAddr = 200, value = 1)
@@ -400,19 +394,14 @@ class JobExecutorUtils(
 
     private suspend fun clean(index: Int, process: Process, inChannel: Int, outChannel: Int) {
         val group = index / 4
-        val pulse = (hpc[group] ?: { x -> x * 100 }).invoke(process.dosage)!!
+        val pulse = (hpc[group] ?: { x -> x * 100 }).invoke(process.dosage)
         val inAddr = 2 * group
         val outAddr = 2 * group + 1
+        val recoup = dataStore.readData(Constants.ZT_0002, 0L)
         callback(JobEvent.Shaker(false))
         writeRegister(slaveAddr = 0, startAddr = 200, value = 0)
         delay(300L)
-        readWithPosition(slaveAddr = 0)
-        delay(100L)
-        val p = (hpp[0] ?: 0) % 6400L
-        if (p > 0) {
-            writeWithPulse(0, if (p > 3200) 6400L - p else -p)
-            delay(100L)
-        }
+        writeRegister(slaveAddr = 0, startAddr = 201, value = 45610)
         writeWithValve(inAddr, inChannel)
         writeWithValve(outAddr, outChannel)
         writeWithPulse(group + 1, -(pulse + recoup).toLong() * 2)

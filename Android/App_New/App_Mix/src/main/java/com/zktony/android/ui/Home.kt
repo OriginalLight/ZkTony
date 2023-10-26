@@ -110,13 +110,12 @@ fun HomeWrapper(
     uiEvent: (HomeUiEvent) -> Unit,
     navigation: () -> Unit
 ) {
-
     Column {
         HomeAppBar(uiState = uiState) { navigation() }
         AnimatedContent(targetState = uiState.page) {
             when (uiState.page) {
                 PageType.PROGRAM_LIST -> ProgramList(entities, uiEvent)
-                PageType.HOME -> JobContent(entities.toList(), uiState, uiEvent)
+                PageType.HOME -> HomeContent(entities.toList(), uiState, uiEvent)
             }
         }
     }
@@ -178,7 +177,7 @@ fun ProgramList(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JobContent(
+fun HomeContent(
     entities: List<Program>,
     uiState: HomeUiState,
     uiEvent: (HomeUiEvent) -> Unit

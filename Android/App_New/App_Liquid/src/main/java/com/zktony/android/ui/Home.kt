@@ -3,6 +3,7 @@ package com.zktony.android.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
@@ -111,11 +113,10 @@ fun HomeWrapper(
         AnimatedContent(targetState = uiState.page) {
             when (uiState.page) {
                 PageType.PROGRAM_LIST -> ProgramList(entities, uiEvent)
-                PageType.HOME -> JobContent(entities.toList(), uiState, uiEvent)
+                PageType.HOME -> HomeContent(entities.toList(), uiState, uiEvent)
                 else -> {}
             }
         }
-
     }
 }
 
@@ -175,7 +176,7 @@ fun ProgramList(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun JobContent(
+fun HomeContent(
     entities: List<Program>,
     uiState: HomeUiState,
     uiEvent: (HomeUiEvent) -> Unit
@@ -230,13 +231,12 @@ fun JobContent(
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(0.5f),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             val selected = entities.firstOrNull { it.id == uiState.selected } ?: Program()
 
-            FlowRow(
+            ListItem(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .clip(MaterialTheme.shapes.small)
                     .clickable {
                         scope.launch {
@@ -248,41 +248,47 @@ fun JobContent(
                                 }
                             }
                         }
-                    }
-            ) {
-                Text(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .padding(vertical = 4.dp, horizontal = 8.dp),
-                    text = selected.displayText,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                info.forEach {
+                    },
+                headlineContent = {
                     Text(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceVariant,
-                                shape = MaterialTheme.shapes.small
-                            )
-                            .padding(vertical = 4.dp, horizontal = 8.dp),
-                        text = it,
-                        style = MaterialTheme.typography.bodyMedium
+                        text = selected.displayText,
+                        style = MaterialTheme.typography.titleLarge,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-                }
-            }
+                },
+                supportingContent = {
+                    FlowRow(
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        info.forEach {
+                            Text(
+                                modifier = Modifier
+                                    .border(
+                                        width = 1.dp,
+                                        color = Color.Gray,
+                                        shape = MaterialTheme.shapes.small
+                                    )
+                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                text = it,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                },
+                trailingContent = {
+                    Icon(imageVector = Icons.Default.ArrowRight, contentDescription = null)
+                },
+                colors = ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                )
+            )
 
             OrificePlate(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(328.dp)
-                    .padding(16.dp),
+                    .height(328.dp),
                 row = uiState.jobState.orificePlate.row,
                 column = uiState.jobState.orificePlate.column,
                 selected = uiState.jobState.finished

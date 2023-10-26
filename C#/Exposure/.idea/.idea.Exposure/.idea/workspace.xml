@@ -12,10 +12,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="218c30b2-f65b-45d2-afac-8f962c847297" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/HomeViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/HomeViewModel.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/utils/JobExecutorUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/ui/utils/JobExecutorUtils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../Android/App_New/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/gradle/libs.versions.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/AlgorithmUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/AlgorithmUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/AppStateUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/AppStateUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/service/CalibrationService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Incubation/src/main/java/com/zktony/android/utils/service/CalibrationService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/lint-baseline.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/lint-baseline.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Home.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Home.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Program.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/ui/Program.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/AlgorithmUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/AlgorithmUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/AppStateUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/AppStateUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/SerialPortUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/service/CalibrationService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/java/com/zktony/android/utils/service/CalibrationService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values-en/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values-en/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values-zh/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values-zh/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Liquid/src/main/res/xml/network_security_config.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Mix/src/main/java/com/zktony/android/ui/Home.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Mix/src/main/java/com/zktony/android/ui/Home.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Mix/src/main/java/com/zktony/android/utils/AlgorithmUtils.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Mix/src/main/java/com/zktony/android/utils/AlgorithmUtils.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../Android/App_New/App_Mix/src/main/java/com/zktony/android/utils/service/CalibrationService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/../../Android/App_New/App_Mix/src/main/java/com/zktony/android/utils/service/CalibrationService.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Exposure/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Exposure/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -122,6 +137,8 @@
       <workItem from="1697158086058" duration="1504000" />
       <workItem from="1697164826053" duration="3096000" />
       <workItem from="1697426914729" duration="607000" />
+      <workItem from="1698196096396" duration="2644000" />
+      <workItem from="1698215321985" duration="2502000" />
     </task>
     <servers />
   </component>

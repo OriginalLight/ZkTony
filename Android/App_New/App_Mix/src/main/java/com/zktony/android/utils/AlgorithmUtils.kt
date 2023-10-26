@@ -36,8 +36,11 @@ object AlgorithmUtils {
             if (it.x == 0.0) return@forEach
             slopeList.add(it.y / it.x)
         }
-        val averageSlope = slopeList.average()
-        return { x -> x * averageSlope }
+        if (slopeList.isEmpty()) {
+            return { x -> x * 100 }
+        } else {
+            return { x -> x * slopeList.average() }
+        }
     }
 
     fun fitQuadraticCurve(points: List<Point>): (Double) -> Double? {

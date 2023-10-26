@@ -1,15 +1,18 @@
 package com.zktony.android.utils
 
-import com.zktony.android.utils.AppStateUtils.hpp
+import com.zktony.android.utils.AppStateUtils.hps
 import com.zktony.android.utils.AppStateUtils.hpt
 import com.zktony.android.utils.AppStateUtils.hpv
 import com.zktony.android.utils.LogUtils.logE
 import com.zktony.serialport.AbstractSerialHelper
-import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.command.modbus.RtuProtocol
 import com.zktony.serialport.command.runze.RunzeProtocol
 import com.zktony.serialport.config.SerialConfig
-import com.zktony.serialport.ext.*
+import com.zktony.serialport.ext.readInt16BE
+import com.zktony.serialport.ext.toAsciiString
+import com.zktony.serialport.ext.writeInt16BE
+import com.zktony.serialport.ext.writeInt32BE
+import com.zktony.serialport.ext.writeInt8
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
@@ -36,10 +39,8 @@ object SerialPortUtils {
                 } else {
                     RtuProtocol.Protocol.callbackHandler(byteArray) { code, rx ->
                         when (code) {
-                            RtuProtocol.LOCATION -> {
-                                val height = rx.data.copyOfRange(3, 5)
-                                val low = rx.data.copyOfRange(1, 3)
-                                hpp[rx.slaveAddr.toInt() - 1] = height.plus(low).readInt32BE()
+                            RtuProtocol.READ -> {
+                                hps[rx.slaveAddr.toInt() - 1] = rx.data.readInt16BE(1)
                             }
 
                             else -> {}
@@ -72,10 +73,6 @@ object SerialPortUtils {
 
     inline fun sendRtuProtocol(block: RtuProtocol.() -> Unit) =
         serialRtu.sendByteArray(RtuProtocol().apply(block).toByteArray())
-
-    inline fun sendProtocol(block: Protocol.() -> Unit) =
-        serialZkty.sendByteArray(Protocol().apply(block).toByteArray())
-
 
     /**
      * 读取寄存器
@@ -124,12 +121,6 @@ object SerialPortUtils {
         }
 
     /**
-     * 读取脉冲数
-     */
-    fun readWithPosition(slaveAddr: Int) =
-        readRegister(slaveAddr = slaveAddr, startAddr = 4, quantity = 2)
-
-    /**
      * 设置阀门状态
      */
     suspend fun writeWithValve(slaveAddr: Int, channel: Int, retry: Int = 3) {
@@ -163,21 +154,21 @@ object SerialPortUtils {
      */
     suspend fun writeWithPulse(slaveAddr: Int, value: Long, retry: Int = 3) {
         if (value == 0L) return
-        val before = hpp[slaveAddr] ?: 0
+        val before = hps[slaveAddr] ?: 0
         try {
-            withTimeout(maxOf(value.absoluteValue / 6400L, 1) * 1000L) {
-                val target = (before + value - 5).toInt()..(before + value + 5).toInt()
+            withTimeout(maxOf(value.absoluteValue / 32000L, 1) * 1000L + 1000L) {
                 writeRegister(startAddr = 222, slaveAddr = slaveAddr, value = value)
-                while ((hpp[slaveAddr] ?: 0) !in target) {
+                hps[slaveAddr] = 1
+                while ((hps[slaveAddr] ?: 0) != 0) {
                     repeat(3) {
                         delay(100L)
-                        if ((hpp[slaveAddr] ?: 0) in target) return@withTimeout
+                        if ((hps[slaveAddr] ?: 0) == 0) return@withTimeout
                     }
-                    readWithPosition(slaveAddr)
+                    readRegister(slaveAddr = slaveAddr, startAddr = 25, quantity = 1)
                 }
             }
         } catch (ex: TimeoutCancellationException) {
-            if ((hpp[slaveAddr] ?: 0) == before && retry > 0) {
+            if ((hps[slaveAddr] ?: 0) == before && retry > 0) {
                 writeWithPulse(slaveAddr, value, retry - 1)
             }
         }
@@ -197,4 +188,3 @@ object SerialPortUtils {
         serialZkty.sendAsciiString("TC1:TCACTUALTEMP?@$id\n")
     }
 }
-

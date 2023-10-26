@@ -13,14 +13,14 @@ object AppStateUtils {
     val hpv: MutableMap<Int, Int> = ConcurrentHashMap()
 
     /**
-     * 绝对位置
+     * 运行速度
      */
-    val hpp: MutableMap<Int, Int> = ConcurrentHashMap()
+    val hps: MutableMap<Int, Int> = ConcurrentHashMap()
 
     /**
      * 校准函数
      */
-    val hpc: MutableMap<Int, (Double) -> Double?> = ConcurrentHashMap()
+    val hpc: MutableMap<Int, (Double) -> Double> = ConcurrentHashMap()
 
     /**
      * 温度

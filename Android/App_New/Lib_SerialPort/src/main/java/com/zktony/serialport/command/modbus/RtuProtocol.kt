@@ -40,7 +40,7 @@ class RtuProtocol : BaseProtocol<RtuProtocol> {
         // 处理数据包
         when (funcCode) {
             0x03.toByte() -> {
-                block(LOCATION, this)
+                block(READ, this)
             }
 
             else -> {}
@@ -48,7 +48,7 @@ class RtuProtocol : BaseProtocol<RtuProtocol> {
     }
 
     companion object {
-        const val LOCATION = 0
+        const val READ = 0
 
         // 单例 RtuProtocol 协议 用于返回
         val Protocol: RtuProtocol by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { RtuProtocol() }

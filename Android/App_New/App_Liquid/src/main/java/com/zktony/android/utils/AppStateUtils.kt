@@ -31,5 +31,5 @@ object AppStateUtils {
     /**
      * 校准曲线
      */
-    val hpc: MutableMap<Int, (Double) -> Double?> = ConcurrentHashMap()
+    val hpc: MutableMap<Int, (Double) -> Double> = ConcurrentHashMap()
 }

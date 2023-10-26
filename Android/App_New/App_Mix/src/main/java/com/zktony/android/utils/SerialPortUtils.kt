@@ -56,8 +56,7 @@ object SerialPortUtils {
             is Double -> when (index) {
                 0 -> (dvp / 4.0 * 3200L).toLong()
                 1 -> (dvp / 6.35 * 3200L).toLong()
-                else -> ((AppStateUtils.hpc[index - 2] ?: { x -> x * 100 }).invoke(dvp)
-                    ?: 0.0).toLong()
+                else -> (AppStateUtils.hpc[index - 2] ?: { x -> x * 100 }).invoke(dvp).toLong()
             }
 
             is Long -> dvp

@@ -15,7 +15,7 @@ object ProcessDefaults {
         dosage = 8000.0,
         recycle = false,
         origin = 0,
-        times = 0,
+        times = 3,
         status = Process.UPCOMING
     )
 
@@ -26,7 +26,7 @@ object ProcessDefaults {
         dosage = 8000.0,
         recycle = true,
         origin = 0,
-        times = 0,
+        times = 3,
         status = Process.UPCOMING
     )
 
@@ -37,7 +37,7 @@ object ProcessDefaults {
         dosage = 8000.0,
         recycle = false,
         origin = 0,
-        times = 0,
+        times = 3,
         status = Process.UPCOMING
     )
 
@@ -59,7 +59,7 @@ object ProcessDefaults {
         dosage = 8000.0,
         recycle = false,
         origin = 0,
-        times = 0,
+        times = 3,
         status = Process.UPCOMING
     )
 }
