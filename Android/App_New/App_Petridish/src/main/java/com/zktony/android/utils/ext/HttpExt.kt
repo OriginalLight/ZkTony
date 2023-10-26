@@ -1,13 +1,10 @@
 package com.zktony.android.utils.ext
 
+import androidx.annotation.Keep
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.zktony.android.utils.Constants
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
+import okhttp3.*
 import java.io.IOException
 
 /**
@@ -41,13 +38,14 @@ fun httpCall(url: String = Constants.OSS_APP, callback: (List<Application>) -> U
     })
 }
 
+@Keep
 data class Application(
     val id: Int,
-    val application_id: String,
-    val build_type: String,
-    val version_code: Int,
-    val version_name: String,
-    val create_time: String,
+    val applicationId: String,
+    val buildType: String,
+    val versionCode: Int,
+    val versionName: String,
+    val createTime: String,
     val description: String,
-    val download_url: String,
+    val downloadUrl: String,
 )

@@ -8,10 +8,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
-import com.zktony.android.data.datastore.DataSaverDataStore
 import com.zktony.android.data.datastore.LocalDataSaver
 import com.zktony.android.ui.theme.AppTheme
-import com.zktony.android.utils.tx.initializer
+import com.zktony.android.utils.ext.dataSaver
 
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore("dataStore")
@@ -19,14 +18,25 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore("dataStore
 /**
  * The main activity of the application.
  */
+/**
+ * 培养皿
+ * 举升1是电机1
+ * 举升2是电机0
+ * 夹爪是电机2
+ * 上盘是电机5
+ * 下盘是电机4
+ * 紫外线灯或者蠕动泵是3
+ * 检测培养皿是否摆放正确7
+ * 检测是否有培养皿6
+ */
+
+//TODO 1.排液回吸没测；2运行是加液没测；3紫外没写
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val dataSaver = DataSaverDataStore(applicationContext.dataStore)
 
-        initializer()
 
         setContent {
             AppTheme {

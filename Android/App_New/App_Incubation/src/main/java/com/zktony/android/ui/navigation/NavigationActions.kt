@@ -1,29 +1,37 @@
 package com.zktony.android.ui.navigation
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Analytics
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Terminal
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import com.zktony.android.R
 
 object Route {
-    const val HOME = "HOME"
-    const val PROGRAM = "PROGRAM"
-    const val CALIBRATION = "CALIBRATION"
-    const val SETTING = "SETTING"
-    const val MOTOR = "MOTOR"
-    const val CONFIG = "CONFIG"
-    const val SPLASH = "SPLASH"
+    const val HOME = "Home"
+    const val PROGRAM = "Program"
+    const val CALIBRATION = "Calibration"
+    const val HISTORY = "History"
+    const val DEBUG = "Debug"
+    const val SETTING = "Setting"
+    const val SPLASH = "Splash"
 }
 
 data class TopLevelDestination(
     val route: String,
-    val imageId: Int,
+    val icon: ImageVector,
     val iconTextId: Int
 )
 
 class NavigationActions(private val navController: NavHostController) {
+    fun navigateTo(destination: TopLevelDestination) = navigate(destination.route)
 
-    fun navigateTo(destination: TopLevelDestination) {
-        navController.navigate(destination.route) {
+    fun navigate(route: String) {
+        navController.navigate(route) {
             // Pop up to the start destination of the graph to
             // avoid building up a large stack of destinations
             // on the back stack as users select items
@@ -37,27 +45,44 @@ class NavigationActions(private val navController: NavHostController) {
             restoreState = true
         }
     }
+
+    fun navigateUp() {
+        if (navController.previousBackStackEntry == null) {
+            navigate(Route.HOME)
+        } else {
+            navController.navigateUp()
+        }
+    }
+
+    fun popBackStack() {
+        navController.popBackStack()
+    }
 }
 
 val TOP_LEVEL_DESTINATIONS = listOf(
     TopLevelDestination(
-        route = Route.HOME,
-        imageId = R.drawable.ic_home,
-        iconTextId = R.string.tab_home
-    ),
-    TopLevelDestination(
         route = Route.PROGRAM,
-        imageId = R.drawable.ic_program,
-        iconTextId = R.string.tab_program
+        icon = Icons.Outlined.Terminal,
+        iconTextId = R.string.program
     ),
     TopLevelDestination(
         route = Route.CALIBRATION,
-        imageId = R.drawable.ic_module,
-        iconTextId = R.string.tab_calibration
+        icon = Icons.Outlined.BarChart,
+        iconTextId = R.string.calibration
+    ),
+    TopLevelDestination(
+        route = Route.HISTORY,
+        icon = Icons.Outlined.History,
+        iconTextId = R.string.history
+    ),
+    TopLevelDestination(
+        route = Route.DEBUG,
+        icon = Icons.Outlined.Analytics,
+        iconTextId = R.string.debug
     ),
     TopLevelDestination(
         route = Route.SETTING,
-        imageId = R.drawable.ic_settings,
-        iconTextId = R.string.tab_setting
+        icon = Icons.Outlined.Settings,
+        iconTextId = R.string.setting
     )
 )

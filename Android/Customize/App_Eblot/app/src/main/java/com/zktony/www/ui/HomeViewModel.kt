@@ -223,28 +223,30 @@ class HomeViewModel constructor(
     /**
      * 填充或者回吸
      * @param upOrBack 区分
-     * @param start 开始/停止
      * @param xy 模块
      */
-    fun pumpUpOrBack(upOrBack: Int, start: Int, xy: Int) {
+    fun pumpUpOrBack(upOrBack: Int, xy: Int) {
+        val state = getUiState(xy)
         val latest = SM.send.value
         var speed = _setting.value.motorSpeed
         if (upOrBack == 1) speed = -speed
-        if (xy == 0) {
-            if (start == 0) {
+        val job = viewModelScope.launch {
+            if(xy == 0) {
                 _uiStateX.value = _uiStateX.value.copy(motorCache = latest.stepMotorX)
+                SM.send(latest.apply { stepMotorX = speed })
             } else {
-                speed = _uiStateX.value.motorCache
-            }
-            SM.send(latest.apply { stepMotorX = speed })
-        } else {
-            if (start == 0) {
                 _uiStateY.value = _uiStateY.value.copy(motorCache = latest.stepMotorY)
-            } else {
-                speed = _uiStateY.value.motorCache
+                SM.send(latest.apply { stepMotorY = speed })
             }
-            SM.send(latest.apply { stepMotorY = speed })
+            delay((1600L / _setting.value.motorSpeed) * 1000L)
+            if(xy == 0) {
+                SM.send(latest.apply { stepMotorX = _uiStateX.value.motorCache })
+            } else {
+                SM.send(latest.apply { stepMotorY = _uiStateY.value.motorCache })
+            }
+            state.value = state.value.copy(job = null)
         }
+        state.value = state.value.copy(job = job)
     }
 
     /**

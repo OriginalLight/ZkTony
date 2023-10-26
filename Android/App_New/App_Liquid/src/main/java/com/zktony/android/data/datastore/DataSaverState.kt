@@ -42,21 +42,6 @@ class DataSaverMutableState<T>(
             doSetValue(value)
         }
 
-    @Deprecated(
-        "请优先使用带`savePolicy`参数的构造函数(The constructor with parameter `savePolicy` is preferred.)",
-    )
-    constructor(
-        dataSaverInterface: DataSaverInterface,
-        key: String,
-        value: T,
-        autoSave: Boolean = true,
-    ) : this(
-        dataSaverInterface,
-        key,
-        value,
-        if (autoSave) SavePolicy.IMMEDIATELY else SavePolicy.NEVER
-    )
-
     operator fun setValue(thisObj: Any?, property: KProperty<*>, value: T) {
         doSetValue(value)
     }

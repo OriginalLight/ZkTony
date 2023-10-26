@@ -1,6 +1,7 @@
 package com.zktony.android.utils.tx
 
 import com.zktony.android.data.entities.Motor
+import com.zktony.android.utils.ext.dataSaver
 import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
 
@@ -50,29 +51,43 @@ class TxScope {
     fun move(type: MoveType = MoveType.MOVE_DV, block: MoveScope.() -> Unit) {
         controlType = ControlType.CONTROL_MOVE
         val moveScope = MoveScope().apply(block)
+
+        val ads = moveScope.ads
+        var adsBytes = ByteArray(12)
+        if (ads == null) {
+            val hpm = asyncTask.hpm[moveScope.index] ?: Motor()
+            adsBytes.writeInt32LE(hpm.acc, 0).writeInt32LE(hpm.dec, 4).writeInt32LE(hpm.speed, 8)
+        } else {
+            adsBytes.writeInt32LE(ads.first, 0).writeInt32LE(ads.second, 4)
+                .writeInt32LE(ads.third, 8)
+        }
+
         when (type) {
+            //按照校准数据运动
             MoveType.MOVE_DV -> {
-                val pulse = pulse(moveScope.index, moveScope.dv)
-                val config =
-                    Motor(speed = moveScope.speed, acc = moveScope.acc, dec = moveScope.dec)
+                val jyh = dataSaver.readData("jyh", 0f)
+                val jyq = dataSaver.readData("jyq", 0f)
+                val pulse = ((moveScope.dv / ((jyh - jyq) / 10 * 1000)) * 3200L).toLong()
+                println("moveScope.dv===" + moveScope.dv)
+                println("jyh===" + jyh)
+                println("jyq===" + jyq)
+                println("pulse===" + pulse)
                 if (pulse != 0L) {
                     val ba = ByteArray(5)
                     ba.writeInt8(moveScope.index, 0).writeInt32LE(pulse, 1)
                     byteList.addAll(ba.toList())
-                    byteList.addAll(config.toByteArray().toList())
+                    byteList.addAll(adsBytes.toList())
                     indexList.add(moveScope.index)
                 }
             }
-
+            //按照步数运动/3200
             MoveType.MOVE_PULSE -> {
                 val pulse = pulse(moveScope.index, moveScope.pulse)
-                val config =
-                    Motor(speed = moveScope.speed, acc = moveScope.acc, dec = moveScope.dec)
                 if (pulse != 0L) {
                     val ba = ByteArray(5)
                     ba.writeInt8(moveScope.index, 0).writeInt32LE(pulse, 1)
                     byteList.addAll(ba.toList())
-                    byteList.addAll(config.toByteArray().toList())
+                    byteList.addAll(adsBytes.toList())
                     indexList.add(moveScope.index)
                 }
             }

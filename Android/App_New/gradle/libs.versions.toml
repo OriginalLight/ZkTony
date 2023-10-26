@@ -5,54 +5,49 @@
 [versions]
 ## build
 cmake = "3.22.1"
-compileSdk = "33"
+compileSdk = "34"
 minSdk = "21"
 ndk = "25.2.9519653"
-targetSdk = "33"
+targetSdk = "34"
 ## dependencies
-accompanist = "0.30.1"
-androidGradlePlugin = "8.1.0"
-androidx-activity-compose = "1.7.2"
+accompanist = "0.32.0"
+androidGradlePlugin = "8.1.2"
+androidx-activity-compose = "1.8.0"
 androidx-appcompat = "1.6.1"
-androidx-compose-bom = "2023.06.01"
+androidx-compose-bom = "2023.10.01"
 androidx-constraintlayout = "1.0.1"
-androidx-corektx = "1.10.1"
+androidx-corektx = "1.12.0"
 androidx-datastore = "1.0.0"
-androidx-lifecycle = "2.6.1"
-androidx-lifecycle-compose = "2.6.1"
-androidx-lifecycle-runtime-compose = "2.6.1"
-androidx-navigation = "2.6.0"
+androidx-lifecycle = "2.6.2"
+androidx-lifecycle-compose = "2.6.2"
+androidx-lifecycle-runtime-compose = "2.6.2"
+androidx-navigation = "2.7.4"
 androidx-palette = "1.0.0"
 androidx-test = "1.5.0"
 androidx-test-espresso = "3.5.1"
 androidx-test-ext-junit = "1.1.5"
 androidx-test-ext-truth = "1.5.0"
-androidx-window = "1.2.0-beta01"
+androidx-window = "1.2.0-beta04"
 androix-test-uiautomator = "2.2.0"
-coil = "2.2.2"
-compose-compiler = "1.5.0"
+coil = "2.4.0"
+compose-compiler = "1.5.3"
+compose-paging = "3.2.1"
 coroutines = "1.7.3"
 gson = "2.10.1"
-hilt = "2.47"
+hilt = "2.48.1"
 hiltExt = "1.0.0"
 jdkDesugar = "2.0.3"
 junit = "4.13.2"
-koin = "3.4.6"
-kotlin = "1.9.0"
-ksp = "1.9.0-1.0.11"
-material = "1.9.0"
+koin = "3.5.0"
+kotlin = "1.9.10"
+ksp = "1.9.10-1.0.13"
+material = "1.10.0"
 okhttp = "5.0.0-alpha.11"
-room = "2.5.2"
+room = "2.6.0"
 
 [libraries]
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive", version.ref = "accompanist" }
-accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
-accompanist-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "accompanist" }
-accompanist-navigation-material = { module = "com.google.accompanist:accompanist-navigation-material", version.ref = "accompanist" }
-accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
-accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanist" }
-accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity-compose" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
@@ -75,6 +70,7 @@ androidx-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview" }
 androidx-compose-ui-util = { module = "androidx.compose.ui:ui-util" }
 androidx-compose-ui-viewbinding = { module = "androidx.compose.ui:ui-viewbinding" }
+androidx-compose-paging = { module = "androidx.paging:paging-compose", version.ref = "compose-paging" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "androidx-constraintlayout" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidx-corektx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltExt" }
@@ -92,6 +88,7 @@ androidx-navigation-ui-ktx = { module = "androidx.navigation:navigation-ui-ktx",
 androidx-palette = { module = "androidx.palette:palette", version.ref = "androidx-palette" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test" }
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidx-test-espresso" }

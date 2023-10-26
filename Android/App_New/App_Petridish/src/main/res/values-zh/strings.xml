@@ -17,7 +17,7 @@
     <string name="tab_calibration">校准管理</string>
     <string name="tab_container">容器</string>
     <string name="tab_home">主页面</string>
-    <string name="tab_program">制胶程序</string>
+    <string name="tab_program">分液程序</string>
     <string name="update">检测更新</string>
     <string name="update_available">有新版本</string>
     <string name="version">版本</string>
@@ -38,7 +38,7 @@
     <string name="save_success">保存成功</string>
     <string name="authentication">权限认证</string>
     <string name="time_out">超时</string>
-    <string name="notice_content">1、请按照说明书进行操作\n2、请先填充促凝剂再填充胶液\n3、灌胶中请将针头贴紧胶板开口\n4、使用中请尽可能保持管路中液体处于流动状态\n5、灌装两块凝胶之间的时间间隔不宜过长\n6、灌胶完成后用清水冲洗管路避免凝胶堵塞管路</string>
+    <string name="notice_content">1、请按照说明书进行操作\n2、请在运行程序前确定上盘举升处没有培养皿\n3、如果开机后发现下盘将举升挡住，请先进入调试模式更改下盘位置再进行复位</string>
     <string name="notice">注意事项</string>
     <string name="x_axis">X 轴</string>
     <string name="y_axis">Y 轴</string>

@@ -2,127 +2,78 @@ package com.zktony.android.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
 import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
-import com.zktony.android.utils.tx.tx
+import com.zktony.android.ui.utils.UiFlags
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * @author 刘贺贺
  * @date 2023/5/15 14:51
  */
-class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
+@HiltViewModel
+class ProgramViewModel @Inject constructor(
+    private val dao: ProgramDao
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProgramUiState())
     private val _selected = MutableStateFlow(0L)
-    private val _page = MutableStateFlow(PageType.LIST)
-    private val _loading = MutableStateFlow(false)
+    private val _page = MutableStateFlow(PageType.PROGRAM_LIST)
+    private val _uiFlags = MutableStateFlow(UiFlags.NONE)
+    private val _message = MutableStateFlow<String?>(null)
 
     val uiState = _uiState.asStateFlow()
+    val message = _message.asStateFlow()
+    val entities = Pager(
+        config = PagingConfig(pageSize = 20, initialLoadSize = 40)
+    ) { dao.getByPage() }.flow.cachedIn(viewModelScope)
 
     init {
         viewModelScope.launch {
-            // Combine the various flows into a single program UI state
-            combine(
-                dao.getAll(),
-                _selected,
-                _page,
-                _loading,
-            ) { entities, selected, page, loading ->
-                ProgramUiState(
-                    entities = entities,
-                    selected = selected,
-                    page = page,
-                    loading = loading
-                )
+            combine(_selected, _page, _uiFlags) { selected, page, uiFlags ->
+                ProgramUiState(selected, page, uiFlags)
             }.catch { ex ->
-                ex.printStackTrace()
+                _message.value = ex.message
             }.collect {
-                // Set the program UI state
                 _uiState.value = it
             }
         }
     }
 
-    /**
-     * Processes a program event and updates the program UI state accordingly.
-     *
-     * @param event The program event to process.
-     */
-    fun event(event: ProgramEvent) {
-        when (event) {
-            is ProgramEvent.NavTo -> _page.value = event.page
-            is ProgramEvent.ToggleSelected -> _selected.value = event.id
-            is ProgramEvent.Insert -> async { dao.insert(Program(text = event.name)) }
-            is ProgramEvent.Update -> async { dao.update(event.entity) }
-            is ProgramEvent.Delete -> async { dao.deleteById(event.id) }
-            is ProgramEvent.MoveTo -> moveTo(event.id, event.distance)
-        }
-    }
 
-    /**
-     * Runs a suspend block of code asynchronously on the view model scope.
-     *
-     * @param block The suspend block of code to run.
-     */
-    private fun async(block: suspend () -> Unit) {
-        viewModelScope.launch {
-            // Execute the suspend block of code
-            block()
-        }
-    }
-
-    /**
-     * Moves a program to a new position in the list.
-     *
-     * @param id The ID of the program to move.
-     * @param distance The distance to move the program.
-     */
-    private fun moveTo(id: Int, distance: Float) {
-        viewModelScope.launch {
-            // Set the loading state to true
-            _loading.value = true
-            // Execute the transaction to move the program
-            tx {
-                move {
-                    index = id
-                    dv = distance
-                }
-            }
-            // Set the loading state to false
-            _loading.value = false
+    fun uiEvent(uiEvent: ProgramUiEvent) {
+        when (uiEvent) {
+            is ProgramUiEvent.Delete -> viewModelScope.launch { dao.deleteById(uiEvent.id) }
+            is ProgramUiEvent.Insert -> viewModelScope.launch { dao.insert(Program(displayText = uiEvent.name)) }
+            is ProgramUiEvent.Message -> _message.value = uiEvent.message
+            is ProgramUiEvent.NavTo -> _page.value = uiEvent.page
+            is ProgramUiEvent.ToggleSelected -> _selected.value = uiEvent.id
+            is ProgramUiEvent.Update -> viewModelScope.launch { dao.update(uiEvent.program) }
         }
     }
 }
 
-/**
- * Data class that represents the state of the program UI.
- *
- * @param entities The list of program entities to display.
- * @param selected The ID of the currently selected program.
- * @param page The current page being displayed.
- * @param loading Whether or not the UI is currently loading data.
- */
 data class ProgramUiState(
-    val entities: List<Program> = emptyList(),
     val selected: Long = 0L,
-    val page: PageType = PageType.LIST,
-    val loading: Boolean = false,
+    val page: Int = PageType.PROGRAM_LIST,
+    val uiFlags: Int = UiFlags.NONE
 )
 
-/**
- * Sealed class that represents events that can occur in the program UI.
- */
-sealed class ProgramEvent {
-    data class NavTo(val page: PageType) : ProgramEvent()
-    data class ToggleSelected(val id: Long) : ProgramEvent()
-    data class Insert(val name: String) : ProgramEvent()
-    data class Update(val entity: Program) : ProgramEvent()
-    data class Delete(val id: Long) : ProgramEvent()
-    data class MoveTo(val id: Int, val distance: Float) : ProgramEvent()
+sealed class ProgramUiEvent {
+    data class Delete(val id: Long) : ProgramUiEvent()
+    data class Insert(val name: String) : ProgramUiEvent()
+    data class Message(val message: String?) : ProgramUiEvent()
+    data class NavTo(val page: Int) : ProgramUiEvent()
+    data class ToggleSelected(val id: Long) : ProgramUiEvent()
+    data class Update(val program: Program) : ProgramUiEvent()
 }

@@ -433,7 +433,6 @@
             android:textStyle="bold"
             tools:ignore="HardcodedText" />
 
-
     </LinearLayout>
 
 </layout>

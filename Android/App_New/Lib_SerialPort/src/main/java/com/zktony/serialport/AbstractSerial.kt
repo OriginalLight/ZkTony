@@ -1,40 +1,44 @@
 package com.zktony.serialport
 
-import android.os.Handler
-import android.os.HandlerThread
-import android.os.Message
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.core.SerialPort
-import java.io.File
-import java.io.IOException
-import java.io.InputStream
-import java.io.OutputStream
+import java.io.*
 import java.security.InvalidParameterException
+import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
 
 /**
  * Serial port helper class (abstract class)
  */
 abstract class AbstractSerial {
 
+    private val executor = Executors.newFixedThreadPool(2)
     private var serialPort: SerialPort? = null
     private var outputStream: OutputStream? = null
     private var inputStream: InputStream? = null
+    private var delay: Long = 10L
     private var isOpen: Boolean = false
+    private val buffer = ByteArrayOutputStream()
+    private val byteArrayQueue = LinkedBlockingQueue<ByteArray>()
 
     /**
-     * Thread for receiving data
+     * Callback handler
      */
-    private var readThread: ReadThread? = null
-    private var handler: Handler? = null
-    private var handlerThread: HandlerThread? = null
+    @Throws(Exception::class)
+    abstract fun callbackHandler(byteArray: ByteArray)
 
-    private var cache: ByteArray = byteArrayOf()
-    var callback: (ByteArray) -> Unit = { }
-    var exception: (Exception) -> Unit = { }
+    /**
+     * Exception handler
+     */
+    abstract fun exceptionHandler(e: Exception)
 
-
+    /**
+     * Open the serial port
+     */
     @Throws(SecurityException::class, IOException::class, InvalidParameterException::class)
     fun open(config: SerialConfig) {
+        delay = config.delay
         serialPort = SerialPort(
             device = File(config.device),
             baudRate = config.baudRate,
@@ -42,56 +46,49 @@ abstract class AbstractSerial {
             dataBits = config.dataBits,
             parity = config.parity,
             flowCon = config.flowCon,
-            flags = config.flags,
+            flags = config.flags
         )
         serialPort?.let {
             outputStream = it.outputStream
             inputStream = it.inputStream
         }
-        readThread = ReadThread()
-        readThread?.start()
 
-        handlerThread = HandlerThread("handlerThread")
-        handlerThread?.let {
-            it.start()
-            handler = object : Handler(it.looper) {
-                override fun handleMessage(msg: Message) {
-                    super.handleMessage(msg)
-                    send(msg.obj as ByteArray)
-                    try {
-                        Thread.sleep(config.delay)
-                    } catch (e: InterruptedException) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-        }
         isOpen = true
+        byteArrayReceiver()
+        byteArraySender()
     }
 
-    fun addWaitMessage(msg: Message) {
-        handler?.sendMessage(msg)
-    }
-
+    /**
+     * Close the serial port
+     */
     open fun close() {
         try {
             inputStream?.close()
             outputStream?.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
+            serialPort?.close()
+            executor.shutdownNow()
+            isOpen = false
+        } catch (ex: IOException) {
+            exceptionHandler(ex)
         }
-        serialPort?.close()
-        readThread?.interrupt()
-        handlerThread?.interrupt()
-        isOpen = false
     }
 
+    /**
+     * Add message to the message queue
+     */
+    fun addByteArrayToQueue(byteArray: ByteArray) {
+        byteArrayQueue.add(byteArray)
+    }
+
+    /**
+     * Send data
+     */
     private fun send(bOutArray: ByteArray) {
         if (isOpen) {
             try {
                 outputStream?.write(bOutArray)
-            } catch (e: IOException) {
-                e.printStackTrace()
+            } catch (ex: IOException) {
+                exceptionHandler(ex)
             }
         }
     }
@@ -101,44 +98,65 @@ abstract class AbstractSerial {
      */
     private fun dataProcess(byteArray: ByteArray?) {
         if (byteArray == null) {
-            if (cache.isNotEmpty()) {
+            if (buffer.size() > 0) {
                 try {
-                    callback.invoke(cache)
-                } catch (e: Exception) {
-                    exception.invoke(e)
+                    callbackHandler(buffer.toByteArray())
+                } catch (ex: Exception) {
+                    exceptionHandler(ex)
                 } finally {
-                    cache = byteArrayOf()
+                    buffer.reset()
                 }
             }
         } else {
-            cache += byteArray
+            buffer.write(byteArray)
         }
     }
 
     /**
      * Thread for receiving data
      */
-    private inner class ReadThread : Thread() {
-        override fun run() {
-            super.run()
-            while (!isInterrupted) {
+    private fun byteArrayReceiver() {
+        executor.execute {
+            val buffer = ByteArray(1024)
+            while (isOpen) {
                 try {
-                    val input = inputStream?.available()
-                    if (input != null && input > 0) {
-                        val buffer = ByteArray(input)
-                        inputStream?.read(buffer)
-                        dataProcess(buffer)
+                    val available = inputStream?.available()
+                    if (available != null && available > 0) {
+                        val bytesRead = inputStream?.read(buffer)
+                        if (bytesRead != null && bytesRead > 0) {
+                            dataProcess(buffer.copyOfRange(0, bytesRead))
+                        } else {
+                            dataProcess(null)
+                        }
                     } else {
                         dataProcess(null)
                     }
+
                     try {
-                        sleep(4L)
-                    } catch (e: InterruptedException) {
-                        e.printStackTrace()
+                        Thread.sleep(10L)
+                    } catch (ex: InterruptedException) {
+                        exceptionHandler(ex)
                     }
-                } catch (e: Throwable) {
-                    e.printStackTrace()
-                    return
+                } catch (ex: Exception) {
+                    exceptionHandler(ex)
+                }
+            }
+        }
+    }
+
+    /**
+     * Thread for sending data
+     */
+    private fun byteArraySender() {
+        executor.execute {
+            while (isOpen) {
+                try {
+                    val message = byteArrayQueue.poll(delay, TimeUnit.MILLISECONDS)
+                    if (message != null) {
+                        send(message)
+                    }
+                } catch (ex: Exception) {
+                    exceptionHandler(ex)
                 }
             }
         }

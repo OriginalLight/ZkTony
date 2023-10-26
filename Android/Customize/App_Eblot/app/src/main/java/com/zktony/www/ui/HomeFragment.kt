@@ -56,28 +56,9 @@ class HomeFragment : BaseFragment<HomeViewModel, FragmentHomeBinding>(R.layout.f
                 bind.apply {
                     stop.clickNoRepeat { viewModel.stop(i) }
                     start.clickNoRepeat { viewModel.start(i) }
-                    pumpUp.addTouchEvent({
-                        it.scaleX = 0.9f
-                        it.scaleY = 0.9f
-                        it.background = resources.getDrawable(R.drawable.bg_btn_orange_pressed)
-                        viewModel.pumpUpOrBack(0, 0, i)
-                    }, {
-                        it.scaleX = 1f
-                        it.scaleY = 1f
-                        it.background = resources.getDrawable(R.drawable.bg_btn_orange_selector)
-                        viewModel.pumpUpOrBack(0, 1, i)
-                    })
-                    pumpBack.addTouchEvent({
-                        it.scaleX = 0.9f
-                        it.scaleY = 0.9f
-                        it.background = resources.getDrawable(R.drawable.bg_btn_orange_pressed)
-                        viewModel.pumpUpOrBack(1, 0, i)
-                    }, {
-                        it.scaleX = 1f
-                        it.scaleY = 1f
-                        it.background = resources.getDrawable(R.drawable.bg_btn_orange_selector)
-                        viewModel.pumpUpOrBack(1, 1, i)
-                    })
+
+                    pumpUp.clickNoRepeat { viewModel.pumpUpOrBack(0, i) }
+                    pumpBack.clickNoRepeat { viewModel.pumpUpOrBack(1, i) }
 
                     bind.tabLayout.addOnTabSelectedListener(object :
                         TabLayout.OnTabSelectedListener {

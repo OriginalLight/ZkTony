@@ -62,6 +62,7 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             is ProgramEvent.Update -> viewModelScope.launch { dao.update(event.entity) }
             is ProgramEvent.Delete -> viewModelScope.launch { dao.deleteById(event.id) }
             is ProgramEvent.MoveTo -> moveTo(event.id, event.distance)
+            else -> {}
         }
     }
 
@@ -83,6 +84,7 @@ class ProgramViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 }
             }
             // Set the loading state to false
+
             _loading.value = false
         }
     }

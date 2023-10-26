@@ -2,16 +2,41 @@ package com.zktony.android.utils.tx
 
 import com.zktony.android.utils.AsyncTask
 import com.zktony.android.utils.SerialPortHelper
+import com.zktony.android.utils.ext.loge
 import com.zktony.serialport.command.Protocol
-import kotlinx.coroutines.*
+import com.zktony.serialport.ext.toHexString
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
 import java.util.concurrent.atomic.AtomicLong
 
 val serialPort: SerialPortHelper = SerialPortHelper.instance
 val asyncTask: AsyncTask = AsyncTask.instance
 
-private var x: AtomicLong = AtomicLong(0L)
-private var y: AtomicLong = AtomicLong(0L)
-private var z: AtomicLong = AtomicLong(0L)
+/**
+ * 控制类型
+ * 举升2是电机0
+ */
+private var js2: AtomicLong = AtomicLong(0L)
+
+/**
+ * 举升1是电机1
+ */
+private var js1: AtomicLong = AtomicLong(0L)
+
+/**
+ * 夹爪是电机2
+ */
+private var jiazhua: AtomicLong = AtomicLong(0L)
+
+/**
+ * 下盘是电机4
+ */
+private var xp: AtomicLong = AtomicLong(0L)
+
+/**
+ * 上盘是电机5
+ */
+private var sp: AtomicLong = AtomicLong(0L)
 
 /**
  * 脉冲
@@ -36,16 +61,40 @@ fun <T : Number> pulse(index: Int, dvp: T): Long {
         }
     }
 
+    /**
+     * 记录坐标
+     */
     return when (index) {
         0 -> {
-            val d = p - y.get()
-            y.set(maxOf(p, 0))
+            val d = p - js2.get()
+            js2.set(maxOf(p, 0))
             d
         }
 
         1 -> {
-            val d = p - z.get()
-            z.set(maxOf(p, 0))
+            val d = p - js1.get()
+            js1.set(maxOf(p, 0))
+            d
+        }
+
+
+        2 -> {
+            val d = p - jiazhua.get()
+            jiazhua.set(maxOf(p, 0))
+            d
+        }
+
+
+        4 -> {
+            val d = p - xp.get()
+            xp.set(maxOf(p, 0))
+            d
+        }
+
+
+        5 -> {
+            val d = p - sp.get()
+            sp.set(maxOf(p, 0))
             d
         }
 
@@ -70,7 +119,8 @@ fun sendByteArray(byteArray: ByteArray) {
  * @return Unit
  */
 fun sendProtocol(block: Protocol.() -> Unit) {
-    serialPort.sendProtocol(Protocol().apply(block))
+    serialPort.sendByteArray(Protocol().apply(block).toByteArray())
+    Protocol().apply(block).toByteArray().toHexString().loge()
 }
 
 /**
@@ -145,21 +195,7 @@ fun getLock(vararg ids: Int): Boolean {
  * @param ids List<Int>
  * @return Boolean
  */
-fun getGpio(ids: List<Int>): Boolean {
-    return ids.any {
-        serialPort.gpio[it] == true
-    }
-}
-
-/**
- * 获取光电状态
- *
- * @param ids List<Int>
- * @return Boolean
- */
-fun getGpio(vararg ids: Int): Boolean {
-    return ids.any { serialPort.gpio[it] }
-}
+fun getGpio(id: Int): Boolean = serialPort.gpio[id]
 
 /**
  * 发送命令
@@ -175,7 +211,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
         // 复位
         ControlType.CONTROL_RESET -> {
             sendProtocol {
-                control = 0x00
+                func = 0x00
                 data = tx.byteList.toByteArray()
             }
         }
@@ -192,7 +228,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
                             if (tx.byteList.isNotEmpty()) {
                                 setLock(tx.indexList)
                                 sendProtocol {
-                                    control = 0x01
+                                    func = 0x01
                                     data = tx.byteList.toByteArray()
                                 }
                                 delay(10L)
@@ -224,7 +260,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
                     if (tx.byteList.isNotEmpty()) {
                         setLock(tx.indexList)
                         sendProtocol {
-                            control = 0x01
+                            func = 0x01
                             data = tx.byteList.toByteArray()
                         }
                     }
@@ -235,7 +271,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
         // 停止
         ControlType.CONTROL_STOP -> {
             sendProtocol {
-                control = 0x02
+                func = 0x02
                 data = tx.byteList.toByteArray()
             }
         }
@@ -243,7 +279,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
         // 查询轴状态
         ControlType.CONTROL_QUERY_AXIS -> {
             sendProtocol {
-                control = 0x03
+                func = 0x03
                 data = tx.byteList.toByteArray()
             }
         }
@@ -251,7 +287,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
         // 查询GPIO状态
         ControlType.CONTROL_QUERY_GPIO -> {
             sendProtocol {
-                control = 0x04
+                func = 0x04
                 data = tx.byteList.toByteArray()
             }
         }
@@ -259,7 +295,7 @@ suspend fun tx(block: TxScope.() -> Unit) {
         // 控制气阀
         ControlType.CONTROL_VALVE -> {
             sendProtocol {
-                control = 0x05
+                func = 0x05
                 data = tx.byteList.toByteArray()
             }
         }
@@ -269,82 +305,3 @@ suspend fun tx(block: TxScope.() -> Unit) {
     delay(tx.delay)
 }
 
-/**
- * 初始化
- */
-fun initializer() {
-
-    val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
-    scope.launch {
-        launch {
-            val ids = listOf(0, 1)
-            // 查询GPIO状态
-            tx {
-                delay = 300L
-                queryGpio(ids)
-            }
-            // 针对每个电机进行初始化
-            ids.forEach {
-                // 如果电机未初始化，则进行初始化
-                if (!getGpio(it)) {
-                    // 进行电机初始化
-                    tx {
-                        timeout = 1000L * 60
-                        move(MoveType.MOVE_PULSE) {
-                            index = it
-                            pulse = 3200L * -30
-                        }
-                    }
-                }
-
-                // 进行正向运动
-                tx {
-                    timeout = 1000L * 10
-                    move(MoveType.MOVE_PULSE) {
-                        index = it
-                        pulse = 3200L * 2
-                        acc = 50
-                        dec = 80
-                        speed = 100
-                    }
-                }
-
-                // 进行反向运动
-                tx {
-                    timeout = 1000L * 15
-                    move(MoveType.MOVE_PULSE) {
-                        index = it
-                        pulse = 3200L * -3
-                        acc = 50
-                        dec = 80
-                        speed = 100
-                    }
-                }
-            }
-        }
-
-//        launch {
-//            delay(150L)
-//            val ids = listOf(2)
-//            // 查询GPIO状态
-//            tx { queryGpio(ids) }
-//            // 延迟
-//            delay(100L)
-//            // 关闭所有气阀
-//            tx { valve(ids.toList().map { it to 0 }) }
-//            // 对每个注射泵进行初始化
-//            tx {
-//                timeout = 1000L * 30
-//                ids.forEach {
-//                    // 进行注射泵初始化
-//                    move(MoveType.MOVE_PULSE) {
-//                        index = it
-//                        pulse = Constants.MAX_SYRINGE * -1
-//                    }
-//                }
-//            }
-//        }
-    }
-
-}

@@ -6,7 +6,9 @@ import com.zktony.android.data.dao.CalibrationDao
 import com.zktony.android.data.entities.Calibration
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.utils.tx.MoveType
+import com.zktony.android.utils.tx.getGpio
 import com.zktony.android.utils.tx.tx
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -23,8 +25,10 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
     private val _page = MutableStateFlow(PageType.CALIBRATION_LIST)
     private val _loading = MutableStateFlow(false)
     private val _uiState = MutableStateFlow(CalibrationUiState())
+    private val _loadingNum = MutableStateFlow(0)
 
     val uiState = _uiState.asStateFlow()
+
 
     init {
         viewModelScope.launch {
@@ -64,8 +68,113 @@ class CalibrationViewModel constructor(private val dao: CalibrationDao) : ViewMo
             is CalibrationEvent.AddLiquid -> addLiquid(event.index)
             is CalibrationEvent.DeleteData -> deleteData(event.data)
             is CalibrationEvent.InsertData -> insertData(event.index, event.volume)
+            is CalibrationEvent.Reset -> reset(
+                event.ids,
+                event.spydjl,
+                event.xpydjl,
+                event.fwgd,
+                event.fwgd2
+            )
         }
     }
+
+    /**
+     * Resets the axes and syringe.
+     */
+    private fun reset(ids: List<Int>, spydjl: Double, xpydjl: Double, fwgd: Double, fwgd2: Double) {
+        viewModelScope.launch {
+            _loadingNum.value = 1
+            try {
+                if (!_loading.value) {
+                    _loading.value = true
+                    // 查询GPIO状态
+                    tx { queryGpio(ids) }
+                    delay(300L)
+                    // 针对每个电机进行初始化
+                    ids.forEach {
+                        // 如果电机未初始化，则进行初始化
+                        if (!getGpio(it)) {
+                            println("第一次反向运动")
+                            // 进行电机初始化
+                            tx {
+                                timeout = 1000L * 60
+                                move(MoveType.MOVE_PULSE) {
+                                    index = it
+                                    pulse = 3200L * -30
+                                    ads = Triple(50L, 80L, 100L)
+                                }
+
+                            }
+                        }
+                        println("正向运动")
+                        // 进行正向运动
+                        tx {
+                            timeout = 1000L * 10
+                            move(MoveType.MOVE_PULSE) {
+                                index = it
+                                pulse = 800L
+                                ads = Triple(50L, 80L, 100L)
+                            }
+                        }
+
+                        println("反向运动")
+                        // 进行反向运动
+                        tx {
+                            timeout = 1000L * 15
+                            move(MoveType.MOVE_PULSE) {
+                                index = it
+                                pulse = 3200L * -3
+                                ads = Triple(50L, 80L, 100L)
+                            }
+                        }
+                    }
+                    if (ids.size > 1) {
+                        //移动上盘到原点距离
+                        tx {
+                            move(MoveType.MOVE_PULSE) {
+                                index = 5
+                                pulse = (3200L * spydjl).toLong();
+                                ads = Triple(50L, 80L, 100L)
+                            }
+
+                            //移动下盘到原点距离
+                            move(MoveType.MOVE_PULSE) {
+                                index = 4
+                                pulse = (2599L * xpydjl).toLong();
+                                ads = Triple(50L, 80L, 100L)
+                            }
+
+                        }
+
+                        tx {
+                            //移动到复位高度
+                            move(MoveType.MOVE_PULSE) {
+                                index = 1
+                                pulse = (3200L * fwgd).toLong();
+                                ads = Triple(50L, 80L, 100L)
+                            }
+                            //移动到复位高度
+                            move(MoveType.MOVE_PULSE) {
+                                index = 0
+                                pulse = (3200L * fwgd2).toLong();
+                                ads = Triple(50L, 80L, 100L)
+                            }
+                        }
+
+                    }
+
+                    _loading.value = false
+                }
+
+
+            } catch (ex: Exception) {
+                _loadingNum.value = 0
+            } finally {
+                _loadingNum.value = 0
+            }
+        }
+    }
+
 
     /**
      * Adds a new liquid to the selected calibration entity.
@@ -179,4 +288,11 @@ sealed class CalibrationEvent {
     data class AddLiquid(val index: Int) : CalibrationEvent()
     data class DeleteData(val data: Triple<Int, Double, Double>) : CalibrationEvent()
     data class InsertData(val index: Int, val volume: Double) : CalibrationEvent()
+    data class Reset(
+        val ids: List<Int>,
+        val spydjl: Double,
+        val xpydjl: Double,
+        val fwgd: Double,
+        val fwgd2: Double
+    ) : CalibrationEvent()
 }

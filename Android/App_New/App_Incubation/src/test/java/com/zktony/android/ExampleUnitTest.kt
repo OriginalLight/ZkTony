@@ -1,5 +1,7 @@
 package com.zktony.android
 
+import com.zktony.android.data.entities.internal.Point
+import com.zktony.android.utils.AlgorithmUtils
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.concurrent.CopyOnWriteArrayList
@@ -27,5 +29,25 @@ class ExampleUnitTest {
         assertEquals(11, list.size)
         assertEquals(1, list[0])
         assertEquals(11, list[10])
+    }
+
+    @Test
+    fun test() {
+        val points = listOf(
+            Point(0.0, 0.0),
+            Point(1.0, 640.0),
+            Point(99.0, 64000.0),
+            Point(203.0, 128000.0),
+            Point(986.0, 640000.0)
+        )
+
+        val quadraticCurve = AlgorithmUtils.fitQuadraticCurve(points)
+
+        val x = 986.0
+        val y = quadraticCurve(x)
+
+        if (y != null) {
+            assertEquals(639982.8994101394, y, 1.0)
+        }
     }
 }

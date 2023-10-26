@@ -35,10 +35,8 @@ class AdminViewModel constructor(
         val cmd = SM.send.value
         if (pump) {
             cmd.motorX = 1
-            cmd.motorY = 1
         } else {
             cmd.motorX = 0
-            cmd.motorY = 0
         }
         SM.send(cmd)
     }
@@ -144,7 +142,7 @@ class AdminViewModel constructor(
     private fun downloadApk(application: Application) {
         viewModelScope.launch {
             PopTip.show(Ext.ctx.getString(R.string.start_downloading))
-            application.download_url.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
+            application.downloadUrl.download(File(Ext.ctx.getExternalFilesDir(null), "update.apk"))
                 .collect {
                     when (it) {
                         is DownloadState.Success -> {
@@ -181,7 +179,7 @@ class AdminViewModel constructor(
             if (Ext.ctx.isNetworkAvailable()) {
                 val application = _uiState.value.application
                 if (application != null) {
-                    if (application.version_code > BuildConfig.VERSION_CODE) {
+                    if (application.versionCode > BuildConfig.VERSION_CODE) {
                         updateDialog(
                             title = Ext.ctx.getString(R.string.new_remote_update),
                             message = application.description + "\n${Ext.ctx.getString(R.string.whether_to_update)}",
@@ -203,9 +201,9 @@ class AdminViewModel constructor(
                         }
                     ) {
                         val app =
-                            it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                            it.find { app -> app.applicationId == BuildConfig.APPLICATION_ID }
                         if (app != null) {
-                            if (app.version_code > BuildConfig.VERSION_CODE) {
+                            if (app.versionCode > BuildConfig.VERSION_CODE) {
                                 updateDialog(
                                     title = Ext.ctx.getString(R.string.new_remote_update),
                                     message = app.description + "\n${Ext.ctx.getString(R.string.whether_to_update)}",

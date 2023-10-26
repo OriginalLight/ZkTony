@@ -1,4 +1,4 @@
-@file:Suppress("UNCHECKED_CAST", "UNUSED", "UNNECESSARY_NOT_NULL_ASSERTION")
+@file:Suppress("UNCHECKED_CAST", "UNUSED")
 
 package com.zktony.android.data.datastore
 
@@ -6,8 +6,6 @@ package com.zktony.android.data.datastore
  * @author 刘贺贺
  * @date 2023/7/24 10:59
  */
-import android.content.Context
-import android.content.SharedPreferences
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.ReadOnlyComposable
@@ -16,7 +14,7 @@ import androidx.compose.ui.platform.LocalInspectionMode
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
- * The interface is used to save/read data. We provide the basic implementation using Preference, DataStore and MMKV.
+ * The interface is used to save/read data. We provide the basic implementation using Preference
  *
  * If you want to write your own, you need to implement `saveData` and `readData`. Besides, a suspend function `saveDataAsync` is optional(which is equal to `saveData` by default)
  */
@@ -32,77 +30,12 @@ abstract class DataSaverInterface(val senseExternalDataChange: Boolean = false) 
 }
 
 /**
- * Default implementation using [SharedPreferences] to save data
- */
-class DataSaverPreferences(
-    private val preference: SharedPreferences,
-    senseExternalDataChange: Boolean = false
-) : DataSaverInterface(senseExternalDataChange) {
-    constructor(
-        context: Context,
-        senseExternalDataChange: Boolean
-    ) : this(
-        context.getSharedPreferences(context.packageName, Context.MODE_PRIVATE),
-        senseExternalDataChange
-    )
-
-    private val onSharedPreferenceChangeListener by lazy {
-        SharedPreferences.OnSharedPreferenceChangeListener { sharedPreferences, key ->
-            externalDataChangedFlow?.tryEmit(key to sharedPreferences.all[key])
-        }
-    }
-
-    init {
-        if (senseExternalDataChange) {
-            this.preference.registerOnSharedPreferenceChangeListener(
-                onSharedPreferenceChangeListener
-            )
-        }
-    }
-
-    override fun <T> saveData(key: String, data: T) = with(preference.edit()) {
-        when (data) {
-            null -> {
-                this@DataSaverPreferences.remove(key)
-                return@with
-            }
-
-            is Long -> putLong(key, data)
-            is Int -> putInt(key, data)
-            is String -> putString(key, data)
-            is Boolean -> putBoolean(key, data)
-            is Float -> putFloat(key, data)
-            else -> throw IllegalArgumentException("Unable to save $data, this type(${data!!::class.java}) cannot be saved using SharedPreferences, call [registerTypeConverters] to support it.")
-        }.apply()
-    }
-
-    override fun <T> readData(key: String, default: T): T = with(preference) {
-        val res: Any = when (default) {
-            is Long -> getLong(key, default)
-            is String -> this.getString(key, default)!!
-            is Int -> getInt(key, default)
-            is Boolean -> getBoolean(key, default)
-            is Float -> getFloat(key, default)
-            else -> throw IllegalArgumentException("Unable to read $default, this type(${default!!::class.java}) cannot be get from Preferences, call [registerTypeConverters] to support it.")
-        }
-        return res as T
-    }
-
-    override fun remove(key: String) {
-        preference.edit().remove(key).apply()
-    }
-
-    override fun contains(key: String) = preference.contains(key)
-
-}
-
-/**
  * Using [HashMap] to save data in memory, can be used for testing
  * @property map MutableMap<String, Any?>
  */
 class DataSaverInMemory(senseExternalDataChange: Boolean = false) :
     DataSaverInterface(senseExternalDataChange) {
-    inner class ObservableMap() {
+    inner class ObservableMap {
         private val map by lazy {
             mutableMapOf<String, Any?>()
         }
@@ -160,7 +93,7 @@ internal val DefaultDataSaverInMemory by lazy {
 }
 
 /**
- * Get the [DataSaverInterface] instance, if [LocalInspectionMode.current] is true, return [DataSaverInMemory] instead
+ * Get the [DataSaverInterface] instance
  * which supports preview in Android Studio
  * @return DataSaverInterface
  */

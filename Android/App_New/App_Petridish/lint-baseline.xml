@@ -1,11 +1,565 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.1.0" type="baseline" client="gradle" dependencies="false" name="AGP (8.1.0)" variant="all" version="8.1.0">
+<issues format="6" by="lint 8.1.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.1.2)" variant="all" version="8.1.2">
 
     <issue
-        id="LintError"
-        message="Unexpected failure during lint analysis (this is a bug in lint or one of the libraries it depends on)&#xA;&#xA;Message: Protocol message contained an invalid tag (zero).&#xA;Stack: `InvalidProtocolBufferException:InvalidProtocolBufferException.invalidTag(InvalidProtocolBufferException.java:89)←CodedInputStream.readTag(CodedInputStream.java:158)←JvmModuleProtoBuf$Module.&lt;init>(JvmModuleProtoBuf.java:223)←JvmModuleProtoBuf$Module.&lt;init>(JvmModuleProtoBuf.java:188)←JvmModuleProtoBuf$Module$1.parsePartialFrom(JvmModuleProtoBuf.java:341)←JvmModuleProtoBuf$Module$1.parsePartialFrom(JvmModuleProtoBuf.java:336)←AbstractParser.parsePartialFrom(AbstractParser.java:192)←AbstractParser.parseFrom(AbstractParser.java:209)←AbstractParser.parseFrom(AbstractParser.java:49)←JvmModuleProtoBuf$Module.parseFrom(JvmModuleProtoBuf.java:821)←ModuleMapping$Companion.loadModuleMapping(ModuleMapping.kt:83)←ModuleMappingUtilKt.loadModuleMapping(ModuleMappingUtil.kt:19)←JvmPackagePartProviderKt.tryLoadModuleMapping(JvmPackagePartProvider.kt:73)←JvmPackagePartProvider.addRoots(JvmPackagePartProvider.kt:55)←KotlinCoreEnvironment.createPackagePartProvider(KotlinCoreEnvironment.kt:301)←Fe10UastEnvironment$analyzeFiles$1.invoke(Fe10UastEnvironment.kt:175)←Fe10UastEnvironment$analyzeFiles$1.invoke(Fe10UastEnvironment.kt:175)←TopDownAnalyzerFacadeForJVM.createContainer(TopDownAnalyzerFacadeForJVM.kt:198)←TopDownAnalyzerFacadeForJVM.createContainer$default(TopDownAnalyzerFacadeForJVM.kt:150)←TopDownAnalyzerFacadeForJVM.analyzeFilesWithJavaIntegration(TopDownAnalyzerFacadeForJVM.kt:101)←TopDownAnalyzerFacadeForJVM.analyzeFilesWithJavaIntegration$default(TopDownAnalyzerFacadeForJVM.kt:99)←Fe10UastEnvironment.analyzeFiles(Fe10UastEnvironment.kt:170)←LintCliClient$LintCliUastParser.prepare(LintCliClient.kt:1851)←UastParser.prepare$default(UastParser.kt:59)←LintDriver.prepareUast(LintDriver.kt:2107)←LintDriver.runFileDetectors(LintDriver.kt:1280)←LintDriver.checkProject(LintDriver.kt:1144)←LintDriver.checkProjectRoot(LintDriver.kt:615)←LintDriver.access$checkProjectRoot(LintDriver.kt:170)←LintDriver$analyzeOnly$1.invoke(LintDriver.kt:441)←LintDriver$analyzeOnly$1.invoke(LintDriver.kt:438)←LintDriver.doAnalyze(LintDriver.kt:497)←LintDriver.analyzeOnly(LintDriver.kt:438)←LintCliClient$analyzeOnly$1.invoke(LintCliClient.kt:237)←LintCliClient$analyzeOnly$1.invoke(LintCliClient.kt:237)←LintCliClient.run(LintCliClient.kt:279)←LintCliClient.run$default(LintCliClient.kt:262)←LintCliClient.analyzeOnly(LintCliClient.kt:237)←Main.run(Main.java:1689)←Main.run(Main.java:275)←NativeMethodAccessorImpl.invoke0(NativeMethodAccessorImpl.java:-2)←NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)←DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)←Method.invoke(Method.java:568)←AndroidLintWorkAction.invokeLintMainRunMethod(AndroidLintWorkAction.kt:98)←AndroidLintWorkAction.runLint(AndroidLintWorkAction.kt:87)←AndroidLintWorkAction.execute(AndroidLintWorkAction.kt:62)←DefaultWorkerServer.execute(DefaultWorkerServer.java:63)←NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)←NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)←ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)←NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)←AbstractWorker$1.call(AbstractWorker.java:44)←AbstractWorker$1.call(AbstractWorker.java:41)←DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)←DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)←DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)←DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)←DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)←DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)←DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)←DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)←AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)←NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)←DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:169)←FutureTask.run(FutureTask.java:264)←DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:187)←DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:120)←DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:162)←Factories$1.create(Factories.java:31)←DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:249)←DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:109)←DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:114)←DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:157)←DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:126)←Executors$RunnableAdapter.call(Executors.java:539)←FutureTask.run(FutureTask.java:264)←ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)←ManagedExecutorImpl$1.run(ManagedExecutorImpl.java:49)←ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)←ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)←Thread.run(Thread.java:833)`&#xA;&#xA;You can run with --stacktrace or set environment variable `LINT_PRINT_STACKTRACE=true` to dump a full stacktrace to stdout.">
+        id="InsecureBaseConfiguration"
+        message="Insecure Base Configuration"
+        errorLine1="    &lt;base-config cleartextTrafficPermitted=&quot;true&quot; />"
+        errorLine2="                                            ~~~~">
         <location
-            file="App_Petridish"/>
+            file="src/main/res/xml/network_security_config.xml"
+            line="3"
+            column="45"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (849 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M33.703,21.661c-1.194,-0.014 -2.351,-0.637 -2.991,-1.747c-0.617,-1.068 -0.604,-2.324 -0.081,-3.346c-1.063,-0.944 -2.321,-1.67 -3.715,-2.094C26.288,15.418 25.217,16.04 24,16.04s-2.288,-0.622 -2.916,-1.565c-1.394,0.425 -2.653,1.151 -3.715,2.094c0.523,1.022 0.536,2.278 -0.081,3.346c-0.64,1.11 -1.797,1.732 -2.991,1.747C14.11,22.425 14,23.219 14,24.04c0,0.642 0.066,1.267 0.182,1.876c1.234,-0.026 2.445,0.604 3.106,1.749c0.684,1.185 0.594,2.602 -0.11,3.673c1.041,0.974 2.287,1.728 3.67,2.188c0.565,-1.173 1.762,-1.985 3.152,-1.985s2.587,0.812 3.152,1.986c1.383,-0.459 2.629,-1.214 3.67,-2.188c-0.704,-1.07 -0.794,-2.487 -0.11,-3.672c0.661,-1.145 1.872,-1.774 3.107,-1.749C33.933,25.307 34,24.682 34,24.04C34,23.219 33.89,22.425 33.703,21.661zM24,29.29c-2.899,0 -5.25,-2.351 -5.25,-5.25s2.351,-5.25 5.25,-5.25s5.25,2.351 5.25,5.25S26.899,29.29 24,29.29z&quot;>"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_config.xml"
+            line="41"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (1165 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M43.407,19.243c-2.389,-0.029 -4.702,-1.274 -5.983,-3.493c-1.233,-2.136 -1.208,-4.649 -0.162,-6.693c-2.125,-1.887 -4.642,-3.339 -7.43,-4.188C28.577,6.756 26.435,8 24,8s-4.577,-1.244 -5.831,-3.131c-2.788,0.849 -5.305,2.301 -7.43,4.188c1.046,2.044 1.071,4.557 -0.162,6.693c-1.281,2.219 -3.594,3.464 -5.983,3.493C4.22,20.77 4,22.358 4,24c0,1.284 0.133,2.535 0.364,3.752c2.469,-0.051 4.891,1.208 6.213,3.498c1.368,2.37 1.187,5.204 -0.22,7.345c2.082,1.947 4.573,3.456 7.34,4.375C18.827,40.624 21.221,39 24,39s5.173,1.624 6.303,3.971c2.767,-0.919 5.258,-2.428 7.34,-4.375c-1.407,-2.141 -1.588,-4.975 -0.22,-7.345c1.322,-2.29 3.743,-3.549 6.213,-3.498C43.867,26.535 44,25.284 44,24C44,22.358 43.78,20.77 43.407,19.243zM36,24c0,1.626 -0.327,3.176 -0.913,4.59l-5.166,-3.66C29.968,24.626 30,24.317 30,24c0,-2.611 -1.671,-4.827 -4,-5.651V12.18C31.673,13.134 36,18.056 36,24zM22,12.18v6.169c-2.329,0.825 -4,3.04 -4,5.651c0,0.317 0.032,0.626 0.079,0.93l-5.166,3.66C12.327,27.176 12,25.626 12,24C12,18.056 16.327,13.134 22,12.18zM24,36c-3.561,0 -6.75,-1.56 -8.948,-4.023l4.953,-3.509C21.066,29.418 22.464,30 24,30s2.934,-0.582 3.995,-1.532l4.953,3.509C30.75,34.44 27.561,36 24,36z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_setting.xml"
+            line="23"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (939 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M21,28.207V31.5c0,0.827 -0.673,1.5 -1.5,1.5h-3.293c-0.608,0 -1.152,-0.363 -1.386,-0.926c-0.232,-0.562 -0.105,-1.204 0.325,-1.635l0.291,-0.291C14.495,28.593 14,26.83 14,25c0,-5.295 4.139,-9.68 9.421,-9.983c0.411,-0.024 0.81,0.126 1.105,0.406C24.827,15.708 25,16.107 25,16.521v1.002c0,0.781 -0.619,1.437 -1.409,1.492C20.455,19.228 18,21.856 18,25c0,0.737 0.144,1.47 0.422,2.164l0.018,-0.018c0.43,-0.43 1.072,-0.559 1.635,-0.325S21,27.599 21,28.207zM32.56,19.854l0.294,-0.294c0.431,-0.431 0.558,-1.072 0.325,-1.635C32.945,17.363 32.401,17 31.793,17H28.5c-0.827,0 -1.5,0.673 -1.5,1.5v3.293c0,0.608 0.363,1.152 0.926,1.386c0.562,0.232 1.205,0.104 1.635,-0.325l0.026,-0.026C29.859,23.518 30,24.253 30,25c0,3.144 -2.455,5.772 -5.591,5.985C23.619,31.041 23,31.696 23,32.478v1.002c0,0.413 0.173,0.812 0.474,1.098c0.276,0.262 0.646,0.409 1.024,0.409c0.027,0 0.054,-0.001 0.081,-0.003C29.861,34.68 34,30.295 34,25C34,23.173 33.505,21.41 32.56,19.854z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_sync.xml"
+            line="23"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="VectorPath"
+        message="Very long vector path (946 characters), which is bad for performance. Considering reducing precision, removing minor details or rasterizing vector."
+        errorLine1="      android:pathData=&quot;M20.5,28.207V31.5c0,0.552 -0.448,1 -1,1h-3.293c-0.405,0 -0.769,-0.242 -0.924,-0.617s-0.07,-0.803 0.217,-1.09l0.574,-0.574C15.043,28.663 14.5,26.868 14.5,25c0,-5.03 3.932,-9.196 8.95,-9.484c0.266,-0.017 0.536,0.084 0.732,0.271c0.202,0.19 0.317,0.458 0.317,0.734v1.002c0,0.528 -0.405,0.955 -0.943,0.993C20.16,18.746 17.5,21.595 17.5,25c0,1.045 0.266,2.078 0.771,3.021l0.521,-0.521c0.286,-0.286 0.713,-0.373 1.09,-0.217C20.258,27.438 20.5,27.802 20.5,28.207zM31.923,19.784l0.577,-0.577c0.287,-0.287 0.372,-0.715 0.217,-1.09S32.198,17.5 31.793,17.5H28.5c-0.552,0 -1,0.448 -1,1v3.293c0,0.405 0.242,0.769 0.617,0.924c0.376,0.155 0.804,0.069 1.09,-0.217l0.532,-0.532C30.238,22.903 30.5,23.939 30.5,25c0,3.405 -2.66,6.254 -6.057,6.484c-0.538,0.038 -0.943,0.465 -0.943,0.993v1.002c0,0.276 0.115,0.544 0.317,0.734c0.184,0.175 0.429,0.272 0.68,0.272c0.018,0 0.035,-0.001 0.053,-0.002C29.568,34.196 33.5,30.03 33.5,25C33.5,23.135 32.956,21.341 31.923,19.784z&quot;"
+        errorLine2="                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/drawable/ic_sync.xml"
+            line="28"
+            column="25"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var valveOne_ex by remember { mutableStateOf(0) }"
+        errorLine2="                                  ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Calibration.kt"
+            line="261"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var pipeline by remember { mutableStateOf(0) }"
+        errorLine2="                               ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="87"
+            column="32"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var syringe by remember { mutableStateOf(0) }"
+        errorLine2="                              ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="88"
+            column="31"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var time by remember { mutableStateOf(0) }"
+        errorLine2="                           ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="89"
+            column="28"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var valveOne_ex by remember { mutableStateOf(0) }"
+        errorLine2="                                  ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Home.kt"
+            line="113"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableLongStateOf` instead of `mutableStateOf`"
+        errorLine1="    var speed by remember { mutableStateOf(entity.speed) }"
+        errorLine2="                            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Setting.kt"
+            line="560"
+            column="29"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableLongStateOf` instead of `mutableStateOf`"
+        errorLine1="    var acc by remember { mutableStateOf(entity.acc) }"
+        errorLine2="                          ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Setting.kt"
+            line="561"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableLongStateOf` instead of `mutableStateOf`"
+        errorLine1="    var dec by remember { mutableStateOf(entity.dec) }"
+        errorLine2="                          ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Setting.kt"
+            line="562"
+            column="27"/>
+    </issue>
+
+    <issue
+        id="AutoboxingStateCreation"
+        message="Prefer `mutableIntStateOf` instead of `mutableStateOf`"
+        errorLine1="    var valveOne_ex by remember { mutableStateOf(0) }"
+        errorLine2="                                  ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/java/com/zktony/android/ui/Splash.kt"
+            line="74"
+            column="35"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_about` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_about.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_language` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_language.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_note` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_note.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_pipeline` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_pipeline.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_program` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_program.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_reset` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_reset.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_start` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_start.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_stop` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_stop.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_syringe` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_syringe.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_uv` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_uv.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.drawable.ic_water` appears to be unused"
+        errorLine1="&lt;vector xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
+        errorLine2="^">
+        <location
+            file="src/main/res/drawable/ic_water.xml"
+            line="1"
+            column="1"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.device_info` appears to be unused"
+        errorLine1="    &lt;string name=&quot;device_info&quot;>设备信息&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="6"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.empty_screen_subtitle` appears to be unused"
+        errorLine1="    &lt;string name=&quot;empty_screen_subtitle&quot;>This screen is still under construction. This sample will help you learn about adaptive layouts in Jetpack Compose&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="7"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.empty_screen_title` appears to be unused"
+        errorLine1="    &lt;string name=&quot;empty_screen_title&quot;>Screen under construction&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="8"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.language` appears to be unused"
+        errorLine1="    &lt;string name=&quot;language&quot;>语言&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="11"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.tab_container` appears to be unused"
+        errorLine1="    &lt;string name=&quot;tab_container&quot;>容器&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="18"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.tab_program` appears to be unused"
+        errorLine1="    &lt;string name=&quot;tab_program&quot;>制胶程序&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="20"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.interface_exception` appears to be unused"
+        errorLine1="    &lt;string name=&quot;interface_exception&quot;>接口异常&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="27"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.save` appears to be unused"
+        errorLine1="    &lt;string name=&quot;save&quot;>保存&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="31"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.edit` appears to be unused"
+        errorLine1="    &lt;string name=&quot;edit&quot;>编辑&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="32"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.delete` appears to be unused"
+        errorLine1="    &lt;string name=&quot;delete&quot;>删除&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="33"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.maximum_stroke` appears to be unused"
+        errorLine1="    &lt;string name=&quot;maximum_stroke&quot;>最大行程&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="35"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.waste_tank` appears to be unused"
+        errorLine1="    &lt;string name=&quot;waste_tank&quot;>废液槽坐标&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="36"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.save_success` appears to be unused"
+        errorLine1="    &lt;string name=&quot;save_success&quot;>保存成功&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="38"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.authentication` appears to be unused"
+        errorLine1="    &lt;string name=&quot;authentication&quot;>权限认证&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="39"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.time_out` appears to be unused"
+        errorLine1="    &lt;string name=&quot;time_out&quot;>超时&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="40"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.x_axis` appears to be unused"
+        errorLine1="    &lt;string name=&quot;x_axis&quot;>X 轴&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="43"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.y_axis` appears to be unused"
+        errorLine1="    &lt;string name=&quot;y_axis&quot;>Y 轴&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="44"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.z_axis` appears to be unused"
+        errorLine1="    &lt;string name=&quot;z_axis&quot;>Z 轴&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="45"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.volume` appears to be unused"
+        errorLine1="    &lt;string name=&quot;volume&quot;>出液量 μL&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="46"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.colloid` appears to be unused"
+        errorLine1="    &lt;string name=&quot;colloid&quot;>胶体 μL&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="47"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.coagulant` appears to be unused"
+        errorLine1="    &lt;string name=&quot;coagulant&quot;>促凝剂 μL&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="48"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.glue_making` appears to be unused"
+        errorLine1="    &lt;string name=&quot;glue_making&quot;>制胶&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="49"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.pre_drain` appears to be unused"
+        errorLine1="    &lt;string name=&quot;pre_drain&quot;>预排&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="50"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.moving_distance` appears to be unused"
+        errorLine1="    &lt;string name=&quot;moving_distance&quot;>移动距离&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="52"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.actions` appears to be unused"
+        errorLine1="    &lt;string name=&quot;actions&quot;>操作&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="53"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.motor` appears to be unused"
+        errorLine1="    &lt;string name=&quot;motor&quot;>电机&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="54"
+            column="13"/>
     </issue>
 
 </issues>

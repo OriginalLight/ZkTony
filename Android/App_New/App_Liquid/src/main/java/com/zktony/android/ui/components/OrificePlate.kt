@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -26,7 +25,6 @@ import androidx.compose.ui.unit.dp
  * @date 2023/7/25 13:35
  */
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun OrificePlate(
     modifier: Modifier = Modifier,

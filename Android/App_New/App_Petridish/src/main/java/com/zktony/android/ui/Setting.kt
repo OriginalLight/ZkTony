@@ -73,6 +73,13 @@ fun Setting(
         }
     }
 
+    val isResetBool = rememberDataSaverState(key = "isResetBool", default = false)
+    var isResetBool_ex by remember { mutableStateOf(false) }
+
+    isResetBool.value = false
+    isResetBool_ex = false
+
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -320,7 +327,7 @@ fun OperationContent(
                 val painter = if (uiState.application == null) {
                     painterResource(id = R.drawable.ic_sync)
                 } else {
-                    if (uiState.application.version_code > BuildConfig.VERSION_CODE) {
+                    if (uiState.application.versionCode > BuildConfig.VERSION_CODE) {
                         painterResource(id = R.drawable.ic_new)
                     } else {
                         painterResource(id = R.drawable.ic_happy_cloud)
@@ -330,7 +337,7 @@ fun OperationContent(
                     stringResource(id = R.string.update)
                 } else {
                     if (uiState.progress == 0) {
-                        if (uiState.application.version_code > BuildConfig.VERSION_CODE) {
+                        if (uiState.application.versionCode > BuildConfig.VERSION_CODE) {
                             stringResource(id = R.string.update_available)
                         } else {
                             stringResource(id = R.string.already_latest)

@@ -1,5 +1,6 @@
 package com.zktony.android.data.dao
 
+import androidx.paging.PagingSource
 import androidx.room.*
 import com.zktony.android.data.entities.Program
 import kotlinx.coroutines.flow.Flow
@@ -12,15 +13,23 @@ import kotlinx.coroutines.flow.Flow
 abstract class ProgramDao : BaseDao<Program> {
     @Query(
         """
-        SELECT * FROM programs
-        ORDER BY create_time DESC
+        SELECT * FROM program
+        ORDER BY createTime DESC
         """
     )
     abstract fun getAll(): Flow<List<Program>>
 
     @Query(
         """
-        DELETE FROM programs
+        SELECT * FROM program
+        ORDER BY createTime DESC
+        """
+    )
+    abstract fun getByPage(): PagingSource<Int, Program>
+
+    @Query(
+        """
+        DELETE FROM program
         WHERE id = :id
         """
     )

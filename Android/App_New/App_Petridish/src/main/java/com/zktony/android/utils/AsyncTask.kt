@@ -53,8 +53,21 @@ class AsyncTask {
                 }
             } else {
                 val list = mutableListOf<Motor>()
-                for (i in 0..15) {
-                    list.add(Motor(text = "M$i", index = i))
+                for (i in 0..5) {
+                    if (i == 0) {
+                        list.add(Motor(text = "举升2", index = i))
+                    } else if (i == 1) {
+                        list.add(Motor(text = "举升1", index = i))
+                    } else if (i == 2) {
+                        list.add(Motor(text = "夹爪", index = i))
+                    } else if (i == 3) {
+                        list.add(Motor(text = "泵", index = i))
+                    } else if (i == 4) {
+                        list.add(Motor(text = "下盘", index = i))
+                    } else if (i == 5) {
+                        list.add(Motor(text = "上盘", index = i))
+                    }
+
                 }
                 md.insertAll(list)
             }

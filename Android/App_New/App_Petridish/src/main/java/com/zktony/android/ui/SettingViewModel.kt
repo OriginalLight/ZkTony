@@ -28,6 +28,7 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
     private val _application = MutableStateFlow<Application?>(null)
     private val _selected = MutableStateFlow(0L)
     private val _progress = MutableStateFlow(0)
+    private val _loading = MutableStateFlow(0)
     private val _page = MutableStateFlow(PageType.SETTINGS)
 
     val uiState = _uiState.asStateFlow()
@@ -60,11 +61,12 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
             launch {
                 httpCall {
                     _application.value =
-                        it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                        it.find { app -> app.applicationId == BuildConfig.APPLICATION_ID }
                 }
             }
         }
     }
+
 
     /**
      * Handles the specified setting event and updates the UI state accordingly.
@@ -128,18 +130,18 @@ class SettingViewModel constructor(private val dao: MotorDao) : ViewModel() {
                 val application = _application.value
                 if (application != null) {
                     // Check if a new version of the application is available for download
-                    if (application.version_code > BuildConfig.VERSION_CODE
-                        && application.download_url.isNotEmpty()
+                    if (application.versionCode > BuildConfig.VERSION_CODE
+                        && application.downloadUrl.isNotEmpty()
                         && _progress.value == 0
                     ) {
                         // Download the latest version of the application
-                        download(application.download_url)
+                        download(application.downloadUrl)
                         _progress.value = 1
                     }
                 } else {
                     // Get the latest application instance from the server
                     httpCall {
-                        it.find { app -> app.application_id == BuildConfig.APPLICATION_ID }
+                        it.find { app -> app.applicationId == BuildConfig.APPLICATION_ID }
                     }
                 }
             } else {
