@@ -2,27 +2,27 @@ package com.zktony.android.utils
 
 import com.zktony.android.utils.AppStateUtils.hpa
 import com.zktony.android.utils.AppStateUtils.hpg
-import com.zktony.android.utils.LogUtils.logE
 import com.zktony.android.utils.internal.ControlType
 import com.zktony.android.utils.internal.ExceptionPolicy
 import com.zktony.android.utils.internal.ExecuteType
 import com.zktony.android.utils.internal.GlueBuilder
 import com.zktony.android.utils.internal.StartBuilder
-import com.zktony.serialport.AbstractSerialHelper
+import com.zktony.serialport.abstractSerialHelperOf
 import com.zktony.serialport.command.Protocol
-import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.readInt8
 import com.zktony.serialport.ext.writeInt8
+import com.zktony.serialport.lifecycle.SerialStoreUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 
 object SerialPortUtils {
-    /**
-     * 串口通信
-     */
-    val serialHelper = object : AbstractSerialHelper(SerialConfig()) {
-        override fun callbackHandler(byteArray: ByteArray) {
-            Protocol.Protocol.callbackHandler(byteArray) { code, rx ->
+    fun with() {
+        // 初始化zkty串口
+        SerialStoreUtils.put("zkty", abstractSerialHelperOf {})
+
+        // rtu串口全局回调
+        SerialStoreUtils.get("zkty")?.callbackHandler = { bytes ->
+            Protocol.Protocol.callbackHandler(bytes) { code, rx ->
                 when (code) {
                     Protocol.RX_0X01 -> {
                         for (i in 0 until rx.data.size / 2) {
@@ -41,10 +41,6 @@ object SerialPortUtils {
                     }
                 }
             }
-        }
-
-        override fun exceptionHandler(e: Exception) {
-            logE(message = "Serial Exception: ${e.message}")
         }
     }
 
@@ -75,8 +71,8 @@ object SerialPortUtils {
     /**
      * 发送协议
      */
-    inline fun sendProtocol(block: Protocol.() -> Unit) =
-        serialHelper.sendByteArray(Protocol().apply(block).toByteArray())
+    suspend inline fun sendProtocol(block: Protocol.() -> Unit) =
+        SerialStoreUtils.get("zkty")?.sendByteArray(Protocol().apply(block).toByteArray())
 
     /**
      * 设置轴锁定状态
@@ -106,7 +102,7 @@ object SerialPortUtils {
     /**
      * 初始化下位机
      */
-    fun init() {
+    suspend fun init() {
         sendProtocol {
             func = ControlType.RESET
             data = byteArrayOf(0x00)
@@ -172,7 +168,7 @@ object SerialPortUtils {
     /**
      * 停止运动
      */
-    fun stop(ids: List<Int>) {
+    suspend fun stop(ids: List<Int>) {
         val byteArray = ByteArray(ids.size)
         ids.forEachIndexed { index, i ->
             byteArray.writeInt8(i, index)
@@ -185,12 +181,12 @@ object SerialPortUtils {
         }
     }
 
-    fun stop(vararg ids: Int) = stop(ids.toList())
+    suspend fun stop(vararg ids: Int) = stop(ids.toList())
 
     /**
      * 查询轴状态
      */
-    fun query(ids: List<Int>) {
+    suspend fun query(ids: List<Int>) {
         val byteArray = ByteArray(ids.size)
         ids.forEachIndexed { index, i ->
             byteArray.writeInt8(i, index)
@@ -203,12 +199,12 @@ object SerialPortUtils {
         }
     }
 
-    fun query(vararg ids: Int) = query(ids.toList())
+    suspend fun query(vararg ids: Int) = query(ids.toList())
 
     /**
      * 查询 GPIO 状态
      */
-    fun gpio(ids: List<Int>) {
+    suspend fun gpio(ids: List<Int>) {
         val byteArray = ByteArray(ids.size)
         ids.forEachIndexed { index, i ->
             byteArray.writeInt8(i, index)
@@ -221,12 +217,12 @@ object SerialPortUtils {
         }
     }
 
-    fun gpio(vararg ids: Int) = gpio(ids.toList())
+    suspend fun gpio(vararg ids: Int) = gpio(ids.toList())
 
     /**
      * 设置阀门状态
      */
-    fun valve(ids: List<Pair<Int, Int>>) {
+    suspend fun valve(ids: List<Pair<Int, Int>>) {
         val byteArray = ByteArray(ids.size * 2)
         ids.forEachIndexed { index, i ->
             byteArray.writeInt8(i.first, index * 2)
@@ -240,7 +236,7 @@ object SerialPortUtils {
         }
     }
 
-    fun valve(vararg ids: Pair<Int, Int>) = valve(ids.toList())
+    suspend fun valve(vararg ids: Pair<Int, Int>) = valve(ids.toList())
 
     /**
      * 制胶

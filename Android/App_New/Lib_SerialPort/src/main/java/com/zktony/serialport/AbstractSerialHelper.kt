@@ -4,6 +4,9 @@ import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.ext.ascii2ByteArray
 import com.zktony.serialport.ext.hex2ByteArray
+import com.zktony.serialport.lifecycle.Callback
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.withTimeout
 import java.io.IOException
 import java.security.InvalidParameterException
 
@@ -46,8 +49,26 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      *
      * @param bytes byte data
      */
-    fun sendByteArray(bytes: ByteArray) {
-        addByteArrayToQueue(bytes)
+    suspend fun sendByteArray(bytes: ByteArray, timeOut: Long = 1000L, callback: Callback? = null) {
+        if (callback == null) {
+            addByteArrayToQueue(bytes)
+        } else {
+            try {
+                withTimeout(timeOut) {
+                    var ref = ByteArray(0)
+                    callbackHandler = { ref = it }
+                    addByteArrayToQueue(bytes)
+                    while (ref.isEmpty()) {
+                        delay(10L)
+                    }
+                    callback.callback(ref)
+                }
+            } catch (ex: Exception) {
+                callback.exception(ex)
+            } finally {
+                callbackHandler = null
+            }
+        }
     }
 
     /**
@@ -55,8 +76,8 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      *
      * @param hex String
      */
-    fun sendHexString(hex: String) {
-        addByteArrayToQueue(hex.hex2ByteArray())
+    suspend fun sendHexString(hex: String, timeOut: Long = 1000L, callback: Callback? = null) {
+        sendByteArray(hex.hex2ByteArray(), timeOut, callback)
     }
 
     /**
@@ -64,13 +85,13 @@ abstract class AbstractSerialHelper(config: SerialConfig) : AbstractSerial() {
      *
      * @param ascii String
      */
-    fun sendAsciiString(ascii: String) {
-        addByteArrayToQueue(ascii.ascii2ByteArray(true))
+    suspend fun sendAsciiString(ascii: String, timeOut: Long = 1000L, callback: Callback? = null) {
+        sendByteArray(ascii.ascii2ByteArray(true), timeOut, callback)
     }
 
 
     companion object {
-        private const val TAG = "AbstractSerial"
+        private const val TAG = "AbstractSerialHelper"
     }
 
 }

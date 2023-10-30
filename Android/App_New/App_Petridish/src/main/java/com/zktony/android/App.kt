@@ -2,6 +2,7 @@ package com.zktony.android
 
 import android.app.Application
 import com.zktony.android.di.koinModule
+import com.zktony.android.utils.SerialPortUtils
 import com.zktony.android.utils.ext.Ext
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -21,6 +22,7 @@ class App : Application() {
 
         // Initialize the application context and data store factory
         Ext.with(this)
+        SerialPortUtils.with()
 
         // Initialize the dependency injection framework with the application context and modules
         startKoin {

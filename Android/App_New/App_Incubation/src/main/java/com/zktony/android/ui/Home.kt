@@ -170,10 +170,12 @@ fun HomeContent(
                         .clip(MaterialTheme.shapes.small)
                         .clickable {
                             scope.launch {
-                                if (entities.isNotEmpty()) {
-                                    uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
-                                } else {
-                                    navigationActions.navigate(Route.PROGRAM)
+                                if (!jobState.isRunning()) {
+                                    if (entities.isNotEmpty()) {
+                                        uiEvent(HomeUiEvent.NavTo(PageType.PROGRAM_LIST))
+                                    } else {
+                                        navigationActions.navigate(Route.PROGRAM)
+                                    }
                                 }
                             }
                         },

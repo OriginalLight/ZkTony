@@ -21,10 +21,4 @@ object AppStateUtils {
      * 校准函数
      */
     val hpc: MutableMap<Int, (Double) -> Double> = ConcurrentHashMap()
-
-    /**
-     * 温度
-     */
-    val hpt: MutableMap<Int, Double> = ConcurrentHashMap()
-
 }

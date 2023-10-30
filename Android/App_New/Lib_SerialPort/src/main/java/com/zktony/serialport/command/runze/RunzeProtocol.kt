@@ -126,7 +126,7 @@ class RunzeProtocol : BaseProtocol<RunzeProtocol> {
         // 处理数据包
         when (funcCode) {
             0x00.toByte() -> {
-                block(CHANNEL, this)
+                block(RX_0x00, this)
             }
 
             0x01.toByte() -> throw Exception("帧错误")
@@ -135,14 +135,18 @@ class RunzeProtocol : BaseProtocol<RunzeProtocol> {
             0x04.toByte() -> throw Exception("电机忙")
             0x05.toByte() -> throw Exception("电机堵转")
             0x06.toByte() -> throw Exception("未知位置")
-            0xFE.toByte() -> throw Exception("任务挂起")
+            0xFE.toByte() -> {
+                block(RX_0XFE, this)
+            }
+
             0xFF.toByte() -> throw Exception("未知错误")
             else -> {}
         }
     }
 
     companion object {
-        const val CHANNEL = 0
+        const val RX_0x00 = 0
+        const val RX_0XFE = 1
 
         // 单例 RunzeProtocol 协议 用于返回
         val Protocol: RunzeProtocol by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) { RunzeProtocol() }

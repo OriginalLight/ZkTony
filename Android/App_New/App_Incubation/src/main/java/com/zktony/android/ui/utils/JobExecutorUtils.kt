@@ -82,7 +82,7 @@ class JobExecutorUtils @Inject constructor(
         }
     }
 
-    val blocking: suspend (Int, Process) -> Unit = start@{ index, process ->
+    private suspend fun blocking(index: Int, process: Process) {
         // check
         try {
             verify(index, process)
@@ -95,7 +95,7 @@ class JobExecutorUtils @Inject constructor(
                     message = "${ex.message}"
                 )
             )
-            return@start
+            return
         }
 
         var state = hashMap[index]!!
@@ -138,7 +138,7 @@ class JobExecutorUtils @Inject constructor(
         )
     }
 
-    val primaryAntibody: suspend (Int, Process) -> Unit = start@{ index, process ->
+    private suspend fun primaryAntibody(index: Int, process: Process) {
         try {
             verify(index, process)
         } catch (ex: Exception) {
@@ -150,7 +150,7 @@ class JobExecutorUtils @Inject constructor(
                     message = "${ex.message}"
                 )
             )
-            return@start
+            return
         }
 
         var state = hashMap[index]!!
@@ -205,7 +205,7 @@ class JobExecutorUtils @Inject constructor(
         )
     }
 
-    val secondaryAntibody: suspend (Int, Process) -> Unit = start@{ index, process ->
+    private suspend fun secondaryAntibody(index: Int, process: Process) {
         try {
             verify(index, process)
         } catch (ex: Exception) {
@@ -217,7 +217,7 @@ class JobExecutorUtils @Inject constructor(
                     message = "${ex.message}"
                 )
             )
-            return@start
+            return
         }
 
         var state = hashMap[index]!!
@@ -262,7 +262,7 @@ class JobExecutorUtils @Inject constructor(
         )
     }
 
-    val washing: suspend (Int, Process) -> Unit = start@{ index, process ->
+    private suspend fun washing(index: Int, process: Process) {
         try {
             verify(index, process)
         } catch (ex: Exception) {
@@ -274,7 +274,7 @@ class JobExecutorUtils @Inject constructor(
                     message = "${ex.message}"
                 )
             )
-            return@start
+            return
         }
 
         var state = hashMap[index]!!
@@ -314,7 +314,7 @@ class JobExecutorUtils @Inject constructor(
         hashMap[index] = state
     }
 
-    val phosphateBufferedSaline: suspend (Int, Process) -> Unit = start@{ index, process ->
+    private suspend fun phosphateBufferedSaline(index: Int, process: Process) {
         try {
             verify(index, process)
         } catch (ex: Exception) {
@@ -326,7 +326,7 @@ class JobExecutorUtils @Inject constructor(
                     message = "${ex.message}"
                 )
             )
-            return@start
+            return
         }
 
         var state = hashMap[index]!!
@@ -434,6 +434,9 @@ data class JobState(
     val status: Int = 0,
     val time: Long = 0L
 ) {
+
+    fun isRunning() = status != RUNNING && status != FINISHED
+
     companion object {
         const val STOPPED = 0
         const val RUNNING = 1

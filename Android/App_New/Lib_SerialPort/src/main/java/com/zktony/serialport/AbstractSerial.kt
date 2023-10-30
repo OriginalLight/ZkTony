@@ -1,8 +1,14 @@
 package com.zktony.serialport
 
+import android.util.Log
 import com.zktony.serialport.config.SerialConfig
 import com.zktony.serialport.core.SerialPort
-import java.io.*
+import com.zktony.serialport.ext.toHexString
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.security.InvalidParameterException
 import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
@@ -18,20 +24,12 @@ abstract class AbstractSerial {
     private var outputStream: OutputStream? = null
     private var inputStream: InputStream? = null
     private var delay: Long = 10L
+    private var log: Boolean = false
     private var isOpen: Boolean = false
     private val buffer = ByteArrayOutputStream()
     private val byteArrayQueue = LinkedBlockingQueue<ByteArray>()
 
-    /**
-     * Callback handler
-     */
-    @Throws(Exception::class)
-    abstract fun callbackHandler(byteArray: ByteArray)
-
-    /**
-     * Exception handler
-     */
-    abstract fun exceptionHandler(e: Exception)
+    var callbackHandler: ((ByteArray) -> Unit)? = null
 
     /**
      * Open the serial port
@@ -39,6 +37,7 @@ abstract class AbstractSerial {
     @Throws(SecurityException::class, IOException::class, InvalidParameterException::class)
     fun open(config: SerialConfig) {
         delay = config.delay
+        log = config.log
         serialPort = SerialPort(
             device = File(config.device),
             baudRate = config.baudRate,
@@ -69,7 +68,7 @@ abstract class AbstractSerial {
             executor.shutdownNow()
             isOpen = false
         } catch (ex: IOException) {
-            exceptionHandler(ex)
+            ex.printStackTrace()
         }
     }
 
@@ -88,7 +87,7 @@ abstract class AbstractSerial {
             try {
                 outputStream?.write(bOutArray)
             } catch (ex: IOException) {
-                exceptionHandler(ex)
+                ex.printStackTrace()
             }
         }
     }
@@ -100,9 +99,12 @@ abstract class AbstractSerial {
         if (byteArray == null) {
             if (buffer.size() > 0) {
                 try {
-                    callbackHandler(buffer.toByteArray())
+                    callbackHandler?.let { it(buffer.toByteArray()) }
+                    if (log) {
+                        Log.i("SerialPort", "Receive: ${buffer.toByteArray().toHexString()}")
+                    }
                 } catch (ex: Exception) {
-                    exceptionHandler(ex)
+                    ex.printStackTrace()
                 } finally {
                     buffer.reset()
                 }
@@ -135,10 +137,10 @@ abstract class AbstractSerial {
                     try {
                         Thread.sleep(10L)
                     } catch (ex: InterruptedException) {
-                        exceptionHandler(ex)
+                        ex.printStackTrace()
                     }
                 } catch (ex: Exception) {
-                    exceptionHandler(ex)
+                    ex.printStackTrace()
                 }
             }
         }
@@ -154,9 +156,12 @@ abstract class AbstractSerial {
                     val message = byteArrayQueue.poll(delay, TimeUnit.MILLISECONDS)
                     if (message != null) {
                         send(message)
+                        if (log) {
+                            Log.i("SerialPort", "Send: ${message.toHexString()}")
+                        }
                     }
                 } catch (ex: Exception) {
-                    exceptionHandler(ex)
+                    ex.printStackTrace()
                 }
             }
         }

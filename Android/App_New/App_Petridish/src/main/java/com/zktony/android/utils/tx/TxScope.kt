@@ -6,11 +6,6 @@ import com.zktony.serialport.ext.writeInt32LE
 import com.zktony.serialport.ext.writeInt8
 
 /**
- * @author 刘贺贺
- * @date 2023/6/30 9:14
- */
-
-/**
  * TxDsl
  *
  * @property byteList MutableList<Byte>
@@ -70,7 +65,7 @@ class TxScope {
                 if (moveScope.index == 3) {
                     jyh = dataSaver.readData("jyh", 0f)
                     jyq = dataSaver.readData("jyq", 0f)
-                }else{
+                } else {
                     jyh = dataSaver.readData("jyh2", 0f)
                     jyq = dataSaver.readData("jyq2", 0f)
                 }

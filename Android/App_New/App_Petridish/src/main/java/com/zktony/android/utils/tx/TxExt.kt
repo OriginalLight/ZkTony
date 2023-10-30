@@ -1,15 +1,16 @@
 package com.zktony.android.utils.tx
 
+import com.zktony.android.utils.AppStateUtils
 import com.zktony.android.utils.AsyncTask
-import com.zktony.android.utils.SerialPortHelper
 import com.zktony.android.utils.ext.loge
 import com.zktony.serialport.command.Protocol
 import com.zktony.serialport.ext.toHexString
+import com.zktony.serialport.lifecycle.SerialStoreUtils
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withTimeout
 import java.util.concurrent.atomic.AtomicLong
 
-val serialPort: SerialPortHelper = SerialPortHelper.instance
+
 val asyncTask: AsyncTask = AsyncTask.instance
 
 /**
@@ -105,42 +106,12 @@ fun <T : Number> pulse(index: Int, dvp: T): Long {
 /**
  * 发送命令
  *
- * @param byteArray ByteArray
- * @return Unit
- */
-fun sendByteArray(byteArray: ByteArray) {
-    serialPort.sendByteArray(byteArray)
-}
-
-/**
- * 发送命令
- *
  * @param block [@kotlin.ExtensionFunctionType] Function1<Protocol, Unit>
  * @return Unit
  */
-fun sendProtocol(block: Protocol.() -> Unit) {
-    serialPort.sendByteArray(Protocol().apply(block).toByteArray())
+suspend fun sendProtocol(block: Protocol.() -> Unit) {
+    SerialStoreUtils.get("zkty")?.sendByteArray(Protocol().apply(block).toByteArray())
     Protocol().apply(block).toByteArray().toHexString().loge()
-}
-
-/**
- * 发送命令
- *
- * @param hex String
- * @return Unit
- */
-fun sendHexString(hex: String) {
-    serialPort.sendHexString(hex)
-}
-
-/**
- * 发送命令
- *
- * @param ascii String
- * @return Unit
- */
-fun sendAsciiString(ascii: String) {
-    serialPort.sendAsciiString(ascii)
 }
 
 /**
@@ -151,7 +122,7 @@ fun sendAsciiString(ascii: String) {
  */
 fun setLock(ids: List<Int>, isLock: Boolean = true) {
     ids.forEach {
-        serialPort.axis[it] = isLock
+        AppStateUtils.hpa[it] = isLock
     }
 }
 
@@ -163,7 +134,7 @@ fun setLock(ids: List<Int>, isLock: Boolean = true) {
  */
 fun setLock(vararg ids: Int, isLock: Boolean = true) {
     ids.forEach {
-        serialPort.axis[it] = isLock
+        AppStateUtils.hpa[it] = isLock
     }
 }
 
@@ -175,7 +146,7 @@ fun setLock(vararg ids: Int, isLock: Boolean = true) {
  */
 fun getLock(ids: List<Int>): Boolean {
     return ids.any {
-        serialPort.axis[it] == true
+        AppStateUtils.hpa[it] == true
     }
 }
 
@@ -186,7 +157,7 @@ fun getLock(ids: List<Int>): Boolean {
  * @return Boolean
  */
 fun getLock(vararg ids: Int): Boolean {
-    return ids.any { serialPort.axis[it] }
+    return ids.any { AppStateUtils.hpa[it] ?: false }
 }
 
 /**
@@ -195,7 +166,7 @@ fun getLock(vararg ids: Int): Boolean {
  * @param ids List<Int>
  * @return Boolean
  */
-fun getGpio(id: Int): Boolean = serialPort.gpio[id]
+fun getGpio(id: Int): Boolean = AppStateUtils.hpg[id] ?: false
 
 /**
  * 发送命令

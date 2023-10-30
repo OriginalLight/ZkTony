@@ -2,6 +2,7 @@ package com.zktony.android
 
 import android.app.Application
 import com.zktony.android.utils.ApplicationUtils
+import com.zktony.android.utils.SerialPortUtils
 import dagger.hilt.android.HiltAndroidApp
 
 /**
@@ -18,5 +19,6 @@ class App : Application() {
 
         // Initialize the application context
         ApplicationUtils.with(this)
+        SerialPortUtils.with()
     }
 }

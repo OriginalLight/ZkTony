@@ -113,7 +113,6 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
             is HomeEvent.Clean -> clean(event.index)
             is HomeEvent.Syringe -> syringe(event.index)
             is HomeEvent.Pipeline -> pipeline(event.index)
-            else -> {}
         }
     }
 

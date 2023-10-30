@@ -17,12 +17,13 @@ import com.zktony.android.ui.utils.JobExecutorUtils
 import com.zktony.android.ui.utils.JobState
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
-import com.zktony.android.utils.AppStateUtils.hpt
 import com.zktony.android.utils.Constants
 import com.zktony.android.utils.SerialPortUtils.readWithTemperature
 import com.zktony.android.utils.SerialPortUtils.readWithValve
 import com.zktony.android.utils.SerialPortUtils.writeRegister
 import com.zktony.android.utils.SerialPortUtils.writeWithTemperature
+import com.zktony.serialport.ext.toAsciiString
+import com.zktony.serialport.lifecycle.Callback
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -181,18 +182,35 @@ class HomeViewModel @Inject constructor(
             readWithValve(slaveAddr = it)
             delay(300L)
         }
-        val coll = dataStore.readData(Constants.ZT_0000, 0)
+        val coll = dataStore.readData(Constants.ZT_0000, 4)
         writeWithTemperature(0, dataStore.readData(Constants.ZT_0001, 4.0))
         delay(500L)
         repeat(coll) {
             writeWithTemperature(it + 1, 26.0)
             delay(500L)
         }
+        _stand.value = _stand.value.copy(insulation = List(coll + 1) { 0.0 })
         while (true) {
-            _stand.value = _stand.value.copy(insulation = hpt.values.toList())
-            delay(2000L)
+            delay(3000L)
             repeat(coll + 1) {
-                readWithTemperature(it)
+                readWithTemperature(it, object : Callback {
+                    override fun callback(byteArray: ByteArray) {
+                        val ascii = byteArray.toAsciiString()
+                        val address = ascii.substring(ascii.length - 2, ascii.length - 1).toInt()
+                        val data = ascii.replace("TC1:TCACTUALTEMP=", "").split("@")[0].format()
+                        _stand.value = _stand.value.copy(
+                            insulation = _stand.value.insulation.toMutableList().apply {
+                                this[address] = data.toDoubleOrNull() ?: 0.0
+                            })
+                    }
+
+                    override fun exception(ex: Exception) {
+                        _stand.value = _stand.value.copy(
+                            insulation = _stand.value.insulation.toMutableList().apply {
+                                this[it] = 0.0
+                            })
+                    }
+                })
                 delay(100L)
             }
         }
