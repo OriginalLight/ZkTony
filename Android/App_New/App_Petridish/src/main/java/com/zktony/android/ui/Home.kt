@@ -101,6 +101,13 @@ fun MenuContent(
 
 
     /**
+     * 加液体积2
+     */
+    val tiji2 = rememberDataSaverState(key = "tiji2", default = 0f)
+    var tiji_ex2 by remember { mutableStateOf(tiji2.value.format(1)) }
+
+
+    /**
      * 紫外状态-默认关闭
      * false关
      * true开
@@ -203,7 +210,32 @@ fun MenuContent(
                         tiji.value = it.toFloatOrNull() ?: 0f
                     }
                 },
-                label = { Text(text = "体积/μL") },
+                label = { Text(text = "体积1/μL") },
+                shape = MaterialTheme.shapes.medium,
+                textStyle = MaterialTheme.typography.bodyLarge,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Done,
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        keyboard?.hide()
+                    }
+                ),
+            )
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .width(140.dp)
+                    .padding(start = 20.dp, top = 10.dp),
+                value = tiji_ex2,
+                onValueChange = {
+                    scope.launch {
+                        tiji_ex2 = it
+                        tiji2.value = it.toFloatOrNull() ?: 0f
+                    }
+                },
+                label = { Text(text = "体积2/μL") },
                 shape = MaterialTheme.shapes.medium,
                 textStyle = MaterialTheme.typography.bodyLarge,
                 keyboardOptions = KeyboardOptions(
@@ -225,8 +257,6 @@ fun MenuContent(
                 onClick = {
                     if (isResetBool.value) {
                         if (tiji.value.toFloat() != 0f) {
-                            println("valveOne.value===" + valveOne.value)
-                            println("valveOne_ex===" + valveOne_ex)
                             if (uiState.loading == 0) {
                                 event(HomeEvent.Start(7))
                             } else {
@@ -244,7 +274,7 @@ fun MenuContent(
                             context,
                             "复位后再运动!",
                             Toast.LENGTH_SHORT
-                        ).show();
+                        ).show()
                     }
 
 
@@ -275,15 +305,23 @@ fun MenuContent(
 
                 enabled = uiState.loading == 0,
                 onClick = {
-                    if (spStartNum < 8) {
-                        if (valveOne.value == 7) {
-                            valveOne.value = 0
-                        } else {
-                            valveOne.value += 1
-                            valveOne_ex += 1
+                    if (isResetBool.value) {
+                        if (spStartNum < 8) {
+                            if (valveOne.value == 7) {
+                                valveOne.value = 0
+                            } else {
+                                valveOne.value += 1
+                                valveOne_ex += 1
+                            }
+                            spStartNum += 1
+                            event(HomeEvent.spStart(valveOne.value))
                         }
-                        spStartNum += 1
-                        event(HomeEvent.spStart(valveOne.value))
+                    } else {
+                        Toast.makeText(
+                            context,
+                            "复位后再运动!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
                 }
@@ -342,7 +380,7 @@ fun MenuContent(
                     .width(140.dp)
                     .padding(start = 20.dp, top = 10.dp),
 
-                enabled = uiState.loading == 0,
+                enabled = uiState.loading == 0 || uiState.loading == 7,
                 onClick = {
                     if (!uvState.value) {
                         uvState.value = true

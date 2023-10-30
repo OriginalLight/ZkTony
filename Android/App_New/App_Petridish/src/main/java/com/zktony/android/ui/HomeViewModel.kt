@@ -6,6 +6,7 @@ import com.zktony.android.data.dao.ProgramDao
 import com.zktony.android.data.entities.Program
 import com.zktony.android.ui.utils.PageType
 import com.zktony.android.ui.utils.UiFlags
+import com.zktony.android.utils.Constants
 import com.zktony.android.utils.ext.dataSaver
 import com.zktony.android.utils.tx.ExecuteType
 import com.zktony.android.utils.tx.MoveType
@@ -488,23 +489,12 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
 
 //    private fun start(int: Int) {
 //        viewModelScope.launch {
-//            tx {
+//            val shake = dataSaver.readData(Constants.SHAKE, false)
+//            println("shake===" + shake)
 //
-//                /**
-//                 * 加液
-//                 */
-//                move(MoveType.MOVE_DV) {
-//                    index = 3
-//                    dv = tiji
-//                }
-//            }
 //        }
 //    }
 
-    /**
-     * Starts the execution of the selected program entity.
-     */
-//
     private fun start(int: Int) {
         viewModelScope.launch {
             _loading.value = int
@@ -560,6 +550,14 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                 val skjl = dataSaver.readData("skjl", 0f);
 
                 val tiji = dataSaver.readData("tiji", 0f)
+
+                val tiji2 = dataSaver.readData("tiji2", 0f)
+
+                /**
+                 * 是否晃动
+                 * true=晃动
+                 */
+                val shake = dataSaver.readData(Constants.SHAKE, false)
 
                 /**
                  * 是否有培养皿运动过
@@ -1013,6 +1011,11 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                                 dv = tiji
                             }
 
+                            move(MoveType.MOVE_DV) {
+                                index = 8
+                                dv = tiji2
+                            }
+
                             /**
                              * 举升1举升到夹爪高度
                              */
@@ -1030,6 +1033,76 @@ class HomeViewModel constructor(private val dao: ProgramDao) : ViewModel() {
                             }
 
                         }
+
+                        if (shake) {
+                            /*晃动*/
+                            tx {
+                                /**
+                                 * 下盘移动一格
+                                 */
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 4
+                                    pulse = (xpydjl + xpkwjj + 100).toLong()
+                                    ads = Triple(100L, 100L, 100L)
+                                }
+                            }
+                            tx {
+                                /**
+                                 * 下盘移动一格
+                                 */
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 4
+                                    pulse = (xpydjl + xpkwjj).toLong()
+                                    ads = Triple(100L, 100L, 100L)
+                                }
+                            }
+                            tx {
+                                /**
+                                 * 下盘移动一格
+                                 */
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 4
+                                    pulse = (xpydjl + xpkwjj + 100).toLong()
+                                    ads = Triple(100L, 100L, 100L)
+                                }
+                            }
+
+                            tx {
+                                /**
+                                 * 下盘移动一格
+                                 */
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 4
+                                    pulse = (xpydjl + xpkwjj).toLong()
+                                    ads = Triple(100L, 100L, 100L)
+                                }
+                            }
+
+                            tx {
+                                /**
+                                 * 下盘移动一格
+                                 */
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 4
+                                    pulse = (xpydjl + xpkwjj + 100).toLong()
+                                    ads = Triple(100L, 100L, 100L)
+                                }
+                            }
+
+                            tx {
+                                /**
+                                 * 下盘移动一格
+                                 */
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 4
+                                    pulse = (xpydjl + xpkwjj).toLong()
+                                    ads = Triple(100L, 100L, 100L)
+                                }
+                            }
+                            /*晃动*/
+                        }
+
+
                         xpkwjj += 2599
                         _count.value += 1;
                         startState = 0;

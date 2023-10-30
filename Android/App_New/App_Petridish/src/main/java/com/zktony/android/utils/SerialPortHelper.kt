@@ -31,7 +31,7 @@ class SerialPortHelper : AbstractSerialHelper(
                     }
                 }
 
-                Protocol.Rx_0X02 -> {
+                Protocol.RX_0X02 -> {
                     for (i in 0 until rx.data.size / 2) {
                         val index = rx.data.readInt8(offset = i * 2)
                         val status = rx.data.readInt8(offset = i * 2 + 1)

@@ -65,13 +65,16 @@ class TxScope {
         when (type) {
             //按照校准数据运动
             MoveType.MOVE_DV -> {
-                val jyh = dataSaver.readData("jyh", 0f)
-                val jyq = dataSaver.readData("jyq", 0f)
+                var jyh = 0f
+                var jyq = 0f
+                if (moveScope.index == 3) {
+                    jyh = dataSaver.readData("jyh", 0f)
+                    jyq = dataSaver.readData("jyq", 0f)
+                }else{
+                    jyh = dataSaver.readData("jyh2", 0f)
+                    jyq = dataSaver.readData("jyq2", 0f)
+                }
                 val pulse = ((moveScope.dv / ((jyh - jyq) / 10 * 1000)) * 3200L).toLong()
-                println("moveScope.dv===" + moveScope.dv)
-                println("jyh===" + jyh)
-                println("jyq===" + jyq)
-                println("pulse===" + pulse)
                 if (pulse != 0L) {
                     val ba = ByteArray(5)
                     ba.writeInt8(moveScope.index, 0).writeInt32LE(pulse, 1)

@@ -255,6 +255,18 @@ fun CalibrationList(
     var jyh_ex by remember { mutableStateOf(jyh.value.format(4)) }
 
     /**
+     * 加液前2
+     */
+    val jyq2 = rememberDataSaverState(key = "jyq2", default = 0f)
+    var jyq_ex2 by remember { mutableStateOf(jyq2.value.format(4)) }
+
+    /**
+     * 加液后2
+     */
+    val jyh2 = rememberDataSaverState(key = "jyh2", default = 0f)
+    var jyh_ex2 by remember { mutableStateOf(jyh2.value.format(4)) }
+
+    /**
      * ui的坐标
      */
     val valveOne = rememberDataSaverState(key = "valveOne", default = 0)
@@ -1724,7 +1736,7 @@ fun CalibrationList(
 
             Row {
                 Text(
-                    text = "蠕动泵",
+                    text = "蠕动泵1",
                     fontSize = 30.sp
                 )
                 Button(
@@ -1733,6 +1745,29 @@ fun CalibrationList(
                             tx {
                                 move(MoveType.MOVE_PULSE) {
                                     index = 3
+                                    pulse = 32000L
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier.padding(start = 20.dp),
+                    shape = RoundedCornerShape(10.dp),
+                ) {
+                    Text("加    液")
+                }
+
+
+                Text(
+                    text = "蠕动泵2",
+                    fontSize = 30.sp,
+                    modifier = Modifier.padding(start = 20.dp),
+                )
+                Button(
+                    onClick = {
+                        scope.launch {
+                            tx {
+                                move(MoveType.MOVE_PULSE) {
+                                    index = 8
                                     pulse = 32000L
                                 }
                             }
@@ -1796,6 +1831,60 @@ fun CalibrationList(
                         }
                     ),
                 )
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .padding(start = 20.dp),
+                    value = jyq_ex2,
+                    onValueChange = {
+                        scope.launch {
+                            jyq_ex2 = it
+                            jyq2.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "加液前") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+
+
+                OutlinedTextField(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .padding(start = 20.dp),
+                    value = jyh_ex2,
+                    onValueChange = {
+                        scope.launch {
+                            jyh_ex2 = it
+                            jyh2.value = it.toFloatOrNull() ?: 0f
+                        }
+                    },
+                    label = { Text(text = "加液后") },
+                    shape = MaterialTheme.shapes.medium,
+                    textStyle = MaterialTheme.typography.bodyLarge,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            keyboard?.hide()
+                        }
+                    ),
+                )
+
+
             }
 
 

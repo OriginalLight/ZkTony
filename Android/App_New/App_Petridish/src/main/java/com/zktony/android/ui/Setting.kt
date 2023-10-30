@@ -158,6 +158,11 @@ fun SettingsContent(
         default = false
     )
 
+    var shake by rememberDataSaverState(
+        key = Constants.SHAKE,
+        default = false
+    )
+
     // Define the lazy column state and coroutine scope
     val lazyColumnState = rememberLazyListState()
     val scope = rememberCoroutineScope()
@@ -187,6 +192,22 @@ fun SettingsContent(
                         scope.launch {
                             navigation = it
                             event(SettingEvent.Navigation(it))
+                        }
+                    },
+                )
+            }
+        }
+        item {
+            SettingsCard(
+                image = R.drawable.ic_reset,
+                text = stringResource(id = R.string.shake),
+            ) {
+                Switch(
+                    modifier = Modifier.height(32.dp),
+                    checked = shake,
+                    onCheckedChange = {
+                        scope.launch {
+                            shake = it
                         }
                     },
                 )

@@ -15,9 +15,7 @@ import com.zktony.android.utils.ext.dataSaver
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore("dataStore")
 
-/**
- * The main activity of the application.
- */
+
 /**
  * 培养皿
  * 举升1是电机1
@@ -25,12 +23,12 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore("dataStore
  * 夹爪是电机2
  * 上盘是电机5
  * 下盘是电机4
- * 紫外线灯或者蠕动泵是3
+ * 紫外线灯是电磁阀5
+ * 蠕动泵1是3
  * 检测培养皿是否摆放正确7
  * 检测是否有培养皿6
  */
 
-//TODO 1.排液回吸没测；2运行是加液没测；3紫外没写
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

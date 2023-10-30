@@ -11,6 +11,7 @@
     <string name="language">语言</string>
     <string name="motor_config">电机参数</string>
     <string name="navigation">导航栏</string>
+    <string name="shake" translatable="false">晃动</string>
     <string name="parameters">系统参数</string>
     <string name="qrcode">微信扫码关注公众号</string>
     <string name="system_config">系统参数</string>
